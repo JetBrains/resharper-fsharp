@@ -12,66 +12,57 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
     inherit FSharpQuickFixBase()
     let errorRefPat = error.Pat.As<IReferencePat>()
     
-    let tryFindSigFile (topRefPat: ITopReferencePat) =
-        let containing = topRefPat.GetContainingTypeDeclaration()
-        let decls = containing.DeclaredElement.GetDeclarations()
+    let tryFindDeclarationFromSignature () =
+        let containingTypeDecl = errorRefPat.GetContainingTypeDeclaration()
+        let decls = containingTypeDecl.DeclaredElement.GetDeclarations()
         decls |> Seq.tryFind (fun d -> d.GetSourceFile().IsFSharpSignatureFile)
         
     let tryFindSigBindingSignature sigMembers =
-        sigMembers
-        |>  Seq.tryPick(fun m ->
-            let bindingSignature = m.As<IBindingSignature>()
-            match bindingSignature with
-            | null -> None
-            | _ ->
-                match error.Pat.Binding.HeadPattern with
-                | :? IReferencePat as implPat ->
+        let p = errorRefPat.Binding.HeadPattern.As<IFSharpPattern>()
+        if Seq.length p.Declarations = 1 then
+            let implDec = Seq.head p.Declarations
+            let declName = implDec.DeclaredName
+            sigMembers
+            |>  Seq.tryPick(fun m ->
+                let bindingSignature = m.As<IBindingSignature>()
+                match bindingSignature with
+                | null -> None
+                | _ ->
                     match bindingSignature.HeadPattern with
                     | :? IReferencePat as sigRefPat when
-                        implPat.DeclaredName = sigRefPat.DeclaredName -> Some bindingSignature
+                        declName = sigRefPat.DeclaredName -> Some bindingSignature
                     | _ -> None
-                | _ -> None
-            )
+                )
+        else
+            None
 
-    let isField =
-        let refExpr = error.Pat.Binding.Expression.As<IReferenceExpr>()
-        isNotNull refExpr && refExpr.Reference.GetFcsSymbol() :? FSharpField
-            
     let mutable sigRefPat = null
 
-    override x.Text = $"Update literal constant {error.Pat.Identifier.Name} in signature"
+    override x.Text = $"Update literal constant {errorRefPat.Identifier.Name} in signature"
 
     override x.IsAvailable _ =
         // Todo reuse/extend SignatureFixUtil
-        if isNotNull errorRefPat then
-            match tryFindSigFile error.Pat with
-            | Some sigFile ->
-                let sigMembers = sigFile.As<IModuleDeclaration>().Members
-                let sigBindingSignature = tryFindSigBindingSignature sigMembers
-                match sigBindingSignature with
-                | None -> false
-                | Some s ->
-                    match s.HeadPattern with
-                    | :? IReferencePat as sRefPat ->
-                        sigRefPat <- sRefPat
-                        
-                        if isField then
-                            let implSymbolUse = errorRefPat.GetFcsSymbolUse()
-                            let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-                            sRefPat.CheckerService.ResolveNameAtLocation(
-                                sRefPat, [ implMfv.ReturnParameter.Type.TypeDefinition.DisplayName ], false, null)
-                            |> Option.isSome
-                        elif error.Pat.Binding.Expression :? IReferenceExpr then
-                            let exprText = error.Pat.Binding.Expression.GetText()
-                            sRefPat.CheckerService.ResolveNameAtLocation(sRefPat, [ exprText ], false, null)
-                            |> Option.isSome
-                        else
-                            true
+        if isNull errorRefPat then false else
 
-                    | _ -> false
-            | _ -> false
-        else
-            false
+        match tryFindDeclarationFromSignature () with
+        | Some sigDecl ->
+            let sigMembers = sigDecl.As<IModuleDeclaration>().Members
+            let sigBindingSignature = tryFindSigBindingSignature sigMembers
+            match sigBindingSignature with
+            | None -> false
+            | Some s ->
+                match s.HeadPattern with
+                | :? IReferencePat as sRefPat ->
+                    sigRefPat <- sRefPat
+                    let refExpr = errorRefPat.Binding.Expression.As<IReferenceExpr>()
+                    if isNull refExpr then true else
+                    
+                    refExpr.Reference.ResolveWithFcs(sRefPat, System.String.Empty, false, refExpr.IsQualified)
+                    |> Option.isSome
+                
+                | _ -> false
+        
+        | _ -> false
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(sigRefPat.IsPhysical())
@@ -87,4 +78,4 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
             let typeUsage = factory.CreateTypeUsage(returnTypeString, TypeUsageContext.TopLevel)
             sigRefPat.Binding.ReturnTypeInfo.SetReturnType(typeUsage) |> ignore
 
-        sigRefPat.Binding.SetExpression(error.Pat.Binding.Expression.Copy()) |> ignore
+        sigRefPat.Binding.SetExpression(errorRefPat.Binding.Expression.Copy()) |> ignore
