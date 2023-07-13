@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -46,9 +47,10 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
     let mutable sigRefPat = null
 
     let rec isImplExprValidInSig (implExpression: IFSharpExpression) =
-        match implExpression with
+        match implExpression.IgnoreInnerParens() with
         | :? IReferenceExpr as refExpr ->
-            refExpr.Reference.ResolveWithFcs(sigRefPat, System.String.Empty, false, refExpr.IsQualified)
+            refExpr.Reference.ResolveWithFcs(
+                sigRefPat, $"{nameof UpdateLiteralConstantFix}.IsAvailable", true, true)
             |> Option.isSome
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
