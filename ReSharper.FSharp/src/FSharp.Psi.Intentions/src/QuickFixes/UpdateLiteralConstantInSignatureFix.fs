@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferError) =
+type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSignatureError) =
     inherit FSharpQuickFixBase()
     let errorRefPat = error.Pat.As<IReferencePat>()
     let implNeedsLiteralAttr =
