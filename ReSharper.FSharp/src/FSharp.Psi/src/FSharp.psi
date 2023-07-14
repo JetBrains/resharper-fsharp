@@ -539,7 +539,11 @@ unitExpr options { stubBase="UnitExpressionBase"; }:
   RPAREN<RPAREN, RParen>;
 
 literalExpr options { stubBase="FSharpExpressionBase"; }:
-  literalToken;
+  literalToken
+  typeMeasure<TYPE_MEASURE, TypeMeasure>?;
+
+typeMeasure:
+  fakeSeparator;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
