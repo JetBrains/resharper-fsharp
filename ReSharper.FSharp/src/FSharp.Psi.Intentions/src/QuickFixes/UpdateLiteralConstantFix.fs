@@ -54,7 +54,8 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
             |> Option.isSome
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
-        | _ -> true
+        | :? ILiteralExpr -> true
+        | _ -> false
 
     override x.Text =
         if implNeedsLiteralAttr then $"Add Literal attribute to constant {errorRefPat.Identifier.Name}"
