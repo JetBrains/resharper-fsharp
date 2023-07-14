@@ -801,11 +801,13 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         | SynExpr.Const(synConst, _) ->
             let mark = x.Mark(range)
+
             match synConst with
             | SynConst.Measure _ ->
                 x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LESS, expr.Range)
                 x.MarkAndDone(expr.Range, ElementType.TYPE_MEASURE)
             | _ -> ()
+
             x.Done(range, mark, x.GetConstElementType(synConst))
 
         | SynExpr.Typed(expr, synType, _) ->
