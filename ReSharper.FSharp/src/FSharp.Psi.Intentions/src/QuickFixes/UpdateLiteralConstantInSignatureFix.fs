@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
+type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferError) =
     inherit FSharpQuickFixBase()
     let errorRefPat = error.Pat.As<IReferencePat>()
     let implNeedsLiteralAttr =
@@ -50,7 +50,7 @@ type UpdateLiteralConstantFix(error: LiteralConstantValuesDifferError) =
         match implExpression.IgnoreInnerParens() with
         | :? IReferenceExpr as refExpr ->
             refExpr.Reference.ResolveWithFcs(
-                sigRefPat, $"{nameof UpdateLiteralConstantFix}.IsAvailable", true, true)
+                sigRefPat, $"{nameof UpdateLiteralConstantInSignatureFix}.IsAvailable", true, true)
             |> Option.isSome
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument

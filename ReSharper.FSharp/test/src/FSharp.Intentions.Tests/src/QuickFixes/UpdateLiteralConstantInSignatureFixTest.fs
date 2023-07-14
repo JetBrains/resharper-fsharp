@@ -6,10 +6,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type UpdateLiteralConstantFixTest() =
-    inherit FSharpQuickFixTestBase<UpdateLiteralConstantFix>()
+type UpdateLiteralConstantInSignatureFixTest() =
+    inherit FSharpQuickFixTestBase<UpdateLiteralConstantInSignatureFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/updateLiteralConstantValueToSignatureFix"
+    override x.RelativeTestDataPath = "features/quickFixes/updateLiteralConstantInSignatureFix"
 
     [<Test>] member x.``Update Literal Constant - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Update Literal Constant - 02`` () = x.DoNamedTestWithSignature()
