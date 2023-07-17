@@ -35,7 +35,7 @@ module FSharpQuickDoc =
         let column = int coords.Column
 
         let settingsStore = token.GetSettingsStoreWithEditorConfig()
-        let wrapLimit = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
+        let wrapLimit = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT) / 3
 
         Some(results.CheckResults.GetToolTip(line, column, lineText, tokenNames, FSharpTokenTag.Identifier, wrapLimit))
 
