@@ -319,6 +319,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | ValueNotContainedMutability ->
             if error.Message.EndsWith("The mutability attributes differ") then
                 createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
+            elif error.Message.EndsWith("The accessibility specified in the signature is more than that specified in the implementation") then
+                createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAccessibilityMoreError range error
             else
                 createGenericHighlighting error range
         
