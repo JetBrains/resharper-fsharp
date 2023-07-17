@@ -53,7 +53,7 @@ object Core31 {
     override val breakpointLine: Int = 8
 
     init {
-      addMute(Mute("No run configuration"), ::runConfiguration)
+      addMute(Mute("No run configuration"), XUnitProjectTemplateTestBase::runConfiguration)
       addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
     }
   }
