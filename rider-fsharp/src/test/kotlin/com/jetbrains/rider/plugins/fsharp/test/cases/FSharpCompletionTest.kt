@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
