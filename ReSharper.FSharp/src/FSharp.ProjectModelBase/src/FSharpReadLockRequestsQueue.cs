@@ -9,18 +9,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public class FSharpReadLockRequestsQueue
   {
     private readonly object mySyncObject = new();
-    private static readonly Queue<FSharpReadLockRequest> Queue = new();
+    private static readonly Queue<Action> Queue = new();
 
-    public void Enqueue(Action action, Func<bool> upToDateCheck = null)
+    public void Enqueue(Action action)
     {
       lock (mySyncObject)
       {
-        Queue.Enqueue(new FSharpReadLockRequest(action, upToDateCheck));
+        Queue.Enqueue(action);
         Monitor.Pulse(mySyncObject);
       }
     }
 
-    public bool TryDequeue(out FSharpReadLockRequest result)
+    public bool TryDequeue(out Action result)
     {
       lock (mySyncObject)
       {
@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     }
 
     [CanBeNull]
-    public FSharpReadLockRequest ExtractOrBlock(int timeout, Task fcsTask = null)
+    public Action ExtractOrBlock(int timeout, Task fcsTask = null)
     {
       lock (mySyncObject)
       {
@@ -51,15 +51,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     {
       lock (mySyncObject)
         Monitor.PulseAll(mySyncObject);
-    }
-  }
-
-  public record FSharpReadLockRequest([NotNull] Action Action, [CanBeNull] Func<bool> UpToDateCheck)
-  {
-    public void Invoke()
-    {
-      if (UpToDateCheck == null || UpToDateCheck.Invoke())
-        Action();
     }
   }
 }
