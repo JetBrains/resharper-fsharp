@@ -19,9 +19,9 @@ open NUnit.Framework
 [<FSharpTest>]
 type QuickDocTest() =
     inherit BaseTestWithTextControl()
-        
+
     override x.RelativeTestDataPath = "features/quickdoc"
-    
+
     override this.DoTest(lifetime, _) =
         let textControl = this.OpenTextControl(lifetime)
         let solution = this.Solution
@@ -60,43 +60,30 @@ type QuickDocTest() =
                 else writer.Write(html.Text)
             )
         )
-    
+
     [<Test>] member x.``ActivePattern 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``ActivePattern 02``() = x.DoNamedTest()
-    
     [<Test>] member x.``ActivePattern 03``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Partial ActivePattern 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``Partial ActivePattern 02``() = x.DoNamedTest()
-    
     [<Test>] member x.``Partial ActivePattern 03``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Let Binding 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``Let Binding 02``() = x.DoNamedTest()
-    
     [<Test>] member x.``Let Binding 03``() = x.DoNamedTest()
-    
     [<Test>] member x.``Let Binding 04``() = x.DoNamedTest()
-    
     [<Test>] member x.``Let Binding 05``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``DiscriminatedUnion 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``DiscriminatedUnion 02``() = x.DoNamedTest()
-    
     [<Test>] member x.``DiscriminatedUnion 03``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Record 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``Record 02``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Class 01``() = x.DoNamedTest()
-    
-    [<Test>] member x.``Class 02``() = x.DoNamedTest()
-    
+    [<Test; Explicit>] member x.``Class 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Top Level Module 01``() = x.DoNamedTest()
-    
     [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()

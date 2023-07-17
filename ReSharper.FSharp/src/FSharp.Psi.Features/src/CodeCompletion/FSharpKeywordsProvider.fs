@@ -151,7 +151,7 @@ module FSharpKeywordsProvider =
     let isAtConstTypePosition (context: FSharpCodeCompletionContext) =
         let treeNode = context.ReparsedContext.TreeNode
         isNotNull treeNode &&
-        
+
         let prevToken = treeNode.GetPreviousMeaningfulToken()
         let prevTokenType = getTokenType prevToken
         prevTokenType == FSharpTokenType.LESS || prevTokenType == FSharpTokenType.COMMA
@@ -339,6 +339,10 @@ type FSharpKeywordsProvider() =
 
                 collector.Add(item)
             ()
+
+        if isNotNull reference && isNotNull (OpenStatementNavigator.GetByReferenceName(reference.GetElement().As())) then
+            add true ["type", ""; "global", ""]
+            true else
 
         add false FSharpKeywordsProvider.alwaysSuggestedKeywords
         add true (FSharpKeywordsProvider.suggestKeywords context |> Seq.map (fun k -> k, ""))

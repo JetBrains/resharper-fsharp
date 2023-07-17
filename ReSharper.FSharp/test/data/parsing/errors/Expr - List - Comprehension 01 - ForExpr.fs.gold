@@ -6,23 +6,22 @@ IFSharpImplFile
         IListExpr
           FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IFromErrorExpr
-            IForExpr
-              FSharpTokenType+ForTokenElement(type:FOR, text:for)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ILocalDeclaration
-                FSharpIdentifierToken(type:IDENTIFIER, text:a)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ILiteralExpr
-                FSharpToken(type:INT32, text:1)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+ToTokenElement(type:TO, text:to)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ILiteralExpr
-                FSharpToken(type:INT32, text:10)
-              IFromErrorExpr
+          IForExpr
+            FSharpTokenType+ForTokenElement(type:FOR, text:for)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILocalDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpToken(type:INT32, text:1)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+ToTokenElement(type:TO, text:to)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpToken(type:INT32, text:10)
+            IFromErrorExpr
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

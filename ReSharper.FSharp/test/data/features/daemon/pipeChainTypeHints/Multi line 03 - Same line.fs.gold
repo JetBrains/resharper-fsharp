@@ -14,8 +14,8 @@ Set.toSeq||(4)
 (0): ReSharper Parameter Name Hint: : int list
 (1): ReSharper Parameter Name Hint: : int list
 (2): ReSharper Parameter Name Hint: : (int * int list) list
-(3): ReSharper Parameter Name Hint: : seq<int * int list>
-(4): ReSharper Parameter Name Hint: : seq<int * int list>
+(3): ReSharper Parameter Name Hint: : (int * int list) seq
+(4): ReSharper Parameter Name Hint: : (int * int list) seq
 (5): ReSharper Parameter Name Hint: : Set<int * int list>
 
 ================
@@ -35,8 +35,8 @@ Set.toSeq||(6)
 (0): ReSharper Parameter Name Hint: : int list
 (1): ReSharper Parameter Name Hint: : int list
 (2): ReSharper Parameter Name Hint: : (int * int list) list
-(3): ReSharper Parameter Name Hint: : seq<int * int list>
-(4): ReSharper Parameter Name Hint: : seq<int * int list>
+(3): ReSharper Parameter Name Hint: : (int * int list) seq
+(4): ReSharper Parameter Name Hint: : (int * int list) seq
 (5): ReSharper Parameter Name Hint: : Set<int * int list>
-(6): ReSharper Parameter Name Hint: : seq<int * int list>
+(6): ReSharper Parameter Name Hint: : (int * int list) seq
 (7): ReSharper Parameter Name Hint: : Set<int * int list>

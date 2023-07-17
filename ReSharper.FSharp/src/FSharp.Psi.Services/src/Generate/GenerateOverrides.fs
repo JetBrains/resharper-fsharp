@@ -66,7 +66,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
             if paramGroup.Count = 1 then
                 [ [ getValueParamNameAndType paramGroup[0] ] ]
             else
-                let accessorParams, valueParam = 
+                let accessorParams, valueParam =
                     paramGroup
                     |> List.ofSeq
                     |> List.splitAt (paramGroup.Count - 1)
@@ -96,7 +96,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
         if isPropertySetterMethod then true else
         if isPropertyGetterMethod && paramGroups.Count = 1 && paramGroups[0].Count = 0 then false else
 
-        not (mfv.IsCliEvent()) 
+        not (mfv.IsCliEvent())
 
     let paramGroups =
         if not generateParameters then [] else
@@ -141,7 +141,7 @@ let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
 let addEmptyLineBeforeIfNeeded (anchor: ITreeNode) =
     let addEmptyLine =
         not noEmptyLineAnchors[getTokenType anchor] &&
-        
+
         let anchor = getThisOrPreviousMeaningfulSibling anchor
         not ((anchor :? IOverridableMemberDeclaration) && anchor.IsSingleLine)
 
@@ -201,15 +201,15 @@ let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeDeclaration): ITreeN
     if canInsertAtNode selectedTreeNode then
         if isNull typeDecl || typeDecl.Contains(selectedTreeNode) then selectedTreeNode else
         typeDecl.FindLastTokenIn().GetPreviousMeaningfulToken(true)
-    else    
-    let objectTypeRepr = psiView.GetSelectedTreeNode<IObjectModelTypeRepresentation>()
-    if isNotNull objectTypeRepr then
-        getObjectTypeReprAnchor objectTypeRepr psiView else
+    else
+        let objectTypeRepr = psiView.GetSelectedTreeNode<IObjectModelTypeRepresentation>()
+        if isNotNull objectTypeRepr then
+            getObjectTypeReprAnchor objectTypeRepr psiView else
 
-    let typeRepresentation = psiView.GetSelectedTreeNode<ITypeRepresentation>()
-    if isNotNull typeRepresentation then typeRepresentation else
+        let typeRepresentation = psiView.GetSelectedTreeNode<ITypeRepresentation>()
+        if isNotNull typeRepresentation then typeRepresentation else
 
-    let selectedTreeNode = psiView.GetSelectedTreeNode()
-    selectedTreeNode.LeftSiblings()
-    |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
-    |> Option.defaultValue null
+        let selectedTreeNode = psiView.GetSelectedTreeNode()
+        selectedTreeNode.LeftSiblings()
+        |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
+        |> Option.defaultValue null

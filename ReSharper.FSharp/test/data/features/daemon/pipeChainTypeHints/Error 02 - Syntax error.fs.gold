@@ -4,4 +4,4 @@
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int list
-(1): ReSharper Parameter Name Hint: : (obj * int list) list
+(1): ReSharper Parameter Name Hint: : (int * int list) list

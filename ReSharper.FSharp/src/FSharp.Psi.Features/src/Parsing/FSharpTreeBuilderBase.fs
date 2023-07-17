@@ -495,7 +495,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         let paramMark = x.Mark(range)
 
         match pats with
-        | SynSimplePats.SimplePats([], _) ->
+        | SynSimplePats.SimplePats([], _, _) ->
             x.MarkAndDone(range, ElementType.UNIT_PAT)
             x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
@@ -504,10 +504,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         let parenPatMark = x.Mark()
 
         match pats with
-        | SynSimplePats.SimplePats([pat], _) ->
+        | SynSimplePats.SimplePats([pat], _, _) ->
             x.ProcessImplicitCtorParam(pat)
 
-        | SynSimplePats.SimplePats(headPat :: _ as pats, range) ->
+        | SynSimplePats.SimplePats(headPat :: _ as pats, _, range) ->
             let tupleMark = x.Mark(headPat.Range)
             for pat in pats do
                 x.ProcessImplicitCtorParam(pat)

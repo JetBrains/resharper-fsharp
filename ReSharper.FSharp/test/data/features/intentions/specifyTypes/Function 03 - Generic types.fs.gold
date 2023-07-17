@@ -1,4 +1,4 @@
 ﻿module Module
 
-let f{caret} (a: seq<string>): string = 
+let f{caret} (a: string seq): string = 
     String.concat ", " a

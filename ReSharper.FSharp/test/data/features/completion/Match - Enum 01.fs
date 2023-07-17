@@ -1,5 +1,5 @@
 // ${COMPLETE_ITEM:Match values}
-module Module =
+module Module
 
 type E =
     | A = 1

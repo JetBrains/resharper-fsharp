@@ -11,14 +11,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -153,14 +151,14 @@ type FSharpOverridableMembersProvider() =
 
         let addOverrides (memberInstance: OverridableMemberInstance) =
             for overridableMemberInstance in OverridableMemberImpl.GetImmediateOverride(memberInstance) do
-                let state = 
+                let state =
                     match memberInstance.Member with
                     | :? IProperty as prop ->
                         (if prop.IsReadable then PropertyOverrideState.Getter else PropertyOverrideState.None) |||
                         (if prop.IsReadable then PropertyOverrideState.Getter else PropertyOverrideState.None)
                     | _ -> PropertyOverrideState.None
 
-                let state = 
+                let state =
                     match alreadyOverriden.TryGetValue(overridableMemberInstance) with
                     | true, existingState -> existingState ||| state
                     | _ -> state
@@ -326,6 +324,7 @@ type FSharpOverridingMembersBuilder() =
             unionRepr.UnionCasesEnumerable
             |> Seq.tryHead
             |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
+
         | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
             let factory = typeDecl.CreateElementFactory()
             let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
@@ -334,6 +333,7 @@ type FSharpOverridingMembersBuilder() =
             let repr = typeDeclaration.TypeRepresentation
             let newRepr = typeDecl.SetTypeRepresentation(repr)
             if context.Anchor == abbrRepr then context.Anchor <- newRepr
+
         | _ -> ()
 
         let typeRepr = typeDecl.TypeRepresentation

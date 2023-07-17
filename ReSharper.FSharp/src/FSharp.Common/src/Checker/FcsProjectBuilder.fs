@@ -73,7 +73,6 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
            "--optimize-"
            "--tailcalls-"
            "--fullpaths"
-           "--flaterrors"
            "--highentropyva+"
            "--noconditionalerasure"
            "--ignorelinedirectives" |]

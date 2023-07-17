@@ -1,5 +1,6 @@
 module M
 
-do (ignore ();
-    (fun _ ->
-()) |> ignore)
+let _ =
+    do (ignore ();
+        (fun _ ->
+    ()) |> ignore)

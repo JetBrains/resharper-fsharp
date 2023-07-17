@@ -282,7 +282,7 @@ return
 return!
 round    ^T
 sbyte    sbyte
-seq    seq<'T>
+seq    'T seq
 set    Set<'T>
 sig
 sign    int

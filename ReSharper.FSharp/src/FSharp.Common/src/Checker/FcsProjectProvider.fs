@@ -252,7 +252,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         if isFSharpProjectModule psiModule then
                             let referencedFcsProject = fcsProjects[psiModule]
                             let path = referencedFcsProject.OutputPath.FullPath
-                            Some(FSharpReferencedProject.CreateFSharp(path, referencedFcsProject.ProjectOptions))
+                            Some(FSharpReferencedProject.FSharpReference(path, referencedFcsProject.ProjectOptions))
 
                         elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedModule psiModule then
                             match fcsAssemblyReaderShim.GetModuleReader(psiModule) with
@@ -267,7 +267,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                             let getTimestamp () = reader.Timestamp
                             let getReader () = reader :> ILModuleReader
 
-                            Some(FSharpReferencedProject.CreateFromILModuleReader(path, getTimestamp, getReader))
+                            Some(FSharpReferencedProject.ILModuleReference(path, getTimestamp, getReader))
 
                         else
                             None)

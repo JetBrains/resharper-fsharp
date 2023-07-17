@@ -380,7 +380,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         let memberParams =
             match memberParams with
-            | SynArgPats.Pats([SynPat.Tuple(_, patterns, _)]) -> SynArgPats.Pats(patterns)
+            | SynArgPats.Pats([SynPat.Tuple(_, patterns, _, _)]) -> SynArgPats.Pats(patterns)
             | _ -> memberParams
 
         x.ProcessPatternParams(memberParams, true, true)
@@ -512,7 +512,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     x.ProcessPat(pat, isLocal, false)
                 ElementType.ANDS_PAT
 
-            | SynPat.Tuple(_, pats, _) ->
+            | SynPat.Tuple(_, pats, _, _) ->
                 x.ProcessListLikePat(pats, isLocal)
                 ElementType.TUPLE_PAT
 

@@ -1,4 +1,4 @@
 ﻿let |d|(0) = dict
 
 ---------------------------------------------------------
-(0): CodeInsights: seq<'a * 'b> -> IDictionary<'a,'b>
+(0): CodeInsights: ('a * 'b) seq -> IDictionary<'a,'b>

@@ -1,12 +1,13 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    FSharpTokenType+IfTokenElement(type:IF, text:if)
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     IExpressionStatement
       IChameleonExpression
-        IFromErrorExpr
+        IIfThenElseExpr
+          FSharpTokenType+IfTokenElement(type:IF, text:if)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          IFromErrorExpr
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -79,8 +79,8 @@ IFSharpImplFile
                   IUnitExpr
                     FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                     FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
 

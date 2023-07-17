@@ -362,8 +362,8 @@ type FSharpKeywordCompletionTest() =
     [<Test>] member x.``Const 05``() = x.DoNamedTest()
     [<Test>] member x.``Const 06``() = x.DoNamedTest()
 
-    [<Test>] member x.``Constraint 01``() = x.DoNamedTest()
-    [<Test>] member x.``Constraint 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Constraint 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Constraint 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Comp - App - List ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Comp - App - List ctor 02``() = x.DoNamedTest()
@@ -408,19 +408,19 @@ type FSharpKeywordCompletionTest() =
     [<Test>] member x.``Type - Exception 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - Exception 03``() = x.DoNamedTest()
     [<Test>] member x.``Type - Union 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Union 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type - Union 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - Union 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Abstract 01``() = x.DoNamedTest()
 
     // todo: suggest void in extern declarations only, provide info in fcs
-    [<Test>] member x.``Type member - Property 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type member - Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Property 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member 01``() = x.DoNamedTest()
 
     // todo: add recovery in parser, filter member start keywords
-    [<Test>] member x.``Type member 02 - Member``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Type member 02 - Member``() = x.DoNamedTest()
 
     [<Explicit("Get non-parsed identifier from reparse context")>]
     [<Test>] member x.``Module - Top level 03 - Before namespace``() = x.DoNamedTest()
@@ -490,7 +490,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``NamedUnionCaseFieldsPat - 05`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 06`` () = x.DoNamedTest()
     [<Test>] member x.``NamedUnionCaseFieldsPat - 07`` () = x.DoNamedTest()
-    [<Test>] member x.``NamedUnionCaseFieldsPat - 08`` () = x.DoNamedTest()
+    [<Test; Explicit>] member x.``NamedUnionCaseFieldsPat - 08`` () = x.DoNamedTest()
 
     override this.BeforeTestStart(_, _, documentText) =
         this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")

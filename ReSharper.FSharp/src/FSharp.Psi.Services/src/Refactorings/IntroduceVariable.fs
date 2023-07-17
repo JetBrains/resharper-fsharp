@@ -456,8 +456,14 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let letBindings = ModificationUtil.AddChildBefore(ranges.ReplaceRange.First, letBindings)
 
                 let binding = letBindings.Bindings[0]
-                let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
-                let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
+                let nextSibling = binding.NextSibling
+
+                let replaced =
+                    if isNotNull nextSibling then
+                        let replaceRange = TreeRange(nextSibling, letBindings.LastChild)
+                        ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
+                    else
+                        ModificationUtil.AddChildRangeAfter(binding, ranges.InRange)
 
                 if isInSingleLineContext then
                     addNodesBefore replaced.First [

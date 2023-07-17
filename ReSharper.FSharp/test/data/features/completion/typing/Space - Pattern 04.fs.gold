@@ -276,6 +276,7 @@ Operators
 OptimizedClosures
 Option
 OptionalArgumentAttribute
+Primitives
 Printf
 PrintfFormat
 ProjectionParameterAttribute
@@ -297,6 +298,7 @@ StructuralComparisonAttribute
 StructuralEqualityAttribute
 StructuredFormatDisplayAttribute
 System
+Text
 Unchecked
 UnverifiableAttribute
 ValueOption
