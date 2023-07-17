@@ -1,8 +1,8 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
+import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension
 import com.jetbrains.rider.projectView.ProjectEntityView
-import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.solutionName
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
@@ -33,13 +33,13 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
       val targetFile = findFileView("Project", "TargetFile.fs")
 
       Assert.assertTrue(
-        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, ActionOrderType.None)
+        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, RdDndOrderType.None)
       )
       Assert.assertFalse(
-        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, ActionOrderType.Before)
+        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, RdDndOrderType.Before)
       )
       Assert.assertFalse(
-        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, ActionOrderType.After)
+        provider.allowPaste(listOf(compileFile, compileBeforeFile), targetFile, RdDndOrderType.After)
       )
     }
   }
@@ -59,48 +59,48 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
 
       // Compile case
       val compileFile = listOf(findFile("SourceProject", "CompileFile.fs"))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[0], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[0], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[1], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[1], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[2], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[2], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[3], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[3], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileFile, files[4], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[4], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[5], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileFile, files[5], ActionOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[0], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[0], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[1], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[1], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[2], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[2], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[3], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[3], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileFile, files[4], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[4], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[5], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileFile, files[5], RdDndOrderType.After))
 
       // CompileBefore case
       val compileBeforeFile = listOf(findFile("SourceProject", "CompileBeforeFile.fs"))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[0], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[0], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[1], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[1], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[2], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[2], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[3], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[3], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[4], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[4], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[5], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[5], ActionOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[0], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[0], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[1], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[1], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, files[2], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[2], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[3], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[3], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[4], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[4], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[5], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, files[5], RdDndOrderType.After))
 
       // CompileAfter
       val compileAfterFile = listOf(findFile("SourceProject", "CompileAfterFile.fs"))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[0], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[0], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[1], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[1], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[2], ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[2], ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[3], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[3], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[4], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[4], ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[5], ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[5], ActionOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[0], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[0], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[1], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[1], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[2], RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[2], RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, files[3], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[3], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[4], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[4], RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[5], RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, files[5], RdDndOrderType.After))
     }
   }
 
@@ -114,30 +114,30 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
 
       // Compile case
       val compileFile = listOf(findFile("SourceProject", "CompileFile.fs"))
-      Assert.assertFalse(provider.allowPaste(compileFile, folder1, ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileFile, folder1, ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileFile, rootFile, ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileFile, rootFile, ActionOrderType.After))
-      Assert.assertTrue(provider.allowPaste(compileFile, folder2, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileFile, folder2, ActionOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileFile, folder1, RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileFile, folder1, RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileFile, rootFile, RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileFile, rootFile, RdDndOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileFile, folder2, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileFile, folder2, RdDndOrderType.After))
 
       // CompileBefore case
       val compileBeforeFile = listOf(findFile("SourceProject", "CompileBeforeFile.fs"))
-      Assert.assertTrue(provider.allowPaste(compileBeforeFile, folder1, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder1, ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, rootFile, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, rootFile, ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder2, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder2, ActionOrderType.After))
+      Assert.assertTrue(provider.allowPaste(compileBeforeFile, folder1, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder1, RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, rootFile, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, rootFile, RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder2, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileBeforeFile, folder2, RdDndOrderType.After))
 
       // CompileAfter
       val compileAfterFile = listOf(findFile("SourceProject", "CompileAfterFile.fs"))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder1, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder1, ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, rootFile, ActionOrderType.Before))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, rootFile, ActionOrderType.After))
-      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder2, ActionOrderType.Before))
-      Assert.assertTrue(provider.allowPaste(compileAfterFile, folder2, ActionOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder1, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder1, RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, rootFile, RdDndOrderType.Before))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, rootFile, RdDndOrderType.After))
+      Assert.assertFalse(provider.allowPaste(compileAfterFile, folder2, RdDndOrderType.Before))
+      Assert.assertTrue(provider.allowPaste(compileAfterFile, folder2, RdDndOrderType.After))
     }
   }
 

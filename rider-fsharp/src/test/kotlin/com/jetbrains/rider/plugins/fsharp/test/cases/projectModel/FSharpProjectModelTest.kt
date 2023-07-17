@@ -1,5 +1,5 @@
+import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -16,7 +16,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   override fun getSolutionDirectoryName() = "EmptySolution"
   override val restoreNuGetPackages = true
 
-  private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: ActionOrderType? = null) {
+  private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: RdDndOrderType? = null) {
     // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
     waitBackend(project) {
       cutItem(project, from)
@@ -24,7 +24,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     }
   }
 
-  private fun moveItem(from: Array<String>, to: Array<String>, orderType: ActionOrderType? = null) {
+  private fun moveItem(from: Array<String>, to: Array<String>, orderType: RdDndOrderType? = null) {
     moveItem(arrayOf(from), to, orderType)
   }
 
@@ -72,13 +72,13 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
       ) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File3.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"), RdDndOrderType.Before
         )
       }
       dump2("3. Move file 'Folder(2)/File1.fs' before folder 'Folder(2)'", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File1.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"), RdDndOrderType.Before
         )
       }
       dump2("4. Move file 'File3.fs' and 'File1.fs' in folder 'Folder(2)/Sub(1)' before 'Class1.fs'", false, true) {
@@ -87,37 +87,37 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
             arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
             arrayOf("FSharpProjectTree", "ClassLibrary1", "File1.fs")
           ),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs"), RdDndOrderType.Before
         )
       }
       dump2("5. Move 'Folder/Sub/File3.fs' to project folder before EmptyFolder", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File3.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.Before
         )
       }
       dump2("6. Move 'Folder/Sub/File3.fs' to project folder after EmptyFolder", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), ActionOrderType.After
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.After
         )
       }
       dump2("7. Move file 'Class2.fs' in folder 'Folder(2)' before 'Sub(2)'", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2", "Class2.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2"), RdDndOrderType.Before
         )
       }
       dump2("8. Move file 'Folder(1)/File2.fs' before folder 'Folder(1)/File3.fs'", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File3.fs"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File3.fs"), RdDndOrderType.Before
         )
       }
       dump2("9. Move file 'Folder/File2.fs' before 'Folder(1)'", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), RdDndOrderType.Before
         )
       }
       dump2("10. Rename file 'File3.fs' to 'Foo.fs'", false, true) {
@@ -134,7 +134,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
       dump2("12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'", false, true) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1", "Foo.fs"),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), RdDndOrderType.Before
         )
       }
       dump2("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
@@ -143,7 +143,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
             arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
             arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs")
           ),
-          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1"), ActionOrderType.Before
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1"), RdDndOrderType.Before
         )
       }
     }

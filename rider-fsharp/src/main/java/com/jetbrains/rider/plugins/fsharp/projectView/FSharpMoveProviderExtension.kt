@@ -2,12 +2,12 @@ package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.virtualFile
+import com.jetbrains.rd.ide.model.RdDndOrderType
+import com.jetbrains.rd.ide.model.RdDndTargetType
 import com.jetbrains.rider.model.RdProjectFileDescriptor
 import com.jetbrains.rider.projectView.ProjectElementView
 import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
-import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
-import com.jetbrains.rider.projectView.moveProviders.impl.NodeOrderType
 import com.jetbrains.rider.projectView.nodes.*
 import com.jetbrains.rider.projectView.utils.compareProjectModelEntities
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
@@ -50,11 +50,11 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     return childrenEntities.sortedWith(comparator).toList()
   }
 
-  override fun supportOrdering(element: ProjectElementView): NodeOrderType {
+  override fun supportOrdering(element: ProjectElementView): RdDndTargetType {
     if (element is ProjectEntityView && isFSharpNode(element.entity)) {
-      if (element.entity.isProjectFile()) return NodeOrderType.BeforeAfter
-      if (element.entity.isProjectFolder()) return NodeOrderType.BeforeAfterInside
-      return NodeOrderType.None
+      if (element.entity.isProjectFile()) return RdDndTargetType.BeforeAfter
+      if (element.entity.isProjectFolder()) return RdDndTargetType.BeforeAfterInside
+      return RdDndTargetType.Default
     }
     return super.supportOrdering(element)
   }
@@ -62,12 +62,12 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
   override fun allowPaste(
     entities: Collection<ProjectModelEntity>,
     relativeTo: ProjectElementView,
-    orderType: ActionOrderType
+    orderType: RdDndOrderType
   ): Boolean {
     if (entities.any { it.isProjectFolder() && it.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" })
       return false
 
-    if (orderType == ActionOrderType.None) {
+    if (orderType == RdDndOrderType.None) {
       return super.allowPaste(entities, relativeTo, orderType)
     }
 
@@ -77,47 +77,47 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
 
       val relativeToEntity = relativeTo.entity
       when (orderType) {
-        ActionOrderType.Before -> {
+        RdDndOrderType.Before -> {
           when (nodesItemType) {
             FSharpItemType.Default -> {
-              if (relativeToEntity.isCompileBefore(ActionOrderType.Before))
+              if (relativeToEntity.isCompileBefore(RdDndOrderType.Before))
                 return false
-              if (relativeToEntity.prevSibling().isCompileAfter(ActionOrderType.After))
+              if (relativeToEntity.prevSibling().isCompileAfter(RdDndOrderType.After))
                 return false
               return true
             }
 
             FSharpItemType.CompileBefore ->
-              return relativeToEntity.isCompileBefore(ActionOrderType.Before) ||
-                relativeToEntity.prevSibling().isCompileBefore(ActionOrderType.After)
+              return relativeToEntity.isCompileBefore(RdDndOrderType.Before) ||
+                relativeToEntity.prevSibling().isCompileBefore(RdDndOrderType.After)
 
-            FSharpItemType.CompileAfter -> return relativeToEntity.isCompileAfter(ActionOrderType.Before)
+            FSharpItemType.CompileAfter -> return relativeToEntity.isCompileAfter(RdDndOrderType.Before)
             else -> {
             }
           }
         }
 
-        ActionOrderType.After -> {
+        RdDndOrderType.After -> {
           when (nodesItemType) {
             FSharpItemType.Default -> {
-              if (relativeToEntity.isCompileAfter(ActionOrderType.After))
+              if (relativeToEntity.isCompileAfter(RdDndOrderType.After))
                 return false
-              if (relativeToEntity.nextSibling().isCompileBefore(ActionOrderType.Before))
+              if (relativeToEntity.nextSibling().isCompileBefore(RdDndOrderType.Before))
                 return false
               return true
             }
 
-            FSharpItemType.CompileBefore -> return relativeToEntity.isCompileBefore(ActionOrderType.After)
+            FSharpItemType.CompileBefore -> return relativeToEntity.isCompileBefore(RdDndOrderType.After)
             FSharpItemType.CompileAfter ->
-              return relativeToEntity.isCompileAfter(ActionOrderType.After) ||
-                relativeToEntity.nextSibling().isCompileAfter(ActionOrderType.Before)
+              return relativeToEntity.isCompileAfter(RdDndOrderType.After) ||
+                relativeToEntity.nextSibling().isCompileAfter(RdDndOrderType.Before)
 
             else -> {
             }
           }
         }
 
-        ActionOrderType.None -> throw Exception()
+        RdDndOrderType.None -> throw Exception()
       }
 
     }
@@ -131,8 +131,8 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     for (node in entities) {
       if (node.isProjectFile()) {
         when {
-          node.isCompileBefore(ActionOrderType.None) -> compileBeforeFound = true
-          node.isCompileAfter(ActionOrderType.None) -> compileAfterFound = true
+          node.isCompileBefore(RdDndOrderType.None) -> compileBeforeFound = true
+          node.isCompileAfter(RdDndOrderType.None) -> compileAfterFound = true
           else -> other = true
         }
       }
@@ -169,7 +169,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
       application.isUnitTestMode // todo: workaround for dummy project?
   }
 
-  private fun ProjectModelEntity?.isCompileBefore(orderType: ActionOrderType): Boolean {
+  private fun ProjectModelEntity?.isCompileBefore(orderType: RdDndOrderType): Boolean {
     this ?: return false
     val descriptor = descriptor
     if (descriptor is RdProjectFileDescriptor) {
@@ -177,15 +177,15 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     }
     if (isProjectFolder()) {
       return when (orderType) {
-        ActionOrderType.Before -> getSortedChildren().firstOrNull()?.isCompileBefore(orderType) == true
-        ActionOrderType.After -> getSortedChildren().lastOrNull()?.isCompileBefore(orderType) == true
-        ActionOrderType.None -> false
+        RdDndOrderType.Before -> getSortedChildren().firstOrNull()?.isCompileBefore(orderType) == true
+        RdDndOrderType.After -> getSortedChildren().lastOrNull()?.isCompileBefore(orderType) == true
+        RdDndOrderType.None -> false
       }
     }
     return false
   }
 
-  private fun ProjectModelEntity?.isCompileAfter(orderType: ActionOrderType): Boolean {
+  private fun ProjectModelEntity?.isCompileAfter(orderType: RdDndOrderType): Boolean {
     this ?: return false
     val descriptor = descriptor
     if (descriptor is RdProjectFileDescriptor) {
@@ -193,9 +193,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     }
     if (isProjectFolder()) {
       return when (orderType) {
-        ActionOrderType.Before -> getSortedChildren().firstOrNull()?.isCompileAfter(orderType) == true
-        ActionOrderType.After -> getSortedChildren().lastOrNull()?.isCompileAfter(orderType) == true
-        ActionOrderType.None -> false
+        RdDndOrderType.Before -> getSortedChildren().firstOrNull()?.isCompileAfter(orderType) == true
+        RdDndOrderType.After -> getSortedChildren().lastOrNull()?.isCompileAfter(orderType) == true
+        RdDndOrderType.None -> false
       }
     }
     return false
