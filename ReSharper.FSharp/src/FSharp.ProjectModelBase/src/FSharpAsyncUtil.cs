@@ -9,6 +9,7 @@ using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Threading;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -31,32 +32,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     {
       // Try to acquire read lock on the current thread.
       // It should be possible, unless there's a write lock request that prevents it.
-      if (locks.TryExecuteWithReadLock(action))
-        return;
 
-      // Could not get a read lock. Queue a request to be processed by a thread calling FCS.
-      var tcs = new TaskCompletionSource<Unit>();
-      ReadRequests.Enqueue(() =>
+      try
       {
+        if (locks.TryExecuteWithReadLock(action))
+          return;
+      }
+      catch (Exception e) when (e.IsOperationCanceled())
+      {
+      }
+      catch (Exception e)
+      {
+        Logger.LogException(e);
+        throw;
+      }
+
+      // Could not finish task under a read lock. Queue a request to be processed by a thread calling FCS.
+      while (true)
+      {
+        var tcs = new TaskCompletionSource<Unit>();
+        ReadRequests.Enqueue(() =>
+        {
+          try
+          {
+            if (upToDateCheck == null || !upToDateCheck())
+              action();
+
+            tcs.SetResult(Unit.Instance);
+          }
+          catch (Exception e) when (e.IsOperationCanceled())
+          {
+            tcs.SetCanceled();
+            throw;
+          }
+          catch (Exception e)
+          {
+            tcs.SetException(e);
+          }
+        });
+
         try
         {
-          action();
-          tcs.SetResult(Unit.Instance);
+          tcs.Task.Wait();
+          break;
         }
-        catch (Exception e) when (!e.IsOperationCanceled())
+        catch (Exception e) when (e.IsOperationCanceled())
         {
-          tcs.SetException(e);
         }
-      }, () =>
-      {
-        if (upToDateCheck == null || upToDateCheck())
-          return true;
-
-        tcs.SetResult(Unit.Instance);
-        return false;
-      });
-
-      tcs.Task.Wait();
+        catch (Exception e)
+        {
+          Logger.LogException(e);
+        }
+      }
     }
 
     public static void ProcessEnqueuedReadRequests()
@@ -68,12 +95,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         {
           request.Invoke();
         }
-        catch (Exception e) when (e.IsOperationCanceled())
+        catch (Exception e)
         {
-          ReadRequests.Enqueue(request.Action, request.UpToDateCheck);
+          Interruption.Current.CheckAndThrow();
+
+          Logger.LogException("Unexpected exception", e);
           throw;
         }
-        Interruption.Current.CheckAndThrow();
       }
     }
 
