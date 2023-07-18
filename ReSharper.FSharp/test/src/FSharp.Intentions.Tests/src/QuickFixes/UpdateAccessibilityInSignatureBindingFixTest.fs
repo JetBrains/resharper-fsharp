@@ -5,10 +5,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type UpdateAccessibilityInSignatureFixTest() =
-    inherit FSharpQuickFixTestBase<UpdateAccessibilityInSignatureFix>()
+type UpdateAccessibilityInSignatureBindingFixTest() =
+    inherit FSharpQuickFixTestBase<UpdateAccessibilityInSignatureBindingFix>()
 
-    override x.RelativeTestDataPath = "features/quickFixes/updateAccessibilityInSignatureFix"
+    override x.RelativeTestDataPath = "features/quickFixes/updateAccessibilityInSignatureBindingFix"
 
     [<Test>] member x.``Binding - 01`` () = x.DoNamedTestWithSignature()
     [<Test>] member x.``Binding - 02`` () = x.DoNamedTestWithSignature()

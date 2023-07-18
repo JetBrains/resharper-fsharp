@@ -218,7 +218,7 @@
     <QuickFix>UpdateMutabilityInSignatureFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMore" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
+  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMoreInBinding" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
     <Parameter type="IExpressionReferenceName" name="referenceName"/>
     <Parameter type="string" name="fcsMessage"/>
     <Range>referenceName.GetNavigationRange()</Range>
@@ -226,7 +226,18 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>UpdateAccessibilityInSignatureFix</QuickFix>
+    <QuickFix>UpdateAccessibilityInSignatureBindingFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMoreInMember" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
+    <Parameter type="FSharpIdentifierToken" name="memberName"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Range>memberName.GetNavigationRange()</Range>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateAccessibilityInSignatureMemberFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">

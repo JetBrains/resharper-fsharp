@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 
-type UpdateAccessibilityInSignatureFix(error: ValueNotContainedMutabilityAccessibilityMoreError) =
+type UpdateAccessibilityInSignatureBindingFix(error: ValueNotContainedMutabilityAccessibilityMoreInBindingError) =
     inherit FSharpQuickFixBase()
 
     let tryFindBindingSignatureAccessRights (declaredElement: IFSharpMember) =
