@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 type UpdateAccessibilityInSignatureMemberFix(error: ValueNotContainedMutabilityAccessibilityMoreInMemberError) =
     inherit FSharpQuickFixBase()
 
-    let tryFindSignatureMemberAccessRights (memberDeclaration: IMemberDeclaration) =
+    let tryFindSignatureMemberAccessRights (memberDeclaration: IOverridableMemberDeclaration) =
         if isNull memberDeclaration.DeclaredElement then None else
         memberDeclaration.DeclaredElement.GetDeclarations()
         |> Seq.tryPick (function

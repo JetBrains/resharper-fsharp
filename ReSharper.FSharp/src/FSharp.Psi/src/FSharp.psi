@@ -1370,6 +1370,8 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
   STATIC<STATIC, StaticKeyword>?
   memberKeyword{MEMBER, MemberKeyword}
   VAL<VAL, ValKeyword>
+  MUTABLE<MUTABLE, MutableKeyword>?
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
