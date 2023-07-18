@@ -1,0 +1,3 @@
+﻿module A
+
+val inline private a: b: 't -> unit

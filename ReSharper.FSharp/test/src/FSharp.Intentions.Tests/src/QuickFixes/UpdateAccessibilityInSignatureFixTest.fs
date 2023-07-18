@@ -11,3 +11,6 @@ type UpdateAccessibilityInSignatureFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/updateAccessibilityInSignatureFix"
 
     [<Test>] member x.``Binding - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Binding - 02`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Binding - 03`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Binding - 04`` () = x.DoNamedTestWithSignature()

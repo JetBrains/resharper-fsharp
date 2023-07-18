@@ -29,14 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       // TODO: check for AccessRights.NONE
       if (AccessModifier == null)
       {
-        if (Attributes.IsEmpty && FirstChild != null)
-        {
-          ModificationUtil.AddChildBefore(FirstChild, ModifiersUtil.GetAccessNode(accessModifier));
-        }
-        else
-        {
-          ModificationUtil.AddChildAfter(Attributes.Last(), ModifiersUtil.GetAccessNode(accessModifier));
-        }
+        ModificationUtil.AddChildAfter(BindingKeyword, ModifiersUtil.GetAccessNode(accessModifier));
       }
       else
       {
