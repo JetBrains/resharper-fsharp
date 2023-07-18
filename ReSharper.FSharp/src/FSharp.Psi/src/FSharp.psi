@@ -150,9 +150,9 @@ bindingSignature extras {
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   VAL<VAL, BindingKeyword>
-  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   referencePat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   (
