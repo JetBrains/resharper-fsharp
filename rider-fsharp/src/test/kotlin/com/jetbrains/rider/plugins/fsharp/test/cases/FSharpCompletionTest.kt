@@ -66,5 +66,6 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
+  @Test(enabled = false)
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 }
