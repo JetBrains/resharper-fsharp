@@ -43,5 +43,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsStatic => StaticKeyword != null;
     public override bool IsVirtual => MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
     public override bool IsOverride => this.IsOverride();
+    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
   }
 }
