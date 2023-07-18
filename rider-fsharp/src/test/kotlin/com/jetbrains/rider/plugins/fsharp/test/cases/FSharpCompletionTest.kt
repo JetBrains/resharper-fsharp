@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
-import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -8,6 +7,7 @@ import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.waitForCompletion
+import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
