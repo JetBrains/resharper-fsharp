@@ -200,7 +200,14 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Const - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const - Unit 02 - Parens``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Const - Measure 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Divide 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Named 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - One 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Product 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Power 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Anon 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Paren 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Measure - Var 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
 

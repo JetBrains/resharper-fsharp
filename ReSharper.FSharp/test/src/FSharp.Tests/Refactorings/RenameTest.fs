@@ -106,6 +106,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Abbreviations 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Measure 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Attribute - Arg 01 - Record field``() = x.DoNamedTest()
     [<Test>] member x.``Attribute - Attribute type 01``() = x.DoNamedTest()
