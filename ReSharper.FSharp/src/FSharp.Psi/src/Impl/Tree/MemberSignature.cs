@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (AccessModifier == null)
       {
-        ModificationUtil.AddChildAfter(MemberKeyword, ModifiersUtil.GetAccessNode(accessModifier));
+        ModificationUtil.AddChildAfter(InlineKeyword ?? MemberKeyword, ModifiersUtil.GetAccessNode(accessModifier));
       }
       else
       {

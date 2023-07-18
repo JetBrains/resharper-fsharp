@@ -1317,6 +1317,7 @@ memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } e
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
   memberKeyword{MEMBER_KEYWORD, MemberKeyword}
+  INLINE<INLINE, InlineKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   identOrOpName{IDENTIFIER, Identifier}
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
