@@ -320,10 +320,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             if error.Message.EndsWith("The mutability attributes differ") then
                 createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
             elif error.Message.EndsWith("The accessibility specified in the signature is more than that specified in the implementation") then
-                let ref = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                let memberName = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                if isNotNull ref then ValueNotContainedMutabilityAccessibilityMoreInBindingError (ref, error.Message) :> _
-                elif isNotNull memberName then ValueNotContainedMutabilityAccessibilityMoreInMemberError (memberName, error.Message) :> _
+                let refHighlighting = createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAccessibilityMoreInBindingError range error
+                let memberHighlighting = createHighlightingFromParentNodeWithMessage ValueNotContainedMutabilityAccessibilityMoreInMemberError range error
+                if isNotNull refHighlighting then refHighlighting
+                elif isNotNull memberHighlighting then memberHighlighting
                 else createGenericHighlighting error range
             else
                 createGenericHighlighting error range

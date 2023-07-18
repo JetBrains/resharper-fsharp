@@ -230,9 +230,9 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMoreInMember" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
-    <Parameter type="FSharpIdentifierToken" name="memberName"/>
+    <Parameter type="IMemberDeclaration" name="memberDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>
-    <Range>memberName.GetNavigationRange()</Range>
+    <Range>memberDeclaration.GetNavigationRange()</Range>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>

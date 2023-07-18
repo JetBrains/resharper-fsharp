@@ -119,6 +119,7 @@
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateAccessibilityInSignatureBindingFixTest.fs" />
+    <Compile Include="src\QuickFixes\UpdateAccessibilityInSignatureMemberFixTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
 

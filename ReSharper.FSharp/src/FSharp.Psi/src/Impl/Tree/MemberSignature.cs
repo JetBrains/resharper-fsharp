@@ -2,6 +2,7 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -27,6 +28,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       this.CreateMemberDeclaredElement(fcsSymbol);
 
     public bool IsIndexer => this.IsIndexer();
+    public void SetAccessModifier(AccessRights accessModifier)
+    {
+      if (AccessModifier == null)
+      {
+        ModificationUtil.AddChildAfter(MemberKeyword, ModifiersUtil.GetAccessNode(accessModifier));
+      }
+      else
+      {
+        ModificationUtil.ReplaceChild(AccessModifier, ModifiersUtil.GetAccessNode(accessModifier));
+      }
+    }
 
     public override bool IsStatic => StaticKeyword != null;
     public override bool IsVirtual => MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;

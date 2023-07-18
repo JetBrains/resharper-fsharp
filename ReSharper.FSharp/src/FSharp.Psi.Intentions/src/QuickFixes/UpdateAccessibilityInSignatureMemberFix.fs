@@ -9,46 +9,27 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 type UpdateAccessibilityInSignatureMemberFix(error: ValueNotContainedMutabilityAccessibilityMoreInMemberError) =
     inherit FSharpQuickFixBase()
 
-    let tryFindBindingSignatureAccessRights (declaredElement: IFSharpMember) =
-        declaredElement.GetDeclarations()
+    let tryFindSignatureMemberAccessRights (memberDeclaration: IMemberDeclaration) =
+        if isNull memberDeclaration.DeclaredElement then None else
+        memberDeclaration.DeclaredElement.GetDeclarations()
         |> Seq.tryPick (function
-            | :? IReferencePat as pat when pat.IsFSharpSigFile() ->
-                match pat.DeclaredElement.As<IFSharpMember>() with
-                | null -> None
-                | sigMember ->
-                    let bindingSignature = BindingSignatureNavigator.GetByHeadPattern(pat)
-                    if isNull bindingSignature then
-                        None
-                    else
-                        Some (bindingSignature, sigMember.GetAccessRights())
-            | _ -> None
-        )
-
-    let tryFindImplementationBindingInfo (pat: ITopReferencePat) =
-        if isNull pat then None else
-
-        match pat.DeclaredElement.As<IFSharpMember>() with
-        | null -> None
-        | fsMember -> Some fsMember
-
+            | :? IMemberSignature as memberSig -> Some (memberSig, memberSig.GetAccessRights())
+            | _ -> None)
     let mutable implAccessRights = AccessRights.NONE
-    let mutable bindingSignature = null
+    let mutable memberSignature = null
 
-    override x.Text = $"Update accessibility for {error.MemberName.Name} in signature"
+    override x.Text = $"Update accessibility for {error.MemberDeclaration.Identifier.GetText()} in signature"
 
-    override x.IsAvailable _ = false
-        // let topPat = TopReferencePatNavigator.GetByReferenceName(error.ReferenceName)
-        // match tryFindImplementationBindingInfo topPat with
-        // | None -> false
-        // | Some implDeclaredElement ->
-        //     match tryFindBindingSignatureAccessRights implDeclaredElement with
-        //     | None -> false
-        //     | Some (bindingSig, sigAccessRights) ->
-        //         implAccessRights <- implDeclaredElement.GetAccessRights()
-        //         bindingSignature <- bindingSig
-        //         implAccessRights <> sigAccessRights
+    override x.IsAvailable _ =
+        if isNull error.MemberDeclaration then false else
+        implAccessRights <- error.MemberDeclaration.GetAccessRights()
+
+        match tryFindSignatureMemberAccessRights error.MemberDeclaration with
+        | None -> false
+        | Some (ms, sigAccessRights) ->
+            memberSignature <- ms
+            implAccessRights <> sigAccessRights
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(error.MemberName.IsPhysical())
-        ()
-        // bindingSignature.SetAccessModifier(implAccessRights)
+        use writeCookie = WriteLockCookie.Create(error.MemberDeclaration.IsPhysical())
+        memberSignature.SetAccessModifier(implAccessRights)
