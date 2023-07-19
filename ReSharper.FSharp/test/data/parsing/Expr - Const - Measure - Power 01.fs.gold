@@ -7,14 +7,13 @@ IFSharpImplFile
           FSharpToken(type:INT32, text:123)
           IUnitOfMeasureClause
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
-            ISeqMeasure
-              IPowerMeasure
-                INamedMeasure
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:kg)
-                FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-                FSharpToken(type:INT32, text:2)
+            IPowerMeasure
+              INamedMeasure
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:kg)
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+              FSharpToken(type:INT32, text:2)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

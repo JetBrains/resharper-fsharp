@@ -817,9 +817,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 | SynMeasure.One ->
                     () // handled in SynMeasure.Seq to have the range
                 | SynMeasure.Seq([SynMeasure.One], range) ->
-                    let seqMark = x.Mark(range)
                     x.MarkAndDone(range, ElementType.ONE_MEASURE)
-                    x.Done(range, seqMark, ElementType.SEQ_MEASURE)
+                | SynMeasure.Seq(measures = [synMeasure]) ->
+                    processMeasure synMeasure
                 | SynMeasure.Seq(synMeasures, range) ->
                     let seqMark = x.Mark(range)
                     synMeasures |> List.iter processMeasure
@@ -829,7 +829,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     processMeasure measure1
                     processMeasure measure2
                     x.Done(range, divMark, ElementType.DIVIDE_MEASURE)
-                | SynMeasure.Power(synMeasure, _synRationalConst, range) ->
+                | SynMeasure.Power(measure = synMeasure; range = range) ->
                     let powerMark = x.Mark(range)
                     processMeasure synMeasure
                     x.Done(range, powerMark, ElementType.POWER_MEASURE)

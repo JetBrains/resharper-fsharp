@@ -8,19 +8,17 @@ IFSharpImplFile
           IUnitOfMeasureClause
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
             IDivideMeasure
-              ISeqMeasure
-                INamedMeasure
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:kg)
+              INamedMeasure
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:kg)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ISeqMeasure
-                INamedMeasure
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:s)
+              INamedMeasure
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:s)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -7,9 +7,8 @@ IFSharpImplFile
           FSharpToken(type:INT32, text:123)
           IUnitOfMeasureClause
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
-            ISeqMeasure
-              IOneMeasure
-                FSharpToken(type:INT32, text:1)
+            IOneMeasure
+              FSharpToken(type:INT32, text:1)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

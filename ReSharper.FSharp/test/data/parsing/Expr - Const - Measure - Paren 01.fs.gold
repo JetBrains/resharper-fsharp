@@ -7,24 +7,21 @@ IFSharpImplFile
           FSharpToken(type:INT32, text:123)
           IUnitOfMeasureClause
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
-            ISeqMeasure
-              IParenMeasure
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                IProductMeasure
-                  ISeqMeasure
-                    INamedMeasure
-                      INamedTypeUsage
-                        ITypeReferenceName
-                          FSharpIdentifierToken(type:IDENTIFIER, text:kg)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  FSharpTokenType+StarTokenElement(type:STAR, text:*)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  ISeqMeasure
-                    INamedMeasure
-                      INamedTypeUsage
-                        ITypeReferenceName
-                          FSharpIdentifierToken(type:IDENTIFIER, text:m)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IParenMeasure
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IProductMeasure
+                INamedMeasure
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:kg)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                INamedMeasure
+                  INamedTypeUsage
+                    ITypeReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:m)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
