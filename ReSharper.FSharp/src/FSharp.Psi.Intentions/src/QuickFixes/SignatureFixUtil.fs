@@ -153,7 +153,7 @@ let tryFindBindingPairFromTopReferencePat (implTopRefPat: ITopReferencePat) =
             parentDeclarations
             |> Seq.tryPick (fun d ->
                 match d with
-                | :? INamedModuleDeclaration as signatureModule when signatureModule.IsFSharpSigFile() ->
+                | :? ITypeDeclaration as signatureModule when signatureModule.IsFSharpSigFile() ->
                     Some signatureModule
                 | _ -> None)
 
