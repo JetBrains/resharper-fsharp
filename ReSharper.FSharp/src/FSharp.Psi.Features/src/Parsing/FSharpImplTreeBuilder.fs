@@ -850,8 +850,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     let parenMark = x.Mark(range)
                     processMeasure synMeasure
                     x.Done(range, parenMark, ElementType.PAREN_MEASURE)
-                | SynMeasure.Var(_synTypar, range) ->
-                    x.MarkAndDone(range, ElementType.VAR_MEASURE)
+                | SynMeasure.Var(synTypar, range) ->
+                    let mark = x.Mark(range)
+                    x.ProcessTypeParameter(synTypar)
+                    x.Done(range, mark, ElementType.VAR_MEASURE)
 
             let mark = x.Mark(range)
 

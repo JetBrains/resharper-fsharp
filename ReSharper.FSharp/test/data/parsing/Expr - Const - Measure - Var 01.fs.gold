@@ -9,8 +9,10 @@ IFSharpImplFile
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
             ISeqMeasure
               IVarMeasure
-                FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-                FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                ITypeReferenceName
+                  ITypeParameterId
+                    FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                    FSharpIdentifierToken(type:IDENTIFIER, text:a)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
