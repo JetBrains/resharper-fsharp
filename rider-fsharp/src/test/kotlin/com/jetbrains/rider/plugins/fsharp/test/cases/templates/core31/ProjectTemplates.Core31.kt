@@ -6,6 +6,7 @@ import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBa
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.PlatformType
+import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplateIds
 import com.jetbrains.rider.test.scriptingApi.TemplateIdWithVersion
@@ -14,6 +15,7 @@ import com.jetbrains.rider.test.scriptingApi.TemplateIdWithVersion
 @Suppress("unused")
 @TestEnvironment(
   sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
+  buildTool = BuildTool.SDK,
   platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL]
 )
 object Core31 {
