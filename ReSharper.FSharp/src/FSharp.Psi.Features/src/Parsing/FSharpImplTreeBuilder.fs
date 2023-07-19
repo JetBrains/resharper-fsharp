@@ -861,7 +861,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 let typeMeasureMark = x.Mark(range)
                 processMeasure synMeasure
                 x.AdvanceTo(range.End)
-                x.Done(typeMeasureMark, ElementType.TYPE_MEASURE)
+                x.Done(typeMeasureMark, ElementType.UNIT_OF_MEASURE_CLAUSE)
             | _ -> ()
 
             x.Done(range, mark, x.GetConstElementType(synConst))

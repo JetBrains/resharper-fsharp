@@ -540,9 +540,14 @@ unitExpr options { stubBase="UnitExpressionBase"; }:
 
 literalExpr options { stubBase="FSharpExpressionBase"; }:
   literalToken
-  typeMeasure<TYPE_MEASURE, TypeMeasure>?;
+  unitOfMeasureClause<MEASURE, UnitOfMeasure>?;
 
-typeMeasure:
+unitOfMeasureClause:
+  LESS
+  unitOfMeasure<MEASURE, Measure>
+  GREATER;
+
+interface unitOfMeasure:
   namedMeasure |
   productMeasure |
   seqMeasure |
@@ -557,20 +562,20 @@ namedMeasure:
   typeUsage<TYPE_USAGE, TypeUsage>;
   
 productMeasure:
-  typeMeasure<MEASURE_1, Measure1>
+  unitOfMeasure<MEASURE_1, Measure1>
   STAR
-  typeMeasure<MEASURE_2, Measure2>;
+  unitOfMeasure<MEASURE_2, Measure2>;
     
 seqMeasure:
-  typeMeasure<MEASURE, Measures>*;
+  unitOfMeasure<MEASURE, Measures>*;
   
 divideMeasure:
-  typeMeasure<MEASURE_1, Measure1>
+  unitOfMeasure<MEASURE_1, Measure1>
   SYMBOLIC_OP
-  typeMeasure<MEASURE_2, Measure2>;
+  unitOfMeasure<MEASURE_2, Measure2>;
 
 powerMeasure:
-  typeMeasure<MEASURE, Measure>
+  unitOfMeasure<MEASURE, Measure>
   SYMBOLIC_OP
   literalToken;
 
@@ -585,7 +590,7 @@ varMeasure:
   
 parenMeasure:
   LPAREN<LPAREN, LParen>
-  typeMeasure<MEASURE, Measure>
+  unitOfMeasure<MEASURE, Measure>
   RPAREN<RPAREN, RParen>;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:

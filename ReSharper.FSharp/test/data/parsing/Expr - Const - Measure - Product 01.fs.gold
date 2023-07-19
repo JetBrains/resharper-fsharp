@@ -5,7 +5,7 @@ IFSharpImplFile
       IChameleonExpression
         ILiteralExpr
           FSharpToken(type:INT32, text:123)
-          ITypeMeasure
+          IUnitOfMeasureClause
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
             IProductMeasure
               ISeqMeasure
