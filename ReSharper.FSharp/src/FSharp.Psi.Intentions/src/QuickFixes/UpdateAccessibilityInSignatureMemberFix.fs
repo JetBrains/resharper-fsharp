@@ -1,8 +1,10 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type UpdateAccessibilityInSignatureMemberFix(error: ValueNotContainedMutabilityAccessibilityMoreInMemberError) =
@@ -14,15 +16,35 @@ type UpdateAccessibilityInSignatureMemberFix(error: ValueNotContainedMutabilityA
         |> Seq.tryPick (function
             | :? IMemberSignature as memberSig -> Some (memberSig, memberSig.GetAccessRights())
             | _ -> None)
-        
+
     let tryFindSignatureMemberInPropertyAccessRights (memberDeclaration: IMemberDeclaration) (accessorDeclaration:IAccessorDeclaration)  =
         if isNull memberDeclaration.DeclaredElement then None else
         let implAccessRights = accessorDeclaration.GetAccessRights()
-        memberDeclaration.DeclaredElement.GetDeclarations()
+
+        let allDeclarations : IDeclaration array = memberDeclaration.DeclaredElement.GetDeclarations() |> Seq.toArray
+        let allDeclarations =
+            if allDeclarations.Length > 1 then allDeclarations  else
+
+            // Search via the parent
+            let fm = memberDeclaration.DeclaredElement.As<IFSharpMember>()
+            if isNull fm then Array.empty else
+
+            fm.ContainingType.GetDeclarations()
+            |> Seq.tryPick (fun t ->
+                match t with
+                | :? IFSharpTypeDeclaration as td when td.IsFSharpSigFile() ->
+                    td.TypeMembers
+                    |> Seq.choose (function | :? IDeclaration as decl -> Some decl | _ -> None)
+                    |> Seq.toArray
+                    |> Some
+                | _ -> None)
+            |> Option.defaultValue Array.empty
+
+        allDeclarations
         |> Seq.tryPick (function
             | :? IMemberSignature as memberSig ->
                 memberSig.AccessorDeclarationsEnumerable
-                |> Seq.tryFind (fun ad -> ad.DeclaredName = accessorDeclaration.DeclaredName) 
+                |> Seq.tryFind (fun ad -> ad.DeclaredName = accessorDeclaration.DeclaredName)
                 |> Option.bind (fun _ ->
                     if implAccessRights <> memberSig.GetAccessRights() then
                         Some (memberSig, accessorDeclaration.DeclaredName, implAccessRights)
