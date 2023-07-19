@@ -1,0 +1,6 @@
+﻿module A
+
+type B =
+    new: unit -> B
+    member private Foo: int with get
+    member internal Foo: int with set

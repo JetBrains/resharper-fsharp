@@ -17,3 +17,4 @@ type UpdateAccessibilityInSignatureMemberFixTest() =
     [<Test>] member x.``AutoProperty - 01`` () = x.DoNamedTestWithSignature()
     
     [<Test>] member x.``Property - 01`` () = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Property - 02`` () = x.DoNamedTestWithSignature()

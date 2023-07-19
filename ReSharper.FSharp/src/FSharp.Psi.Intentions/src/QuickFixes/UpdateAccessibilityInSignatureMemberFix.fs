@@ -29,40 +29,32 @@ type UpdateAccessibilityInSignatureMemberFix(error: ValueNotContainedMutabilityA
                     else None)
             | _ -> None)
 
-    let mutable implAccessRights = AccessRights.NONE
-    let mutable memberSignature = null
+    let updatableSignatures : ResizeArray<IMemberSignature * AccessRights> = ResizeArray()
 
     override x.Text = $"Update accessibility for {error.MemberDeclaration.Identifier.GetText()} in signature"
 
     override x.IsAvailable _ =
         if isNull error.MemberDeclaration then false else
+        // If both the get and set of a property are reported, IsAvailable will be called twice.
+        if updatableSignatures.Count > 0 then true else
 
         match error.MemberDeclaration with
         | :? IMemberDeclaration as md when md.AccessorDeclarations.Count = 2 ->
             // property with get/set
-            let properties =
-                md.AccessorDeclarationsEnumerable
-                |> Seq.choose (fun ad -> tryFindSignatureMemberInPropertyAccessRights md ad)
-                |> Seq.toList
-
-            // TODO: check for scenario when more than one property has different access rights
-            
-            match properties with
-            | [ memberSig, _, implAccR ] ->
-                implAccessRights <- implAccR
-                memberSignature <- memberSig
-                true
-            | _ -> false
+            md.AccessorDeclarationsEnumerable
+            |> Seq.choose (tryFindSignatureMemberInPropertyAccessRights md)
+            |> Seq.iter (fun (memberSig, _declName, implAccR) -> updatableSignatures.Add (memberSig, implAccR))
         | _ ->
+            match tryFindSignatureMemberAccessRights error.MemberDeclaration with
+            | None -> ()
+            | Some (ms, sigAccessRights) ->
+                let implAccessRights = error.MemberDeclaration.GetAccessRights()
+                if implAccessRights <> sigAccessRights then
+                    updatableSignatures.Add (ms, implAccessRights)
 
-        implAccessRights <- error.MemberDeclaration.GetAccessRights()
-
-        match tryFindSignatureMemberAccessRights error.MemberDeclaration with
-        | None -> false
-        | Some (ms, sigAccessRights) ->
-            memberSignature <- ms
-            implAccessRights <> sigAccessRights
+        updatableSignatures.Count > 0
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.MemberDeclaration.IsPhysical())
-        memberSignature.SetAccessModifier(implAccessRights)
+        for memberSignature, implAccessRights in updatableSignatures do
+            memberSignature.SetAccessModifier(implAccessRights)
