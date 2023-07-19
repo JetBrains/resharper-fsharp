@@ -1,0 +1,20 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        ILiteralExpr
+          FSharpToken(type:INT32, text:123)
+          IUnitOfMeasureClause
+            FSharpTokenType+LessTokenElement(type:LESS, text:<)
+            IDivideMeasure
+              IOneMeasure
+                FSharpToken(type:INT32, text:1)
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
+              INamedMeasure
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:kg)
+            FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
