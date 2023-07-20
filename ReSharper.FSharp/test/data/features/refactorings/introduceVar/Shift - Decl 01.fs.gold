@@ -1,5 +1,5 @@
 ﻿Suggested names: identity, i
-let identity = 
+let identity =
   id
     1
 ignore identity

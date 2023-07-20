@@ -1,6 +1,6 @@
 ﻿Suggested names: identity, i
 do
-  let identity = 
+  let identity =
     id
       1
   ignore identity

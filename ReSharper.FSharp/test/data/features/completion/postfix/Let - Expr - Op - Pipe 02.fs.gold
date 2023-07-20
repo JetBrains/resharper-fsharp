@@ -2,6 +2,6 @@
 // ${OCCURRENCE:1 |> (+) 1}
 module Module
 
-let opAddition = 
+let opAddition =
   1
   |> (+) 1{caret}

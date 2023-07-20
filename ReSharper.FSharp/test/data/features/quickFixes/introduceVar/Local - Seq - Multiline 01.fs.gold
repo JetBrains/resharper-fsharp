@@ -1,5 +1,5 @@
 ﻿do
-    let {selstart}i{selend} = 
+    let {selstart}i{selend} =
       1 +
       1
     ()
