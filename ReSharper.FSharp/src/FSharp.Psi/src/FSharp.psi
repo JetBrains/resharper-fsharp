@@ -576,8 +576,7 @@ divideMeasure:
 
 powerMeasure:
   unitOfMeasure<MEASURE, Measure>
-  SYMBOLIC_OP
-  literalToken;
+  powerClause<POWER, Power>;
 
 oneMeasure:
   literalToken;
@@ -592,6 +591,26 @@ parenMeasure:
   LPAREN<LPAREN, LParen>
   unitOfMeasure<MEASURE, Measure>
   RPAREN<RPAREN, RParen>;
+
+powerClause:
+  SYMBOLIC_OP
+  rationalConst<RATIONAL_CONST, RationalConst>;
+
+rationalConst:
+  integerRat |
+  rationalRat |
+  negateRat;
+  
+integerRat:
+  literalToken;  
+
+rationalRat:
+  LPAREN<LPAREN, LeftParen>
+  literalToken
+  RPAREN<RPAREN, RightParen>;  
+
+negateRat:
+  rationalConst<RATIONAL_CONST, RationalConst>;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>

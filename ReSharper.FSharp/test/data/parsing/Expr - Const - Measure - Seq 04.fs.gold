@@ -25,11 +25,13 @@ IFSharpImplFile
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:kg)
                 FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpToken(type:INT32, text:3)
-                FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
-                FSharpToken(type:INT32, text:4)
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                IRationalConst
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  IRationalRat
+                    FSharpToken(type:INT32, text:3)
+                    FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
+                    FSharpToken(type:INT32, text:4)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

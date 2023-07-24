@@ -33,6 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_LITERAL_PAT = "";
     public const string IDS_CONST_PAT = "";
     public const string IDS_TYPE_MEASURE = "";
+    public const string IDS_RATIONAL_CONST = "";
     public const string IDS_F_SHARP_IDENTIFIER = "";
     public const string IDS_REFERENCE_NAME_OWNER_PAT = "";
     public const string IDS_REFERENCE_PAT = "";

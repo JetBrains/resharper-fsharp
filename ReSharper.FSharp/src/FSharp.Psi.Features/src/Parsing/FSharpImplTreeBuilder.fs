@@ -800,6 +800,39 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)
 
         | SynExpr.Const(synConst, _) ->
+            
+            let getSynMeasureRange (synMeasure: SynMeasure) =
+                match synMeasure with
+                | SynMeasure.Named(range = range)
+                | SynMeasure.Anon range
+                | SynMeasure.Product(range = range)
+                | SynMeasure.Seq([SynMeasure.One], range)
+                | SynMeasure.Seq(range = range)
+                | SynMeasure.Divide(range = range)
+                | SynMeasure.Power(range = range)
+                | SynMeasure.Var(range = range)
+                | SynMeasure.Paren(range = range) -> range
+                | SynMeasure.One -> failwith "should not be reached"
+            
+            let processRatio (ratio: SynRationalConst) overallRange =
+                
+                let rec processRatConstCase (ratio: SynRationalConst) =
+                    match ratio with
+                    | SynRationalConst.Integer _value ->
+                        let m = x.Mark()
+                        x.MarkAndDone(overallRange, ElementType.LITERAL_EXPR)
+                        x.Done(overallRange, m, ElementType.INTEGER_RAT)
+                    | SynRationalConst.Negate ratConst ->
+                        let m = x.Mark()
+                        processRatConstCase ratConst
+                        x.Done(overallRange, m, ElementType.NEGATE_RAT)
+                    | SynRationalConst.Rational(range = range) ->
+                        x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LPAREN, range)
+                        x.MarkAndDone(range, ElementType.RATIONAL_RAT)
+
+                let ratConstMark = x.Mark()
+                processRatConstCase ratio
+                x.Done(overallRange, ratConstMark, ElementType.RATIONAL_CONST)
 
             let rec processMeasure (synMeasure: SynMeasure) =
                 match synMeasure with
@@ -829,9 +862,16 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     processMeasure measure1
                     processMeasure measure2
                     x.Done(range, divMark, ElementType.DIVIDE_MEASURE)
-                | SynMeasure.Power(measure = synMeasure; range = range) ->
+                | SynMeasure.Power(measure = synMeasure; power = ratio; range = range) ->
                     let powerMark = x.Mark(range)
                     processMeasure synMeasure
+                    
+                    let measureRange = getSynMeasureRange synMeasure
+                    let ratioRange = Range.mkRange range.FileName measureRange.End range.End
+                    x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, ratioRange) // advance to ^ or ^-
+                    x.AdvanceLexer() // advanve beyond ^ or ^-
+                    processRatio ratio ratioRange
+                    
                     x.Done(range, powerMark, ElementType.POWER_MEASURE)
                 | SynMeasure.Anon range ->
                     // horrible workaround for a bug in FCS:

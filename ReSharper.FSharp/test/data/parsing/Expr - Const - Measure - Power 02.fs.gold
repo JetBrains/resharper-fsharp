@@ -12,11 +12,12 @@ IFSharpImplFile
                 INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:kg)
-              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^-)
               IRationalConst
-                IIntegerRat
-                  ILiteralExpr
-                    FSharpToken(type:INT32, text:2)
+                INegateRat
+                  IIntegerRat
+                    ILiteralExpr
+                      FSharpToken(type:INT32, text:2)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
