@@ -79,8 +79,8 @@ type ScriptPsiModulesTest() =
 
 
 [<SolutionInstanceComponent>]
-type MyTestSolutionToolset(lifetime: Lifetime, logger: ILogger) =
-    inherit DefaultSolutionToolset(lifetime, logger)
+type MyTestSolutionToolset(lifetime: Lifetime, settings, logger: ILogger) =
+    inherit DefaultSolutionToolset(lifetime, settings, logger)
 
     let changed = new Signal<_>("MySolutionToolset::Changed")
 
