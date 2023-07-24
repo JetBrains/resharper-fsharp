@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.HabitatDetector
+open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Diagnostic
 open JetBrains.ProjectModel.ProjectsHost.Impl
@@ -15,9 +16,12 @@ open JetBrains.Util
 [<ShellComponent>]
 type FSharpProjectLoadTargetsAnalyzer() =
      interface IMsBuildProjectLoadDiagnosticProvider with
-         member x.CollectDiagnostic(projectMark, _, result) =
-             match result.FatalError with
-             | error when isNotNull error && error.PresentableText.Contains("Microsoft.FSharp.Targets") ->
+         member x.CollectDiagnostic(projectMark, project) =
+             let fatalError = project.FatalError
+             if isNull fatalError then [||] else
+
+             match fatalError.Message with
+             | :? RdMsBuildUserMessage as message when message.PresentableText.Contains("Microsoft.FSharp.Targets") ->
                  [| FSharpTargetsDiagnosticMessage(projectMark) :> ProjectLoadDiagnostic |] :> _
              | _ -> EmptyArray.Instance :> _
 
@@ -42,7 +46,7 @@ and FSharpTargetsDiagnosticMessage(projectMark, message) =
 [<ShellComponent>]
 type FSharpProjectTypeGuidAnalyzer() =
     interface IMsBuildProjectLoadDiagnosticProvider with
-        member x.CollectDiagnostic(projectMark, _, _) =
+        member x.CollectDiagnostic(projectMark, _) =
             // Don't check guid when opening a single project or directory, i.e. not a solution file.
             if projectMark :? VirtualProjectMark then EmptyArray.Instance :> _ else
 
