@@ -1,0 +1,234 @@
+﻿# 231 ITEMS #
+
+AutoOpenAttribute
+Choice1Of2    Choice<'T1,'T2>
+Choice1Of3    Choice<'T1,'T2,'T3>
+Choice1Of4    Choice<'T1,'T2,'T3,'T4>
+Choice1Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice1Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice1Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice2Of2    Choice<'T1,'T2>
+Choice2Of3    Choice<'T1,'T2,'T3>
+Choice2Of4    Choice<'T1,'T2,'T3,'T4>
+Choice2Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice2Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice2Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice3Of3    Choice<'T1,'T2,'T3>
+Choice3Of4    Choice<'T1,'T2,'T3,'T4>
+Choice3Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice3Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice3Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice4Of4    Choice<'T1,'T2,'T3,'T4>
+Choice4Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice4Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice4Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice5Of5    Choice<'T1,'T2,'T3,'T4,'T5>
+Choice5Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice5Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice6Of6    Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+Choice6Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+Choice7Of7    Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+ComparisonConditionalOnAttribute
+CustomOperationAttribute
+EqualityConditionalOnAttribute
+ExtraTopLevelOperators
+Observable
+Ok    Result<'T,'TError>
+OperatorIntrinsics
+Operators
+OptimizedClosures
+Option
+OptionalArgumentAttribute
+ValueOption
+invalidOp    'T
+obj
+option
++ or
+outref
++ override
+readOnlyDict    IReadOnlyDictionary<'Key,'Value>
+---- FULL EVALUATION ----
+AnonymousObject (in Microsoft.FSharp.Linq.RuntimeHelpers)
+AppDomainManagerInitializationOptions (in System)
+ArgumentOutOfRangeException (in System)
+ArrayWithOffset (in System.Runtime.InteropServices)
+AsyncOperation (in System.ComponentModel)
+AsyncOperationManager (in System.ComponentModel)
+AutoOpenAttribute (in Microsoft.FSharp.Core)
+BIND_OPTS (in System.Runtime.InteropServices)
+BIND_OPTS (in System.Runtime.InteropServices.ComTypes)
+Base64FormattingOptions (in System)
+BaseChannelObjectWithProperties (in System.Runtime.Remoting.Channels)
+BypassOnLocalValues (in System.Net.Configuration.ProxyElement)
+ClientWebSocketOptions (in System.Net.WebSockets)
+CodeBinaryOperatorExpression (in System.CodeDom)
+CodeBinaryOperatorType (in System.CodeDom)
+CodeGeneratorOptions (in System.CodeDom.Compiler)
+CodeObject (in System.CodeDom)
+CodeObjectCreateExpression (in System.CodeDom)
+CodeTypeOfExpression (in System.CodeDom)
+CodeTypeReferenceOptions (in System.CodeDom)
+CommonObjectSecurity (in System.Security.AccessControl)
+CompareOptions (in System.Globalization)
+ComparisonConditionalOnAttribute (in Microsoft.FSharp.Core)
+CompilerMarshalOverride (in System.Runtime.CompilerServices)
+ComponentGuaranteesOptions (in System.Runtime.Versioning)
+ContextBoundObject (in System)
+ContractOptionAttribute (in System.Diagnostics.Contracts)
+CriticalFinalizerObject (in System.Runtime.ConstrainedExecution)
+CriticalHandleMinusOneIsInvalid (in Microsoft.Win32.SafeHandles)
+CriticalHandleZeroOrMinusOneIsInvalid (in Microsoft.Win32.SafeHandles)
+CryptographicUnexpectedOperationException (in System.Security.Cryptography)
+CustomOperationAttribute (in Microsoft.FSharp.Core)
+DataObjectAttribute (in System.ComponentModel)
+DataObjectFieldAttribute (in System.ComponentModel)
+DataObjectMethodAttribute (in System.ComponentModel)
+DataObjectMethodType (in System.ComponentModel)
+DateTimeOffset (in System)
+DateTimeOffsetConverter (in System.ComponentModel)
+DayOfWeek (in System)
+DeliveryNotificationOptions (in System.Net.Mail)
+DesignOnlyAttribute (in System.ComponentModel)
+DesignerOptionCollection (in System.ComponentModel.Design.DesignerOptionService)
+DesignerOptionService (in System.ComponentModel.Design)
+DirectoryObjectSecurity (in System.Security.AccessControl)
+DuplicateWaitObjectException (in System)
+EndOfStreamException (in System.IO)
+EnumerablePartitionerOptions (in System.Collections.Concurrent)
+EqualityConditionalOnAttribute (in Microsoft.FSharp.Core)
+EventOpcode (in System.Diagnostics.Tracing)
+ExceptionHandlingClauseOptions (in System.Reflection)
+ExpandableObjectConverter (in System.ComponentModel)
+FieldOffsetAttribute (in System.Runtime.InteropServices)
+FileOptions (in System.IO)
+GCLargeObjectHeapCompactionMode (in System.Runtime)
+GenericUriParserOptions (in System)
+HostSecurityManagerOptions (in System.Security)
+IContributeObjectSink (in System.Runtime.Remoting.Contexts)
+IDataObject (in System.Runtime.InteropServices.ComTypes)
+IDesignerOptionService (in System.ComponentModel.Design)
+IEditableObject (in System.ComponentModel)
+IObjectHandle (in System.Runtime.Remoting)
+IObjectReference (in System.Runtime.Serialization)
+IObservable (in System)
+IObserver (in System)
+IOrderedDictionary (in System.Collections.Specialized)
+IPv6MulticastOption (in System.Net.Sockets)
+IReadOnlyCollection (in System.Collections.Generic)
+IReadOnlyDictionary (in System.Collections.Generic)
+IReadOnlyList (in System.Collections.Generic)
+IRunningObjectTable (in System.Runtime.InteropServices.ComTypes)
+ImmutableObjectAttribute (in System.ComponentModel)
+InOut (in Microsoft.FSharp.Core.ByRefKinds)
+IndexOutOfRangeException (in System)
+InternalBufferOverflowException (in System.IO)
+IntrinsicOperators (in Microsoft.FSharp.Core.LanguagePrimitives)
+InvalidComObjectException (in System.Runtime.InteropServices)
+InvalidOleVariantTypeException (in System.Runtime.InteropServices)
+InvalidOperationException (in System)
+IsolatedStorageSecurityOptions (in System.IO.IsolatedStorage)
+LanguageOptions (in System.CodeDom.Compiler)
+LingerOption (in System.Net.Sockets)
+LoaderOptimization (in System)
+LoaderOptimizationAttribute (in System)
+MarshalByRefObject (in System)
+MeasureOne (in Microsoft.FSharp.Core.CompilerServices)
+MethodImplOptions (in System.Runtime.CompilerServices)
+MulticastOption (in System.Net.Sockets)
+NameObjectCollectionBase (in System.Collections.Specialized)
+NativeObjectSecurity (in System.Security.AccessControl)
+NativeOverlapped (in System.Threading)
+NullableOperators (in Microsoft.FSharp.Linq)
+ObfuscateAssemblyAttribute (in System.Reflection)
+ObfuscationAttribute (in System.Reflection)
+ObjRef (in System.Runtime.Remoting)
+Object (in System)
+ObjectAccessRule (in System.Security.AccessControl)
+ObjectAce (in System.Security.AccessControl)
+ObjectAceFlags (in System.Security.AccessControl)
+ObjectAuditRule (in System.Security.AccessControl)
+ObjectCreationDelegate (in System.Runtime.InteropServices)
+ObjectDisposedException (in System)
+ObjectHandle (in System.Runtime.Remoting)
+ObjectIDGenerator (in System.Runtime.Serialization)
+ObjectManager (in System.Runtime.Serialization)
+ObjectSecurity (in System.Security.AccessControl)
+ObservableCollection (in System.Collections.ObjectModel)
+ObsoleteAttribute (in System)
+Oid (in System.Security.Cryptography)
+OidCollection (in System.Security.Cryptography)
+OidEnumerator (in System.Security.Cryptography)
+OidGroup (in System.Security.Cryptography)
+OnDeserializedAttribute (in System.Runtime.Serialization)
+OnDeserializingAttribute (in System.Runtime.Serialization)
+OnSerializedAttribute (in System.Runtime.Serialization)
+OnSerializingAttribute (in System.Runtime.Serialization)
+OneWayAttribute (in System.Runtime.Remoting.Messaging)
+OpCode (in System.Reflection.Emit)
+OpCodeType (in System.Reflection.Emit)
+OpCodes (in System.Reflection.Emit)
+OpenFlags (in System.Security.Cryptography.X509Certificates)
+OpenReadCompletedEventArgs (in System.Net)
+OpenReadCompletedEventHandler (in System.Net)
+OpenWriteCompletedEventArgs (in System.Net)
+OpenWriteCompletedEventHandler (in System.Net)
+OperandType (in System.Reflection.Emit)
+OperatingSystem (in System)
+OperationCanceledException (in System)
+OperationalStatus (in System.Net.NetworkInformation)
+Option (in Microsoft.FSharp.Core)
+OptionalArgumentAttribute (in Microsoft.FSharp.Core)
+OptionalAttribute (in System.Runtime.InteropServices)
+OptionalFieldAttribute (in System.Runtime.Serialization)
+OrderablePartitioner (in System.Collections.Concurrent)
+OrderedDictionary (in System.Collections.Specialized)
+Out (in Microsoft.FSharp.Core.ByRefKinds)
+OutAttribute (in System.Runtime.InteropServices)
+OutOfMemoryException (in System)
+OverflowAction (in System.Diagnostics)
+OverflowException (in System)
+Overlapped (in System.Threading)
+ParallelOptions (in System.Threading.Tasks)
+PingOptions (in System.Net.NetworkInformation)
+PrefixOrigin (in System.Net.NetworkInformation)
+ProfileOptimization (in System.Runtime)
+ReadOnlyArrayAttribute (in System.Runtime.InteropServices.WindowsRuntime)
+ReadOnlyAttribute (in System.ComponentModel)
+ReadOnlyCollection (in System.Collections.ObjectModel)
+ReadOnlyCollectionBase (in System.Collections)
+ReadOnlyDictionary (in System.Collections.ObjectModel)
+ReadOnlyObservableCollection (in System.Collections.ObjectModel)
+ReadOnlyPermissionSet (in System.Security)
+RegexOptions (in System.Text.RegularExpressions)
+RegistryOptions (in Microsoft.Win32)
+RegistryValueOptions (in Microsoft.Win32)
+SafeHandleMinusOneIsInvalid (in Microsoft.Win32.SafeHandles)
+SafeHandleZeroOrMinusOneIsInvalid (in Microsoft.Win32.SafeHandles)
+SearchOption (in System.IO)
+SeekOrigin (in System.IO)
+SendOrPostCallback (in System.Threading)
+SerializationObjectManager (in System.Runtime.Serialization)
+SettingsPropertyIsReadOnlyException (in System.Configuration)
+SoapOption (in System.Runtime.Remoting.Metadata)
+SocketAsyncOperation (in System.Net.Sockets)
+SocketInformationOptions (in System.Net.Sockets)
+SocketOptionLevel (in System.Net.Sockets)
+SocketOptionName (in System.Net.Sockets)
+SpecialFolderOption (in System.Environment)
+StackOverflowException (in System)
+StandardOleMarshalObject (in System.Runtime.InteropServices)
+StringSplitOptions (in System)
+SuffixOrigin (in System.Net.NetworkInformation)
+TargetedPatchingOptOutAttribute (in System.Runtime)
+TaskContinuationOptions (in System.Threading.Tasks)
+TaskCreationOptions (in System.Threading.Tasks)
+TraceOptions (in System.Diagnostics)
+TransmitFileOptions (in System.Net.Sockets)
+UCOMIRunningObjectTable (in System.Runtime.InteropServices)
+ValueOption (in Microsoft.FSharp.Core)
+WaitHandleCannotBeOpenedException (in System.Threading)
+WaitOrTimerCallback (in System.Threading)
+WellKnownObjectMode (in System.Runtime.Remoting)
+WriteOnlyArrayAttribute (in System.Runtime.InteropServices.WindowsRuntime)
+X509IncludeOption (in System.Security.Cryptography.X509Certificates)
+XmlFieldOrderOption (in System.Runtime.Remoting.Metadata)

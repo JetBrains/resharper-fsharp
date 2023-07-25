@@ -241,7 +241,7 @@ type UnionCasePatternRule() =
             match lookupItem.FcsSymbol with
             | :? FSharpUnionCase as fcsUnionCase ->
                 let returnType = fcsUnionCase.ReturnType
-                if not (matchesType returnType) then
+                if not (matchesType returnType || isFSharpList returnType) then
                     let text = fcsUnionCase.Name
                     let fcsEntityInstance = FcsEntityInstance.create returnType
                     let displayContext = lookupItem.FcsSymbolUse.DisplayContext
@@ -268,7 +268,7 @@ type UnionCasePatternRule() =
         match expectedType with
         | None -> ()
         | Some(fcsEntityInstance, fcsType, displayContext) ->
-            if isNull expectedTypeElement then () else
+            if isNull expectedTypeElement || isFSharpList fcsType then () else
 
             let fcsEntity = fcsEntityInstance.Entity
             let typeName = expectedTypeElement.GetSourceName()

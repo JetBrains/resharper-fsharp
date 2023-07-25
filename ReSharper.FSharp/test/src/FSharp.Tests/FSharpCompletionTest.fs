@@ -481,6 +481,8 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field 07``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case - List 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union case - List 02``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``NamedUnionCaseFieldsPat - 01`` () = x.DoNamedTest()

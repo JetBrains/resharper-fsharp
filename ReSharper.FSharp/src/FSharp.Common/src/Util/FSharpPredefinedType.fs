@@ -148,6 +148,17 @@ let isUnit (fcsType: FSharpType) =
     try fcsType.ErasedType.BasicQualifiedName = unitTypeName.FullName
     with _ -> false
 
+let isFSharpList (fcsType: FSharpType) =
+    if isNull fcsType then false else
+
+    let erasedType = fcsType.ErasedType
+    if not erasedType.HasTypeDefinition then false else
+
+    let fcsEntity = erasedType.TypeDefinition
+    if fcsEntity.IsArrayType then false else
+
+    fcsEntity.BasicQualifiedName = "Microsoft.FSharp.Collections.FSharpList`1"
+
 [<Extension; CompiledName("IsNativePtr")>]
 let isNativePtr (fcsType: FSharpType) =
     try fcsType.ErasedType.BasicQualifiedName = StandardTypeNames.IntPtr
