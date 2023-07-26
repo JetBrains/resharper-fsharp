@@ -829,6 +829,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                         x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LPAREN, range)
                         x.MarkAndDone(range, ElementType.RATIONAL_RAT)
 
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, overallRange) // advance to ^ or ^-
+                x.AdvanceLexer() // advanve beyond ^ or ^-
                 let ratConstMark = x.Mark()
                 processRatConstCase ratio
                 x.Done(overallRange, ratConstMark, ElementType.RATIONAL_CONST)
@@ -867,8 +869,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     
                     let measureRange = getSynMeasureRange synMeasure
                     let ratioRange = Range.mkRange range.FileName measureRange.End range.End
-                    x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, ratioRange) // advance to ^ or ^-
-                    x.AdvanceLexer() // advanve beyond ^ or ^-
                     processRatio ratio ratioRange
                     
                     x.Done(range, powerMark, ElementType.POWER_MEASURE)
