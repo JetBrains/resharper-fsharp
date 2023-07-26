@@ -800,7 +800,110 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)
 
         | SynExpr.Const(synConst, _) ->
-            x.MarkAndDone(range, x.GetConstElementType(synConst))
+            
+            let getSynMeasureRange (synMeasure: SynMeasure) =
+                match synMeasure with
+                | SynMeasure.Named(range = range)
+                | SynMeasure.Anon range
+                | SynMeasure.Product(range = range)
+                | SynMeasure.Seq(range = range)
+                | SynMeasure.Divide(range = range)
+                | SynMeasure.Power(range = range)
+                | SynMeasure.Var(range = range)
+                | SynMeasure.Paren(range = range) -> range
+                | SynMeasure.One -> failwith "should not be reached"
+            
+            let processRatio (ratio: SynRationalConst) (overallRange: range) =
+                
+                let rec processRatConstCase (ratio: SynRationalConst) =
+                    match ratio with
+                    | SynRationalConst.Integer _ ->
+                        x.MarkAndDone(overallRange, ElementType.INTEGER_RAT)
+                    | SynRationalConst.Negate ratConst ->
+                        let m = x.Mark()
+                        processRatConstCase ratConst
+                        x.Done(overallRange, m, ElementType.NEGATE_RAT)
+                    | SynRationalConst.Rational(range = range) ->
+                        x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LPAREN, range)
+                        x.MarkAndDone(range, ElementType.RATIONAL_RAT)
+
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, overallRange) // advance to ^ or ^-
+                x.AdvanceLexer() // advanve beyond ^ or ^-
+                let ratConstMark = x.Mark()
+                processRatConstCase ratio
+                x.Done(overallRange, ratConstMark, ElementType.RATIONAL_CONST)
+
+            let rec processMeasure (synMeasure: SynMeasure) =
+                match synMeasure with
+                | SynMeasure.Named(longId, range) ->
+                    let namedMark = x.Mark(range)
+                    let namedTypeMark = x.Mark(range)
+                    x.ProcessNamedTypeReference(longId)
+                    x.Done(range, namedTypeMark, ElementType.NAMED_TYPE_USAGE)
+                    x.Done(range, namedMark, ElementType.NAMED_MEASURE)
+                | SynMeasure.Product(measure1, measure2, range) ->
+                    let prodMark = x.Mark(range)
+                    processMeasure measure1
+                    processMeasure measure2
+                    x.Done(range, prodMark, ElementType.PRODUCT_MEASURE)
+                | SynMeasure.One ->
+                    () // handled in SynMeasure.Seq to have the range
+                | SynMeasure.Seq([SynMeasure.One], range) ->
+                    x.MarkAndDone(range, ElementType.ONE_MEASURE)
+                | SynMeasure.Seq(measures = [synMeasure]) ->
+                    processMeasure synMeasure
+                | SynMeasure.Seq(synMeasures, range) ->
+                    let seqMark = x.Mark(range)
+                    synMeasures |> List.iter processMeasure
+                    x.Done(range, seqMark, ElementType.SEQ_MEASURE)
+                | SynMeasure.Divide(measure1, measure2, range) ->
+                    let divMark = x.Mark(range)
+                    processMeasure measure1
+                    processMeasure measure2
+                    x.Done(range, divMark, ElementType.DIVIDE_MEASURE)
+                | SynMeasure.Power(measure = synMeasure; power = ratio; range = range) ->
+                    let powerMark = x.Mark(range)
+                    processMeasure synMeasure
+                    
+                    let measureRange = getSynMeasureRange synMeasure
+                    let ratioRange = Range.mkRange range.FileName measureRange.End range.End
+                    processRatio ratio ratioRange
+                    
+                    x.Done(range, powerMark, ElementType.POWER_MEASURE)
+                | SynMeasure.Anon range ->
+                    // horrible workaround for a bug in FCS:
+                    // currently the range of SynMeasure.Anon spans over all of the "<_>"
+                    // construct a new range not including the GREATER
+                    let endLine, endColumn =
+                        if range.EndColumn > 0 then
+                            range.EndLine, range.EndColumn - 1
+                        else
+                            range.EndLine - 1, range.EndColumn
+                    let endBeforeGreater = Position.mkPos endLine endColumn
+                    let r = Range.mkRange range.FileName range.Start endBeforeGreater
+                    x.AdvanceToTokenOrRangeEnd(FSharpTokenType.IDENTIFIER, range)
+                    x.MarkAndDone(r, ElementType.ANON_MEASURE)
+                | SynMeasure.Paren(synMeasure, range) ->
+                    let parenMark = x.Mark(range)
+                    processMeasure synMeasure
+                    x.Done(range, parenMark, ElementType.PAREN_MEASURE)
+                | SynMeasure.Var(synTypar, range) ->
+                    let mark = x.Mark(range)
+                    x.ProcessTypeParameter(synTypar)
+                    x.Done(range, mark, ElementType.VAR_MEASURE)
+
+            let mark = x.Mark(range)
+
+            match synConst with
+            | SynConst.Measure(_synConst, _constantRange, synMeasure) ->
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LESS, range)
+                let typeMeasureMark = x.Mark(range)
+                processMeasure synMeasure
+                x.AdvanceTo(range.End)
+                x.Done(typeMeasureMark, ElementType.UNIT_OF_MEASURE_CLAUSE)
+            | _ -> ()
+
+            x.Done(range, mark, x.GetConstElementType(synConst))
 
         | SynExpr.Typed(expr, synType, _) ->
             let typeRange = synType.Range

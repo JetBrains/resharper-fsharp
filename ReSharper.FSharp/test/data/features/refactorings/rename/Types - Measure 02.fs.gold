@@ -1,0 +1,4 @@
+﻿module Module
+
+[<Measure>] type zzz
+let i = 1<zzz>
