@@ -54,7 +54,7 @@ type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSig
             |> Option.isSome
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
-        | :? ILiteralExpr -> true
+        | :? ILiteralExpr as litExpr -> isNull litExpr.UnitOfMeasure
         | _ -> false
 
     override x.Text =

@@ -29,3 +29,4 @@ type UpdateLiteralConstantInSignatureFixTest() =
     [<FSharpLanguageLevel(FSharpLanguageLevel.Preview)>]
     [<Test; NotAvailable>] member x.``No update with unknown module symbol - 02`` () = x.DoNamedTestWithSignature()
     [<Test; NotAvailable>] member x.``No update with unknown other literal - 01`` () = x.DoNamedTestWithSignature()
+    [<Test; NotAvailable>] member x.``No update for measure constant - 01`` () = x.DoNamedTestWithSignature()
