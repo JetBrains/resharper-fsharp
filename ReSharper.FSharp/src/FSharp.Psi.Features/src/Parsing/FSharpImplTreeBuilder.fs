@@ -813,12 +813,12 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 | SynMeasure.Paren(range = range) -> range
                 | SynMeasure.One -> failwith "should not be reached"
             
-            let processRatio (ratio: SynRationalConst) overallRange =
+            let processRatio (ratio: SynRationalConst) (overallRange: range) =
                 
                 let rec processRatConstCase (ratio: SynRationalConst) =
                     match ratio with
                     | SynRationalConst.Integer _ ->
-                        let m = x.Mark()
+                        let m = x.Mark(overallRange)
                         x.MarkAndDone(overallRange, ElementType.LITERAL_EXPR)
                         x.Done(overallRange, m, ElementType.INTEGER_RAT)
                     | SynRationalConst.Negate ratConst ->
