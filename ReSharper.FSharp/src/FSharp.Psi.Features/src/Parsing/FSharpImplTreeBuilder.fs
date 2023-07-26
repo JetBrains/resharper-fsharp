@@ -818,9 +818,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 let rec processRatConstCase (ratio: SynRationalConst) =
                     match ratio with
                     | SynRationalConst.Integer _ ->
-                        let m = x.Mark(overallRange)
-                        x.MarkAndDone(overallRange, ElementType.LITERAL_EXPR)
-                        x.Done(overallRange, m, ElementType.INTEGER_RAT)
+                        x.MarkAndDone(overallRange, ElementType.INTEGER_RAT)
                     | SynRationalConst.Negate ratConst ->
                         let m = x.Mark()
                         processRatConstCase ratConst

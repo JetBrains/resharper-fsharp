@@ -364,7 +364,7 @@ interface constPat:
   literalPat;
 
 literalPat options { stubBase="FSharpPatternBase"; }:
-  literalToken;
+  literalToken{LITERAL, Literal};
 
 unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
@@ -539,7 +539,7 @@ unitExpr options { stubBase="UnitExpressionBase"; }:
   RPAREN<RPAREN, RParen>;
 
 literalExpr options { stubBase="FSharpExpressionBase"; }:
-  literalToken
+  literalToken{LITERAL, Literal}
   unitOfMeasureClause<MEASURE, UnitOfMeasure>?;
 
 unitOfMeasureClause:
@@ -579,7 +579,7 @@ powerMeasure:
   powerClause<POWER, Power>;
 
 oneMeasure:
-  literalToken;
+  literalToken{LITERAL, Literal};
   
 anonMeasure:
   UNDERSCORE;
@@ -602,13 +602,13 @@ rationalConst:
   negateRat;
   
 integerRat:
-  literalToken;  
+  literalToken{LITERAL, Literal};  
 
 rationalRat:
   LPAREN<LPAREN, LeftParen>
-  literalToken
-  SYMBOLIC_OP
-  literalToken
+  literalToken{NUMERATOR, Numerator}
+  SYMBOLIC_OP<SLASH, Slash>
+  literalToken{DENOMINATOR, Denominator}
   RPAREN<RPAREN, RightParen>;  
 
 negateRat:
@@ -1917,31 +1917,31 @@ private topLevelTypeParameterName:
   IDENTIFIER
   COLON;
 
-private literalToken:
-  TRUE<LITERAL, Literal> |
-  FALSE<LITERAL, Literal> |
-  NULL<LITERAL, Literal> |
-  SBYTE<LITERAL, Literal> |
-  BYTE<LITERAL, Literal> |
-  INT16<LITERAL, Literal> |
-  UINT16<LITERAL, Literal> |
-  INT32<LITERAL, Literal> |
-  UINT32<LITERAL, Literal> |
-  INT64<LITERAL, Literal> |
-  UINT64<LITERAL, Literal> |
-  IEEE32<LITERAL, Literal> |
-  IEEE64<LITERAL, Literal> |
-  DECIMAL<LITERAL, Literal> |
-  BIGNUM<LITERAL, Literal> |
-  NATIVEINT<LITERAL, Literal> |
-  UNATIVEINT<LITERAL, Literal> |
-  CHARACTER_LITERAL<LITERAL, Literal> |
-  STRING<LITERAL, Literal> |
-  VERBATIM_STRING<LITERAL, Literal> |
-  TRIPLE_QUOTED_STRING<LITERAL, Literal> |
-  BYTEARRAY<LITERAL, Literal> |
-  VERBATIM_BYTEARRAY<LITERAL, Literal> |
-  BYTECHAR<LITERAL, Literal>;
+private literalToken{ROLE,Getter}:
+  TRUE<@ROLE, @Getter> |
+  FALSE<@ROLE, @Getter> |
+  NULL<@ROLE, @Getter> |
+  SBYTE<@ROLE, @Getter> |
+  BYTE<@ROLE, @Getter> |
+  INT16<@ROLE, @Getter> |
+  UINT16<@ROLE, @Getter> |
+  INT32<@ROLE, @Getter> |
+  UINT32<@ROLE, @Getter> |
+  INT64<@ROLE, @Getter> |
+  UINT64<@ROLE, @Getter> |
+  IEEE32<@ROLE, @Getter> |
+  IEEE64<@ROLE, @Getter> |
+  DECIMAL<@ROLE, @Getter> |
+  BIGNUM<@ROLE, @Getter> |
+  NATIVEINT<@ROLE, @Getter> |
+  UNATIVEINT<@ROLE, @Getter> |
+  CHARACTER_LITERAL<@ROLE, @Getter> |
+  STRING<@ROLE, @Getter> |
+  VERBATIM_STRING<@ROLE, @Getter> |
+  TRIPLE_QUOTED_STRING<@ROLE, @Getter> |
+  BYTEARRAY<@ROLE, @Getter> |
+  VERBATIM_BYTEARRAY<@ROLE, @Getter> |
+  BYTECHAR<@ROLE, @Getter>;
 
 interface attributesOwnerDeclaration:
   constructorSignatureOrDeclaration
