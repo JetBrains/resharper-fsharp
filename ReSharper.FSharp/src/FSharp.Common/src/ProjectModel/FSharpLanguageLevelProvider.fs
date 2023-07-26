@@ -67,7 +67,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     let getVersionMappingByToolset () =
         let languageLevel = getLanguageLevelByToolsetVersion ()
-        VersionMapping(languageLevel, languageLevel)
+        VersionMapping(languageLevel, FSharpLanguageLevel.Preview)
 
     // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
