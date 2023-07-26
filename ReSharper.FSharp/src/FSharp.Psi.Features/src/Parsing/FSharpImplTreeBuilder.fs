@@ -806,7 +806,6 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 | SynMeasure.Named(range = range)
                 | SynMeasure.Anon range
                 | SynMeasure.Product(range = range)
-                | SynMeasure.Seq([SynMeasure.One], range)
                 | SynMeasure.Seq(range = range)
                 | SynMeasure.Divide(range = range)
                 | SynMeasure.Power(range = range)
