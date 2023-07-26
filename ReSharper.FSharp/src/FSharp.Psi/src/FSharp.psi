@@ -570,7 +570,7 @@ seqMeasure:
   unitOfMeasure<MEASURE, Measures>*;
   
 divideMeasure:
-  unitOfMeasure<MEASURE_1, Measure1>
+  unitOfMeasure<MEASURE_1, Measure1>?
   SYMBOLIC_OP
   unitOfMeasure<MEASURE_2, Measure2>;
 
