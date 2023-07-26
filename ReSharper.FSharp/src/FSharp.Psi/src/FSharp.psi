@@ -607,6 +607,8 @@ integerRat:
 rationalRat:
   LPAREN<LPAREN, LeftParen>
   literalToken
+  SYMBOLIC_OP
+  literalToken
   RPAREN<RPAREN, RightParen>;  
 
 negateRat:
