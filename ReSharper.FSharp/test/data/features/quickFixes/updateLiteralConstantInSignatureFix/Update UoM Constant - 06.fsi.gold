@@ -1,0 +1,4 @@
+module A
+
+[<Literal>]
+val a : int<_> = 42<_>

@@ -47,14 +47,49 @@ type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSig
     let mutable sigRefPat = null
 
     let rec isImplExprValidInSig (implExpression: IFSharpExpression) =
+        
+        let opName = $"{nameof UpdateLiteralConstantInSignatureFix}.IsAvailable"
+        
+        let rec collectUofMRefs (uOfM: IUnitOfMeasure) =
+            seq {
+                match uOfM with
+                | :? INamedMeasure as named ->
+                    yield named.TypeUsage.As<INamedTypeUsage>().ReferenceName.Reference
+                | :? IProductMeasure as product ->
+                    yield! collectUofMRefs product.Measure1
+                    yield! collectUofMRefs product.Measure2
+                | :? ISeqMeasure as seqM ->
+                    for m in seqM.Measures do
+                        yield! collectUofMRefs m
+                | :? IDivideMeasure as divide ->
+                    yield! collectUofMRefs divide.Measure1
+                    yield! collectUofMRefs divide.Measure2
+                | :? IPowerMeasure as power ->
+                    yield! collectUofMRefs power.Measure
+                | :? IParenMeasure as paren ->
+                    yield! collectUofMRefs paren.Measure
+                | _ -> ()
+            }
+    
+        let isValidUofMInSig (uOfM: IUnitOfMeasureClause) =
+            if isNull uOfM.Measure then false else
+                
+                let refs = collectUofMRefs uOfM.Measure
+                refs |> Seq.forall (
+                    fun r -> r.ResolveWithFcs(
+                        sigRefPat, opName, false, true)
+                            |> Option.isSome)
+
+        
         match implExpression.IgnoreInnerParens() with
         | :? IReferenceExpr as refExpr ->
             refExpr.Reference.ResolveWithFcs(
-                sigRefPat, $"{nameof UpdateLiteralConstantInSignatureFix}.IsAvailable", true, true)
+                sigRefPat, opName, true, true)
             |> Option.isSome
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
-        | :? ILiteralExpr as litExpr -> isNull litExpr.UnitOfMeasure
+        | :? ILiteralExpr as litExpr ->
+            if isNull litExpr.UnitOfMeasure then true else isValidUofMInSig litExpr.UnitOfMeasure
         | _ -> false
 
     override x.Text =

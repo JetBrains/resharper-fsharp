@@ -1,6 +1,7 @@
 module A
 
 [<Measure>] type m
+[<Measure>] type kg
 
 [<Literal>]
-val a : int<m> = 23<m>
+let a{caret} = 42<m>
