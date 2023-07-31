@@ -37,6 +37,24 @@ Regex(pattern = "|[|(14)123|]|(15)")
 Regex((pattern = "[123]"))
 id (pattern = "[123]")
 
+
+type F =
+    static member Foo([<StringSyntax(StringSyntaxAttribute.Regex)>] a: string, 
+                      [<StringSyntax(StringSyntaxAttribute.Regex)>] ?b: string,
+                      ?c: string) = ()
+
+    static member Bar([<StringSyntax(StringSyntaxAttribute.Regex)>] a: string, 
+                      [<StringSyntax(StringSyntaxAttribute.Regex)>] b: string,
+                      ?c: string) = ()
+
+F.Foo("|[|(16)123|]|(17)")
+F.Foo("|[|(18)123|]|(19)", "|[|(20)123|]|(21)")
+F.Foo("|[|(22)123|]|(23)", "|[|(24)123|]|(25)", "[123]")
+
+F.Bar("[123]")
+F.Bar("|[|(26)123|]|(27)", "|[|(28)123|]|(29)")
+F.Bar("|[|(30)123|]|(31)", "|[|(32)123|]|(33)", "[123]")
+
 ---------------------------------------------------------
 (0): ReSharper Regex Set: 
 (1): ReSharper Regex Set: 
@@ -54,3 +72,21 @@ id (pattern = "[123]")
 (13): ReSharper Regex Set: 
 (14): ReSharper Regex Set: 
 (15): ReSharper Regex Set: 
+(16): ReSharper Regex Set: 
+(17): ReSharper Regex Set: 
+(18): ReSharper Regex Set: 
+(19): ReSharper Regex Set: 
+(20): ReSharper Regex Set: 
+(21): ReSharper Regex Set: 
+(22): ReSharper Regex Set: 
+(23): ReSharper Regex Set: 
+(24): ReSharper Regex Set: 
+(25): ReSharper Regex Set: 
+(26): ReSharper Regex Set: 
+(27): ReSharper Regex Set: 
+(28): ReSharper Regex Set: 
+(29): ReSharper Regex Set: 
+(30): ReSharper Regex Set: 
+(31): ReSharper Regex Set: 
+(32): ReSharper Regex Set: 
+(33): ReSharper Regex Set: 
