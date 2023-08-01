@@ -21,7 +21,6 @@ Provided Assemblies:
 Provided Abbreviations:
 2178a420-42c0-437c-a71f-ed080577878f(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr
-	GenerativeTypeProvider.SimpleGenerativeTypeAbbr+GenerativeSubtype
 
 [Out-Process dump]:
 
@@ -78,7 +77,6 @@ Provided Assemblies:
 Provided Abbreviations:
 2178a420-42c0-437c-a71f-ed080577878f(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr1
-	GenerativeTypeProvider.SimpleGenerativeTypeAbbr1+GenerativeSubtype
 
 [Out-Process dump]:
 
