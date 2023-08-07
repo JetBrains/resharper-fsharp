@@ -8,6 +8,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
@@ -19,13 +20,13 @@ open JetBrains.Util.Text
 [<CodeCleanupModule>]
 type FSharpReformatCode(textControlManager: ITextControlManager) =
     let REFORMAT_CODE_DESCRIPTOR = CodeCleanupOptionDescriptor<bool>(
-        "FSReformatCode",
+        "FSharpReformatCode",
         CodeCleanupLanguage("F#", 2),
         CodeCleanupOptionDescriptor.ReformatGroup,
-        displayName = "Reformat code")
+        typeof<Strings>)
 
     interface IReformatCodeCleanupModule with
-        member x.Name = "Reformat F#"
+        member x.Name = Strings.FSharpReformatCode_Name_Reformat_FSharp
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = [| REFORMAT_CODE_DESCRIPTOR |]
         member x.IsAvailableOnSelection = true

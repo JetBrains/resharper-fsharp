@@ -5,6 +5,22 @@
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>JetResourceGenerator</Generator>
+      <LastGenOutput>Strings.Designer.fs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Include="Resources\Strings.Designer.fs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="src\FileTemplates\FileTemplates.xml">
+      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="src\ReadLockCookieUtil.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
@@ -36,9 +52,6 @@
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
     <Compile Include="src\ExternalSources\FSharpDeclaredElementBinder.fs" />
     <Compile Include="src\FileTemplates\FileTemplates.fs" />
-    <EmbeddedResource Include="src\FileTemplates\FileTemplates.xml">
-      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
-    </EmbeddedResource>
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
     <Compile Include="src\Search\FSharpItemOccurrenceKind.fs" />
     <Compile Include="src\Search\FSharpPathReference.fs" />
