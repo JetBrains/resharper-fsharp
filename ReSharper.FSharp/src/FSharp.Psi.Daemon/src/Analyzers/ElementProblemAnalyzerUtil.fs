@@ -1,26 +1,40 @@
 ﻿[<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers.Util
 
+open System
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.dataStructures
 
 let allowHighPrecedenceAppParensKey = Key<Boxed<bool>>("AllowHighPrecedenceAppParens")
+let fsCoreVersionKey = Key<Version>("FSharpCoreVersionKey")
 
 type ElementProblemAnalyzerData with
     member this.LanguageLevel =
-        let languageLevel = this.GetData(FSharpLanguageLevel.key)
-        if isNotNull languageLevel then languageLevel.Value else
-
-        let languageLevel = Boxed(FSharpLanguageLevel.ofTreeNode this.File)
-        this.PutData(FSharpLanguageLevel.key, languageLevel)
-
+        let languageLevel = 
+            this.GetOrCreateDataUnderLock(FSharpLanguageLevel.key, fun _ ->
+                Boxed(FSharpLanguageLevel.ofTreeNode this.File)
+            )
         languageLevel.Value
+
+    member this.FSharpCoreVersion =
+        this.GetOrCreateDataUnderLock(fsCoreVersionKey, fun _ ->
+            this.File.GetPsiModule()
+            |> getReferencedModules
+            |> Seq.tryPick (fun psiModule ->
+                match psiModule with
+                | :? IAssemblyPsiModule as assemblyPsiModule when assemblyPsiModule.Name = "FSharp.Core" ->
+                    Some assemblyPsiModule.Assembly.AssemblyName.Version
+                | _ -> None
+            )
+            |> Option.defaultValue (Version())
+        )
 
     member this.IsFSharp47Supported =
         this.LanguageLevel >= FSharpLanguageLevel.FSharp47

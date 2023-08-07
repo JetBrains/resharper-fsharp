@@ -37,7 +37,7 @@ type InterpolatedStringCandidateAnalyzer() =
         tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING
 
     override x.Run(prefixAppExpr, data, consumer) =
-        if not data.IsFSharp50Supported then () else
+        if not data.IsFSharp50Supported || data.FSharpCoreVersion.Major < 5 then () else
 
         let formatStringExpr = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().As<ILiteralExpr>()
         if isNull formatStringExpr then () else
