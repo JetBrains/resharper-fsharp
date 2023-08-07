@@ -16,10 +16,10 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="FSReformatCode_Name_Reformat_F_" xml:space="preserve">
+    <data name="FSharpReformatCode_Name_Reformat_FSharp" xml:space="preserve">
         <value>Reformat F#</value>
     </data>
-    <data name="CodeCleanupTask_FSReformatCode" xml:space="preserve">
+    <data name="CodeCleanupTask_FSharpReformatCode" xml:space="preserve">
         <value>Reformat code</value>
     </data>
 </root>

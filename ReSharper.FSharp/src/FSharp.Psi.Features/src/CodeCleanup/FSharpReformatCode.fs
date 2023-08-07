@@ -20,13 +20,13 @@ open JetBrains.Util.Text
 [<CodeCleanupModule>]
 type FSharpReformatCode(textControlManager: ITextControlManager) =
     let REFORMAT_CODE_DESCRIPTOR = CodeCleanupOptionDescriptor<bool>(
-        "FSReformatCode",
+        "FSharpReformatCode",
         CodeCleanupLanguage("F#", 2),
         CodeCleanupOptionDescriptor.ReformatGroup,
         typeof<Strings>)
 
     interface IReformatCodeCleanupModule with
-        member x.Name = Strings.FSReformatCode_Name_Reformat_F_
+        member x.Name = Strings.FSharpReformatCode_Name_Reformat_FSharp
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = [| REFORMAT_CODE_DESCRIPTOR |]
         member x.IsAvailableOnSelection = true

@@ -33,5 +33,5 @@ type public Strings() =
             | null -> ErrorJetResourceManager.Instance
             | _ -> resourceManager.Value
 
-    static member FSReformatCode_Name_Reformat_F_ = Strings.ResourceManager.GetString("FSReformatCode_Name_Reformat_F_")
-    static member CodeCleanupTask_FSReformatCode = Strings.ResourceManager.GetString("CodeCleanupTask_FSReformatCode")
+    static member FSharpReformatCode_Name_Reformat_FSharp = Strings.ResourceManager.GetString("FSharpReformatCode_Name_Reformat_FSharp")
+    static member CodeCleanupTask_FSharpReformatCode = Strings.ResourceManager.GetString("CodeCleanupTask_FSharpReformatCode")
