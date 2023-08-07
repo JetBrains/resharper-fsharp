@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 module InterpolatedStringCandidateAnalyzer =
@@ -37,7 +38,7 @@ type InterpolatedStringCandidateAnalyzer() =
         tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING
 
     override x.Run(prefixAppExpr, data, consumer) =
-        if not data.IsFSharp50Supported || data.FSharpCoreVersion.Major < 5 then () else
+        if not data.IsFSharp50Supported || (data.FSharpCoreVersion.Major < 5 && not Shell.Instance.IsTestShell) then () else
 
         let formatStringExpr = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().As<ILiteralExpr>()
         if isNull formatStringExpr then () else
