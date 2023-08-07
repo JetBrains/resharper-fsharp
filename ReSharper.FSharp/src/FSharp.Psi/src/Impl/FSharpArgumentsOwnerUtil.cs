@@ -51,9 +51,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           if (paramGroup.Count == 1)
             return new[] {argExpr as IArgument};
 
-          var tupleExprs = argExpr is ITupleExpr tupleExpr
-            ? (IReadOnlyList<IFSharpExpression>) tupleExpr.Expressions
-            : EmptyList<IFSharpExpression>.Instance;
+          var tupleExprs =
+            argExpr switch
+            {
+              ITupleExpr tupleExpr => (IReadOnlyList<IFSharpExpression>)tupleExpr.Expressions,
+              // if the second parameter is optional (and hence all subsequent ones)
+              // then F# allows one argument to be passed
+              //
+              // member M(a, ?b, ...)
+              // >> M(1)
+              _ when paramGroup[1].IsOptionalArg => new[] { argExpr }, //RIDER-96778
+              _ => EmptyList<IFSharpExpression>.Instance
+            };
 
           return Enumerable.Range(0, paramGroup.Count)
             .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
