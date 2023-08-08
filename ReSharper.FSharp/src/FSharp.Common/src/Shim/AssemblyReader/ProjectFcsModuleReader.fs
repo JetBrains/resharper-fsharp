@@ -85,7 +85,22 @@ type FcsTypeDef =
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path,
         shim: IFcsAssemblyReaderShim) =
     let locks = psiModule.GetPsiServices().Locks
-    let symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
+
+    let getSymbolScope, invalidateSymbolScope =
+        let mutable symbolScope = null
+
+        let get () =
+            match symbolScope with
+            | null ->
+                symbolScope <- psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
+                symbolScope
+
+            | symbolScope -> symbolScope
+
+        let invalidate () =
+            symbolScope <- null
+
+        get, invalidate
 
     let locker = JetFastSemiReenterableRWLock()
 
@@ -873,6 +888,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         readData (fun _ ->
             if not (psiModule.IsValid()) then () else
 
+            let symbolScope = getSymbolScope ()
             let typeElement = symbolScope.GetTypeElementByCLRName(typeName)
             if isNull typeElement then () else
 
@@ -1102,6 +1118,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let typeDef = typeDefs.TryGetValue(clrTypeName)
             isNull typeDef ||
 
+            let symbolScope = getSymbolScope ()
             let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName).NotNull("IsUpToDate: nested type")
             isUpToDateTypeDef typeElement typeDef)
 
@@ -1115,6 +1132,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         isUpToDatePropertyDefs typeElement members.Properties
 
     let isUpToDateTypeDef (clrTypeName: IClrTypeName) (fcsTypeDef: FcsTypeDef) =
+        let symbolScope = getSymbolScope ()
         match symbolScope.GetTypeElementByCLRName(clrTypeName) with
         | null -> false
         | typeElement -> isUpToDateTypeDef typeElement fcsTypeDef
@@ -1159,6 +1177,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         readData (fun _ ->
             if not (psiModule.IsValid()) then () else
 
+            let symbolScope = getSymbolScope ()
             match symbolScope.GetTypeElementByCLRName(clrTypeName) with
             | null ->
                 // The type doesn't exist in the module anymore.
@@ -1209,6 +1228,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             // todo: add test for adding/removing not-seen-by-FCS types
             moduleDef <- None
             timestamp <- DateTime.UtcNow
+            invalidateSymbolScope ()
             shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
         finally
             isInvalidating <- false
@@ -1230,6 +1250,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let isDll = isDll project psiModule.TargetFrameworkId
 
                 let typeDefs =
+                    let symbolScope = getSymbolScope ()
                     // todo: make inner types computed on demand, needs an Fcs patch
                     let result = List<ILPreTypeDef>()
 
@@ -1321,6 +1342,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if not (isUpToDate ()) then
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
+                invalidateSymbolScope ()
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.InvalidateAllTypeDefs() =
@@ -1332,6 +1354,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 typeDefs.Clear()
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
+                invalidateSymbolScope ()
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
             finally
                 isInvalidating <- false
@@ -1344,6 +1367,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 shim.Logger.Trace("Mark dirty: {0}", path)
                 isDirty <- true
                 upToDateChecked <- null
+                invalidateSymbolScope ()
             finally
                 isInvalidating <- false
 
