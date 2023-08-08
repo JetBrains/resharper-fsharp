@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -190,7 +191,10 @@ type UnionCasePatternRule() =
                         TextPresentation(info, typeText, matchesType, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
                     .WithBehavior(fun _ -> behavior)
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
-                    .WithRelevance(CLRLookupItemRelevance.Methods)
+
+            BlessingItemSupport.MarkAsBlessed(item)
+
+            let item = item.WithRelevance(CLRLookupItemRelevance.Methods)
 
             if matchesType then
                 markRelevance item (CLRLookupItemRelevance.ExpectedTypeMatch ||| CLRLookupItemRelevance.ExpectedTypeMatchStaticMember)
