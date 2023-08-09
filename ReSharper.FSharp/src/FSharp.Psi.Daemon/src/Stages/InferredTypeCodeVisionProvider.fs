@@ -28,14 +28,14 @@ open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
-    let ProviderId = Strings.FSharpInferredTypeHighlighting_ProviderId
-    let TooltipText = Strings.FSharpInferredTypeHighlighting_TooltipText
+    let providerId = Strings.FSharpInferredTypeHighlighting_ProviderId
+    let tooltipText = Strings.FSharpInferredTypeHighlighting_TooltipText
 
 [<StaticSeverityHighlighting(
     Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>,
     AttributeId = FSharpInferredTypeHighlighting.Id, OverlapResolve = OverlapResolveKind.NONE)>]
 type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider) =
-    inherit CodeInsightsHighlighting(range, text, "", FSharpInferredTypeHighlighting.TooltipText, provider, null, null)
+    inherit CodeInsightsHighlighting(range, text, "", FSharpInferredTypeHighlighting.tooltipText, provider, null, null)
 
     interface IHighlightingWithTestOutput with
         member x.TestOutput = text
@@ -43,11 +43,11 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
 
 [<ShellComponent>]
 type InferredTypeCodeVisionProvider() =
-    let TypeCopiedTooltipText = Strings.InferredTypeCodeVisionProvider_TypeCopied_TooltipText
+    let typeCopiedTooltipText = Strings.InferredTypeCodeVisionProvider_TypeCopied_TooltipText
 
     interface ICodeInsightsProvider with
-        member x.ProviderId = FSharpInferredTypeHighlighting.ProviderId
-        member x.DisplayName = FSharpInferredTypeHighlighting.ProviderId
+        member x.ProviderId = FSharpInferredTypeHighlighting.providerId
+        member x.DisplayName = FSharpInferredTypeHighlighting.providerId
         member x.DefaultAnchor = CodeVisionAnchorKind.Default
         member x.RelativeOrderings = [| CodeVisionRelativeOrderingFirst() :> CodeVisionRelativeOrdering |] :> _
 
@@ -61,11 +61,11 @@ type InferredTypeCodeVisionProvider() =
             let shell = Shell.Instance
             shell.GetComponent<Clipboard>().SetText(entry.Text)
             let documentMarkupManager = shell.GetComponent<IDocumentMarkupManager>()
-            shell.GetComponent<ITooltipManager>().Show(TypeCopiedTooltipText, PopupWindowContextSource(fun _ ->
+            shell.GetComponent<ITooltipManager>().Show(typeCopiedTooltipText, PopupWindowContextSource(fun _ ->
                 let documentMarkup = documentMarkupManager.TryGetMarkupModel(codeInsightsHighlighting.Range.Document)
                 if isNull documentMarkup then null else
 
-                documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.ProviderId,
+                documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.providerId,
                     fun h -> highlighting.Equals(h.UserData))
                 |> Seq.tryHead
                 |> Option.map RiderEditorOffsetPopupWindowContext
@@ -143,7 +143,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
             not Shell.Instance.IsTestShell &&
 
             x.DaemonProcess.ContextBoundSettingsStore.GetIndexedValue(
-                (fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.ProviderId)
+                (fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.providerId)
 
         if not isDisabled then
             fsFile.ProcessThisAndDescendants(Processor(x, consumer))
