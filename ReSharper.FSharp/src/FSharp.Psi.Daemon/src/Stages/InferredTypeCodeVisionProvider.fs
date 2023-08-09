@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.RdBackend.Common.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -27,13 +28,14 @@ open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
-    let [<Literal>] ProviderId = "F# Inferred types"
+    let ProviderId = Strings.FSharpInferredTypeHighlighting_ProviderId
+    let TooltipText = Strings.FSharpInferredTypeHighlighting_TooltipText
 
 [<StaticSeverityHighlighting(
     Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>,
     AttributeId = FSharpInferredTypeHighlighting.Id, OverlapResolve = OverlapResolveKind.NONE)>]
 type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider) =
-    inherit CodeInsightsHighlighting(range, text, "", "Copy inferred type", provider, null, null)
+    inherit CodeInsightsHighlighting(range, text, "", FSharpInferredTypeHighlighting.TooltipText, provider, null, null)
 
     interface IHighlightingWithTestOutput with
         member x.TestOutput = text
@@ -41,7 +43,7 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
 
 [<ShellComponent>]
 type InferredTypeCodeVisionProvider() =
-    let [<Literal>] TypeCopiedTooltipText = "Inferred type copied to clipboard"
+    let TypeCopiedTooltipText = Strings.InferredTypeCodeVisionProvider_TypeCopied_TooltipText
 
     interface ICodeInsightsProvider with
         member x.ProviderId = FSharpInferredTypeHighlighting.ProviderId
