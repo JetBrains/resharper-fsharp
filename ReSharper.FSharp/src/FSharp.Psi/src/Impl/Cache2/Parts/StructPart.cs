@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class StructPart : FSharpTypeMembersOwnerTypePart, IFSharpStructPart
+  internal class StructPart : StructuralTypePartBase, IFSharpStructPart
   {
     public StructPart([NotNull] IFSharpTypeOrExtensionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder, PartKind.Struct)
@@ -24,5 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
+
+    public override bool OverridesToString => false;
+    public override bool ReportCtor => false;
   }
 }

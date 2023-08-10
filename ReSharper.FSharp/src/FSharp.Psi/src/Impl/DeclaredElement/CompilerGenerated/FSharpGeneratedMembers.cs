@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 {
   public static class FSharpGeneratedMembers
   {
-    public static readonly string[] SimpleTypeExtendsListShortNames =
+    public static readonly string[] StructuralTypeExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
     public const string CompareToMethodName = "CompareTo";
@@ -65,9 +65,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region CompareToSimpleTypeMethod
 
-  public class CompareToSimpleTypeMethod : GeneratedMethodWithOneParam
+  public class CompareToStructuralTypeMethod : GeneratedMethodWithOneParam
   {
-    public CompareToSimpleTypeMethod([NotNull] ITypeElement containingType) : base(containingType)
+    public CompareToStructuralTypeMethod([NotNull] ITypeElement containingType) : base(containingType)
     {
     }
 
@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region EqualsObjectMethod
 
-  public class EqualsObjectMethod : EqualsSimpleTypeMethod
+  public class EqualsObjectMethod : EqualsStructuralTypeMethod
   {
     public EqualsObjectMethod([NotNull] ITypeElement containingType) : base(containingType)
     {
@@ -116,9 +116,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region EqualsSimpleTypeMethod
 
-  public class EqualsSimpleTypeMethod : GeneratedMethodWithOneParam
+  public class EqualsStructuralTypeMethod : GeneratedMethodWithOneParam
   {
-    public EqualsSimpleTypeMethod([NotNull] ITypeElement containingType) : base(containingType)
+    public EqualsStructuralTypeMethod([NotNull] ITypeElement containingType) : base(containingType)
     {
     }
 

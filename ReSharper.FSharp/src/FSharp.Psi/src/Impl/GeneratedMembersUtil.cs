@@ -13,12 +13,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   {
     public static IList<ITypeMember> GetGeneratedMembers(this TypePart typePart)
     {
-      if (!(typePart.TypeElement is { } typeElement))
+      if (typePart.TypeElement is not { } typeElement)
         return EmptyList<ITypeMember>.Instance;
 
       var result = new LocalList<ITypeMember>(new ITypeMember[]
       {
-        new EqualsSimpleTypeMethod(typeElement),
+        new EqualsStructuralTypeMethod(typeElement),
         new EqualsObjectMethod(typeElement),
         new EqualsObjectWithComparerMethod(typeElement),
 
@@ -26,14 +26,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         new GetHashCodeWithComparerMethod(typeElement),
       });
 
-      if (typePart is ISimpleTypePart simpleTypePart)
+      if (typePart is IStructuralTypePart simpleTypePart)
       {
         if (simpleTypePart.OverridesToString)
           result.Add(new ToStringMethod(typeElement));
 
         if (simpleTypePart.HasCompareTo)
         {
-          result.Add(new CompareToSimpleTypeMethod(typeElement));
+          result.Add(new CompareToStructuralTypeMethod(typeElement));
           result.Add(new CompareToObjectMethod(typeElement));
           result.Add(new CompareToObjectWithComparerMethod(typeElement));
         }
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static IEnumerable<IDeclaredElement> GetGeneratedMembers([NotNull] this IUnionCase unionCase)
     {
-      if (!(unionCase.GetContainingType().GetPart<IUnionPart>() is { } unionPart))
+      if (unionCase.ContainingType.GetPart<IUnionPart>() is not { } unionPart)
         return EmptyList<IDeclaredElement>.Instance;
 
       if (unionPart.IsSingleCase && !unionCase.HasFields)

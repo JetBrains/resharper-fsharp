@@ -61,6 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       MemberPresenceFlag membersMask = 0;
 
       var isInterface = partKind == PartKind.Interface;
+      var isStruct = partKind == PartKind.Struct;
 
       foreach (var decl in declaration.MemberDeclarations)
       {
@@ -96,14 +97,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         if (decl is IConstructorSignatureOrDeclaration constructorDeclOrSig &&
             constructorDeclOrSig.GetAccessRights() == AccessRights.PUBLIC)
         {
-          membersMask |= MemberPresenceFlag.INSTANCE_CTOR;
+          if (!isStruct)
+            membersMask |= MemberPresenceFlag.INSTANCE_CTOR;
 
           if (constructorDeclOrSig is IConstructorDeclaration constructorDecl)
           {
             if (constructorDecl.ParameterPatterns.IgnoreInnerParens() is IUnitPat)
+            {
               membersMask |= MemberPresenceFlag.PUBLIC_DEFAULT_CTOR;
+              if (isStruct)
+                membersMask |= MemberPresenceFlag.INSTANCE_CTOR;
+            }
           }
-          
+
           else if (constructorDeclOrSig is IConstructorSignature constructorSig)
           {
             if (constructorSig.ReturnTypeInfo?.ReturnType is IFunctionTypeUsage funTypeUsage && 
@@ -112,6 +118,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
                 namedTypeUsage.ReferenceName?.ShortName == declaration.SourceName)
             {
               membersMask |= MemberPresenceFlag.PUBLIC_DEFAULT_CTOR;
+              if (isStruct)
+                membersMask |= MemberPresenceFlag.INSTANCE_CTOR;
             }
           }
         }

@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsByRefLike => false;
   }
 
-  internal abstract class UnionPartBase : SimpleTypePartBase, IUnionPart
+  internal abstract class UnionPartBase : StructuralTypePartBase, IUnionPart
   {
     public bool HasNestedTypes { get; }
     public bool IsSingleCase { get; }
@@ -123,7 +123,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     AccessRights RepresentationAccessRights { get; }
   }
 
-  public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner, IFSharpTypePart
+  public interface IUnionPart : IStructuralTypePart, IRepresentationAccessRightsOwner, IFSharpTypePart
   {
     bool HasNestedTypes { get; }
     bool IsSingleCase { get; }

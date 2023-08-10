@@ -134,6 +134,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Events 01``() = x.DoNamedTest()
     [<Test>] member x.``Events 02 - Abstract``() = x.DoNamedTest()
 
+    [<Test>] member x.``Struct 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 03 - Struct record``() = x.DoNamedTest()

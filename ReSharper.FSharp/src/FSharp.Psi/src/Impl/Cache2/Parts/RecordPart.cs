@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsByRefLike => false;
   }
 
-  internal abstract class RecordPartBase : SimpleTypePartBase, IRecordPart, IGeneratedConstructorOwner
+  internal abstract class RecordPartBase : StructuralTypePartBase, IRecordPart, IGeneratedConstructorOwner
   {
     public bool CliMutable { get; }
     public AccessRights RepresentationAccessRights { get; }
@@ -116,7 +116,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     bool CliMutable { get; }
   }
 
-  public interface IFieldsOwnerPart : ISimpleTypePart
+  public interface IFieldsOwnerPart : IStructuralTypePart
   {
     IList<ITypeOwner> Fields { get; }
   }

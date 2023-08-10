@@ -65,6 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public bool OverridesToString => false;
     public bool HasCompareTo => false;
+    public bool ReportCtor => true;
 
     public IParametersOwner GetConstructor() =>
       new FSharpGeneratedConstructorFromFields(this);
