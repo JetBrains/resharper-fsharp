@@ -63,18 +63,25 @@ module ProjectFcsModuleReader =
                 locker.Release()
 
 
-type FcsTypeDefMembers =
-    { mutable Methods: ILMethodDef[]
-      mutable Fields: ILFieldDef list
-      mutable Events: ILEventDef list
-      mutable Properties: ILPropertyDef list
-      mutable NestedTypes: ILPreTypeDef[] }
+type FcsTypeDefMemberTables =
+    { Methods: ILMethodDef[]
+      Fields: ILFieldDef list
+      Events: ILEventDef list
+      Properties: ILPropertyDef list }
 
     static member Create() =
         { Fields = Unchecked.defaultof<_>
           Methods = Unchecked.defaultof<_>
           Events = Unchecked.defaultof<_>
-          Properties = Unchecked.defaultof<_>
+          Properties = Unchecked.defaultof<_> }
+
+
+type FcsTypeDefMembers =
+    { mutable MemberTables: FcsTypeDefMemberTables
+      mutable NestedTypes: ILPreTypeDef[] }
+
+    static member Create() =
+        { MemberTables = Unchecked.defaultof<_>
           NestedTypes = Unchecked.defaultof<_> }
 
 type FcsTypeDef =
@@ -897,28 +904,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         result
 
-    let getOrCreateMembers (typeName: IClrTypeName) defaultValue (getMemberTable: FcsTypeDefMembers -> 'Table) createTable =
-        use _ = usingWriteLock ()
-
-        let fcsTypeDef = typeDefs.TryGetValue(typeName)
-        if isNull fcsTypeDef then
-            // The type has been invalidated.
-            // Fcs will check the module timestamp and request new data, so return dummy info.
-            defaultValue else
-
-        let members = fcsTypeDef.Members
-        let table = if isNotNull members then getMemberTable members else Unchecked.defaultof<_>
-        if isNotNull table then table else
-
-        lock fcsTypeDef (fun _ ->
-            if isNull fcsTypeDef.Members then
-                fcsTypeDef.Members <- FcsTypeDefMembers.Create()
-
-            let members = fcsTypeDef.Members
-            let table = getMemberTable members
-            if isNotNull table then table else
-
-            usingTypeElement typeName defaultValue (createTable members))
 
     let isExplicitImpl (typeMember: ITypeMember) =
         let overridableMember = typeMember.As<IOverridableMember>()
@@ -927,17 +912,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let getSignature (parametersOwner: IParametersOwner) =
         parametersOwner.GetSignature(parametersOwner.IdSubstitution)
 
-    let mkMethods (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
-        let methods =
-            let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
-            [| for method in typeElement.GetMembers().OfType<IFunction>() do
-                if not (isExplicitImpl method) && seenMethods.Add(getSignature method) then
-                    yield mkMethodDef method |]
+    let mkMethods (typeElement: ITypeElement) =
+        let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
+        [| for method in typeElement.GetMembers().OfType<IFunction>() do
+            if not (isExplicitImpl method) && seenMethods.Add(getSignature method) then
+                yield mkMethodDef method |]
 
-        table.Methods <- methods
-        methods
-
-    let mkFields (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
+    let mkFields (typeElement: ITypeElement) =
         let fields =
             match typeElement with
             | :? IEnum as e -> e.EnumMembers
@@ -952,55 +933,97 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
             | _ -> fields
 
-        table.Fields <- fields
         fields
 
-    let mkProperties (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
-        let properties =
-            let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
-            [ for property in typeElement.Properties do
-                if not (isExplicitImpl property) && seenProperties.Add(getSignature property) then
-                    yield mkPropertyDef property ]
+    let mkProperties (typeElement: ITypeElement) =
+        let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
+        [ for property in typeElement.Properties do
+            if not (isExplicitImpl property) && seenProperties.Add(getSignature property) then
+                yield mkPropertyDef property ]
 
-        table.Properties <- properties
-        properties
+    let mkEvents (typeElement: ITypeElement) =
+        [ for event in typeElement.Events do
+            yield mkEventDef event ]
 
-    let mkEvents (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
-        let events =
-            [ for event in typeElement.Events do
-                yield mkEventDef event ]
-
-        table.Events <- events
-        events
-
-    let mkNestedTypes reader (table: FcsTypeDefMembers) (typeElement: ITypeElement) =
-        let nestedTypes =
-            [| for typeElement in typeElement.NestedTypes do
-                PreTypeDef(typeElement, reader) :> ILPreTypeDef |]
-
-        table.NestedTypes <- nestedTypes
-        nestedTypes
+    let mkNestedTypes reader (typeElement: ITypeElement) =
+        [| for typeElement in typeElement.NestedTypes do
+            PreTypeDef(typeElement, reader) :> ILPreTypeDef |]
 
     let mkTypeDefName (typeElement: ITypeElement) (clrTypeName: IClrTypeName) =
         match typeElement.GetContainingType() with
         | null -> clrTypeName.FullName
         | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
 
+    
+    let getOrCreateNestedTypes (table: FcsTypeDefMembers) (typeName: IClrTypeName) defaultValue reader =
+        use _ = usingWriteLock ()
 
-    let getOrCreateMethods (typeName: IClrTypeName) =
-        getOrCreateMembers typeName EmptyArray.Instance (fun members -> members.Methods) mkMethods
+        let typeTable = table.NestedTypes
+        if isNotNull typeTable then typeTable else
 
-    let getOrCreateFields (typeName: IClrTypeName) =
-        getOrCreateMembers typeName [] (fun members -> members.Fields) mkFields
+        lock table (fun _ ->
+            usingTypeElement typeName () (fun typeElement ->
+                table.NestedTypes <- mkNestedTypes reader typeElement
 
-    let getOrCreateProperties (typeName: IClrTypeName) =
-        getOrCreateMembers typeName [] (fun members -> members.Properties) mkProperties
+                // Cache on the first access by FCS, so these table could later be used in isUpToDate checks
+                let fcsTypeDef = typeDefs.TryGetValue(typeName)
+                if isNotNull fcsTypeDef && isNull fcsTypeDef.Members then
+                    fcsTypeDef.Members <- table
+            )
 
-    let getOrCreateEvents (typeName: IClrTypeName) =
-        getOrCreateMembers typeName [] (fun members -> members.Events) mkEvents
+            let memberTables = table.NestedTypes
 
-    let getOrCreateNestedTypes reader (typeName: IClrTypeName) =
-        getOrCreateMembers typeName [||] (fun members -> members.NestedTypes) (mkNestedTypes reader)
+            // false when could not get the type element
+            if isNull memberTables then defaultValue else
+
+            memberTables
+        )
+
+    let getOrCreateMembers (table: FcsTypeDefMembers) (typeName: IClrTypeName) (defaultValue: 'Table) (getMemberTable: FcsTypeDefMemberTables -> 'Table) =
+        use _ = usingWriteLock ()
+
+        let memberTables = table.MemberTables
+        if isNotNull memberTables then getMemberTable memberTables else
+
+        lock table (fun _ ->
+            usingTypeElement typeName () (fun typeElement ->
+                let memberTables =
+                    { Methods = mkMethods typeElement
+                      Fields = mkFields typeElement
+                      Events = mkEvents typeElement
+                      Properties = mkProperties typeElement }
+
+                table.MemberTables <- memberTables
+
+                // Cache on the first access by FCS, so these table could later be used in isUpToDate checks
+                let fcsTypeDef = typeDefs.TryGetValue(typeName)
+                if isNotNull fcsTypeDef && isNull fcsTypeDef.Members then
+                    fcsTypeDef.Members <- table
+            )
+
+            let memberTables = table.MemberTables
+
+            // false when could not get the type element
+            if isNull memberTables then defaultValue else
+
+            getMemberTable memberTables
+        )
+
+
+    let getOrCreateMethods (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
+        getOrCreateMembers table typeName EmptyArray.Instance (fun members -> members.Methods)
+
+    let getOrCreateFields (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
+        getOrCreateMembers table typeName [] (fun members -> members.Fields)
+
+    let getOrCreateProperties (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
+        getOrCreateMembers table typeName [] (fun members -> members.Properties)
+
+    let getOrCreateEvents (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
+        getOrCreateMembers table typeName [] (fun members -> members.Events)
+
+    let getOrCreateNestedTypes (table: FcsTypeDefMembers) reader (typeName: IClrTypeName) =
+        getOrCreateNestedTypes table typeName [||] reader
 
 
     let isUpToDateTypeParamDef (typeParameter: ITypeParameter) (genericParameterDef: ILGenericParameterDef) =
@@ -1107,7 +1130,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         isUpToDateTypeParamDefs typeElement.TypeParameters typeDef.GenericParams &&
         isUpToDateTypeDefCustomAttributes typeElement typeDef &&
-        isUpToDateMembers typeElement fcsTypeDef.Members
+        isUpToDateNestedMembers typeElement fcsTypeDef.Members
 
     and isUpToDateNestedTypeDefs  (preTypeDefs: ILPreTypeDef[]) =
         isNull preTypeDefs ||
@@ -1122,14 +1145,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName).NotNull("IsUpToDate: nested type")
             isUpToDateTypeDef typeElement typeDef)
 
-    and isUpToDateMembers (typeElement: ITypeElement) (members: FcsTypeDefMembers) =
+    and isUpToDateNestedMembers (typeElement: ITypeElement) (members: FcsTypeDefMembers) =
         isNull members ||
 
         isUpToDateNestedTypeDefs members.NestedTypes &&
-        isUpToDateMethodsDefs typeElement members.Methods &&
-        isUpToDateFieldDefs typeElement members.Fields &&
-        isUpToDateEventDefs typeElement members.Events &&
-        isUpToDatePropertyDefs typeElement members.Properties
+        isUpToDateMembers typeElement members.MemberTables
+
+    and isUpToDateMembers (typeElement: ITypeElement) (tables: FcsTypeDefMemberTables) =
+        isNull tables ||
+
+        isUpToDateMethodsDefs typeElement tables.Methods &&
+        isUpToDateFieldDefs typeElement tables.Fields &&
+        isUpToDateEventDefs typeElement tables.Events &&
+        isUpToDatePropertyDefs typeElement tables.Properties
 
     let isUpToDateTypeDef (clrTypeName: IClrTypeName) (fcsTypeDef: FcsTypeDef) =
         let symbolScope = getSymbolScope ()
@@ -1191,12 +1219,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let typeAttributes = mkTypeAttributes typeElement
                 let extends = mkTypeDefExtends typeElement
                 let implements = mkTypeDefImplements typeElement
-                let nestedTypes = mkILTypeDefsComputed (fun _ -> getOrCreateNestedTypes this clrTypeName)
                 let genericParams = mkGenericParamDefs typeElement
-                let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods clrTypeName)
-                let fields = mkILFieldsLazy (lazy getOrCreateFields clrTypeName)
-                let properties = mkILPropertiesLazy (lazy getOrCreateProperties clrTypeName)
-                let events = mkILEventsLazy (lazy getOrCreateEvents clrTypeName)
+
+                // todo: pass this table in nested types too?
+                let membersTable = FcsTypeDefMembers.Create()
+                let nestedTypes = mkILTypeDefsComputed (fun _ -> getOrCreateNestedTypes membersTable this clrTypeName)
+                let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods membersTable clrTypeName)
+                let fields = mkILFieldsLazy (lazy getOrCreateFields membersTable clrTypeName)
+                let properties = mkILPropertiesLazy (lazy getOrCreateProperties membersTable clrTypeName)
+                let events = mkILEventsLazy (lazy getOrCreateEvents membersTable clrTypeName)
+
                 let customAttrs = mkTypeDefCustomAttrs typeElement
 
                 let typeDef =
