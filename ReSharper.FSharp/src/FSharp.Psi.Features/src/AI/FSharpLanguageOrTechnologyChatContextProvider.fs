@@ -4,7 +4,7 @@ open JetBrains.Application.Parts
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.AI
-open JetBrains.ReSharper.Feature.Services.AI.Context.Common
+open JetBrains.ReSharper.Feature.Services.ChatContexts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
