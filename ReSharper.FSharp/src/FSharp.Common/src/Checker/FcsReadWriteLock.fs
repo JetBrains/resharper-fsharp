@@ -2,7 +2,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Checker.FcsReadWriteLock
 
 open System
-open System.Threading
 open JetBrains.Application.Threading
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp
@@ -11,10 +10,10 @@ open JetBrains.Util.Concurrency
 let private fcsLocks = ReentrantWriterPreferenceReadWriteLock()
 
 let assertReadAccess () =
-    Assertion.Assert(fcsLocks.IsReadLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertReadAccess")
+    Assertion.Assert(fcsLocks.IsReadLockHeldByCurrentThread(), "FcsReadWriteLock.assertReadAccess")
 
 let assertWriteAccess () =
-    Assertion.Assert(fcsLocks.IsWriteLockAcquired(Thread.CurrentThread), "FcsReadWriteLock.assertWriteAccess")
+    Assertion.Assert(fcsLocks.IsWriteLockHeldByCurrentThread(), "FcsReadWriteLock.assertWriteAccess")
 
 
 [<Struct>]
