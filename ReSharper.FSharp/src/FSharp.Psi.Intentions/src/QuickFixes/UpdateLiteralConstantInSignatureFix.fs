@@ -46,6 +46,8 @@ type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSig
 
     let mutable sigRefPat = null
 
+    let mutable isUoM = false
+
     let rec isImplExprValidInSig (implExpression: IFSharpExpression) =
         
         let opName = $"{nameof UpdateLiteralConstantInSignatureFix}.IsAvailable"
@@ -89,7 +91,9 @@ type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSig
         | :? IBinaryAppExpr as binExpr ->
             isImplExprValidInSig binExpr.LeftArgument && isImplExprValidInSig binExpr.RightArgument
         | :? ILiteralExpr as litExpr ->
-            if isNull litExpr.UnitOfMeasure then true else isValidUofMInSig litExpr.UnitOfMeasure
+            if isNull litExpr.UnitOfMeasure then true else
+                isUoM <- true
+                isValidUofMInSig litExpr.UnitOfMeasure
         | _ -> false
 
     override x.Text =
@@ -121,7 +125,8 @@ type UpdateLiteralConstantInSignatureFix(error: LiteralConstantValuesDifferInSig
         let implSymbolUse = errorRefPat.GetFcsSymbolUse()
         let implMfv = implSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let sigMfv = sigSymbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-        if implMfv.FullType.BasicQualifiedName <> sigMfv.FullType.BasicQualifiedName then
+        // currenty FSharpType.Format is broken for UoM https://github.com/dotnet/fsharp/issues/15843
+        if implMfv.FullType.BasicQualifiedName <> sigMfv.FullType.BasicQualifiedName && not isUoM then
             let returnTypeString = implMfv.ReturnParameter.Type.Format(sigSymbolUse.DisplayContext)
             let factory = sigRefPat.CreateElementFactory()
             let typeUsage = factory.CreateTypeUsage(returnTypeString, TypeUsageContext.TopLevel)
