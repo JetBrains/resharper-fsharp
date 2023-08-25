@@ -202,6 +202,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
 
+    [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
+
+
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()
