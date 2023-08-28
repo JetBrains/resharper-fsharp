@@ -30,12 +30,12 @@ type FSharpProjectConfiguration() as this =
     interface IFSharpProjectConfiguration with
         member val LanguageVersion = FSharpLanguageVersion.Default with get, set
 
-    override this.WriteConfiguration(writer) =
-        base.WriteConfiguration(writer)
+    override this.WriteConfiguration(writer, stringIntern) =
+        base.WriteConfiguration(writer, stringIntern)
         writer.WriteEnum(configuration.LanguageVersion)
 
-    override this.ReadConfiguration(reader) =
-        base.ReadConfiguration(reader)
+    override this.ReadConfiguration(reader, stringIntern) =
+        base.ReadConfiguration(reader, stringIntern)
         configuration.LanguageVersion <- reader.ReadEnum(FSharpLanguageVersion.Default)
 
     override this.UpdateFrom(otherConfiguration) =
@@ -65,16 +65,16 @@ type FSharpProjectProperties =
     override x.BuildSettings = x.buildSettings :> _
     override x.DefaultLanguage = FSharpProjectLanguage.Instance
 
-    override x.ReadProjectProperties(reader) =
-        base.ReadProjectProperties(reader)
-        x.buildSettings.ReadBuildSettings(reader)
+    override x.ReadProjectProperties(reader, stringIntern) =
+        base.ReadProjectProperties(reader, stringIntern)
+        x.buildSettings.ReadBuildSettings(reader, stringIntern)
         let tpd = TargetPlatformData()
         tpd.Read(reader)
         if not tpd.IsEmpty then x.targetPlatformData <- tpd
 
-    override x.WriteProjectProperties(writer) =
-        base.WriteProjectProperties(writer)
-        x.buildSettings.WriteBuildSettings(writer)
+    override x.WriteProjectProperties(writer, stringIntern) =
+        base.WriteProjectProperties(writer, stringIntern)
+        x.buildSettings.WriteBuildSettings(writer, stringIntern)
         match x.targetPlatformData with
         | null -> TargetPlatformData.WriteEmpty(writer)
         | _ -> x.targetPlatformData.Write(writer)
@@ -93,12 +93,12 @@ and FSharpBuildSettings() =
 
     member val TailCalls = Unchecked.defaultof<bool> with get, set
 
-    override x.WriteBuildSettings(writer) =
-        base.WriteBuildSettings(writer)
+    override x.WriteBuildSettings(writer, stringIntern) =
+        base.WriteBuildSettings(writer, stringIntern)
         writer.Write(x.TailCalls)
 
-    override x.ReadBuildSettings(reader) =
-        base.ReadBuildSettings(reader)
+    override x.ReadBuildSettings(reader, stringIntern) =
+        base.ReadBuildSettings(reader, stringIntern)
         x.TailCalls <- reader.ReadBool()
 
     override x.Dump(writer, indent) =
@@ -152,9 +152,9 @@ type FSharpProjectPropertiesFactory() =
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
         FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, null) :> _
 
-    override x.Read(reader) =
+    override x.Read(reader, stringIntern) =
         let projectProperties = FSharpProjectProperties(factoryGuid)
-        projectProperties.ReadProjectProperties(reader)
+        projectProperties.ReadProjectProperties(reader, stringIntern)
         projectProperties :> _
 
     static member IsKnownProjectTypeGuid(guid) = isFSharpGuid guid
