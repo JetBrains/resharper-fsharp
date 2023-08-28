@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net70
 
-import com.intellij.openapi.project.Project
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
@@ -9,23 +8,13 @@ import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
-import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.maskRandomDotnetRcSuffix
-import com.jetbrains.rider.test.maskRandomFileNameInFolder
-import com.jetbrains.rider.test.normalizeSeparators
-import com.jetbrains.rider.test.scriptingApi.ProjectTemplateIds
-import com.jetbrains.rider.test.scriptingApi.TemplateIdWithVersion
-import java.io.File
-import java.nio.file.*
-import java.nio.file.attribute.BasicFileAttributes
+import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 
 @Suppress("unused")
 @Mute("Unable to load project and obtain project information from MsBuild.", [PlatformType.LINUX_ARM64])
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK )
 object Net70 {
-  class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_classLibrary
+  class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.classLibrary) {
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val targetFramework: String = "net7.0"
@@ -38,9 +27,7 @@ object Net70 {
     }
   }
 
-  class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_consoleApplication
+  class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.consoleApplication) {
     override val expectedNumOfAnalyzedFiles: Int = 3
     override val expectedNumOfSkippedFiles: Int = 0
     override val breakpointLine: Int = 2
@@ -58,9 +45,7 @@ object Net70 {
     }
   }
 
-  class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_xUnit
+  class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.xUnit) {
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val sessionElements: Int = 3

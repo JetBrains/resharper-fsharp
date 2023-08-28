@@ -155,7 +155,8 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
-        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplateIds.currentSdk.fsharp_classLibrary)
+        // currently ProjectTemplates.Sdk.Net6 should be used in LATEST_STABLE tests
+        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net6.FSharp.classLibrary)
       }
       dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")

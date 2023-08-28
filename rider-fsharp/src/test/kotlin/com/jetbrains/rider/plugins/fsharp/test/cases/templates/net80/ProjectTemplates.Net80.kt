@@ -8,16 +8,13 @@ import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.ProjectTemplateIds
-import com.jetbrains.rider.test.scriptingApi.TemplateIdWithVersion
+import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 
 @Suppress("unused")
 @Mute("Unable to load project and obtain project information from MsBuild.", [PlatformType.LINUX_ARM64])
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK )
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
 object Net80 {
-  class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_classLibrary
+  class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.classLibrary) {
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val targetFramework: String = "net8.0"
@@ -31,9 +28,7 @@ object Net80 {
     }
   }
 
-  class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_consoleApplication
+  class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.consoleApplication) {
     override val expectedNumOfAnalyzedFiles: Int = 3
     override val expectedNumOfSkippedFiles: Int = 0
     override val breakpointLine: Int = 2
@@ -51,9 +46,7 @@ object Net80 {
     }
   }
 
-  class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase() {
-    override val templateId: TemplateIdWithVersion
-      get() = ProjectTemplateIds.currentSdk.fsharp_xUnit
+  class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.xUnit) {
     override val expectedNumOfAnalyzedFiles: Int = 1
     override val expectedNumOfSkippedFiles: Int = 0
     override val sessionElements: Int = 3
