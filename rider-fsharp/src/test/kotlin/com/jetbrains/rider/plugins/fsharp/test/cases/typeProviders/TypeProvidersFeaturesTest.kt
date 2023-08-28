@@ -68,8 +68,8 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()
       executeWithGold(testGoldFile) {
-        callActionAndHandlePopup(IdeActions.ACTION_GOTO_DECLARATION, it, true, Duration.ofSeconds(1)) {
-          this.closeAll()
+        callActionAndHandlePopup(IdeActions.ACTION_GOTO_DECLARATION, true, Duration.ofSeconds(1), it) {
+          this.cancel()
         }
       }
     }
