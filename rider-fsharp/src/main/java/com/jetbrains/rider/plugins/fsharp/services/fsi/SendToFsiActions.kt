@@ -81,15 +81,15 @@ class DebugSelectionInFsiIntentionAction :
 open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) :
   BaseSendToFsiIntentionAction(debug, actionId) {
   override fun getText() = titleText
-  override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
-    super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+    super.isAvailable(project, editor, file) && !editor.selectionModel.hasSelection()
 }
 
 open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) :
   BaseSendToFsiIntentionAction(debug, actionId) {
   override fun getText() = titleText
-  override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
-    super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+    super.isAvailable(project, editor, file) && editor.selectionModel.hasSelection()
 }
 
 abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) :
@@ -99,8 +99,8 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   override fun getFamilyName(): String = FSharpBundle.message("Fsi.actions.send.to.fsi.intention.action.text")
   override fun startInWriteAction() = false
 
-  override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
-    isAvailable && file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+    isAvailable && file.language is FSharpLanguageBase && editor.caretModel.caretCount == 1
 
   override fun invoke(project: Project, editor: Editor, element: PsiElement) {
     project.getComponent<FsiHost>().sendToFsi(editor, element.containingFile, debug)
