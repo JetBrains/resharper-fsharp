@@ -8,9 +8,10 @@ type CE() =
 
 let ce = CE()
 
-module M =
-    let car = ()
+let foo f = ()
+
+let car = ()
 
 ce {
-    do c{caret}
+    foo c{caret}
 }
