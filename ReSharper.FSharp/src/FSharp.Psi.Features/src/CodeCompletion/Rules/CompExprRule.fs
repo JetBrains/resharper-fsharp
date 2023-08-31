@@ -23,6 +23,11 @@ open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 
+// TODO: test for first item of completion list
+// TODO: IsAvailable implementation (simple - detect computation expression)
+// TODO: better relevance for custom operations?
+// TODO: cases where custom operation is possible inside CE (for, if, match, ... ?)
+
 [<Language(typeof<FSharpLanguage>)>]
 type CompExprRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
