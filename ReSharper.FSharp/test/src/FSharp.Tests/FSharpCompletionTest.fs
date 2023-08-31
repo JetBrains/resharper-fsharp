@@ -204,6 +204,7 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 03 no prefix`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
 
 
