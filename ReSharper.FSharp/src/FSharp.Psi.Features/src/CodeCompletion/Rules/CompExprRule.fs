@@ -28,6 +28,8 @@ type CompExprRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override this.IsAvailable(context) =
+        //let n = context.ReparsedContext.Reference :?> IFSharpExpression |> ComputationExprNavigator.GetByExpression
+        //n <> null
         true
 
     override this.TransformItems(context, collector) =
