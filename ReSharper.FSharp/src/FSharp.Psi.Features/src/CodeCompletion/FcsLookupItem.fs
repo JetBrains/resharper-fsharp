@@ -168,7 +168,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     interface IParameterInfoCandidatesProvider with
         member x.HasCandidates = x.Candidates.Length > 1
-        member x.CreateCandidates() = x.Candidates :> _
+        member x.CreateCandidates _ = x.Candidates :> _
 
     interface IDescriptionProvidingLookupItem with
         /// Called when x.HasCandidates is false.
