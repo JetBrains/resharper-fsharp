@@ -15,6 +15,12 @@ open JetBrains.Text
 
 [<SolutionComponent>]
 type FSharpLiteralInjectionTarget() =
+    let isInjectionAllowed tokenType =
+        FSharpTokenType.Strings[tokenType] &&
+        tokenType <> FSharpTokenType.CHARACTER_LITERAL &&
+        tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
+        tokenType <> FSharpTokenType.BYTEARRAY
+
     interface IInjectionTargetLanguage with
         override _.ShouldInjectByAnnotation(_, prefix, postfix) =
             prefix <- null
@@ -32,14 +38,14 @@ type FSharpLiteralInjectionTarget() =
             null
 
         override _.SupportsRegeneration = false
+        override _.LiteralBorderCharacters = [|'"'|]
 
-        override _.IsInjectionAllowed(node) =
+        override x.IsInjectionAllowed(tokenType) =
+            isInjectionAllowed tokenType
+
+        override x.IsInjectionAllowed(node: ITreeNode) =
             let tokenType = node.GetTokenType()
-
-            FSharpTokenType.Strings[tokenType] &&
-            tokenType <> FSharpTokenType.CHARACTER_LITERAL &&
-            tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
-            tokenType <> FSharpTokenType.BYTEARRAY
+            isInjectionAllowed tokenType
 
         override _.GetCorrespondingCommentTextForLiteral _ = null
 
