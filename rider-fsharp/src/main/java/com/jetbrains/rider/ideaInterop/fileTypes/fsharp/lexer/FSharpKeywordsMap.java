@@ -1,13 +1,14 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
 
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.containers.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.Map;
 
 class FSharpKeywordsMap {
-  private static final HashMap<CharSequence, IElementType> ourKeywordMap = new HashMap<>();
+  private static final Map<CharSequence, IElementType> ourKeywordMap = CollectionFactory.createCharSequenceMap(true);
 
   static {
     for (IElementType type : FSharpTokenType.IDENT_KEYWORDS.getTypes()) {
@@ -24,7 +25,7 @@ class FSharpKeywordsMap {
 }
 
 class FSharpReservedKeywordsMap {
-  private static final HashMap<CharSequence, IElementType> ourKeywordMap = new HashMap<>();
+  private static final Map<CharSequence, IElementType> ourKeywordMap = CollectionFactory.createCharSequenceMap(true);
 
   static {
     for (IElementType type : FSharpTokenType.RESERVED_IDENT_KEYWORDS.getTypes()) {
