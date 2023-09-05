@@ -23,20 +23,3 @@ class FSharpKeywordsMap {
     return ourKeywordMap.get(sequence);
   }
 }
-
-class FSharpReservedKeywordsMap {
-  private static final Map<CharSequence, IElementType> ourKeywordMap = CollectionFactory.createCharSequenceMap(true);
-
-  static {
-    for (IElementType type : FSharpTokenType.RESERVED_IDENT_KEYWORDS.getTypes()) {
-      if (!(type instanceof FSharpKeywordTokenNodeType)) continue;
-      ourKeywordMap.put(((FSharpKeywordTokenNodeType) type).getRepresentation(), type);
-    }
-  }
-
-  @Nullable
-  static IElementType findKeyword(@NotNull CharSequence buffer, int start, int end) {
-    CharSequence sequence = buffer.subSequence(start, end);
-    return ourKeywordMap.get(sequence);
-  }
-}
