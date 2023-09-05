@@ -199,6 +199,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     [NotNull]
     private FcsModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
+      CheckerService.AssertFcsAccessThread();
+
       var psiModule = sourceFile.PsiModule;
       if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FcsModuleResolvedSymbols.Empty;

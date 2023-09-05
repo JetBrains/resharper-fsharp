@@ -9,6 +9,8 @@ open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -26,6 +28,7 @@ open JetBrains.ReSharper.Psi.CSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.VB
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 module FcsCheckerService =
@@ -68,7 +71,7 @@ type FcsProject =
 
 [<ShellComponent; AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-        settingsStore: ISettingsStore, locks: IShellLocks) =
+        settingsStore: ISettingsStore, locks: IShellLocks, configurations: RunsProducts.ProductConfigurations) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -102,6 +105,14 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
     member x.Checker = checker.Value
 
+    member this.AssertFcsAccessThread() =
+        if Shell.Instance.IsTestShell then () else
+
+        if locks.IsOnMainThread() then
+            logger.Error("Accessing FCS from main thread")
+        elif Interruption.Current.IsEmpty then
+            logger.Error("Accessing FCS without interruption")
+
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
             locks.AssertReadAccessAllowed()
@@ -130,6 +141,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
         locks.AssertReadAccessAllowed()
+        x.AssertFcsAccessThread()
 
         let psiModule = sourceFile.PsiModule
         match x.FcsProjectProvider.GetFcsProject(psiModule) with
