@@ -9,8 +9,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
 [<SolutionComponent(Instantiation.DemandAnyThread)>]
-[<ZoneMarker(typeof<IArtificialIntelligenceZone>)>]
 type FSharpLanguageOrTechnologyChatContextProvider() =
+    let _ = Unchecked.defaultof<IArtificialIntelligenceZone>
+
     interface ILanguageOrTechnologyChatContextProvider with
         member this.GetLanguageOrTechnologyPresentation(psiModule) =
             if isFSharpProjectModule psiModule || psiModule :? FSharpScriptPsiModule then "F#" else null
+
+[<ZoneMarker>]
+type ZoneMarker() =
+    interface IRequire<IArtificialIntelligenceZone>
