@@ -22,6 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private readonly JetProcessRuntimeRequest myRequest;
     private readonly DotNetCoreToolset myToolset;
     private readonly bool myIsInternalMode;
+    private readonly bool myEnableTracing;
     private Lifetime myLifetime;
 
     protected override string Name => "Out-of-Process TypeProviders";
@@ -110,6 +111,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         },
         {
           "RESHARPER_INTERNAL_MODE", myIsInternalMode.ToString()
+        },
+        {
+          TypeProvidersProtocolConstants.ENABLE_TRACING_ENV_VAR, myEnableTracing ? "1" : "0"
         }
       };
     }
@@ -122,12 +126,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, DotNetCoreToolset toolset,
-      bool isInternalMode)
+      bool isInternalMode, bool enableTracing)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myToolset = toolset;
       myIsInternalMode = isInternalMode;
+      myEnableTracing = enableTracing;
     }
   }
 }

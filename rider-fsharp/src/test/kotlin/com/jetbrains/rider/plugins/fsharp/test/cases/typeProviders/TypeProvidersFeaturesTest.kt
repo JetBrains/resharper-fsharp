@@ -2,8 +2,10 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.IdeActions
+import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -16,6 +18,8 @@ import java.time.Duration
 class TypeProvidersFeaturesTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
+  override val traceScenarios: Set<LogTraceScenario>
+    get() = super.traceScenarios + FSharpLogTraceScenarios.TypeProviders
 
   @Test
   fun `signature file navigation`() = doNavigationTestWithMultipleDeclarations()

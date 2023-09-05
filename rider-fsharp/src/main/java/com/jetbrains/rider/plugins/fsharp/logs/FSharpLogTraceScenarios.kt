@@ -14,4 +14,12 @@ class FSharpLogTraceScenarios {
     "JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem.FSharpSourceCache",
     "JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem.AssemblyInfoShim"
   )
+
+  object TypeProviders : LogTraceScenario(
+    "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host"
+  )
+
+  object Fantomas : LogTraceScenario(
+    "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host"
+  )
 }

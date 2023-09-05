@@ -33,6 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
     protected override void InitLogger(Lifetime lifetime, string path)
     {
+      var traceEnv = Environment.GetEnvironmentVariable(TypeProvidersProtocolConstants.ENABLE_TRACING_ENV_VAR);
+      if (traceEnv != "1") return;
+
       ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
 
       if (Environment.GetEnvironmentVariable("RESHARPER_INTERNAL_MODE") is { } env &&

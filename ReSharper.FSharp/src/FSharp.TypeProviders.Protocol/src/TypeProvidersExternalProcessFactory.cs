@@ -6,6 +6,7 @@ using JetBrains.Platform.MsBuildHost;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.Properties;
+using JetBrains.Rider.Model.Loggers;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -19,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     [NotNull] private readonly ISolutionToolset myToolset;
     [NotNull] private readonly OutputAssemblies myOutputAssemblies;
     [NotNull] private readonly IShellLocks myLocks;
+    [NotNull] private readonly LoggerModel myLoggerModel;
 
     public TypeProvidersExternalProcessFactory(
       [NotNull] ISolutionProcessStartInfoPatcher solutionProcessStartInfoPatcher,
@@ -26,7 +28,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       [NotNull] IShellLocks shellLocks,
       [NotNull] ISolutionToolset toolset,
       [NotNull] OutputAssemblies outputAssemblies,
-      [NotNull] IShellLocks locks)
+      [NotNull] IShellLocks locks,
+      [NotNull] LoggerModel loggerModel)
     {
       mySolutionProcessStartInfoPatcher = solutionProcessStartInfoPatcher;
       myLogger = logger;
@@ -34,6 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       myToolset = toolset;
       myOutputAssemblies = outputAssemblies;
       myLocks = locks;
+      myLoggerModel = loggerModel;
     }
 
     [CanBeNull]
@@ -76,13 +80,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         ? JetProcessRuntimeRequest.CreateCore(mutator, true)
         : JetProcessRuntimeRequest.CreateFramework(mutator: mutator);
 
+      var enableTracing = myLoggerModel.TraceCategories.Value.Contains(TypeProvidersProtocolConstants.TraceScenario);
+
       return new TypeProvidersExternalProcess(lifetime,
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
         runtimeRequest,
         toolset,
-        isInternalMode);
+        isInternalMode,
+        enableTracing);
     }
   }
 }

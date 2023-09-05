@@ -7,7 +7,6 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
@@ -15,9 +14,8 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Test
-class TypeProvidersRuntimeTest : BaseTestWithSolution() {
+class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
-  override val restoreNuGetPackages = true
 
   @Test
   @TestEnvironment(
