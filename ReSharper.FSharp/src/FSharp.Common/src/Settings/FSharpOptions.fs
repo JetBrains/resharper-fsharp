@@ -36,7 +36,7 @@ type FSharpOptions =
     { [<SettingsEntry(true, skipImplementationAnalysis); DefaultValue>]
       mutable SkipImplementationAnalysis: bool
 
-      [<SettingsEntry(false, parallelProjectReferencesAnalysis); DefaultValue>]
+      [<SettingsEntry(true, parallelProjectReferencesAnalysis); DefaultValue>]
       mutable ParallelProjectReferencesAnalysis: bool
 
       [<SettingsEntry(true, nonFSharpProjectInMemoryReferences); DefaultValue>]
