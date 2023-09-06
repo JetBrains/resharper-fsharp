@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
 open FSharp.Compiler.Diagnostics
+open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -282,7 +283,28 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedValue ->
             match fsFile.GetNode<IReferencePat>(range) with
-            | null -> UnusedHighlighting(error.Message, range) :> _
+            | null ->
+                match fsFile.GetNode<IReferenceExpr>(range) with
+                | null ->
+                    UnusedHighlighting(error.Message, range) :> _
+
+                | refExpr ->
+                    let tryGetSymbol (refExpr: IReferenceExpr) =
+                        let reference = refExpr.Reference
+                        let offset = reference.SymbolOffset
+                        if not (offset.IsValid()) then Unchecked.defaultof<_> else
+
+                        let fcsSymbolUse = refExpr.FSharpFile.GetSymbolDeclaration(offset.Offset)
+                        if isNull fcsSymbolUse then Unchecked.defaultof<_> else
+
+                        fcsSymbolUse.Symbol
+
+                    match tryGetSymbol refExpr with
+                    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsReferencedValue ->
+                        IgnoredHighlighting.Instance :> _
+                    | _ ->
+                        UnusedHighlighting(error.Message, range) :> _
+
             | refPat ->
 
             let pat = FSharpPatternUtil.ignoreParentAsPatsFromRight refPat

@@ -1,0 +1,11 @@
+﻿module Module
+
+let _ =
+    query {
+        join a in [] on ("" = a)
+        join |c|(0) in [] on ("" = "") 
+        select a
+    }
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: The value 'c' is unused

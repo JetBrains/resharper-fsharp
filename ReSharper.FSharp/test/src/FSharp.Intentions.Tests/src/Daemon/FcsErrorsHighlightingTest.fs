@@ -39,6 +39,8 @@ type FcsErrorsHighlightingTest() =
 
     [<Test>] member x.``Unused value - Operators 01``() = x.DoNamedTest()
 
+    [<TestReferences("System.Core")>]
+    [<Test>] member x.``Unused value - Query 01``() = x.DoNamedTest()
     [<Test>] member x.``Unused value - Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Unused value - Partial pattern 02 - And``() = x.DoNamedTest()
     [<Test>] member x.``Unused value 01 - Object expression``() = x.DoNamedTest()
