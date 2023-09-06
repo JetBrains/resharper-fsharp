@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
-import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
@@ -13,9 +12,8 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
-class TypeProvidersCSharpTest : BaseTestWithSolution() {
+class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   override fun getSolutionDirectoryName() = "YamlProviderCSharp"
-  override val restoreNuGetPackages = true
 
   @Test
   fun resolveTest() {

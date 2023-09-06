@@ -1,10 +1,8 @@
 ﻿using System.Linq;
 using JetBrains.Collections.Viewable;
 using JetBrains.Core;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
-using JetBrains.Platform.RdFramework.ExternalProcess.Util;
 using JetBrains.Rd.Impl;
 using JetBrains.Util;
 using JetBrains.Rd.Tasks;
@@ -23,8 +21,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
 
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger) => new(lifetime, logger);
 
-    protected override void InitLogger(Lifetime lifetime, string path) =>
-      ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
+    protected override void InitLogger(Lifetime lifetime, string path)
+    {
+    }
 
     protected override RdFantomasModel InitModel(Lifetime lifetime, JetBrains.Rd.Impl.Protocol protocol)
     {

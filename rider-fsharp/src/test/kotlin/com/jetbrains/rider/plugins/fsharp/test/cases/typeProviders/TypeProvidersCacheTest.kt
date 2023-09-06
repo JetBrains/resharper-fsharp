@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
-import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -17,9 +16,8 @@ import java.io.File
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
-class TypeProvidersCacheTest : BaseTestWithSolution() {
+class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   override fun getSolutionDirectoryName() = "TypeProviderLibrary"
-  override val restoreNuGetPackages = true
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 
   private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {

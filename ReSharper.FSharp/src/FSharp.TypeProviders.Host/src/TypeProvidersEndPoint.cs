@@ -18,6 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
     TypeProvidersEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersModel, RdSimpleDispatcher>
   {
     private RdSimpleDispatcher myDispatcher;
+    private LifetimeDefinition myLoggerLifetime = Lifetime.Define(Lifetime.Terminated);
+    private string myLoggingPath;
 
     protected override string ProtocolName => "Out-of-Process Type Providers Host";
 
@@ -33,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
 
     protected override void InitLogger(Lifetime lifetime, string path)
     {
-      ProtocolEndPointUtil.InitLogger(path, lifetime, LoggingLevel.TRACE);
+      myLoggingPath = path;
 
       if (Environment.GetEnvironmentVariable("RESHARPER_INTERNAL_MODE") is { } env &&
           bool.TryParse(env, out var isInternalMode) && isInternalMode)
@@ -41,13 +43,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host
         Trace.Listeners.Clear();
         Trace.Listeners.Add(new WriteToLogTraceListener(Logger));
       }
+    }
 
-      Logger.Log(LoggingLevel.INFO, $"Process Runtime: {RuntimeInformation.FrameworkDescription}");
+    private void ConfigureTracing(Lifetime lifetime, bool enable)
+    {
+      if (enable && myLoggerLifetime.Lifetime.IsNotAlive)
+      {
+        myLoggerLifetime = Lifetime.Define(lifetime);
+        ProtocolEndPointUtil.InitLogger(myLoggingPath, myLoggerLifetime.Lifetime, LoggingLevel.TRACE);
+      }
+
+      else myLoggerLifetime.Terminate();
     }
 
     protected override RdFSharpTypeProvidersModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
       var model = new RdFSharpTypeProvidersModel(lifetime, protocol);
+      model.EnableTracing.Advise(lifetime, enabled => ConfigureTracing(lifetime, enabled));
       var typeProvidersContext = new TypeProvidersContext(Logger, myDispatcher.AsTaskScheduler());
 
       new TypeProvidersHost(typeProvidersContext).Initialize(model.RdTypeProviderProcessModel);
