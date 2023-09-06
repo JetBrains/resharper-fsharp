@@ -3,6 +3,7 @@ using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.MsBuildHost;
+using JetBrains.Platform.RdFramework.Util;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Build;
 using JetBrains.ProjectModel.Properties;
@@ -80,8 +81,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         ? JetProcessRuntimeRequest.CreateCore(mutator, true)
         : JetProcessRuntimeRequest.CreateFramework(mutator: mutator);
 
-      var enableTracing = myLoggerModel.TraceCategories.Value.Contains(TypeProvidersProtocolConstants.TraceScenario);
-
       return new TypeProvidersExternalProcess(lifetime,
         myLogger,
         myShellLocks,
@@ -89,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         runtimeRequest,
         toolset,
         isInternalMode,
-        enableTracing);
+        myLoggerModel);
     }
   }
 }

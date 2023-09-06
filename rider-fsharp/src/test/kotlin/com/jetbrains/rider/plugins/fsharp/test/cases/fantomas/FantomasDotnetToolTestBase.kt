@@ -5,10 +5,8 @@ import com.intellij.util.application
 import com.intellij.util.io.createFile
 import com.intellij.util.io.delete
 import com.intellij.util.io.write
-import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.*
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
@@ -28,8 +26,6 @@ import kotlin.io.path.*
 abstract class FantomasDotnetToolTestBase : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
   override val restoreNuGetPackages = false
-  override val traceScenarios: Set<LogTraceScenario>
-    get() = super.traceScenarios + FSharpLogTraceScenarios.Fantomas
 
   private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
   private val fantomasNotifications = ArrayList<String>()

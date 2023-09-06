@@ -8,9 +8,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
   {
     public const string PROCESS_FILENAME = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll";
     public const string PARENT_PROCESS_PID_ENV_VARIABLE = "FSHARP_FANTOMAS_PROCESS_PID";
-    public const string ENABLE_TRACING_ENV_VAR = "ENABLE_TRACING";
-
-    public const string TraceScenario = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host";
     public static readonly FileSystemPath LogFolder = Logger.LogFolderPath / "Fantomas";
     
     /// Breaking changes:

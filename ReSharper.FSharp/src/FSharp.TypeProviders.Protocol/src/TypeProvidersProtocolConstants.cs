@@ -6,8 +6,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
   public static class TypeProvidersProtocolConstants
   {
     public const string TypeProvidersHostPid = "TypeProvidersHost";
-    public const string ENABLE_TRACING_ENV_VAR = "ENABLE_TRACING";
-
     public const string TraceScenario = "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host";
 
     public static string TypeProvidersHostFrameworkFilename =>

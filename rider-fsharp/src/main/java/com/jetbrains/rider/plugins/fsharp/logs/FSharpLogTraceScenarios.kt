@@ -18,8 +18,4 @@ class FSharpLogTraceScenarios {
   object TypeProviders : LogTraceScenario(
     "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host"
   )
-
-  object Fantomas : LogTraceScenario(
-    "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host"
-  )
 }

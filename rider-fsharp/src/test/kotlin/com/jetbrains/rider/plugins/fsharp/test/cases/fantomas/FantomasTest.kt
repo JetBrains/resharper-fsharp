@@ -1,9 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
-import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
@@ -17,8 +15,6 @@ import org.testng.annotations.Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
-  override val traceScenarios: Set<LogTraceScenario>
-    get() = super.traceScenarios + FSharpLogTraceScenarios.Fantomas
 
   @Test
   fun withEditorConfig() = doTest("EditorConfig.fs")

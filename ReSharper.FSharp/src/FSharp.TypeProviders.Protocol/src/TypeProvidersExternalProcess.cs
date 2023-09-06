@@ -9,9 +9,11 @@ using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
+using JetBrains.Platform.RdFramework.Util;
 using JetBrains.ProjectModel.BuildTools;
 using JetBrains.Rd;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Client;
+using JetBrains.Rider.Model.Loggers;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
@@ -22,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private readonly JetProcessRuntimeRequest myRequest;
     private readonly DotNetCoreToolset myToolset;
     private readonly bool myIsInternalMode;
-    private readonly bool myEnableTracing;
+    private readonly LoggerModel myLoggerModel;
     private Lifetime myLifetime;
 
     protected override string Name => "Out-of-Process TypeProviders";
@@ -30,8 +32,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private static readonly FileSystemPath TypeProvidersDirectory =
       typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory.Parent / "typeProviders";
 
-    protected override RdFSharpTypeProvidersModel CreateModel(Lifetime lifetime, IProtocol protocol) =>
-      new(lifetime, protocol);
+    protected override RdFSharpTypeProvidersModel CreateModel(Lifetime lifetime, IProtocol protocol)
+    {
+      var model = new RdFSharpTypeProvidersModel(lifetime, protocol);
+
+      if (myLoggerModel.TryGetProto() is { } loggerModelProtocol)
+        loggerModelProtocol.Scheduler.Queue(() =>
+          myLoggerModel.TraceCategories.Advise(lifetime, categories =>
+            protocol.Scheduler.Queue(() =>
+              model.EnableTracing.Value = categories.Contains(TypeProvidersProtocolConstants.TraceScenario))));
+
+      else Logger.Info("Unable to subscribe to LoggerModel.TraceCategories because its protocol is null");
+      return model;
+    }
 
     protected override TypeProvidersConnection CreateConnection(Lifetime lifetime,
       RdFSharpTypeProvidersModel model, IProtocol protocol, StartupOutputWriter outputWriter, int processId,
@@ -111,28 +124,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         },
         {
           "RESHARPER_INTERNAL_MODE", myIsInternalMode.ToString()
-        },
-        {
-          TypeProvidersProtocolConstants.ENABLE_TRACING_ENV_VAR, myEnableTracing ? "1" : "0"
         }
       };
     }
 
     protected override bool Shutdown(RdFSharpTypeProvidersModel model)
     {
-      model.TryGetProto().NotNull().Scheduler.Queue(() => model.RdTypeProviderProcessModel.Kill.Start(myLifetime, Unit.Instance));
+      model.TryGetProto().NotNull().Scheduler
+        .Queue(() => model.RdTypeProviderProcessModel.Kill.Start(myLifetime, Unit.Instance));
       return true;
     }
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, DotNetCoreToolset toolset,
-      bool isInternalMode, bool enableTracing)
+      bool isInternalMode, LoggerModel loggerModel)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myToolset = toolset;
       myIsInternalMode = isInternalMode;
-      myEnableTracing = enableTracing;
+      myLoggerModel = loggerModel;
     }
   }
 }

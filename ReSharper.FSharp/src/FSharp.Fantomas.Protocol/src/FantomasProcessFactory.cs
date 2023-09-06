@@ -30,13 +30,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 
     public FantomasProcess Create(Lifetime lifetime, string version, VirtualFileSystemPath path = null)
     {
-      var enableTracing = myLoggerModel.TraceCategories.Value.Contains(FantomasProtocolConstants.TraceScenario);
-
       return new FantomasProcess(lifetime,
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
-        JetProcessRuntimeRequest.CreateCore(), version, enableTracing, path);
+        JetProcessRuntimeRequest.CreateCore(), version, path);
     }
   }
 }

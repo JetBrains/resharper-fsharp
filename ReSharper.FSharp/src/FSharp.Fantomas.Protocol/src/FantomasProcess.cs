@@ -17,7 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
   public class FantomasProcess : ProtocolExternalProcess<RdFantomasModel, FantomasConnection>
   {
     private readonly string myVersion;
-    private readonly bool myEnableTracing;
     private readonly VirtualFileSystemPath mySpecifiedPath;
     protected override string Name => "Fantomas";
 
@@ -69,9 +68,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
         },
         {
           "FSHARP_FANTOMAS_VERSION", myVersion
-        },
-        {
-          FantomasProtocolConstants.ENABLE_TRACING_ENV_VAR, myEnableTracing ? "1" : "0"
         }
       };
     }
@@ -83,12 +79,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     }
 
     public FantomasProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
-      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, string version, bool enableTracing,
+      IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, string version,
       VirtualFileSystemPath specifiedPath = null)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myVersion = version;
-      myEnableTracing = enableTracing;
       mySpecifiedPath = specifiedPath;
     }
   }
