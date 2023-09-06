@@ -40,6 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       }
       catch (Exception e) when (e.IsOperationCanceled())
       {
+        // The FCS request has originated from a R# thread, but was cancelled. We don't want to requeue this request.
+        if (locks.IsReadAccessAllowed())
+          throw;
       }
       catch (Exception e)
       {
