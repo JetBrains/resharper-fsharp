@@ -26,7 +26,7 @@ open JetBrains.ReSharper.Psi.Tree
 // TODO: test for first item of completion list
 // TODO: IsAvailable implementation (simple - detect computation expression)
 // TODO: better relevance for custom operations?
-// TODO: cases where custom operation is possible inside CE (for, if, match, ... ?)
+// TODO: allow only cases where custom operation is possible inside CE (toplevel, for, ... ?)
 
 [<Language(typeof<FSharpLanguage>)>]
 type CompExprRule() =
