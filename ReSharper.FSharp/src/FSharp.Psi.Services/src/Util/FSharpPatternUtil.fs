@@ -45,7 +45,7 @@ let bindFcsSymbolToReference (context: ITreeNode) (referenceName: IReferenceName
     if isNull referenceName || referenceName.IsQualified || isNull declaredElement then () else
 
     let reference = referenceName.Reference
-    FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement)
+    FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement, context)
 
     if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
         // todo: use declared element directly

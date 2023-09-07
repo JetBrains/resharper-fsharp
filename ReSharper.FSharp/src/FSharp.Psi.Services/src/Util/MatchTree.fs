@@ -497,7 +497,7 @@ module MatchNode =
 
                 let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
                 let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName unionCase "get pattern"
+                FSharpPatternUtil.bindFcsSymbolToReference context pat.ReferenceName unionCase "get pattern"
 
                 if not unionCase.HasFields then () else
 
