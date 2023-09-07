@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       var name = FSharpReferenceBindingUtil.SuggestShortReferenceName(declaredElement, referenceOwner.Language);
       var delimiter = ModificationUtil.AddChildBefore(identifier, FSharpTokenType.DOT.CreateLeafElement());
       var qualifier = ModificationUtil.AddChildBefore(delimiter, factory(name));
-      FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifier.Reference, declaredElement);
+      FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifier.Reference, declaredElement, referenceOwner);
     }
   }
 }

@@ -76,7 +76,7 @@ type FSharpQuickFixUtilComponent() =
         let referenceOwner = reference.GetElement()
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
-        FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
+        FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement, referenceOwner)
         if FSharpResolveUtil.resolvesToQualified typeElement reference false FcsOpName then reference else
 
         addOpens reference typeElement

@@ -151,7 +151,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
                 | _ -> null
 
             if isNotNull clrDeclaredElement then
-                FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement)
+                FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement, referenceOwner)
 
         if ns.IsEmpty() then () else
         addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore moduleToImport
