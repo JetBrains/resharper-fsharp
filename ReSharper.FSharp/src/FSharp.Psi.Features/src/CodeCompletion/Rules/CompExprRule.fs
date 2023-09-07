@@ -42,7 +42,7 @@ type CompExprRule() =
            match item with
             | :? FcsLookupItem as fcsItem ->
                 match fcsItem.FcsSymbol with
-                | :? FSharpMemberOrFunctionOrValue as m when m.Attributes |> Seq.exists (fun a -> a.AttributeType.DisplayName = "CustomOperationAttribute") ->
+                | :? FSharpMemberOrFunctionOrValue when fcsItem.FcsSymbolUse.IsFromComputationExpression ->
                     item.Placement.Location <- PlacementLocation.Top
                     markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
                 | _ -> ()
