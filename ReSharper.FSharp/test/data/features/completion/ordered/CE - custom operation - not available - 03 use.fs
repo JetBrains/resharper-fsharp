@@ -1,15 +1,17 @@
-// ${COMPLETE_ITEM:custom}
 module Module
 
 type CE() =
     member this.Yield(x) = x
-    member this.Return(x) = x
     [<CustomOperation("custom")>]
     member this.Custom(x) = x
 
 let ce = CE()
 
+let foo f = ()
+
+let car = ()
+
 ce {
-    custom{caret}
-    return 0
+    use x = 1
+    {caret}
 }

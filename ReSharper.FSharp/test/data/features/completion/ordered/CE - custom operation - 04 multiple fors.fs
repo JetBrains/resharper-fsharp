@@ -1,4 +1,3 @@
-// ${COMPLETE_ITEM:custom}
 module Module
 
 type CE() =
@@ -9,5 +8,7 @@ type CE() =
 let ce = CE()
 
 ce {
-    custom{caret}
+    for i = 1 to 10 do
+        for j in [1..10] do
+            {caret}
 }

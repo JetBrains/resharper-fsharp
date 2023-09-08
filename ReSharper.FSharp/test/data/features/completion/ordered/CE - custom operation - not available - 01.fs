@@ -1,4 +1,3 @@
-// ${COMPLETE_ITEM:car}
 module Module
 
 type CE() =
@@ -13,5 +12,5 @@ let foo f = ()
 let car = ()
 
 ce {
-    foo car{caret}
+    foo c{caret}
 }

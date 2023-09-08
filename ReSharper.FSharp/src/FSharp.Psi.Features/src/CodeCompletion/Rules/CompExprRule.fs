@@ -22,6 +22,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 // TODO: test for first item of completion list
 // TODO: IsAvailable implementation (simple - detect computation expression)
@@ -33,9 +34,15 @@ type CompExprRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override this.IsAvailable(context) =
-        //let n = context.ReparsedContext.Reference :?> IFSharpExpression |> ComputationExprNavigator.GetByExpression
-        //n <> null
-        true
+        // let reference = context.ReparsedContext.Reference
+        // if isNull reference then false else
+        //
+        // let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+        // if isNull refExpr then false else
+        //
+        // let computationExpr, _ = tryGetEffectiveParentComputationExpression refExpr
+        // isNotNull computationExpr
+        false
 
     override this.TransformItems(context, collector) =
         collector.Items |> Seq.iter (fun item ->

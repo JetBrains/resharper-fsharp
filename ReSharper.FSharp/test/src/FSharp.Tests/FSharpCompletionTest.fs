@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open System
 open System.Linq.Expressions
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -201,12 +202,6 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Interpolated string 03 - Start``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
-
-    [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - 03 no prefix`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
-
 
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
@@ -561,3 +556,32 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``Space - NamedUnionCaseField 01`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 02`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()
+
+[<FSharpTest>]
+type FSharpOrderedCompletionTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/ordered"
+
+    override x.TestType = CodeCompletionTestType.List
+
+    override x.Sorting = LookupListSorting.ByRelevance
+
+    // member val CompleteItem = null with get, set
+    //
+    // override this.ItemSelector =
+    //     Func<_, _>(fun lookupItem ->
+    //         isNull this.CompleteItem ||
+    //
+    //         match lookupItem with
+    //         | :? FcsLookupItem as item -> item.Text = this.CompleteItem
+    //         | _ -> lookupItem.DisplayName.Text = this.CompleteItem)
+
+    [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 03 no prefix`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 04 multiple fors`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 05 let`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 03 use`` () = x.DoNamedTest()
