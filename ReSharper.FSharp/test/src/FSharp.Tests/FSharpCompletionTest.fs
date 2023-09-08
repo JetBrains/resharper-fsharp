@@ -585,3 +585,4 @@ type FSharpOrderedCompletionTest() =
     [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 02`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 03 use`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 04 let nested`` () = x.DoNamedTest()
