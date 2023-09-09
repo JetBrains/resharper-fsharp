@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open System
 open System.Linq.Expressions
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
