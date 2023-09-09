@@ -180,9 +180,6 @@ let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
         let forExpr = ForExprNavigator.GetByDoExpression(expr)
         if isNotNull forExpr then loop isLetInExpr forExpr else
 
-        let forEachExpr = ForEachExprNavigator.GetByDoExpression(expr)
-        if isNotNull forEachExpr then loop isLetInExpr forEachExpr else
-
         let tryExpr = TryLikeExprNavigator.GetByTryExpression(expr)
         if isNotNull tryExpr then loop isLetInExpr tryExpr else
 
@@ -199,11 +196,11 @@ let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
 
     loop false expr
 
-let insideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
+let isInsideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
     let rec loop isLetInExpr (expr: IFSharpExpression) =
         let computationExpr = ComputationExprNavigator.GetByExpression(expr)
         let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(computationExpr)
-        if isNotNull appExpr then computationExpr, isLetInExpr else
+        if isNotNull appExpr && isNotNull computationExpr then true else
 
         let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
         if isNotNull letOrUseExpr && not letOrUseExpr.IsUse then loop true letOrUseExpr else
@@ -217,7 +214,7 @@ let insideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
         let forEachExpr = ForEachExprNavigator.GetByDoExpression(expr)
         if isNotNull forEachExpr then loop isLetInExpr forEachExpr else
 
-        null, false
+        false
 
     loop false expr
 

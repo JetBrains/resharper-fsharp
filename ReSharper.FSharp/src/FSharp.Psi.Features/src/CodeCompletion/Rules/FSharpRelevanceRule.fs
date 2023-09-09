@@ -6,9 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRelevanceRule() =
@@ -42,16 +42,15 @@ type FSharpRelevanceRule() =
                     markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                 else
                     if fcsLookupItem.FcsSymbolUse.IsFromComputationExpression then
-                        let isInCE =
+                        let isCustomOperationPossible =
                             let reference = context.ReparsedContext.Reference
                             if isNull reference then false else
 
                             let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
                             if isNull refExpr then false else
 
-                            let computationExpr, _ = insideComputationExpressionForCustomOperation refExpr
-                            isNotNull computationExpr
-                        if isInCE then
+                            isInsideComputationExpressionForCustomOperation refExpr
+                        if isCustomOperationPossible then
                             markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 
                     markRelevance item CLRLookupItemRelevance.Methods

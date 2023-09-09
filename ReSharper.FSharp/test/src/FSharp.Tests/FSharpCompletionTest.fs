@@ -567,16 +567,6 @@ type FSharpOrderedCompletionTest() =
 
     override x.Sorting = LookupListSorting.ByRelevance
 
-    // member val CompleteItem = null with get, set
-    //
-    // override this.ItemSelector =
-    //     Func<_, _>(fun lookupItem ->
-    //         isNull this.CompleteItem ||
-    //
-    //         match lookupItem with
-    //         | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-    //         | _ -> lookupItem.DisplayName.Text = this.CompleteItem)
-
     [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 03 no prefix`` () = x.DoNamedTest()
