@@ -558,14 +558,12 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()
 
 [<FSharpTest>]
-type FSharpOrderedCompletionTest() =
+type FSharpSelectionCompletionTest() =
     inherit CodeCompletionTestBase()
 
-    override x.RelativeTestDataPath = "features/completion/ordered"
+    override x.RelativeTestDataPath = "features/completion/selection"
 
-    override x.TestType = CodeCompletionTestType.List
-
-    override x.Sorting = LookupListSorting.ByRelevance
+    override x.TestType = CodeCompletionTestType.Selection
 
     [<Test>] member x.``CE - custom operation - 01 prefix`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 02 no prefix`` () = x.DoNamedTest()
