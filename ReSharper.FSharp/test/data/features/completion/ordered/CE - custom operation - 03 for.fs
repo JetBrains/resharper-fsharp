@@ -7,12 +7,7 @@ type CE() =
 
 let ce = CE()
 
-let foo f = ()
-
-let car = ()
-
 ce {
-    if true then
-        for i in [1..10] do
-            c{caret}
+    for i in 1..10 do
+        {caret}
 }

@@ -7,7 +7,10 @@ type CE() =
 
 let ce = CE()
 
+let foo f = ()
+
+let car = ()
+
 ce {
-    for i in 1..10 do
-        c{caret}
+    foo {caret}
 }

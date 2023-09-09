@@ -567,12 +567,12 @@ type FSharpOrderedCompletionTest() =
 
     override x.Sorting = LookupListSorting.ByRelevance
 
-    [<Test>] member x.``CE - custom operation - 01`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - 02`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - 03 no prefix`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 01 prefix`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 02 no prefix`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 03 for`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 04 multiple fors`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 05 let`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - not available - 01`` () = x.DoNamedTest()
-    [<Test>] member x.``CE - custom operation - not available - 02`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 01 app`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - not available - 02 if for`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 03 use`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 04 let nested`` () = x.DoNamedTest()

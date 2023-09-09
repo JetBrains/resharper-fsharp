@@ -12,5 +12,7 @@ let foo f = ()
 let car = ()
 
 ce {
-    foo c{caret}
+    if true then
+        for i in [1..10] do
+            {caret}
 }
