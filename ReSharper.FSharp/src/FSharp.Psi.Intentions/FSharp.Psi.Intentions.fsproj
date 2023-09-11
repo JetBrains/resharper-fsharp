@@ -105,13 +105,11 @@
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
       <OutputFile>src\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
-      <SubType>Designer</SubType>
     </ErrorsGen>
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\FcsErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
       <OutputFile>src\QuickFixes\FcsErrorsQuickFixes.Generated.fs</OutputFile>
-      <SubType>Designer</SubType>
     </ErrorsGen>
   </ItemGroup>
 

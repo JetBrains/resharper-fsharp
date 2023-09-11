@@ -15,7 +15,6 @@
 
     <TokenGenerator Include="src\Parsing\FSharpTokens.xml">
       <OutputFile>src\Parsing\FSharpTokenType.Generated.cs</OutputFile>
-      <SubType>Designer</SubType>
     </TokenGenerator>
 
     <Compile Update="Src\Parsing\FSharpTokenType.Generated.cs">

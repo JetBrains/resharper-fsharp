@@ -48,7 +48,6 @@
       <Mode>ERRORS</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors</Namespace>
       <OutputFile>src\Daemon\Highlightings\Errors.Generated.fs</OutputFile>
-      <SubType>Designer</SubType>
     </ErrorsGen>
     <Compile Include="src\Daemon\Highlightings\Errors.Generated.fs">
       <DependentUpon>Errors.xml</DependentUpon>
@@ -57,7 +56,6 @@
       <Mode>ERRORS</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FcsErrors</Namespace>
       <OutputFile>src\Daemon\Highlightings\FcsErrors.Generated.fs</OutputFile>
-      <SubType>Designer</SubType>
     </ErrorsGen>
     <Compile Include="src\Daemon\Highlightings\FcsErrors.Generated.fs">
       <DependentUpon>FcsErrors.xml</DependentUpon>
