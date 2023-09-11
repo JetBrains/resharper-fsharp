@@ -6,8 +6,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.jetbrains.rdclient.protocol.IProtocolHost
-import com.jetbrains.rdclient.protocol.protocolHost
+import com.jetbrains.rider.protocol.IProtocolHost
+import com.jetbrains.rider.protocol.protocolHost
 import com.jetbrains.rdclient.util.idea.callSynchronously
 import com.jetbrains.rider.RiderEnvironment
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
