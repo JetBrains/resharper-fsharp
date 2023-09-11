@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rdclient.daemon.DaemonKind
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -8,7 +7,9 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.waitForTypingSessionTermination
 import org.testng.annotations.Test
+import java.time.Duration
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
@@ -21,7 +22,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
         it.print(dumpRunOptions())
 
         reformatCode()
-        waitForDaemon(kind = DaemonKind.Both)
+        waitForDaemon()
         checkFantomasVersion(bundledVersion)
         dumpNotifications(it, 0)
       }
@@ -37,7 +38,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
           it.print(dumpRunOptions())
 
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion("4.7.6.0")
 
           it.println("\nFormatted:")
@@ -49,7 +50,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
         it.print(dumpRunOptions())
 
         reformatCode()
-        waitForDaemon(kind = DaemonKind.Both)
+        waitForDaemon()
         checkFantomasVersion(bundledVersion)
 
         it.println("\nFormatted:")
@@ -77,7 +78,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
       withOpenedEditor("Simple.fs", "LargeFile.fs") {
         executeWithGold(testGoldFile) {
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion("6.0.0.0")
           dumpOpenedDocument(it, project!!, true)
         }
@@ -93,7 +94,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
           it.print(dumpRunOptions())
 
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion(globalVersion)
           dumpNotifications(it, 0)
         }
@@ -115,7 +116,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
           it.print(dumpRunOptions())
 
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion(bundledVersion)
 
           dumpNotifications(it, 1)
@@ -133,7 +134,8 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
             it.print(dumpRunOptions())
 
             reformatCode()
-            waitForDaemon(kind = DaemonKind.Both)
+            waitForDaemon()
+            waitForTypingSessionTermination(Duration.ofSeconds(1), "", true)
             checkFantomasVersion(globalVersion)
 
             dumpNotifications(it, 1)
@@ -148,7 +150,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
       withFantomasLocalTool(name, version) {
         executeWithGold(testGoldFile) {
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion(expectedVersion)
           dumpOpenedDocument(it, project!!, false)
         }
@@ -164,7 +166,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
           it.print(dumpRunOptions())
 
           reformatCode()
-          waitForDaemon(kind = DaemonKind.Both)
+          waitForDaemon()
           checkFantomasVersion(bundledVersion)
 
           dumpNotifications(it, 1)
