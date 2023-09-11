@@ -1,14 +1,19 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
+import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
+import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.waitForCompletion
 import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
+import java.nio.file.Files
+import kotlin.io.path.name
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
@@ -66,5 +71,16 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
-  fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
+  fun `nuget reference - replace path part`() {
+    dumpOpenedEditor("Script.fsx", "Script.fsx") {
+      executeWithGold(testGoldFile){
+        Files.walk(project!!.solutionDirectory.toPath()).forEach{ x -> it.println(x.name) }
+      }
+      flushFileChanges(project!!)
+      waitForDaemon()
+      callBasicCompletion()
+      waitForCompletion()
+      completeWithTab("Folder3/")
+    }
+  }
 }
