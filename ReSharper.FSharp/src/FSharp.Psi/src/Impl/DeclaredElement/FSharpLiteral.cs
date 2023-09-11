@@ -1,8 +1,12 @@
-﻿using FSharp.Compiler.Symbols;
+﻿using System.Collections.Generic;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -16,6 +20,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONSTANT;
+
+    private IList<FSharpAttribute> Attributes =>
+      Mfv?.Attributes ?? EmptyList<FSharpAttribute>.Instance;
+
+    public override IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
+      Attributes.ToAttributeInstances(Module);
+
+    public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
+      Attributes.GetAttributes(clrName).ToAttributeInstances(Module);
+
+    public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
+      Attributes.HasAttributeInstance(clrName.FullName);
 
     public override bool IsStatic => true;
 
