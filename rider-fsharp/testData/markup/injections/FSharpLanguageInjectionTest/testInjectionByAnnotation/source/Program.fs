@@ -36,7 +36,10 @@ open System.Diagnostics.CodeAnalysis
 open JetBrains.Annotations
 
 
-type C =
+type C() =
+    [<LanguageInjection(InjectedLanguage.JSON)>]
+    let [<Literal>] literal = """{ "key": "value" }"""
+
     [<StringSyntax("json")>]
     member x.JsonProperty0 = "[ { \"key\": \"value\" } ]"
 
