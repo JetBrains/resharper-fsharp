@@ -554,7 +554,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
 
     interface IFSharpParameterInfoContext with
         member this.Range =
-            context.GetDocumentRange().TextRange
+            context.GetDocumentRange()
 
         member this.GetArgument(candidate) =
             let candidate = candidate :?> IFcsParameterInfoCandidate
