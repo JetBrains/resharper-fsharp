@@ -81,7 +81,7 @@
   </PropertyGroup>
 
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" Condition="!$(InternalBuild)" />
   </Target>
 
   <ItemGroup>
