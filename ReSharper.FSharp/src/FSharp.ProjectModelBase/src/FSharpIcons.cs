@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp
+﻿namespace JetBrains.ReSharper.Plugins.FSharp
 {
   public class FSharpIcons
   {
