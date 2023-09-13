@@ -8,10 +8,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-  
-  <PropertyGroup>
-    <PackageLockFilePath>$(MSBuildThisFileDirectory)src\PackagesLock.targets</PackageLockFilePath>
-  </PropertyGroup>
 
   <PropertyGroup>
     <FSharpCompilerServiceVersion>2023.3.0.2</FSharpCompilerServiceVersion>
