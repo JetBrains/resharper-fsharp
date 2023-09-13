@@ -76,11 +76,11 @@
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <FSharpCoreXmlDocRelativePath>fsharp.core\$(FSharpCoreVersion)\lib\netstandard2.0\FSharp.Core.xml</FSharpCoreXmlDocRelativePath>
-  </PropertyGroup>
-
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
+    <PropertyGroup>
+      <FSharpCoreVersion Condition="'%(PackageLock.Identity)'=='FSharp.Core'">%(PackageLock.Version)</FSharpCoreVersion>
+      <FSharpCoreXmlDocRelativePath>fsharp.core\$(FSharpCoreVersion)\lib\netstandard2.0\FSharp.Core.xml</FSharpCoreXmlDocRelativePath>
+    </PropertyGroup>
     <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" Condition="!$(InternalBuild)" />
   </Target>
 
