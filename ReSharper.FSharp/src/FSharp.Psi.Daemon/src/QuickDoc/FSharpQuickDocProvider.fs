@@ -3,12 +3,14 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.QuickDoc
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
+open JetBrains.Application.Settings
 open JetBrains.DocumentModel.DataContext
 open JetBrains.ReSharper.Daemon
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Files
@@ -31,7 +33,11 @@ module FSharpQuickDoc =
         // todo: provide tooltip for #r strings in fsx, should pass String tag
         let line = int coords.Line + 1
         let column = int coords.Column
-        Some(results.CheckResults.GetToolTip(line, column, lineText, tokenNames, FSharpTokenTag.Identifier))
+
+        let settingsStore = token.GetSettingsStoreWithEditorConfig()
+        let wrapLimit = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT) / 3
+
+        Some(results.CheckResults.GetToolTip(line, column, lineText, tokenNames, FSharpTokenTag.Identifier, wrapLimit))
 
 
 type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFSharpIdentifier) =
