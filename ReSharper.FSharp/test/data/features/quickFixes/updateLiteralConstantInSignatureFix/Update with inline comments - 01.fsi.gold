@@ -1,0 +1,4 @@
+﻿module A
+
+[<Literal>]
+val c (* foo *) : int (* bar *) = 23

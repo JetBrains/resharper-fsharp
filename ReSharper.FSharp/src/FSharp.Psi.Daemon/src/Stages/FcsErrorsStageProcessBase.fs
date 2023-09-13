@@ -341,6 +341,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | ValueNotContainedMutability ->
             if error.Message.EndsWith("The mutability attributes differ") then
                 createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
+            elif error.Message.EndsWith("The literal constant values and/or attributes differ") then
+                createHighlightingFromNodeWithMessage LiteralConstantValuesDifferInSignatureError range error
             else
                 createGenericHighlighting error range
         

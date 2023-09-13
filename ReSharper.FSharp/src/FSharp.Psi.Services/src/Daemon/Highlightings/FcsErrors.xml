@@ -218,6 +218,17 @@
     <QuickFix>UpdateMutabilityInSignatureFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="LiteralConstantValuesDifferInSignature" ID="FS0034: Module contains but its signature specifies The literal constant values and/or attributes differ">
+    <Parameter type="ITopReferencePat" name="pat"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Range>pat.GetNavigationRange()</Range>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateLiteralConstantInSignatureFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">
     <Parameter type="IReferencePat" name="pat"/>
     <Message resourceName="IsBoundMultipleTimesMessage" resourceType="Strings">
