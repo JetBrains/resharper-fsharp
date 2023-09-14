@@ -5,6 +5,8 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
@@ -75,7 +77,10 @@ type FSharpLiteralInjectionTarget() =
 
             CSharpRegExpBuffer(StringBuffer(text), literalType, lexerOptions) :> _
 
-        override _.DoNotProcessNodeInterior _ = false
+        override _.ContainsInjectableLiterals(node) =
+            match node with
+            | :? IChameleonExpression as e when e.IsLiteralExpression() -> InjectableLiteralsPresence.Yes
+            | _ -> InjectableLiteralsPresence.Maybe
 
         override _.IsPrimaryLanguageApplicable(sourceFile) =
             sourceFile.LanguageType.Is<FSharpProjectFileType>()
