@@ -1,11 +1,14 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Features.Navigation.Goto.GotoProviders
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<NavigationZone>)>]
 type FSharpGotoClassMemberProvider() =
     inherit ClrGotoClassMemberProviderBase()
 

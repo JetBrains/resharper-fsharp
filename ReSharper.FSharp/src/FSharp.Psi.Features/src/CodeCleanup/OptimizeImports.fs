@@ -1,15 +1,19 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.OptimizeImports
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ReSharper.Daemon.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CSharp
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.Util
 
 [<CodeCleanupModule>]
+[<ZoneMarker(typeof<DaemonZone>, typeof<ILanguageCSharpZone>)>]
 type FSharpOptimizeImports() =
     interface IWholeFileCleanupOnSaveModule with
         member this.Name = "Remove unused opens"

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Features.RegExp.Intellisense
@@ -9,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
+open JetBrains.ReSharper.Psi.RegExp
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex.Tree
 open JetBrains.ReSharper.Psi.RegExp.Resources

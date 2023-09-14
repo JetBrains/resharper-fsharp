@@ -4,12 +4,15 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Syntax.PrettyNaming
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -30,6 +33,7 @@ open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ICodeEditingZone>, typeof<IRdFrameworkZone>, typeof<ISinceClr4HostZone>)>]
 type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
         manager: ITypingAssistManager) as this =

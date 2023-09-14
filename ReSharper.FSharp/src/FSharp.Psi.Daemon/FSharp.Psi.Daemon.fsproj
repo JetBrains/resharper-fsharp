@@ -68,6 +68,7 @@
     <Compile Include="src\Analyzers\AsPatAnalyzer.fs" />
     <Compile Include="src\Analyzers\IndexerExprAnalyzer.fs" />
     <Compile Include="src\Analyzers\XmlDocAnalyzer.fs" />
+    <Compile Include="src\Analyzers\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />

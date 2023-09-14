@@ -2,7 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open System.Collections.Generic
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.DataContext
+open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Features.Navigation.Features.FindUsages
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
@@ -10,6 +12,7 @@ open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.Util
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<NavigationZone>)>]
 type FSharpGeneratedElementsSearch() =
     inherit FindUsagesContextSearch()
 

@@ -1,13 +1,19 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.ContextHighlighters
 
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CaretDependentFeatures
 open JetBrains.ReSharper.Feature.Services.Contexts
+open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 
 [<ContainsContextConsumer>]
+[<ZoneMarker(typeof<DaemonEngineZone>, typeof<IDocumentModelZone>, typeof<ILanguageFSharpZone>, typeof<PsiFeaturesImplZone>)>]
 type FSharpMatchingBraceContextHighlighter() =
     inherit MatchingBraceContextHighlighterBase<FSharpLanguage>()
 

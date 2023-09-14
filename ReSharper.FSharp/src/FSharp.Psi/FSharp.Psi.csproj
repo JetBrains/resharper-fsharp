@@ -37,6 +37,8 @@
     <CsLex Include="src\Parsing\Lexing\fsharpLexer.lex" References="src\Parsing\Lexing\FSharpRules.lex" />
   </ItemGroup>
   <Import Project="$(PsiFeaturesSubplatform)" Condition="Exists('$(PsiFeaturesSubplatform)')" />
+  <Import Project="$(RdBackendCommonSubplatform)" Condition="Exists('$(RdBackendCommonSubplatform)')" />
+  <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />

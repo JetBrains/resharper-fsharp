@@ -1,16 +1,16 @@
-﻿namespace  JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ProjectModel
+open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel.NuGet
+open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.RdBackend.Common.Env
 open JetBrains.Rider.Backend.Env
-open JetBrains.Rider.Model
 
 [<ZoneMarker>]
 type ZoneMarker() =
+    interface IRequire<IHostSolutionZone>
     interface IRequire<INuGetZone>
-    interface IRequire<IProjectModelZone>
+    interface IRequire<IRdFrameworkZone>
     interface IRequire<IResharperHostCoreFeatureZone>
     interface IRequire<IRiderFeatureEnvironmentZone>
-    interface IRequire<IRiderModelZone>

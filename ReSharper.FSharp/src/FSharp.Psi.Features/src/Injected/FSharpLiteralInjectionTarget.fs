@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -9,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.CSharp.Util.Literals
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
+open JetBrains.ReSharper.Psi.RegExp
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex
 open JetBrains.ReSharper.Psi.RegExp.ClrRegex.Parsing
 open JetBrains.ReSharper.Psi.Tree

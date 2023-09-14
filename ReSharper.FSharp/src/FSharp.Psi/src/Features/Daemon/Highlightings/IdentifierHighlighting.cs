@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -33,6 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
   }
 
   [SolutionComponent]
+  [ZoneMarker(typeof(DaemonEngineZone))]
   internal class FSharpIdentifierTooltipProvider : IdentifierTooltipProvider<FSharpLanguage>
   {
     public FSharpIdentifierTooltipProvider(Lifetime lifetime, ISolution solution,

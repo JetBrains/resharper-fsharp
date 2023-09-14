@@ -2,7 +2,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Text
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.DocumentModel
+open JetBrains.IDE.Debugger
+open JetBrains.Platform.RdFramework
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -11,6 +14,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
+[<ZoneMarker(typeof<IDebuggerZone>, typeof<IRdFrameworkZone>, typeof<ISinceClr4HostZone>)>]
 type FSharpDebuggerLocalSymbolProvider() =
     interface IDebuggerLocalSymbolProvider with
         member x.FindLocalDeclarationAt(file: IFile, range: DocumentRange, name: string) =

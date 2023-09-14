@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 open System
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.VisualElements
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -8,9 +10,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Colors
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Rider.Backend.Env
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpVisualElementFactory() =
     let getFromProperty (referenceExpr: IReferenceExpr) (qualifier: IReferenceExpr): IColorReference =
         let name = referenceExpr.Reference.GetName()

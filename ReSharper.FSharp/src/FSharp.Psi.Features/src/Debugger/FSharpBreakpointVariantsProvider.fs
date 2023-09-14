@@ -3,6 +3,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Text
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.IDE.Debugger
+open JetBrains.Platform.RdFramework
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -19,6 +22,7 @@ module FSharpBreakpointVariantsProvider =
            FSharpScriptProjectFileType.FsScriptExtension |]
 
 [<Language(typeof<FSharpLanguage>)>]
+[<ZoneMarker(typeof<IDebuggerZone>, typeof<IRdFrameworkZone>, typeof<ISinceClr4HostZone>)>]
 type FSharpBreakpointVariantsProvider() =
 
     let [<Literal>] multilineSuffix = " ..."

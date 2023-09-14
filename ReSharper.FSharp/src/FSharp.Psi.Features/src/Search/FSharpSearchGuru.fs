@@ -1,12 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.Rider.Backend.Env
 
 type FSharpSearchGuruElementId =
     { DeclaredElement: IDeclaredElement
@@ -15,6 +18,7 @@ type FSharpSearchGuruElementId =
 
 
 [<SearchGuru(SearchGuruPerformanceEnum.FastFilterOutByLanguage)>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpSearchGuru(fsProjectOptionsProvider: IFcsProjectProvider) =
     let getTypeElement (fsElement: IFSharpDeclaredElement) =
         match fsElement with
