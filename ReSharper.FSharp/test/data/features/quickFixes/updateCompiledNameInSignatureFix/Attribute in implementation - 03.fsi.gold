@@ -1,0 +1,6 @@
+﻿namespace A
+    
+module B =
+
+    [<CompiledName("X")>]
+val x: a:int -> b:int -> int

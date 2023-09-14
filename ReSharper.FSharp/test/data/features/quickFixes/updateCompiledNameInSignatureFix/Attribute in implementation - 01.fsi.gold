@@ -1,0 +1,4 @@
+﻿module A
+
+[<CompiledName("X")>]
+val x: a:int -> b:int -> int

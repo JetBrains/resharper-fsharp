@@ -123,3 +123,50 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
     if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
         [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
         |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
+
+type BindingPair =
+    | BindingPair of
+        implBinding: IBindingLikeDeclaration *
+        implMember: IFSharpMember *
+        sigBinding: IBindingLikeDeclaration *
+        sigMember: IFSharpMember
+
+let tryFindBindingPairFromTopReferencePat (implTopRefPat: ITopReferencePat) =
+    match implTopRefPat.Binding, implTopRefPat.DeclaredElement.As<IFSharpMember>() with
+    | null, _ | _, null -> None
+    | implBinding, implMember ->
+
+    let tryPickFromDeclaration (condition: IReferencePat -> bool) (declaration: IDeclaration) =
+        match declaration with
+        | :? IReferencePat as pat when pat.IsFSharpSigFile() && condition pat ->
+            Option.both (Option.ofObj pat.Binding) (Option.ofObj (pat.DeclaredElement.As<IFSharpMember>()))
+            |> Option.map (fun (sigBinding, sigMember) -> BindingPair(implBinding, implMember, sigBinding, sigMember))
+        | _ -> None
+    
+    implMember.GetDeclarations()
+    |> Seq.tryPick (tryPickFromDeclaration (fun _ -> true))
+    |> Option.orElseWith (fun () ->
+        let parentDeclarations = implMember.ContainingType.GetDeclarations()
+
+        // Find the parent signature counter part
+        let parentSignatureDeclaration =
+            parentDeclarations
+            |> Seq.tryPick (fun d ->
+                match d with
+                | :? ITypeDeclaration as signatureModule when signatureModule.IsFSharpSigFile() ->
+                    Some signatureModule
+                | _ -> None)
+
+        parentSignatureDeclaration
+        |> Option.bind (fun signatureModule ->
+            signatureModule.MemberDeclarations
+            |> Seq.tryPick (
+                tryPickFromDeclaration (fun (sigRefPat: IReferencePat) ->
+                    match implBinding.HeadPattern with
+                    | :? IReferencePat as implPat ->
+                        implPat.DeclaredName = sigRefPat.DeclaredName
+                        || implPat.Identifier.Name = sigRefPat.Identifier.Name
+                    | _ -> false)
+            )
+        )
+    )

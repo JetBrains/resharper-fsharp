@@ -34,6 +34,9 @@ let cliEventAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CLIEventAttribute"
 [<CompiledName("StructAttribute")>]
 let structAttrTypeName = clrTypeName "Microsoft.FSharp.Core.StructAttribute"
 
+[<CompiledName("CompiledNameAttribute")>]
+let compiledNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompiledNameAttribute"
+
 [<CompiledName("FSharpListTypeName")>]
 let fsListTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpList`1"
 
