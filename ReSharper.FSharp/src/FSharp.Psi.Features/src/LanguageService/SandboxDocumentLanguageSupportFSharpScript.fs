@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System
 open JetBrains.ProjectModel

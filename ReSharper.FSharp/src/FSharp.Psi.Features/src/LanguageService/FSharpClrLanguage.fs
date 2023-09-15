@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Application
 open JetBrains.ReSharper.Plugins.FSharp.Psi
