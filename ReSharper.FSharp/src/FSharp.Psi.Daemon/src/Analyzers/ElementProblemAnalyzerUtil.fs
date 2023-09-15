@@ -5,7 +5,7 @@ open System
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Modules

@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open NUnit.Framework
 
 type InferredTypeCodeVisionProviderTest() =

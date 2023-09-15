@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System.Collections.Generic
 open JetBrains.Application

@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open FSharp.Compiler.Diagnostics
 open JetBrains.Diagnostics

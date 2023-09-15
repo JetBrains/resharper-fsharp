@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 
 open System.Threading
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.TestFramework
 open NUnit.Framework

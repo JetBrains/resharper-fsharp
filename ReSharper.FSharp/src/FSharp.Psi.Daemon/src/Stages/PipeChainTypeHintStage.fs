@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
 open System.Collections.Generic
