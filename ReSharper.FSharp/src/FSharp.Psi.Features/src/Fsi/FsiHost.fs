@@ -14,7 +14,7 @@ open JetBrains.RdBackend.Common.Features.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules

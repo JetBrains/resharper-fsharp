@@ -12,7 +12,7 @@ open JetBrains.ProjectModel.Properties
 open JetBrains.RdBackend.Common.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.DevEnv

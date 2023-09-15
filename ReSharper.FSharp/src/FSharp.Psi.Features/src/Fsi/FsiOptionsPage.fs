@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 open System
 open System.Runtime.InteropServices
