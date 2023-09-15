@@ -1,4 +1,4 @@
-﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers.RedundantQualifierAnalyzer
+﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers.RedundantQualifierAnalyzer
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Daemon

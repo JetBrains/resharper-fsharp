@@ -1,5 +1,5 @@
 ﻿[<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers.Util
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers.Util
 
 open System
 open JetBrains.Diagnostics

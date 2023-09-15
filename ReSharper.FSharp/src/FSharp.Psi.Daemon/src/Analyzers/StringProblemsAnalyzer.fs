@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
 open JetBrains.ReSharper.Daemon.StringAnalysis
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting

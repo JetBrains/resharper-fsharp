@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Feature.Services.Daemon

@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.ColorHints
