@@ -1,0 +1,5 @@
+﻿module A
+
+type B =
+    new: unit -> B
+    static member inline private Foo: unit -> int

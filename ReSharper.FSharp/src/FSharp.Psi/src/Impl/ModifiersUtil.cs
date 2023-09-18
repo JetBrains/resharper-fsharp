@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -120,6 +121,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return AccessRights.INTERNAL;
 
       return AccessRights.PUBLIC;
+    }
+
+    public static ITreeNode GetAccessNode(AccessRights accessRights)
+    {
+      return accessRights switch
+      {
+        AccessRights.PRIVATE => FSharpTokenType.PRIVATE.CreateTreeElement(),
+        AccessRights.INTERNAL => FSharpTokenType.INTERNAL.CreateTreeElement(),
+        _ => FSharpTokenType.PUBLIC.CreateTreeElement()
+      };
     }
   }
 }

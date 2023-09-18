@@ -218,6 +218,28 @@
     <QuickFix>UpdateMutabilityInSignatureFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMoreInBinding" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
+    <Parameter type="IExpressionReferenceName" name="referenceName"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Range>referenceName.GetNavigationRange()</Range>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateAccessibilityInSignatureBindingFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAccessibilityMoreInMember" ID="FS0034: Module contains but its signature specifies The accessibility specified in the signature is more than that specified in the implementation">
+    <Parameter type="IOverridableMemberDeclaration" name="memberDeclaration"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Range>memberDeclaration.GetNavigationRange()</Range>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>UpdateAccessibilityInSignatureMemberFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="VarBoundTwice" ID="FS0038: Pattern bound twice">
     <Parameter type="IReferencePat" name="pat"/>
     <Message resourceName="IsBoundMultipleTimesMessage" resourceType="Strings">

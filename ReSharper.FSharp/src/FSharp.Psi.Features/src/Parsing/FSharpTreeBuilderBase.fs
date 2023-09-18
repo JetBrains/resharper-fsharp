@@ -927,17 +927,24 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, trivia), flags, range, _) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, valSigTrivia), flags, range, memberTrivia) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
-                    x.ProcessAccessorsNamesClause(trivia, range)
+                    x.ProcessAccessorsNamesClause(valSigTrivia, range)
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with
                     | SynMemberKind.Constructor -> ElementType.CONSTRUCTOR_SIGNATURE
                     | _ -> ElementType.MEMBER_SIGNATURE
+
+            match valSigTrivia.WithKeyword, memberTrivia.GetSetKeywords with
+            | Some withKw, Some getSetKeywords ->
+                let m = Range.unionRanges withKw getSetKeywords.Range
+                x.MarkAndDone(m, ElementType.ACCESSOR_DECLARATION)
+            | _ -> ()
+
             x.Done(range, mark, elementType)
 
         | SynMemberSig.ValField(SynField(attrs, _, id, synType, _, XmlDoc xmlDoc, _, _, _), range) ->
