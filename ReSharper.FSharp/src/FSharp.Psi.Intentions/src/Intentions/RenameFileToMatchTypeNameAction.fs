@@ -2,17 +2,25 @@
 
 open System
 open System.Collections.Generic
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.DocumentManagers.Transactions
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Intentions.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
 open JetBrains.Util
 
 [<ContextAction(Group = "F#", Name = "Match file name with type name", Priority = 1s,
                 Description = "Renames current file to match the name of the single type or a top-level module.")>]
+[<ZoneMarker(typeof<DaemonZone>, typeof<ICodeEditingZone>, typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
 type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

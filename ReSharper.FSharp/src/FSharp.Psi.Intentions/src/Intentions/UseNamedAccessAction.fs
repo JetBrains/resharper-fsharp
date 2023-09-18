@@ -1,7 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Symbols
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.DocumentModel
+open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -9,8 +14,10 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open type JetBrains.Diagnostics.Assertion
+open JetBrains.Rider.Backend.Env
 
 [<ContextAction(Name = "UseNamedAccess", Group = "F#", Description = "Use named access inside a DU pattern")>]
+[<ZoneMarker(typeof<IDocumentModelZone>, typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<PsiFeaturesImplZone>)>]
 type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
     
@@ -102,3 +109,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
                 |> ignore
             | _ -> ()
         | _ -> ()
+
+module MissingAssemblyReferenceWorkaround =
+    type T(a: IResharperHostCoreFeatureZone, b: IRiderFeatureEnvironmentZone) =
+        class end
