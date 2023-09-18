@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
@@ -15,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Backend.Env
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 
@@ -69,6 +72,7 @@ type IFSharpQuickFixUtilComponent =
     abstract BindTo: FSharpSymbolReference * ITypeElement -> FSharpSymbolReference
 
 [<Language(typeof<FSharpLanguage>)>]
+[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpQuickFixUtilComponent() =
     let [<Literal>] FcsOpName = "FSharpQuickFixUtilComponent.BindTo"
 
