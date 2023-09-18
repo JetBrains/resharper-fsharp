@@ -2,10 +2,10 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageInterpolatedStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
-import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageStringLiteralExpression
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenNodeType
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageStringLiteralExpression
 
 interface FSharpElement : PsiElement
 
@@ -18,9 +18,9 @@ interface FSharpStringLiteralExpression : FSharpElement, ClrLanguageStringLitera
 }
 
 interface FSharpInterpolatedStringLiteralExpressionPart : FSharpElement,
-  ClrLanguageInterpolatedStringLiteralExpressionPart {
+                                                          ClrLanguageInterpolatedStringLiteralExpressionPart {
   val tokenType: FSharpTokenNodeType
 }
 
 interface FSharpInterpolatedStringLiteralExpression : FSharpStringLiteralExpression,
-  ClrLanguageInterpolatedStringLiteralExpression
+                                                      ClrLanguageInterpolatedStringLiteralExpression
