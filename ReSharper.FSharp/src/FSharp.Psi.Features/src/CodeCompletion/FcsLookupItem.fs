@@ -21,6 +21,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Backend.Features.QuickDoc.Lookup
 open JetBrains.UI.RichText
 open JetBrains.Util
 
@@ -55,6 +56,24 @@ module FcsLookupCandidate =
                 mainDescription.AddLines(RichTextBlock(" "))
             mainDescription.AddLines(xmlDoc)
         mainDescription
+
+
+// type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, context: ITreeNode) =
+//     member x.CreateRichTextTooltip() =
+//         FSharpQuickDoc.getFSharpToolTipText context
+//         |> Option.map (FSharpQuickDoc.presentLayouts xmlDocService context)
+//         |> Option.defaultValue null
+//
+//     interface IQuickDocPresenter with
+//         member this.GetHtml _ =
+//             QuickDocTitleAndText(this.CreateRichTextTooltip(), null)
+//
+//         member this.GetId() = null
+//         member this.OpenInEditor _ = ()
+//         member this.ReadMore _ = ()
+//         member this.Resolve _ = null
+
+
 
 type FcsErrorLookupItem(item: DeclarationListItem) =
     inherit TextLookupItemBase()
@@ -179,5 +198,10 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
             let candidate = candidate :?> FcsLookupCandidate
             FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule candidate.FcsTooltip
+
+    interface IQuickDocProvidingLookupItem with
+        member this.Language = FSharpLanguage.Instance
+
+        member this.GetPresenter() = failwith "todo"
 
     interface IRiderAsyncCompletionLookupItem

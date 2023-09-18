@@ -62,6 +62,7 @@
     <Compile Include="src\Daemon\Highlightings\FcsErrors.Generated.fs">
       <DependentUpon>FcsErrors.xml</DependentUpon>
     </Compile>
+    <Compile Include="src\Daemon\FSharpQuickDoc.fs" />
     <Compile Include="src\Generate\FSharpGeneratorContext.fs" />
     <Compile Include="src\Generate\GenerateOverrides.fs" />
     <Compile Include="src\Generate\GenerateProvider.fs" />

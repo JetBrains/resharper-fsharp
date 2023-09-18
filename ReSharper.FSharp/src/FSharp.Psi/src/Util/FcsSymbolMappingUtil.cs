@@ -156,6 +156,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (symbol is FSharpField field)
       {
+        // tree leaks via the reference, if declared element is cached somewhere
         if (field.IsAnonRecordField && referenceExpression != null)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
