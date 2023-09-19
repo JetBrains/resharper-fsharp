@@ -209,11 +209,8 @@ let isInsideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
         let seqExpr = SequentialExprNavigator.GetByExpression(expr)
         if isNotNull seqExpr then loop seqExpr else
 
-        let forExpr = ForExprNavigator.GetByDoExpression(expr)
+        let forExpr = ForLikeExprNavigator.GetByDoExpression(expr)
         if isNotNull forExpr then loop forExpr else
-
-        let forEachExpr = ForEachExprNavigator.GetByDoExpression(expr)
-        if isNotNull forEachExpr then loop forEachExpr else
 
         false
 
