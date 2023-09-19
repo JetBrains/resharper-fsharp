@@ -6,13 +6,23 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRelevanceRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    override this.DecorateItems(_, items) =
+    override this.DecorateItems(context, items) =
+        let isCustomOperationPossible =
+            lazy
+                let refExpr =
+                    context.ReparsedContext.Reference |> Option.ofObj
+                    |> Option.bind (fun reference ->
+                        reference.GetTreeNode().As<IReferenceExpr>() |> Option.ofObj)
+                refExpr |> Option.exists isInsideComputationExpressionForCustomOperation
+
         for item in items do
             let fcsLookupItem = item.As<FcsLookupItem>()
             if isNull fcsLookupItem then () else
@@ -39,6 +49,10 @@ type FSharpRelevanceRule() =
                 if mfv.IsMember && mfv.IsProperty then
                     markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                 else
+                    if fcsLookupItem.FcsSymbolUse.IsFromComputationExpression then
+                        if isCustomOperationPossible.Value then
+                            markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+
                     markRelevance item CLRLookupItemRelevance.Methods
 
             | :? FSharpField as field when
