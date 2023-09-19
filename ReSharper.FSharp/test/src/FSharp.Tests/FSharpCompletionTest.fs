@@ -569,6 +569,7 @@ type FSharpSelectionCompletionTest() =
     [<Test>] member x.``CE - custom operation - 03 for`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 04 multiple fors`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 05 let`` () = x.DoNamedTest()
+    [<Test>] member x.``CE - custom operation - 06 before param`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 01 app`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 02 if for`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 03 use`` () = x.DoNamedTest()

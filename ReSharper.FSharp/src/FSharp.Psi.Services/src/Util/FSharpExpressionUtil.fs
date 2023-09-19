@@ -212,6 +212,9 @@ let isInsideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
         let forExpr = ForLikeExprNavigator.GetByDoExpression(expr)
         if isNotNull forExpr then loop forExpr else
 
+        let prefixAppExpr = PrefixAppExprNavigator.GetByExpression(expr)
+        if isNotNull prefixAppExpr then loop prefixAppExpr else
+
         false
 
     loop expr
