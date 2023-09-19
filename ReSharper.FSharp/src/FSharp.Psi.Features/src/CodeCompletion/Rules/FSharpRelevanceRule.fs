@@ -15,6 +15,14 @@ type FSharpRelevanceRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override this.DecorateItems(context, items) =
+        let isCustomOperationPossible =
+            lazy
+                let refExpr =
+                    context.ReparsedContext.Reference |> Option.ofObj
+                    |> Option.bind (fun reference ->
+                        reference.GetTreeNode().As<IReferenceExpr>() |> Option.ofObj)
+                refExpr |> Option.exists isInsideComputationExpressionForCustomOperation
+
         for item in items do
             let fcsLookupItem = item.As<FcsLookupItem>()
             if isNull fcsLookupItem then () else
@@ -42,15 +50,7 @@ type FSharpRelevanceRule() =
                     markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                 else
                     if fcsLookupItem.FcsSymbolUse.IsFromComputationExpression then
-                        let isCustomOperationPossible =
-                            let reference = context.ReparsedContext.Reference
-                            if isNull reference then false else
-
-                            let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
-                            if isNull refExpr then false else
-
-                            isInsideComputationExpressionForCustomOperation refExpr
-                        if isCustomOperationPossible then
+                        if isCustomOperationPossible.Value then
                             markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 
                     markRelevance item CLRLookupItemRelevance.Methods
