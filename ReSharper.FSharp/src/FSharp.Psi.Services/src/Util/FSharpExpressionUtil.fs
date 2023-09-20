@@ -196,6 +196,29 @@ let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
 
     loop false expr
 
+let isInsideComputationExpressionForCustomOperation (expr: IFSharpExpression) =
+    let rec loop (expr: IFSharpExpression) =
+        let computationExpr = ComputationExprNavigator.GetByExpression(expr)
+        let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(computationExpr)
+        if isNotNull appExpr && isNotNull computationExpr then true else
+
+        let letOrUseExpr = LetOrUseExprNavigator.GetByInExpression(expr)
+        // use is not allowed before custom operation
+        if isNotNull letOrUseExpr && not letOrUseExpr.IsUse then loop letOrUseExpr else
+
+        let seqExpr = SequentialExprNavigator.GetByExpression(expr)
+        if isNotNull seqExpr then loop seqExpr else
+
+        let forExpr = ForLikeExprNavigator.GetByDoExpression(expr)
+        if isNotNull forExpr then loop forExpr else
+
+        let prefixAppExpr = PrefixAppExprNavigator.GetByExpression(expr)
+        if isNotNull prefixAppExpr then loop prefixAppExpr else
+
+        false
+
+    loop expr
+
 let isOperatorReferenceExpr (expr: IFSharpExpression) =
     let refExpr = expr.As<IReferenceExpr>()
     isNotNull refExpr &&
