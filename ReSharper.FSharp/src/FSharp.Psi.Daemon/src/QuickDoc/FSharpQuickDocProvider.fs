@@ -121,6 +121,8 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
         if isNull sourceFile then None else
 
         context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
+        |> Option.ofObj
+        |> Option.defaultValue []
         |> Seq.choose (function
             | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile ->
                 let activePatternCaseName = ActivePatternCaseNameNavigator.GetByIdentifier(node)
