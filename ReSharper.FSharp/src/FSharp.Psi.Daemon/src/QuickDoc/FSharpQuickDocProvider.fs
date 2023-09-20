@@ -7,6 +7,7 @@ open JetBrains.Application.DataContext
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.DataContext
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Daemon
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp
@@ -17,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Backend.Env
 open JetBrains.UI.RichText
 open JetBrains.Util
 
@@ -105,7 +107,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
 
 
 [<QuickDocProvider(-1000)>]
-[<ZoneMarker(typeof<IDocumentModelZone>, typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<PsiFeaturesImplZone>)>]
+[<ZoneMarker(typeof<IDocumentModelZone>, typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<PsiFeaturesImplZone>)>]
 type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
     let tryFindFSharpFile (context: IDataContext) =
         let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)

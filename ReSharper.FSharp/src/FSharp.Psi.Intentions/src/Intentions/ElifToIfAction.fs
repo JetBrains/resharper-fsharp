@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open System
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -14,11 +15,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Backend.Env
 open JetBrains.TextControl
 open JetBrains.Util
 
 [<ContextAction(Name = "ElifToIf", Group = "F#", Description = "Converts `elif` expression to 'if'")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
+[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
 type ElifToIfAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
