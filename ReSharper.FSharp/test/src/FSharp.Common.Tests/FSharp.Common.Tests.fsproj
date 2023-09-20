@@ -21,8 +21,10 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+    <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit.Console" />
     <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>

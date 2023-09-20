@@ -20,6 +20,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.RdFramework" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>
   <Import Project="../../TypeProviders.Host.targets" />

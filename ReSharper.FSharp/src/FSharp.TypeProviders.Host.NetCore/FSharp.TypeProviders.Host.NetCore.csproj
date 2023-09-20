@@ -20,6 +20,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="System.Diagnostics.Debug" />
     <PackageReference Include="Microsoft.NETCore.Platforms" />
     <PackageReference Include="Microsoft.NETCore.Targets" />

@@ -14,6 +14,12 @@
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="JetBrains.Lifetimes" />
+        <PackageReference Include="JetBrains.RdFramework" />
+    </ItemGroup>
+
     <Import Project="$(RdBackendCommonSubplatform)" Condition="Exists('$(RdBackendCommonSubplatform)')" />
 
     <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
