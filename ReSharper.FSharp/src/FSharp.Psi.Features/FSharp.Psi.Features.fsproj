@@ -118,7 +118,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.NuGet.Packaging" />
+    <PackageReference Include="JetBrains.NuGet.Versioning" />
+    <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
@@ -129,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />

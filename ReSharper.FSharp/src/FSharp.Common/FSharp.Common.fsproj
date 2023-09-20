@@ -73,7 +73,11 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+    <PackageReference Include="JetBrains.HabitatDetector" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
 
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">

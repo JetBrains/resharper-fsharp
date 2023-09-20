@@ -124,8 +124,9 @@
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+    <PackageReference Include="JetBrains.Lifetimes" />
   </ItemGroup>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
