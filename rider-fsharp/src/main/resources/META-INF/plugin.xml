@@ -40,7 +40,7 @@
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
-    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
+    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rider.quickDoc.FrontendDocumentationProvider"/>
     <rider.debuggerSupportPolicy language="F#" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
     <scratch.creationHelper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpScratchCreationHelper" />
