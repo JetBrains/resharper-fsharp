@@ -4,14 +4,12 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Text
 open FSharp.Compiler.AbstractIL.ILBinaryReader
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -24,7 +22,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.VB
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Backend.Env
 open JetBrains.Util
 
 module AssemblyReaderShim =
@@ -71,7 +68,6 @@ module AssemblyReaderShim =
 // todo: support script -> project references
 
 [<SolutionComponent>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim, checkerService: FcsCheckerService,
         fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution,

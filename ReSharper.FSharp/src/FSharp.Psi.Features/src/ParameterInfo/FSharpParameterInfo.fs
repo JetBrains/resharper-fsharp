@@ -5,13 +5,11 @@ open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Text
 open FSharp.Compiler.Symbols
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Threading
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
@@ -34,7 +32,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Backend.Env
 open JetBrains.UI.RichText
 open JetBrains.Util
 open JetBrains.Util.Extension
@@ -786,7 +783,6 @@ type FSharpPatternParameterInfoContext(caretOffset, pat: IFSharpPattern, referen
 
 
 [<ParameterInfoContextFactory(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpParameterInfoContextFactory() =
     let popupChars = [| ' '; '('; ',' |]
 

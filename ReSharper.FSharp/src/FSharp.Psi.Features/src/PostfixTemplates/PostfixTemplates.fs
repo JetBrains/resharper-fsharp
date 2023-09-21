@@ -1,10 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
@@ -19,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Rider.Backend.Env
 open JetBrains.Util
 
 module FSharpPostfixTemplates =
@@ -227,7 +224,6 @@ and FSharpPostfixExpressionContext(postfixContext, expression) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpPostfixTemplateContextFactory() =
     interface IPostfixTemplateContextFactory with
         member this.GetReparseStrings() = EmptyArray.Instance
@@ -246,7 +242,6 @@ type FSharpPostfixTemplateContextFactory() =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
