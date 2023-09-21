@@ -9,7 +9,6 @@ open JetBrains.Application.UI.Options
 open JetBrains.Diagnostics
 open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel.Resources
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Context
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope
@@ -19,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.Files
-open JetBrains.Rider.Backend.Env
 open JetBrains.Rider.Model
 open JetBrains.Util
 
@@ -77,7 +75,6 @@ type FSharpScopeProviderBase() as this =
 
 
 [<ShellComponent>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>)>]
 type FSharpProjectScopeProvider() =
     inherit FSharpScopeProviderBase()
 

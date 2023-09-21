@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
@@ -12,12 +11,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Backend.Env
 
 [<ContextAction(Name = "Deconstruct variable", Group = "F#",
                 Description = "Deconstructs pattern into multiple positional components",
                 Priority = 1s)>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<PsiFeaturesImplZone>)>]
+[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<PsiFeaturesImplZone>)>]
 type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(provider)
 

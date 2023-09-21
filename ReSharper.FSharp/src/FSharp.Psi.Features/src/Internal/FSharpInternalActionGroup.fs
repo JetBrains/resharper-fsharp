@@ -9,7 +9,6 @@ open JetBrains.DocumentModel.DataContext
 open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Psi
@@ -17,7 +16,6 @@ open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Rider.Backend.Env
 
 [<Action("FSharp_Internal_DumpFcsProjects", "Dump all FCS projects")>]
 type DumpFcsProjectsAction() =
@@ -103,6 +101,4 @@ type FSharpInternalActionGroup(
 type ZoneMarker() =
     interface IRequire<IInternalVisibilityZone>
     interface IRequire<IRdFrameworkZone>
-    interface IRequire<IResharperHostCoreFeatureZone>
-    interface IRequire<IRiderFeatureEnvironmentZone>
     interface IRequire<ISinceClr4HostZone>

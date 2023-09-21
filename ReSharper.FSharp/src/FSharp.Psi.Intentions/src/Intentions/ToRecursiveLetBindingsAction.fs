@@ -2,18 +2,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
-open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Backend.Env
 open JetBrains.TextControl
 
 [<ContextAction(Name = "ToRecursiveLetBindings", Group = "F#", Description = "To recursive")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
+[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
 type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
