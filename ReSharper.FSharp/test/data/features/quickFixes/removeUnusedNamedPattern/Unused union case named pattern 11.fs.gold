@@ -1,0 +1,7 @@
+type U =
+    | A of i: int
+    | B
+
+match B with
+| A _{caret} -> 1
+| B -> 2
