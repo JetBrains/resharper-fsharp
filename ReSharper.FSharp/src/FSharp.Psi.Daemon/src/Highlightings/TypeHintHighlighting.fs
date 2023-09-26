@@ -1,13 +1,10 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
@@ -17,7 +14,6 @@ open JetBrains.UI.RichText
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-[<ZoneMarker(typeof<IDocumentModelZone>, typeof<PsiFeaturesImplZone>)>]
 type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
     let text = RichText(": " + typeNameString)
 
@@ -33,7 +29,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
     member x.Text = text
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
-and [<SolutionComponent>] [<ZoneMarker(typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>] TypeHintAdornmentProvider() =
+and [<SolutionComponent>] TypeHintAdornmentProvider() =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.UserData with

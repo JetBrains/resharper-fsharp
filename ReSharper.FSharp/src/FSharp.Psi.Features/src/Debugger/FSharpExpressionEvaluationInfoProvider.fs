@@ -1,8 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
 open FSharp.Compiler.EditorServices
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.IDE.Debugger
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -11,7 +9,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IDebuggerZone>)>]
 type FSharpExpressionEvaluationInfoProvider() =
     static let rec getTextToEvaluate (expr: IFSharpExpression) =
         match expr with

@@ -4,13 +4,10 @@ open System
 open System.Collections.Generic
 open System.IO
 open JetBrains.Application
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.UI.Controls.JetPopupMenu
 open JetBrains.Application.UI.Controls.TreeView
-open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeStructure
-open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -19,7 +16,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Backend.Features.CodeStructure
-open JetBrains.Rider.Backend.Product
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
@@ -32,7 +28,6 @@ type FSharpExtendedFileStructureLanguage() =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IRdFrameworkZone>, typeof<ISinceClr4HostZone>)>]
 type FSharpCodeStructureProvider() =
     let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
 

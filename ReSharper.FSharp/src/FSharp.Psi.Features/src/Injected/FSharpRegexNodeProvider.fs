@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Features.RegExp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -9,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
-open JetBrains.ReSharper.Psi.RegExp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil

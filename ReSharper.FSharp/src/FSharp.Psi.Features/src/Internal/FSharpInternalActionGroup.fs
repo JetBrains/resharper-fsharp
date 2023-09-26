@@ -6,7 +6,6 @@ open JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu
 open JetBrains.Application.UI.Actions.InternalMenu
 open JetBrains.Application.UI.ActionsRevised.Menu
 open JetBrains.DocumentModel.DataContext
-open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -100,5 +99,3 @@ type FSharpInternalActionGroup(
 [<ZoneMarker>]
 type ZoneMarker() =
     interface IRequire<IInternalVisibilityZone>
-    interface IRequire<IRdFrameworkZone>
-    interface IRequire<ISinceClr4HostZone>

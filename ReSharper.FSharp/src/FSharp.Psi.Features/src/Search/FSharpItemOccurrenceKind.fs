@@ -2,8 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open FSharp.Compiler.Symbols
 open JetBrains.Application
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Feature.Services.Resources
@@ -52,7 +50,6 @@ type FsharpSpecificOccurrenceKindIconsProvider() =
 // todo: patterns in overrides and objExpr
 
 [<SolutionComponent>]
-[<ZoneMarker(typeof<IRdFrameworkZone>, typeof<ISinceClr4HostZone>)>]
 type FSharpItemOccurenceKindProvider() =
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =

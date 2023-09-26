@@ -1,7 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ExternalSources
 
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ReSharper.Feature.Services.ExternalSources
 open JetBrains.ReSharper.Feature.Services.ExternalSources.Utils
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -13,7 +11,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<ExternalSourcesZone>)>]
 type FSharpDeclaredElementBinder() =
     inherit DeclaredElementBinder()
 

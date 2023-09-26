@@ -3,13 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplate
 open System
 open System.Reflection
 open JetBrains.Application
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.Diagnostics
-open JetBrains.Platform.RdFramework
 open JetBrains.ProjectModel.Resources
-open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Context
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
@@ -18,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.Files
-open JetBrains.Rider.Model
 open JetBrains.Util
 
 type InFSharpProjectScope() =
@@ -115,7 +111,6 @@ type FSharpProjectScopeCategoryUIProvider() as this =
 
 
 [<OptionsPage("RiderFSharpFileTemplatesSettings", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
-[<ZoneMarker(typeof<ICodeEditingZone>, typeof<IRdFrameworkZone>, typeof<IRiderModelZone>, typeof<ISinceClr4HostZone>)>]
 type RiderFSharpFileTemplatesOptionPage(lifetime, optionsPageContext, settings, storedTemplatesProvider,
         uiProvider: FSharpProjectScopeCategoryUIProvider, scopeCategoryManager, uiFactory, iconHost, dialogHost) =
     inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, optionsPageContext, settings,
