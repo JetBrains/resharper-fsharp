@@ -1,10 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
 open FSharp.Compiler.EditorServices.Structure
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
-open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -81,7 +79,6 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<DaemonEngineZone>)>]
 type FSharpCodeFoldingProcessFactory(logger: ILogger) =
     interface ICodeFoldingProcessorFactory with
         member x.CreateProcessor() =

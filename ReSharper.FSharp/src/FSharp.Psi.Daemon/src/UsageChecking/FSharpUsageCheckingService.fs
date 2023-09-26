@@ -1,14 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.UsageChecking
 
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
-open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Daemon.UsageChecking
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Resources.Shell
 
 type FSharpDummyUsageAnalyzer(lifetime, suppressors) =
     inherit UsageAnalyzer(lifetime, suppressors)
@@ -17,7 +12,6 @@ type FSharpDummyUsageAnalyzer(lifetime, suppressors) =
     override x.ProcessElement(_, _) = ()
 
 [<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadSafe)>]
-[<ZoneMarker(typeof<DaemonZone>, typeof<ILanguageFSharpZone>, typeof<PsiFeaturesImplZone>)>]
 type FSharpUsageCheckingServices(lifetime, suppressors) =
     inherit UsageCheckingServices(FSharpDummyUsageAnalyzer(lifetime, suppressors), null, null)
 
@@ -38,7 +32,6 @@ type FSharpCollectUsagesPsiFileProcessor(collectUsagesStageProcess, daemonProces
 
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<DaemonEngineZone>, typeof<DaemonZone>, typeof<IProjectModelZone>, typeof<PsiFeaturesImplZone>)>]
 type FSharpCollectUsagesPsiFileProcessorFactory() =
     inherit CollectUsagesPsiFileProcessorFactory()
 

@@ -1,18 +1,13 @@
-using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Lifetimes;
-using JetBrains.Platform.RdFramework;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.NuGet;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.Rider.Model;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.TypeProviders
 {
   [SolutionComponent]
-  [ZoneMarker(typeof(INuGetZone), typeof(IRdFrameworkZone), typeof(IRiderModelZone), typeof(ISinceClr4HostZone))]
   public class ProvidedAbbreviationTypePartInvalidator
   {
     private readonly IProxyExtensionTypingProvider myTypeProvidersShim;

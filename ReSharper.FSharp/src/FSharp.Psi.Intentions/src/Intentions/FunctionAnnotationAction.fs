@@ -1,12 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Symbols
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -89,7 +86,6 @@ module SpecifyTypes =
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#",
                 Description = "Annotate function with parameter types and return type")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<PsiFeaturesImplZone>)>]
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

@@ -44,7 +44,6 @@
     <Compile Include="src\CodeCompletion\FSharpScriptReferenceCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
-    <Compile Include="src\CodeCompletion\ZoneMarker.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\CodeStructure\FSharpGotoClassMemberProvider.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
@@ -68,7 +67,6 @@
     <Compile Include="src\CodeCleanup\FantomasHost.fs" />
     <Compile Include="src\CodeCleanup\FSharpReformatCode.fs" />
     <Compile Include="src\CodeCleanup\OptimizeImports.fs" />
-    <Compile Include="src\CodeCleanup\ZoneMarker.fs" />
     <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
     <Compile Include="src\CodeStyle\FantomasPage.fs" />
     <Compile Include="src\Fsi\FsiSandboxUtil.fs" />
@@ -76,7 +74,6 @@
     <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiHost.fs" />
     <Compile Include="src\Fsi\FsiOptionsPage.fs" />
-    <Compile Include="src\Fsi\ZoneMarker.fs" />
     <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />
     <Compile Include="src\ParameterInfo\FSharpParameterInfo.fs" />
     <Compile Include="src\Parsing\FcsSyntaxTreeUtil.fs" />
@@ -103,14 +100,12 @@
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
     <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageSpecificCopyPasteBehavior.fs" />
-    <Compile Include="src\LanguageService\ZoneMarker.fs" />
     <Compile Include="src\Internal\FSharpInternalActionGroup.fs" />
     <Compile Include="src\Injected\FSharpInjectionUtil.fs" />
     <Compile Include="src\Injected\FSharpLiteralInjectionTarget.fs" />
     <Compile Include="src\Injected\FSharpRegexProviders.fs" />
     <Compile Include="src\Injected\FSharpRegexNodeProvider.fs" />
     <Compile Include="src\Injected\FSharpInjectionTargetsFinderFactory.fs" />
-    <Compile Include="src\Injected\ZoneMarker.fs" />
     <Compile Include="src\AI\FSharpLanguageOrTechnologyChatContextProvider.fs" />
     <Compile Include="src\AI\ZoneMarker.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />

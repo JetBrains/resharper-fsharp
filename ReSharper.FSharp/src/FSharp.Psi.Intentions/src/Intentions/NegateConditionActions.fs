@@ -1,8 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -37,7 +35,6 @@ type NegateConditionActionBase<'T when 'T: not struct and 'T :> IConditionOwnerE
 
 
 [<ContextAction(Name = "NegateIfCondition", Group = "F#", Description = "Negate 'if' condition")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<PsiFeaturesImplZone>)>]
 type NegateIfConditionAction(dataProvider: FSharpContextActionDataProvider) =
     inherit NegateConditionActionBase<IIfThenElseExpr>(dataProvider)
 
@@ -48,7 +45,6 @@ type NegateIfConditionAction(dataProvider: FSharpContextActionDataProvider) =
 
 
 [<ContextAction(Name = "NegateWhileCondition", Group = "F#", Description = "Negate 'while' condition")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<PsiFeaturesImplZone>)>]
 type NegateWhileConditionAction(dataProvider: FSharpContextActionDataProvider) =
     inherit NegateConditionActionBase<IWhileExpr>(dataProvider)
 
