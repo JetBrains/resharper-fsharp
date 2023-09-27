@@ -11,6 +11,8 @@ open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projec
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Utils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
+open JetBrains.RdBackend.Common.Env
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<ShellFeaturePart>]
 type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
@@ -40,6 +42,7 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
 
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     interface IMsBuildConfigurationTabProvider with
         member x.Order = Int32.MaxValue

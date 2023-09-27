@@ -25,6 +25,8 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
 open NUnit.Framework
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.Application.BuildScript.Application.Zones
 
 type ScriptPsiModulesTest() =
     inherit BaseTest()
@@ -79,6 +81,7 @@ type ScriptPsiModulesTest() =
 
 
 [<SolutionInstanceComponent>]
+[<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
 type MyTestSolutionToolset(lifetime: Lifetime, settings, logger: ILogger) =
     inherit DefaultSolutionToolset(lifetime, settings, logger)
 
@@ -94,37 +97,12 @@ type MyTestSolutionToolset(lifetime: Lifetime, settings, logger: ILogger) =
         member x.GetBuildTool() = buildTool
         member x.Changed = changed :> _
 
-[<ZoneActivator>]
-type SolutionHostZoneActivator() =
-    interface IActivate<IHostSolutionZone>
 
 
-[<SolutionInstanceComponent>]
-type FSharpProjectStructurePresenterStub() =
-    interface IHideImplementation<FSharpProjectStructurePresenter>
-
-
-[<SolutionInstanceComponent>]
-type FSharpItemsContainerRefresherStub() =
-    interface IHideImplementation<FSharpItemsContainerRefresher>
-
-    interface  IFSharpItemsContainerRefresher with
-        member x.RefreshProject(_, _) = ()
-        member x.RefreshFolder(_, _, _) = ()
-        member x.UpdateFile(_, _) = ()
-        member x.UpdateFolder(_, _, _) = ()
-        member x.ReloadProject _ = ()
-        member x.SelectItem(_, _) = ()
-
-
-[<SolutionFeaturePart>]
-type FSharpItemModificationContextProviderStub() =
-    interface IHideImplementation<FSharpItemModificationContextProvider>
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
 type FSharpFileServiceStub() =
-    interface IHideImplementation<FSharpFileService>
-
     interface IFSharpFileService with
         member x.IsScratchFile _ = false
         member x.IsScriptLike _ = false

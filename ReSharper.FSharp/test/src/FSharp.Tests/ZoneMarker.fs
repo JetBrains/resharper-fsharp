@@ -10,4 +10,4 @@ do()
 
 [<SetUpFixture>]
 type PsiFeaturesTestEnvironmentAssembly() =
-    inherit ExtensionTestEnvironmentAssembly<IFSharpTestsZone>()
+    inherit ExtensionTestEnvironmentAssembly<IFSharpTestsEnvZone>()

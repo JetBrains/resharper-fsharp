@@ -20,8 +20,10 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<JetBrains.RdBackend.Common.Env.IResharperHostCoreFeatureZone>)>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider, logger: ILogger) =
 

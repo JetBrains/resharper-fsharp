@@ -19,8 +19,11 @@ open JetBrains.Rider.Backend.Features.CodeStructure
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.RdBackend.Common.Env
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<JetBrains.Rider.Backend.Product.IRiderProductEnvironmentZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureZone>)>]
 type FSharpExtendedFileStructureLanguage() =
     interface IExtendedFileStructureLanguage with
         member this.IsValid(languageType) =

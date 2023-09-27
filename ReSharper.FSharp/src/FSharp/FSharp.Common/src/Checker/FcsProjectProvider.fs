@@ -29,6 +29,7 @@ open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<AutoOpen>]
 module FcsProjectProvider =
@@ -56,10 +57,11 @@ module FcsProjectProvider =
         ProjectModelChangeType.REFERENCE_TARGET
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<JetBrains.Application.BuildScript.Application.Zones.ISinceClr4HostZone>)>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        fsFileService: IFSharpFileService, fsItemsContainer: FSharpItemsContainer,
+        fsFileService: IFSharpFileService, fsItemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, locks: IShellLocks, logger: ILogger,
         fcsAssemblyReaderShim: IFcsAssemblyReaderShim,
         experimentalFeatures: FSharpExperimentalFeaturesProvider) as this =
@@ -175,7 +177,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         // Start listening for the changes after project model is ready.
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             changeManager.Changed2.Advise(lifetime, this.ProcessChange)
-            fsItemsContainer.FSharpProjectLoaded.Advise(lifetime, this.ProcessFSharpProjectLoaded)))
+            fsItemsContainer.AdviseFSharpProjectLoaded lifetime this.ProcessFSharpProjectLoaded))
 
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore

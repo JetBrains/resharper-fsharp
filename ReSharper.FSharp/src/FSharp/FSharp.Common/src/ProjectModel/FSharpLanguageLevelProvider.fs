@@ -16,6 +16,8 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Settings
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+open JetBrains.RdBackend.Common.Env
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<AllowNullLiteral>]
 type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLanguageLevel,
@@ -210,6 +212,7 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
         member this.LanguageVersionModifier = failwith "todo"
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     inherit LanguageSpecificItemsProviderBase<FSharpLanguageVersion, FSharpLanguageLevel>()
 
