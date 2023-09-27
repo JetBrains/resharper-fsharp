@@ -24,10 +24,12 @@
 
     <ItemGroup>
       <PackageReference Include="Fantomas.Core" />
+      <PackageReference Include="Fantomas.FCS" />
       <PackageReference Include="FSharp.Core" />
       <PackageReference Include="JetBrains.Lifetimes" />
       <PackageReference Include="JetBrains.NuGet.Versioning" />
       <PackageReference Include="JetBrains.RdFramework" />
+      <PackageReference Include="System.Diagnostics.DiagnosticSource" />
       <PackageReference Include="System.Runtime.Loader" />
       <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
       <PackageReference Include="System.Memory" />
