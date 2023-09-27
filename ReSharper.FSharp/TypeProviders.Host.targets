@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="$(MSBuildThisFileDirectory)\src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj"/>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\src\FSharp\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

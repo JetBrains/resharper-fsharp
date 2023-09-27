@@ -129,8 +129,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
-    <ProjectReference Include="..\..\..\src\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
     <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />
   </ItemGroup>
   

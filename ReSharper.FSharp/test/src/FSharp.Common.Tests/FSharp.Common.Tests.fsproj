@@ -29,7 +29,7 @@
     <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="WindowsBase" />

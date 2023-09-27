@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Psi", "src\FSharp.Psi\FSharp.Psi.csproj", "{4D2A870A-2D0D-4004-A795-596F0F9CE591}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Psi", "src\FSharp\FSharp.Psi\FSharp.Psi.csproj", "{4D2A870A-2D0D-4004-A795-596F0F9CE591}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Features", "src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj", "{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Features", "src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj", "{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common", "src\FSharp.Common\FSharp.Common.fsproj", "{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common", "src\FSharp\FSharp.Common\FSharp.Common.fsproj", "{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.ProjectModelBase", "src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj", "{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.ProjectModelBase", "src\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj", "{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E19336B-3133-4C1A-8E65-E2F7C465663B}"
 EndProject
@@ -21,21 +21,21 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Host", "test\s
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test\src\FSharp.Common.Tests\FSharp.Common.Tests.fsproj", "{83C5104C-057E-4AF8-B3FE-3437968CA621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host", "src\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj", "{4EB01188-F511-4991-9A0F-604EE28E8F9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host", "src\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj", "{4EB01188-F511-4991-9A0F-604EE28E8F9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host.NetCore", "src\FSharp.TypeProviders.Host.NetCore\FSharp.TypeProviders.Host.NetCore.csproj", "{72982346-1D28-41CB-9CBF-056EC8482305}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Host.NetCore", "src\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.NetCore\FSharp.TypeProviders.Host.NetCore.csproj", "{72982346-1D28-41CB-9CBF-056EC8482305}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Protocol", "src\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.TypeProviders.Protocol", "src\FSharp\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj", "{912A7F5F-73F2-4DFE-B81A-C13A4F58F31C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Host", "src\FSharp.Fantomas.Host\FSharp.Fantomas.Host.csproj", "{CF12A71A-1296-418B-8C0A-CC4B398AAB16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Protocol", "src\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj", "{D8DE097E-04DC-4A9B-88BF-10923FF44F8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Fantomas.Protocol", "src\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj", "{D8DE097E-04DC-4A9B-88BF-10923FF44F8B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Services", "src\FSharp.Psi.Services\FSharp.Psi.Services.fsproj", "{B41F2443-4F46-4571-8C49-CFB0EADD5F65}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Services", "src\FSharp\FSharp.Psi.Services\FSharp.Psi.Services.fsproj", "{B41F2443-4F46-4571-8C49-CFB0EADD5F65}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Daemon", "src\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj", "{92CA923A-5889-4B0F-8A89-5310042F9FEF}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Daemon", "src\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj", "{92CA923A-5889-4B0F-8A89-5310042F9FEF}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Intentions", "src\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj", "{12E28B8B-CB6E-4620-B438-013C93ACC734}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Psi.Intentions", "src\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj", "{12E28B8B-CB6E-4620-B438-013C93ACC734}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Intentions.Tests", "test\src\FSharp.Intentions.Tests\FSharp.Intentions.Tests.fsproj", "{24E8C927-A6E4-48DB-B548-DEEEE808EC4E}"
 EndProject

@@ -2,6 +2,7 @@
 <SubplatformInfo xmlns="urn:schemas-jetbrains-com:build-subplatform-info" CompanyNameHuman="JetBrains" IsGitSubplatform="true">
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Rider\Rider.Backend" />
+        <SubplatformReference Name="Plugins\resharper-fsharp\ReSharper.FSharp\src\FSharp" IsCompileTimeOnly="True" />
         <SubplatformReference Name="Plugins\_ReSharperFSharp.Pregenerated\BackendModel" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>

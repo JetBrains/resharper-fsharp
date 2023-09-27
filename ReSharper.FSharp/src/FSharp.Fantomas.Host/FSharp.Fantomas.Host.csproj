@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
+      <ProjectReference Include="..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     </ItemGroup>
 
     <ItemGroup>

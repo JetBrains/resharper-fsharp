@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
-    <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

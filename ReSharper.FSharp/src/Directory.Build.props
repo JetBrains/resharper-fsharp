@@ -1,6 +1,3 @@
 <Project>
-    <PropertyGroup>
-        <PackageLockFilePath>$(MSBuildThisFileDirectory)\PackagesLock.targets</PackageLockFilePath>
-    </PropertyGroup>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 </Project>
