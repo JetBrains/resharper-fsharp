@@ -15,6 +15,7 @@ open JetBrains.ProjectModel.Properties.Common
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.Util
 open JetBrains.Util.PersistentMap
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<AllowNullLiteral>]
 type IFSharpProjectConfiguration =
@@ -114,6 +115,7 @@ and FSharpBuildSettings() =
 
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpProjectApplicableProvider() =
     interface ProjectConfigurationValidator.IApplicableProvider with
         member x.IsApplicable(projectMark) =
@@ -121,6 +123,7 @@ type FSharpProjectApplicableProvider() =
 
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpProjectMarkTypeGuidProvider() =
     inherit ProjectMarkTypeGuidProvider()
 

@@ -20,6 +20,7 @@ open JetBrains.Rider.Backend.Features.Settings.Layers.ExportImportWorkaround
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
 type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
@@ -142,6 +143,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<JetBrains.Rider.Backend.Product.IRiderProductEnvironmentZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureZone>)>]
 type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"
 

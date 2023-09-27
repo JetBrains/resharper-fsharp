@@ -8,8 +8,11 @@ open JetBrains.RdBackend.Common.Features.ProjectModel.View.Appenders.ProjectStru
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
+open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.RdBackend.Common.Env
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
     interface IProjectStructureProvider with
         member x.Priority = 10
@@ -46,6 +49,7 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
 
 
 [<SolutionInstanceComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer,
         presenter: ProjectModelViewPresenter) =
 

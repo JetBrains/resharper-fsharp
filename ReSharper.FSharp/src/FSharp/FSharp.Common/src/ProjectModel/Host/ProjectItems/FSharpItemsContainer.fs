@@ -41,9 +41,14 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
+open JetBrains.Rider.Backend.Env
+open JetBrains.RdBackend.Common.Env
+open JetBrains.Application.BuildScript.Application.Zones
+
 
 /// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
 [<SolutionInstanceComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
     abstract GetMap: unit -> IDictionary<IProjectMark, ProjectMapping>
@@ -89,6 +94,7 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 
@@ -201,7 +207,7 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
 
-    member x.RemoveProject(project: IProject) =
+    member x.RemoveProjectInner(project: IProject) =
         use lock = locker.UsingWriteLock()
         let projectMark = project.GetProjectMark()
         x.ProjectMappings.Remove(projectMark) |> ignore
@@ -343,11 +349,16 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
             tryGetProjectMapping projectMark
             |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
             |> Option.defaultValue [| |]
+            
+        member this.AdviseFSharpProjectLoaded(lifetime) (body) = this.FSharpProjectLoaded.Advise(lifetime, body)
+        member this.RemoveProject(project) = this.RemoveProjectInner(project)
 
 type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
 
+    abstract member AdviseFSharpProjectLoaded : Lifetime -> (IProjectMark -> unit) -> unit
+    abstract member RemoveProject : IProject -> unit
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
@@ -1091,6 +1102,7 @@ type IFSharpItemsContainerRefresher =
 
 
 [<SolutionInstanceComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
 
     let tryGetProject projectMark =
@@ -1203,6 +1215,7 @@ type FSharpViewFolderIdentity =
 
 
 [<SolutionFeaturePart>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
     inherit OrderingContextProvider()
 

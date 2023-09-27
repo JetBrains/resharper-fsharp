@@ -19,8 +19,12 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+open JetBrains.Application.BuildScript.Application.Zones
+
+// TODO The reason for per component zone marker is avoiding to mark interfaces
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpTargetsProjectLoadModificator() =
     let fsTargets =
         [| "GenerateCode"
@@ -56,6 +60,7 @@ module FcsProjectBuilder =
         |> List.ofArray
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<JetBrains.Application.BuildScript.Application.Zones.ISinceClr4HostZone>)>]
 type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, fileSystemTracker: IFileSystemTracker, logger: ILogger) =
 

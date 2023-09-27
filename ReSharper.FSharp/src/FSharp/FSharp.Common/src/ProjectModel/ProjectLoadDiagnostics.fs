@@ -12,8 +12,10 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic
 open JetBrains.RdBackend.Common.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
+open JetBrains.Application.BuildScript.Application.Zones
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpProjectLoadTargetsAnalyzer() =
      interface IMsBuildProjectLoadDiagnosticProvider with
          member x.CollectDiagnostic(projectMark, project) =
@@ -44,6 +46,7 @@ and FSharpTargetsDiagnosticMessage(projectMark, message) =
 
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
 type FSharpProjectTypeGuidAnalyzer() =
     interface IMsBuildProjectLoadDiagnosticProvider with
         member x.CollectDiagnostic(projectMark, _) =

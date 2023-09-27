@@ -16,21 +16,20 @@ open NUnit.Framework
 do()
 
 [<ZoneDefinition>]
-type IFSharpTestsZone =
+type ICommonFSharpTestsEnvZone =
     inherit ITestsEnvZone
 
+[<ZoneDefinition>]
+type ICommonTestFSharpPluginZone =
+    inherit IZone
+    inherit IRequire<IFSharpPluginZone>
+    inherit IRequire<PsiFeatureTestZone>
+    
 [<ZoneActivator>]
-type PsiFeatureTestZoneActivator() =
-    interface IActivate<PsiFeatureTestZone>
-
-[<ZoneActivator>]
-type FSharpZoneActivator() =
-    interface IActivate<ILanguageFSharpZone>
-
-[<ShellComponent>]
-type FSharpFileServiceStub() =
-    interface IHideImplementation<FSharpFileService>
+[<ZoneMarker(typeof<ICommonFSharpTestsEnvZone>)>]
+type FSharpTestZoneActivator() =
+    interface IActivate<ICommonTestFSharpPluginZone>
 
 [<SetUpFixture>]
 type PsiFeaturesTestEnvironmentAssembly() =
-    inherit ExtensionTestEnvironmentAssembly<IFSharpTestsZone>()
+    inherit ExtensionTestEnvironmentAssembly<ICommonFSharpTestsEnvZone>()

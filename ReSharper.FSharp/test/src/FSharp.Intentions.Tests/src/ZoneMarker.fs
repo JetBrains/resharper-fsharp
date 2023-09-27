@@ -11,7 +11,7 @@ do()
 
 [<SetUpFixture>]
 type PsiFeaturesTestEnvironmentAssembly() =
-    inherit ExtensionTestEnvironmentAssembly<IFSharpTestsZone>()
+    inherit ExtensionTestEnvironmentAssembly<IFSharpTestsEnvZone>()
 
 module ForceAssemblyReference =
     let _ = FSharpErrorsStage.redundantParensEnabledKey
