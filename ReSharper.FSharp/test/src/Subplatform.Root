@@ -2,7 +2,9 @@
 <SubplatformInfo xmlns="urn:schemas-jetbrains-com:build-subplatform-info" CompanyNameHuman="JetBrains" IsGitSubplatform="true">
     <SubplatformInfo.SubplatformReferences>
         <SubplatformReference Name="Rider\Rider.Backend" />
-        <SubplatformReference Name="Plugins\resharper-fsharp\ReSharper.FSharp\src" />
+        <SubplatformReference Name="Plugins\resharper-fsharp\ReSharper.FSharp\src\FSharp" />
+        <SubplatformReference Name="Plugins\resharper-fsharp\ReSharper.FSharp\src\FSharp.Fantomas.Host" />
+        <SubplatformReference Name="Plugins\resharper-fsharp\ReSharper.FSharp\src\FSharp.TypeProviders.Host" />
         <SubplatformReference Name="Psi.Features\test\Framework" />
     </SubplatformInfo.SubplatformReferences>
 </SubplatformInfo>

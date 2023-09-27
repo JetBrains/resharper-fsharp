@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.BuildScript
 
 			return constants.SelectMany(s => new []
 			{
-                new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\resharper-fsharp\\ReSharper.FSharp\\src"), s),
+                new AutofixAllowedDefineConstant(new SubplatformName("Plugins\\resharper-fsharp\\ReSharper.FSharp\\src\\FSharp.TypeProviders.Host"), s),
 			});
 		}
 	}
