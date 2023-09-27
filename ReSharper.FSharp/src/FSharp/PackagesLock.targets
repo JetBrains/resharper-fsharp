@@ -9,8 +9,8 @@
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2023.3.0.4" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.0.2" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
-    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.6.20230630.117" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.6.20230630.117" />
+    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.7.20230927.119" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.7.20230927.119" />
     <PackageLock Include="JetBrains.RdFramework" Version="2023.3.0" />
     <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.11.1" />
     <PackageLock Include="NVelocity" Version="1.0.3" />
