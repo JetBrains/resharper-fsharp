@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open System
 open System.Runtime.InteropServices
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.UI.Controls.FileSystem
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel
@@ -16,11 +17,12 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.Rider.Backend.Env
 open JetBrains.Rider.Backend.Features.Settings.Layers.ExportImportWorkaround
+open JetBrains.Rider.Backend.Product
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.Util
-open JetBrains.Application.BuildScript.Application.Zones
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
 type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
@@ -143,7 +145,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
 
 [<ShellComponent>]
-[<ZoneMarker(typeof<JetBrains.Rider.Backend.Product.IRiderProductEnvironmentZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"
 

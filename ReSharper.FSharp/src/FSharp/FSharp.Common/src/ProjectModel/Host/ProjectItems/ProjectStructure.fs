@@ -1,15 +1,15 @@
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 
 open System
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Appenders.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.RdBackend.Common.Env
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
@@ -25,7 +26,6 @@ open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
-open JetBrains.Application.BuildScript.Application.Zones
 
 module FSharpTestAttribute =
     let extensions =

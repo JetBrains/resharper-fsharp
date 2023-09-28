@@ -5,6 +5,7 @@ open System.IO
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
@@ -29,7 +30,6 @@ open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open JetBrains.Application.BuildScript.Application.Zones
 
 [<AutoOpen>]
 module FcsProjectProvider =
@@ -57,7 +57,7 @@ module FcsProjectProvider =
         ProjectModelChangeType.REFERENCE_TARGET
 
 [<SolutionComponent>]
-[<ZoneMarker(typeof<JetBrains.Application.BuildScript.Application.Zones.ISinceClr4HostZone>)>]
+[<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,

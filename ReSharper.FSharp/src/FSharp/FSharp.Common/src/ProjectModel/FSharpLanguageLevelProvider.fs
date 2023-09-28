@@ -3,11 +3,13 @@
 open System
 open System.Collections.Concurrent
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Extensions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
@@ -16,8 +18,6 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Settings
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open JetBrains.RdBackend.Common.Env
-open JetBrains.Application.BuildScript.Application.Zones
 
 [<AllowNullLiteral>]
 type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLanguageLevel,

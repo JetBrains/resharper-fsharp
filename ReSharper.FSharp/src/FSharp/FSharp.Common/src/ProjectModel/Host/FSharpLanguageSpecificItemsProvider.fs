@@ -2,17 +2,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host
 
 open System
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Extensions
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projects.MsBuild
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Providers
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Utils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
-open JetBrains.RdBackend.Common.Env
-open JetBrains.Application.BuildScript.Application.Zones
 
 [<ShellFeaturePart>]
 type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =

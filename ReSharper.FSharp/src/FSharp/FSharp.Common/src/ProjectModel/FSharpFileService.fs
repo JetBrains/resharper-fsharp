@@ -2,16 +2,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.Application
 open JetBrains.Application.BuildScript
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
+open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 open JetBrains.Rider.Backend.Env
-open JetBrains.RdBackend.Common.Env
-open JetBrains.Application.BuildScript.Application.Zones
 
 [<ShellComponent>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureEnvironmentZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderFeatureEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation, fileExtensions: IProjectFileExtensions) =
     let scratchesDir =
         // Parameters are arbitrary, they aren't currently used inside this override.
