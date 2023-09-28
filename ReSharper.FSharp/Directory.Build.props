@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FantomasBundledVersion>6.0.5</FantomasBundledVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <CSharpLanguageVersion>9</CSharpLanguageVersion>
   </PropertyGroup>
 
