@@ -6,6 +6,7 @@ open System.Diagnostics
 open System.IO
 open System.Linq
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.DataContext
 open JetBrains.Application.PersistentMap
@@ -26,12 +27,14 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Appenders
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Ordering
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.Rider.Backend.Env
 open JetBrains.Serialization
 open JetBrains.Threading
 open JetBrains.UI.RichText
@@ -41,14 +44,10 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
-open JetBrains.Rider.Backend.Env
-open JetBrains.RdBackend.Common.Env
-open JetBrains.Application.BuildScript.Application.Zones
-
 
 /// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
 [<SolutionInstanceComponent>]
-[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
+[<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
     abstract GetMap: unit -> IDictionary<IProjectMark, ProjectMapping>
@@ -94,7 +93,7 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
-[<ZoneMarker(typeof<JetBrains.ProjectModel.ProjectsHost.SolutionHost.IHostSolutionZone>)>]
+[<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
 

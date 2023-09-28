@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open System
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -17,8 +18,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open NUnit.Framework
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ReSharper.Plugins.FSharp.Tests
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]

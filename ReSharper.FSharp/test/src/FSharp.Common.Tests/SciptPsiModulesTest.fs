@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Linq
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Environment
 open JetBrains.Application.platforms
@@ -20,13 +21,12 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
 open NUnit.Framework
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
-open JetBrains.Application.BuildScript.Application.Zones
 
 type ScriptPsiModulesTest() =
     inherit BaseTest()

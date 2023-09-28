@@ -1,5 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.RunMarkers
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -9,9 +10,10 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches.SymbolCache
 open JetBrains.ReSharper.Psi.EntryPoints
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Rider.Backend.Env
 open JetBrains.Rider.Backend.Features.RunMarkers
+open JetBrains.Rider.Backend.Product
 open JetBrains.Util
-open JetBrains.Application.BuildScript.Application.Zones
 
 let isEntryPoint (binding: ITopBinding) =
     let attribute = binding.Attributes.GetAttribute("EntryPoint")
@@ -45,7 +47,7 @@ let isApplicableMethod (binding: IBinding) =
     isNotNull method && RunMarkerUtil.IsSuitableStaticMethod(method)
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<JetBrains.Rider.Backend.Product.IRiderProductEnvironmentZone>, typeof<JetBrains.Rider.Backend.Env.IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpRunMarkerProvider() =
     interface IRunMarkerProvider with
         member this.CollectRunMarkers(file, settings, consumer) =
