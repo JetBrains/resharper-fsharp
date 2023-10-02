@@ -11,7 +11,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</AssemblyName>
-        <OutputType>Exe</OutputType>
+        <OutputType Condition="!$(InternalBuild)">Exe</OutputType>
         <LangVersion>$(CSharpLanguageVersion)</LangVersion>
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
         <SignAssembly>false</SignAssembly>
