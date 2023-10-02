@@ -13,6 +13,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore</AssemblyName>
+    <OutputType Condition="!$(InternalBuild)">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\FSharp.TypeProviders.Host\src\**\*.cs">
