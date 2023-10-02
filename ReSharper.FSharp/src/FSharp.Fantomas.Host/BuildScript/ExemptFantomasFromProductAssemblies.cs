@@ -2,13 +2,14 @@
 using JetBrains.Application.BuildScript.Solution;
 using JetBrains.Build;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.BuildScript;
-
-public class ExemptFantomasFromProductAssemblies
+namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.BuildScript
 {
-    [BuildStep]
-    public static SubplatformWithNonProductAssemblies[] MarkMyselfNonProduct(AllAssembliesOnEverything allass)
+    public class ExemptFantomasFromProductAssemblies
     {
-        return SubplatformWithNonProductAssemblies.MarkCaller<ExemptFantomasFromProductAssemblies>(allass);
+        [BuildStep]
+        public static SubplatformWithNonProductAssemblies[] MarkMyselfNonProduct(AllAssembliesOnEverything allass)
+        {
+            return SubplatformWithNonProductAssemblies.MarkCaller<ExemptFantomasFromProductAssemblies>(allass);
+        }
     }
 }
