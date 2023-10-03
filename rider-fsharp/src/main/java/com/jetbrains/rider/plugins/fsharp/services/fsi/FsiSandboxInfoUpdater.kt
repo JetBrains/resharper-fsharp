@@ -119,19 +119,21 @@ class FsiSandboxInfoUpdater(
   }
 }
 
-fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () -> Unit) {
+fun withGenericSandBoxing(sandboxInfo: SandboxInfo, outerProject: Project, block: () -> Unit) {
   application.assertIsDispatchThread()
 
-  val textControlHost = (FrontendTextControlHost.getInstance(project) as RiderTextControlHost)
+  val textControlHost = (FrontendTextControlHost.getInstance(outerProject) as RiderTextControlHost)
 
   var localInfo: SandboxInfo? = sandboxInfo
   Lifetime.using { lt ->
-    project.messageBus.subscribe(lt, FrontendTextControlHostListener.TOPIC, object : FrontendTextControlHostListener {
+    com.intellij.util.application.messageBus.subscribe(lt, FrontendTextControlHostListener.TOPIC, object : FrontendTextControlHostListener {
       override fun beforeEditorBound(lifetime: Lifetime,
                                      project: Project,
                                      textControlId: TextControlId,
                                      editorModel: TextControlModel,
                                      editor: Editor) {
+        if (project != outerProject)
+          return
         if (localInfo != null)
           SandboxManager.getInstance().markAsSandbox(editor, sandboxInfo)
       }
