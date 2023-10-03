@@ -36,7 +36,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     protected override ProcessStartInfo GetProcessStartInfo(Lifetime lifetime, int port)
     {
       var runtimeConfigPath = FantomasHostDirectory / FantomasProtocolConstants.CoreRuntimeConfigFilename;
-      var launchPath = FantomasHostDirectory / FantomasProtocolConstants.PROCESS_FILENAME;
+      var launchPath =
+        // because the internal SDK produces .exe instead of .dll
+        FantomasHostDirectory / (FantomasProtocolConstants.PROCESS_FILENAME_WITHOUT_EXTENSION + ".exe")
+          is { ExistsFile: true } exeFile
+            ? exeFile
+            : FantomasHostDirectory / (FantomasProtocolConstants.PROCESS_FILENAME_WITHOUT_EXTENSION + ".dll");
       var dotnetArgs = $"--runtimeconfig \"{runtimeConfigPath}\"";
 
       Assertion.Assert(launchPath.ExistsFile, $"can't find '{launchPath}'");
