@@ -13,7 +13,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</AssemblyName>
-    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.config">
