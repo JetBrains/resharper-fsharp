@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     private static readonly FileSystemPath FantomasHostDirectory =
       typeof(FantomasProcess).Assembly.GetPath().Directory.Parent / "fantomas";
 
-    private static readonly FileSystemPath FantomasDllsDirectory = FantomasHostDirectory / "dlls";
+    private static readonly FileSystemPath FantomasDllsDirectory = FantomasHostDirectory;
 
     protected override RdFantomasModel CreateModel(Lifetime lifetime, IProtocol protocol) => new(lifetime, protocol);
 
