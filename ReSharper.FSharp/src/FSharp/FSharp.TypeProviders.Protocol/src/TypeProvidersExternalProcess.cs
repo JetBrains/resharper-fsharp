@@ -80,15 +80,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       var versionToRun = majorVersions.Max();
 
       var runtimeConfigPath = basePath / TypeProvidersProtocolConstants.CoreRuntimeConfigFilename;
-      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostCoreFilename;
+      var launchPath =
+        // because the internal SDK produces .exe instead of .dll
+        basePath / (TypeProvidersProtocolConstants.CoreHostFilenameWithoutExtension + ".exe") 
+          is { ExistsFile: true } exeFile 
+          ? exeFile
+          : basePath / (TypeProvidersProtocolConstants.CoreHostFilenameWithoutExtension + ".dll");
       var dotnetArgs = $"--fx-version {versionToRun} --runtimeconfig \"{runtimeConfigPath}\"";
-      Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
+      Assertion.Assert(launchPath.ExistsFile, $"can't find '{launchPath.FullPath}'");
       Assertion.Assert(runtimeConfigPath.ExistsFile, $"can't find '{runtimeConfigPath.FullPath}'");
 
       var processStartInfo = new ProcessStartInfo
       {
         Arguments =
-          $"{dotnetArgs} \"{fileSystemPath.FullPath}\" {port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+          $"{dotnetArgs} \"{launchPath.FullPath}\" {port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
         FileName = "exec"
       };
 
@@ -97,7 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     private static ProcessStartInfo GetFrameworkProcessStartInfo(int port, FileSystemPath basePath)
     {
-      var fileSystemPath = basePath / TypeProvidersProtocolConstants.TypeProvidersHostFrameworkFilename;
+      var fileSystemPath = basePath / TypeProvidersProtocolConstants.HostFrameworkFilename;
       Assertion.Assert(fileSystemPath.ExistsFile, $"can't find '{fileSystemPath.FullPath}'");
 
       var processStartInfo = new ProcessStartInfo

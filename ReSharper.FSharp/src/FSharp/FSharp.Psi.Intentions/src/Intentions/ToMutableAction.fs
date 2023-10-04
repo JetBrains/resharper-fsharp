@@ -1,18 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 
 // todo: fix mutable inside binding range, then replace IRecordField usage below
 
 [<ContextAction(Name = "ToMutable", Group = "F#", Description = "Makes value mutable")>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
 type ToMutableAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

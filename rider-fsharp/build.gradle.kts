@@ -130,13 +130,11 @@ val typeProvidersFiles = listOf(
 val fantomasHostFiles = listOf(
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.deps.json",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Core.dll",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.FCS.dll",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.win.runtimeconfig.json",
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json"
-)
-
-val fantomasDllFiles = listOf(
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.FCS.dll",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Core.dll"
 )
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
@@ -281,7 +279,6 @@ tasks {
     var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     files = files.map { "$resharperPluginPath/src/$it" }
     val fantomasHostFiles = fantomasHostFiles.map { "$resharperPluginPath/src/$it" }
-    val fantomasDllFiles = fantomasDllFiles.map { "$resharperPluginPath/src/$it" }
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
     if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
@@ -298,7 +295,6 @@ tasks {
 
     moveToPlugin(files, "dotnet")
     moveToPlugin(fantomasHostFiles, "fantomas")
-    moveToPlugin(fantomasDllFiles, "fantomas/dlls")
     moveToPlugin(typeProvidersFiles, "typeProviders")
     moveToPlugin(listOf("projectTemplates"), "projectTemplates")
     from("$resharperPluginPath/src/annotations") {
@@ -315,7 +311,6 @@ tasks {
       }
       validateFiles(files, "dotnet")
       validateFiles(fantomasHostFiles, "fantomas")
-      validateFiles(fantomasDllFiles, "fantomas/dlls")
       validateFiles(typeProvidersFiles, "typeProviders")
     }
   }

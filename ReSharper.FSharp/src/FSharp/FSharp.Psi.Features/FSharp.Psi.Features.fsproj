@@ -13,6 +13,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\ZoneMarkerServices.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -138,16 +139,22 @@
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-<!--  <Target Name="AddFantomasBundledVersion" BeforeTargets="CoreGenerateAssemblyInfo">-->
-<!--    <PropertyGroup>-->
-<!--      <FantomasBundledVersion Condition="'%(PackageLock.Identity)'=='Fantomas.Core'">%(PackageLock.Version)</FantomasBundledVersion>-->
-<!--    </PropertyGroup>-->
-<!--    <ItemGroup>-->
-<!--      <AssemblyAttribute Include="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.FantomasBundledVersionAttribute">-->
-<!--        <_Parameter1>$(FantomasBundledVersion)</_Parameter1>-->
-<!--      </AssemblyAttribute>-->
-<!--    </ItemGroup>-->
-<!--  </Target>-->
+  <Target Name="AddFantomasBundledVersion" BeforeTargets="BeforeCompile">
+    <PropertyGroup>
+      <GenerateAdditionalSources Condition="$(InternalBuild)">true</GenerateAdditionalSources>
+      <AssemblyAttributesPath Condition="$(InternalBuild)">$(TargetFrameworkMonikerAssemblyAttributesPath)</AssemblyAttributesPath>
+      <FantomasBundledVersion Condition="'%(PackageLock.Identity)'=='Fantomas.Core'">%(PackageLock.Version)</FantomasBundledVersion>
+      <FantomasBundledVersionAttribute>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.FantomasBundledVersionAttribute</FantomasBundledVersionAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+      <AssemblyAttribute Condition="!$(InternalBuild)" Include="$(FantomasBundledVersionAttribute)">
+        <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttributes Condition="$(InternalBuild)" Include="$(FantomasBundledVersionAttribute)">
+        <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
+      </AssemblyAttributes>
+    </ItemGroup>
+  </Target>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />

@@ -1,23 +1,17 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.DataProviders
 
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 
 type FSharpContextActionDataProvider(solution, textControl, fsFile) =
     inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, fsFile)
 
 
 [<ContextActionDataBuilder(typeof<FSharpContextActionDataProvider>)>]
-[<ZoneMarker(typeof<ILanguageFSharpZone>, typeof<IProjectModelZone>, typeof<ITextControlsZone>, typeof<PsiFeaturesImplZone>)>]
 type FSharpContextActionDataBuilder() =
     inherit ContextActionDataBuilderBase<FSharpLanguage, IFSharpFile>()
 
