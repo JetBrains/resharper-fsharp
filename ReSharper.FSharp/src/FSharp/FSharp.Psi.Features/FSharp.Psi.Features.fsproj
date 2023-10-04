@@ -113,7 +113,6 @@
     <Compile Include="src\AI\ZoneMarker.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
-    <Compile Include="AssemblyInfo.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
