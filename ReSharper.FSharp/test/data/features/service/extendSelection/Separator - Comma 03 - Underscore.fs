@@ -1,1 +1,1 @@
-_{caret},2
+let _{caret},2 = ()

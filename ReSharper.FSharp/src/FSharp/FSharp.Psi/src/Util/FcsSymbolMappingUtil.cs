@@ -281,12 +281,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (declarations.Count == 0)
         return GetTypeMember(mfv, typeElement);
 
-      var singleDeclaration = declarations.SingleItem(decl =>
-      {
-        var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
-        var nameIdentifierRange = decl.GetNameIdentifierRange();
-        return range.Contains(nameIdentifierRange);
-      });
+      var singleDeclaration =
+        declarations.Count == 1
+          ? declarations[0]
+          : declarations.SingleItem(decl =>
+          {
+            var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
+            var nameIdentifierRange = decl.GetNameIdentifierRange();
+            return range.Contains(nameIdentifierRange);
+          });
 
       var singleSourceElement = singleDeclaration?.GetOrCreateDeclaredElement(mfv);
       if (singleSourceElement != null)

@@ -194,6 +194,7 @@ val
 void
 when
 while
+while!
 with
 yield
 AbstractClassAttribute

@@ -2904,5 +2904,6 @@ voidptr
 voption
 when
 while
+while!
 with
 yield{caret}
