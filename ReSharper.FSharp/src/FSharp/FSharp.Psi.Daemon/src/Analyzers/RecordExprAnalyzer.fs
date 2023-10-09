@@ -40,13 +40,14 @@ type RecordExprAnalyzer() =
             let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed copyRefExprNamesReversed
             let fieldsChainMatch =
                 if searchInDepthWhileMatched then
-                    let fieldNamePrefixReversed =
-                        match fieldsChainMatch with
-                        | ValueNone -> getNamesReversed previousFieldBinding.ReferenceName
-                        | ValueSome(_, previousFieldNameReversed) -> previousFieldNameReversed
-
-                    let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed fieldNamePrefixReversed
-                    ValueSome(previousFieldBinding, currentFieldNameReversed)                    
+                    match fieldsChainMatch with
+                    | ValueNone ->
+                        let fieldNamePrefixReversed = getNamesReversed previousFieldBinding.ReferenceName
+                        let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed fieldNamePrefixReversed
+                        ValueSome(previousFieldBinding, currentFieldNameReversed)         
+                    | ValueSome(rootFieldBinding, previousFieldNameReversed) ->
+                        let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed previousFieldNameReversed
+                        ValueSome(rootFieldBinding, currentFieldNameReversed)                          
                 else
                     produceHighlighting fieldsChainMatch recordExpr consumer
                     ValueNone
