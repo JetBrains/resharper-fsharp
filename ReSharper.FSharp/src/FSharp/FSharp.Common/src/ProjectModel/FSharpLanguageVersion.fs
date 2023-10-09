@@ -28,7 +28,10 @@ type FSharpLanguageLevel =
     /// Lowercase union cases
     | FSharp70 = 70
 
-    | Latest = 70
+    /// Nested record field copy and update
+    | FSharp80 = 80
+
+    | Latest = 80
 
     | Preview = 2147483646 // Int32.MaxValue - 1
 
@@ -40,6 +43,7 @@ type FSharpLanguageVersion =
     | FSharp50 = 50
     | FSharp60 = 60
     | FSharp70 = 70
+    | FSharp80 = 80
     | LatestMajor = 2147483644 // Int32.MaxValue - 3
     | Latest = 2147483645 // Int32.MaxValue - 2
     | Preview = 2147483646 // Int32.MaxValue - 1
@@ -54,6 +58,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp50 -> FSharpLanguageVersion.FSharp50
         | FSharpLanguageLevel.FSharp60 -> FSharpLanguageVersion.FSharp60
         | FSharpLanguageLevel.FSharp70 -> FSharpLanguageVersion.FSharp70
+        | FSharpLanguageLevel.FSharp80 -> FSharpLanguageVersion.FSharp80
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
@@ -64,6 +69,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
         | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
+        | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
         | FSharpLanguageVersion.Preview -> FSharpLanguageLevel.Preview
         | _ -> FSharpLanguageLevel.Latest
 
@@ -99,6 +105,10 @@ module FSharpLanguageLevel =
     let isFSharp60Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp60
 
+    [<Extension; CompiledName("IsFSharp80Supported")>]
+    let isFSharp80Supported (treeNode: ITreeNode) =
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp80
+
 [<RequireQualifiedAccess>]
 module FSharpLanguageVersion =
     let tryParseCompilationOption (emptyVersion: FSharpLanguageVersion) (langVersion: string): FSharpLanguageVersion option =
@@ -115,6 +125,7 @@ module FSharpLanguageVersion =
         | "5" | "5.0" -> Some(FSharpLanguageVersion.FSharp50)
         | "6" | "6.0" -> Some(FSharpLanguageVersion.FSharp60)
         | "7" | "7.0" -> Some(FSharpLanguageVersion.FSharp70)
+        | "8" | "8.0" -> Some(FSharpLanguageVersion.FSharp80)
 
         | _ -> None
 
@@ -130,6 +141,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp50 -> "F# 5.0"
         | FSharpLanguageVersion.FSharp60 -> "F# 6.0"
         | FSharpLanguageVersion.FSharp70 -> "F# 7.0"
+        | FSharpLanguageVersion.FSharp80 -> "F# 8.0"
         | FSharpLanguageVersion.LatestMajor -> "Latest major"
         | FSharpLanguageVersion.Latest -> "Latest"
         | FSharpLanguageVersion.Preview -> "Preview"
@@ -143,6 +155,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp50 -> "5.0"
         | FSharpLanguageVersion.FSharp60 -> "6.0"
         | FSharpLanguageVersion.FSharp70 -> "7.0"
+        | FSharpLanguageVersion.FSharp80 -> "8.0"
         | FSharpLanguageVersion.LatestMajor -> "latestmajor"
         | FSharpLanguageVersion.Latest -> "latest"
         | FSharpLanguageVersion.Preview -> "preview"

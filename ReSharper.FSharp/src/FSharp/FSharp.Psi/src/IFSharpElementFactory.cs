@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -35,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ILetBindingsDeclaration CreateLetModuleDecl(string bindingName);
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
-    IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
+    IRecordFieldBinding CreateRecordFieldBinding(IEnumerable<string> fieldPath, bool addSemicolon);
     IRecordFieldDeclaration CreateRecordFieldDeclaration(bool isMutable, string fieldName, ITypeUsage typeUsage);
     IFSharpPattern CreatePattern(string text, bool topLevel);
     IParenPat CreateParenPat();

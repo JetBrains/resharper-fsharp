@@ -128,3 +128,4 @@ type public Strings() =
     static member UseSelfId6 = Strings.ResourceManager.GetString("UseSelfId6")
     static member XMLCommentIsNotPlacedOnAValidLanguageElementMessage = Strings.ResourceManager.GetString("XMLCommentIsNotPlacedOnAValidLanguageElementMessage")
     static member YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage = Strings.ResourceManager.GetString("YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage")
+    static member NestedRecordUpdateCanBeSimplifiedMessage = Strings.ResourceManager.GetString("NestedRecordUpdateCanBeSimplifiedMessage")

@@ -140,12 +140,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
             binaryAppExpr
 
-        member x.CreateRecordFieldBinding(field, addSemicolon) =
+        member x.CreateRecordFieldBinding(fieldPath, addSemicolon) =
             let namingService = getNamingService ()
-            let field = namingService.MangleNameIfNecessary(field)
+            let field =
+                match fieldPath |> Seq.tryExactlyOne with
+                | Some(shortName) -> namingService.MangleNameIfNecessary(shortName)
+                | _ -> String.concat "." fieldPath
             let semicolon = if addSemicolon then ";" else ""
+            let expr = @"failwith ""todo"""
 
-            let source = sprintf """{ %s = failwith "todo"%s }""" field semicolon
+            let source = $"""{{ %s{field} = %s{expr}%s{semicolon} }}"""
             let newExpr = getExpression source
 
             match newExpr.As<IRecordExpr>() with
