@@ -16,9 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="src\ZoneMarker.fs" />
     <Compile Include="src\Common.fs" />
     <Compile Include="src\Stubs.fs" />
-    <Compile Include="src\ZoneMarker.fs" />
     <Compile Include="src\TestWithTwoProjectsBase.fs" />
   </ItemGroup>
 

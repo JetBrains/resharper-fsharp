@@ -16,6 +16,7 @@
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
         <SignAssembly>false</SignAssembly>
         <SdkTargetFrameworkOverride>.NETCoreApp,Version=v6.0</SdkTargetFrameworkOverride>
+        <GenerateDependencyFile>false</GenerateDependencyFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,10 +25,12 @@
 
     <ItemGroup>
       <PackageReference Include="Fantomas.Core" />
+      <PackageReference Include="Fantomas.FCS" />
       <PackageReference Include="FSharp.Core" />
       <PackageReference Include="JetBrains.Lifetimes" />
       <PackageReference Include="JetBrains.NuGet.Versioning" />
       <PackageReference Include="JetBrains.RdFramework" />
+      <PackageReference Include="System.Diagnostics.DiagnosticSource" />
       <PackageReference Include="System.Runtime.Loader" />
       <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
       <PackageReference Include="System.Memory" />
@@ -40,6 +43,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Fantomas.Host.unix.runtimeconfig.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.deps.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

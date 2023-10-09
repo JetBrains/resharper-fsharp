@@ -4,11 +4,13 @@ open System
 open System.Collections.Generic
 open System.Text
 open System.Threading
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Lifetimes
 open JetBrains.Metadata.Utils
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.RdBackend.Common.Features.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
@@ -22,6 +24,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider, logger: ILogger) =
 

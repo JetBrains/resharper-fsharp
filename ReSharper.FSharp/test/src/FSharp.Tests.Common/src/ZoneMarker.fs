@@ -8,11 +8,16 @@ open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Application.Zones
 
 [<ZoneDefinition>]
-type IFSharpTestsZone =
+type IFSharpTestsEnvZone =
     inherit ITestsEnvZone
 
+[<ZoneDefinition>]
+type ITestFSharpPluginZone =
+    inherit IZone
+    inherit IRequire<IFSharpPluginZone>
+    inherit IRequire<PsiFeatureTestZone>
+    
 [<ZoneActivator>]
-type FSharpZoneActivator() =
-    interface IActivate<PsiFeatureTestZone>
-    interface IActivate<ILanguageFSharpZone>
-    interface IActivate<ISyntaxHighlightingZone>
+[<ZoneMarker(typeof<IFSharpTestsEnvZone>)>]
+type FSharpTestZoneActivator() =
+    interface IActivate<ITestFSharpPluginZone>

@@ -13,6 +13,8 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
+    <Compile Include="PsiNamespaceZoneMarker.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -68,6 +70,7 @@
     <Compile Include="src\Analyzers\AsPatAnalyzer.fs" />
     <Compile Include="src\Analyzers\IndexerExprAnalyzer.fs" />
     <Compile Include="src\Analyzers\XmlDocAnalyzer.fs" />
+    <Compile Include="ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />

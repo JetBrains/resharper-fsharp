@@ -8,11 +8,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     public const string TypeProvidersHostPid = "TypeProvidersHost";
     public const string TraceScenario = "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host";
 
-    public static string TypeProvidersHostFrameworkFilename =>
+    public static string HostFrameworkFilename =>
       "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe";
 
-    public static string TypeProvidersHostCoreFilename =>
-      "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore.dll";
+    public static string CoreHostFilenameWithoutExtension =>
+      "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore";
 
     public static string CoreRuntimeConfigFilename =>
       $"tploader.{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";

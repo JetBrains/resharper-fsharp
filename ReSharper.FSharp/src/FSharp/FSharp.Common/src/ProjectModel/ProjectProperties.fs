@@ -1,15 +1,17 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
-open JetBrains.Application
 open System
 open System.Collections.Generic
 open System.Runtime.InteropServices
+open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
+open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Common
 open JetBrains.ProjectModel.Properties.Managed
@@ -114,6 +116,7 @@ and FSharpBuildSettings() =
 
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpProjectApplicableProvider() =
     interface ProjectConfigurationValidator.IApplicableProvider with
         member x.IsApplicable(projectMark) =
@@ -121,6 +124,7 @@ type FSharpProjectApplicableProvider() =
 
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpProjectMarkTypeGuidProvider() =
     inherit ProjectMarkTypeGuidProvider()
 

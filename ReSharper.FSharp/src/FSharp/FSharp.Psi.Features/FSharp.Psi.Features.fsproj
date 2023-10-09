@@ -13,6 +13,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\ZoneMarkerServices.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -53,7 +54,9 @@
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="src\Debugger\FSharpDebuggerLocalSymbolProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
+    <Compile Include="src\Debugger\ZoneMarker.fs" />
     <Compile Include="src\ExternalSources\FSharpDeclaredElementBinder.fs" />
+    <Compile Include="src\ExternalSources\ZoneMarker.fs" />
     <Compile Include="src\FileTemplates\FileTemplates.fs" />
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
     <Compile Include="src\Search\FSharpItemOccurrenceKind.fs" />
@@ -106,6 +109,7 @@
     <Compile Include="src\Injected\FSharpRegexProviders.fs" />
     <Compile Include="src\Injected\FSharpRegexNodeProvider.fs" />
     <Compile Include="src\Injected\FSharpInjectionTargetsFinderFactory.fs" />
+    <Compile Include="src\Injected\ZoneMarker.fs" />
     <Compile Include="src\AI\FSharpLanguageOrTechnologyChatContextProvider.fs" />
     <Compile Include="src\AI\ZoneMarker.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
@@ -134,11 +138,22 @@
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-  <ItemGroup>
-    <AssemblyAttribute Include="JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.FantomasBundledVersionAttribute">
-      <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+  <Target Name="AddFantomasBundledVersion" BeforeTargets="BeforeCompile">
+    <PropertyGroup>
+      <GenerateAdditionalSources Condition="$(InternalBuild)">true</GenerateAdditionalSources>
+      <AssemblyAttributesPath Condition="$(InternalBuild)">$(TargetFrameworkMonikerAssemblyAttributesPath)</AssemblyAttributesPath>
+      <FantomasBundledVersion Condition="'%(PackageLock.Identity)'=='Fantomas.Core'">%(PackageLock.Version)</FantomasBundledVersion>
+      <FantomasBundledVersionAttribute>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol.FantomasBundledVersionAttribute</FantomasBundledVersionAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+      <AssemblyAttribute Condition="!$(InternalBuild)" Include="$(FantomasBundledVersionAttribute)">
+        <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttributes Condition="$(InternalBuild)" Include="$(FantomasBundledVersionAttribute)">
+        <_Parameter1>$(FantomasBundledVersion)</_Parameter1>
+      </AssemblyAttributes>
+    </ItemGroup>
+  </Target>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />

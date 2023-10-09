@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
@@ -128,6 +129,7 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
 
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks) =
     inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks)
 
@@ -138,6 +140,7 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
 
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFcsProjectBuilder(lifetime, checkerService, modulePathProvider, fileSystemTracker, logger) =
     inherit FcsProjectBuilder(lifetime, checkerService, Mock<_>().Object, modulePathProvider, fileSystemTracker, logger)
 
@@ -151,6 +154,7 @@ type TestFcsProjectBuilder(lifetime, checkerService, modulePathProvider, fileSys
 
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerService,
         fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
     do

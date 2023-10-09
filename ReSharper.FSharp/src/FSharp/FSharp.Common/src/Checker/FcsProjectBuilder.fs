@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.FileSystemTracker
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -11,6 +12,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
+open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
@@ -21,6 +23,7 @@ open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpTargetsProjectLoadModificator() =
     let fsTargets =
         [| "GenerateCode"
@@ -56,6 +59,7 @@ module FcsProjectBuilder =
         |> List.ofArray
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, fileSystemTracker: IFileSystemTracker, logger: ILogger) =
 

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open System
 open System.Runtime.InteropServices
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.UI.Controls.FileSystem
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel
@@ -16,7 +17,9 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.Rider.Backend.Env
 open JetBrains.Rider.Backend.Features.Settings.Layers.ExportImportWorkaround
+open JetBrains.Rider.Backend.Product
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.Util
@@ -142,6 +145,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
 
 [<ShellComponent>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"
 

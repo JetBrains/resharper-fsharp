@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open System
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -19,6 +20,7 @@ open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
         fsOptionsProvider, symbolCache, solution, locks, logger) =
     inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
@@ -56,6 +58,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
     interface IHideImplementation<AssemblyReaderShim>
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestModulePathProvider(shim: TestAssemblyReaderShim) =
     inherit ModulePathProvider()
 

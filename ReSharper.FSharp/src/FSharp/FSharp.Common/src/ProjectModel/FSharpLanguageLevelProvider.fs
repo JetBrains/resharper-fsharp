@@ -3,11 +3,13 @@
 open System
 open System.Collections.Concurrent
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.EditProperties.Projects.MsBuild.Extensions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
@@ -210,6 +212,7 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
         member this.LanguageVersionModifier = failwith "todo"
 
 [<ShellFeaturePart>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     inherit LanguageSpecificItemsProviderBase<FSharpLanguageVersion, FSharpLanguageLevel>()
 

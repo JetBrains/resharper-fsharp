@@ -1,12 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
-open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.RdBackend.Common.Features.CodeInsights.Stages.Vcs
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.RdBackend.Common.Env
 
 [<DaemonStage>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FSharpVcsCodeVisionRangesProviderStage() =
     inherit CodeInsightsVcsRangesStageBase<FSharpLanguage>()
 

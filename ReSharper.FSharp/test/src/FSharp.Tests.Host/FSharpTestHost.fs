@@ -6,10 +6,12 @@ open System.Linq
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.IO
 open JetBrains.Application.Notifications
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.DotNetTools
 open JetBrains.Rd.Tasks
+open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -25,6 +27,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent>]
+[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IFSharpPluginZone>)>]
 type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer,
         fantomasHost: FantomasHost, dotnetToolsTracker: SolutionDotnetToolsTracker, notifications: UserNotifications,
         assemblyReaderShim: IFcsAssemblyReaderShim, projectProvider: IFcsProjectProvider,
