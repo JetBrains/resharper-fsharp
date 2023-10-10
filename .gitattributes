@@ -1,3 +1,6 @@
 *.fs  linguist-language=fsharp
 *.fsi linguist-language=fsharp
 *.fsx linguist-language=fsharp
+
+# Do not touch line endings, but show diff
+* -text
