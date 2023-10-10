@@ -27,6 +27,7 @@
     <lang.syntaxHighlighter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter"/>
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperBulbMenuModelFactory" />
     <lang.elementManipulator forClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringElementManipulator"/>
+    <lang.commenter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpCommenter"/>
     <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
 
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />

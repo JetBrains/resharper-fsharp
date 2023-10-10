@@ -137,6 +137,8 @@ val fantomasHostFiles = listOf(
   "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json"
 )
 
+val externalAnnotationsDirectory = "$resharperPluginPath/src/FSharp/annotations"
+
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 val backendLexerSources = "$repoRoot/rider-fsharp/build/backend-lexer-sources/"
@@ -297,9 +299,7 @@ tasks {
     moveToPlugin(fantomasHostFiles, "fantomas")
     moveToPlugin(typeProvidersFiles, "typeProviders")
     moveToPlugin(listOf("projectTemplates"), "projectTemplates")
-    from("$resharperPluginPath/src/annotations") {
-      into("${intellij.pluginName.get()}/dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")
-    }
+    moveToPlugin(listOf(externalAnnotationsDirectory), "dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")
 
     doLast {
       fun validateFiles(files: List<String>, destinationFolder: String) {
@@ -312,6 +312,7 @@ tasks {
       validateFiles(files, "dotnet")
       validateFiles(fantomasHostFiles, "fantomas")
       validateFiles(typeProvidersFiles, "typeProviders")
+      validateFiles(listOf(externalAnnotationsDirectory), "dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")
     }
   }
 

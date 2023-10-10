@@ -2,9 +2,9 @@
  Module
   T
    T()
-   x:int
-   f(int):int
-   Foo:int
+   x : int
+   f(int) : int
+   Foo : int
    IDisposable start
-    IDisposable.Dispose():void
+    IDisposable.Dispose() : void
    IDisposable end
