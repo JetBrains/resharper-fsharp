@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ILetBindingsDeclaration CreateLetModuleDecl(string bindingName);
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
-    IRecordFieldBinding CreateRecordFieldBinding(IEnumerable<string> fieldPath, bool addSemicolon);
+    IRecordFieldBinding CreateRecordFieldBinding(IEnumerable<string> fieldQualifiedName, bool addSemicolon);
     IRecordFieldDeclaration CreateRecordFieldDeclaration(bool isMutable, string fieldName, ITypeUsage typeUsage);
     IFSharpPattern CreatePattern(string text, bool topLevel);
     IParenPat CreateParenPat();
