@@ -17,6 +17,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
+using JetBrains.Util.Concurrency.Threading;
 using JetBrains.Util.DataStructures;
 using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
@@ -38,14 +39,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private ResolvedSymbols GetResolvedSymbols()
     {
-      lock (myLock)
-      {
-        if (mySymbols != null)
-          return mySymbols;
+      using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
 
-        mySymbols = CreateFileResolvedSymbols();
+      if (mySymbols != null)
         return mySymbols;
-      }
+
+      mySymbols = CreateFileResolvedSymbols();
+      return mySymbols;
     }
 
     public FSharpSymbolUse GetSymbolUse(int offset)
