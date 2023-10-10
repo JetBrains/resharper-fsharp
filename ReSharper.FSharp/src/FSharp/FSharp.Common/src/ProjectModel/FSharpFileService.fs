@@ -15,7 +15,7 @@ open JetBrains.Rider.Backend.Env
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation, fileExtensions: IProjectFileExtensions) =
     let scratchesDir =
         // Parameters are arbitrary, they aren't currently used inside this override.
-        settingsLocation.GetSettingsPath(HostFolderLifetime.TempFolder, ApplicationHostDetails.PerHost)
+        settingsLocation.GetUserSettingsDir(HostFolderLifetime.TempFolder, ApplicationHostDetails.PerHost)
             .Parent / "scratches"
 
     interface IFSharpFileService with
