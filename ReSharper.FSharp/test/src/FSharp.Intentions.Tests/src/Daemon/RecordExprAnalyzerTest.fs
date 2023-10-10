@@ -19,5 +19,8 @@ type RecordExprAnalyzerTest() =
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.Availability() = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Availability - Overlap``() = x.DoNamedTest()
+
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>]
     [<Test>] member x.``Availability - F# 7``() = x.DoNamedTest()

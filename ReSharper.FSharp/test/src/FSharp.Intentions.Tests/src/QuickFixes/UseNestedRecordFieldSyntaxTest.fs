@@ -13,6 +13,7 @@ type UseNestedRecordFieldSyntaxTest() =
     override x.RelativeTestDataPath = "features/quickFixes/useNestedRecordFieldSyntaxFix"
 
     [<Test; ExecuteScopedActionInFile>] member x.``File scoped`` () = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``File scoped - Overlap`` () = x.DoNamedTest()
 
 
 [<FSharpTest>]

@@ -336,6 +336,7 @@
     <Parameter type="string list" name="fieldQualifiedName" isValid="skip"/>
     <Parameter type="IFSharpExpression" name="updateExpression" isValid="skip"/>
     <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+    <Behavour overlapResolvePolicy="NONE"/>
     <Range>binding.GetHighlightingRange()</Range>
     <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>
   </Warning>
