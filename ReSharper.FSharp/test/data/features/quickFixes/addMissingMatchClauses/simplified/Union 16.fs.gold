@@ -1,0 +1,6 @@
+﻿module Say
+
+match Some(1, 2) with
+| Some(_, 1) -> ()
+| None -> {selstart}failwith "todo"{selend}
+| Some value -> failwith "todo"
