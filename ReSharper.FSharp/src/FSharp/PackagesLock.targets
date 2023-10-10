@@ -4,7 +4,7 @@
     <PackageLock Include="Antlr2.Runtime" Version="2.7.7.3" />
     <PackageLock Include="Fantomas.Core" Version="6.0.5" />
     <PackageLock Include="FSharp.Core" Version="7.0.300" />
-    <PackageLock Include="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageLock Include="JetBrains.Annotations" Version="2023.3.0-eap2" />
     <PackageLock Include="JetBrains.Build.Platform.DistributedCache" Version="1.0.20230909.199" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2023.3.0.4" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.0.2" />
