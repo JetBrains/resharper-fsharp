@@ -13,19 +13,11 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpCompilerWarningProcessor() =
-    let getConfiguration (file: IFile) =
-        let project = file.GetSourceFile().GetProject()
-        if isNull project then null else
-
-        let frameworkId = file.GetPsiModule().TargetFrameworkId
-        project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(frameworkId)
-
-    let separators = [| ','; ';'; ' '; '\t' |]
+module FSharpCompilerWarningProcessor =
+    let private separators = [| ','; ';'; ' '; '\t' |]
 
     let parseCompilerIds (s: string) =
-        if s.IsNullOrEmpty() then EmptySet.InstanceSet else
+        if s.IsNullOrEmpty() then EmptySet.Collection else
 
         let parts = s.Split(separators, StringSplitOptions.RemoveEmptyEntries)
         let results = HashSet()
@@ -36,7 +28,16 @@ type FSharpCompilerWarningProcessor() =
             | _ -> results.Add(warning)
             |> ignore
 
-        results :> _
+        results
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpCompilerWarningProcessor() =
+    let getConfiguration (file: IFile) =
+        let project = file.GetSourceFile().GetProject()
+        if isNull project then null else
+
+        let frameworkId = file.GetPsiModule().TargetFrameworkId
+        project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(frameworkId)
 
     interface ICompilerWarningProcessor with
         member this.ProcessCompilerWarning(file, info, compilerIds, _, _, _) =
@@ -52,7 +53,7 @@ type FSharpCompilerWarningProcessor() =
                     isNotNull otherFlags && otherFlags.Contains("--warnon:1182") ||
 
                     let warnOn = props.GetReadOnlyValueSafe(FSharpProperties.WarnOn)
-                    let warnOn = parseCompilerIds warnOn
+                    let warnOn = FSharpCompilerWarningProcessor.parseCompilerIds warnOn
                     not (warnOn.IsEmpty()) && Seq.exists warnOn.Contains compilerIds
                 | _ -> true
 
@@ -61,7 +62,7 @@ type FSharpCompilerWarningProcessor() =
                 warningIsError <- isEnabled
 
             let warningsAsErrors = props.GetReadOnlyValueSafe(MSBuildProjectUtil.WarningsAsErrorsProperty)
-            let warningsAsErrors = parseCompilerIds warningsAsErrors
+            let warningsAsErrors = FSharpCompilerWarningProcessor.parseCompilerIds warningsAsErrors
 
             if isEnabled && not (warningsAsErrors.IsEmpty()) && Seq.exists warningsAsErrors.Contains compilerIds then
                 warningIsError <- true
@@ -70,7 +71,7 @@ type FSharpCompilerWarningProcessor() =
                 let warningsNotAsErrors =
                     props.GetReadOnlyValueSafe(MSBuildProjectUtil.WarningsNotAsErrorsProperty)
 
-                let warningsNotAsErrors = parseCompilerIds warningsNotAsErrors
+                let warningsNotAsErrors = FSharpCompilerWarningProcessor.parseCompilerIds warningsNotAsErrors
                 if not (warningsNotAsErrors.IsEmpty()) && Seq.exists warningsNotAsErrors.Contains compilerIds then
                     warningIsError <- false
 

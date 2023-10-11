@@ -1008,6 +1008,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             match id with
             | "l" | "load" -> ElementType.LOAD_DIRECTIVE
             | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
+            | "nowarn" -> ElementType.NOWARN_DIRECTIVE
             | "I" -> ElementType.I_DIRECTIVE
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)
