@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'B'`:
-    TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
+    TO: [R] U u = U.|B|; RANGE: (56,57) @ Union case 02 - Singleton.cs
     Menu item (enabled) :
       icon: UsageRead
       text: Class1.Class1      <font color="FFD5A286">U u = U.**B**;</font><font color="06C"> (5)</font>
@@ -8,7 +8,7 @@
       tooltip: U u = U.**B**;
     Navigation result:
       caret did not move
-    TO: [R] var isB = u.|IsB|; RANGE: (80,83) @ Union case 02 - Singleton.cs
+    TO: [R] var isB = u.|IsB|; RANGE: (75,78) @ Union case 02 - Singleton.cs
     Menu item (enabled) :
       icon: UsageRead
       text: Class1.Class1      <font color="FFD5A286">var isB = u.**IsB**;</font><font color="06C"> (6)</font>
@@ -24,7 +24,7 @@
       }
       ------------------
 
-    TO: [O] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
+    TO: [O] let b = |B| RANGE: (79,80) @ Union case 02 - Singleton.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
       text: Module.b      <font color="FFD5A286">let b = **B</font>**<font color="06C"> (8)</font>

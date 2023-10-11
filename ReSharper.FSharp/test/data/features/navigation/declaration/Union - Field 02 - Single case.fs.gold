@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] | A of |a|: int RANGE: (21,22) @ Union - Field 02 - Single case.fs
+    TO: [O] | A of |a|: int RANGE: (20,21) @ Union - Field 02 - Single case.fs
     Navigation result:
       opened file: Union - Field 02 - Single case.fs
       ------------------

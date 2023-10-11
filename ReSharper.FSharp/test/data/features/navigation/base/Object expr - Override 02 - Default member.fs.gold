@@ -5,7 +5,7 @@
       caret did not move
       Side effects during navigation:
         Show global popup menu `Declarations of property 'P'`:
-          TO: [O] abstract |P|: int RANGE: (25,26) @ Object expr - Override 02 - Default member.fs
+          TO: [O] abstract |P|: int RANGE: (24,25) @ Object expr - Override 02 - Default member.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Object expr - Override 02 - Default member.fs<font color="06C"> (2)</font>
@@ -20,7 +20,7 @@
 
             ------------------
 
-          TO: [O] default x.|P| = 1 RANGE: (47,48) @ Object expr - Override 02 - Default member.fs
+          TO: [O] default x.|P| = 1 RANGE: (45,46) @ Object expr - Override 02 - Default member.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Object expr - Override 02 - Default member.fs<font color="06C"> (3)</font>

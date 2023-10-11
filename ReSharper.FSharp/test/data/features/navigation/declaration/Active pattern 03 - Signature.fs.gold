@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Show context popup menu `Declarations of A 'A'`:
-    TO: [O] let (||A||) x = x + 1 RANGE: (23,24) @ Active pattern 03 - Signature.fs
+    TO: [O] let (||A||) x = x + 1 RANGE: (21,22) @ Active pattern 03 - Signature.fs
     Menu item (enabled) :
       icon: Fsharp
       text: Active pattern 03 - Signature.fs<font color="06C"> (3)</font>
@@ -16,7 +16,7 @@
       match 1 with
       ------------------
 
-    TO: [O] val (||A||): int -> int RANGE: (23,24) @ Active pattern 03 - Signature.fsi
+    TO: [O] val (||A||): int -> int RANGE: (21,22) @ Active pattern 03 - Signature.fsi
     Menu item (enabled) :
       icon: Fsharp
       text: Active pattern 03 - Signature.fsi<font color="06C"> (3)</font>

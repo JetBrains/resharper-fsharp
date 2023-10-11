@@ -15,20 +15,25 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-        IInterfaceRepresentation
-          FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
-        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         IInterfaceImplementation
-          FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpIdentifierToken(type:IDENTIFIER, text:T2)
-          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:T2)
+        IPrimaryConstructorDeclaration
+          IParametersPatternDeclaration
+            IUnitPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IInterfaceImplementation
           FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeReferenceName

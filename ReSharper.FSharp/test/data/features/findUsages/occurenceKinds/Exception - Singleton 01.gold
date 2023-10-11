@@ -1,17 +1,17 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |e1| = Exn RANGE: (38,40) @ Exception - Singleton 01.fs
-UsageOther TO: [O] let e1 = |Exn| RANGE: (43,46) @ Exception - Singleton 01.fs
-UsageOther TO: [O] let |e2|: Exn = () RANGE: (52,54) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let |e1| = Exn RANGE: (34,36) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let e1 = |Exn| RANGE: (39,42) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let |e2|: Exn = () RANGE: (47,49) @ Exception - Singleton 01.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] let e1 = |Exn| RANGE: (43,46) @ Exception - Singleton 01.fs
+UsageInstanceCreation TO: [O] let e1 = |Exn| RANGE: (39,42) @ Exception - Singleton 01.fs
 
 
 Type specification
 ---
-UsageOther TO: [O] let e2: |Exn| = () RANGE: (56,59) @ Exception - Singleton 01.fs
+UsageOther TO: [O] let e2: |Exn| = () RANGE: (51,54) @ Exception - Singleton 01.fs
 
 

@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'A'`:
-    TO: [I] U u = U.|NewA|(123); RANGE: (60,64) @ Union case 01 - Fields.cs
+    TO: [I] U u = U.|NewA|(123); RANGE: (56,60) @ Union case 01 - Fields.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">U u = U.**NewA**(123);</font><font color="06C"> (5)</font>
@@ -8,7 +8,7 @@
       tooltip: U u = U.**NewA**(123);
     Navigation result:
       caret did not move
-    TO: [R] var isA = u.|IsA|; RANGE: (88,91) @ Union case 01 - Fields.cs
+    TO: [R] var isA = u.|IsA|; RANGE: (83,86) @ Union case 01 - Fields.cs
     Menu item (enabled) :
       icon: UsageRead
       text: Class1.Class1      <font color="FFD5A286">var isA = u.**IsA**;</font><font color="06C"> (6)</font>
@@ -24,7 +24,7 @@
       }
       ------------------
 
-    TO: [O] let a = |A|(123) RANGE: (86,87) @ Union case 01 - Fields.fs
+    TO: [O] let a = |A|(123) RANGE: (79,80) @ Union case 01 - Fields.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
       text: Module.a      <font color="FFD5A286">let a = **A**(123)</font><font color="06C"> (8)</font>

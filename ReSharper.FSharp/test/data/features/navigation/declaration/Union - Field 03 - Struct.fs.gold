@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] | A of |a|: int RANGE: (33,34) @ Union - Field 03 - Struct.fs
+    TO: [O] | A of |a|: int RANGE: (31,32) @ Union - Field 03 - Struct.fs
     Navigation result:
       opened file: Union - Field 03 - Struct.fs
       ------------------

@@ -1,11 +1,11 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |t| = T() RANGE: (43,44) @ New instance 02.fs
+UsageOther TO: [O] let |t| = T() RANGE: (40,41) @ New instance 02.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] let t = |T|() RANGE: (47,48) @ New instance 02.fs
-UsageInstanceCreation TO: [O] let t = |T|() RANGE: (47,48) @ New instance 02.fs
+UsageInstanceCreation TO: [O] let t = |T|() RANGE: (44,45) @ New instance 02.fs
+UsageInstanceCreation TO: [O] let t = |T|() RANGE: (44,45) @ New instance 02.fs
 
 

@@ -1,15 +1,15 @@
 ﻿Field declaration
 ---
-UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (34,37) @ Pattern - Exception 02 - Fields.fs
+UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (32,35) @ Pattern - Exception 02 - Fields.fs
 
 
 Pattern
 ---
-UsagePatternChecking TO: [O] with |Exn| n -> () RANGE: (54,57) @ Pattern - Exception 02 - Fields.fs
+UsagePatternChecking TO: [O] with |Exn| n -> () RANGE: (49,52) @ Pattern - Exception 02 - Fields.fs
 
 
 Other
 ---
-UsageOther TO: [O] with Exn |n| -> () RANGE: (58,59) @ Pattern - Exception 02 - Fields.fs
+UsageOther TO: [O] with Exn |n| -> () RANGE: (53,54) @ Pattern - Exception 02 - Fields.fs
 
 

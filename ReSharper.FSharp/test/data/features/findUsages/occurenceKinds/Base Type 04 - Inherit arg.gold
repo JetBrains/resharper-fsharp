@@ -1,28 +1,28 @@
 ﻿Module or namespace import
 ---
-Fsharp TO: [O] open |System| RANGE: (21,27) @ Base Type 04 - Inherit arg.fs
+Fsharp TO: [O] open |System| RANGE: (19,25) @ Base Type 04 - Inherit arg.fs
 
 
 Other
 ---
-UsageOther TO: [O] type Base(|s|: String) = RANGE: (63,64) @ Base Type 04 - Inherit arg.fs
-UsageOther TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (157,164) @ Base Type 04 - Inherit arg.fs
+UsageOther TO: [O] type Base(|s|: String) = RANGE: (58,59) @ Base Type 04 - Inherit arg.fs
+UsageOther TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (146,153) @ Base Type 04 - Inherit arg.fs
 
 
 Type specification
 ---
-UsageOther TO: [O] type Base(s: |String|) = RANGE: (66,72) @ Base Type 04 - Inherit arg.fs
+UsageOther TO: [O] type Base(s: |String|) = RANGE: (61,67) @ Base Type 04 - Inherit arg.fs
 
 
 Base type
 ---
-UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
-UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
+UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (154,158) @ Base Type 04 - Inherit arg.fs
+UsageExtendedType TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (154,158) @ Base Type 04 - Inherit arg.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
-UsageInstanceCreation TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
+UsageInstanceCreation TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (159,165) @ Base Type 04 - Inherit arg.fs
+UsageInstanceCreation TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (159,165) @ Base Type 04 - Inherit arg.fs
 
 
