@@ -599,7 +599,8 @@ powerClause:
 rationalConst:
   integerRat |
   rationalRat |
-  negateRat;
+  negateRat |
+  parenRat;
   
 integerRat:
   literalToken{LITERAL, Literal};  
@@ -613,6 +614,12 @@ rationalRat:
 
 negateRat:
   rationalConst<RATIONAL_CONST, RationalConst>;
+
+parenRat:
+  LPAREN<LPAREN, LeftParen>
+  rationalConst
+  RPAREN<RPAREN, RightParen>;
+
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>

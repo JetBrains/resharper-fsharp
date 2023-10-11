@@ -345,7 +345,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeConstraint(typeConstraint)
         x.Done(mark, ElementType.TYPE_CONSTRAINTS_CLAUSE)
 
-    member x.ProcessTypeParameter(SynTyparDecl(attrs, SynTypar(IdentRange range, _, _)), elementType) =
+    member x.ProcessTypeParameter(SynTyparDecl(attrs, SynTypar(IdentRange range, _, _), _, _), elementType) = // todo: constraints
         let range = 
             match attrs with
             | [] -> range

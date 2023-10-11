@@ -13,6 +13,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\ZoneMarkerServices.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
