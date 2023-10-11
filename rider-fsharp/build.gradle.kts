@@ -33,7 +33,7 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
 
-val baseVersion = "2023.3"
+val baseVersion = "2024.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
