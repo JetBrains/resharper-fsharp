@@ -27,6 +27,7 @@
       <PackageReference Include="Fantomas.Core" />
       <PackageReference Include="Fantomas.FCS" />
       <PackageReference Include="FSharp.Core" />
+      <PackageReference Include="JetBrains.Annotations" />
       <PackageReference Include="JetBrains.Lifetimes" />
       <PackageReference Include="JetBrains.NuGet.Versioning" />
       <PackageReference Include="JetBrains.RdFramework" />
