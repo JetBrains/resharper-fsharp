@@ -18,10 +18,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     new (error: TypeConstraintMismatchError) =
         // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'
         ReplaceReturnTypeFix(error.Expr, error.MismatchedType)
-    
-    new (error: TypeDoesNotMatchTypeError) =
-        // error FS0001: The type 'double' does not match the type 'int'
-        ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
     (*
         match () with
@@ -30,10 +26,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     new (error: TypeEquationError) =
         // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
         ReplaceReturnTypeFix(error.Expr, error.ActualType.Format(error.DisplayContext))
-
-    new (error: IfExpressionNeedsTypeToSatisfyTypeRequirementsError) =
-        // error FS0001: The 'if' expression needs to have type 'string' to satisfy context type requirements. It currently has type 'int'.
-        ReplaceReturnTypeFix(error.Expr, error.ActualType)
 
     new (error: TypeMisMatchTuplesHaveDifferingLengthsError) =
         // Type mismatch. Expecting a

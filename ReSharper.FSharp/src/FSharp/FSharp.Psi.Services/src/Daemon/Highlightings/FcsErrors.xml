@@ -564,32 +564,6 @@
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeDoesNotMatchType" ID="FS0001: The type does not match the type">
-    <Parameter type="string" name="expectedType"/>
-    <Parameter type="string" name="actualType"/>
-    <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>fcsMessage</Argument>
-    </Message>
-    <Range>expr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ReplaceReturnTypeFix</QuickFix>
-  </Error>
-
-  <Error staticGroup="FSharpErrors" name="IfExpressionNeedsTypeToSatisfyTypeRequirements" ID="FS0001: The 'if' expression needs to have type">
-    <Parameter type="string" name="expectedType"/>
-    <Parameter type="string" name="actualType"/>
-    <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>fcsMessage</Argument>
-    </Message>
-    <Range>expr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ReplaceReturnTypeFix</QuickFix>
-  </Error>
-
   <Error staticGroup="FSharpErrors" name="TypeMisMatchTuplesHaveDifferingLengths" ID="FS0001: Type mismatch. Expecting">
     <Parameter type="string" name="expectedType"/>
     <Parameter type="string" name="actualType"/>
