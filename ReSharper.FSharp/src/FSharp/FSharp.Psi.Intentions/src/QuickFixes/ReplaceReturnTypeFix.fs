@@ -29,7 +29,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
     *)
     new (error: TypeEquationError) =
         // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
-        ReplaceReturnTypeFix(error.Expr, error.ActualType)
+        ReplaceReturnTypeFix(error.Expr, error.ActualType.Format(error.DisplayContext))
 
     new (error: IfExpressionNeedsTypeToSatisfyTypeRequirementsError) =
         // error FS0001: The 'if' expression needs to have type 'string' to satisfy context type requirements. It currently has type 'int'.
