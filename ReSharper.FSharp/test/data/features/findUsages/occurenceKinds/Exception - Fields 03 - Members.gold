@@ -1,17 +1,17 @@
 ﻿Field declaration
 ---
-UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 03 - Members.fs
+UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (32,35) @ Exception - Fields 03 - Members.fs
 
 
 Read access
 ---
-UsageRead TO: [R] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
+UsageRead TO: [R] Exn.|Foo| RANGE: (70,73) @ Exception - Fields 03 - Members.fs
 
 
 Other
 ---
-UsageOther TO: [O] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
-UsageOther TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
-UsageOther TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
+UsageOther TO: [O] Exn.|Foo| RANGE: (70,73) @ Exception - Fields 03 - Members.fs
+UsageOther TO: [O] |Exn|.Foo RANGE: (66,69) @ Exception - Fields 03 - Members.fs
+UsageOther TO: [O] |Exn|.Foo RANGE: (66,69) @ Exception - Fields 03 - Members.fs
 
 

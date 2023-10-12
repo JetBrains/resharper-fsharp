@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'op_PipeRight(…)'`:
-    TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
+    TO: [O] ||>| ignore RANGE: (18,20) @ Operator 01 - Pipe.fs
     Menu item (enabled) :
       icon: UsageOther
       text: Module      **<font color="FFD5A286">|>** ignore</font><font color="06C"> (4)</font>
@@ -8,7 +8,7 @@
       tooltip: **|>** ignore
     Navigation result:
       caret did not move
-    TO: [O] ||>| ignore RANGE: (32,34) @ Operator 01 - Pipe.fs
+    TO: [O] ||>| ignore RANGE: (28,30) @ Operator 01 - Pipe.fs
     Menu item (enabled) :
       icon: UsageOther
       text: Module      **<font color="FFD5A286">|>** ignore</font><font color="06C"> (5)</font>

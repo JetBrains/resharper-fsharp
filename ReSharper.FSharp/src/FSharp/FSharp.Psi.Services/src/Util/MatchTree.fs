@@ -149,8 +149,8 @@ module MatchType =
     let rec ofFcsType (context: ITreeNode) (fcsType: FSharpType) =
         if isNull fcsType then MatchType.Error else
 
-        if fcsType.IsTupleType then createTupleType context false fcsType.GenericArguments else
         if fcsType.IsStructTupleType then createTupleType context true fcsType.GenericArguments else
+        if fcsType.IsTupleType then createTupleType context false fcsType.GenericArguments else
 
         if not fcsType.ErasedType.HasTypeDefinition then MatchType.Other fcsType else
 
@@ -1025,9 +1025,11 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
         let casePath = caseTest :: caseValue.Path
 
         // todo: matching over case with no fields
+
+        let substitution = unionEntityInstance.Substitution
         let makeSingleFieldNode pat =
             addDeconstruction casePath Deconstruction.InnerPatterns
-            let fieldNode = makeFieldNode false casePath unionEntityInstance.Substitution 0 unionCase.Fields[0] pat
+            let fieldNode = makeFieldNode false casePath substitution 0 unionCase.Fields[0] pat
 
             if unionCase.Fields.Count <> 1 then MatchTest.Error, [] else
             MatchTest.UnionCase, [fieldNode]
@@ -1043,16 +1045,23 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
 
                     let innerPatterns = tuplePat.Patterns
                     let caseFields = unionCase.Fields
-                    if innerPatterns.Count <> caseFields.Count then
-                        let n = min innerPatterns.Count caseFields.Count
-                        (Seq.take n caseFields, Seq.take n innerPatterns)
-                        ||> Seq.mapi2 (makeFieldNode false casePath unionEntityInstance.Substitution)
-                        |> List.ofSeq
-                        |> ignore
-                        MatchTest.Error, [] else
 
-                    let fieldNodes = Seq.mapi2 (makeFieldNode false casePath unionEntityInstance.Substitution) caseFields innerPatterns |> List.ofSeq
-                    caseTest, fieldNodes
+                    let singleField = caseFields.SingleItem()
+                    if isNotNull singleField && singleField.FieldType.Instantiate(substitution).IsTupleType then
+                        // let fieldNode = makeFieldNode false casePath substitution 0 singleField tuplePat 
+                        // caseTest, [fieldNode]
+                        makeSingleFieldNode tuplePat
+                    else
+                        if innerPatterns.Count <> caseFields.Count then
+                            let n = min innerPatterns.Count caseFields.Count
+                            (Seq.take n caseFields, Seq.take n innerPatterns)
+                            ||> Seq.mapi2 (makeFieldNode false casePath substitution)
+                            |> List.ofSeq
+                            |> ignore
+                            MatchTest.Error, [] else
+
+                        let fieldNodes = Seq.mapi2 (makeFieldNode false casePath substitution) caseFields innerPatterns |> List.ofSeq
+                        caseTest, fieldNodes
 
                 | pat -> makeSingleFieldNode pat
 
@@ -1074,7 +1083,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
 
                 let fieldNodes =
                     unionCase.Fields
-                    |> Seq.mapi (fun i fcsField -> makeFieldNode true casePath unionEntityInstance.Substitution i fcsField fieldPatterns[i])
+                    |> Seq.mapi (fun i fcsField -> makeFieldNode true casePath substitution i fcsField fieldPatterns[i])
                     |> List.ofSeq
 
                 MatchTest.UnionCase, fieldNodes

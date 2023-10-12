@@ -3,10 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
-import com.jetbrains.rider.test.scriptingApi.completeWithTab
-import com.jetbrains.rider.test.scriptingApi.typeWithLatency
-import com.jetbrains.rider.test.scriptingApi.waitForCompletion
+import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
 
@@ -69,4 +66,13 @@ class FSharpCompletionTest : CompletionTestBase() {
 
   @Test(enabled = false)
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
+
+  fun `comments - language injections`() = doTestChooseItem("f#")
+  fun `doc comments - not available`(){
+    dumpOpenedEditor("Program.fs", "Program.fs") {
+      waitForDaemon()
+      callBasicCompletion()
+      ensureThereIsNoLookup()
+    }
+  }
 }

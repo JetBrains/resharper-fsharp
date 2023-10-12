@@ -15,6 +15,8 @@ type FSharpParserTest() =
     /// Use this test case to dump the psi tree for a given file, see `_.fs`. 
     [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
 
+    [<Test>] member x.``Directive - Nowarn 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
 

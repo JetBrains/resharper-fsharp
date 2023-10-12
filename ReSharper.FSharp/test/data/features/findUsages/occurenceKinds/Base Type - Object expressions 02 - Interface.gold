@@ -1,11 +1,11 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |t| = { RANGE: (21,22) @ Base Type - Object expressions 02 - Interface.fs
-UsageOther TO: [O] new |System|.IDisposable with RANGE: (36,42) @ Base Type - Object expressions 02 - Interface.fs
+UsageOther TO: [O] let |t| = { RANGE: (19,20) @ Base Type - Object expressions 02 - Interface.fs
+UsageOther TO: [O] new |System|.IDisposable with RANGE: (33,39) @ Base Type - Object expressions 02 - Interface.fs
 
 
 Base type
 ---
-UsageExtendedType TO: [O] new System.|IDisposable| with RANGE: (43,54) @ Base Type - Object expressions 02 - Interface.fs
+UsageExtendedType TO: [O] new System.|IDisposable| with RANGE: (40,51) @ Base Type - Object expressions 02 - Interface.fs
 
 

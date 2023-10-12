@@ -44,6 +44,7 @@
     <Compile Include="src\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Stages\ZoneMarker.fs" />
+    <Compile Include="src\Stages\FSharpFileStructureExplorer.fs" />
     <Compile Include="src\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Analyzers\ElementProblemAnalyzerUtil.fs" />
     <Compile Include="src\Analyzers\ReSpellerHelper.fs" />

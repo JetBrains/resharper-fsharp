@@ -9,17 +9,19 @@ let x =
     (* |todo:|(2)
        multiline *)
 
-    (* |todo|(3)
-         multiline *)
+    (* |todo
+         multiline|(3) *)
     123
 
 ---------------------------------------------------------
 (0): ReSharper Todo Item Normal: (T) '' (E) 'todo: comment'
 (1): ReSharper Todo Item Normal: (T) '' (E) 'todo: another (* todo *)'
 (2): ReSharper Todo Item Normal: (T) '' (E) 'todo:'
-(3): ReSharper Todo Item Normal: (T) '' (E) 'todo'
+(3): ReSharper Todo Item Normal: (T) '' (E) 'todo
+         multiline'
 ---------------------------------------------------------
 (0) Todo: "todo: comment" {@ Namespace  }
 (1) Todo: "todo: another (* todo *)" {@ Namespace  }
 (2) Todo: "todo:" {@ Namespace  }
-(3) Todo: "todo" {@ Namespace  }
+(3) Todo: "todo
+         multiline" {@ Namespace  }

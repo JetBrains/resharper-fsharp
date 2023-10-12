@@ -5,7 +5,7 @@
       caret did not move
       Side effects during navigation:
         Show global popup menu `Declarations of property 'P'`:
-          TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Auto property 02.fs
+          TO: [O] abstract |P|: int RANGE: (57,58) @ Member - Virtual - Auto property 02.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Member - Virtual - Auto property 02.fs<font color="06C"> (5)</font>
@@ -21,7 +21,7 @@
 
             ------------------
 
-          TO: [O] override val |P| = 1 RANGE: (86,87) @ Member - Virtual - Auto property 02.fs
+          TO: [O] override val |P| = 1 RANGE: (81,82) @ Member - Virtual - Auto property 02.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Member - Virtual - Auto property 02.fs<font color="06C"> (6)</font>
