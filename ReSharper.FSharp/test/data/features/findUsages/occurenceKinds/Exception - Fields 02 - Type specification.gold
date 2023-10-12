@@ -1,15 +1,15 @@
 ﻿Field declaration
 ---
-UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 02 - Type specification.fs
+UsageFieldTypeDeclaration TO: [O] exception Exn of |int| RANGE: (32,35) @ Exception - Fields 02 - Type specification.fs
 
 
 Other
 ---
-UsageOther TO: [O] let |e|: Exn = () RANGE: (45,46) @ Exception - Fields 02 - Type specification.fs
+UsageOther TO: [O] let |e|: Exn = () RANGE: (41,42) @ Exception - Fields 02 - Type specification.fs
 
 
 Type specification
 ---
-UsageOther TO: [O] let e: |Exn| = () RANGE: (48,51) @ Exception - Fields 02 - Type specification.fs
+UsageOther TO: [O] let e: |Exn| = () RANGE: (44,47) @ Exception - Fields 02 - Type specification.fs
 
 

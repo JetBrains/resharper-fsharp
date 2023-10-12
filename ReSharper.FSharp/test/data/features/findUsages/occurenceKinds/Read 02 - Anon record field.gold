@@ -1,18 +1,18 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |ar| = {| F = 1 |} RANGE: (21,23) @ Read 02 - Anon record field.fs
-UsageOther TO: [O] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
-UsageOther TO: [O] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
+UsageOther TO: [O] let |ar| = {| F = 1 |} RANGE: (19,21) @ Read 02 - Anon record field.fs
+UsageOther TO: [O] ar.|F| RANGE: (39,40) @ Read 02 - Anon record field.fs
+UsageOther TO: [O] |ar|.F RANGE: (36,38) @ Read 02 - Anon record field.fs
 
 
 Write access
 ---
-UsageWrite TO: [W] let ar = {| |F| = 1 |} RANGE: (29,30) @ Read 02 - Anon record field.fs
+UsageWrite TO: [W] let ar = {| |F| = 1 |} RANGE: (27,28) @ Read 02 - Anon record field.fs
 
 
 Read access
 ---
-UsageRead TO: [R] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
-UsageRead TO: [R] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
+UsageRead TO: [R] ar.|F| RANGE: (39,40) @ Read 02 - Anon record field.fs
+UsageRead TO: [R] |ar|.F RANGE: (36,38) @ Read 02 - Anon record field.fs
 
 

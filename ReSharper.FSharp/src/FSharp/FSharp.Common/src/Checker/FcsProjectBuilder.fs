@@ -237,7 +237,10 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
             |> Array.map (fun psiModule ->
                 let path = modulePathProvider.GetModulePath(psiModule)
                 if psiModule :? IProjectPsiModule then
-                    fileSystemTracker.AdviseFileChanges(lifetime, path) |> ignore
+                    if not path.IsEmpty then
+                        fileSystemTracker.AdviseFileChanges(lifetime, path) |> ignore
+                    else
+                        logger.Warn("Got empty path for module")
                 path)
             |> Array.map (fun r -> "-r:" + r.FullPath)
 

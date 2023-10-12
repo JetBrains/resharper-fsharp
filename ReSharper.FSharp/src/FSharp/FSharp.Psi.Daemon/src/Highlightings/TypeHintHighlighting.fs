@@ -40,7 +40,7 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
             match highlighter.UserData with
             | :? TypeHintHighlighting as thh ->
                 let data =
-                    AdornmentData(thh.Text, null, enum 0, AdornmentPlacement.DefaultBeforeThisChar,
+                    AdornmentData(thh.Text, null, AdornmentFlags.None, AdornmentPlacement.DefaultAfterPrevChar,
                         PushToHintMode.Default)
                 
                 { new IAdornmentDataModel with

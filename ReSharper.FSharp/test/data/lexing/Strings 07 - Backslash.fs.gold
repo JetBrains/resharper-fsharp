@@ -1,1 +1,1 @@
-﻿0000: STRING '"a\\r\n          b\\r\n\t\tc\\r\n\r\n\td"'
+﻿0000: STRING '"a\\n          b\\n\t\tc\\n\n\td"'

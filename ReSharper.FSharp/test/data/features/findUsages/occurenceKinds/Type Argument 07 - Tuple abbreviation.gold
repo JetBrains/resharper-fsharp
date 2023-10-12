@@ -1,6 +1,6 @@
 ﻿Type argument
 ---
-UsageTypeArgument TO: [O] type T = |int| * int RANGE: (26,29) @ Type Argument 07 - Tuple abbreviation.fs
-UsageTypeArgument TO: [O] type T = int * |int| RANGE: (32,35) @ Type Argument 07 - Tuple abbreviation.fs
+UsageTypeArgument TO: [O] type T = |int| * int RANGE: (24,27) @ Type Argument 07 - Tuple abbreviation.fs
+UsageTypeArgument TO: [O] type T = int * |int| RANGE: (30,33) @ Type Argument 07 - Tuple abbreviation.fs
 
 

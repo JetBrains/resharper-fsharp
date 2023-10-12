@@ -1,24 +1,24 @@
 ﻿Module or namespace import
 ---
-UsageInUsings TO: [O] open System.Collections.|Generic| RANGE: (41,48) @ Type Argument 03 - Tuple.fs
+UsageInUsings TO: [O] open System.Collections.|Generic| RANGE: (39,46) @ Type Argument 03 - Tuple.fs
 
 
 Other
 ---
-UsageOther TO: [O] open System.|Collections|.Generic RANGE: (29,40) @ Type Argument 03 - Tuple.fs
-UsageOther TO: [O] open |System|.Collections.Generic RANGE: (22,28) @ Type Argument 03 - Tuple.fs
-UsageOther TO: [O] let |l| = List<string * string>() RANGE: (56,57) @ Type Argument 03 - Tuple.fs
+UsageOther TO: [O] open System.|Collections|.Generic RANGE: (27,38) @ Type Argument 03 - Tuple.fs
+UsageOther TO: [O] open |System|.Collections.Generic RANGE: (20,26) @ Type Argument 03 - Tuple.fs
+UsageOther TO: [O] let |l| = List<string * string>() RANGE: (52,53) @ Type Argument 03 - Tuple.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] let l = |List|<string * string>() RANGE: (60,64) @ Type Argument 03 - Tuple.fs
-UsageInstanceCreation TO: [O] let l = |List|<string * string>() RANGE: (60,64) @ Type Argument 03 - Tuple.fs
+UsageInstanceCreation TO: [O] let l = |List|<string * string>() RANGE: (56,60) @ Type Argument 03 - Tuple.fs
+UsageInstanceCreation TO: [O] let l = |List|<string * string>() RANGE: (56,60) @ Type Argument 03 - Tuple.fs
 
 
 Type argument
 ---
-UsageTypeArgument TO: [O] let l = List<|string| * string>() RANGE: (65,71) @ Type Argument 03 - Tuple.fs
-UsageTypeArgument TO: [O] let l = List<string * |string|>() RANGE: (74,80) @ Type Argument 03 - Tuple.fs
+UsageTypeArgument TO: [O] let l = List<|string| * string>() RANGE: (61,67) @ Type Argument 03 - Tuple.fs
+UsageTypeArgument TO: [O] let l = List<string * |string|>() RANGE: (70,76) @ Type Argument 03 - Tuple.fs
 
 

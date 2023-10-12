@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] | |A| RANGE: (16,17) @ Union - Case - Empty 01 - Expr.fs
+    TO: [O] | |A| RANGE: (15,16) @ Union - Case - Empty 01 - Expr.fs
     Navigation result:
       opened file: Union - Case - Empty 01 - Expr.fs
       ------------------

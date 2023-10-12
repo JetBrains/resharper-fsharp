@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'KeyValue'`:
-    TO: [O] for |KeyValue| _ in m do () RANGE: (45,53) @ Compiled active pattern case.fs
+    TO: [O] for |KeyValue| _ in m do () RANGE: (42,50) @ Compiled active pattern case.fs
     Menu item (enabled) :
       icon: UsagePatternChecking
       text: Module      <font color="FFD5A286">for **KeyValue** _ in m do ()</font><font color="06C"> (4)</font>
@@ -8,7 +8,7 @@
       tooltip: for **KeyValue** _ in m do ()
     Navigation result:
       caret did not move
-    TO: [O] for |KeyValue| _ in m do () RANGE: (72,80) @ Compiled active pattern case.fs
+    TO: [O] for |KeyValue| _ in m do () RANGE: (68,76) @ Compiled active pattern case.fs
     Menu item (enabled) :
       icon: UsagePatternChecking
       text: Module      <font color="FFD5A286">for **KeyValue** _ in m do ()</font><font color="06C"> (5)</font>

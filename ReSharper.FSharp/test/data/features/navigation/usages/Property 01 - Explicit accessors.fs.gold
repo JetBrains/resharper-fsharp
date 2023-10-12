@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'A'`:
-    TO: [I] T.|set_A|(0, 0); RANGE: (141,146) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0); RANGE: (134,139) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0);</font><font color="06C"> (8)</font>
@@ -16,7 +16,7 @@
           T.set_A(0, 0, 0, 0, 0);
       ------------------
 
-    TO: [I] T.|set_A|(0, 0, 0); RANGE: (161,166) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0, 0); RANGE: (153,158) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0, 0);</font><font color="06C"> (9)</font>
@@ -32,7 +32,7 @@
         }
       ------------------
 
-    TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (184,189) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (175,180) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0, 0, 0, 0);</font><font color="06C"> (10)</font>
@@ -48,7 +48,7 @@
       }
       ------------------
 
-    TO: [I] var _ = T.|get_A|(0); RANGE: (62,67) @ Property 01 - Explicit accessors.cs
+    TO: [I] var _ = T.|get_A|(0); RANGE: (58,63) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var _ = T.**get_A**(0);</font><font color="06C"> (5)</font>
@@ -64,7 +64,7 @@
           var ___ = T.get_A(0, 0, 0);
       ------------------
 
-    TO: [I] var __ = T.|get_A|(0, 0); RANGE: (88,93) @ Property 01 - Explicit accessors.cs
+    TO: [I] var __ = T.|get_A|(0, 0); RANGE: (83,88) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var __ = T.**get_A**(0, 0);</font><font color="06C"> (6)</font>
@@ -80,7 +80,7 @@
           T.set_A(0, 0);
       ------------------
 
-    TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (118,123) @ Property 01 - Explicit accessors.cs
+    TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (112,117) @ Property 01 - Explicit accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var ___ = T.**get_A**(0, 0, 0);</font><font color="06C"> (7)</font>
@@ -96,7 +96,7 @@
           T.set_A(0, 0, 0);
       ------------------
 
-    TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (224,225) @ Property 01 - Explicit accessors.fs
+    TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (216,217) @ Property 01 - Explicit accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: T.set_A      <font color="FFD5A286">... int, _: int) (_: int) = T.**A**(0) <- 0</font><font color="06C"> (9)</font>
@@ -112,7 +112,7 @@
         static member A with get (_: int, _: int, _: int) = 0
       ------------------
 
-    TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (369,370) @ Property 01 - Explicit accessors.fs
+    TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (357,358) @ Property 01 - Explicit accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: T.set_A      <font color="FFD5A286">... int, _: int) (_: int) = T.**A**(0, 0) <- 0</font><font color="06C"> (13)</font>

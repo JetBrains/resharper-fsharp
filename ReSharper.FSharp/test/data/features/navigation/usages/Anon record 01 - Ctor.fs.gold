@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'F'`:
-    TO: [W] {| |F| = 1 |} RANGE: (20,21) @ Anon record 01 - Ctor.fs
+    TO: [W] {| |F| = 1 |} RANGE: (18,19) @ Anon record 01 - Ctor.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: Module      <font color="FFD5A286">{| **F** = 1 |}</font><font color="06C"> (3)</font>
@@ -8,7 +8,7 @@
       tooltip: {| **F** = 1 |}
     Navigation result:
       caret did not move
-    TO: [W] {| |F| = 1 |} RANGE: (33,34) @ Anon record 01 - Ctor.fs
+    TO: [W] {| |F| = 1 |} RANGE: (30,31) @ Anon record 01 - Ctor.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: Module      <font color="FFD5A286">{| **F** = 1 |}</font><font color="06C"> (4)</font>
