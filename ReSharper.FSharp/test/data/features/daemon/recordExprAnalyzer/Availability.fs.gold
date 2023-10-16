@@ -10,17 +10,17 @@ let item = Module.item
 let item2 = item
 
 // Available
-ignore { item with |Foo = { item.Foo with Foo = 3 }|(0) }
-ignore { item with |Foo.Zoo = { item.Foo.Zoo with Foo = 3 }|(1) }
-ignore { Module.item with |Foo = { Module.item.Foo with Foo = 3 }|(2) }
-ignore { (Module.item) with |Foo = ({ Module.item.Foo with Foo = 3 })|(3) }
-ignore { item with |Foo = { item.Foo with Zoo = { Foo = 3; Bar = 4 } }|(4) }
-ignore { item with |Module.Record2.Foo.Zoo = { item.Foo.Zoo with Foo = 3 }|(5) }
-ignore { item with |Foo = { item.Foo with Zoo = { item.Bar.Zoo with Foo = 3 } }|(6) }
-ignore { item with |Foo = { item.Foo with Zoo = { item.Foo.Zoo with Foo = 3 } }|(7) }
-ignore { item with Bar = { item.Foo with |Zoo = { item.Foo.Zoo with Bar = 3 }|(8) } }
-ignore { Module.item with Foo = { item.Foo with |Zoo = { item.Foo.Zoo with Foo = 3 }|(9) } }
-ignore { item with |Foo = { item.Foo with Foo = 3 };|(10) |Bar = { item.Bar with Foo = 3 }|(11) }
+ignore { item with Foo |=|(0) |{|(1) item.Foo with Foo = 3 |}|(2) }
+ignore { item with Foo.Zoo |=|(3) |{|(4) item.Foo.Zoo with Foo = 3 |}|(5) }
+ignore { Module.item with Foo |=|(6) |{|(7) Module.item.Foo with Foo = 3 |}|(8) }
+ignore { (Module.item) with Foo |=|(9) (|{|(10) Module.item.Foo with Foo = 3 |}|(11)) }
+ignore { item with Foo |=|(12) |{|(13) item.Foo with Zoo = { Foo = 3; Bar = 4 } |}|(14) }
+ignore { item with Module.Record2.Foo.Zoo |=|(15) |{|(16) item.Foo.Zoo with Foo = 3 |}|(17) }
+ignore { item with Foo |=|(18) |{|(19) item.Foo with Zoo = { item.Bar.Zoo with Foo = 3 } |}|(20) }
+ignore { item with Foo |=|(21) |{|(22) item.Foo with Zoo = { item.Foo.Zoo with Foo = 3 } |}|(23) }
+ignore { item with Bar = { item.Foo with Zoo |=|(24) |{|(25) item.Foo.Zoo with Bar = 3 |}|(26) } }
+ignore { Module.item with Foo = { item.Foo with Zoo |=|(27) |{|(28) item.Foo.Zoo with Foo = 3 |}|(29) } }
+ignore { item with Foo |=|(30) |{|(31) item.Foo with Foo = 3 |}|(32); Bar |=|(33) |{|(34) item.Bar with Foo = 3 |}|(35) }
 
 // Not available
 ignore { item with Foo = { item.Bar with Foo = 3} }
@@ -30,15 +30,39 @@ ignore { item with Foo = { item.Foo with Foo = 3; Bar = 3 } }
 ignore { item with Foo = { item2.Foo with Foo = 3 } }
 
 ---------------------------------------------------------
-(0): ReSharper Suggestion: Nested with can be simplified
-(1): ReSharper Suggestion: Nested with can be simplified
-(2): ReSharper Suggestion: Nested with can be simplified
-(3): ReSharper Suggestion: Nested with can be simplified
-(4): ReSharper Suggestion: Nested with can be simplified
-(5): ReSharper Suggestion: Nested with can be simplified
-(6): ReSharper Suggestion: Nested with can be simplified
-(7): ReSharper Suggestion: Nested with can be simplified
-(8): ReSharper Suggestion: Nested with can be simplified
-(9): ReSharper Suggestion: Nested with can be simplified
-(10): ReSharper Suggestion: Nested with can be simplified
-(11): ReSharper Suggestion: Nested with can be simplified
+(0): ReSharper Dead Code: Nested with can be simplified
+(1):<secondary> ReSharper Dead Code: Nested with can be simplified
+(2):<secondary> ReSharper Dead Code: Nested with can be simplified
+(3): ReSharper Dead Code: Nested with can be simplified
+(4):<secondary> ReSharper Dead Code: Nested with can be simplified
+(5):<secondary> ReSharper Dead Code: Nested with can be simplified
+(6): ReSharper Dead Code: Nested with can be simplified
+(7):<secondary> ReSharper Dead Code: Nested with can be simplified
+(8):<secondary> ReSharper Dead Code: Nested with can be simplified
+(9): ReSharper Dead Code: Nested with can be simplified
+(10):<secondary> ReSharper Dead Code: Nested with can be simplified
+(11):<secondary> ReSharper Dead Code: Nested with can be simplified
+(12): ReSharper Dead Code: Nested with can be simplified
+(13):<secondary> ReSharper Dead Code: Nested with can be simplified
+(14):<secondary> ReSharper Dead Code: Nested with can be simplified
+(15): ReSharper Dead Code: Nested with can be simplified
+(16):<secondary> ReSharper Dead Code: Nested with can be simplified
+(17):<secondary> ReSharper Dead Code: Nested with can be simplified
+(18): ReSharper Dead Code: Nested with can be simplified
+(19):<secondary> ReSharper Dead Code: Nested with can be simplified
+(20):<secondary> ReSharper Dead Code: Nested with can be simplified
+(21): ReSharper Dead Code: Nested with can be simplified
+(22):<secondary> ReSharper Dead Code: Nested with can be simplified
+(23):<secondary> ReSharper Dead Code: Nested with can be simplified
+(24): ReSharper Dead Code: Nested with can be simplified
+(25):<secondary> ReSharper Dead Code: Nested with can be simplified
+(26):<secondary> ReSharper Dead Code: Nested with can be simplified
+(27): ReSharper Dead Code: Nested with can be simplified
+(28):<secondary> ReSharper Dead Code: Nested with can be simplified
+(29):<secondary> ReSharper Dead Code: Nested with can be simplified
+(30): ReSharper Dead Code: Nested with can be simplified
+(31):<secondary> ReSharper Dead Code: Nested with can be simplified
+(32):<secondary> ReSharper Dead Code: Nested with can be simplified
+(33): ReSharper Dead Code: Nested with can be simplified
+(34):<secondary> ReSharper Dead Code: Nested with can be simplified
+(35):<secondary> ReSharper Dead Code: Nested with can be simplified
