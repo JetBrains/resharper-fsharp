@@ -13,7 +13,7 @@ type ReplaceReturnTypeTest() =
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Infix application``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Infix application``() = x.DoNamedTest()
     [<Test>] member x.Sequential() = x.DoNamedTest()
 
     [<Test>] member x.``Match clause 01``() = x.DoNamedTest()
@@ -42,7 +42,7 @@ type ReplaceReturnTypeTest() =
     [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Not available 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 03``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 04``() = x.DoNamedTest()

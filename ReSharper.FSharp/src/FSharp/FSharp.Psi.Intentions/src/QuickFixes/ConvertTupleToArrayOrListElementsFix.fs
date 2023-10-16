@@ -1,6 +1,5 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System.Text.RegularExpressions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -17,7 +16,6 @@ open JetBrains.Util
 type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     inherit FSharpQuickFixBase()
 
-    let regex = Regex("['?\w\d]*( \* ['?\w\d]*)+")
     let expr = warning.Expr
     let actualType = warning.ActualType
     let arrayOrListExpr = ArrayOrListExprNavigator.GetByExpression(expr.IgnoreParentParens())
@@ -25,7 +23,7 @@ type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     override x.Text = "Use ';' separators"
 
     override x.IsAvailable _ =
-        isValid expr && isNotNull arrayOrListExpr && regex.Match(actualType).Value = actualType
+        isValid expr && isNotNull arrayOrListExpr && actualType.IsTupleType
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
