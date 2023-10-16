@@ -190,6 +190,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
             | Some(:? TypeMismatchDiagnosticExtendedData as data)
+                // TODO: currently FollowingPatternMatchClause context info can be returned
+                // even if the expression is not returned from the end of the branch
                 when data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
                 let displayContext = data.DisplayContext
                 createTypeMismatchHighlighting
