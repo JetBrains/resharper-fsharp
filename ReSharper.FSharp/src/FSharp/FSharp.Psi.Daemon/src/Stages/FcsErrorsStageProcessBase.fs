@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
 open FSharp.Compiler.Diagnostics
+open FSharp.Compiler.Diagnostics.ExtendedData
 open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.DocumentModel
@@ -15,6 +16,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
+
+#nowarn "57"
 
 type IIgnoredHighlighting =
     inherit IHighlighting
@@ -90,20 +93,6 @@ module FSharpErrors =
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] XmlDocSignatureCheckFailed = 3390
     let [<Literal>] InvalidXmlDocPosition = 3520
-
-    let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
-    let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is "
-    let [<Literal>] butItsSignatureSpecifies = "but its signature specifies"
-    let [<Literal>] theModuleContainsTheField = "The module contains the field"
-    let [<Literal>] typeConstraintMismatchMessage = "Type constraint mismatch. The type \n    '(.+)'    \nis not compatible with type\n    '(.+)'"
-
-    let [<Literal>] typeEquationMessage = "This expression was expected to have type\n    '(.+)'    \nbut here has type\n    '(.+)'"
-    let [<Literal>] typeDoesNotMatchMessage = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'"
-    let [<Literal>] elseBranchHasWrongTypeMessage = "All branches of an 'if' expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
-    let [<Literal>] matchClauseHasWrongTypeMessage = "All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is '(.+)'. This branch returns a value of type '(.+)'."
-    let [<Literal>] ifBranchSatisfyContextTypeRequirements = "The 'if' expression needs to have type '(.+)' to satisfy context type requirements\. It currently has type '(.+)'"
-    let [<Literal>] typeMisMatchTupleLengths = "Type mismatch. Expecting a\n    '(.+)'    \nbut given a\n    '(.+)'    \nThe tuples have differing lengths of \\d+ and \\d+"
-    let [<Literal>] argumentNamesInTheSignatureAndImplementationDoNotMatch = "The argument names in the signature '(.+)' and implementation '(.+)' do not match. The argument name from the signature file will be used. This may cause problems when debugging or profiling."
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -195,32 +184,40 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 | null -> null
                 | expr -> highlightingCtor (expected, actual, expr, error.Message) :> _
 
-            match error.Message with
-            | message when message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
+            match error.ExtendedData with
+            | Some(:? TypeMismatchDiagnosticExtendedData as data)
+                when data.ContextInfo = DiagnosticContextInfo.OmittedElseBranch ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
-            | Regex typeEquationMessage [expectedType; actualType]
-            | Regex elseBranchHasWrongTypeMessage [expectedType; actualType] ->
+            | Some(:? TypeMismatchDiagnosticExtendedData as data)
+                // TODO: currently FollowingPatternMatchClause context info can be returned
+                // even if the expression is not returned from the end of the branch
+                when data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
+                let displayContext = data.DisplayContext
+                createTypeMismatchHighlighting
+                    MatchClauseWrongTypeError
+                        (data.ExpectedType.Format(displayContext))
+                        (data.ActualType.Format(displayContext))
+
+            | Some(:? TypeMismatchDiagnosticExtendedData as data) ->
+                let expectedType = data.ExpectedType
+                let actualType = data.ActualType
+                let displayContext = data.DisplayContext
+
+                if expectedType.IsTupleType && actualType.IsTupleType &&
+                   expectedType.GenericArguments.Count <> actualType.GenericArguments.Count then
+                   createTypeMismatchHighlighting
+                       TypeMisMatchTuplesHaveDifferingLengthsError
+                           (expectedType.Format(displayContext))
+                           (actualType.Format(displayContext))
+
+                else
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                 let expr = getResultExpr expr
-                if isNotNull expr then
-                    match expectedType with
-                    | "unit" -> createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                    | _ -> TypeEquationError(expectedType, actualType, expr, error.Message) :> _
-                else
-                    null
 
-            | Regex matchClauseHasWrongTypeMessage [expectedType; actualType] ->
-                createTypeMismatchHighlighting MatchClauseWrongTypeError expectedType actualType
-            
-            | Regex typeMisMatchTupleLengths [expectedType; actualType] ->
-                createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError expectedType actualType
-
-            | Regex typeDoesNotMatchMessage [expectedType; actualType] ->
-                createTypeMismatchHighlighting TypeDoesNotMatchTypeError expectedType actualType
-
-            | Regex ifBranchSatisfyContextTypeRequirements [expectedType; actualType] ->
-                createTypeMismatchHighlighting IfExpressionNeedsTypeToSatisfyTypeRequirementsError expectedType actualType
+                if isNull expr then null
+                elif isUnit data.ExpectedType then createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+                else TypeEquationError(expectedType, actualType, displayContext, expr, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
 
@@ -339,10 +336,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             ValueNotMutableError(refExpr) :> _
 
         | ValueNotContainedMutability ->
-            if error.Message.EndsWith("The mutability attributes differ") then
+            match error.ExtendedData with
+            | Some (:? ValueNotContainedDiagnosticExtendedData) ->
                 createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
-            else
-                createGenericHighlighting error range
+            | _ -> createGenericHighlighting error range
         
         | UnitTypeExpected ->
             createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedWarning range error
@@ -444,11 +441,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode LiteralPatternDoesNotTakeArgumentsError range
 
         | ArgumentNamesInSignatureAndImplementationDoNotMatch ->
-            match error.Message with
-            | Regex argumentNamesInTheSignatureAndImplementationDoNotMatch [ signature; implementation ] ->
+            match error.ExtendedData with
+            | Some (:? ArgumentsInSigAndImplMismatchExtendedData as data) ->
                 match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
                 | null -> null
-                | expr -> ArgumentNameMismatchWarning(expr, signature, implementation, error.Message) :> _
+                | expr -> ArgumentNameMismatchWarning(expr, data.SignatureName, data.ImplementationName, error.Message) :> _
 
             | _ -> null
 
@@ -494,23 +491,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
         | MissingErrorNumber ->
-            match error.Message with
-            | x when startsWith expressionIsAFunctionMessage x ->
+            match error.ExtendedData with
+            | Some (:? ExpressionIsAFunctionExtendedData) ->
                 createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
 
-            | x when (x.Contains(theModuleContainsTheField) && x.Contains(butItsSignatureSpecifies)) ->
+            | Some (:? FieldNotContainedDiagnosticExtendedData) ->
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
-            | Regex typeConstraintMismatchMessage [mismatchedType; typeConstraint] ->
-                let highlighting =
-                    match typeConstraint with
-                    | "unit" -> createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error
-                    | _ -> null
-
-                if isNotNull highlighting then highlighting else
-
+            | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
+                if isUnit data.ExpectedType then createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
                 let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                if isNotNull expr then TypeConstraintMismatchError(mismatchedType, expr, error.Message) else null
+                if isNotNull expr then TypeConstraintMismatchError(data.ActualType.Format(data.DisplayContext), expr, error.Message) else null
 
             | _ -> null
 
@@ -536,7 +527,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         let errors =
             errors
-            |> Array.map (fun error -> (error, getDocumentRange error))
+            |> Array.map (fun error -> error, getDocumentRange error)
             |> Array.distinctBy (fun (error, range) -> range, error.Message)
 
         for error, range in errors  do
