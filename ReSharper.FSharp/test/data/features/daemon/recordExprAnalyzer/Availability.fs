@@ -6,8 +6,11 @@ module Module =
     type Record2 = { Foo: Record1; Bar: Record1 }
     let item: Record2 = null
 
+let Zoo = { Record0.Foo = 3; Bar = 3 }
 let item = Module.item
 let item2 = item
+
+let f<'a> = Zoo
 
 // Available
 ignore { item with Foo = { item.Foo with Foo = 3 } }
@@ -24,7 +27,10 @@ ignore { item with Foo = { item.Foo with Foo = 3 }; Bar = { item.Bar with Foo = 
 
 // Not available
 ignore { item with Foo = { item.Bar with Foo = 3} }
+ignore { item with Foo.Zoo = { Zoo with Foo = 3 } }
+ignore { item with Foo.Zoo = { f<int> with Foo = 3 } }
 ignore { Module.item with Foo = { item.Foo with Foo = 3 } }
+ignore { item with Foo = { Module.item.Foo with Foo = 3 } }
 ignore { item with Foo = { Foo = 3; Bar = 3; Zoo = null } }
 ignore { item with Foo = { item.Foo with Foo = 3; Bar = 3 } }
 ignore { (id item) with Foo = { (id item).Foo with Foo = 3 } }

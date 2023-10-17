@@ -25,26 +25,20 @@ type RecordExprAnalyzer() =
         let qualifiedFieldName = qualifiedFieldNameReversed |> List.rev
         consumer.AddHighlighting(NestedRecordUpdateCanBeSimplifiedWarning(fieldBinding, qualifiedFieldName, fieldUpdateExpr))
 
-    let isSimpleReferencePart (ref: IReferenceExpr) =
-        isNull ref.TypeArgumentList && ref.Identifier :? IFSharpIdentifierToken
-
-    let rec compareReferenceExprs x y =
+    let rec compareReferenceExprs (x: IReferenceExpr) (y: IReferenceExpr) =
         if isNull x then isNull y
         elif isNull y then isNull x
-        elif not (isSimpleReferencePart x) || not (isSimpleReferencePart y) then false
         elif x.ShortName <> y.ShortName then false
         else compareReferenceExprs (x.Qualifier.As<_>()) (y.Qualifier.As<_>())
 
     let rec compareFieldWithNextCopyRefExpr (previousCopyRefExpr: IReferenceExpr) (fieldName: IReferenceName) (copyRefExpr: IReferenceExpr) =
-        if isNull copyRefExpr then isNull fieldName
+        if isNull copyRefExpr then false
         elif isNull fieldName then compareReferenceExprs copyRefExpr previousCopyRefExpr
-        elif not (isSimpleReferencePart copyRefExpr) then false
         elif fieldName.ShortName <> copyRefExpr.ShortName then
             compareReferenceExprs copyRefExpr previousCopyRefExpr && not (fieldName.Reference.GetFcsSymbol() :? FSharpField)
         else compareFieldWithNextCopyRefExpr previousCopyRefExpr fieldName.Qualifier (copyRefExpr.Qualifier.As<_>())
 
     let rec collectRecordExprsToSimplify recordExpr (previousFieldBinding: IRecordFieldBinding) previousCopyRefExpr fieldsChainMatch (consumer: IHighlightingConsumer) =
-
         let copyRefExpr = getCopyInfoExpressionAsReferenceExpr recordExpr
         if isNull copyRefExpr then produceHighlighting fieldsChainMatch recordExpr consumer else
 
