@@ -13,7 +13,7 @@ module UseNestedRecordFieldSyntax =
           if shortName.IsEmpty() ||
              shortName = SharedImplUtil.MISSING_DECLARATION_NAME ||
              not (predicate(referenceName)) then basePath else
-          shortName :: (getNamesReversed basePath referenceName.Qualifier predicate)
+          shortName :: getNamesReversed basePath referenceName.Qualifier predicate
       getNamesReversed prefix referenceName predicate
 
    let inline appendFieldNameReversed basePath referenceName =
@@ -21,11 +21,3 @@ module UseNestedRecordFieldSyntax =
 
    let inline getNamesReversed referenceName =
       getSuffixReversed [] referenceName (fun _ -> true)
-
-   let getRefExprNamesReversed referenceExpr =
-      let rec getNamesReversed (referenceExpr: IReferenceExpr) =
-          if isNull referenceExpr then [] else
-          let shortName = referenceExpr.ShortName
-          if shortName.IsEmpty() || shortName = SharedImplUtil.MISSING_DECLARATION_NAME then []
-          else shortName :: (getNamesReversed (referenceExpr.Qualifier.As<IReferenceExpr>()))
-      getNamesReversed referenceExpr

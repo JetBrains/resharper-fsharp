@@ -6,10 +6,22 @@ type Record1 = { Foo: int; Bar: int; Zoo: Record0 }
 [<AutoOpen>]
 module Module = type Record2 = { Foo: Record1; Bar: Record1 }
 
-let f item = { item with |Module.Record2.Foo.Zoo = { item.Foo.Zoo with Foo = 3 }|(0) }
+let f item = { item with Module.Record2.Foo.Zoo |=|(0) |{|(1) item.Foo.Zoo with Foo = 3 |}|(2) }
 
 ------------------------------------------------
 0: Nested with can be simplified
+QUICKFIXES:
+Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
+--Use nested record field syntax in file
+--Use nested record field syntax in project
+--Use nested record field syntax in solution
+1: Nested with can be simplified
+QUICKFIXES:
+Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
+--Use nested record field syntax in file
+--Use nested record field syntax in project
+--Use nested record field syntax in solution
+2: Nested with can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
 --Use nested record field syntax in file

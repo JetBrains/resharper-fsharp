@@ -27,6 +27,7 @@ ignore { item with Foo = { item.Bar with Foo = 3} }
 ignore { Module.item with Foo = { item.Foo with Foo = 3 } }
 ignore { item with Foo = { Foo = 3; Bar = 3; Zoo = null } }
 ignore { item with Foo = { item.Foo with Foo = 3; Bar = 3 } }
+ignore { (id item) with Foo = { (id item).Foo with Foo = 3 } }
 ignore { item with Foo = { item2.Foo with Foo = 3 } }
 
 ---------------------------------------------------------
