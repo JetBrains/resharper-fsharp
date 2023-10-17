@@ -29,14 +29,14 @@ type RecordExprAnalyzer() =
         if isNull x then isNull y
         elif isNull y then isNull x
         elif x.ShortName <> y.ShortName then false
-        else compareReferenceExprs (x.Qualifier.As<_>()) (y.Qualifier.As<_>())
+        else compareReferenceExprs (x.Qualifier.As()) (y.Qualifier.As())
 
     let rec compareFieldWithNextCopyRefExpr (previousCopyRefExpr: IReferenceExpr) (fieldName: IReferenceName) (copyRefExpr: IReferenceExpr) =
         if isNull copyRefExpr then false
         elif isNull fieldName then compareReferenceExprs copyRefExpr previousCopyRefExpr
         elif fieldName.ShortName <> copyRefExpr.ShortName then
             compareReferenceExprs copyRefExpr previousCopyRefExpr && not (fieldName.Reference.GetFcsSymbol() :? FSharpField)
-        else compareFieldWithNextCopyRefExpr previousCopyRefExpr fieldName.Qualifier (copyRefExpr.Qualifier.As<_>())
+        else compareFieldWithNextCopyRefExpr previousCopyRefExpr fieldName.Qualifier (copyRefExpr.Qualifier.As())
 
     let rec collectRecordExprsToSimplify recordExpr (previousFieldBinding: IRecordFieldBinding) previousCopyRefExpr fieldsChainMatch (consumer: IHighlightingConsumer) =
         let copyRefExpr = getCopyInfoExpressionAsReferenceExpr recordExpr
@@ -56,10 +56,10 @@ type RecordExprAnalyzer() =
                     | ValueNone ->
                         let fieldNamePrefixReversed = getNamesReversed previousFieldBinding.ReferenceName
                         let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed fieldNamePrefixReversed
-                        ValueSome(previousFieldBinding, currentFieldNameReversed)         
+                        ValueSome(previousFieldBinding, currentFieldNameReversed)
                     | ValueSome(rootFieldBinding, previousFieldNameReversed) ->
                         let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed previousFieldNameReversed
-                        ValueSome(rootFieldBinding, currentFieldNameReversed)                          
+                        ValueSome(rootFieldBinding, currentFieldNameReversed)
                 else
                     produceHighlighting fieldsChainMatch recordExpr consumer
                     ValueNone
