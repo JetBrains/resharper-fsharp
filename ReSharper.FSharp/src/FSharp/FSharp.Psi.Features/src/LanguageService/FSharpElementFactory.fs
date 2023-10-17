@@ -143,9 +143,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         member x.CreateRecordFieldBinding(fieldQualifiedName, addSemicolon) =
             let namingService = getNamingService ()
             let field =
-                match fieldQualifiedName |> Seq.tryExactlyOne with
-                | Some(shortName) -> namingService.MangleNameIfNecessary(shortName)
-                | _ -> String.concat "." fieldQualifiedName
+                fieldQualifiedName
+                |> Seq.map (fun shortName -> namingService.MangleNameIfNecessary(shortName))
+                |> String.concat "."
             let semicolon = if addSemicolon then ";" else ""
             let expr = @"failwith ""todo"""
 
