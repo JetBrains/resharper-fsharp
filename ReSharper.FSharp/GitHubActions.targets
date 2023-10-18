@@ -5,11 +5,4 @@
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <OutDir>$(SolutionDir)/Bin</OutDir>
     </PropertyGroup>
-
-    <Target Name="CleanDuplicates">
-        <ItemGroup>
-            <FilesToClean Include="$(OutDir)/ClrStack.*"/>
-        </ItemGroup>
-        <Delete Files="@(FilesToClean)"/>
-    </Target>
 </Project>
