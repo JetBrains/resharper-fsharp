@@ -148,6 +148,8 @@
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
+  <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
+
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />

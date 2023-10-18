@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <OutDir>$(SolutionDir)/Bin</OutDir>
+    </PropertyGroup>
 
-    <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+    <Target Name="CleanDuplicates">
         <ItemGroup>
-            <FilesToExclude Include="@(ReferenceCopyLocalPaths)"
-                            Condition="'%(Filename)'!='FSharp.Core' And 
-                                 '%(Filename)'!='Fantomas' And
-                                 '%(Filename)'!='FSharp.Compiler.Service' And
-                                 '%(Filename)'!='FSharp.DependencyManager.Nuget' And
-                                 '%(Filename)'!='FSharp.Compiler.Interactive.Settings'"/>
-            <ReferenceCopyLocalPaths Remove="@(FilesToExclude)"/>
+            <FilesToClean Include="$(OutDir)/ClrStack.*"/>
         </ItemGroup>
+        <Delete Files="@(FilesToClean)"/>
     </Target>
-
 </Project>
