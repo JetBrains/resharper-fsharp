@@ -6,9 +6,9 @@
         <OutDir>$(SolutionDir)/Bin</OutDir>
     </PropertyGroup>
 
-    <Target Name="CleanDuplicates">
+    <Target Name="CleanDuplicates" AfterTargets="AfterBuild">
         <ItemGroup>
-            <FilesToClean Include="$(OutDir)/ClrStack.*"/>
+            <FilesToClean Include="$(OutDir)/ClrStack.dll"/>
         </ItemGroup>
         <Delete Files="@(FilesToClean)"/>
     </Target>
