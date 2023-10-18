@@ -1,2 +1,2 @@
 ﻿0000: TRIPLE_QUOTED_STRING '"""Foo"""'
-0009: NEW_LINE '\r\n'
+0009: NEW_LINE '\n'

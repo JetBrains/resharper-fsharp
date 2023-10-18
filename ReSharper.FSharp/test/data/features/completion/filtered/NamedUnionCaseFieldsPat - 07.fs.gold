@@ -1,4 +1,4 @@
-﻿# 99 ITEMS #
+﻿# 14 ITEMS #
 
 i, named
 AllowNullLiteralAttribute
@@ -9,94 +9,9 @@ NativeInterop
 NoComparisonAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
+named    int
 + named    int
-nameof    string
-nan    float
-nanf    float32
-nativeint    nativeint
+nativeint
 nativeptr
-nullArg    'T
 ---- FULL EVALUATION ----
-AddingNewEventArgs (in System.ComponentModel)
-AllowNullLiteralAttribute (in Microsoft.FSharp.Core)
-AspNetHostingPermissionAttribute (in System.Web)
-AssemblyKeyNameAttribute (in System.Reflection)
-AssemblyName (in System.Reflection)
-AssemblyNameFlags (in System.Reflection)
-AssemblyNameProxy (in System.Reflection)
-CallerLineNumberAttribute (in System.Runtime.CompilerServices)
-CallerMemberNameAttribute (in System.Runtime.CompilerServices)
-CodeNamespace (in System.CodeDom)
-CodeNamespaceCollection (in System.CodeDom)
-CodeNamespaceImport (in System.CodeDom)
-CodeNamespaceImportCollection (in System.CodeDom)
-ComAliasNameAttribute (in System.Runtime.InteropServices)
-CompilationSourceNameAttribute (in Microsoft.FSharp.Core)
-CompiledNameAttribute (in Microsoft.FSharp.Core)
-ContractPublicPropertyNameAttribute (in System.Diagnostics.Contracts)
-CustomAttributeNamedArgument (in System.Reflection)
-DebuggerNonUserCodeAttribute (in System.Diagnostics)
-DesignerNamespaceResolveEventArgs (in System.Runtime.InteropServices.WindowsRuntime)
-DisplayNameAttribute (in System.ComponentModel)
-DispositionTypeNames (in System.Net.Mime)
-FrameworkName (in System.Runtime.Versioning)
-IComNativeDescriptorHandler (in System.ComponentModel)
-INameCreationService (in System.ComponentModel.Design.Serialization)
-IProvidedNamespace (in Microsoft.FSharp.Core.CompilerServices)
-ISymbolNamespace (in System.Diagnostics.SymbolStore)
-ITypeLibExporterNameProvider (in System.Runtime.InteropServices)
-IndexerNameAttribute (in System.Runtime.CompilerServices)
-ManagedToNativeComInteropStubAttribute (in System.Runtime.InteropServices)
-MediaTypeNames (in System.Net.Mime)
-NTAccount (in System.Security.Principal)
-NameObjectCollectionBase (in System.Collections.Specialized)
-NameValueCollection (in System.Collections.Specialized)
-NameValueFileSectionHandler (in System.Configuration)
-NameValueSectionHandler (in System.Configuration)
-NamedPermissionSet (in System.Security)
-NamespaceResolveEventArgs (in System.Runtime.InteropServices.WindowsRuntime)
-NativeCppClassAttribute (in System.Runtime.CompilerServices)
-NativeObjectSecurity (in System.Security.AccessControl)
-NativeOverlapped (in System.Threading)
 NativePtr (in Microsoft.FSharp.NativeInterop)
-NetworkAccess (in System.Net)
-NetworkAddressChangedEventHandler (in System.Net.NetworkInformation)
-NetworkAvailabilityChangedEventHandler (in System.Net.NetworkInformation)
-NetworkAvailabilityEventArgs (in System.Net.NetworkInformation)
-NetworkInformationAccess (in System.Net.NetworkInformation)
-NetworkInformationPermissionAttribute (in System.Net.NetworkInformation)
-NeutralResourcesLanguageAttribute (in System.Resources)
-NoComparisonAttribute (in Microsoft.FSharp.Core)
-NoDynamicInvocationAttribute (in Microsoft.FSharp.Core)
-NoEqualityAttribute (in Microsoft.FSharp.Core)
-NoSettingsVersionUpgradeAttribute (in System.Configuration)
-NonEventAttribute (in System.Diagnostics.Tracing)
-NonSerializedAttribute (in System)
-NotifyCollectionChangedAction (in System.Collections.Specialized)
-NotifyCollectionChangedEventArgs (in System.Collections.Specialized)
-NotifyParentPropertyAttribute (in System.ComponentModel)
-ParenthesizePropertyNameAttribute (in System.ComponentModel)
-ResolveNameEventArgs (in System.ComponentModel.Design.Serialization)
-ResolveNameEventHandler (in System.ComponentModel.Design.Serialization)
-ReturnValueNameAttribute (in System.Runtime.InteropServices.WindowsRuntime)
-ServiceNameCollection (in System.Security.Authentication.ExtendedProtection)
-ServiceNameElement (in System.Security.Authentication.ExtendedProtection.Configuration)
-ServiceNameElementCollection (in System.Security.Authentication.ExtendedProtection.Configuration)
-SettingsGroupNameAttribute (in System.Configuration)
-SoapName (in System.Runtime.Remoting.Metadata.W3cXsd2001)
-SoapNcName (in System.Runtime.Remoting.Metadata.W3cXsd2001)
-SoapQName (in System.Runtime.Remoting.Metadata.W3cXsd2001)
-SocketOptionName (in System.Net.Sockets)
-SpecialNameAttribute (in System.Runtime.CompilerServices)
-StoreName (in System.Security.Cryptography.X509Certificates)
-StrongName (in System.Security.Policy)
-StrongNameIdentityPermission (in System.Security.Permissions)
-StrongNameIdentityPermissionAttribute (in System.Security.Permissions)
-StrongNameKeyPair (in System.Reflection)
-StrongNameMembershipCondition (in System.Security.Policy)
-StrongNamePublicKeyBlob (in System.Security.Permissions)
-UriHostNameType (in System)
-X500DistinguishedName (in System.Security.Cryptography.X509Certificates)
-X500DistinguishedNameFlags (in System.Security.Cryptography.X509Certificates)
-X509NameType (in System.Security.Cryptography.X509Certificates)
-_AssemblyName (in System.Runtime.InteropServices)

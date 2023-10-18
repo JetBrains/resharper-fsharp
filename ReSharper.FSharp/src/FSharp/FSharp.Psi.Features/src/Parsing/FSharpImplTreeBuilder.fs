@@ -313,7 +313,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 match lid with
                 | [_] ->
                     match valData with
-                    | SynValData(Some(flags), _, selfId) when flags.MemberKind = SynMemberKind.Constructor ->
+                    | SynValData(Some(flags), _, selfId, _) when flags.MemberKind = SynMemberKind.Constructor ->
                         x.ProcessPatternParams(memberParams, true, true) // todo: should check isLocal
                         x.ProcessCtorSelfId(selfId)
 
@@ -355,7 +355,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             | _ -> ElementType.MEMBER_DECLARATION
 
         match valData with
-        | SynValData(Some(flags), _, _) when
+        | SynValData(Some(flags), _, _, _) when
                 flags.MemberKind = SynMemberKind.PropertyGet || flags.MemberKind = SynMemberKind.PropertySet ->
             if expr.Range.End <> range.End then
                 unfinishedDeclaration <- Some(mark, range, ElementType.MEMBER_DECLARATION)
@@ -574,7 +574,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 ElementType.QUOTE_EXPR_PAT
 
             | SynPat.Null _ -> ElementType.NULL_PAT
-            | SynPat.DeprecatedCharRange _ -> ElementType.CHAR_RANGE_PAT
 
             // todo: mark inner pattern, assert ranges
             | SynPat.FromParseError _ -> ElementType.FROM_ERROR_PAT
@@ -811,7 +810,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 | SynMeasure.Power(range = range)
                 | SynMeasure.Var(range = range)
                 | SynMeasure.Paren(range = range) -> range
-                | SynMeasure.One -> failwith "should not be reached"
+                | SynMeasure.One _ -> failwith "should not be reached"
             
             let processRatio (ratio: SynRationalConst) (overallRange: range) =
                 
@@ -819,13 +818,17 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     match ratio with
                     | SynRationalConst.Integer _ ->
                         x.MarkAndDone(overallRange, ElementType.INTEGER_RAT)
-                    | SynRationalConst.Negate ratConst ->
+                    | SynRationalConst.Negate(ratConst, _) ->
                         let m = x.Mark()
                         processRatConstCase ratConst
                         x.Done(overallRange, m, ElementType.NEGATE_RAT)
                     | SynRationalConst.Rational(range = range) ->
                         x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LPAREN, range)
                         x.MarkAndDone(range, ElementType.RATIONAL_RAT)
+                    | SynRationalConst.Paren(rationalConst, range) ->
+                        let mark = x.Mark(range)
+                        processRatConstCase rationalConst
+                        x.Done(range, mark, ElementType.PAREN_RAT)
 
                 x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, overallRange) // advance to ^ or ^-
                 x.AdvanceLexer() // advanve beyond ^ or ^-
@@ -841,14 +844,14 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     x.ProcessNamedTypeReference(longId)
                     x.Done(range, namedTypeMark, ElementType.NAMED_TYPE_USAGE)
                     x.Done(range, namedMark, ElementType.NAMED_MEASURE)
-                | SynMeasure.Product(measure1, measure2, range) ->
+                | SynMeasure.Product(measure1, _, measure2, range) ->
                     let prodMark = x.Mark(range)
                     processMeasure measure1
                     processMeasure measure2
                     x.Done(range, prodMark, ElementType.PRODUCT_MEASURE)
-                | SynMeasure.One ->
+                | SynMeasure.One _ ->
                     () // handled in SynMeasure.Seq to have the range
-                | SynMeasure.Seq([SynMeasure.One], range) ->
+                | SynMeasure.Seq([SynMeasure.One _], range) ->
                     x.MarkAndDone(range, ElementType.ONE_MEASURE)
                 | SynMeasure.Seq(measures = [synMeasure]) ->
                     processMeasure synMeasure
@@ -856,9 +859,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     let seqMark = x.Mark(range)
                     synMeasures |> List.iter processMeasure
                     x.Done(range, seqMark, ElementType.SEQ_MEASURE)
-                | SynMeasure.Divide(measure1, measure2, range) ->
+                | SynMeasure.Divide(measure1, _, measure2, range) ->
                     let divMark = x.Mark(range)
-                    processMeasure measure1
+                    measure1 |> Option.iter processMeasure
                     processMeasure measure2
                     x.Done(range, divMark, ElementType.DIVIDE_MEASURE)
                 | SynMeasure.Power(measure = synMeasure; power = ratio; range = range) ->
@@ -871,18 +874,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     
                     x.Done(range, powerMark, ElementType.POWER_MEASURE)
                 | SynMeasure.Anon range ->
-                    // horrible workaround for a bug in FCS:
-                    // currently the range of SynMeasure.Anon spans over all of the "<_>"
-                    // construct a new range not including the GREATER
-                    let endLine, endColumn =
-                        if range.EndColumn > 0 then
-                            range.EndLine, range.EndColumn - 1
-                        else
-                            range.EndLine - 1, range.EndColumn
-                    let endBeforeGreater = Position.mkPos endLine endColumn
-                    let r = Range.mkRange range.FileName range.Start endBeforeGreater
-                    x.AdvanceToTokenOrRangeEnd(FSharpTokenType.IDENTIFIER, range)
-                    x.MarkAndDone(r, ElementType.ANON_MEASURE)
+                    x.MarkAndDone(range, ElementType.ANON_MEASURE)
                 | SynMeasure.Paren(synMeasure, range) ->
                     let parenMark = x.Mark(range)
                     processMeasure synMeasure
@@ -895,7 +887,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             let mark = x.Mark(range)
 
             match synConst with
-            | SynConst.Measure(_synConst, _constantRange, synMeasure) ->
+            | SynConst.Measure(_, _, synMeasure, _) ->
                 x.AdvanceToTokenOrRangeEnd(FSharpTokenType.LESS, range)
                 let typeMeasureMark = x.Mark(range)
                 processMeasure synMeasure

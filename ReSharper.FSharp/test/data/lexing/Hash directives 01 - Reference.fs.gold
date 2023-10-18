@@ -1,4 +1,4 @@
 ﻿0000: PP_REFERENCE '#r'
 0002: WHITE_SPACE ' '
 0003: STRING '"foo.dll"'
-0012: NEW_LINE '\r\n'
+0012: NEW_LINE '\n'

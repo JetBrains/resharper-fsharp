@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] let (||A|_||) x = Some () RANGE: (22,27) @ Active pattern 01 - Expr.fs
+    TO: [O] let (||A|_||) x = Some () RANGE: (20,25) @ Active pattern 01 - Expr.fs
     Navigation result:
       opened file: Active pattern 01 - Expr.fs
       ------------------

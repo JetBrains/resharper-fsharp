@@ -1,12 +1,12 @@
 ﻿Read access
 ---
-UsageRead TO: [R] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 02 - Members.fs
+UsageRead TO: [R] Exn.|Foo| RANGE: (63,66) @ Exception - Singleton 02 - Members.fs
 
 
 Other
 ---
-UsageOther TO: [O] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 02 - Members.fs
-UsageOther TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 02 - Members.fs
-UsageOther TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 02 - Members.fs
+UsageOther TO: [O] Exn.|Foo| RANGE: (63,66) @ Exception - Singleton 02 - Members.fs
+UsageOther TO: [O] |Exn|.Foo RANGE: (59,62) @ Exception - Singleton 02 - Members.fs
+UsageOther TO: [O] |Exn|.Foo RANGE: (59,62) @ Exception - Singleton 02 - Members.fs
 
 

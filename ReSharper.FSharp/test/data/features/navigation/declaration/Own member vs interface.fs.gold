@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    TO: [O] member x.|Dispose|() = () RANGE: (42,49) @ Own member vs interface.fs
+    TO: [O] member x.|Dispose|() = () RANGE: (39,46) @ Own member vs interface.fs
     Navigation result:
       opened file: Own member vs interface.fs
       ------------------

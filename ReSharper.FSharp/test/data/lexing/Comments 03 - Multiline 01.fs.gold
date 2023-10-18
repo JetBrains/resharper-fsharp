@@ -1,2 +1,2 @@
-﻿0000: BLOCK_COMMENT '(*\r\n *\r\n *)'
-0011: NEW_LINE '\r\n'
+﻿0000: BLOCK_COMMENT '(*\n *\n *)'
+0009: NEW_LINE '\n'

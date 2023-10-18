@@ -1,21 +1,21 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |s1| = obj() :?> string RANGE: (21,23) @ Type Cast 02 - Downcast.fs
-UsageOther TO: [O] let |s2| = obj() :?> System.String RANGE: (48,50) @ Type Cast 02 - Downcast.fs
-UsageOther TO: [O] let s2 = obj() :?> |System|.String RANGE: (63,69) @ Type Cast 02 - Downcast.fs
+UsageOther TO: [O] let |s1| = obj() :?> string RANGE: (19,21) @ Type Cast 02 - Downcast.fs
+UsageOther TO: [O] let |s2| = obj() :?> System.String RANGE: (45,47) @ Type Cast 02 - Downcast.fs
+UsageOther TO: [O] let s2 = obj() :?> |System|.String RANGE: (60,66) @ Type Cast 02 - Downcast.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] let s1 = |obj|() :?> string RANGE: (26,29) @ Type Cast 02 - Downcast.fs
-UsageInstanceCreation TO: [O] let s1 = |obj|() :?> string RANGE: (26,29) @ Type Cast 02 - Downcast.fs
-UsageInstanceCreation TO: [O] let s2 = |obj|() :?> System.String RANGE: (53,56) @ Type Cast 02 - Downcast.fs
-UsageInstanceCreation TO: [O] let s2 = |obj|() :?> System.String RANGE: (53,56) @ Type Cast 02 - Downcast.fs
+UsageInstanceCreation TO: [O] let s1 = |obj|() :?> string RANGE: (24,27) @ Type Cast 02 - Downcast.fs
+UsageInstanceCreation TO: [O] let s1 = |obj|() :?> string RANGE: (24,27) @ Type Cast 02 - Downcast.fs
+UsageInstanceCreation TO: [O] let s2 = |obj|() :?> System.String RANGE: (50,53) @ Type Cast 02 - Downcast.fs
+UsageInstanceCreation TO: [O] let s2 = |obj|() :?> System.String RANGE: (50,53) @ Type Cast 02 - Downcast.fs
 
 
 Type conversions
 ---
-UsageTypeConversions TO: [O] let s1 = obj() :?> |string| RANGE: (36,42) @ Type Cast 02 - Downcast.fs
-UsageTypeConversions TO: [O] let s2 = obj() :?> System.|String| RANGE: (70,76) @ Type Cast 02 - Downcast.fs
+UsageTypeConversions TO: [O] let s1 = obj() :?> |string| RANGE: (34,40) @ Type Cast 02 - Downcast.fs
+UsageTypeConversions TO: [O] let s2 = obj() :?> System.|String| RANGE: (67,73) @ Type Cast 02 - Downcast.fs
 
 

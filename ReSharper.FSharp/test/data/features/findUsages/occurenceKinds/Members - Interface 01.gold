@@ -1,10 +1,10 @@
 ﻿Base type
 ---
-UsageExtendedType TO: [O] interface System.|IDisposable| with RANGE: (50,61) @ Members - Interface 01.fs
+UsageExtendedType TO: [O] interface System.|IDisposable| with RANGE: (47,58) @ Members - Interface 01.fs
 
 
 Other
 ---
-UsageOther TO: [O] interface |System|.IDisposable with RANGE: (43,49) @ Members - Interface 01.fs
+UsageOther TO: [O] interface |System|.IDisposable with RANGE: (40,46) @ Members - Interface 01.fs
 
 

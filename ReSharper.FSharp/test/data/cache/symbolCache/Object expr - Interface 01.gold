@@ -1,7 +1,7 @@
 ﻿Project Files:Object expr - Interface 01.fs:
 FSharpProjectFilePart:ImplFile
  NamedModulePart:Module->Class:Module
- ObjectExpressionTypePart:Object expression in Object expr - Interface 01.fs@17->Class:Object expression in Object expr - Interface 01.fs@17
+ ObjectExpressionTypePart:Object expression in Object expr - Interface 01.fs@15->Class:Object expression in Object expr - Interface 01.fs@15
 []: Namespace:
  [Module]: Class:Module[TestProject]
- [Object expression in Object expr - Interface 01.fs@17]: Class:Object expression in Object expr - Interface 01.fs@17[TestProject]
+ [Object expression in Object expr - Interface 01.fs@15]: Class:Object expression in Object expr - Interface 01.fs@15[TestProject]

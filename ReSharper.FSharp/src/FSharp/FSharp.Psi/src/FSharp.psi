@@ -599,7 +599,8 @@ powerClause:
 rationalConst:
   integerRat |
   rationalRat |
-  negateRat;
+  negateRat |
+  parenRat;
   
 integerRat:
   literalToken{LITERAL, Literal};  
@@ -613,6 +614,12 @@ rationalRat:
 
 negateRat:
   rationalConst<RATIONAL_CONST, RationalConst>;
+
+parenRat:
+  LPAREN<LPAREN, LeftParen>
+  rationalConst
+  RPAREN<RPAREN, RightParen>;
+
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
@@ -1481,6 +1488,7 @@ interface hashDirective:
   loadDirective |
   referenceDirective |
   iDirective |
+  nowarnDirective |
   otherDirective;
 
 lineDirective:
@@ -1497,6 +1505,10 @@ referenceDirective:
 
 iDirective:
   PP_I<PP_I, HashToken>
+  STRING<STRING, Args>*;
+
+nowarnDirective:
+  PP_NOWARN<PP_NOWARN, HashToken>
   STRING<STRING, Args>*;
 
 otherDirective:

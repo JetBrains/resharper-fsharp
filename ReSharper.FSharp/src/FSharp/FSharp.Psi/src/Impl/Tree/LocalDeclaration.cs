@@ -63,6 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsWritable => false;
     public bool IsStatic => false;
     public ScopedKind Scope => ScopedKind.None;
+    public ReferenceKind ReferenceKind => ReferenceKind.VALUE;
   }
 
   internal partial class LocalDeclaration

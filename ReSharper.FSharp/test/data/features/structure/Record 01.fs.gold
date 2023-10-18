@@ -1,7 +1,7 @@
 ﻿File: Record 01.fs
  Module
   R
-   Field:int
+   Field : int
    IDisposable start
-    IDisposable.Dispose():void
+    IDisposable.Dispose() : void
    IDisposable end

@@ -190,6 +190,7 @@ upcast
 use
 when
 while
+while!
 with
 yield
 AbstractClassAttribute

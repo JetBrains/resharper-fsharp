@@ -1,11 +1,11 @@
 ﻿Type checking
 ---
-UsagePatternChecking TO: [O] | :? |string| -> () RANGE: (37,43) @ Type Test 02 - Pattern.fs
-UsagePatternChecking TO: [O] | :? System.|String| -> () RANGE: (63,69) @ Type Test 02 - Pattern.fs
+UsagePatternChecking TO: [O] | :? |string| -> () RANGE: (34,40) @ Type Test 02 - Pattern.fs
+UsagePatternChecking TO: [O] | :? System.|String| -> () RANGE: (59,65) @ Type Test 02 - Pattern.fs
 
 
 Other
 ---
-UsageOther TO: [O] | :? |System|.String -> () RANGE: (56,62) @ Type Test 02 - Pattern.fs
+UsageOther TO: [O] | :? |System|.String -> () RANGE: (52,58) @ Type Test 02 - Pattern.fs
 
 

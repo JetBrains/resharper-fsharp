@@ -1,2 +1,2 @@
-﻿0000: BLOCK_COMMENT '(*\r\n"""foo"""\r\n \r\n """\r\nbar"""\r\n *)'
-0035: NEW_LINE '\r\n'
+﻿0000: BLOCK_COMMENT '(*\n"""foo"""\n \n """\nbar"""\n *)'
+0030: NEW_LINE '\n'

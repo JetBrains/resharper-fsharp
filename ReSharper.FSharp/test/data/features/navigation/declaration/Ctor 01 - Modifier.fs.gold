@@ -8,7 +8,7 @@
         tail icon: FsharpProject
     Candidate execution:
       Immediate result:
-        TO: [O] internal |new| (x: int) = T() RANGE: (42,45) @ Ctor 01 - Modifier.fs
+        TO: [O] internal |new| (x: int) = T() RANGE: (39,42) @ Ctor 01 - Modifier.fs
         Navigation result:
           opened file: Ctor 01 - Modifier.fs
           ------------------
@@ -27,7 +27,7 @@
         tail icon: FsharpProject
     Candidate execution:
       Immediate result:
-        TO: [O] type |T|() = RANGE: (22,23) @ Ctor 01 - Modifier.fs
+        TO: [O] type |T|() = RANGE: (20,21) @ Ctor 01 - Modifier.fs
         Navigation result:
           opened file: Ctor 01 - Modifier.fs
           ------------------

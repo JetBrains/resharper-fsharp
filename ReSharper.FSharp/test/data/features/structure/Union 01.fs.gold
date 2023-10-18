@@ -1,8 +1,8 @@
 ﻿File: Union 01.fs
  Module
   U
-   A:U
-   B:U
+   A : U
+   B : U
    IDisposable start
-    IDisposable.Dispose():void
+    IDisposable.Dispose() : void
    IDisposable end
