@@ -18,9 +18,9 @@ interface FSharpStringLiteralExpression : FSharpElement, ClrLanguageStringLitera
 }
 
 interface FSharpInterpolatedStringLiteralExpressionPart : FSharpElement,
-                                                          ClrLanguageInterpolatedStringLiteralExpressionPart {
+  ClrLanguageInterpolatedStringLiteralExpressionPart {
   val tokenType: FSharpTokenNodeType
 }
 
 interface FSharpInterpolatedStringLiteralExpression : FSharpStringLiteralExpression,
-                                                      ClrLanguageInterpolatedStringLiteralExpression
+  ClrLanguageInterpolatedStringLiteralExpression
