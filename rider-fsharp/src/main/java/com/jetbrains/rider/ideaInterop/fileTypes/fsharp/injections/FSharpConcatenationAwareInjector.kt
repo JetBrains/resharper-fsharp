@@ -3,11 +3,11 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiElement
-import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageInterpolatedStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.common.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.plugins.appender.database.common.ClrLanguageConcatenationAwareInjector
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
 
