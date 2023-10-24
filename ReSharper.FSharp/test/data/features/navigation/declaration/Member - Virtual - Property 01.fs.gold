@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Show context popup menu `Declarations of property 'P'`:
-    TO: [O] abstract |P|: int RANGE: (61,62) @ Member - Virtual - Property 01.fs
+    TO: [O] abstract |P|: int RANGE: (57,58) @ Member - Virtual - Property 01.fs
     Menu item (enabled) :
       icon: Fsharp
       text: Member - Virtual - Property 01.fs<font color="06C"> (5)</font>
@@ -16,7 +16,7 @@
 
       ------------------
 
-    TO: [O] default x.|P| = 1 RANGE: (83,84) @ Member - Virtual - Property 01.fs
+    TO: [O] default x.|P| = 1 RANGE: (78,79) @ Member - Virtual - Property 01.fs
     Menu item (enabled) :
       icon: Fsharp
       text: Member - Virtual - Property 01.fs<font color="06C"> (6)</font>

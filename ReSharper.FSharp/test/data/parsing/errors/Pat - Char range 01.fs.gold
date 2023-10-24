@@ -14,16 +14,16 @@ IFSharpImplFile
           IMatchClause
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ICharRangePat
+            ILiteralPat
               FSharpString(type:CHARACTER_LITERAL, text:'a')
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpString(type:CHARACTER_LITERAL, text:'c')
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IFromErrorExpr
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpString(type:CHARACTER_LITERAL, text:'c')
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+    FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

@@ -1,12 +1,12 @@
 ﻿New instance creation
 ---
-UsageInstanceCreation TO: [O] System.|String|([||]) RANGE: (24,30) @ New instance 01.fs
-UsageInstanceCreation TO: [O] System.|String|([||]) RANGE: (24,30) @ New instance 01.fs
+UsageInstanceCreation TO: [O] System.|String|([||]) RANGE: (22,28) @ New instance 01.fs
+UsageInstanceCreation TO: [O] System.|String|([||]) RANGE: (22,28) @ New instance 01.fs
 
 
 Other
 ---
-UsageOther TO: [O] |System|.String([||]) RANGE: (17,23) @ New instance 01.fs
-UsageOther TO: [O] |System|.String([||]) RANGE: (17,23) @ New instance 01.fs
+UsageOther TO: [O] |System|.String([||]) RANGE: (15,21) @ New instance 01.fs
+UsageOther TO: [O] |System|.String([||]) RANGE: (15,21) @ New instance 01.fs
 
 

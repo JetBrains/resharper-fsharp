@@ -1,11 +1,11 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |foo| = 123 RANGE: (21,24) @ Read 01.fs
-UsageOther TO: [O] |foo| RANGE: (32,35) @ Read 01.fs
+UsageOther TO: [O] let |foo| = 123 RANGE: (19,22) @ Read 01.fs
+UsageOther TO: [O] |foo| RANGE: (29,32) @ Read 01.fs
 
 
 Read access
 ---
-UsageRead TO: [R] |foo| RANGE: (32,35) @ Read 01.fs
+UsageRead TO: [R] |foo| RANGE: (29,32) @ Read 01.fs
 
 

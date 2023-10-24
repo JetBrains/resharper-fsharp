@@ -1,5 +1,5 @@
 ﻿Pattern
 ---
-UsagePatternChecking TO: [O] with |Exn| -> () RANGE: (47,50) @ Pattern - Exception 01.fs
+UsagePatternChecking TO: [O] with |Exn| -> () RANGE: (42,45) @ Pattern - Exception 01.fs
 
 

@@ -1,2 +1,2 @@
-﻿0000: STRING '"Foo\r\n\r\n"'
-0009: NEW_LINE '\r\n'
+﻿0000: STRING '"Foo\n\n"'
+0007: NEW_LINE '\n'

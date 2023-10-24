@@ -1,27 +1,27 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |f| (a: int) (b: int) = () RANGE: (21,22) @ Invocation 01.fs
-UsageOther TO: [O] let f (|a|: int) (b: int) = () RANGE: (24,25) @ Invocation 01.fs
-UsageOther TO: [O] let f (a: int) (|b|: int) = () RANGE: (33,34) @ Invocation 01.fs
-UsageOther TO: [O] |f| 1 2 RANGE: (49,50) @ Invocation 01.fs
-UsageOther TO: [O] |f| "" null RANGE: (56,57) @ Invocation 01.fs
-UsageOther TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
+UsageOther TO: [O] let |f| (a: int) (b: int) = () RANGE: (19,20) @ Invocation 01.fs
+UsageOther TO: [O] let f (|a|: int) (b: int) = () RANGE: (22,23) @ Invocation 01.fs
+UsageOther TO: [O] let f (a: int) (|b|: int) = () RANGE: (31,32) @ Invocation 01.fs
+UsageOther TO: [O] |f| 1 2 RANGE: (45,46) @ Invocation 01.fs
+UsageOther TO: [O] |f| "" null RANGE: (51,52) @ Invocation 01.fs
+UsageOther TO: [O] |f| 1 RANGE: (61,62) @ Invocation 01.fs
 
 
 Type specification
 ---
-UsageOther TO: [O] let f (a: |int|) (b: int) = () RANGE: (27,30) @ Invocation 01.fs
-UsageOther TO: [O] let f (a: int) (b: |int|) = () RANGE: (36,39) @ Invocation 01.fs
+UsageOther TO: [O] let f (a: |int|) (b: int) = () RANGE: (25,28) @ Invocation 01.fs
+UsageOther TO: [O] let f (a: int) (b: |int|) = () RANGE: (34,37) @ Invocation 01.fs
 
 
 Invocation
 ---
-UsageInvocation TO: [O] |f| 1 2 RANGE: (49,50) @ Invocation 01.fs
-UsageInvocation TO: [O] |f| "" null RANGE: (56,57) @ Invocation 01.fs
+UsageInvocation TO: [O] |f| 1 2 RANGE: (45,46) @ Invocation 01.fs
+UsageInvocation TO: [O] |f| "" null RANGE: (51,52) @ Invocation 01.fs
 
 
 Partial application
 ---
-UsagePartialApplication TO: [O] |f| 1 RANGE: (67,68) @ Invocation 01.fs
+UsagePartialApplication TO: [O] |f| 1 RANGE: (61,62) @ Invocation 01.fs
 
 

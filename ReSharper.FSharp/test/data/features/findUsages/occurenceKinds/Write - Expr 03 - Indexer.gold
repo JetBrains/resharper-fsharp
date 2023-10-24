@@ -1,28 +1,28 @@
 ﻿Other
 ---
-UsageOther TO: [O] let |a|: int[] = [||] RANGE: (21,22) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |a|.[0] <- 1 RANGE: (38,39) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |a|[0] <- 1 RANGE: (50,51) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] let |b|: int[][] = [||] RANGE: (67,68) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |b|.[0].[0] <- 1 RANGE: (86,87) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |b|[0].[0] <- 1 RANGE: (102,103) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |b|.[0][0] <- 1 RANGE: (117,118) @ Write - Expr 03 - Indexer.fs
-UsageOther TO: [O] |b|[0][0] <- 1 RANGE: (132,133) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] let |a|: int[] = [||] RANGE: (19,20) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |a|.[0] <- 1 RANGE: (35,36) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |a|[0] <- 1 RANGE: (46,47) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] let |b|: int[][] = [||] RANGE: (61,62) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|.[0].[0] <- 1 RANGE: (79,80) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|[0].[0] <- 1 RANGE: (94,95) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|.[0][0] <- 1 RANGE: (108,109) @ Write - Expr 03 - Indexer.fs
+UsageOther TO: [O] |b|[0][0] <- 1 RANGE: (122,123) @ Write - Expr 03 - Indexer.fs
 
 
 Type argument
 ---
-UsageTypeArgument TO: [O] let a: |int|[] = [||] RANGE: (24,27) @ Write - Expr 03 - Indexer.fs
-UsageTypeArgument TO: [O] let b: |int|[][] = [||] RANGE: (70,73) @ Write - Expr 03 - Indexer.fs
+UsageTypeArgument TO: [O] let a: |int|[] = [||] RANGE: (22,25) @ Write - Expr 03 - Indexer.fs
+UsageTypeArgument TO: [O] let b: |int|[][] = [||] RANGE: (64,67) @ Write - Expr 03 - Indexer.fs
 
 
 Write access
 ---
-UsageWrite TO: [W] |a|.[0] <- 1 RANGE: (38,39) @ Write - Expr 03 - Indexer.fs
-UsageWrite TO: [W] |a|[0] <- 1 RANGE: (50,51) @ Write - Expr 03 - Indexer.fs
-UsageWrite TO: [W] |b|.[0].[0] <- 1 RANGE: (86,87) @ Write - Expr 03 - Indexer.fs
-UsageWrite TO: [W] |b|[0].[0] <- 1 RANGE: (102,103) @ Write - Expr 03 - Indexer.fs
-UsageWrite TO: [W] |b|.[0][0] <- 1 RANGE: (117,118) @ Write - Expr 03 - Indexer.fs
-UsageWrite TO: [W] |b|[0][0] <- 1 RANGE: (132,133) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |a|.[0] <- 1 RANGE: (35,36) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |a|[0] <- 1 RANGE: (46,47) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |b|.[0].[0] <- 1 RANGE: (79,80) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |b|[0].[0] <- 1 RANGE: (94,95) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |b|.[0][0] <- 1 RANGE: (108,109) @ Write - Expr 03 - Indexer.fs
+UsageWrite TO: [W] |b|[0][0] <- 1 RANGE: (122,123) @ Write - Expr 03 - Indexer.fs
 
 

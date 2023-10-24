@@ -1,6 +1,6 @@
 ﻿## GotoDeclarationProvider activity:
   Show context popup menu `Declarations of property 'x'`:
-    TO: [O] let |x| = 123 RANGE: (21,22) @ Signature 02 - Same range.fs
+    TO: [O] let |x| = 123 RANGE: (19,20) @ Signature 02 - Same range.fs
     Menu item (enabled) :
       icon: Fsharp
       text: Signature 02 - Same range.fs<font color="06C"> (3)</font>
@@ -16,7 +16,7 @@
       x
       ------------------
 
-    TO: [O] val |x|: int RANGE: (21,22) @ Signature 02 - Same range.fsi
+    TO: [O] val |x|: int RANGE: (19,20) @ Signature 02 - Same range.fsi
     Menu item (enabled) :
       icon: Fsharp
       text: Signature 02 - Same range.fsi<font color="06C"> (3)</font>

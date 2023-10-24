@@ -1,11 +1,11 @@
 ﻿Other
 ---
-UsageOther TO: [O] new System.|String|(' ', 1) RANGE: (28,34) @ New instance 03 - New.fs
-UsageOther TO: [O] new |System|.String(' ', 1) RANGE: (21,27) @ New instance 03 - New.fs
+UsageOther TO: [O] new System.|String|(' ', 1) RANGE: (26,32) @ New instance 03 - New.fs
+UsageOther TO: [O] new |System|.String(' ', 1) RANGE: (19,25) @ New instance 03 - New.fs
 
 
 New instance creation
 ---
-UsageInstanceCreation TO: [O] new System.|String|(' ', 1) RANGE: (28,34) @ New instance 03 - New.fs
+UsageInstanceCreation TO: [O] new System.|String|(' ', 1) RANGE: (26,32) @ New instance 03 - New.fs
 
 

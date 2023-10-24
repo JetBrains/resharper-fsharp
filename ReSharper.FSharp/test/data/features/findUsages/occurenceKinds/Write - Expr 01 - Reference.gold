@@ -1,19 +1,19 @@
 ﻿Other
 ---
-UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 01 - Reference.fs
-UsageOther TO: [O] |aaa| <- aaa + 1 RANGE: (40,43) @ Write - Expr 01 - Reference.fs
-UsageOther TO: [O] aaa <- |aaa| + 1 RANGE: (47,50) @ Write - Expr 01 - Reference.fs
-UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (51,52) @ Write - Expr 01 - Reference.fs
-UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (51,52) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (27,30) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] |aaa| <- aaa + 1 RANGE: (37,40) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] aaa <- |aaa| + 1 RANGE: (44,47) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (48,49) @ Write - Expr 01 - Reference.fs
+UsageOther TO: [O] aaa <- aaa |+| 1 RANGE: (48,49) @ Write - Expr 01 - Reference.fs
 
 
 Write access
 ---
-UsageWrite TO: [W] |aaa| <- aaa + 1 RANGE: (40,43) @ Write - Expr 01 - Reference.fs
+UsageWrite TO: [W] |aaa| <- aaa + 1 RANGE: (37,40) @ Write - Expr 01 - Reference.fs
 
 
 Read access
 ---
-UsageRead TO: [R] aaa <- |aaa| + 1 RANGE: (47,50) @ Write - Expr 01 - Reference.fs
+UsageRead TO: [R] aaa <- |aaa| + 1 RANGE: (44,47) @ Write - Expr 01 - Reference.fs
 
 

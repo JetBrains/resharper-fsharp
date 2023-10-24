@@ -1,6 +1,6 @@
 ﻿## ShowUsagesProvider activity:
   Immediate result:
-    TO: [O] let r = |{ Field = 1 }| RANGE: (57,70) @ Record Ctor 01 - Source.fs
+    TO: [O] let r = |{ Field = 1 }| RANGE: (52,65) @ Record Ctor 01 - Source.fs
     Navigation result:
       opened file: Record Ctor 01 - Source.fs
       ------------------

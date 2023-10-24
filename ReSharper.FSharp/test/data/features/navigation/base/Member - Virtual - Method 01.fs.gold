@@ -5,7 +5,7 @@
       caret did not move
       Side effects during navigation:
         Show global popup menu `Declarations of method 'M'`:
-          TO: [O] abstract |M|: unit -> unit RANGE: (61,62) @ Member - Virtual - Method 01.fs
+          TO: [O] abstract |M|: unit -> unit RANGE: (57,58) @ Member - Virtual - Method 01.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Member - Virtual - Method 01.fs<font color="06C"> (5)</font>
@@ -21,7 +21,7 @@
 
             ------------------
 
-          TO: [O] default x.|M|() = () RANGE: (92,93) @ Member - Virtual - Method 01.fs
+          TO: [O] default x.|M|() = () RANGE: (87,88) @ Member - Virtual - Method 01.fs
           Menu item (enabled) :
             icon: Fsharp
             text: Member - Virtual - Method 01.fs<font color="06C"> (6)</font>

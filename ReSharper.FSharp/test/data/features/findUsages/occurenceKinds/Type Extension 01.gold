@@ -1,15 +1,15 @@
 ﻿Field declaration
 ---
-UsageFieldTypeDeclaration TO: [O] { Field: |int| } RANGE: (40,43) @ Type Extension 01.fs
+UsageFieldTypeDeclaration TO: [O] { Field: |int| } RANGE: (37,40) @ Type Extension 01.fs
 
 
 Module or namespace import
 ---
-UsageInUsings TO: [O] open |Ns1| RANGE: (92,95) @ Type Extension 01.fs
+UsageInUsings TO: [O] open |Ns1| RANGE: (84,87) @ Type Extension 01.fs
 
 
 Type extension
 ---
-UsageExtensionMethod TO: [O] type |T| with RANGE: (108,109) @ Type Extension 01.fs
+UsageExtensionMethod TO: [O] type |T| with RANGE: (98,99) @ Type Extension 01.fs
 
 
