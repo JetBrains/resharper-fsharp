@@ -37,9 +37,11 @@ type FSharpTargetsProjectLoadModificator() =
             | FSharpProjectMark -> true
             | _ -> false
 
-        member x.Modify(targets) =
+        member x.ModifyTargets(targets) =
             targets.AddRange(fsTargets)
 
+        member x.ModifyProperties(properties) =
+            ()
 
 module FcsProjectBuilder =
     let itemsDelimiters = [| ';'; ','; ' ' |]
