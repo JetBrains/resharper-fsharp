@@ -184,7 +184,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 // Reschedule again
                 fun _ -> queueUpdateReferences path newOptions
 
-            ira.DoStart())
+            ira.DoStart()
+            ())
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
