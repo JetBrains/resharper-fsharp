@@ -1198,11 +1198,11 @@ AfterFile.fs
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
-   File2.fs
    -Folder
     File3.fs
    EmptyFolder
    File3.fs
+   File2.fs
    -Folder
     File4.fs
     -Sub
@@ -1279,11 +1279,11 @@ Content roots:
     1:net5.0[1]
       1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:File3.fs
+4:EmptyFolder[1]
+5:File3.fs
+6:File2.fs
 7:Folder[2]
   1:File4.fs
   2:Sub[1]
@@ -1300,9 +1300,9 @@ net5.0
 BeforeFile.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-File2.fs
 Folder/File3.fs
 File3.fs
+File2.fs
 Folder/File4.fs
 Folder/Sub/File1.fs
 Folder/Sub/Class1.fs
@@ -1328,11 +1328,11 @@ AfterFile.fs
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
-   File2.fs
    -Folder
     File3.fs
    EmptyFolder
    Foo.fs
+   File2.fs
    -Folder
     File4.fs
     -Sub
@@ -1409,11 +1409,11 @@ Content roots:
     1:net5.0[1]
       1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:Foo.fs
+4:EmptyFolder[1]
+5:Foo.fs
+6:File2.fs
 7:Folder[2]
   1:File4.fs
   2:Sub[1]
@@ -1430,9 +1430,9 @@ net5.0
 BeforeFile.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-File2.fs
 Folder/File3.fs
 Foo.fs
+File2.fs
 Folder/File4.fs
 Folder/Sub/File1.fs
 Folder/Sub/Class1.fs
@@ -1458,11 +1458,11 @@ AfterFile.fs
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
-   File2.fs
    -Folder
     File3.fs
    -EmptyFolder
     Foo.fs
+   File2.fs
    -Folder
     File4.fs
     -Sub
@@ -1540,11 +1540,11 @@ Content roots:
     1:net5.0[1]
       1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
+4:EmptyFolder[1]
   1:Foo.fs
+5:File2.fs
 6:Folder[2]
   1:File4.fs
   2:Sub[1]
@@ -1561,9 +1561,9 @@ net5.0
 BeforeFile.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-File2.fs
 Folder/File3.fs
 EmptyFolder/Foo.fs
+File2.fs
 Folder/File4.fs
 Folder/Sub/File1.fs
 Folder/Sub/Class1.fs
@@ -1589,11 +1589,11 @@ AfterFile.fs
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
-   File2.fs
    -Folder
     File3.fs
    Foo.fs
    EmptyFolder
+   File2.fs
    -Folder
     File4.fs
     -Sub
@@ -1670,11 +1670,11 @@ Content roots:
     1:net5.0[1]
       1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+3:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
+4:Foo.fs
+5:EmptyFolder[1]
+6:File2.fs
 7:Folder[2]
   1:File4.fs
   2:Sub[1]
@@ -1691,9 +1691,9 @@ net5.0
 BeforeFile.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-File2.fs
 Folder/File3.fs
 Foo.fs
+File2.fs
 Folder/File4.fs
 Folder/Sub/File1.fs
 Folder/Sub/Class1.fs
@@ -1704,7 +1704,7 @@ Folder/Class2.fs
 AfterFile.fs
 
 ===================
-Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
+13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
 
 -Project
  -FSharpProjectTree * 1 project
@@ -1719,11 +1719,11 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
      -Frameworks
       Microsoft.NETCore.App
    BeforeFile.fs [CompileBefore]
-   File2.fs
    -Folder
     File3.fs
    Foo.fs
    EmptyFolder
+   File2.fs
    -Folder
     File4.fs
     File1.fs
@@ -1799,11 +1799,11 @@ Content roots:
     1:net5.0[1]
       1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
       2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+3:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
+4:Foo.fs
+5:EmptyFolder[1]
+6:File2.fs
 7:Folder[2]
   1:File4.fs
   2:File1.fs
@@ -1820,9 +1820,9 @@ net5.0
 BeforeFile.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-File2.fs
 Folder/File3.fs
 Foo.fs
+File2.fs
 Folder/File4.fs
 Folder/File1.fs
 Folder/Class1.fs
