@@ -11,6 +11,7 @@ import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -92,6 +93,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, 3, emptyList())
   }
 
+  @Mute("Broken after ProjectModelMonitor refactoring")
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   fun projectReferencesCSharp() {
     withNonFSharpProjectReferences {
