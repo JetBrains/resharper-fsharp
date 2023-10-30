@@ -15,5 +15,8 @@ type PaketTargetsProjectLoadModificator() =
         member x.IsApplicable(projectMark) =
             projectMark.HasPossibleImport(paketTargets)
 
-        member x.Modify(targets) =
+        member x.ModifyTargets(targets) =
             targets.Add("PaketRestore")
+
+        member x.ModifyProperties(properties) =
+            ()
