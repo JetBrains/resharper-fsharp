@@ -2,6 +2,7 @@
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -116,3 +117,26 @@ let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
 
     let checkResults = results.CheckResults
     Some (checkResults, checkResults.GetMethodsAsSymbols(endLine, endColumn, "", names))
+
+// TODO: check if field can be resolved without qualifier
+// TODO: support generics
+let findRequiredQualifierForRecordField (fieldBinding: IRecordFieldBinding) =
+    let rec findRequiredQualifier
+        (context: IFSharpTreeNode)
+        (declaringEntity: FSharpEntity option)
+        (field: FSharpField) qualifiedField =
+
+        match declaringEntity with
+        | None -> None
+        | Some declaringEntity ->
+
+        let qualifiedField = declaringEntity.DisplayName :: qualifiedField
+        match context.CheckerService.ResolveNameAtLocation(context, qualifiedField, true, "findRequiredQualifierForRecordField") with
+        | Some x when x.Symbol.IsEffectivelySameAs(field) ->
+            qualifiedField
+            |> List.take (qualifiedField.Length - 1)
+            |> Some
+        | _ ->  findRequiredQualifier context declaringEntity.DeclaringEntity field qualifiedField
+
+    let field = fieldBinding.ReferenceName.Reference.GetFcsSymbol().As<FSharpField>()
+    findRequiredQualifier fieldBinding field.DeclaringEntity field [field.DisplayName]

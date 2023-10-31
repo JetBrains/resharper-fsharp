@@ -14,6 +14,8 @@ type UseNestedRecordFieldSyntaxTest() =
 
     [<Test; ExecuteScopedActionInFile>] member x.``File scoped`` () = x.DoNamedTest()
     [<Test; ExecuteScopedActionInFile>] member x.``File scoped - Overlap`` () = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Resolve qualifiers 01`` () = x.DoNamedTest()
+    [<Test; ExecuteScopedActionInFile>] member x.``Resolve qualifiers 02 - Namespaces`` () = x.DoNamedTest()
     [<Test>] member x.``Mangle field name`` () = x.DoNamedTest()
 
 

@@ -21,8 +21,8 @@ ignore { item with Foo.Zoo = { Foo = 3; Bar = 4 } }
 ignore { item with Module.Record2.Foo.Zoo.Foo = 3 }
 ignore { item with Foo.Zoo = { item.Bar.Zoo with Foo = 3 } }
 ignore { item with Foo.Zoo.Foo = 3 }
-ignore { item with Bar = { item.Foo with Zoo.Bar = 3 } }
-ignore { Module.item with Foo = { item.Foo with Zoo.Foo = 3 } }
+ignore { item with Bar = { item.Foo with Record1.Zoo.Bar = 3 } }
+ignore { Module.item with Foo = { item.Foo with Record1.Zoo.Foo = 3 } }
 ignore { item with Foo.Foo = 3; Bar.Foo = 3 }
 
 // Not available

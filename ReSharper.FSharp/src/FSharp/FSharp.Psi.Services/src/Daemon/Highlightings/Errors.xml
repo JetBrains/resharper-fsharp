@@ -332,13 +332,13 @@
   </Warning>
 
   <Warning name="NestedRecordUpdateCanBeSimplified" configurableSeverity="NestedRecordUpdateCanBeSimplified">
-    <Parameter type="IRecordFieldBinding" name="binding"/>
+    <Parameter type="IRecordFieldBinding" name="outerBinding"/>
+    <Parameter type="IRecordFieldBinding" name="innerBinding"/>
     <Parameter type="string list" name="fieldQualifiedName" isValid="skip"/>
-    <Parameter type="IFSharpExpression" name="updateExpression" isValid="skip"/>
     <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Range>binding.EqualsToken.GetHighlightingRange()</Range>
-    <SecondaryRanges>binding.Expression.IgnoreInnerParens() |> getBracketsRange</SecondaryRanges>
+    <Range>outerBinding.EqualsToken.GetHighlightingRange()</Range>
+    <SecondaryRanges>outerBinding.Expression.IgnoreInnerParens() |> getBracketsRange</SecondaryRanges>
     <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>
   </Warning>
 </Errors>

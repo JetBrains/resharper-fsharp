@@ -18,14 +18,13 @@ type RecordExprAnalyzer() =
         | :? IReferenceExpr as copyRefExpr when isSimpleQualifiedName copyRefExpr -> copyRefExpr
         | _ -> null
 
-    let produceHighlighting fieldsChainMatch (lastFieldBinding: IRecordFieldBinding) (consumer: IHighlightingConsumer) =
+    let produceHighlighting fieldsChainMatch (innerFieldBinding: IRecordFieldBinding) (consumer: IHighlightingConsumer) =
         match fieldsChainMatch with
         | ValueNone -> ()
-        | ValueSome(fieldBinding, qualifiedFieldNameReversed) ->
-        if not (lastFieldBinding.ReferenceName.Reference.GetFcsSymbol() :? FSharpField) then () else
+        | ValueSome(outerFieldBinding, qualifiedFieldNameReversed) ->
+        if not (innerFieldBinding.ReferenceName.Reference.GetFcsSymbol() :? FSharpField) then () else
         let qualifiedFieldName = qualifiedFieldNameReversed |> List.rev
-        let fieldUpdateExpr = lastFieldBinding.Expression.IgnoreInnerParens()
-        consumer.AddHighlighting(NestedRecordUpdateCanBeSimplifiedWarning(fieldBinding, qualifiedFieldName, fieldUpdateExpr))
+        consumer.AddHighlighting(NestedRecordUpdateCanBeSimplifiedWarning(outerFieldBinding, innerFieldBinding, qualifiedFieldName))
 
     let rec compareReferenceExprs (x: IReferenceExpr) (y: IReferenceExpr) =
         if isNull x then isNull y
