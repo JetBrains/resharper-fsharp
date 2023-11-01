@@ -256,6 +256,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - CompExpr - AndBang 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - For 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - WhileBang 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
