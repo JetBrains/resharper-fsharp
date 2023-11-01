@@ -399,7 +399,7 @@ interface fSharpExpression:
   forLikeExpr |
   rangeLikeExpr |
   computationExpr |
-  lambdaExpr |
+  lambdaLikeExpr |
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
@@ -422,6 +422,10 @@ interface fSharpExpression:
   interpolatedStringExpr |
   libraryOnlyExpr |
   fromErrorExpr;
+
+interface lambdaLikeExpr:
+  lambdaExpr |
+  dotLambdaExpr;
 
 interface rangeLikeExpr:
   beginningSliceExpr |
@@ -745,6 +749,11 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   FUN
   lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
   RARROW<RARROW, RArrow>
+  fSharpExpression<EXPR, Expression>;
+
+dotLambdaExpr options { stubBase="FSharpExpressionBase"; }:
+  wildPat<UNDERSCORE, Underscore>
+  DOT
   fSharpExpression<EXPR, Expression>;
   
 lambdaParametersList:

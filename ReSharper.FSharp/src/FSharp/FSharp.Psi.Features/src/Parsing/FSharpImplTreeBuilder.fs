@@ -1000,6 +1000,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     x.ProcessPat(pat, true, false)
             | _ -> ()
 
+        | SynExpr.DotLambda(expr, _, { UnderscoreRange = wildPatRange }) ->
+            x.PushRange(range, ElementType.DOT_LAMBDA_EXPR)
+            x.PushExpression(expr)
+            x.ProcessPat(SynPat.Wild(wildPatRange), true, false)
+
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
             x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)
             x.ProcessMatchClauses(clauses)
