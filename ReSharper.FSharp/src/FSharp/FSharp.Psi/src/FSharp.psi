@@ -473,6 +473,7 @@ interface computableExpr:
   letOrUseExpr |
   matchExpr |
   doExpr |
+  whileExpr |
   yieldOrReturnExpr;
 
 setExpr options { stubBase="UnitExpressionBase"; }:

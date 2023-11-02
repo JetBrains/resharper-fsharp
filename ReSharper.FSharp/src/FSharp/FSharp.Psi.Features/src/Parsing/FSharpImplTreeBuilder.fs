@@ -961,7 +961,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-        | SynExpr.While(_, whileExpr, doExpr, _) ->
+        | SynExpr.While(_, whileExpr, doExpr, _)
+        | SynExpr.WhileBang(_, whileExpr, doExpr, _) ->
             x.PushRange(range, ElementType.WHILE_EXPR)
             x.PushExpression(doExpr)
             x.ProcessExpression(whileExpr)

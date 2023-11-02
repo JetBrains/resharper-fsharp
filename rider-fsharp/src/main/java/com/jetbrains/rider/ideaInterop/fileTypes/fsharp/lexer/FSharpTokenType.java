@@ -43,6 +43,7 @@ public interface FSharpTokenType {
   IElementType RETURN_BANG = createToken("RETURN_BANG");
   IElementType MATCH_BANG = createToken("MATCH_BANG");
   IElementType AND_BANG = createToken("AND_BANG");
+  IElementType WHILE_BANG = createToken("WHILE_BANG");
   IElementType BAR = createToken("BAR");
   IElementType RARROW = createToken("RARROW");
   IElementType LARROW = createToken("LARROW");
@@ -362,6 +363,7 @@ public interface FSharpTokenType {
     VOID,
     WHEN,
     WHILE,
+    WHILE_BANG,
     WITH,
     YIELD,
     YIELD_BANG,
