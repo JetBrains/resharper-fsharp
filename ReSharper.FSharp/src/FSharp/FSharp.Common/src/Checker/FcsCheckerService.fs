@@ -108,7 +108,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member this.AssertFcsAccessThread() =
         if Shell.Instance.IsTestShell then () else
 
-        if Interruption.Current.IsEmpty then
+        if configurations.IsInternalMode() && Interruption.Current.IsEmpty then
             if locks.IsOnMainThread() then
                 logger.Error("Accessing FCS without interruption (main thread)")
             else
