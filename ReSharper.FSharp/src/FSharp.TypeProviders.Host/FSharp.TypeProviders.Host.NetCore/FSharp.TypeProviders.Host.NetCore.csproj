@@ -14,6 +14,9 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup>
+    <JetNonProductAssembly>true</JetNonProductAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\FSharp.TypeProviders.Host\src\**\*.cs">
       <Link>src/*</Link>
