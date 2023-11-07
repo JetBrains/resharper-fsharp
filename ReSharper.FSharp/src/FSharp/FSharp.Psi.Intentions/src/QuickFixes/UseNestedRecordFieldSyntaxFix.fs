@@ -18,7 +18,7 @@ type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWar
     override this.IsAvailable _ = isValid outerBinding && isValid innerBinding
 
     override this.Text = $"Replace with '{fieldNameText} = ...'"
-    override this.ScopedText = "Use nested record field syntax"
+    override this.ScopedText = "Use nested record field update"
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(outerBinding.IsPhysical())
@@ -33,8 +33,8 @@ type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWar
             // ResolveNameAtLocation can resolve only fields that are qualified by its declaring entity at the beginning,
             // so if the call returns None, we can assume that the qualified name resolves into the field and nothing else.
             match outerBinding.CheckerService.ResolveNameAtLocation(outerBinding, fieldName, true, "UseNestedRecordFieldSyntaxFix") with
-            // TODO: If None is returned, then something other than the type has resolved.
-            // We must use an API that can fully resolve record fields.
+            // TODO: We must use an API that can fully resolve record fields.
+            // Currently, if None is returned, then something other than the type has resolved.
             | Some _ -> findRequiredQualifierForRecordField outerBinding |> Option.defaultValue []
             | _ -> []
 

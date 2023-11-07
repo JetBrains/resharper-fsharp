@@ -13,16 +13,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 type RecordExprAnalyzer() =
     inherit ElementProblemAnalyzer<IRecordExpr>()
 
-    let getCopyInfoExpressionAsReferenceExpr (expr: IRecordExpr) =
+    let getCopyInfoReferenceExpr (expr: IRecordExpr) =
         match expr.CopyInfoExpression.IgnoreInnerParens() with
-        | :? IReferenceExpr as copyRefExpr when isSimpleQualifiedName copyRefExpr -> copyRefExpr
+        | :? IReferenceExpr as copyExpr when isSimpleQualifiedName copyExpr -> copyExpr
         | _ -> null
 
     let produceHighlighting fieldsChainMatch (innerFieldBinding: IRecordFieldBinding) (consumer: IHighlightingConsumer) =
         match fieldsChainMatch with
         | ValueNone -> ()
         | ValueSome(outerFieldBinding, qualifiedFieldNameReversed) ->
-        if not (innerFieldBinding.ReferenceName.Reference.GetFcsSymbol() :? FSharpField) then () else
+
+        if isNull innerFieldBinding.Expression then ()
+        elif not (innerFieldBinding.ReferenceName.Reference.GetFcsSymbol() :? FSharpField) then () else
         let qualifiedFieldName = qualifiedFieldNameReversed |> List.rev
         consumer.AddHighlighting(NestedRecordUpdateCanBeSimplifiedWarning(outerFieldBinding, innerFieldBinding, qualifiedFieldName))
 
@@ -32,22 +34,22 @@ type RecordExprAnalyzer() =
         elif x.ShortName <> y.ShortName then false
         else compareReferenceExprs (x.Qualifier.As()) (y.Qualifier.As())
 
-    let rec compareFieldWithNextCopyRefExpr (previousCopyRefExpr: IReferenceExpr) (fieldName: IReferenceName) (copyRefExpr: IReferenceExpr) =
-        if isNull copyRefExpr then false
-        elif isNull fieldName then compareReferenceExprs copyRefExpr previousCopyRefExpr
-        elif fieldName.ShortName <> copyRefExpr.ShortName then
-            compareReferenceExprs copyRefExpr previousCopyRefExpr && not (fieldName.Reference.GetFcsSymbol() :? FSharpField)
-        else compareFieldWithNextCopyRefExpr previousCopyRefExpr fieldName.Qualifier (copyRefExpr.Qualifier.As())
+    let rec compareFieldWithNextCopyExpr (previousCopyExpr: IReferenceExpr) (fieldName: IReferenceName) (copyExpr: IReferenceExpr) =
+        if isNull copyExpr then false
+        elif isNull fieldName then compareReferenceExprs copyExpr previousCopyExpr
+        elif fieldName.ShortName <> copyExpr.ShortName then
+            compareReferenceExprs copyExpr previousCopyExpr && not (fieldName.Reference.GetFcsSymbol() :? FSharpField)
+        else compareFieldWithNextCopyExpr previousCopyExpr fieldName.Qualifier (copyExpr.Qualifier.As())
 
-    let rec collectRecordExprsToSimplify recordExpr previousFieldBinding previousCopyRefExpr fieldsChainMatch (consumer: IHighlightingConsumer) =
-        let copyRefExpr = getCopyInfoExpressionAsReferenceExpr recordExpr
-        if isNull copyRefExpr then produceHighlighting fieldsChainMatch previousFieldBinding consumer else
+    let rec collectRecordExprsToSimplify recordExpr previousFieldBinding previousCopyExpr fieldsChainMatch (consumer: IHighlightingConsumer) =
+        let copyExpr = getCopyInfoReferenceExpr recordExpr
+        if isNull copyExpr then produceHighlighting fieldsChainMatch previousFieldBinding consumer else
 
         let fieldBindings = recordExpr.FieldBindingsEnumerable
         let singleField = fieldBindings.SingleItem
         let hasFieldsMatch =
             isNotNull previousFieldBinding &&
-            compareFieldWithNextCopyRefExpr previousCopyRefExpr previousFieldBinding.ReferenceName copyRefExpr
+            compareFieldWithNextCopyExpr previousCopyExpr previousFieldBinding.ReferenceName copyExpr
         let searchInDepthWhileMatched = hasFieldsMatch && isNotNull singleField
 
         for currentFieldBinding in fieldBindings do
@@ -67,7 +69,7 @@ type RecordExprAnalyzer() =
 
             match currentFieldBinding.Expression.IgnoreInnerParens() with
             | :? IRecordExpr as recordExpr ->
-                collectRecordExprsToSimplify recordExpr currentFieldBinding copyRefExpr fieldsChainMatch consumer
+                collectRecordExprsToSimplify recordExpr currentFieldBinding copyExpr fieldsChainMatch consumer
             | _ ->
                 if not searchInDepthWhileMatched then () else
                 produceHighlighting fieldsChainMatch currentFieldBinding consumer

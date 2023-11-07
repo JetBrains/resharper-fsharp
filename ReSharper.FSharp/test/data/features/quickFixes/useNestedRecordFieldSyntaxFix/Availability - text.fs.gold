@@ -12,18 +12,18 @@ let f item = { item with Module.Record2.Foo.Zoo |=|(0) |{|(1) item.Foo.Zoo with 
 0: Nested with can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
---Use nested record field syntax in file
---Use nested record field syntax in project
---Use nested record field syntax in solution
+--Use nested record field update in file
+--Use nested record field update in project
+--Use nested record field update in solution
 1: Nested with can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
---Use nested record field syntax in file
---Use nested record field syntax in project
---Use nested record field syntax in solution
+--Use nested record field update in file
+--Use nested record field update in project
+--Use nested record field update in solution
 2: Nested with can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
---Use nested record field syntax in file
---Use nested record field syntax in project
---Use nested record field syntax in solution
+--Use nested record field update in file
+--Use nested record field update in project
+--Use nested record field update in solution
