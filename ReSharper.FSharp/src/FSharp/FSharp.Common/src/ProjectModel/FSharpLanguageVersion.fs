@@ -105,6 +105,10 @@ module FSharpLanguageLevel =
     let isFSharp60Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp60
 
+    [<Extension; CompiledName("IsFSharp70Supported")>]
+    let isFSharp70Supported (treeNode: ITreeNode) =
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp70
+
     [<Extension; CompiledName("IsFSharp80Supported")>]
     let isFSharp80Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp80
