@@ -222,7 +222,7 @@ type FSharpAtomicRenamesFactory() =
 type FSharpDeclaredElementForRenameProvider() =
     interface IPrimaryDeclaredElementForRenameProvider with
         member x.GetPrimaryDeclaredElement(element, _) =
-            if element :? IShorthandId then null else
+            if element :? IDotLambdaId then null else
             match element.As<ISecondaryDeclaredElement>() with
             | null -> element
             | generated when generated.IsReadOnly -> element

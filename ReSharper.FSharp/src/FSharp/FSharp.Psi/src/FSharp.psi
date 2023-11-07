@@ -749,7 +749,7 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   fSharpExpression<EXPR, Expression>;
 
 dotLambdaExpr options { stubBase="FSharpExpressionBase"; }:
-  shorthandId<SHORTHAND, Shorthand>
+  dotLambdaId<SHORTHAND, Shorthand>
   DOT<FSHARP_DELIMITER, Delimiter>
   fSharpExpression<EXPR, Expression>;
 
@@ -1331,8 +1331,7 @@ primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }
 
 interface selfId:
   ctorSelfId |
-  memberSelfId |
-  shorthandId;
+  memberSelfId;
 
 interface memberSelfId:
   namedSelfId |
@@ -1346,9 +1345,6 @@ namedSelfId options { stubBase="LocalDeclarationBase"; }:
   identifier<IDENTIFIER, Identifier>;  
 
 wildSelfId options { stubBase="LocalDeclarationBase"; }:
-  UNDERSCORE<UNDERSCORE, Underscore>;
-
-shorthandId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
 constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {
@@ -1583,12 +1579,16 @@ activePatternId:
   )+
   RPAREN<RPAREN, RParen>;
 
+dotLambdaId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
+
 typeParameterId:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
   activePatternId |
+  dotLambdaId |
   ampAmp |
   colonColon |
   equals |

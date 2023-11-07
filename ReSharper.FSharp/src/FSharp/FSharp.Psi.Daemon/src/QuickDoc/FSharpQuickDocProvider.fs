@@ -126,7 +126,7 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
                 if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
             | node when node.GetTokenType() == FSharpTokenType.UNDERSCORE ->
                 match node.Parent with
-                | :? IShorthandId as shorthand -> Some shorthand
+                | :? IDotLambdaId as dotLambdaId -> Some dotLambdaId
                 | _ -> None
             | _ -> None
         )

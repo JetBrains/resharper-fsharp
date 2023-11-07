@@ -1000,10 +1000,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     x.ProcessPat(pat, true, false)
             | _ -> ()
 
-        | SynExpr.DotLambda(expr, _, { UnderscoreRange = shorthandRange }) ->
+        | SynExpr.DotLambda(expr, _, { UnderscoreRange = underscoreRange }) ->
             x.PushRange(range, ElementType.DOT_LAMBDA_EXPR)
             x.PushExpression(expr)
-            x.MarkAndDone(shorthandRange, ElementType.SHORTHAND_ID)
+            x.MarkAndDone(underscoreRange, ElementType.DOT_LAMBDA_ID)
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
             x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)
