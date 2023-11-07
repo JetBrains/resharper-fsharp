@@ -189,3 +189,5 @@ type FSharpGoToTypeTest() =
     member x.``Anon record field 02 - Substitution``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Dot lambda - Shorthand``() = x.DoNamedTest()

@@ -12,7 +12,7 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IChameleonExpression
           IDotLambdaExpr
-            IWildPat
+            IShorthandId
               FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             IReferenceExpr

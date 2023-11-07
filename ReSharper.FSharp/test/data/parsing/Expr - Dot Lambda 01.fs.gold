@@ -6,7 +6,7 @@ IFSharpImplFile
         IParenExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IDotLambdaExpr
-            IWildPat
+            IShorthandId
               FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             IPrefixAppExpr
