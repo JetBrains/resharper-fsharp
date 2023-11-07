@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly JetFastSemiReenterableRWLock myLock = new();
 
     public bool IsScript { get; }
-    [CanBeNull] public FcsProject FcsProject { get; }
+    [CanBeNull] public readonly FcsProject FcsProject;
 
     public static readonly FcsModuleResolvedSymbols Empty = new(null);
 

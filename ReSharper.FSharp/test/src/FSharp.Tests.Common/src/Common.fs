@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
@@ -141,8 +142,8 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFcsProjectBuilder(lifetime, checkerService, modulePathProvider, fileSystemTracker, logger) =
-    inherit FcsProjectBuilder(lifetime, checkerService, Mock<_>().Object, modulePathProvider, fileSystemTracker, logger)
+type TestFcsProjectBuilder(lifetime, checkerService, modulePathProvider, fileSystemTracker, logger, psiModules) =
+    inherit FcsProjectBuilder(lifetime, checkerService, Mock<_>().Object, modulePathProvider, fileSystemTracker, logger, psiModules)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()
@@ -164,8 +165,8 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     let mutable currentFcsProject = None
 
     let getNewFcsProject (psiModule: IPsiModule) =
-        let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
-        fcsProjectBuilder.AddReferences(fcsProject, getReferencedModules psiModule)
+        let projectKey = FcsProjectKey.Create(psiModule)
+        fcsProjectBuilder.BuildFcsProject(projectKey)
 
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
@@ -256,7 +257,6 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             | true, index -> index
             | _ -> -1
 
-        member x.InvalidateDirty() = ()
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
 
         member x.InvalidateReferencesToProject(_, _) = false

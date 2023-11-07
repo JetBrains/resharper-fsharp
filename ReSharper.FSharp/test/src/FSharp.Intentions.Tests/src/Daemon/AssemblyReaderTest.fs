@@ -38,7 +38,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
     member this.CreateProjectCookie(path: VirtualFileSystemPath, psiModule: IPsiModule) =
         projectPath <- path
         projectPsiModule <- psiModule
-        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path, this)
+        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path, this, None)
 
         { new IDisposable with
             member x.Dispose() =
@@ -62,7 +62,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
 type TestModulePathProvider(shim: TestAssemblyReaderShim) =
     inherit ModulePathProvider()
 
-    override this.GetModulePath(psiModule) =
+    override this.GetModulePath(psiModule: IPsiModule) =
         if psiModule == shim.PsiModule then
             shim.Path
         else
