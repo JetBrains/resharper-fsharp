@@ -139,7 +139,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
                 scriptPsiModuleInvalidated.Fire(psiModule)
 
-        solution.GetComponent<IDaemon>().Invalidate()
+        solution.GetComponent<IDaemon>().Invalidate("F# script references are invalidated")
 
         if not scriptOptionsProvider.SyncUpdate then
             changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance)
@@ -183,8 +183,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 // Reschedule again
                 fun _ -> queueUpdateReferences path newOptions
 
-            ira.DoStart()
-            ())
+            ira.DoStart() |> ignore
+        )
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
@@ -262,7 +262,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
             match checkerService.GetCachedScriptOptions(path.FullPath) with
-            | Some options -> checkerService.InvalidateFcsProject(options)
+            | Some options -> checkerService.InvalidateFcsProject(options, FcsProjectInvalidationType.Remove)
             | None -> ()
 
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore

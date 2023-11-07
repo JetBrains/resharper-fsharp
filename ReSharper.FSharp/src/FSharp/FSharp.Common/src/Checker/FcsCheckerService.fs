@@ -42,10 +42,15 @@ type FcsProject =
       ParsingOptions: FSharpParsingOptions
       FileIndices: IDictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
-      ReferencedModules: ISet<IPsiModule> }
+      ReferencedModules: ISet<FcsProjectKey> }
 
     member x.IsKnownFile(sourceFile: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(sourceFile.GetLocation())
+        let path = sourceFile.GetLocation()
+        x.FileIndices.ContainsKey(path)
+
+    member x.GetIndex(sourceFile: IPsiSourceFile) =
+        let path = sourceFile.GetLocation()
+        tryGetValue path x.FileIndices |> Option.defaultValue -1
 
     member x.TestDump(writer: TextWriter) =
         let projectOptions = x.ProjectOptions
@@ -67,6 +72,16 @@ type FcsProject =
             writer.WriteLine($"  {referencedProject.OutputFile}")
 
         writer.WriteLine()
+
+
+[<RequireQualifiedAccess>]
+type FcsProjectInvalidationType =
+    /// Used when invalidation is needed for a project still known to FCS.
+    /// Recreates background builder for the project.
+    | Invalidate
+
+    /// Used when project options are no longer valid and the corresponding background builder should be removed in FCS.
+    | Remove
 
 
 [<ShellComponent; AllowNullLiteral>]
@@ -196,22 +211,15 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             checker.Value.GetCachedScriptOptions(path)
         else None
     
-    member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
+    member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
         if checker.IsValueCreated then
-            logger.Trace("Invalidate FcsProject: {0}", fcsProjectOptions.ProjectFileName)
-            checker.Value.InvalidateConfiguration(fcsProjectOptions)
-
-    member x.InvalidateFcsProject(project: IProject) =
-        if checker.IsValueCreated then
-            project.GetPsiModules()
-            |> Seq.choose x.FcsProjectProvider.GetProjectOptions
-            |> Seq.iter x.InvalidateFcsProject
-
-    member x.InvalidateFcsProjects(solution: ISolution, isApplicable: IProject -> bool) =
-        if checker.IsValueCreated then
-            solution.GetAllProjects()
-            |> Seq.filter isApplicable
-            |> Seq.iter x.InvalidateFcsProject
+            match invalidationType with
+            | FcsProjectInvalidationType.Invalidate ->
+                logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
+                checker.Value.ClearCache(Seq.singleton projectOptions)
+            | FcsProjectInvalidationType.Remove ->
+                logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
+                checker.Value.InvalidateConfiguration(projectOptions)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
@@ -243,13 +251,11 @@ type FSharpParseAndCheckResults =
 
 
 type ReferencedModule =
-    { ReferencedPath: VirtualFileSystemPath
-      ReferencingModules: HashSet<IPsiModule> }
+    { ReferencingProjects: HashSet<FcsProjectKey> }
 
 module ReferencedModule =
-    let create (modulePathProvider: ModulePathProvider) (psiModule: IPsiModule) =
-        { ReferencedPath = modulePathProvider.GetModulePath(psiModule)
-          ReferencingModules = HashSet() }
+    let create () =
+        { ReferencingProjects = HashSet() }
 
 
 type IFcsProjectProvider =
@@ -266,15 +272,14 @@ type IFcsProjectProvider =
     abstract HasPairFile: IPsiSourceFile -> bool
 
     /// Returns True when the project has been invalidated.
-    abstract InvalidateReferencesToProject: IProject * forceInvalidateFcs: bool -> bool
+    abstract InvalidateReferencesToProject: IProject -> bool
 
-    abstract InvalidateDirty: unit -> unit
     abstract ModuleInvalidated: ISignal<IPsiModule * FcsProject>
 
     abstract PrepareAssemblyShim: psiModule: IPsiModule -> unit 
 
-    abstract GetReferencedModule: psiModule: IPsiModule -> ReferencedModule option 
-    abstract GetAllReferencedModules: unit -> KeyValuePair<IPsiModule, ReferencedModule> seq
+    abstract GetReferencedModule: projectKey: FcsProjectKey -> ReferencedModule option 
+    abstract GetAllReferencedModules: unit -> KeyValuePair<FcsProjectKey, ReferencedModule> seq
 
     /// True when any F# projects are currently known to project options provider after requesting info from FCS.
     abstract HasFcsProjects: bool

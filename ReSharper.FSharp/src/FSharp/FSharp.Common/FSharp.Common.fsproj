@@ -48,7 +48,6 @@
     <Compile Include="src\Shim\AssemblyReader\IFcsAssemblyReaderShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
     <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
-    <Compile Include="src\Checker\FcsReadWriteLock.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FcsCheckerService.fs" />

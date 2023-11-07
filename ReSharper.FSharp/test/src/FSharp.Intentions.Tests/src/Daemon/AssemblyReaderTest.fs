@@ -3,9 +3,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open System
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
-open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
@@ -15,35 +15,37 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
+type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
         fsOptionsProvider, symbolCache, solution, locks, logger) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim, checkerService,
+    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
         fsOptionsProvider, symbolCache, solution, locks, logger)
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
-    let mutable projectPsiModule = null
+    let mutable referencedProject = Unchecked.defaultof<_>
     let mutable reader = Unchecked.defaultof<_>
 
-    member this.PsiModule = projectPsiModule
+    member this.ReferencedProject = referencedProject
     member this.Path = projectPath
 
     override this.DebugReadRealAssemblies = false
 
-    member this.CreateProjectCookie(path: VirtualFileSystemPath, psiModule: IPsiModule) =
+    member this.CreateReferencedProjectCookie(project: IProject) =
+        let path = project.Location / (project.Name + ".dll")
+        let psiModule = psiModules.GetPrimaryPsiModule(project, project.TargetFrameworkIds.SingleItem())
+
         projectPath <- path
-        projectPsiModule <- psiModule
-        reader <- new ProjectFcsModuleReader(projectPsiModule, cache, path, this)
+        referencedProject <- project
+        reader <- new ProjectFcsModuleReader(psiModule, cache, path, this, None)
 
         { new IDisposable with
             member x.Dispose() =
                 projectPath <- VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
-                projectPsiModule <- null
+                referencedProject <- Unchecked.defaultof<_>
                 reader <- Unchecked.defaultof<_> }
 
     override this.ExistsFile(path) =
@@ -59,14 +61,13 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestModulePathProvider(shim: TestAssemblyReaderShim) =
-    inherit ModulePathProvider()
+type TestModulePathProvider(shim: TestAssemblyReaderShim, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
+    inherit ModulePathProvider(moduleReferencesResolveStore)
 
-    override this.GetModulePath(psiModule) =
-        if psiModule == shim.PsiModule then
-            shim.Path
-        else
-            base.GetModulePath(psiModule)
+    override this.GetModulePath(moduleReference) =
+        match moduleReference.ResolveResult(moduleReferencesResolveStore) with
+        | :? IProject as project when project == shim.ReferencedProject -> shim.Path
+        | _ -> base.GetModulePath(moduleReference)
 
     interface IHideImplementation<ModulePathProvider>
 
@@ -101,9 +102,8 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
             daemon.Dump()) |> ignore
 
     override this.DoTest(lifetime: Lifetime, project: IProject) =
-        let path = this.SecondProject.Location / (this.SecondProjectName + ".dll")
-        let psiModule = this.SecondProject.GetPsiModules().SingleItem().NotNull()
-        use cookie = this.Solution.GetComponent<TestAssemblyReaderShim>().CreateProjectCookie(path, psiModule)
+        let testAssemblyReaderShim = this.Solution.GetComponent<TestAssemblyReaderShim>()
+        use cookie = testAssemblyReaderShim.CreateReferencedProjectCookie(this.SecondProject)
 
         base.DoTest(lifetime, project)
 

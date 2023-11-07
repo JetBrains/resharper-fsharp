@@ -143,6 +143,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             let envPath, projectPsiModule =
                 match resolutionEnvironment.OutputFile with
                 | Some file ->
+                    // todo: module might have been changed after project changes
                     file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
                 | None -> m.FileName, None
 

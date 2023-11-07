@@ -35,9 +35,6 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
 
-    do
-        assemblyReaderShim.RecordInvalidations <- true
-
     let dumpSingleProjectMapping _ =
         let projectMapping =
             itemsContainer.ProjectMappings.Values.SingleOrDefault().NotNull("Expected single project mapping.")
