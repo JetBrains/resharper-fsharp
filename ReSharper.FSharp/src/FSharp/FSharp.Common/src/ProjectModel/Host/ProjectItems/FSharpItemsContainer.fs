@@ -34,7 +34,6 @@ open JetBrains.RdBackend.Common.Features.ProjectModel.View.Ordering
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.Rider.Backend.Env
 open JetBrains.Serialization
 open JetBrains.Threading
 open JetBrains.UI.RichText
@@ -101,7 +100,7 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
     let projectMappings = lazy containerLoader.GetMap()
     let targetFrameworkIdsIntern = DataIntern(setComparer)
 
-    let fsProjectLoaded = new Signal<IProjectMark>("fsProjectLoaded")
+    let projectUpdated = new Signal<IProjectMark>("fsItemsUpdated")
  
     let tryGetProjectMark (projectItem: IProjectItem) =
         match projectItem.GetProject() with
@@ -181,13 +180,18 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
         refreshFolder, updateItem, refresh
 
     let updateProject projectMark updateFunction =
-        use lock = locker.UsingWriteLock()
-        tryGetProjectMapping projectMark
-        |> Option.iter (fun mapping ->
-            let refreshFolder, update, refresh = createRefreshers projectMark
-            updateFunction mapping refreshFolder update
-            projectMappings.Value[projectMark] <- mapping
-            refresh ())
+        begin
+            use lock = locker.UsingWriteLock()
+            match tryGetProjectMapping projectMark with
+            | None -> ()
+            | Some mapping ->
+                let refreshFolder, update, refresh = createRefreshers projectMark
+                updateFunction mapping refreshFolder update
+                projectMappings.Value[projectMark] <- mapping
+                refresh ()
+        end
+
+        projectUpdated.Fire(projectMark)
 
     let addProjectMapping targetFrameworkIds items projectMark =
         use lock = locker.UsingWriteLock()
@@ -200,18 +204,13 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
 
     member x.ProjectMappings = projectMappings.Value
 
-    member x.FSharpProjectLoaded = fsProjectLoaded
-
     member x.IsValid(viewItem: FSharpViewItem) =
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
 
-    member x.RemoveProjectInner(project: IProject) =
-        use lock = locker.UsingWriteLock()
-        let projectMark = project.GetProjectMark()
-        x.ProjectMappings.Remove(projectMark) |> ignore
-
     interface IFSharpItemsContainer with
+        member x.ProjectUpdated = projectUpdated
+
         member x.OnProjectLoaded(projectMark, projectDescriptor, msBuildProject) =
             match msBuildProject with
             | null ->
@@ -244,7 +243,6 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
                     |> List.ofSeq
                 let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
-                fsProjectLoaded.Fire(projectMark)                
                 addProjectMapping targetFrameworkIds items projectMark
                 projectRefresher.RefreshProject(projectMark, true)
             | _ -> ()
@@ -345,19 +343,22 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
             tryGetProjectItem viewItem |> Option.map (fun item -> item.SortKey)
 
         member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
+            use lock = locker.UsingReadLock()
             tryGetProjectMapping projectMark
             |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
             |> Option.defaultValue [| |]
             
-        member this.AdviseFSharpProjectLoaded(lifetime) (body) = this.FSharpProjectLoaded.Advise(lifetime, body)
-        member this.RemoveProject(project) = this.RemoveProjectInner(project)
+        member this.RemoveProject(project) =
+            use lock = locker.UsingWriteLock()
+            let projectMark = project.GetProjectMark()
+            this.ProjectMappings.Remove(projectMark) |> ignore
 
 type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
 
-    abstract member AdviseFSharpProjectLoaded : Lifetime -> (IProjectMark -> unit) -> unit
-    abstract member RemoveProject : IProject -> unit
+    abstract member ProjectUpdated: ISignal<IProjectMark>
+    abstract member RemoveProject: IProject -> unit
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
