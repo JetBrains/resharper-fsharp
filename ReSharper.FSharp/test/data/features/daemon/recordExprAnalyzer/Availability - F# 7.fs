@@ -1,0 +1,7 @@
+type Record1 = { Foo: int }
+
+module Module =
+type Record2 = { Foo: Record1 }
+let item: Record2 = null
+
+ignore { item with Foo = { item.Foo with Foo = 3 } }

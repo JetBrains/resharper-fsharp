@@ -41,6 +41,7 @@
     <Compile Include="src\Daemon\IfExpressionAnalyzerTest.fs" />
     <Compile Include="src\Daemon\RegexpHighlightingTest.fs" />
     <Compile Include="src\Daemon\XmlDocSyntaxHighlightingTest.fs" />
+    <Compile Include="src\Daemon\RecordExprAnalyzerTest.fs" />
     <Compile Include="src\Intentions\IntentionsTestBase.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="src\Intentions\ToMultilineRecordTest.fs" />
@@ -125,6 +126,7 @@
     <Compile Include="src\QuickFixes\RemovePatternArgumentFixTest.fs" />
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
+    <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
 
