@@ -642,6 +642,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let aprExpr = PrefixAppExprNavigator.GetByArgumentExpression(expr)
         if isNotNull aprExpr then not aprExpr.IsHighPrecedence else
+
         not (isPartOfDotLambda expr)
 
 type FSharpIntroduceVarHelper() =
