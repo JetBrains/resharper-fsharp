@@ -1,8 +1,8 @@
-Version to run: (Bundled, 6.0.5)
+Version to run: (Bundled, 6.2.2)
 
-AutoDetected: Version = (Bundled, 6.0.5), Status = Ok
+AutoDetected: Version = (Bundled, 6.2.2), Status = Ok
 LocalDotnetTool: Version = (LocalDotnetTool, ), Status = SelectedButNotFound
-Bundled: Version = (Bundled, 6.0.5), Status = Ok
+Bundled: Version = (Bundled, 6.2.2), Status = Ok
 
 Notifications:
 

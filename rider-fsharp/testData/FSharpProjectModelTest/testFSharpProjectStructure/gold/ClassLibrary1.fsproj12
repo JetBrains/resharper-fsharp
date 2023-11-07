@@ -7,10 +7,10 @@
     <PackageReference Include="FSharp.Core" Version="5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="File2.fs" />
     <Compile Include="Folder\File3.fs" />
     <Compile Include="Foo.fs" />
-    <Folder Include="EmptyFolder" />
+    <Folder Include="EmptyFolder\" />
+    <Compile Include="File2.fs" />
     <Compile Include="Folder\File4.fs" />
     <Compile Include="Folder\Sub\File1.fs" />
     <Compile Include="Folder\Sub\Class1.fs" />

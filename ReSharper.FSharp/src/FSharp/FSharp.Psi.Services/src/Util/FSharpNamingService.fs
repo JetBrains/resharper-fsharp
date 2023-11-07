@@ -577,11 +577,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         NameRoot.FromWords(root.Emphasis, false, value)
 
     override x.GetNamedElementKind(element) =
-        let field = element.As<IField>()
-        if isNotNull field && field.IsConstant then base.GetNamedElementKind(element) else
-
-        let declarations = element.GetDeclarations()
-        if declarations |> Seq.exists (fun decl -> decl :? IFSharpPattern) then
-            NamedElementKinds.Locals
-        else
-            base.GetNamedElementKind(element)
+        match element with
+        | :? IField as field when field.IsConstant -> base.GetNamedElementKind(element)
+        | :? IFSharpPatternDeclaredElement -> NamedElementKinds.Locals
+        | _ -> base.GetNamedElementKind(element)
