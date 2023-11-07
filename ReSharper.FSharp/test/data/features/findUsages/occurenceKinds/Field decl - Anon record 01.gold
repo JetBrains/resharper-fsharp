@@ -1,10 +1,24 @@
-﻿Field declaration, Read access
+﻿Other
 ---
-UsageRead TO: [R] type R = {| |F|: int |} RANGE: (27,28) @ Field decl - Anon record 01.fs
+UsageOther TO: [O] let |r|: {| F: int |} = RANGE: (19,20) @ Field decl - Anon record 01.fs
+UsageOther TO: [O] r.|F| RANGE: (56,57) @ Field decl - Anon record 01.fs
+UsageOther TO: [O] |r|.F RANGE: (54,55) @ Field decl - Anon record 01.fs
 
 
 Field declaration
 ---
-UsageFieldTypeDeclaration TO: [O] type R = {| F: |int| |} RANGE: (30,33) @ Field decl - Anon record 01.fs
+UsageFieldTypeDeclaration TO: [O] let r: {| |F|: int |} = RANGE: (25,26) @ Field decl - Anon record 01.fs
+UsageFieldTypeDeclaration TO: [O] let r: {| F: |int| |} = RANGE: (28,31) @ Field decl - Anon record 01.fs
+
+
+Write access
+---
+UsageWrite TO: [W] {| |F| = 1 |} RANGE: (44,45) @ Field decl - Anon record 01.fs
+
+
+Read access
+---
+UsageRead TO: [R] r.|F| RANGE: (56,57) @ Field decl - Anon record 01.fs
+UsageRead TO: [R] |r|.F RANGE: (54,55) @ Field decl - Anon record 01.fs
 
 
