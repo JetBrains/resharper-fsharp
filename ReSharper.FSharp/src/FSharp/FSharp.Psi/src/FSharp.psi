@@ -399,7 +399,8 @@ interface fSharpExpression:
   forLikeExpr |
   rangeLikeExpr |
   computationExpr |
-  lambdaLikeExpr |
+  lambdaExpr |
+  dotLambdaExpr |
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
@@ -422,10 +423,6 @@ interface fSharpExpression:
   interpolatedStringExpr |
   libraryOnlyExpr |
   fromErrorExpr;
-
-interface lambdaLikeExpr:
-  lambdaExpr |
-  dotLambdaExpr;
 
 interface rangeLikeExpr:
   beginningSliceExpr |
@@ -752,10 +749,10 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   fSharpExpression<EXPR, Expression>;
 
 dotLambdaExpr options { stubBase="FSharpExpressionBase"; }:
-  wildPat<UNDERSCORE, Underscore>
-  DOT
+  shorthandId<SHORTHAND, Shorthand>
+  DOT<FSHARP_DELIMITER, Delimiter>
   fSharpExpression<EXPR, Expression>;
-  
+
 lambdaParametersList:
   fSharpPattern<PAT, Patterns>*;
 
@@ -1334,7 +1331,8 @@ primaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase"; }
 
 interface selfId:
   ctorSelfId |
-  memberSelfId;
+  memberSelfId |
+  shorthandId;
 
 interface memberSelfId:
   namedSelfId |
@@ -1348,6 +1346,9 @@ namedSelfId options { stubBase="LocalDeclarationBase"; }:
   identifier<IDENTIFIER, Identifier>;  
 
 wildSelfId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
+
+shorthandId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
 constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {

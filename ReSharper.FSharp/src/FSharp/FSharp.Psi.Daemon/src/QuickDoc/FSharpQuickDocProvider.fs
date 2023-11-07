@@ -8,10 +8,12 @@ open JetBrains.ReSharper.Daemon
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
 
@@ -122,6 +124,10 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
                 let activePatternCaseName = ActivePatternCaseNameNavigator.GetByIdentifier(node)
                 let activePatternId = ActivePatternIdNavigator.GetByCase(activePatternCaseName)
                 if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
+            | node when node.GetTokenType() == FSharpTokenType.UNDERSCORE ->
+                match node.Parent with
+                | :? IShorthandId as shorthand -> Some shorthand
+                | _ -> None
             | _ -> None
         )
         |> Seq.tryExactlyOne
