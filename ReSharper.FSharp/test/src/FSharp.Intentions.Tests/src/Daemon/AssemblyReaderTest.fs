@@ -70,13 +70,47 @@ type TestModulePathProvider(shim: TestAssemblyReaderShim) =
 
     interface IHideImplementation<ModulePathProvider>
 
-[<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.AssemblyReaderShim)>]
-type AssemblyReaderTest() =
-    inherit TestWithTwoProjectsBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)
+[<AbstractClass; FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.AssemblyReaderShim)>]
+type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: string) =
+    inherit TestWithTwoProjectsBase(mainFileExtension, secondFileExtension)
 
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
      // todo: test InternalsVisibleTo
+
+    override this.DoTest(project: IProject, _: IProject) =
+        let solution = this.Solution
+        let manager = HighlightingSettingsManager.Instance
+
+        solution.GetPsiServices().Files.CommitAllDocuments()
+
+        this.ExecuteWithGold(fun writer ->
+            let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
+            let sourceFile = projectFile.ToSourceFiles().Single()
+
+            let stages =
+                DaemonStageManager.GetInstance(solution).Stages
+                |> Seq.filter (fun stage -> stage :? TypeCheckErrorsStage)
+                |> List.ofSeq
+
+            let daemon = TestHighlightingDumper(sourceFile, writer, stages, fun highlighting sourceFile settingsStore ->
+                let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
+                severity = Severity.WARNING || severity = Severity.ERROR)
+
+            daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
+            daemon.Dump()) |> ignore
+
+    override this.DoTest(lifetime: Lifetime, project: IProject) =
+        let path = this.SecondProject.Location / (this.SecondProjectName + ".dll")
+        let psiModule = this.SecondProject.GetPsiModules().SingleItem().NotNull()
+        use cookie = this.Solution.GetComponent<TestAssemblyReaderShim>().CreateProjectCookie(path, psiModule)
+
+        base.DoTest(lifetime, project)
+
+type AssemblyReaderCSharpTest() =
+    inherit AssemblyReaderTestBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)
+
+    override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
     [<Test>] member x.``Attribute - Attribute usage 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute - Attribute usage 02``() = x.DoNamedTest()
@@ -138,31 +172,8 @@ type AssemblyReaderTest() =
 
     [<Test>] member x.``Type parameter 01``() = x.DoNamedTest()
 
-    override this.DoTest(project: IProject, _: IProject) =
-        let solution = this.Solution
-        let manager = HighlightingSettingsManager.Instance
 
-        solution.GetPsiServices().Files.CommitAllDocuments()
+type AssemblyReaderVbTest() =
+    inherit AssemblyReaderTestBase(FSharpProjectFileType.FsExtension, VBProjectFileType.VB_EXTENSION)
 
-        this.ExecuteWithGold(fun writer ->
-            let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
-            let sourceFile = projectFile.ToSourceFiles().Single()
-
-            let stages =
-                DaemonStageManager.GetInstance(solution).Stages
-                |> Seq.filter (fun stage -> stage :? TypeCheckErrorsStage)
-                |> List.ofSeq
-
-            let daemon = TestHighlightingDumper(sourceFile, writer, stages, fun highlighting sourceFile settingsStore ->
-                let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
-                severity = Severity.WARNING || severity = Severity.ERROR)
-
-            daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
-            daemon.Dump()) |> ignore
-
-    override this.DoTest(lifetime: Lifetime, project: IProject) =
-        let path = this.SecondProject.Location / (this.SecondProjectName + ".dll")
-        let psiModule = this.SecondProject.GetPsiModules().SingleItem().NotNull()
-        use cookie = this.Solution.GetComponent<TestAssemblyReaderShim>().CreateProjectCookie(path, psiModule)
-
-        base.DoTest(lifetime, project)
+    [<Test>] member x.``Property - Explicit impl 02 - Vb``() = x.DoNamedTest()

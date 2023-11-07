@@ -904,18 +904,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         result
 
-
-    let isExplicitImpl (typeMember: ITypeMember) =
-        let overridableMember = typeMember.As<IOverridableMember>()
-        isNotNull overridableMember && overridableMember.IsExplicitImplementation
-
     let getSignature (parametersOwner: IParametersOwner) =
         parametersOwner.GetSignature(parametersOwner.IdSubstitution)
 
     let mkMethods (typeElement: ITypeElement) =
         let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
         [| for method in typeElement.GetMembers().OfType<IFunction>() do
-            if not (isExplicitImpl method) && seenMethods.Add(getSignature method) then
+            if seenMethods.Add(getSignature method) then
                 yield mkMethodDef method |]
 
     let mkFields (typeElement: ITypeElement) =
@@ -938,7 +933,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkProperties (typeElement: ITypeElement) =
         let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
         [ for property in typeElement.Properties do
-            if not (isExplicitImpl property) && seenProperties.Add(getSignature property) then
+            if seenProperties.Add(getSignature property) then
                 yield mkPropertyDef property ]
 
     let mkEvents (typeElement: ITypeElement) =

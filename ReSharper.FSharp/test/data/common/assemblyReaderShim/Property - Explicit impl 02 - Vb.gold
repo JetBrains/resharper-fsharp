@@ -1,0 +1,12 @@
+﻿module Module
+
+let t = MyType()
+
+let _: string = t.P1
+let _: string = t.P2
+let _: string = t.|P3|(0)
+
+let _: string = (t :> I).P
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
