@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpExpression
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
-import com.jetbrains.rider.plugins.appender.database.common.ClrLanguageConcatenationToInjectorAdapter
+import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageConcatenationToInjectorAdapter
 
 class FSharpConcatenationToInjectorAdapter(project: Project) :
   ClrLanguageConcatenationToInjectorAdapter(project, FSharpTokenType.PLUS) {
