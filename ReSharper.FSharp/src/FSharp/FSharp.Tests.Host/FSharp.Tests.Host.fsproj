@@ -12,7 +12,6 @@
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</AssemblyName>
-    <JetTestProject>true</JetTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,8 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
-    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+    <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +40,6 @@
   </ItemGroup>
 
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
-  <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
 
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
