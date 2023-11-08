@@ -175,6 +175,8 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Union - Field 02 - Single case``() = x.DoNamedTest()
     [<Test>] member x.``Union - Field 03 - Struct``() = x.DoNamedTest()
 
+    [<Test>] member x.``Dot lambda 01``() = x.DoNamedTest()
+
 
 type FSharpGoToTypeTest() =
     inherit FSharpContextSearchTestBase("type")

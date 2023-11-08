@@ -256,3 +256,5 @@ type FSharpRenameTest() =
     [<Test>] member x.``Sig - Union 03 - Struct``() = x.DoNamedTestFsiFsProgram()
 
     [<Test>] member x.``Not allowed - Dot lambda - Shorthand``() = x.DoNamedTest()
+
+    [<Test>] member x.``Dot lambda 01 - Property``() = x.DoNamedTest()

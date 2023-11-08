@@ -1,0 +1,6 @@
+﻿module Module
+
+type A() =
+    member x.zzz = 3
+
+A() |> _.zzz
