@@ -40,39 +40,39 @@ ignore { item with Foo = { item.Foo with Unresolved = 3 } }
 ignore { item with Unresolved = { item.Unresolved with Unresolved = 3 } }
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Nested with can be simplified
-(1):<secondary> ReSharper Dead Code: Nested with can be simplified
-(2):<secondary> ReSharper Dead Code: Nested with can be simplified
-(3): ReSharper Dead Code: Nested with can be simplified
-(4):<secondary> ReSharper Dead Code: Nested with can be simplified
-(5):<secondary> ReSharper Dead Code: Nested with can be simplified
-(6): ReSharper Dead Code: Nested with can be simplified
-(7):<secondary> ReSharper Dead Code: Nested with can be simplified
-(8):<secondary> ReSharper Dead Code: Nested with can be simplified
-(9): ReSharper Dead Code: Nested with can be simplified
-(10):<secondary> ReSharper Dead Code: Nested with can be simplified
-(11):<secondary> ReSharper Dead Code: Nested with can be simplified
-(12): ReSharper Dead Code: Nested with can be simplified
-(13):<secondary> ReSharper Dead Code: Nested with can be simplified
-(14):<secondary> ReSharper Dead Code: Nested with can be simplified
-(15): ReSharper Dead Code: Nested with can be simplified
-(16):<secondary> ReSharper Dead Code: Nested with can be simplified
-(17):<secondary> ReSharper Dead Code: Nested with can be simplified
-(18): ReSharper Dead Code: Nested with can be simplified
-(19):<secondary> ReSharper Dead Code: Nested with can be simplified
-(20):<secondary> ReSharper Dead Code: Nested with can be simplified
-(21): ReSharper Dead Code: Nested with can be simplified
-(22):<secondary> ReSharper Dead Code: Nested with can be simplified
-(23):<secondary> ReSharper Dead Code: Nested with can be simplified
-(24): ReSharper Dead Code: Nested with can be simplified
-(25):<secondary> ReSharper Dead Code: Nested with can be simplified
-(26):<secondary> ReSharper Dead Code: Nested with can be simplified
-(27): ReSharper Dead Code: Nested with can be simplified
-(28):<secondary> ReSharper Dead Code: Nested with can be simplified
-(29):<secondary> ReSharper Dead Code: Nested with can be simplified
-(30): ReSharper Dead Code: Nested with can be simplified
-(31):<secondary> ReSharper Dead Code: Nested with can be simplified
-(32):<secondary> ReSharper Dead Code: Nested with can be simplified
-(33): ReSharper Dead Code: Nested with can be simplified
-(34):<secondary> ReSharper Dead Code: Nested with can be simplified
-(35):<secondary> ReSharper Dead Code: Nested with can be simplified
+(0): ReSharper Dead Code: Nested record update can be simplified
+(1):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(2):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(3): ReSharper Dead Code: Nested record update can be simplified
+(4):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(5):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(6): ReSharper Dead Code: Nested record update can be simplified
+(7):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(8):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(9): ReSharper Dead Code: Nested record update can be simplified
+(10):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(11):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(12): ReSharper Dead Code: Nested record update can be simplified
+(13):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(14):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(15): ReSharper Dead Code: Nested record update can be simplified
+(16):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(17):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(18): ReSharper Dead Code: Nested record update can be simplified
+(19):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(20):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(21): ReSharper Dead Code: Nested record update can be simplified
+(22):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(23):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(24): ReSharper Dead Code: Nested record update can be simplified
+(25):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(26):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(27): ReSharper Dead Code: Nested record update can be simplified
+(28):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(29):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(30): ReSharper Dead Code: Nested record update can be simplified
+(31):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(32):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(33): ReSharper Dead Code: Nested record update can be simplified
+(34):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(35):<secondary> ReSharper Dead Code: Nested record update can be simplified

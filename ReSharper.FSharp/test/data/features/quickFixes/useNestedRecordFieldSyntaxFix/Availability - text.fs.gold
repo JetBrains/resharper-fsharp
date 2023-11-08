@@ -9,19 +9,19 @@ module Module = type Record2 = { Foo: Record1; Bar: Record1 }
 let f item = { item with Module.Record2.Foo.Zoo |=|(0) |{|(1) item.Foo.Zoo with Foo = 3 |}|(2) }
 
 ------------------------------------------------
-0: Nested with can be simplified
+0: Nested record update can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
 --Use nested record field update in file
 --Use nested record field update in project
 --Use nested record field update in solution
-1: Nested with can be simplified
+1: Nested record update can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
 --Use nested record field update in file
 --Use nested record field update in project
 --Use nested record field update in solution
-2: Nested with can be simplified
+2: Nested record update can be simplified
 QUICKFIXES:
 Replace with 'Module.Record2.Foo.Zoo.Foo = ...'
 --Use nested record field update in file

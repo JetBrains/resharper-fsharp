@@ -7,9 +7,9 @@ let f item =
     { item with Foo2 |=|(0) |{|(1) item.Foo2 with Foo1A = { item.Foo2.Foo1B with Foo0 |=|(2) |{|(3) item.Foo2.Foo1B.Foo0 with Foo = 3 |}|(4) } |}|(5) }
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Nested with can be simplified
-(1):<secondary> ReSharper Dead Code: Nested with can be simplified
-(2): ReSharper Dead Code: Nested with can be simplified
-(3):<secondary> ReSharper Dead Code: Nested with can be simplified
-(4):<secondary> ReSharper Dead Code: Nested with can be simplified
-(5):<secondary> ReSharper Dead Code: Nested with can be simplified
+(0): ReSharper Dead Code: Nested record update can be simplified
+(1):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(2): ReSharper Dead Code: Nested record update can be simplified
+(3):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(4):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(5):<secondary> ReSharper Dead Code: Nested record update can be simplified
