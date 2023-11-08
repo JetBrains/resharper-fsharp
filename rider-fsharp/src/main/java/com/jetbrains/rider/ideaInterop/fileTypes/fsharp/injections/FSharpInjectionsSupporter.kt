@@ -4,7 +4,7 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.patterns.ClrLanguagePatterns
-import com.jetbrains.rider.plugins.appender.database.common.ClrLanguageInjectionSupport
+import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageInjectionSupport
 
 object FSharpPatterns : ClrLanguagePatterns(FSharpTokenType.PLUS){
     @JvmStatic
