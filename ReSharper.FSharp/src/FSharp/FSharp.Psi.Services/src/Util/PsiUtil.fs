@@ -409,18 +409,21 @@ let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode and 'T: not st
 let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
     skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
-let rec isPartOfDotLambda (expr: IFSharpExpression) =
-    let exprSkipParens = expr.IgnoreParentParens()
-    // _.M( <caret> )
-    if isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(exprSkipParens)) &&
-       not (expr :? IParenExpr) &&
-       not (expr :? IUnitExpr) then false
-    // _.[ <caret> ]
-    elif isNotNull (ListExprNavigator.GetByExpression(exprSkipParens)) then false else
-    match expr.Parent with
-    | :? IDotLambdaExpr -> true
-    | :? IFSharpExpression as expr -> isPartOfDotLambda expr
-    | _ -> false
+let rec getQualifiedExprIgnoreParens (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr.IgnoreParentParens()) with
+    | null -> expr.IgnoreParentParens()
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let rec getQualifiedExpr (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr) with
+    | null -> expr
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let isDirectPartOfDotLambda (expr: IFSharpExpression) =
+    let prefixApp = PrefixAppExprNavigator.GetByExpression(expr)
+    let expr = if isNull prefixApp then expr else prefixApp
+    let qualifiedExpr = getQualifiedExpr expr
+    isNotNull (DotLambdaExprNavigator.GetByExpression(qualifiedExpr))
 
 
 [<Language(typeof<FSharpLanguage>)>]
