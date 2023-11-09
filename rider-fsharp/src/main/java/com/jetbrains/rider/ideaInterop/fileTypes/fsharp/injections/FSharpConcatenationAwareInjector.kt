@@ -8,7 +8,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedSt
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
-import com.jetbrains.rider.plugins.appender.database.common.ClrLanguageConcatenationAwareInjector
+import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageConcatenationAwareInjector
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
 
 class FSharpConcatenationAwareInjector :
