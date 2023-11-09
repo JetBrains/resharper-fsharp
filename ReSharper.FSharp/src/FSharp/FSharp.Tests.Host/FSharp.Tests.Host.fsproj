@@ -17,7 +17,6 @@
   <ItemGroup>
     <Compile Include="ReadLockCookieUtil.fs" />
     <Compile Include="FSharpTestHost.fs" />
-    <Compile Include="ZoneMarker.fs" />
   </ItemGroup>
 
   <ItemGroup>
