@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.daemon.util.hasErrors
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -68,6 +69,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     }
   }
 
+  @Mute("RIDER-100683")
   @Test
   fun `provided abbreviation rename`() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
