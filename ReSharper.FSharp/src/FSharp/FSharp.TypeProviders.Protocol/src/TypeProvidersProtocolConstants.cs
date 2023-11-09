@@ -17,6 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     public static string CoreRuntimeConfigFilename =>
       $"tploader.{(PlatformUtil.IsRunningUnderWindows ? "win" : "unix")}.runtimeconfig.json";
 
-    public static readonly FileSystemPath LogFolder => Logger.LogFolderPath / "TypeProvidersHost";
+    public static FileSystemPath LogFolder => Logger.LogFolderPath / "TypeProvidersHost";
   }
 }
