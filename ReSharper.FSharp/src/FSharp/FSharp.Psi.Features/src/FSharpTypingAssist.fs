@@ -30,11 +30,8 @@ open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-        externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
-        manager: ITypingAssistManager) as this =
-    inherit TypingAssistLanguageBase<FSharpLanguage>(solution, settingsStore, cachingLexerService, commandProcessor,
-        psiServices, externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
+type FSharpTypingAssist(lifetime, dependencies) as this =
+    inherit TypingAssistLanguageBase<FSharpLanguage>(dependencies)
 
     static let nodeTypeSet (tokenTypes: NodeType[]) =
         NodeTypeSet(tokenTypes)
@@ -547,7 +544,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let lineStartOffset = document.GetLineStartOffset(caretLine)
 
         let indent =
-            match getLineIndent cachingLexerService textControl caretLine with
+            match getLineIndent dependencies.CachingLexerService textControl caretLine with
             | Some lineIndent -> lineIndent.Indent
             | _ -> 0
 
@@ -561,6 +558,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailable2)
         let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
         let isSmartParensHandlerAvailable = Predicate<_>(this.IsTypingSmartParenthesisHandlerAvailable2)
+        let manager = dependencies.TypingAssistManager
 
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, EditorStartNewLineBeforeAction.ACTION_ID, this, Func<_,_>(handleStartNewLineBeforePressed), isActionHandlerAvailable)
@@ -606,7 +604,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if lexer.TokenType != FSharpTokenType.NEW_LINE then false else
 
         let currentIndent = if seenComment then 0 else int caretCoords.Column
-        match tryGetNestedIndentBelow cachingLexerService textControl caretLine seenComment currentIndent with
+        match tryGetNestedIndentBelow dependencies.CachingLexerService textControl caretLine seenComment currentIndent with
         | None -> false
         | Some (_, (Source indent | Comments indent)) ->
             insertNewLineAt textControl indent TrimTrailingSpaces.No
@@ -685,7 +683,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
                 not (isLastTokenOnLine lexer) && isFirstTokenOnLine lexer then false else
 
         let caretLine = document.GetCoordsByOffset(offset).Line
-        match tryGetNestedIndentBelowLine cachingLexerService textControl line with
+        match tryGetNestedIndentBelowLine dependencies.CachingLexerService textControl line with
         | Some (nestedIndentLine, (Source indent | Comments indent)) ->
             if nestedIndentLine = caretLine then false else
 
@@ -701,7 +699,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             lexer.FindTokenAt(offset - 1) |> ignore
             
             let defaultIndent = getIndentSize textControl
-            match getLineIndent cachingLexerService textControl caretLine with
+            match getLineIndent dependencies.CachingLexerService textControl caretLine with
             | Some(Comments n) -> n
             | _ ->
 
@@ -836,7 +834,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
             if lexer.TokenType != FSharpTokenType.RARROW then null else
             let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
             if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.MultiLineLambdaClosingNewline) then
-                getLambdaExprFromRarrow lexer.TokenStart textControl solution else null
+                getLambdaExprFromRarrow lexer.TokenStart textControl dependencies.Solution else null
 
         let tokenType, leftBracketStartOffset, leftBracketEndOffset =
             if isNotNull lambdaExpr && isNotNull lambdaExpr.Expression then
@@ -923,7 +921,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         if tokenType != FSharpTokenType.RARROW || nextTokenType != FSharpTokenType.RPAREN then false else
 
-        let lambdaExpr = getLambdaExprFromRarrow lexer.TokenStart textControl solution
+        let lambdaExpr = getLambdaExprFromRarrow lexer.TokenStart textControl dependencies.Solution
         if isNull lambdaExpr then false else
 
         lexer.Advance()
@@ -939,7 +937,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
 
         let defaultIndent = getIndentSize textControl
         let line = getContinuedIndentLine textControl leftBracketStartOffset LeadingParenContinuesLine.No
-        match getLineIndent cachingLexerService textControl line with
+        match getLineIndent dependencies.CachingLexerService textControl line with
         | None -> false
         | Some indent ->
 
@@ -1677,7 +1675,7 @@ type FSharpTypingAssist(lifetime, solution, settingsStore, cachingLexerService, 
         if startOffset > 0 && buffer[startOffset - 1] = ';' then
             let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
             if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
-                let fsFile = textControl.GetFSharpFile(solution)
+                let fsFile = textControl.GetFSharpFile(dependencies.Solution)
                 let token = fsFile.FindTokenAt(DocumentOffset(document, startOffset - 1))
                 if isNull token || getTokenType token <> FSharpTokenType.SEMICOLON then () else
 
