@@ -286,7 +286,7 @@ tasks {
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
     if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-      val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
+      val testHostPath = "$resharperPluginPath/src/FSharp/FSharp.Tests.Host/$outputRelativePath"
       val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
       files = files + listOf("$testHostName.dll", "$testHostName.pdb")
     }
