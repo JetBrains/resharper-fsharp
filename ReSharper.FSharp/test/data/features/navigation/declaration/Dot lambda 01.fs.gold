@@ -1,0 +1,14 @@
+﻿## GotoDeclarationProvider activity:
+  Immediate result:
+    TO: [O] member x.|Prop| = 3 RANGE: (42,46) @ Dot lambda 01.fs
+    Navigation result:
+      opened file: Dot lambda 01.fs
+      ------------------
+
+      type A() =
+          member x.|CARET|Prop = 3
+
+      A() |> _.Prop
+      ------------------
+
+

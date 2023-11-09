@@ -166,3 +166,18 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Not allowed - NewExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - NewExpr 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not allowed - Dot lambda - Shorthand``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - Prefix``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - Expr part 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - Expr part 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - Parens arg``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - Arg in parens``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - List indexer 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Dot lambda - List indexer 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Dot lambda - Whole``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - Prefix arg 01``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - Prefix arg 02``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - List indexer 01``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - List indexer 02``() = x.DoNamedTest()

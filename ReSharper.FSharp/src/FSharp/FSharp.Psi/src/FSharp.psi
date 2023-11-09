@@ -400,6 +400,7 @@ interface fSharpExpression:
   rangeLikeExpr |
   computationExpr |
   lambdaExpr |
+  dotLambdaExpr |
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
@@ -746,7 +747,12 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
-  
+
+dotLambdaExpr options { stubBase="FSharpExpressionBase"; }:
+  dotLambdaId<SHORTHAND, Shorthand>
+  DOT<FSHARP_DELIMITER, Delimiter>
+  fSharpExpression<EXPR, Expression>;
+
 lambdaParametersList:
   fSharpPattern<PAT, Patterns>*;
 
@@ -1573,12 +1579,16 @@ activePatternId:
   )+
   RPAREN<RPAREN, RParen>;
 
+dotLambdaId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
+
 typeParameterId:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
   activePatternId |
+  dotLambdaId |
   ampAmp |
   colonColon |
   equals |

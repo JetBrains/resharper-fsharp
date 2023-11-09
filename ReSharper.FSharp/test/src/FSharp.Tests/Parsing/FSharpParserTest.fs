@@ -258,6 +258,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - CompExpr - For 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - WhileBang 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Dot Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 05``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 03 - Tuple``() = x.DoNamedTest()
@@ -824,6 +830,7 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Expr - Lambda 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Interpolated string - Unfinished 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string - Unfinished 02``() = x.DoNamedTest()
