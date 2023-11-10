@@ -259,6 +259,10 @@ let escapesAppAtNamedArgPosition (parenExpr: IParenExpr) =
         FSharpMethodInvocationUtil.isTopLevelArg parenExpr
     | _ -> false
 
+let escapesEnumFieldLiteral (parenExpr: IParenExpr) =
+    isNotNull (EnumCaseDeclarationNavigator.GetByExpression(parenExpr)) &&
+    not (parenExpr.InnerExpression :? ILiteralExpr)
+
 let literalsRequiringParens =
     NodeTypeSet(FSharpTokenType.INT32, FSharpTokenType.IEEE32, FSharpTokenType.IEEE64)
 

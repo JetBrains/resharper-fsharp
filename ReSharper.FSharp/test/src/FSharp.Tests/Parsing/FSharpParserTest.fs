@@ -105,6 +105,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Enum 03 - Case attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 04 - Private repr``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 05``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 06 - Complex expr``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Interface 02 - Static member``() = x.DoNamedTest()
