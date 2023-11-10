@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open System
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -47,6 +48,8 @@ type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract HasDirtyModules: bool
     abstract Logger: ILogger
+
+    abstract ProjectInvalidated: ISignal<FcsProjectKey>
 
     abstract TryGetModuleReader: projectKey: FcsProjectKey -> IProjectFcsModuleReader option
 

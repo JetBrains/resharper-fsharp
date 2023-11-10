@@ -32,6 +32,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -87,7 +88,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let outputPathToProjectKey = Dictionary<VirtualFileSystemPath, FcsProjectKey>()
 
     let dirtyProjects = HashSet<IProject>()
-    let fcsProjectInvalidated = new Signal<IPsiModule * FcsProject>("FcsProjectInvalidated")
+    let fcsProjectInvalidated = new Signal<FcsProjectKey * FcsProject>("FcsProjectInvalidated")
 
     do
         // todo: schedule listening after project model is ready; create fcs projects for all projects
@@ -121,6 +122,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             fcsProjects.Remove(projectKey) |> ignore
             outputPathToProjectKey.Remove(fcsProject.OutputPath) |> ignore
             invalidatedFcsProjects.Enqueue(fcsProject, FcsProjectInvalidationType.Remove)
+            fcsProjectInvalidated.Fire((projectKey, fcsProject))
 
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
         let rec loop (newOptions: FSharpProjectOptions) (oldOptions: FSharpProjectOptions) =
@@ -265,6 +267,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     )
                     |> Seq.toArray
 
+                fcsProject.ReferencedModules.AddRange(projectReferences)
+
                 let optionsWithReferences = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
                 let fcsProject = { fcsProject with ProjectOptions = optionsWithReferences }
 
@@ -274,10 +278,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     let tryGetFcsProjectForProjectOrScript (psiModule: IPsiModule): FcsProject option =
         locks.AssertReadAccessAllowed()
-
-        match tryGetFcsProject psiModule with
-        | Some _ as fcsProject -> fcsProject
-        | _ ->
 
         match psiModule with
         | :? FSharpScriptPsiModule as scriptModule ->
@@ -305,7 +305,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             |> Some
 
         | _ ->
-            None
+            tryGetFcsProject psiModule
+
 
     let isScriptLike (file: IPsiSourceFile) =
         not file.Properties.ProvidesCodeModel ||
@@ -414,12 +415,15 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member x.ProcessChange(obj: ChangeEventArgs) =
-        locks.AssertWriteAccessAllowed()
         Assertion.Assert(dirtyProjects.Count = 0)
 
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNotNull change && not change.IsClosingSolution  then
             x.VisitDelta(change)
+
+        if dirtyProjects.Count = 0 then () else
+
+        use cookie = WriteLockCookie.Create()
 
         while dirtyProjects.Count > 0 do
             invalidateDirtyProjects ()
@@ -469,10 +473,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             processInvalidatedFcsProjects ()
 
             let psiModule = sourceFile.PsiModule
-            match tryGetFcsProject psiModule with
-            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
-            | _ ->
-
             match psiModule with
             | :? FSharpScriptPsiModule ->
                 scriptFcsProjectProvider.GetScriptOptions(sourceFile)
@@ -484,7 +484,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 scriptFcsProjectProvider.GetScriptOptions(sourceFile)
 
             | _ ->
-                None
+
+            match tryGetFcsProject psiModule with
+            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
+            | _ -> None
 
         member x.GetProjectOptions(psiModule: IPsiModule) =
             locks.AssertReadAccessAllowed()
@@ -531,7 +534,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             |> Option.map (fun project -> project.GetIndex(sourceFile))
             |> Option.defaultValue -1
 
-        member x.ModuleInvalidated = x.FcsProjectInvalidated :> _
+        member x.ProjectRemoved = x.FcsProjectInvalidated :> _
 
         member x.InvalidateReferencesToProject(project: IProject) =
             project.TargetFrameworkIds
@@ -573,6 +576,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member this.PrepareAssemblyShim(psiModule) =
             locks.AssertReadAccessAllowed()
 
+            if psiModule :? FSharpScriptPsiModule then () else
             if not fcsAssemblyReaderShim.IsEnabled then () else
 
             FSharpAsyncUtil.ProcessEnqueuedReadRequests()

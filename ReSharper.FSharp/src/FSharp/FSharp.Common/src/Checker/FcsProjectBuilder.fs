@@ -226,8 +226,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               ImplementationFilesWithSignatures = implsWithSig
               ReferencedModules = HashSet() }
         
-        fcsProject.ReferencedModules.AddRange(Seq.empty) // todo
-
         let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
         let paths =
             references

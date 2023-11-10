@@ -135,7 +135,7 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
     inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
-        x.PsiModulesCaches.Clear()
+        x.ProjectSymbolsCaches.Clear()
 
     interface IHideImplementation<FcsResolvedSymbolsCache>
 
@@ -257,7 +257,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             | true, index -> index
             | _ -> -1
 
-        member x.ModuleInvalidated = new Signal<_>("Todo") :> _
+        member x.ProjectRemoved = new Signal<_>("Todo") :> _
 
         member x.InvalidateReferencesToProject _ = false
         member x.HasFcsProjects = false
