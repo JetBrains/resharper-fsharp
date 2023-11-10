@@ -12,7 +12,7 @@
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.8.20231120.123" />
     <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.8.20231120.123" />
     <PackageLock Include="JetBrains.RdFramework" Version="2023.3.0" />
-    <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.11.1" />
+    <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.14.1" />
     <PackageLock Include="NVelocity" Version="1.0.3" />
     <PackageLock Include="System.Collections.Immutable" Version="7.0.0" />
     <PackageLock Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
