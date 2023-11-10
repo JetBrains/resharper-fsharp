@@ -107,6 +107,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Enum 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Interface 02 - Static member``() = x.DoNamedTest()
 
     [<Test>] member x.``Type decl - Union - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union - XmlDoc 02 - Multiple cases``() = x.DoNamedTest()

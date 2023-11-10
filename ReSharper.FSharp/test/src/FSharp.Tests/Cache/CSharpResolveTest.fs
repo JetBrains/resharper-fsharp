@@ -27,6 +27,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Exceptions 04 - Protected ctor``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 05 - Augmentation``() = x.DoNamedTest()
 
+    [<Test>] member x.``Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 02 - Static members``() = x.DoNamedTest()
+
     [<Test>] member x.``Unions 01 - Simple generated members``() = x.DoNamedTest()
     [<Test>] member x.``Unions 02 - Singletons``() = x.DoNamedTest()
     [<Test>] member x.``Unions 03 - Nested types``() = x.DoNamedTest()
