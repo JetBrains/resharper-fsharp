@@ -83,7 +83,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     let dirtyTypesInModules = OneToSetMap<IPsiModule, string>()
 
-    let moduleInvalidated = new Signal<FcsProjectKey>("AssemblyReaderShim.ModuleInvalidated")
+    let projectInvalidated = new Signal<FcsProjectKey>("AssemblyReaderShim.ModuleInvalidated")
 
     do
         // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
@@ -161,25 +161,29 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         // todo: better sync with project model
         let projectKey = FcsProjectKey.Create(psiModule)
         for referencingModule in getReferencingModules projectKey do
-            moduleInvalidated.Fire(referencingModule)
+            projectInvalidated.Fire(referencingModule)
 
     // todo: invalidate for per-referencing module
     let markDirtyDependencies () =
         let invalidatedModules = HashSet()
 
-        let visited = HashSet()
-
         let modulesToInvalidate = Stack<FcsProjectKey>(dirtyProjects)
 
-        // for dirtyModule in dirtyTypesInModules.Keys do
-        //     let mutable dirtyModuleReader = Unchecked.defaultof<_>
-        //     if tryGetReaderFromModule dirtyModule &dirtyModuleReader then
-        //         for typeName in dirtyTypesInModules.GetValuesSafe(dirtyModule) do
-        //             dirtyModuleReader.InvalidateTypeDefs(typeName)
-        //
-        //     if invalidatedModules.Add(dirtyModule) then
-        //         modulesToInvalidate.Push(dirtyModule)
-        //         moduleInvalidated.Fire(dirtyModule)
+        for dirtyModule in dirtyTypesInModules.Keys do
+            match dirtyModule.ContainingProjectModule with
+            | :? IProject ->
+                match tryGetReaderFromModule dirtyModule with
+                | None -> ()
+                | Some reader ->
+                    for typeName in dirtyTypesInModules.GetValuesSafe(dirtyModule) do
+                        reader.InvalidateTypeDefs(typeName)
+
+                let projectKey = FcsProjectKey.Create(dirtyModule)
+                if invalidatedModules.Add(projectKey) then
+                    modulesToInvalidate.Push(projectKey)
+                    projectInvalidated.Fire(projectKey)
+
+            | _ -> ()
 
         while modulesToInvalidate.Count > 0 do
             let projectKey = modulesToInvalidate.Pop()
@@ -191,14 +195,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
                 if invalidatedModules.Add(referencingModule) then
                     modulesToInvalidate.Push(referencingModule)
-                    moduleInvalidated.Fire(referencingModule)
+                    projectInvalidated.Fire(referencingModule)
 
         dirtyTypesInModules.Clear()
 
     let markTypePartDirty (typePart: TypePart) =
-        locks.AssertWriteAccessAllowed();
-
         if not (isEnabled ()) then () else
+        if assemblyReadersByModule.Count = 0 then () else
 
         let typeElement = typePart.TypeElement
         let psiModule = typeElement.Module
@@ -224,10 +227,10 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     abstract DebugReadRealAssemblies: bool
     default this.DebugReadRealAssemblies = false
 
-    member val ModuleInvalidated = moduleInvalidated
-
     interface IFcsAssemblyReaderShim with
         member this.IsEnabled = isEnabled ()
+
+        member this.ProjectInvalidated = projectInvalidated
 
         member this.TryGetModuleReader(projectKey: FcsProjectKey) =
             locks.AssertWriteAccessAllowed()
@@ -297,7 +300,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.HasDirtyModules =
             locks.AssertReadAccessAllowed()
 
-            not (dirtyProjects.IsEmpty())
+            not (dirtyProjects.IsEmpty() && dirtyTypesInModules.IsEmpty())
 
         member this.Logger = logger
 
@@ -317,8 +320,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 match change.Type with
                 | PsiModuleChange.ChangeType.Modified
                 | PsiModuleChange.ChangeType.Invalidated ->
-                    let projectKey = FcsProjectKey.Create(change.Item)
-                    dirtyProjects.Add(projectKey) |> ignore
+                    match change.Item.ContainingProjectModule with
+                    | :? IProject ->
+                        let projectKey = FcsProjectKey.Create(change.Item)
+                        dirtyProjects.Add(projectKey) |> ignore
+                    | _ -> ()
 
                 | PsiModuleChange.ChangeType.Removed ->
                     removeModule change.Item

@@ -274,7 +274,7 @@ type IFcsProjectProvider =
     /// Returns True when the project has been invalidated.
     abstract InvalidateReferencesToProject: IProject -> bool
 
-    abstract ModuleInvalidated: ISignal<IPsiModule * FcsProject>
+    abstract ProjectRemoved: ISignal<FcsProjectKey * FcsProject>
 
     abstract PrepareAssemblyShim: psiModule: IPsiModule -> unit 
 
