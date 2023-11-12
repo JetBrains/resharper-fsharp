@@ -3,6 +3,7 @@ using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon;
+using JetBrains.ReSharper.Daemon.Tooltips;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
 using JetBrains.ReSharper.Feature.Services.UI;
@@ -38,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
     public FSharpIdentifierTooltipProvider(Lifetime lifetime, ISolution solution,
       IDeclaredElementDescriptionPresenter presenter, DeclaredElementPresenterTextStylesService textStylesService,
       [CanBeNull] DeclaredElementPresenterTextStyles textStyles = null)
-      : base(lifetime, solution, presenter, textStylesService, textStyles)
+      : base(lifetime, solution, presenter, textStylesService, identifierTooltipSuppressor:null, textStyles: textStyles)
     {
     }
   }

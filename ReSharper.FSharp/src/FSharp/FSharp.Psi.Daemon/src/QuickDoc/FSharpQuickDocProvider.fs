@@ -5,6 +5,7 @@ open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
 open JetBrains.DocumentModel.DataContext
 open JetBrains.ReSharper.Daemon
+open JetBrains.ReSharper.Daemon.Tooltips
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
