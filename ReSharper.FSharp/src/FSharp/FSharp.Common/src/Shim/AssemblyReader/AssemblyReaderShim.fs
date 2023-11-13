@@ -317,14 +317,13 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             if isNull change then null else
 
             for change in change.ModuleChanges do
+                if not (change.Item :? IProjectPsiModule) then () else
+
                 match change.Type with
                 | PsiModuleChange.ChangeType.Modified
                 | PsiModuleChange.ChangeType.Invalidated ->
-                    match change.Item.ContainingProjectModule with
-                    | :? IProject ->
-                        let projectKey = FcsProjectKey.Create(change.Item)
-                        dirtyProjects.Add(projectKey) |> ignore
-                    | _ -> ()
+                    let projectKey = FcsProjectKey.Create(change.Item)
+                    dirtyProjects.Add(projectKey) |> ignore
 
                 | PsiModuleChange.ChangeType.Removed ->
                     removeModule change.Item
