@@ -130,6 +130,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             newOptions.SourceFiles = oldOptions.SourceFiles &&
             newOptions.OtherOptions = oldOptions.OtherOptions &&
 
+            newOptions.ReferencedProjects.Length = oldOptions.ReferencedProjects.Length &&
             (newOptions.ReferencedProjects, oldOptions.ReferencedProjects)
             ||> Array.forall2 (fun r1 r2 ->
                 match r1, r2 with
