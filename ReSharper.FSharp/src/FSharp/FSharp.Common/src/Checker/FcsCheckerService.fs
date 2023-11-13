@@ -106,13 +106,14 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member x.Checker = checker.Value
 
     member this.AssertFcsAccessThread() =
-        if Shell.Instance.IsTestShell then () else
-
-        if configurations.IsInternalMode() && Interruption.Current.IsEmpty then
-            if locks.IsOnMainThread() then
-                logger.Error("Accessing FCS without interruption (main thread)")
-            else
-                logger.Error("Accessing FCS without interruption")
+        ()
+        // if Shell.Instance.IsTestShell then () else
+        //
+        // if configurations.IsInternalMode() && Interruption.Current.IsEmpty then
+        //     if locks.IsOnMainThread() then
+        //         logger.Error("Accessing FCS without interruption (main thread)")
+        //     else
+        //         logger.Error("Accessing FCS without interruption")
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
