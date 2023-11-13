@@ -1,3 +1,5 @@
+* -text
+
 *.fs  linguist-language=fsharp
 *.fsi linguist-language=fsharp
 *.fsx linguist-language=fsharp
