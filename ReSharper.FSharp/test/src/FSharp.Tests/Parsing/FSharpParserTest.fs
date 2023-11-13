@@ -265,6 +265,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Dot Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Dot Lambda 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Dot Lambda 05``() = x.DoNamedTest()
+    // TODO: update gold with new FCS
+    [<Test>] member x.``Expr - Dot Lambda 06 - No parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
