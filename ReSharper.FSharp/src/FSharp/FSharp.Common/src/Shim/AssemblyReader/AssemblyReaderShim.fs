@@ -77,6 +77,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let assemblyReadersByModule = ConcurrentDictionary<IPsiModule, IProjectFcsModuleReader>()
     let assemblyReadersByPath = ConcurrentDictionary<VirtualFileSystemPath, IProjectFcsModuleReader>()
 
+    let projectKeyToPsiModules = ConcurrentDictionary<FcsProjectKey, IPsiModule>()
+
     /// Modules invalidated by symbol cache or are known to read incomplete contents.
     /// Readers need to check up to date before new FCS requests.
     let dirtyProjects = HashSet()
@@ -146,20 +148,23 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         assemblyReadersByModule[psiModule] <- reader
         assemblyReadersByPath[path] <- reader
+        projectKeyToPsiModules[projectKey] <- psiModule
         Some(reader)
 
     let tryGetReaderFromModule (psiModule: IPsiModule) =
         tryGetValue psiModule assemblyReadersByModule
 
     let rec removeModule (psiModule: IPsiModule) =
+        let projectKey = FcsProjectKey.Create(psiModule)
+
         tryGetReaderFromModule psiModule
         |> Option.iter (fun reader ->
             assemblyReadersByPath.TryRemove(reader.Path) |> ignore
             assemblyReadersByModule.TryRemove(psiModule) |> ignore
+            projectKeyToPsiModules.TryRemove(projectKey) |> ignore
         )
 
         // todo: better sync with project model
-        let projectKey = FcsProjectKey.Create(psiModule)
         for referencingModule in getReferencingModules projectKey do
             projectInvalidated.Fire(referencingModule)
 
@@ -188,14 +193,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         while modulesToInvalidate.Count > 0 do
             let projectKey = modulesToInvalidate.Pop()
 
-            for referencingModule in getReferencingModules projectKey do
-                let psiModule = psiModules.GetPrimaryPsiModule(projectKey.Project, projectKey.TargetFrameworkId)
-                tryGetReaderFromModule psiModule
+            for referencingProjectKey in getReferencingModules projectKey do
+                let referencingModule = projectKeyToPsiModules.TryGetValue(referencingProjectKey)
+                if isNull referencingModule then () else
+
+                tryGetReaderFromModule referencingModule
                 |> Option.iter (fun reader -> reader.MarkDirty())
 
-                if invalidatedModules.Add(referencingModule) then
-                    modulesToInvalidate.Push(referencingModule)
-                    projectInvalidated.Fire(referencingModule)
+                if invalidatedModules.Add(referencingProjectKey) then
+                    modulesToInvalidate.Push(referencingProjectKey)
+                    projectInvalidated.Fire(referencingProjectKey)
 
         dirtyTypesInModules.Clear()
 
@@ -267,22 +274,22 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             if referencedModules.Length > 0 then
                 builder.AppendLine("Dependencies to referencing modules:") |> ignore
                 for KeyValue(dependency, referencedModule) in referencedModules do
-                    builder.AppendLine($"  {dependency.Project.Name}") |> ignore
+                    builder.AppendLine($"  {dependency.Project.Name}, IsValid: {dependency.Project.IsValid()}") |> ignore
                     let referencingModules = referencedModule.ReferencingProjects
                     for referencing in referencingModules |> Seq.sortBy (fun projectKey -> projectKey.Project.Name) do
                         builder.AppendLine($"    {referencing.Project.Name}") |> ignore
 
             if dirtyProjects.Count > 0 then
-                builder.AppendLine($"Dirty readers: {dirtyProjects.Count}") |> ignore
+                builder.AppendLine($"Dirty projects: {dirtyProjects.Count}") |> ignore
                 for projectKey in dirtyProjects do
-                    builder.AppendLine($"    {projectKey.Project.Name}") |> ignore
+                    builder.AppendLine($"    {projectKey.Project.Name}, IsValid: {projectKey.Project.IsValid()}") |> ignore
 
-            // if dirtyTypesInModules.Count > 0 then
-            //     builder.AppendLine("Dirty types in readers:") |> ignore
-            //     for psiModule in dirtyTypesInModules.Keys do
-            //         builder.AppendLine($"  {psiModule.DisplayName}") |> ignore
-            //         for typeName in dirtyTypesInModules.GetValuesSafe(psiModule) do
-            //             builder.AppendLine($"    {typeName}") |> ignore
+            if dirtyTypesInModules.Count > 0 then
+                builder.AppendLine("Dirty types in readers:") |> ignore
+                for psiModule in dirtyTypesInModules.Keys do
+                    builder.AppendLine($"  {psiModule.DisplayName}, IsValid: {psiModule.IsValid()}") |> ignore
+                    for typeName in dirtyTypesInModules.GetValuesSafe(psiModule) do
+                        builder.AppendLine($"    {typeName}") |> ignore
 
             // if invalidationsSinceLastTestDump.Count > 0 then
             //     builder.AppendLine("Invalidations since last dump:") |> ignore

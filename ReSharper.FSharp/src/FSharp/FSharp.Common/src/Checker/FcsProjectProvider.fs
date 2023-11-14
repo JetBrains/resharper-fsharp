@@ -108,21 +108,24 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         for referencingModule in getReferencingModules projectKey do
             dirtyProjects.Add(referencingModule.Project) |> ignore
 
-        referencedModules.Remove(projectKey) |> ignore
-        projectsToProjectKeys.Remove(projectKey.Project, projectKey) |> ignore
-
         match tryGetValue projectKey fcsProjects with
         | None -> ()
         | Some fcsProject ->
-            for referencedPsiModule in fcsProject.ReferencedModules do
-                match tryGetValue referencedPsiModule referencedModules with
+            for referencedProjectKey in fcsProject.ReferencedModules do
+                match tryGetValue referencedProjectKey referencedModules with
                 | None -> ()
-                | Some referencedModule -> referencedModule.ReferencingProjects.Remove(referencedPsiModule) |> ignore
+                | Some referencedModule ->
+                    referencedModule.ReferencingProjects.Remove(projectKey) |> ignore
+                    if referencedModule.ReferencingProjects.Count = 0 then
+                        referencedModules.Remove(referencedProjectKey) |> ignore
 
             fcsProjects.Remove(projectKey) |> ignore
             outputPathToProjectKey.Remove(fcsProject.OutputPath) |> ignore
             invalidatedFcsProjects.Enqueue(fcsProject, FcsProjectInvalidationType.Remove)
             fcsProjectInvalidated.Fire((projectKey, fcsProject))
+
+        referencedModules.Remove(projectKey) |> ignore
+        projectsToProjectKeys.Remove(projectKey.Project, projectKey) |> ignore
 
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
         let rec loop (newOptions: FSharpProjectOptions) (oldOptions: FSharpProjectOptions) =
@@ -195,6 +198,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             fcsProject.TestDump(writer)
             logger.Trace($"Adding new project:\n{writer.ToString()}" )
 
+        for referencedProjectKey in getReferencedProjects projectKey do
+            let referencedModule = referencedModules.GetOrCreateValue(referencedProjectKey, ReferencedModule.create)
+            referencedModule.ReferencingProjects.Add(projectKey) |> ignore
+
         fcsProjects[projectKey] <- fcsProject
         outputPathToProjectKey[fcsProject.OutputPath] <- projectKey
         projectsToProjectKeys.Add(projectKey.Project, projectKey) |> ignore
@@ -233,22 +240,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                 let fcsProject = fcsProjectBuilder.BuildFcsProject(projectKey)
 
-                let projectReferences =
-                    moduleReferences
-                    |> Seq.choose (fun reference ->
-                        match reference.ResolveResult(moduleReferencesResolveStore) with
-                        | :? IProject as project ->
-                            let targetFrameworkId = reference.TargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds)
-                            Some(FcsProjectKey.Create(project, targetFrameworkId))
-                        | _ -> None
-                    )
-
-                for referencedProjectKey in projectReferences do
-                    let referencedModule = referencedModules.GetOrCreateValue(referencedProjectKey, ReferencedModule.create)
-                    referencedModule.ReferencingProjects.Add(projectKey) |> ignore
-
                 let referencedFcsProjects = 
-                    projectReferences
+                    moduleReferences
+                    |> Seq.choose tryGetReferencedProject
                     |> Seq.choose (fun referencedProjectKey ->
                         let referencedProject = referencedProjectKey.Project
                         if isFSharpProject referencedProject then
@@ -268,10 +262,13 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     )
                     |> Seq.toArray
 
-                fcsProject.ReferencedModules.AddRange(projectReferences)
+                fcsProject.ReferencedModules.AddRange(moduleReferences |> Seq.choose tryGetReferencedProject)
 
                 let optionsWithReferences = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
                 let fcsProject = { fcsProject with ProjectOptions = optionsWithReferences }
+
+                if projectKey <> initialProjectKey then
+                    addProject projectKey fcsProject |> ignore
 
                 result <- fcsProject
 

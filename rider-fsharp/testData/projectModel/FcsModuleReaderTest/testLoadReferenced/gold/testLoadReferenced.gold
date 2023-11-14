@@ -3,28 +3,19 @@ Init
 
 Readers by module: 1
   CSharpProject, IsValid: True
-Readers by path count: 1
 Dependencies to referencing modules:
-  CSharpProject
+  CSharpProject, IsValid: True
     FSharpProject
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 
 ===================
 2. Unload C# project
 
 Readers by module: 0
-Dependencies to referencing modules:
-  CSharpProject
-    FSharpProject
-Dirty types in readers:
-  CSharpProject
-    CSharpClass
+Dirty projects: 1
+    FSharpProject, IsValid: True
 
 ===================
 3. Open F#
 
 Readers by module: 0
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 
