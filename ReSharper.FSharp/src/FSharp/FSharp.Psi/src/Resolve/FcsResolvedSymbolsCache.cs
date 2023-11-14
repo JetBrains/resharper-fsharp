@@ -20,6 +20,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using JetBrains.Util.Concurrency.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -173,7 +174,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void SyncUpdate(bool underTransaction)
     {
-      using var cookie = WriteLockCookie.Create();
+      using var writeCookie = WriteLockCookie.Create(underTransaction);
+      using var lockCookie = MonitorInterruptibleCookie.EnterOrThrow(mySyncObj);
 
       if (ProjectSymbolsCaches.IsEmpty())
       {
@@ -216,6 +218,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private FcsModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
       myLocks.AssertReadAccessAllowed();
+      SyncUpdate(false);
 
       CheckerService.AssertFcsAccessThread();
 
