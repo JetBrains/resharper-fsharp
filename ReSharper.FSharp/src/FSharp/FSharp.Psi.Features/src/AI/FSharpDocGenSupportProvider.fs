@@ -35,6 +35,15 @@ type FSharpDocGenSupportProvider() =
             let docNode = this.FindDocNode(declaration)
             
             // sometimes there is an empty XmlDocBlock and DocComment right after it
+            //
+            // Example:
+            // type MyType() =
+            //     member _.t = 2
+            //
+            //     /// 
+            //     member _.TestProperty
+            //         with get() = t
+            //
             let actualDocNode =
                 if isNotNull(docNode) && docNode.GetDocumentRange().IsEmpty && docNode.NextSibling :? DocComment
                    then docNode.NextSibling else docNode
@@ -48,9 +57,7 @@ type FSharpDocGenSupportProvider() =
             docRange
         
         member this.FindTarget(node: ITreeNode) =
-            match node with
-            | :? IDeclaration as decl -> decl
-            | _ -> null
+            node.As<IDeclaration>()
         
         member this.GetText(declaration: IDeclaration) =
             declaration.GetText()
@@ -58,14 +65,19 @@ type FSharpDocGenSupportProvider() =
     member this.FindDocNode(declaration: IDeclaration) =
         match declaration with
         | :? IFSharpDeclaration as fsharpDecl -> fsharpDecl.XmlDocBlock
-        | :? ITopBinding as binding ->
-            match binding.FirstChild with
-            | :? XmlDocBlock as docBlock -> docBlock
-            | _ -> null
+        | :? ITopBinding as binding -> binding.FirstChild.As<XmlDocBlock>()
         | _ -> null
     
+    // ITypeExtensionDeclaration range does not include `type` keyword
+    //
+    // Example:
+    // open System
+    //
+    // type String with
+    //     member this.MyExtensionMethod() =
+    //         printfn "hi"
+    //
     member this.TransformNode(declaration: IDeclaration) =
-            match declaration with
-            // ITypeExtensionDeclaration range does not include `type` keyword
-            | :? ITypeExtensionDeclaration as typeExtension -> typeExtension.Parent
-            | _ -> declaration
+        match declaration with
+        | :? ITypeExtensionDeclaration as typeExtension -> typeExtension.Parent
+        | _ -> declaration
