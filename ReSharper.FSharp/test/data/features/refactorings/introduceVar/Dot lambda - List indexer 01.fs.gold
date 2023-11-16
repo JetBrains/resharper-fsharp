@@ -1,0 +1,5 @@
+﻿Suggested names: i
+module Module
+
+let i = 1
+_.[i]

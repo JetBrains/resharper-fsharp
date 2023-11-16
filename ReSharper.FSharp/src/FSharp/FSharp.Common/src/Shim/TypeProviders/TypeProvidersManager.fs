@@ -10,7 +10,6 @@ open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache
@@ -124,9 +123,9 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 | true, provider -> provider.OnInvalidate()
                 | _ -> ()))
 
-        fcsProjectProvider.ModuleInvalidated.Advise(lifetime, fun (psiModule, fcsProject) ->
+        fcsProjectProvider.ProjectRemoved.Advise(lifetime, fun (projectKey, fcsProject) ->
             use lock = lock.Push()
-            let project = getModuleProject psiModule |> notNull
+            let project = projectKey.Project
             projectsWithGenerativeProviders.Remove(project.GetPersistentID()) |> ignore
             disposeTypeProviders fcsProject.OutputPath.FullPath
         )
@@ -143,6 +142,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
             let envPath, projectPsiModule =
                 match resolutionEnvironment.OutputFile with
                 | Some file ->
+                    // todo: module might have been changed after project changes
                     file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
                 | None -> m.FileName, None
 

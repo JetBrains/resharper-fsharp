@@ -2,64 +2,69 @@
 Init
 
 Readers by module: 0
+Dirty projects: 2
+    FSharpProject, IsValid: True
+    CSharpProject, IsValid: True
 
 ===================
 1. Open F# file
 
 Readers by module: 0
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 
 ===================
 2. Add reference
 
-Readers by module: 0
+Readers by module: 1
+  CSharpProject, IsValid: True
+Dependencies to referencing modules:
+  CSharpProject, IsValid: True
+    FSharpProject
+Dirty projects: 1
+    FSharpProject, IsValid: True
 
 ===================
 3. Open F# file
 
 Readers by module: 1
   CSharpProject, IsValid: True
-Readers by path count: 1
 Dependencies to referencing modules:
-  CSharpProject
+  CSharpProject, IsValid: True
     FSharpProject
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 
 ===================
 4. Unload C# project
 
 Readers by module: 0
-Dependencies to referencing modules:
-  CSharpProject
-    FSharpProject
-Dirty types in readers:
-  CSharpProject
-    CSharpClass2
-    CSharpClass
+Dirty projects: 1
+    FSharpProject, IsValid: True
 
 ===================
 5. Open F# file
 
 Readers by module: 0
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 
 ===================
 6. Reload C# project
 
-Readers by module: 0
+Readers by module: 1
+  CSharpProject, IsValid: True
+Dependencies to referencing modules:
+  CSharpProject, IsValid: True
+    FSharpProject
+Dirty projects: 2
+    FSharpProject, IsValid: True
+    CSharpProject, IsValid: True
+Dirty types in readers:
+  CSharpProject, IsValid: True
+    CSharpClass
+    CSharpClass2
 
 ===================
 7. Open F# file
 
 Readers by module: 1
   CSharpProject, IsValid: True
-Readers by path count: 1
 Dependencies to referencing modules:
-  CSharpProject
+  CSharpProject, IsValid: True
     FSharpProject
-Invalidations since last dump:
-  Invalidate all: Assemblies or modules changed
 

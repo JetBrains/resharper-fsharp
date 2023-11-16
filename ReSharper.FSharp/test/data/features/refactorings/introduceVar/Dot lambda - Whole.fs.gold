@@ -1,0 +1,4 @@
+﻿Suggested names: s
+module Module
+
+let s = _.ToString()

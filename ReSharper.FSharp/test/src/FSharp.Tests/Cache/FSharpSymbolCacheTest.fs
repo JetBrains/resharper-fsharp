@@ -43,6 +43,7 @@ type FSharpSymbolCacheTest() =
 
     [<Test>] member x.``Interface 01 - Explicit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 03 - Static member``() = x.DoNamedTest()
 
     [<Test>] member x.``Struct 01 - Explicit``() = x.DoNamedTest()
 

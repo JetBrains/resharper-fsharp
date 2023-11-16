@@ -184,11 +184,6 @@ let rec getLongestBinaryAppParentViaRightArg (context: IFSharpExpression): IFSha
     | null -> context
     | binaryAppExpr -> getLongestBinaryAppParentViaRightArg binaryAppExpr
 
-let rec getQualifiedExpr (expr: IFSharpExpression) =
-    match QualifiedExprNavigator.GetByQualifier(expr.IgnoreParentParens()) with
-    | null -> expr.IgnoreParentParens()
-    | expr -> getQualifiedExpr expr
-
 let rec getFirstQualifier (expr: IQualifiedExpr) =
     match expr.Qualifier with
     | null -> expr :> IFSharpExpression
@@ -263,6 +258,10 @@ let escapesAppAtNamedArgPosition (parenExpr: IParenExpr) =
         FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
         FSharpMethodInvocationUtil.isTopLevelArg parenExpr
     | _ -> false
+
+let escapesEnumFieldLiteral (parenExpr: IParenExpr) =
+    isNotNull (EnumCaseDeclarationNavigator.GetByExpression(parenExpr)) &&
+    not (parenExpr.InnerExpression :? ILiteralExpr)
 
 let literalsRequiringParens =
     NodeTypeSet(FSharpTokenType.INT32, FSharpTokenType.IEEE32, FSharpTokenType.IEEE64)
@@ -371,7 +370,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
         checkPrecedence context expr
 
     | :? IPrefixAppExpr as appExpr ->
-        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExpr context)) ||
+        isNotNull (PrefixAppExprNavigator.GetByArgumentExpression(getQualifiedExprIgnoreParens context)) ||
 
         let isQualifier = isNotNull (QualifiedExprNavigator.GetByQualifier(context))
         isQualifier && isIndexerLikeAppExpr appExpr || 

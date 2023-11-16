@@ -27,6 +27,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Exceptions 04 - Protected ctor``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 05 - Augmentation``() = x.DoNamedTest()
 
+    [<Test>] member x.``Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 02 - Static members``() = x.DoNamedTest()
+
     [<Test>] member x.``Unions 01 - Simple generated members``() = x.DoNamedTest()
     [<Test>] member x.``Unions 02 - Singletons``() = x.DoNamedTest()
     [<Test>] member x.``Unions 03 - Nested types``() = x.DoNamedTest()
@@ -100,6 +103,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 18 - Explicit accessors - Compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Properties 19 - Simple property with getter``() = x.DoNamedTest()
     [<Test>] member x.``Properties 20 - Simple property with accessors``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 21 - static val``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()

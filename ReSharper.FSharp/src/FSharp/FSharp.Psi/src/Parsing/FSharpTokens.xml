@@ -72,6 +72,7 @@
         <Token name="VOID" representation="void" />
         <Token name="WHEN" representation="when" />
         <Token name="WHILE" representation="while" />
+        <Token name="WHILE_BANG" representation="while!" />
         <Token name="WITH" representation="with" />
         <Token name="YIELD" representation="yield" />
         <Token name="YIELD_BANG" representation="yield!" />

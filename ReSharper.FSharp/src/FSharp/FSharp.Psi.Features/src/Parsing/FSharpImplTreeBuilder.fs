@@ -961,7 +961,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-        | SynExpr.While(_, whileExpr, doExpr, _) ->
+        | SynExpr.While(_, whileExpr, doExpr, _)
+        | SynExpr.WhileBang(_, whileExpr, doExpr, _) ->
             x.PushRange(range, ElementType.WHILE_EXPR)
             x.PushExpression(doExpr)
             x.ProcessExpression(whileExpr)
@@ -998,6 +999,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                 for pat in pats do
                     x.ProcessPat(pat, true, false)
             | _ -> ()
+
+        | SynExpr.DotLambda(expr, _, { UnderscoreRange = underscoreRange }) ->
+            x.PushRange(range, ElementType.DOT_LAMBDA_EXPR)
+            x.PushExpression(expr)
+            x.MarkAndDone(underscoreRange, ElementType.DOT_LAMBDA_ID)
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
             x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)

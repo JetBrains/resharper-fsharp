@@ -153,8 +153,7 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
     member val NonFSharpProjectInMemoryReferences =
-        base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
-        with get, set
+        base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value with get, set
 
     member this.UpdateAssemblyReaderSetting() =
         this.NonFSharpProjectInMemoryReferences <-

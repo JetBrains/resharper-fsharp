@@ -400,6 +400,7 @@ interface fSharpExpression:
   rangeLikeExpr |
   computationExpr |
   lambdaExpr |
+  dotLambdaExpr |
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
@@ -473,6 +474,7 @@ interface computableExpr:
   letOrUseExpr |
   matchExpr |
   doExpr |
+  whileExpr |
   yieldOrReturnExpr;
 
 setExpr options { stubBase="UnitExpressionBase"; }:
@@ -745,7 +747,12 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; } extras {
   lambdaParametersList<LAMBDA_PARAMETERS, Parameters>
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
-  
+
+dotLambdaExpr options { stubBase="FSharpExpressionBase"; }:
+  dotLambdaId<SHORTHAND, Shorthand>
+  DOT<FSHARP_DELIMITER, Delimiter>
+  fSharpExpression<EXPR, Expression>;
+
 lambdaParametersList:
   fSharpPattern<PAT, Patterns>*;
 
@@ -1529,6 +1536,7 @@ doStatement options { stubBase="DummyDeclaration"; } extras {
     get { methodName="Expression" path=<doStatement:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
   DO<DO, DoKeyword>?
   chameleonExpression<CHAMELEON_EXPR, DoExpression>;
 
@@ -1572,12 +1580,16 @@ activePatternId:
   )+
   RPAREN<RPAREN, RParen>;
 
+dotLambdaId options { stubBase="LocalDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
+
 typeParameterId:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
   activePatternId |
+  dotLambdaId |
   ampAmp |
   colonColon |
   equals |

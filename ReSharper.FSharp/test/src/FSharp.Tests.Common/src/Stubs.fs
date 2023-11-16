@@ -2,12 +2,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Application.Components
+open JetBrains.DataFlow
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 
 [<ShellComponent>]
@@ -22,25 +21,19 @@ type FSharpFileServiceStub() =
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type StubFSharpItemsContainer() =
     interface IFSharpItemsContainer with
-        member this.AdviseFSharpProjectLoaded lifetime func = ()
+        member this.RemoveProject _ = ()
+        member this.TryGetSortKey _ = None
+        member this.TryGetParentFolderIdentity _ = None
+        member this.CreateFoldersWithParents _ = []
+        member this.GetProjectItemsPaths(_, _) = [||]
+        member this.Dump _ = ()
+        member this.TryGetRelativeChildPath(_, _, _, _) = None
+        member this.OnAddFile(_, _, _, _, _, _) = ()
+        member this.OnAddFolder(_, _, _, _) = ()
+        member this.OnProjectLoaded(_, _, _) = ()
+        member this.OnRemoveFile(_, _, _) = ()
+        member this.OnRemoveFolder(_, _) = ()
+        member this.OnUpdateFile(_, _, _, _, _) = ()
+        member this.OnUpdateFolder(_, _, _) = ()
 
-        member this.RemoveProject project = ()
-
-        member this.TryGetSortKey item = None
-
-        member this.TryGetParentFolderIdentity item = None
-
-        member this.CreateFoldersWithParents projectFolder = []
-
-        member this.GetProjectItemsPaths (projectMark, targetFrameworkId) = [||]
-
-        member this.Dump writer = ()
-
-        member this.TryGetRelativeChildPath (projectMark, modifiedItem, relativeItem, relativeToType) = None
-        member this.OnAddFile(projectMark, itemType, location, linkedPath, relativeTo, relativeToType) = ()
-        member this.OnAddFolder(projectMark, location, relativeTo, relativeToType) = ()
-        member this.OnProjectLoaded(projectMark, projectDescriptor, msBuildProject) = ()
-        member this.OnRemoveFile(projectMark, itemType, location) = ()
-        member this.OnRemoveFolder(projectMark, location) = ()
-        member this.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) = ()
-        member this.OnUpdateFolder(projectMark, oldLocation, newLocation) = ()
+        member val ProjectUpdated = new Signal<IProjectMark>("todo")

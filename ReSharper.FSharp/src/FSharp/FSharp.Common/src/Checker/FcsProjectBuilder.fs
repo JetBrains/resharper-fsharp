@@ -5,9 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Application.FileSystemTracker
 open JetBrains.Diagnostics
-open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
@@ -16,6 +14,7 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
@@ -40,7 +39,7 @@ type FSharpTargetsProjectLoadModificator() =
         member x.ModifyTargets(targets) =
             targets.AddRange(fsTargets)
 
-        member x.ModifyProperties(properties) =
+        member x.ModifyProperties _ =
             ()
 
 module FcsProjectBuilder =
@@ -62,15 +61,8 @@ module FcsProjectBuilder =
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
-type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, fileSystemTracker: IFileSystemTracker, logger: ILogger) =
-
-    let mutable stamp = 0L
-
-    let getNextStamp () =
-        let result = stamp
-        stamp <- stamp + 1L
-        result
+type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
+        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =
 
     let defaultOptions =
         [| "--noframework"
@@ -130,8 +122,10 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
 
         sourceFiles.ToArray(), implsWithSigs, resources
 
-    member x.BuildFcsProject(psiModule: IPsiModule, project: IProject): FcsProject =
-        let targetFrameworkId = psiModule.TargetFrameworkId
+    member x.BuildFcsProject(projectKey: FcsProjectKey): FcsProject =
+        let project = projectKey.Project
+        let targetFrameworkId = projectKey.TargetFrameworkId
+
         let projectProperties = project.ProjectProperties
 
         let otherOptions = List()
@@ -157,6 +151,7 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
                 otherOptions.Add("--warnaserror")
 
             if Shell.Instance.IsTestShell then
+                let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
                 let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
                 let langVersionArg =
                     languageLevel
@@ -223,32 +218,23 @@ type FcsProjectBuilder(lifetime: Lifetime, checkerService: FcsCheckerService, it
         if not errors.IsEmpty then
             logger.Warn("Getting parsing options: {0}", concatErrors errors)
 
-        { OutputPath = outPath
-          ProjectOptions = projectOptions
-          ParsingOptions = parsingOptions
-          FileIndices = fileIndices
-          ImplementationFilesWithSignatures = implsWithSig
-          ReferencedModules = HashSet() }
-
-    member this.AddReferences(fcsProject, referencedPsiModules: IPsiModule seq) =
-        fcsProject.ReferencedModules.AddRange(referencedPsiModules)
-
+        let fcsProject =
+            { OutputPath = outPath
+              ProjectOptions = projectOptions
+              ParsingOptions = parsingOptions
+              FileIndices = fileIndices
+              ImplementationFilesWithSignatures = implsWithSig
+              ReferencedModules = HashSet() }
+        
+        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
         let paths =
-            referencedPsiModules
+            references
             |> Array.ofSeq
-            |> Array.map (fun psiModule ->
-                let path = modulePathProvider.GetModulePath(psiModule)
-                if psiModule :? IProjectPsiModule then
-                    if not path.IsEmpty then
-                        fileSystemTracker.AdviseFileChanges(lifetime, path) |> ignore
-                    else
-                        logger.Warn("Got empty path for module")
-                path)
-            |> Array.map (fun r -> "-r:" + r.FullPath)
+            |> Array.map modulePathProvider.GetModulePath
+            |> Array.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
 
         let projectOptions =
             { fcsProject.ProjectOptions with
-                OtherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths
-                Stamp = Some(getNextStamp ()) }
+                OtherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths }
 
         { fcsProject with ProjectOptions = projectOptions }

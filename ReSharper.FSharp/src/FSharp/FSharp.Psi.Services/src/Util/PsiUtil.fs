@@ -409,6 +409,22 @@ let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode and 'T: not st
 let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
     skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
+let rec getQualifiedExprIgnoreParens (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr.IgnoreParentParens()) with
+    | null -> expr.IgnoreParentParens()
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let rec getQualifiedExpr (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr) with
+    | null -> expr
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let isDirectPartOfDotLambda (expr: IFSharpExpression) =
+    let prefixApp = PrefixAppExprNavigator.GetByExpression(expr)
+    let expr = if isNull prefixApp then expr else prefixApp
+    let qualifiedExpr = getQualifiedExpr expr
+    isNotNull (DotLambdaExprNavigator.GetByExpression(qualifiedExpr))
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProvider() =

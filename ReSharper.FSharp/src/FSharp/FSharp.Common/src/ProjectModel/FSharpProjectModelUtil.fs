@@ -2,8 +2,10 @@
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 let getResolveContext (resolveContextManager: PsiModuleResolveContextManager) project psiModule =
     resolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, psiModule.TargetFrameworkId)
@@ -34,14 +36,20 @@ module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")
 
 [<SolutionComponent>]
-type ModulePathProvider() =
-    abstract GetModulePath: psiModule: IPsiModule -> VirtualFileSystemPath
-    default this.GetModulePath(psiModule) =
-        match psiModule with
-        | :? IAssemblyPsiModule as assemblyPsiModule ->
-            assemblyPsiModule.Assembly.Location.AssemblyPhysicalPath
+type ModulePathProvider(moduleReferencesResolveStore: IModuleReferencesResolveStore) =
+    abstract GetModulePath: reference: IProjectToModuleReference -> VirtualFileSystemPath
+    default this.GetModulePath(reference: IProjectToModuleReference) =
+        let referenceTargetFrameworkId = reference.TargetFrameworkId
+        match reference.ResolveResult(moduleReferencesResolveStore) with
+        | null ->
+            // todo: check logic in PsiModuleUtil.TryGetPsiModuleReferences
+            VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
 
-        | :? IProjectPsiModule as projectPsiModule ->
-            projectPsiModule.Project.GetOutputFilePath(projectPsiModule.TargetFrameworkId)
+        | :? IAssembly as assembly ->
+            assembly.Location.ContainerPhysicalPath
+
+        | :? IProject as project ->
+            let targetFrameworkId = referenceTargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds)
+            project.GetOutputFilePath(targetFrameworkId)
 
         | _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)

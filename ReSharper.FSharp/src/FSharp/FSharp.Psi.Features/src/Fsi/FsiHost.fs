@@ -9,6 +9,7 @@ open JetBrains.Lifetimes
 open JetBrains.Metadata.Utils
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.Rd.Tasks
 open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
@@ -18,7 +19,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -26,7 +26,8 @@ open JetBrains.Util
 [<SolutionComponent>]
 [<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
-        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider, logger: ILogger) =
+        projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,
+        logger: ILogger, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
 
     let stringArg = sprintf "--%s:%O"
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")
@@ -71,8 +72,7 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
 
         RdFsiSessionInfo(fsiPath, fsiRuntime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
 
-    let assemblyFilter (assembly: IPsiAssembly) =
-        let assemblyName = assembly.AssemblyName
+    let assemblyFilter (assemblyName: AssemblyNameInfo) =
         not (FSharpAssemblyUtil.isFSharpCore assemblyName || assemblyName.PossiblyContainsPredefinedTypes())
 
     let getProjectReferences projectId =
@@ -82,11 +82,12 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
         let targetFrameworkId = project.GetCurrentTargetFrameworkId()
         let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
 
-        getReferencedModules psiModule
-        |> Seq.filter (fun psiModule ->
-            match psiModule with
-            | :? IAssemblyPsiModule as assemblyModule -> assemblyFilter assemblyModule.Assembly
-            | _ -> true)
+        project.GetModuleReferences(targetFrameworkId)
+        |> Seq.filter (fun reference ->
+            match reference.ResolveResult(moduleReferencesResolveStore) with
+            | :? IAssembly as assembly -> assemblyFilter assembly.AssemblyName
+            | _ -> true
+        )
         |> Seq.map modulePathProvider.GetModulePath
         |> Seq.map (fun path -> path.FullPath)
         |> List

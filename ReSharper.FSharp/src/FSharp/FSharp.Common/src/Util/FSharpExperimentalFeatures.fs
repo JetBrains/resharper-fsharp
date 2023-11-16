@@ -18,16 +18,23 @@ type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
     static let cookies = OneToListMap<ExperimentalFeature, IDisposable>()
 
     static member Create(feature: ExperimentalFeature) =
-        let cookie = new FSharpExperimentalFeatureCookie(feature)
-        cookies.Add(feature, cookie)
-        cookie
+        lock cookies (fun _ ->
+            let cookie = new FSharpExperimentalFeatureCookie(feature)
+            cookies.Add(feature, cookie)
+            cookie
+        )
+        
 
     static member IsEnabled(feature: ExperimentalFeature) =
-        cookies.ContainsKey(feature)
+        lock cookies (fun _ ->
+            cookies.ContainsKey(feature)
+        )
 
     interface IDisposable with
         member this.Dispose() =
-            cookies.Remove(feature, this) |> ignore
+            lock cookies (fun _ ->
+                cookies.Remove(feature, this) |> ignore
+            )
 
 [<AbstractClass; Sealed; Extension>]
 type FSharpExperimentalFeatures() =
