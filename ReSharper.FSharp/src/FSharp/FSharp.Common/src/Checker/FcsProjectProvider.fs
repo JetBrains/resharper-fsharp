@@ -347,7 +347,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let loop (project: IProject) =
             if not (isFSharpProject project) then () else
 
-            let projectKeys = projectsToProjectKeys[project]
+            let projectKeys = projectsToProjectKeys[project] |> List.ofSeq
             for projectKey in projectKeys do
                 if visited.Contains(projectKey) then () else
 
