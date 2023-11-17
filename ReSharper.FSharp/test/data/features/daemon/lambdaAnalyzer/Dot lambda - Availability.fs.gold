@@ -1,0 +1,38 @@
+﻿open System.Linq
+
+// Available
+ignore <| |fun x ->|(0) x.ToString()
+ignore <| |fun x ->|(1) (x).ToString()
+ignore <| |fun (x) ->|(2) x.ToString()
+ignore <| |fun x ->|(3) (x.ToString())
+ignore <| |fun x ->|(4) (x.ToString())
+[1] |> (|fun x ->|(5) x.[0]) |> ignore
+[1] |> (|fun x ->|(6) x.Select(|fun x ->|(7) x.ToString())) |> ignore
+
+let f (a, (b, c)) =
+    fun x -> |fun x ->|(8) x.ToString()
+
+// Not available
+ignore <| fun x -> x.ToString ()
+ignore <| fun x -> y.ToString()
+ignore <| fun x -> (x.ToString)()
+ignore <| fun (x, y) -> x.ToString()
+[1] |> (fun x -> x.Select(_.ToString())) |> ignore 
+[1] |> _.Select(fun x -> x.ToString()) |> ignore
+(fun _ -> fun x -> x.ToString()) |> ignore
+(fun _ -> fun y -> fun x -> x.ToString()) |> ignore
+(fun (a, (b, _)) -> fun y -> fun x -> x.ToString()) |> ignore
+
+let g (a, (b, Some _)) =
+    fun x -> fun x -> x.ToString()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Dot-lambda syntax can be used
+(1): ReSharper Dead Code: Dot-lambda syntax can be used
+(2): ReSharper Dead Code: Dot-lambda syntax can be used
+(3): ReSharper Dead Code: Dot-lambda syntax can be used
+(4): ReSharper Dead Code: Dot-lambda syntax can be used
+(5): ReSharper Dead Code: Dot-lambda syntax can be used
+(6): ReSharper Dead Code: Dot-lambda syntax can be used
+(7): ReSharper Dead Code: Dot-lambda syntax can be used
+(8): ReSharper Dead Code: Dot-lambda syntax can be used

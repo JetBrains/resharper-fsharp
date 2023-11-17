@@ -97,7 +97,10 @@
         <Title resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
         <Description resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
       </Tag>
-
+      <Tag name="FSharpDotLambdaCanBeUsed" default="HINT">
+        <Title resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
+        <Description resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
+      </Tag>
     </Group>
   </SeverityConfiguration>
 
@@ -275,6 +278,15 @@
       <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
     </Message>
     <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
+  </Warning>
+
+  <Warning name="DotLambdaCanBeUsed" configurableSeverity="FSharpDotLambdaCanBeUsed">
+    <Parameter type="ILambdaExpr" name="lambda"/>
+    <Parameter type="IReferenceExpr" name="rootRefExpr"/>
+    <Range>getTreeNodesDocumentRange lambda lambda.RArrow</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
+    <QuickFix>ReplaceLambdaWithDotLambdaFix</QuickFix>
   </Warning>
 
   <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
