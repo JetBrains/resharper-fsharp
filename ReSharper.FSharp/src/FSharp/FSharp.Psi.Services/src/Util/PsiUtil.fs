@@ -516,6 +516,7 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with
     | :? IPrefixAppExpr as appExpr -> appExpr.IsIndexerLike
+    | :? IItemIndexerExpr -> true
     | _ -> false
 
 let rec getIndexerExprOrIgnoreParens (expr: IFSharpExpression) =
@@ -545,7 +546,5 @@ let rec isContextWithoutWildPats (expr: ITreeNode) =
         if containsWildPat owner.ParameterPatterns then false
         else isContextWithoutWildPats expr.Parent
     | :? ITypeDeclaration
-    | :? IAnonModuleDeclaration
-    | :? INamedModuleDeclaration //TODO: test
     | :? IModuleDeclaration -> true
     | _ -> isContextWithoutWildPats expr.Parent

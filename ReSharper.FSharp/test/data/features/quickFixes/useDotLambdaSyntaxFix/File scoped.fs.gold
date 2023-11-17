@@ -1,20 +1,20 @@
-open System.Linq
+﻿open System.Linq
 
 // Available
-ignore <| fun x -> x.ToString()
-ignore <| fun x -> x   .    ToString()
-ignore <| fun x -> (x).ToString()
-ignore <| fun (x) -> x.ToString()
-ignore <| fun x -> (x.ToString())
-ignore <| fun x -> (x.ToString())
-ignore <| fun x -> x.Prop[0]
-ignore <| fun x -> x.Prop.[0]
-[1] |> (fun x -> x.Select(fun x -> x.ToString())) |> ignore
-[1] |> (fun x -> x.Equals(let x = 5 in x)) |> ignore
-type A1 = member _.M() = fun x -> x.ToString()
-let f (a, (b, c)) = fun x -> fun x -> x.ToString()
-match 1 with _ -> fun x -> x.ToString()
-let _ = let _ = 3 in fun x -> x.ToString()
+ignore <| _{caret}.ToString()
+ignore <| _.ToString()
+ignore <| _.ToString()
+ignore <| _.ToString()
+ignore <| _.ToString()
+ignore <| _.ToString()
+ignore <| _.Prop[0]
+ignore <| _.Prop.[0]
+[1] |> (fun x -> x.Select(_.ToString())) |> ignore
+[1] |> (_.Equals(let x = 5 in x)) |> ignore
+type A1 = member _.M() = _.ToString()
+let f (a, (b, c)) = fun x -> _.ToString()
+match 1 with _ -> _.ToString()
+let _ = let _ = 3 in _.ToString()
 
 // Not available
 ignore <| fun x -> x.Equals(x)

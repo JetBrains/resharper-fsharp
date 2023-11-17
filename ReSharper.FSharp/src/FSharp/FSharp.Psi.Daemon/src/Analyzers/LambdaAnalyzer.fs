@@ -295,6 +295,7 @@ type LambdaAnalyzer() =
         | :? IPrefixAppExpr
         | :? IReferenceExpr
         | :? ITupleExpr
+        | :? IItemIndexerExpr
         | :? IUnitExpr -> not (pats.Count = 1 && pats.First().IgnoreInnerParens() :? IUnitPat)
         | _ -> false
 

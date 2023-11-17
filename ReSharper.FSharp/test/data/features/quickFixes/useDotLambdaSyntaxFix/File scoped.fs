@@ -1,7 +1,7 @@
 open System.Linq
 
 // Available
-ignore <| fun x -> x.ToString()
+ignore <| fun{caret} x -> x.ToString()
 ignore <| fun x -> x   .    ToString()
 ignore <| fun x -> (x).ToString()
 ignore <| fun (x) -> x.ToString()
