@@ -428,3 +428,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         member this.CreateTypeMember(source) =
             (getTypeDecl source).TypeMembers.[0]
             :> IFSharpTypeMemberDeclaration
+
+        member this.CreateDotLambda() =
+            getExpression "_.P" :?> IDotLambdaExpr

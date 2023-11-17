@@ -1,0 +1,9 @@
+﻿|fun x ->|(0) x.ToString()
+
+------------------------------------------------
+0: Shorthand lambda can be used
+QUICKFIXES:
+Replace with shorthand lambda
+--Replace with shorthand lambda in file
+--Replace with shorthand lambda in project
+--Replace with shorthand lambda in solution

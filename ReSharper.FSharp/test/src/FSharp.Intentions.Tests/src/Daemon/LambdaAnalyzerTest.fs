@@ -13,6 +13,7 @@ type LambdaAnalyzerTest() =
 
     override x.HighlightingPredicate(highlighting, _, _) =
         match highlighting with
+        | :? DotLambdaCanBeUsedWarning
         | :? LambdaCanBeReplacedWithInnerExpressionWarning
         | :? LambdaCanBeSimplifiedWarning
         | :? LambdaCanBeReplacedWithBuiltinFunctionWarning
@@ -37,3 +38,5 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Forced calculations``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
     [<Test>] member x.``Optional parameters``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - Availability``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - Availability - Modules``() = x.DoNamedTest()
