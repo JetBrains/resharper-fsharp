@@ -168,3 +168,8 @@ let getMatchLikeExprIncompleteRange (expr: IMatchLikeExpr) =
         | _ -> expr
 
     treeNode.GetHighlightingRange()
+
+let getBracketsRange (expr: IFSharpExpression) =
+    match expr with
+    | :? IRecordExpr as expr -> seq { expr.LeftBrace.GetHighlightingRange(); expr.RightBrace.GetHighlightingRange() }
+    | _ -> Seq.empty

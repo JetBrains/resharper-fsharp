@@ -31,7 +31,7 @@ type  ExtensionAttributeAnalyzer() =
         let mutable typeDeclHasExtensionAttr = false
         let membersMayHaveExtensionAttrs = mayHaveExtensions typeElement
 
-        let typeAttributeIsRequired = not data.IsFSharpExperimentalSupported
+        let typeAttributeIsRequired = not data.IsFSharp80Supported
 
         for attr in typeDeclaration.GetAttributes() do
             if not typeDeclHasExtensionAttr && isExtension attr then

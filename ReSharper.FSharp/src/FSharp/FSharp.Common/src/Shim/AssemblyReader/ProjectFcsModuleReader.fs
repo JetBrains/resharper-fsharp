@@ -90,24 +90,13 @@ type FcsTypeDef =
 
 
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path,
-        shim: IFcsAssemblyReaderShim) =
+        shim: IFcsAssemblyReaderShim, realReader: ILModuleReader option) =
     let locks = psiModule.GetPsiServices().Locks
 
-    let getSymbolScope, invalidateSymbolScope =
-        let mutable symbolScope = null
-
-        let get () =
-            match symbolScope with
-            | null ->
-                symbolScope <- psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, false, true)
-                symbolScope
-
-            | symbolScope -> symbolScope
-
-        let invalidate () =
-            symbolScope <- null
-
-        get, invalidate
+    let getSymbolScope () =
+        // todo: make it safe to cache symbol scope in R#
+        let symbolCache = psiModule.GetPsiServices().Symbols
+        symbolCache.GetSymbolScope(psiModule, false, true)
 
     let locker = JetFastSemiReenterableRWLock()
 
@@ -128,7 +117,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mutable upToDateChecked = null
 
     let mutable moduleDef: ILModuleDef option = None
-    let mutable realModuleReader: ILModuleReader option = None
+    let mutable realModuleReader: ILModuleReader option = realReader
 
     // Initial timestamp should be earlier than any modifications observed by FCS.
     let mutable timestamp = DateTime.MinValue
@@ -904,18 +893,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         result
 
-
-    let isExplicitImpl (typeMember: ITypeMember) =
-        let overridableMember = typeMember.As<IOverridableMember>()
-        isNotNull overridableMember && overridableMember.IsExplicitImplementation
-
     let getSignature (parametersOwner: IParametersOwner) =
         parametersOwner.GetSignature(parametersOwner.IdSubstitution)
 
     let mkMethods (typeElement: ITypeElement) =
         let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
         [| for method in typeElement.GetMembers().OfType<IFunction>() do
-            if not (isExplicitImpl method) && seenMethods.Add(getSignature method) then
+            if seenMethods.Add(getSignature method) then
                 yield mkMethodDef method |]
 
     let mkFields (typeElement: ITypeElement) =
@@ -938,7 +922,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkProperties (typeElement: ITypeElement) =
         let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
         [ for property in typeElement.Properties do
-            if not (isExplicitImpl property) && seenProperties.Add(getSignature property) then
+            if seenProperties.Add(getSignature property) then
                 yield mkPropertyDef property ]
 
     let mkEvents (typeElement: ITypeElement) =
@@ -1260,7 +1244,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             // todo: add test for adding/removing not-seen-by-FCS types
             moduleDef <- None
             timestamp <- DateTime.UtcNow
-            invalidateSymbolScope ()
             shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
         finally
             isInvalidating <- false
@@ -1374,7 +1357,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if not (isUpToDate ()) then
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
-                invalidateSymbolScope ()
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.InvalidateAllTypeDefs() =
@@ -1386,7 +1368,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 typeDefs.Clear()
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
-                invalidateSymbolScope ()
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
             finally
                 isInvalidating <- false
@@ -1399,9 +1380,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 shim.Logger.Trace("Mark dirty: {0}", path)
                 isDirty <- true
                 upToDateChecked <- null
-                invalidateSymbolScope ()
             finally
                 isInvalidating <- false
+
+        member this.MarkDirty(typeShortName) = ()
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =

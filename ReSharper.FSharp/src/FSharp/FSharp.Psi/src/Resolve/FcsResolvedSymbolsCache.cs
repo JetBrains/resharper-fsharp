@@ -18,71 +18,78 @@ using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files.SandboxFiles;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using JetBrains.Util.Concurrency.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   [SolutionComponent]
   public class FcsResolvedSymbolsCache : IPsiSourceFileCache, IFcsResolvedSymbolsCache
   {
+    private readonly object mySyncObj = new();
     private readonly IShellLocks myLocks;
     public IPsiModules PsiModules { get; }
     public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
 
-    protected readonly IDictionary<IPsiModule, FcsModuleResolvedSymbols> PsiModulesCaches =
-      new Dictionary<IPsiModule, FcsModuleResolvedSymbols>();
+    protected readonly Dictionary<FcsProjectKey, FcsModuleResolvedSymbols> ProjectSymbolsCaches = new();
+    protected readonly Dictionary<IPsiModule, FcsModuleResolvedSymbols> ScriptCaches = new();
 
-    private readonly OneToSetMap<IPsiModule, IPsiModule> myReferencingModules = new();
+    private readonly OneToSetMap<FcsProjectKey, FcsProjectKey> myReferencingModules = new();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
-    private readonly ISet<IPsiModule> myDirtyNonFSharpModules = new HashSet<IPsiModule>();
 
     public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
-      IFcsProjectProvider fcsProjectProvider, AssemblyReaderShim assemblyReaderShim,
-      FSharpScriptPsiModulesProvider scriptPsiModulesProvider, IShellLocks locks)
+      IFcsProjectProvider fcsProjectProvider, FSharpScriptPsiModulesProvider scriptPsiModulesProvider,
+      IShellLocks locks)
     {
       myLocks = locks;
       PsiModules = psiModules;
       CheckerService = checkerService;
       FcsProjectProvider = fcsProjectProvider;
 
-      fcsProjectProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
-      assemblyReaderShim.ModuleInvalidated.Advise(lifetime, Invalidate);
-      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
+      fcsProjectProvider.ProjectRemoved.Advise(lifetime, RemoveProject);
+      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, InvalidateScript);
     }
 
-    private static bool IsApplicable(IPsiSourceFile sourceFile) =>
+    private static bool IsFSharpFile(IPsiSourceFile sourceFile) =>
       sourceFile.LanguageType.Is<FSharpProjectFileType>();
 
-    private void Invalidate(Tuple<IPsiModule, FcsProject> project)
+    private void RemoveProject([NotNull] Tuple<FcsProjectKey, FcsProject> invalidated)
     {
-      var (psiModule, _) = project;
-      Invalidate(psiModule);
+      var (projectKey, _) = invalidated;
+      Invalidate(projectKey);
     }
 
-    public void Invalidate(IPsiModule psiModule)
+    private void InvalidateScript(IPsiModule psiModule)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
+      myLocks.AssertWriteAccessAllowed();
+      ScriptCaches.Remove(psiModule);
+    }
+
+    private void Invalidate(FcsProjectKey projectKey)
+    {
+      myLocks.AssertWriteAccessAllowed();
+
+      InvalidateReferencingModules(projectKey);
+      if (ProjectSymbolsCaches.TryGetValue(projectKey, out var symbols) && symbols.FcsProject is { } fcsProject)
       {
-        InvalidateReferencingModules(psiModule);
-        if (PsiModulesCaches.TryGetValue(psiModule, out var symbols) && symbols.FcsProject is { } fcsProject)
+        foreach (var referencedProjectKey in fcsProject.ReferencedModules)
         {
-          foreach (var referencedModule in fcsProject.ReferencedModules)
-            myReferencingModules.Remove(referencedModule, psiModule);
+          myReferencingModules.Remove(referencedProjectKey, projectKey);
         }
-
-        PsiModulesCaches.Remove(psiModule);
       }
+
+      ProjectSymbolsCaches.Remove(projectKey);
     }
 
-    private void InvalidateReferencingModules(IPsiModule psiModule)
+    private void InvalidateReferencingModules(FcsProjectKey projectKey)
     {
-      if (PsiModulesCaches.IsEmpty())
-        return;
+      myLocks.AssertWriteAccessAllowed();
 
-      foreach (var referencingModule in myReferencingModules.GetReadOnlyValues(psiModule))
+      foreach (var referencingModule in myReferencingModules[projectKey])
       {
-        if (PsiModulesCaches.TryGetValue(referencingModule, out var moduleSymbols))
+        if (ProjectSymbolsCaches.TryGetValue(referencingModule, out var moduleSymbols))
           moduleSymbols.Invalidate();
       }
     }
@@ -90,27 +97,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     protected virtual void Invalidate(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      if (!psiModule.IsValid())
+      if (psiModule is FSharpScriptPsiModule)
       {
-        Invalidate(psiModule);
+        ScriptCaches.Remove(psiModule);
         return;
       }
 
-      if (PsiModulesCaches.TryGetValue(psiModule, out var moduleResolvedSymbols))
+      var projectKey = FcsProjectKey.Create(psiModule);
+
+      if (!psiModule.IsValid())
+      {
+        Invalidate(projectKey);
+        return;
+      }
+
+      if (ProjectSymbolsCaches.TryGetValue(projectKey, out var moduleResolvedSymbols))
         moduleResolvedSymbols.Invalidate(sourceFile);
 
-      InvalidateReferencingModules(psiModule);
+      InvalidateReferencingModules(projectKey);
     }
 
     public void MarkAsDirty(IPsiSourceFile sourceFile)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
-      {
-        if (IsApplicable(sourceFile))
-          myDirtyFiles.Add(sourceFile);
-        else
-          myDirtyNonFSharpModules.Add(sourceFile.PsiModule);
-      }
+      myLocks.AssertWriteAccessAllowed();
+
+      myDirtyFiles.Add(sourceFile);
     }
 
     public object Load(IProgressIndicator progress, bool enablePersistence) => null;
@@ -125,8 +136,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public bool UpToDate(IPsiSourceFile sourceFile)
     {
-      // todo: is this correct?
-      using var _ = FcsReadWriteLock.ReadCookie.Create();
+      myLocks.AssertReadAccessAllowed();
+
+      lock (mySyncObj)
         return !myDirtyFiles.Contains(sourceFile);
     }
 
@@ -138,13 +150,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public void Drop(IPsiSourceFile sourceFile)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
-      {
-        if (PsiModulesCaches.IsEmpty())
-          return;
+      myLocks.AssertWriteAccessAllowed();
 
-        Invalidate(sourceFile);
-      }
+      if (ProjectSymbolsCaches.IsEmpty())
+        return;
+
+      Invalidate(sourceFile);
     }
 
     public void OnDocumentChange(IPsiSourceFile sourceFile, ProjectFileDocumentCopyChange change) =>
@@ -161,22 +172,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       MarkAsDirty(sourceFile);
     }
 
-
-    private void InvalidateDirty()
-    {
-      foreach (var sourceFile in myDirtyFiles)
-        Invalidate(sourceFile);
-
-      foreach (var psiModule in myDirtyNonFSharpModules)
-        InvalidateReferencingModules(psiModule);
-
-      myDirtyFiles.Clear();
-    }
-
     public void SyncUpdate(bool underTransaction)
     {
-      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
-        InvalidateDirty();
+      using var writeCookie = WriteLockCookie.Create(underTransaction);
+      using var lockCookie = MonitorInterruptibleCookie.EnterOrThrow(mySyncObj);
+
+      if (ProjectSymbolsCaches.IsEmpty())
+      {
+        myDirtyFiles.Clear();
+        return;
+      }
+
+      foreach (var sourceFile in myDirtyFiles)
+      {
+        if (IsFSharpFile(sourceFile))
+          Invalidate(sourceFile);
+        else
+        {
+          var projectKey = FcsProjectKey.Create(sourceFile.PsiModule);
+          InvalidateReferencingModules(projectKey);
+        }
+      }
+
+      myDirtyFiles.Clear();
     }
 
     public void Dump(TextWriter writer, IPsiSourceFile sourceFile)
@@ -187,8 +205,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       get
       {
-        // todo: is this correct?
-        using var _ = FcsReadWriteLock.ReadCookie.Create();
+        myLocks.AssertReadAccessAllowed();
+        lock (mySyncObj)
           return !myDirtyFiles.IsEmpty();
       }
     }
@@ -199,38 +217,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     [NotNull]
     private FcsModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
+      myLocks.AssertReadAccessAllowed();
+      SyncUpdate(false);
+
       CheckerService.AssertFcsAccessThread();
 
       var psiModule = sourceFile.PsiModule;
-      if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
+      if (psiModule.IsMiscFilesProjectModule() && psiModule is not SandboxPsiModule)
         return FcsModuleResolvedSymbols.Empty;
 
-      using var _ = FcsReadWriteLock.WriteCookie.Create(myLocks);
+      lock (mySyncObj)
       {
-        FcsProjectProvider.InvalidateDirty();
-
-        if (HasDirtyFiles)
-          InvalidateDirty();
-
-        if (PsiModulesCaches.TryGetValue(psiModule, out var symbols))
-          return symbols;
-
         if (psiModule is FSharpScriptPsiModule)
         {
           var scriptResolvedSymbols = new FcsModuleResolvedSymbols(null, true);
-          PsiModulesCaches[psiModule] = scriptResolvedSymbols;
+          ScriptCaches[psiModule] = scriptResolvedSymbols;
           return scriptResolvedSymbols;
         }
+
+        var projectKey = FcsProjectKey.Create(psiModule);
+        if (ProjectSymbolsCaches.TryGetValue(projectKey, out var symbols))
+          return symbols;
 
         var fcsProject = FcsProjectProvider.GetFcsProject(psiModule)?.Value;
         if (fcsProject == null)
           return FcsModuleResolvedSymbols.Empty;
 
         var moduleResolvedSymbols = new FcsModuleResolvedSymbols(fcsProject);
-        PsiModulesCaches[psiModule] = moduleResolvedSymbols;
+        ProjectSymbolsCaches[projectKey] = moduleResolvedSymbols;
 
+        // todo: fix invalidating F# -> C# -> F# modules
         foreach (var referencedModule in fcsProject.ReferencedModules)
-          myReferencingModules.Add(referencedModule, psiModule);
+          myReferencingModules.Add(referencedModule, projectKey);
 
         return moduleResolvedSymbols;
       }

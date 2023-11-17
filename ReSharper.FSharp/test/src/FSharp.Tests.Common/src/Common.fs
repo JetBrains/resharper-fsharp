@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
@@ -130,19 +131,19 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks) =
-    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, assemblyReaderShim, scriptModuleProvider, locks)
+type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
+    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
-        x.PsiModulesCaches.Clear()
+        x.ProjectSymbolsCaches.Clear()
 
     interface IHideImplementation<FcsResolvedSymbolsCache>
 
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFcsProjectBuilder(lifetime, checkerService, modulePathProvider, fileSystemTracker, logger) =
-    inherit FcsProjectBuilder(lifetime, checkerService, Mock<_>().Object, modulePathProvider, fileSystemTracker, logger)
+type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModules) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger, psiModules)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()
@@ -164,8 +165,8 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     let mutable currentFcsProject = None
 
     let getNewFcsProject (psiModule: IPsiModule) =
-        let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, psiModule.ContainingProjectModule.As<IProject>())
-        fcsProjectBuilder.AddReferences(fcsProject, getReferencedModules psiModule)
+        let projectKey = FcsProjectKey.Create(psiModule)
+        fcsProjectBuilder.BuildFcsProject(projectKey)
 
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
@@ -256,10 +257,9 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             | true, index -> index
             | _ -> -1
 
-        member x.InvalidateDirty() = ()
-        member x.ModuleInvalidated = new Signal<_>("Todo") :> _
+        member x.ProjectRemoved = new Signal<_>("Todo") :> _
 
-        member x.InvalidateReferencesToProject(_, _) = false
+        member x.InvalidateReferencesToProject _ = false
         member x.HasFcsProjects = false
         member this.GetAllFcsProjects() = []
 

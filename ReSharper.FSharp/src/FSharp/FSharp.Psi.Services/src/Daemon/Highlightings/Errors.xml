@@ -93,6 +93,10 @@
         <Title resourceName="RedundantInIndexer" resourceType="Strings"/>
         <Description resourceName="CanBeRemovedInIndexers" resourceType="Strings"/>
       </Tag>
+      <Tag name="NestedRecordUpdateCanBeSimplified" default="SUGGESTION">
+        <Title resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+        <Description resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+      </Tag>
 
     </Group>
   </SeverityConfiguration>
@@ -325,5 +329,16 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getIndexerDotRange indexerExpr</Range>
     <QuickFix>RemoveIndexerDotFix</QuickFix>
+  </Warning>
+
+  <Warning name="NestedRecordUpdateCanBeSimplified" configurableSeverity="NestedRecordUpdateCanBeSimplified">
+    <Parameter type="IRecordFieldBinding" name="outerBinding"/>
+    <Parameter type="IRecordFieldBinding" name="innerBinding"/>
+    <Parameter type="string list" name="fieldQualifiedName" isValid="skip"/>
+    <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>outerBinding.EqualsToken.GetHighlightingRange()</Range>
+    <SecondaryRanges>outerBinding.Expression.IgnoreInnerParens() |> getBracketsRange</SecondaryRanges>
+    <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>
   </Warning>
 </Errors>

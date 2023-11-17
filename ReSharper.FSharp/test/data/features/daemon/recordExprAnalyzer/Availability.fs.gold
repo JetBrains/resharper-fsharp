@@ -1,0 +1,78 @@
+﻿type Record0 = { Foo: int; Bar: int }
+type Record1 = { Foo: int; Bar: int; Zoo: Record0 }
+
+[<AutoOpen>]
+module Module =
+    type Record2 = { Foo: Record1; Bar: Record1 }
+    let item: Record2 = null
+
+let Zoo = { Record0.Foo = 3; Bar = 3 }
+let item = Module.item
+let item2 = item
+
+let f<'a> = Zoo
+
+// Available
+ignore { item with Foo |=|(0) |{|(1) item.Foo with Foo = 3 |}|(2) }
+ignore { item with Foo.Zoo |=|(3) |{|(4) item.Foo.Zoo with Foo = 3 |}|(5) }
+ignore { Module.item with Foo |=|(6) |{|(7) Module.item.Foo with Foo = 3 |}|(8) }
+ignore { (Module.item) with Foo |=|(9) (|{|(10) Module.item.Foo with Foo = 3 |}|(11)) }
+ignore { item with Foo |=|(12) |{|(13) item.Foo with Zoo = { Foo = 3; Bar = 4 } |}|(14) }
+ignore { item with Module.Record2.Foo.Zoo |=|(15) |{|(16) item.Foo.Zoo with Foo = 3 |}|(17) }
+ignore { item with Foo |=|(18) |{|(19) item.Foo with Zoo = { item.Bar.Zoo with Foo = 3 } |}|(20) }
+ignore { item with Foo |=|(21) |{|(22) item.Foo with Zoo = { item.Foo.Zoo with Foo = 3 } |}|(23) }
+ignore { item with Bar = { item.Foo with Zoo |=|(24) |{|(25) item.Foo.Zoo with Bar = 3 |}|(26) } }
+ignore { Module.item with Foo = { item.Foo with Zoo |=|(27) |{|(28) item.Foo.Zoo with Foo = 3 |}|(29) } }
+ignore { item with Foo |=|(30) |{|(31) item.Foo with Foo = 3 |}|(32); Bar |=|(33) |{|(34) item.Bar with Foo = 3 |}|(35) }
+
+// Not available
+ignore { item with Foo = { item.Foo with Foo = } }
+ignore { item with Foo = { item.Bar with Foo = 3 } }
+ignore { item with Foo.Zoo = { Zoo with Foo = 3 } }
+ignore { item with Foo.Zoo = { f<int> with Foo = 3 } }
+ignore { Module.item with Foo = { item.Foo with Foo = 3 } }
+ignore { item with Foo = { Module.item.Foo with Foo = 3 } }
+ignore { item with Foo = { Foo = 3; Bar = 3; Zoo = null } }
+ignore { item with Foo = { item.Foo with Foo = 3; Bar = 3 } }
+ignore { (id item) with Foo = { (id item).Foo with Foo = 3 } }
+ignore { item with Foo = { item2.Foo with Foo = 3 } }
+ignore { item with Foo = { item.Foo with Unresolved = 3 } }
+ignore { item with Unresolved = { item.Unresolved with Unresolved = 3 } }
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Nested record update can be simplified
+(1):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(2):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(3): ReSharper Dead Code: Nested record update can be simplified
+(4):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(5):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(6): ReSharper Dead Code: Nested record update can be simplified
+(7):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(8):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(9): ReSharper Dead Code: Nested record update can be simplified
+(10):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(11):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(12): ReSharper Dead Code: Nested record update can be simplified
+(13):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(14):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(15): ReSharper Dead Code: Nested record update can be simplified
+(16):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(17):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(18): ReSharper Dead Code: Nested record update can be simplified
+(19):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(20):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(21): ReSharper Dead Code: Nested record update can be simplified
+(22):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(23):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(24): ReSharper Dead Code: Nested record update can be simplified
+(25):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(26):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(27): ReSharper Dead Code: Nested record update can be simplified
+(28):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(29):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(30): ReSharper Dead Code: Nested record update can be simplified
+(31):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(32):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(33): ReSharper Dead Code: Nested record update can be simplified
+(34):<secondary> ReSharper Dead Code: Nested record update can be simplified
+(35):<secondary> ReSharper Dead Code: Nested record update can be simplified

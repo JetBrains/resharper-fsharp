@@ -107,6 +107,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
         | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
+        | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
         | FSharpLanguageVersion.Latest -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMinor

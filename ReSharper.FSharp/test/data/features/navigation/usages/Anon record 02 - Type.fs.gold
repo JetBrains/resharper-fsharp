@@ -8,9 +8,9 @@
       tooltip: {| **F** = 1 |}
     Navigation result:
       caret did not move
-    TO: [R] type R = {| |F|: int |} RANGE: (27,28) @ Anon record 02 - Type.fs
+    TO: [O] type R = {| |F|: int |} RANGE: (27,28) @ Anon record 02 - Type.fs
     Menu item (enabled) :
-      icon: UsageRead
+      icon: UsageFieldTypeDeclaration
       text: Module.R      <font color="FFD5A286">type R = {| **F**: int |}</font><font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: type R = {| **F**: int |}

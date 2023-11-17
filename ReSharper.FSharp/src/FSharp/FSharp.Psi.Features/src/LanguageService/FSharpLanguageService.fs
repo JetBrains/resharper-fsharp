@@ -122,6 +122,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
                 ReferenceAccessType.WRITE else
 
             if isNotNull (ReferencePatNavigator.GetByReferenceName(referenceName)) ||
+                   isNotNull (AnonRecordFieldNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
                 ReferenceAccessType.OTHER else
