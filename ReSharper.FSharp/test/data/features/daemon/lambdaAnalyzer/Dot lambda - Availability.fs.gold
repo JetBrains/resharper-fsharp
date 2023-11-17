@@ -1,6 +1,4 @@
-﻿open System.Linq
-
-// Available
+﻿// Available
 ignore <| |fun x ->|(0) x.ToString()
 ignore <| |fun x ->|(1) x   .    ToString()
 ignore <| |fun x ->|(2) (x).ToString()
@@ -9,12 +7,12 @@ ignore <| |fun x ->|(4) (x.ToString())
 ignore <| |fun x ->|(5) (x.ToString())
 ignore <| |fun x ->|(6) x.Prop[0]
 ignore <| |fun x ->|(7) x.Prop.[0]
-[1] |> (fun x -> x.Select(|fun x ->|(8) x.ToString())) |> ignore
-[1] |> (|fun x ->|(9) x.Equals(let x = 5 in x)) |> ignore
-type A1 = member _.M() = |fun x ->|(10) x.ToString()
-let f (a, (b, c)) = fun x -> |fun x ->|(11) x.ToString()
-match 1 with _ -> |fun x ->|(12) x.ToString()
-let _ = let _ = 3 in |fun x ->|(13) x.ToString()
+[1] |> (|fun x ->|(8) x.ToString(|fun x ->|(9) x.ToString())) |> ignore
+[1] |> (|fun x ->|(10) x.Equals(let x = 5 in x)) |> ignore
+type A1 = member _.M() = |fun x ->|(11) x.ToString()
+let f (a, (b, c)) = fun x -> |fun x ->|(12) x.ToString()
+match 1 with _ -> |fun x ->|(13) x.ToString()
+let _ = let _ = 3 in |fun x ->|(14) x.ToString()
 
 // Not available
 ignore <| fun x -> x.Equals(x)
@@ -48,3 +46,4 @@ let g (a, (b, Some _)) = fun x -> fun x -> x.ToString()
 (11): ReSharper Dead Code: Shorthand lambda can be used
 (12): ReSharper Dead Code: Shorthand lambda can be used
 (13): ReSharper Dead Code: Shorthand lambda can be used
+(14): ReSharper Dead Code: Shorthand lambda can be used

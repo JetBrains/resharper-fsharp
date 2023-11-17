@@ -1,5 +1,3 @@
-open System.Linq
-
 // Available
 ignore <| fun{caret} x -> x.ToString()
 ignore <| fun x -> x   .    ToString()
@@ -9,7 +7,7 @@ ignore <| fun x -> (x.ToString())
 ignore <| fun x -> (x.ToString())
 ignore <| fun x -> x.Prop[0]
 ignore <| fun x -> x.Prop.[0]
-[1] |> (fun x -> x.Select(fun x -> x.ToString())) |> ignore
+[1] |> (fun x -> x.ToString(fun x -> x.ToString())) |> ignore
 [1] |> (fun x -> x.Equals(let x = 5 in x)) |> ignore
 type A1 = member _.M() = fun x -> x.ToString()
 let f (a, (b, c)) = fun x -> fun x -> x.ToString()

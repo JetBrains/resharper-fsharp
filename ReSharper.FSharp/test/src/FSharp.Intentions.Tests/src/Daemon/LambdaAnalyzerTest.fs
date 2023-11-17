@@ -39,3 +39,4 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
     [<Test>] member x.``Optional parameters``() = x.DoNamedTest()
     [<Test>] member x.``Dot lambda - Availability``() = x.DoNamedTest()
+    [<Test>] member x.``Dot lambda - Availability - Modules``() = x.DoNamedTest()
