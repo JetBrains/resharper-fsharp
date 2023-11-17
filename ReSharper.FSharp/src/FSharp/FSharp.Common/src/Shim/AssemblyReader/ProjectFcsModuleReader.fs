@@ -116,7 +116,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mutable isDirty = false
     let mutable upToDateChecked = null
 
-    let mutable moduleDef: ILModuleDef option = None
+    let mutable moduleDef: (ILModuleDef * ILPreTypeDef[]) option = None
     let mutable realModuleReader: ILModuleReader option = realReader
 
     // Initial timestamp should be earlier than any modifications observed by FCS.
@@ -938,6 +938,21 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> clrTypeName.FullName
         | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
 
+    let mkPreTypeDefs reader =
+        let symbolScope = getSymbolScope ()
+        // todo: make inner types computed on demand, needs an Fcs patch
+        let result = List<ILPreTypeDef>()
+
+        let rec addTypes (ns: INamespace) =
+            for typeElement in ns.GetNestedTypeElements(symbolScope) do
+                result.Add(PreTypeDef(typeElement, reader))
+            for nestedNs in ns.GetNestedNamespaces(symbolScope) do
+                addTypes nestedNs
+
+        addTypes symbolScope.GlobalNamespace
+
+        result.ToArray()
+
     
     let getOrCreateNestedTypes (table: FcsTypeDefMembers) (typeName: IClrTypeName) defaultValue reader =
         use _ = usingWriteLock ()
@@ -1152,10 +1167,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     // todo: check added/removed types
     /// Checks if any external change has lead to a metadata change,
     /// e.g. a super type resolves to a different thing.
-    let isUpToDate () =
+    let isUpToDate reader =
         use lock = usingWriteLock ()
 
-        if not isDirty || typeDefs.IsEmpty then true else
+        if not isDirty then true else
 
         if isNull upToDateChecked then
             upToDateChecked <- HashSet()
@@ -1164,6 +1179,21 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
         let mutable isUpToDate = true
+
+        match moduleDef with
+        | None -> ()
+        | Some(_, oldPreTypeDefs) ->
+            let newPreTypeDefs = mkPreTypeDefs reader
+            let preTypeDefsUpToDate =
+                oldPreTypeDefs.Length = newPreTypeDefs.Length &&
+
+                (oldPreTypeDefs, newPreTypeDefs) ||> Array.forall2 (fun oldPreTypeDef newPreTypeDef ->
+                    oldPreTypeDef.Name = newPreTypeDef.Name &&
+                    oldPreTypeDef.Namespace = newPreTypeDef.Namespace
+                )
+
+            if not preTypeDefsUpToDate then
+                isUpToDate <- false
 
         for KeyValue(clrTypeName, fcsTypeDef) in List.ofSeq typeDefs do
             Interruption.Current.CheckAndThrow()
@@ -1253,7 +1283,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             use lock = usingWriteLock ()
 
             match moduleDef with
-            | Some(moduleDef) -> moduleDef
+            | Some(moduleDef, _) -> moduleDef
             | None ->
 
             readData (fun _ ->
@@ -1264,21 +1294,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let assemblyName = project.GetOutputAssemblyName(psiModule.TargetFrameworkId)
                 let isDll = isDll project psiModule.TargetFrameworkId
 
-                let typeDefs =
-                    let symbolScope = getSymbolScope ()
-                    // todo: make inner types computed on demand, needs an Fcs patch
-                    let result = List<ILPreTypeDef>()
-
-                    let rec addTypes (ns: INamespace) =
-                        for typeElement in ns.GetNestedTypeElements(symbolScope) do
-                            result.Add(PreTypeDef(typeElement, this))
-                        for nestedNs in ns.GetNestedNamespaces(symbolScope) do
-                            addTypes nestedNs
-
-                    addTypes symbolScope.GlobalNamespace
-
-                    let preTypeDefs = result.ToArray()
-                    mkILTypeDefsComputed (fun _ -> preTypeDefs)
+                let preTypeDefs = mkPreTypeDefs this
+                let typeDefs = mkILTypeDefsComputed (fun _ -> preTypeDefs)
 
                 let flags = 0 // todo
                 let exportedTypes = mkILExportedTypes []
@@ -1315,12 +1332,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     let manifest = { newModuleDef.Manifest.Value with CustomAttrsStored = attrs }
                     { newModuleDef with Manifest = Some(manifest) }
 
-                moduleDef <- Some(newModuleDef)
+                moduleDef <- Some(newModuleDef, preTypeDefs)
             )
 
             match moduleDef with
             | None -> mkDummyModuleDef ()
-            | Some value -> value
+            | Some(moduleDef, _) -> moduleDef
 
         member this.Dispose() =
             match realModuleReader with
@@ -1354,7 +1371,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member this.UpdateTimestamp() =
             use _ = usingWriteLock ()
             shim.Logger.Trace("Trying to update timestamp: {0}", path)
-            if not (isUpToDate ()) then
+            if not (isUpToDate this) then
                 moduleDef <- None
                 timestamp <- DateTime.UtcNow
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
