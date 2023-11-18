@@ -92,7 +92,7 @@ val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
 val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
 
 val productMonorepoDir = getProductMonorepoRoot()
-val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
+val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
 val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
 val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
 val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
@@ -197,8 +197,8 @@ tasks {
     if (inMonorepo) {
       sources(
         listOf(
-          File("$productMonorepoDir/Rider/Frontend/rider/model/sources"),
-          File("$productMonorepoDir/Rider/ultimate/remote-dev/rd-ide-model-sources"),
+          File("$productMonorepoDir/rider/model/sources"),
+          File("$productMonorepoDir/remote-dev/rd-ide-model-sources"),
           File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
         )
       )
@@ -475,7 +475,7 @@ fun getProductMonorepoRoot(): File? {
   var currentDir = repoRoot
 
   while (currentDir.parent != null) {
-    if (currentDir.listFiles()?.any { it.name == ".dotnet-products.root.marker" } == true) {
+    if (currentDir.resolve(".ultimate.root.marker").exists()) {
       return currentDir
     }
     currentDir = currentDir.parentFile
