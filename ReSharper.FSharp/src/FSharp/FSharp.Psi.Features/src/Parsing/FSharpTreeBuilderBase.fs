@@ -830,6 +830,18 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeAsTypeReferenceName(rhsType)
             x.Done(range, mark, ElementType.OR_TYPE_USAGE)
 
+        | SynType.Intersection(synTypar, hashConstraints, range, _) ->
+            let mark = x.Mark(range)
+
+            match synTypar with
+            | Some synTypar -> x.ProcessTypeParameter(synTypar)
+            | None -> ()
+
+            for hashConstraint in hashConstraints do
+                x.ProcessType(hashConstraint)
+
+            x.Done(range, mark, ElementType.INTERSECTION_TYPE_USAGE)
+
         | SynType.FromParseError _ -> ()
 
     member x.MarkTypes(synType1, synType2, range: range, elementType) =

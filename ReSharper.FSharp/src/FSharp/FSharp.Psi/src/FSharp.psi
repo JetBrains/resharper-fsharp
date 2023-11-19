@@ -1846,6 +1846,7 @@ interface typeUsage:
   namedStaticConstantTypeUsage |
   constrainedTypeUsage |
   orTypeUsage |
+  intersectionTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1924,6 +1925,17 @@ orTypeUsage:
   typeUsage
   OR
   typeUsage;
+
+intersectionTypeUsage:
+  (
+    typeParameterDeclaration<TYPE_PARAMETER, TypeParameter>
+    AMP
+  )?
+  typeUsage<HASH_CONSTRAINT, HashConstrains>
+  (
+    AMP
+    typeUsage<HASH_CONSTRAINT, HashConstrains>
+  )*;
 
 unsupportedTypeUsage:
   fakeSeparator;

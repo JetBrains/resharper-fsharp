@@ -709,6 +709,10 @@ type FSharpParserTest() =
     [<Test>] member x.``XmlDoc 02 - Simple comment at the end``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 03 - Empty``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types intersection 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types intersection 02 - With type parameter``() = x.DoNamedTest()
+    [<Test>] member x.``Types intersection 03 - Abstract member``() = x.DoNamedTest()
+
 
 [<FSharpSignatureTest>]
 type FSharpSignatureParserTest() =
