@@ -63,6 +63,8 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Binary - Op deindent 01``() = x.DoNamedTest()
     [<Test>] member x.``Binary - Typed 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Dot lambda 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Dynamic 01``() = x.DoNamedTest()
     [<Test>] member x.``Dynamic 02``() = x.DoNamedTest()
     [<Test>] member x.``Dynamic 03``() = x.DoNamedTest()
