@@ -1,0 +1,5 @@
+﻿module Module
+
+type zzz = interface end
+
+let f (x: #zzz) = ()

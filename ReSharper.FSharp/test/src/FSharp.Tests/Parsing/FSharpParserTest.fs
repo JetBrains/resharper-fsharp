@@ -720,6 +720,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Types intersection 04 - Subtype``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash type usage 01 - Underscore``() = x.DoNamedTest()
+    //TODO: FIX
+    [<Test>] member x.``Hash type usage 02 - Next line``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]
