@@ -149,6 +149,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Hash directives 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 02 - Include``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 03 - Light``() = x.DoNamedTest()
+    [<Test>] member x.``Hash directives 04 - Ident``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators - Custom 3 - Multiplication decl``() = x.DoNamedTest()
 

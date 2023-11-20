@@ -720,7 +720,6 @@ type FSharpParserTest() =
     [<Test>] member x.``Types intersection 04 - Subtype``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash type usage 01 - Underscore``() = x.DoNamedTest()
-    //TODO: Fix lexing since hash type usage is recognized as PP_DIRECTIVE token
     [<Test>] member x.``Hash type usage 02 - Next line``() = x.DoNamedTest()
 
 

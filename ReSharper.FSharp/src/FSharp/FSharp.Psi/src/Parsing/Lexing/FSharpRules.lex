@@ -658,7 +658,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
   yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 
-<PPDIRECTIVE> {HASH}{IDENT}                      { yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
+<PPDIRECTIVE> {HASH}{IDENT}                      { yypushback(yylength()); yybegin(LINE); Clear(); break; }
 
 <PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return MakeToken(PP_IF_SECTION); }
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return MakeToken(PP_ELSE_SECTION); }
