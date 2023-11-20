@@ -1845,6 +1845,7 @@ interface typeUsage:
   exprStaticConstantTypeUsage |
   namedStaticConstantTypeUsage |
   constrainedTypeUsage |
+  hashTypeUsage |
   orTypeUsage |
   intersectionTypeUsage |
   unsupportedTypeUsage;
@@ -1925,6 +1926,10 @@ orTypeUsage:
   typeUsage
   OR
   typeUsage;
+
+hashTypeUsage:
+  HASH<HASH, Hash>
+  typeUsage<TYPE, TypeUsage>;
 
 intersectionTypeUsage:
   (

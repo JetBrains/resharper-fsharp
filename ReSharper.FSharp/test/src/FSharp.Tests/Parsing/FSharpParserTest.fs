@@ -719,6 +719,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Types intersection 03 - Abstract member``() = x.DoNamedTest()
     [<Test>] member x.``Types intersection 04 - Subtype``() = x.DoNamedTest()
 
+    [<Test>] member x.``Hash type usage 01 - Underscore``() = x.DoNamedTest()
+
 
 [<FSharpSignatureTest>]
 type FSharpSignatureParserTest() =

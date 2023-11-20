@@ -19,7 +19,7 @@ IFSharpImplFile
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IIntersectionTypeUsage
-                IUnsupportedTypeUsage
+                IHashTypeUsage
                   FSharpToken(type:HASH, text:#)
                   INamedTypeUsage
                     ITypeReferenceName
@@ -27,7 +27,7 @@ IFSharpImplFile
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpTokenType+AmpTokenElement(type:AMP, text:&)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IUnsupportedTypeUsage
+                IHashTypeUsage
                   FSharpToken(type:HASH, text:#)
                   INamedTypeUsage
                     ITypeReferenceName
