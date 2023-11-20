@@ -1,1 +1,0 @@
-let _ = List.map _.ToString().[0] [1]
