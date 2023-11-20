@@ -1928,14 +1928,10 @@ orTypeUsage:
 
 intersectionTypeUsage:
   (
-    typeParameterDeclaration<TYPE_PARAMETER, TypeParameter>
-    AMP
+    typeReferenceName<TYPE_REFERENCE, ReferenceName>
+    AMP<AMP, Ands>
   )?
-  typeUsage<HASH_CONSTRAINT, HashConstrains>
-  (
-    AMP
-    typeUsage<HASH_CONSTRAINT, HashConstrains>
-  )*;
+  LIST typeUsage<HASH_CONSTRAINT, HashConstrains> SEP AMP<AMP, Ands>;
 
 unsupportedTypeUsage:
   fakeSeparator;
