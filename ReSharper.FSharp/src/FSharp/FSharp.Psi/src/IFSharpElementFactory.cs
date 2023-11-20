@@ -74,5 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     IModuleMember CreateModuleMember(string source);
     IFSharpTypeMemberDeclaration CreateTypeMember(string source);
+
+    IDotLambdaExpr CreateDotLambda();
   }
 }

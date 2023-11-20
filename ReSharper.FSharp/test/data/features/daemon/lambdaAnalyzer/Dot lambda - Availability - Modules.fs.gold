@@ -1,0 +1,9 @@
+﻿module M1
+
+let _ = 5
+
+module Nested =
+    let x = |fun x ->|(0) x.ToString()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Shorthand lambda can be used

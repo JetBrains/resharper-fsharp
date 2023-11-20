@@ -127,6 +127,7 @@
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxTest.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithDotLambdaTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
 

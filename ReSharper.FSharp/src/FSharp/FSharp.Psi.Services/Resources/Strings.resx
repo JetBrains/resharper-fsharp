@@ -304,4 +304,7 @@
     <data name="NestedRecordUpdateCanBeSimplifiedMessage" xml:space="preserve">
         <value>Nested record update can be simplified</value>
     </data>
+    <data name="DotLambdaCanBeUsedStringMessage" xml:space="preserve">
+        <value>Shorthand lambda can be used</value>
+    </data>
 </root>
