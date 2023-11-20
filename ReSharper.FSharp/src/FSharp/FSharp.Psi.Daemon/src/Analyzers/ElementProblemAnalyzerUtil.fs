@@ -5,6 +5,7 @@ open System
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -25,8 +26,16 @@ type ElementProblemAnalyzerData with
 
     member this.FSharpCoreVersion =
         this.GetOrCreateDataUnderLock(fsCoreVersionKey, fun _ ->
-            this.File.GetPsiModule()
-            |> getReferencedModules
+            let moduleReferences =
+                let psiModule = this.File.GetPsiModule()
+                match psiModule with
+                | :? FSharpScriptPsiModule ->
+                    let psiModules = psiModule.GetPsiServices().Modules
+                    psiModules.GetModuleReferences(psiModule) |> Seq.map (fun reference -> reference.Module)
+                | _ ->
+                    psiModule |> getReferencedModules
+
+            moduleReferences
             |> Seq.tryPick (fun psiModule ->
                 match psiModule with
                 | :? IAssemblyPsiModule as assemblyPsiModule when assemblyPsiModule.Name = "FSharp.Core" ->
@@ -44,6 +53,12 @@ type ElementProblemAnalyzerData with
 
     member this.IsFSharp60Supported =
         this.LanguageLevel >= FSharpLanguageLevel.FSharp60
+
+    member this.IsFSharp70Supported =
+        this.LanguageLevel >= FSharpLanguageLevel.FSharp70
+
+    member this.IsFSharp80Supported =
+        this.LanguageLevel >= FSharpLanguageLevel.FSharp80
 
     member this.IsFSharpExperimentalSupported =
         this.LanguageLevel >= FSharpLanguageLevel.Preview

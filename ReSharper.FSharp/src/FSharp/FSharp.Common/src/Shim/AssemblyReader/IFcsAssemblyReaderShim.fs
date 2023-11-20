@@ -2,7 +2,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open System
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open JetBrains.DataFlow
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.Util.Dotnet.TargetFrameworkIds
+
+type FcsProjectKey =
+    { Project: IProject
+      TargetFrameworkId: TargetFrameworkId }
+
+    static member Create(psiModule: IPsiModule) =
+        { Project = psiModule.ContainingProjectModule :?> _
+          TargetFrameworkId = psiModule.TargetFrameworkId }
+
+    static member Create(project, targetFrameworkId) =
+        { Project = project
+          TargetFrameworkId = targetFrameworkId }
 
 type IProjectFcsModuleReader =
     inherit ILModuleReader
@@ -10,6 +25,8 @@ type IProjectFcsModuleReader =
     abstract Path: VirtualFileSystemPath
     abstract PsiModule: IPsiModule
     abstract Timestamp: DateTime
+
+    abstract MarkDirty: typeShortName: string -> unit
 
     /// Marks as possibly needing the timestamp update
     abstract MarkDirty: unit -> unit
@@ -27,48 +44,26 @@ type IProjectFcsModuleReader =
     abstract RealModuleReader: ILModuleReader option with get, set
 
 
-[<RequireQualifiedAccess>]
-type ReferencedAssembly =
-    /// An output of a psi source project except for F# projects.
-    | ProjectOutput of IProjectFcsModuleReader * ILModuleReader option
-
-    /// Not supported file or output assembly for F# project.
-    | Ignored of path: VirtualFileSystemPath
-
-    member this.Path =
-        match this with
-        | ProjectOutput(reader, _) -> reader.Path
-        | Ignored path -> path
-
-
-module ReferencedAssembly =
-    let invalid = ReferencedAssembly.Ignored(VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext))
-
-
 type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
-    abstract HasDirtyTypes: bool
+    abstract HasDirtyModules: bool
     abstract Logger: ILogger
 
-    abstract GetModuleReader: psiModule: IPsiModule -> ReferencedAssembly
+    abstract ProjectInvalidated: ISignal<FcsProjectKey>
+
+    abstract TryGetModuleReader: projectKey: FcsProjectKey -> IProjectFcsModuleReader option
 
     abstract IsKnownModule: IPsiModule -> bool
     abstract IsKnownModule: VirtualFileSystemPath -> bool
 
-    /// Removes reader for the module if present, another reader is going to be created for it
-    abstract InvalidateModule: psiModule: IPsiModule -> unit
-
-    abstract InvalidateAll: reason: string -> unit
-
+    /// Marks module as dirty, so it could be invalidated before the next FCS request
     abstract MarkDirty: IPsiModule -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
     abstract InvalidateDirty: unit -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
+    /// todo: remove psi module, replace with project key
     abstract InvalidateDirty: psiModule: IPsiModule -> unit
 
-    abstract RemoveModule: psiModule: IPsiModule -> unit
-
     abstract TestDump: string
-    abstract RecordInvalidations: bool with set

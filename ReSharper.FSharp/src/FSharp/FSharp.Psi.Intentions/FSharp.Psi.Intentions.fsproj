@@ -106,6 +106,8 @@
     <Compile Include="src\QuickFixes\RemovePatternArgumentFix.fs" />
     <Compile Include="src\QuickFixes\AddSetterFix.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFix.fs" />
+    <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithDotLambdaFix.fs" />
     <Compile Include="src\ZoneMarker.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>

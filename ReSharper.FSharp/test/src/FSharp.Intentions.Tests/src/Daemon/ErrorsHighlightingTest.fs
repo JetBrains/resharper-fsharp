@@ -17,8 +17,8 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Enum Rqa analyzer 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Extension analyzer 01``() = x.DoNamedTest()
-    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.Preview)>] member x.``Extension analyzer 02``() = x.DoNamedTest()
+    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>] member x.``Extension analyzer 01``() = x.DoNamedTest()
+    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>] member x.``Extension analyzer 02``() = x.DoNamedTest()
 
     [<HighlightOnly(typeof<RedundantIndexerDotWarning>)>]
     [<Test>] member x.``Indexer dot analyzer 01``() = x.DoNamedTest()

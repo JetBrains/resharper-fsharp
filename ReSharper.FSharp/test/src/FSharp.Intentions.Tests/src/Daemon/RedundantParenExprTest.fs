@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -65,6 +66,9 @@ type RedundantParenExprTest() =
     [<Test>] member x.``Dynamic 01``() = x.DoNamedTest()
     [<Test>] member x.``Dynamic 02``() = x.DoNamedTest()
     [<Test>] member x.``Dynamic 03``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Enum field 01``() = x.DoNamedTest()
 
     [<Test>] member x.``For each - Condition - If 01``() = x.DoNamedTest()
 

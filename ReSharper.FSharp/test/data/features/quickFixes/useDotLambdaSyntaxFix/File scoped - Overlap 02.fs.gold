@@ -1,0 +1,1 @@
+﻿_.ToString(fun{caret} x -> x.ToString())

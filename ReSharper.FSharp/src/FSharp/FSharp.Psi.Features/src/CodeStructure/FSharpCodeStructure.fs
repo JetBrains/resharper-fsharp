@@ -27,9 +27,16 @@ open JetBrains.Util
 [<SolutionComponent>]
 [<ZoneMarker(typeof<IResharperHostCoreFeatureZone>, typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpExtendedFileStructureLanguage() =
+    let filters : IStructureTreeElementFilter array = [| StructureTreeElementFilter() |]
     interface IExtendedFileStructureLanguage with
         member this.IsValid(languageType) =
             isNotNull languageType && languageType.Is<FSharpLanguage>()
+
+        member this.GetFilters() = filters
+   
+    type private StructureTreeElementFilter() =
+        interface IStructureTreeElementFilter with
+            member this.IsVisibleInStructureTree(element) = not (element :? IFSharpGeneratedElement)
 
 
 [<Language(typeof<FSharpLanguage>)>]

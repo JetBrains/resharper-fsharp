@@ -1,0 +1,18 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    int i1 = U.P1;
+    int i2 = U.P2;
+
+    U.|P1|(0) = i1;
+    U.P2 = i2;
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The property 'U.P1' has no setter
+P:U.P1
+P:U.P2
+P:U.P1
+P:U.P2

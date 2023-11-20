@@ -130,7 +130,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   @Test
   fun testSymbolicKeyword() {
     doTest(
-      "let! use! do! yield! return! match! | -> <- . : ( ) [ ] [< >] " +
+      "let! use! do! yield! return! match! and! while! | -> <- . : ( ) [ ] [< >] " +
         "[| |] { } ' # :?> :? :> .. :: := ;; ; = _ ? ?? (*) <@ @> <@@ @@>",
       """
                 |LET_BANG ('let!')
@@ -144,6 +144,10 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
                 |RETURN_BANG ('return!')
                 |WHITESPACE (' ')
                 |MATCH_BANG ('match!')
+                |WHITESPACE (' ')
+                |AND_BANG ('and!')
+                |WHITESPACE (' ')
+                |WHILE_BANG ('while!')
                 |WHITESPACE (' ')
                 |BAR ('|')
                 |WHITESPACE (' ')

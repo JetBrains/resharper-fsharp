@@ -1,0 +1,33 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:async)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IComputationExpr
+            FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpToken(type:BAD_TAB, text:	)
+            IWhileExpr
+              FSharpTokenType+WhileBangTokenElement(type:WHILE_BANG, text:while!)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IPrefixAppExpr
+                IReferenceExpr
+                  FSharpIdentifierToken(type:IDENTIFIER, text:something)
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+DoTokenElement(type:DO, text:do)
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:          ) spaces:"          "
+              IUnitExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

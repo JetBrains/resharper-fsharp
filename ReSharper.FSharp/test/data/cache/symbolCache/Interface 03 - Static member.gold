@@ -1,0 +1,7 @@
+﻿Project Files:Interface 03 - Static member.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Class:Module
+  InterfacePart:I->Interface:Module+I
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [I]: Interface:Module+I[TestProject]

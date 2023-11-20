@@ -409,6 +409,22 @@ let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode and 'T: not st
 let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
     skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
+let rec getQualifiedExprIgnoreParens (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr.IgnoreParentParens()) with
+    | null -> expr.IgnoreParentParens()
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let rec getQualifiedExpr (expr: IFSharpExpression) =
+    match QualifiedExprNavigator.GetByQualifier(expr) with
+    | null -> expr
+    | expr -> getQualifiedExprIgnoreParens expr
+
+let isDirectPartOfDotLambda (expr: IFSharpExpression) =
+    let prefixApp = PrefixAppExprNavigator.GetByExpression(expr)
+    let expr = if isNull prefixApp then expr else prefixApp
+    let qualifiedExpr = getQualifiedExpr expr
+    isNotNull (DotLambdaExprNavigator.GetByExpression(qualifiedExpr))
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProvider() =
@@ -500,6 +516,7 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with
     | :? IPrefixAppExpr as appExpr -> appExpr.IsIndexerLike
+    | :? IItemIndexerExpr -> true
     | _ -> false
 
 let rec getIndexerExprOrIgnoreParens (expr: IFSharpExpression) =
@@ -512,3 +529,22 @@ let rec getIndexerExprOrIgnoreParens (expr: IFSharpExpression) =
         getIndexerExprOrIgnoreParens indexerExpr else
 
     expr.IgnoreParentParens()
+
+let rec isContextWithoutWildPats (expr: ITreeNode) =
+    let inline containsWildPat (patterns: TreeNodeCollection<IFSharpPattern>) =
+        patterns
+        |> Seq.collect (fun x -> x.NestedPatterns)
+        |> Seq.exists (fun x -> x :? IWildPat)
+
+    match expr.Parent with
+    | null -> true
+    | :? IDotLambdaExpr -> false
+    | :? ILambdaExpr as lambda ->
+        if containsWildPat lambda.Patterns then false
+        else isContextWithoutWildPats expr.Parent
+    | :? IParameterOwnerMemberDeclaration as owner ->
+        if containsWildPat owner.ParameterPatterns then false
+        else isContextWithoutWildPats expr.Parent
+    | :? ITypeDeclaration
+    | :? IModuleDeclaration -> true
+    | _ -> isContextWithoutWildPats expr.Parent

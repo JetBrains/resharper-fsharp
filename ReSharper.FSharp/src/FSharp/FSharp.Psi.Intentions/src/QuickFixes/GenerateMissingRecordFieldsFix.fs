@@ -42,7 +42,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             let createdBinding = indexedBindings[fieldIndex]
 
             if isNull createdBinding then
-                let binding = elementFactory.CreateRecordFieldBinding(declaredField, generateSingleLine)
+                let binding = elementFactory.CreateRecordFieldBinding([|declaredField|], generateSingleLine)
 
                 let actualBinding =
                     if fieldIndex = 0 then

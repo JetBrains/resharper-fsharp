@@ -301,4 +301,10 @@
     <data name="YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage" xml:space="preserve">
         <value>`yield` may only be used within list, array, and sequence expressions</value>
     </data>
+    <data name="NestedRecordUpdateCanBeSimplifiedMessage" xml:space="preserve">
+        <value>Nested record update can be simplified</value>
+    </data>
+    <data name="DotLambdaCanBeUsedStringMessage" xml:space="preserve">
+        <value>Shorthand lambda can be used</value>
+    </data>
 </root>

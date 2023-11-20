@@ -1,0 +1,46 @@
+﻿public class C11 : T1
+{
+    public int P => 1;
+}
+
+public class C12 : T1
+{
+    int T1.P => 1;
+}
+
+public class C21 : T2
+{
+    public void Dispose() {}
+}
+
+public class C22 : T2
+{
+    void System.IDisposable.Dispose() {}
+}
+
+public |class C31 : T3|(0)
+{
+    public int |P1|(1) => 1;
+}
+
+public |class C32 : T3|(2)
+{
+    int |T3.|(3)P1 => 1;
+}
+
+public class C41 : T4
+{
+    int P => 1;
+}
+
+public class C42 : T4
+{
+    int |T4.|(4)P => 1;
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Base class 'T3' does not contain parameterless constructor
+(1): ReSharper Underlined Error Highlighting: 'int C31.P1' hides inherited abstract property 'int T3.P1'
+(2): ReSharper Underlined Error Highlighting: Base class 'T3' does not contain parameterless constructor
+(3): ReSharper Underlined Error Highlighting: 'T3' in explicit interface declaration is not an interface
+(4): ReSharper Underlined Error Highlighting: 'T4' in explicit interface declaration is not an interface

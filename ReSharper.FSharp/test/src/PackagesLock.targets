@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="Fantomas.Core" Version="6.0.5" />
+    <PackageLock Include="Fantomas.Core" Version="6.2.2" />
     <PackageLock Include="FSharp.Core" Version="7.0.300" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2023.3.1.2" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
-    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.7.20230927.119" />
-    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.7.20230927.119" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.7.20230927.119" />
+    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.8.20231118.122" />
+    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.8.20231118.122" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.8.20231118.122" />
     <PackageLock Include="JetBrains.RdFramework" Version="2023.3.0" />
     <PackageLock Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="1.1.1" />
@@ -15,7 +15,7 @@
     <PackageLock Include="Moq" Version="4.16.1" />
     <PackageLock Include="NUnit" Version="3.13.2" />
     <PackageLock Include="NUnit.Console" Version="3.12.0" />
-    <PackageLock Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageLock Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageLock Include="System.Diagnostics.Debug" Version="4.3.0" />
     <PackageLock Include="System.Memory" Version="4.5.5" />
     <PackageLock Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
