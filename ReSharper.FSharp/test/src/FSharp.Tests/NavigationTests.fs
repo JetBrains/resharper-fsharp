@@ -177,6 +177,8 @@ type FSharpGoToDeclarationTest() =
 
     [<Test>] member x.``Dot lambda 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types intersection 01``() = x.DoNamedTest()
+
 
 type FSharpGoToTypeTest() =
     inherit FSharpContextSearchTestBase("type")
