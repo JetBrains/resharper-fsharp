@@ -85,8 +85,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateReferencingModules(FcsProjectKey projectKey)
     {
-      myLocks.AssertWriteAccessAllowed();
-
       foreach (var referencingModule in myReferencingModules[projectKey])
       {
         if (ProjectSymbolsCaches.TryGetValue(referencingModule, out var moduleSymbols))
