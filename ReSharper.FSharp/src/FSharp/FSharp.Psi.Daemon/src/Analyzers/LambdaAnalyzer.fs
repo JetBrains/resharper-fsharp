@@ -121,6 +121,58 @@ type LambdaAnalyzer() =
 
         exprType <> lambdaReturnType
 
+    let isLambdaArgOwnerSupported (lambda: IFSharpExpression) delegatesConversionSupported (replacementExprSymbol: FSharpSymbol voption) =
+        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
+        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
+        let argExpr = argExpr.IgnoreParentParens()
+        let appTuple = TupleExprNavigator.GetByExpression(argExpr)
+        let app = getArgsOwner argExpr
+
+        let reference = getReference app
+        if not (app :? IPrefixAppExpr) || isNull reference then true else
+
+        if isNotNull binaryExpr && not (isNamedArgSyntactically binaryExpr) then true else
+
+        match reference.GetFcsSymbol() with
+        | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
+            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
+
+            let parameterGroups = m.CurriedParameterGroups
+            if parameterGroups.Count = 0 then true else
+
+            let parameters = parameterGroups[0]
+            if parameters.Count <= lambdaPos then true else
+
+            let parameterDecl = parameters[lambdaPos]
+            let parameterType = parameterDecl.Type
+            let parameterIsDelegate =
+                parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
+
+            // If the lambda is passed instead of a delegate,
+            // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification
+            if parameterIsDelegate && not delegatesConversionSupported then false else
+
+            match replacementExprSymbol with
+            | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
+                // If the lambda simplification does not convert it to a method group,
+                // for example, if the body of the lambda does not consist of a method call,
+                // then everything is OK
+                x.IsFunction || not x.IsMember ||
+
+                not parameterIsDelegate &&
+
+                // If the body of the lambda consists of a method call,
+                // and the method to which the lambda is passed has overloads,
+                // then it cannot be unambiguously determined whether the lambda can be simplified
+                match getAllMethods reference false "LambdaAnalyzer.getMethods" with
+                | None
+                | Some (_, None)
+                | Some (_, Some [])
+                | Some (_, Some [_]) -> true
+                | _ -> false
+            | _ -> true
+        | _ -> true
+
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
         if isFSharp6Supported && hasExplicitConversion(lambda) then null else
 
@@ -135,58 +187,7 @@ type LambdaAnalyzer() =
         | ValueSome (:? FSharpActivePatternCase) -> null
         | _ ->
 
-        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
-        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
-        let argExpr = argExpr.IgnoreParentParens()
-        let appTuple = TupleExprNavigator.GetByExpression(argExpr)
-        let app = getArgsOwner argExpr
-
-        let outerReferenceCheck =
-            let reference = getReference app
-            if not (app :? IPrefixAppExpr) || isNull reference then true else
-
-            if isNotNull binaryExpr && not (isNamedArgSyntactically binaryExpr) then true else
-
-            match reference.GetFcsSymbol() with
-            | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
-                let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
-
-                let parameterGroups = m.CurriedParameterGroups
-                if parameterGroups.Count = 0 then true else
-
-                let parameters = parameterGroups[0]
-                if parameters.Count <= lambdaPos then true else
-
-                let parameterDecl = parameters[lambdaPos]
-                let parameterType = parameterDecl.Type
-                let parameterIsDelegate =
-                    parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
-
-                // If the lambda is passed instead of a delegate,
-                // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification
-                if parameterIsDelegate && not isFSharp6Supported then false else
-
-                match replacementExprSymbol with
-                | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
-                    // If the lambda simplification does not convert it to a method group,
-                    // for example, if the body of the lambda does not consist of a method call,
-                    // then everything is OK
-                    x.IsFunction || not x.IsMember ||
-
-                    not parameterIsDelegate &&
-
-                    // If the body of the lambda consists of a method call,
-                    // and the method to which the lambda is passed has overloads,
-                    // then it cannot be unambiguously determined whether the lambda can be simplified
-                    match getAllMethods reference false "LambdaAnalyzer.getMethods" with
-                    | None
-                    | Some (_, None)
-                    | Some (_, Some [])
-                    | Some (_, Some [_]) -> true
-                    | _ -> false
-                | _ -> true
-            | _ -> true
-
+        let outerReferenceCheck = isLambdaArgOwnerSupported lambda isFSharp6Supported replacementExprSymbol
         if not outerReferenceCheck then null else
 
         match replacementExprSymbol with
@@ -264,7 +265,8 @@ type LambdaAnalyzer() =
 
         inner null expr
 
-    let getRootRefExprIfCanBeConvertedToDotLambda (pat: ILocalReferencePat) (expr: IFSharpExpression) =
+    let getRootRefExprIfCanBeConvertedToDotLambda (pat: ILocalReferencePat) (lambda: ILambdaExpr) =
+        let expr = lambda.Expression.IgnoreInnerParens()
         if not expr.IsSingleLine then null else
 
         let rootRefExpr = getRootRefExpr expr
@@ -288,7 +290,10 @@ type LambdaAnalyzer() =
                     convertingUnsupported <- isNull symbol || symbol.IsEffectivelySameAs(patSymbol)
                 | _ -> ()
         })
-        if convertingUnsupported then null else rootRefExpr
+        if convertingUnsupported then null
+        //TODO: workaround for https://github.com/dotnet/fsharp/issues/16305
+        elif not (isLambdaArgOwnerSupported lambda false ValueNone) then null
+        else rootRefExpr
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
@@ -336,7 +341,7 @@ type LambdaAnalyzer() =
                             tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFSharp60Supported :> _
                         else null
                     | :? ILocalReferencePat as pat when isFSharp80Supported ->
-                        let referenceExpr = getRootRefExprIfCanBeConvertedToDotLambda pat expr
+                        let referenceExpr = getRootRefExprIfCanBeConvertedToDotLambda pat lambda
                         if isNull referenceExpr then null
                         else DotLambdaCanBeUsedWarning(lambda, referenceExpr)
                     | _ -> null
