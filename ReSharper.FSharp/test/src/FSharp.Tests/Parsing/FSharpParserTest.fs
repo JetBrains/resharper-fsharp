@@ -440,6 +440,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Slice - Star 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - Star 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Interpolated string - Raw 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string - Raw 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 03 - Whitespace``() = x.DoNamedTest()

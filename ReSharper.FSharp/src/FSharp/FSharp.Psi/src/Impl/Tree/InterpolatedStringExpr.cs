@@ -29,6 +29,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : startOffset.Shift(+1).ExtendRight(+1);
     }
 
+    public int DollarCount
+    {
+      get
+      {
+        var child = FirstChild;
+        if (child == null)
+          return 1;
+
+        var tokenType = child.GetTokenType();
+        if (tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING ||
+            tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING_START)
+        {
+          var text = child.GetText();
+          var dollarCount = 0;
+          while (text[dollarCount] == '$')
+            dollarCount++;
+
+          return dollarCount;
+        }
+
+        return 1;
+      }
+    }
+
     bool IInjectionHostNode.IsValidHost => true;
   }
 }

@@ -156,6 +156,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Identifiers;
     public static readonly NodeTypeSet Operators;
     public static readonly NodeTypeSet StringsLiterals;
+    public static readonly NodeTypeSet RawInterpolatedStrings;
     public static readonly NodeTypeSet InterpolatedStrings;
     public static readonly NodeTypeSet InterpolatedStringsStart;
     public static readonly NodeTypeSet InterpolatedStringsMiddle;
@@ -288,7 +289,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         BYTEARRAY,
         VERBATIM_BYTEARRAY);
 
+      RawInterpolatedStrings = new NodeTypeSet(
+        RAW_INTERPOLATED_STRING,
+        RAW_INTERPOLATED_STRING_START,
+        RAW_INTERPOLATED_STRING_MIDDLE,
+        RAW_INTERPOLATED_STRING_END,
+        UNFINISHED_RAW_INTERPOLATED_STRING
+      );
+
       InterpolatedStrings = new NodeTypeSet(
+        RAW_INTERPOLATED_STRING,
+        RAW_INTERPOLATED_STRING_START,
+        RAW_INTERPOLATED_STRING_MIDDLE,
+        RAW_INTERPOLATED_STRING_END,
         REGULAR_INTERPOLATED_STRING,
         REGULAR_INTERPOLATED_STRING_START,
         REGULAR_INTERPOLATED_STRING_MIDDLE,
@@ -301,21 +314,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         TRIPLE_QUOTE_INTERPOLATED_STRING_START,
         TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE,
         TRIPLE_QUOTE_INTERPOLATED_STRING_END,
+        UNFINISHED_RAW_INTERPOLATED_STRING,
         UNFINISHED_REGULAR_INTERPOLATED_STRING,
         UNFINISHED_VERBATIM_INTERPOLATED_STRING,
         UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING);
 
       InterpolatedStringsStart = new NodeTypeSet(
+        RAW_INTERPOLATED_STRING_START,
         REGULAR_INTERPOLATED_STRING_START,
         VERBATIM_INTERPOLATED_STRING_START,
         TRIPLE_QUOTE_INTERPOLATED_STRING_START);
 
       InterpolatedStringsMiddle = new NodeTypeSet(
+        RAW_INTERPOLATED_STRING_MIDDLE,
         REGULAR_INTERPOLATED_STRING_MIDDLE,
         VERBATIM_INTERPOLATED_STRING_MIDDLE,
         TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE);
 
       InterpolatedStringsEnd = new NodeTypeSet(
+        RAW_INTERPOLATED_STRING_END,
         REGULAR_INTERPOLATED_STRING_END,
         VERBATIM_INTERPOLATED_STRING_END,
         TRIPLE_QUOTE_INTERPOLATED_STRING_END);

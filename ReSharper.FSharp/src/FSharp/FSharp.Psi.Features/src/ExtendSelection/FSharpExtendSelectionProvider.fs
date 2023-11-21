@@ -203,11 +203,12 @@ and FSharpTreeRangeOffsetSelection(fsFile, first: ITreeNode, last: ITreeNode, fi
 and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
     inherit TokenPartSelection<IFSharpFile>(fsFile, treeTextRange, token)
 
-    let findInterpolationInsertRange (tokenType: TokenNodeType): ISelectedRange =
+    let findInterpolationInsertRange (token: ITokenNode): ISelectedRange =
+        let tokenType = token.GetTokenType()
         if not FSharpTokenType.InterpolatedStrings[tokenType] then null else
 
-        let tokenTextEnd = TreeTextRange(token.GetTreeEndOffset()).ExtendLeft(getStringEndingQuotesLength tokenType)
-        let tokenTextStart = TreeTextRange(token.GetTreeStartOffset()).ExtendRight(getStringStartingQuotesLength tokenType)
+        let tokenTextEnd = TreeTextRange(token.GetTreeEndOffset()).ExtendLeft(getStringEndingQuotesLength token)
+        let tokenTextStart = TreeTextRange(token.GetTreeStartOffset()).ExtendRight(getStringStartingQuotesLength token)
 
         let interpolatedStringExpr = token.GetContainingNode<IInterpolatedStringExpr>()
         if isNull interpolatedStringExpr then null else
@@ -251,8 +252,8 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
         let text, start =
             if tokenType.IsStringLiteral || FSharpTokenType.InterpolatedStrings[tokenType] then
                 // todo: trim end if it actually ends with proper symbols?
-                let left = getStringStartingQuotesLength tokenType
-                let right = getStringEndingQuotesLength tokenType
+                let left = getStringStartingQuotesLength token
+                let right = getStringEndingQuotesLength token
                 trim left right
 
             elif tokenType == FSharpTokenType.IDENTIFIER then
@@ -285,7 +286,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
                 FSharpTreeNodeSelection(fsFile, token) :> _
             else
 
-            let interpolationInsertRange = findInterpolationInsertRange tokenType
+            let interpolationInsertRange = findInterpolationInsertRange token
             if isNotNull interpolationInsertRange then
                 interpolationInsertRange else
 
@@ -342,13 +343,13 @@ and FSharpInterpolatedStringExpressionSelection(fsFile: IFSharpFile, expr: IInte
         Func<_,_>(FSharpInterpolatedStringExpressionSelection.LastOffsetFunc))
 
     static member LastOffsetFunc(node: ITreeNode) =
-        let tokenType = node.GetTokenType()
-        let quotesLength = if isNotNull tokenType then getStringEndingQuotesLength tokenType else 0
+        let token = node.As<ITokenNode>()
+        let quotesLength = if isNotNull token then getStringEndingQuotesLength token else 0
         node.GetTreeEndOffset().Shift(-quotesLength)
 
     static member FirstOffsetFunc(node: ITreeNode) =
-        let tokenType = node.GetTokenType()
-        let quotesLength = if isNotNull tokenType then getStringStartingQuotesLength tokenType else 0
+        let token = node.As<ITokenNode>()
+        let quotesLength = if isNotNull token then getStringStartingQuotesLength token else 0
         node.GetTreeStartOffset().Shift(quotesLength)
 
 and FSharpBindingSelection(fsFile: IFSharpFile, binding: IBinding, letBindings: ILetBindings) =

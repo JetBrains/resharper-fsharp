@@ -55,7 +55,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     return myParenLevel + myBrackLevel;
   }
 
-  private void StartInterpolatedString(FSharpInterpolatedStringKind kind)
+  private void StartInterpolatedString(FSharpInterpolatedStringKind kind, Integer delimiterLength)
   {
     FSharpLexerContext previousContext = new FSharpLexerContext(
       yystate(),
@@ -66,10 +66,82 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
     FSharpLexerInterpolatedStringState interpolatedStringState = new FSharpLexerInterpolatedStringState(
       kind,
+      delimiterLength,
       previousContext,
       new Stack<>()
     );
     myInterpolatedStringStates.push(interpolatedStringState);
+  }
+
+  public IElementType StartRawInterpolatedString()
+  {
+    var index = zzMarkedPos;
+    zzCurrentPos = zzStartRead;
+    var dollarCount = ConsumeCharSequence('$', null);
+
+    StartInterpolatedString(FSharpInterpolatedStringKind.Raw, dollarCount);
+
+    zzCurrentPos = index;
+
+    return ContinueRawInterpolatedString(dollarCount, true);
+  }
+
+  private int ConsumeCharSequence(char ch, Integer max)
+  {
+    var start = zzCurrentPos;
+
+    while (zzCurrentPos < zzEndRead && zzBuffer.charAt(zzCurrentPos) == ch && (max == null || zzCurrentPos - start < max))
+      zzCurrentPos++;
+
+    return zzCurrentPos - start;
+  }
+
+  private IElementType ContinueRawInterpolatedString(int dollarCount, boolean isStart)
+  {
+    while (zzCurrentPos < zzEndRead)
+    {
+      if (zzCurrentPos == zzEndRead)
+      {
+        return MakeRawStringToken(FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING);
+      }
+
+      var ch = zzBuffer.charAt(zzCurrentPos);
+      if (ch == '{')
+      {
+        var braceCount = ConsumeCharSequence('{', null);
+        if (braceCount >= dollarCount)
+        {
+          var tokenType = isStart
+                  ? FSharpTokenType.RAW_INTERPOLATED_STRING_START
+                  : FSharpTokenType.RAW_INTERPOLATED_STRING_MIDDLE;
+          return MakeRawStringToken(tokenType);
+        }
+      }
+
+      if (ch == '\"')
+      {
+        var quoteCount = ConsumeCharSequence('\"', 3);
+        if (quoteCount == 3)
+        {
+          var tokenType = isStart
+                  ? FSharpTokenType.RAW_INTERPOLATED_STRING
+                  : FSharpTokenType.RAW_INTERPOLATED_STRING_END;
+
+          myInterpolatedStringStates.pop();
+          return MakeRawStringToken(tokenType);
+        }
+      }
+
+      zzCurrentPos++;
+    }
+
+    return MakeRawStringToken(FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING);
+  }
+
+  IElementType MakeRawStringToken(IElementType tokenType)
+  {
+    zzMarkedPos = zzCurrentPos;
+    return MakeToken(tokenType);
   }
 
   private void FinishInterpolatedString()
@@ -96,10 +168,26 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     }
   }
 
-  private boolean PopInterpolatedStringItem(InterpolatedStringStackItem item)
+  private IElementType PopInterpolatedStringItem(InterpolatedStringStackItem item)
   {
-    if (myInterpolatedStringStates.empty()) return false;
+    if (myInterpolatedStringStates.empty())
+      return MakeToken(RBRACE);
+
     FSharpLexerInterpolatedStringState state = myInterpolatedStringStates.peek();
+    if (state.getKind() == FSharpInterpolatedStringKind.Raw && state.getDelimiterLength() != null && item == InterpolatedStringStackItem.Brace)
+    {
+      Integer delimiterLength = state.getDelimiterLength();
+      zzCurrentPos = zzStartRead;
+      var braceCount = ConsumeCharSequence('}', null);
+      if (braceCount < delimiterLength)
+      {
+        zzCurrentPos = zzMarkedPos = zzStartRead + 1;
+        return MakeToken(RBRACE);
+      }
+
+      return ContinueRawInterpolatedString(delimiterLength, false);
+    }
+
 
     if (state.getInterpolatedStringStack().empty() && item == InterpolatedStringStackItem.Brace)
     {
@@ -107,13 +195,13 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
       yybegin(ToState(myInterpolatedStringStates.peek()));
       Clear();
 
-      return true;
+      return null;
     }
 
     if (state.getInterpolatedStringStack().peek() == item)
       state.getInterpolatedStringStack().pop();
 
-    return false;
+    return MakeToken(RBRACE);
   }
 
   public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState)
