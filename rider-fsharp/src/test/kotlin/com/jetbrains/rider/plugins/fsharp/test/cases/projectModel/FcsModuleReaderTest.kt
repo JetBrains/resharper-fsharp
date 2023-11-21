@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
@@ -71,7 +70,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   ) {
     val project = project
     withOpenedEditor(project, "FSharpProject/Library.fs") {
-      waitForDaemon()
+      waitForNextDaemon()
       assert(markupAdapter.hasErrors == hasErrors)
       assertFcsStampAndReferencedProjectNames(this, expectedReferencedProjects)
       dumpModuleReader(printStream, caption, project)
@@ -148,7 +147,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
         withOpenedEditor(project, "CSharpProject/Class1.cs") {
           typeFromOffset(" ", 75)
-          waitForDaemon()
+          waitForNextDaemon()
         }
 
         waitForDaemonCloseAllOpenEditors(project)
@@ -260,7 +259,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
       assertAllProjectsWereLoaded(project)
 
       withOpenedEditor(project, "FSharpProject/Library.fs") {
-        waitForDaemon()
+        waitForNextDaemon()
       }
 
       waitForDaemonCloseAllOpenEditors(project)
