@@ -265,6 +265,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Dot Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Dot Lambda 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Dot Lambda 05``() = x.DoNamedTest()
+    // TODO: update gold with new FCS
+    [<Test>] member x.``Expr - Dot Lambda 06 - No parens 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot Lambda 06 - No parens 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
@@ -708,6 +711,11 @@ type FSharpParserTest() =
     [<Test>] member x.``XmlDoc 01 - Simple comment separator``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 02 - Simple comment at the end``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc 03 - Empty``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types intersection 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types intersection 02 - With type parameter``() = x.DoNamedTest()
+    [<Test>] member x.``Types intersection 03 - Abstract member``() = x.DoNamedTest()
+    [<Test>] member x.``Types intersection 04 - Subtype``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]
