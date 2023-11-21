@@ -64,9 +64,8 @@ type FSharpTestAttribute(extension) =
         FSharpTestAttribute(FSharpProjectFileType.FsExtension)
 
     interface ITestLibraryReferencesProvider with
-        member this.GetReferences(_, _, _) = JetBrains.Util.EmptyArray.Instance
+        member this.GetReferences _ = JetBrains.Util.EmptyArray.Instance
         member this.Inherits = false
-
         
     interface ITestTargetFrameworkIdProvider with
         member x.GetTargetFrameworkId() = FSharpTestAttribute.targetFrameworkId
