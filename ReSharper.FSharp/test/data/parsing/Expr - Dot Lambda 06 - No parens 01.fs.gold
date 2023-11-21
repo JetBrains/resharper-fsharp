@@ -1,0 +1,29 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:f)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IDotLambdaExpr
+            IDotLambdaId
+              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            IPrefixAppExpr
+              IItemIndexerExpr
+                IReferenceExpr
+                  FSharpIdentifierToken(type:IDENTIFIER, text:P)
+                FSharpTokenType+DotTokenElement(type:DOT, text:.)
+                IIndexerArgList
+                  FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+                  ILiteralExpr
+                    FSharpToken(type:INT32, text:0)
+                  FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IUnitExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+
