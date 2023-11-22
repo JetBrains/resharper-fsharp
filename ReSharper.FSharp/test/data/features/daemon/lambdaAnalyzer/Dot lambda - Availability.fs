@@ -14,6 +14,9 @@ let f (a, (b, c)) = fun x -> fun x -> x.ToString()
 match 1 with _ -> fun x -> x.ToString()
 let _ = let _ = 3 in fun x -> x.ToString()
 
+type A = static member M(x: int -> string) = ()
+A.M(fun x -> x.ToString())
+
 // Not available
 ignore <| fun x -> x.Equals(x)
 ignore <| fun x -> x.ToString ()
@@ -30,3 +33,10 @@ ignore <| fun (x, y) -> x.ToString()
 (fun (a, (b, _)) -> fun y -> fun x -> x.ToString()) |> ignore
 type A2 = member _.M _ = fun x -> x.ToString()
 let g (a, (b, Some _)) = fun x -> fun x -> x.ToString()
+
+open System
+open System.Linq.Expressions
+type A with static member M(x: int, y: Func<int, string>) = ()
+type A with static member M(x: string, y: Expression<Func<int, string>>) = ()
+A.M(1, fun x -> x.ToString())
+A.M("", fun x -> x.ToString())
