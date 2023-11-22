@@ -61,3 +61,4 @@ System.Console.WriteLine("select * from people where name = {0} or name = {1}", 
 $""" select * from people where name = {{Name}} or name = {name} """
 $$"""select * from people where name = 'Alice'"""
 $$"""select * from {people} where {{name}} = 'Alice'"""
+$$"""select * from {people} where %d{{name}} = 'Alice'"""

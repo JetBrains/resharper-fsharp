@@ -61,3 +61,4 @@ System.Console.WriteLine("<frontend:INJECTED_FRAGMENT>select * from people where
 $"""<frontend:INJECTED_FRAGMENT> select * from people where name = {{Name}} or name = </frontend:INJECTED_FRAGMENT>{name}<frontend:INJECTED_FRAGMENT> </frontend:INJECTED_FRAGMENT>"""
 $$"""<frontend:INJECTED_FRAGMENT>select * from people where name = 'Alice'</frontend:INJECTED_FRAGMENT>"""
 $$"""<frontend:INJECTED_FRAGMENT>select * from {people} where </frontend:INJECTED_FRAGMENT>{{name}}<frontend:INJECTED_FRAGMENT> = 'Alice'</frontend:INJECTED_FRAGMENT>"""
+$$"""<frontend:INJECTED_FRAGMENT>select * from {people} where </frontend:INJECTED_FRAGMENT>%d{{name}}<frontend:INJECTED_FRAGMENT> = 'Alice'</frontend:INJECTED_FRAGMENT>"""
