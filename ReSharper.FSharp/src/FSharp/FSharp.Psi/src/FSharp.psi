@@ -1846,6 +1846,7 @@ interface typeUsage:
   namedStaticConstantTypeUsage |
   constrainedTypeUsage |
   orTypeUsage |
+  intersectionTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1924,6 +1925,13 @@ orTypeUsage:
   typeUsage
   OR
   typeUsage;
+
+intersectionTypeUsage:
+  (
+    typeReferenceName<TYPE_REFERENCE, ReferenceName>
+    AMP<AMP, Ands>
+  )?
+  LIST typeUsage<HASH_CONSTRAINT, HashConstrains> SEP AMP<AMP, Ands>;
 
 unsupportedTypeUsage:
   fakeSeparator;

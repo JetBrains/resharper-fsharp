@@ -1,5 +1,6 @@
 ﻿|||let x =|(0)|(1)|(2)
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Incomplete structured construct at or before this point in binding
-(1): ReSharper Underlined Error Highlighting: Possible incorrect indentation: this token is offside of context started at position (1:1). Try indenting this token further or using standard formatting conventions.
-(2): ReSharper Warning: The declarations in this file will be placed in an implicit module 'Syntax errors 02' based on the file name 'Syntax errors 02.fs'. However this is not a valid F# identifier, so the contents will not be accessible from other files. Consider renaming the file or adding a 'module' or 'namespace' declaration at the top of the file.
+(1): ReSharper Warning: The declarations in this file will be placed in an implicit module 'Syntax errors 02' based on the file name 'Syntax errors 02.fs'. However this is not a valid F# identifier, so the contents will not be accessible from other files. Consider renaming the file or adding a 'module' or 'namespace' declaration at the top of the file.
+(2): ReSharper Underlined Error Highlighting: Unexpected syntax or possible incorrect indentation: this token is offside of context started at position (1:1). Try indenting this further.
+To continue using non-conforming indentation, pass the '--strict-indentation-' flag to the compiler, or set the language version to F# 7.
