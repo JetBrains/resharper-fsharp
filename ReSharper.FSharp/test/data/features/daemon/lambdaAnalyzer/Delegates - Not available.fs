@@ -18,3 +18,10 @@ Type1.M4(0, fun x -> x)
 
 let a = fun x -> Delegate x
 let b = fun x -> DelegateAbbreviation x
+
+open System
+open System.Linq.Expressions
+type Type1 with
+    static member M5(x: Expression<Func<int, int>>) = ()
+
+Type1.M5(fun x -> x)

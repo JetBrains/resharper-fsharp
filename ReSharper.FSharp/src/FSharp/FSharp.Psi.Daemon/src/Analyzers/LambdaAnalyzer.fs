@@ -145,12 +145,17 @@ type LambdaAnalyzer() =
 
             let parameterDecl = parameters[lambdaPos]
             let parameterType = parameterDecl.Type
-            let parameterIsDelegate =
-                parameterType.HasTypeDefinition && (getAbbreviatedEntity parameterType.TypeDefinition).IsDelegate
+            let parameterIsDelegateOrExprDelegate =
+                parameterType.HasTypeDefinition &&
+                let abbreviatedType = getAbbreviatedEntity parameterType.TypeDefinition
+                abbreviatedType.IsDelegate ||
+                match abbreviatedType.TryFullName with
+                | Some "System.Linq.Expressions.Expression`1" -> true
+                | _ -> false
 
             // If the lambda is passed instead of a delegate,
             // then in F# < 6.0 there is almost never an implicit cast for the lambda simplification
-            if parameterIsDelegate && not delegatesConversionSupported then false else
+            if parameterIsDelegateOrExprDelegate && not delegatesConversionSupported then false else
 
             match replacementExprSymbol with
             | ValueSome (:? FSharpMemberOrFunctionOrValue as x) ->
@@ -159,7 +164,7 @@ type LambdaAnalyzer() =
                 // then everything is OK
                 x.IsFunction || not x.IsMember ||
 
-                not parameterIsDelegate &&
+                not parameterIsDelegateOrExprDelegate &&
 
                 // If the body of the lambda consists of a method call,
                 // and the method to which the lambda is passed has overloads,

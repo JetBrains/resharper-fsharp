@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 type LambdaAnalyzerTest() =
@@ -28,8 +29,10 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 02 - Method overloads``() = x.DoNamedTest()
+
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp50)>]
-    [<Test>] member x.``Delegates - Not available``() = x.DoNamedTest()
+    [<Test; TestReferences("System.Core")>] member x.``Delegates - Not available``() = x.DoNamedTest()
+
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp60)>]
     [<Test>] member x.``Delegates - F# 6``() = x.DoNamedTest()
     [<Test; Description("RIDER-78171")>] member x.``Implicit conversions``() = x.DoNamedTest()
@@ -38,5 +41,5 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Forced calculations``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
     [<Test>] member x.``Optional parameters``() = x.DoNamedTest()
-    [<Test>] member x.``Dot lambda - Availability``() = x.DoNamedTest()
+    [<Test; TestReferences("System.Core")>] member x.``Dot lambda - Availability``() = x.DoNamedTest()
     [<Test>] member x.``Dot lambda - Availability - Modules``() = x.DoNamedTest()

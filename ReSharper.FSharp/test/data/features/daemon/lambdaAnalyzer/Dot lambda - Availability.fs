@@ -35,5 +35,8 @@ type A2 = member _.M _ = fun x -> x.ToString()
 let g (a, (b, Some _)) = fun x -> fun x -> x.ToString()
 
 open System
+open System.Linq.Expressions
 type A with static member M(x: int, y: Func<int, string>) = ()
+type A with static member M(x: string, y: Expression<Func<int, string>>) = ()
 A.M(1, fun x -> x.ToString())
+A.M("", fun x -> x.ToString())
