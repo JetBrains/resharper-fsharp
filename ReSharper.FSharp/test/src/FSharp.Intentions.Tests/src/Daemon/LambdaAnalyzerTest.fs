@@ -34,7 +34,8 @@ type LambdaAnalyzerTest() =
     [<Test; TestReferences("System.Core")>] member x.``Delegates - Not available``() = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp60)>]
-    [<Test>] member x.``Delegates - F# 6``() = x.DoNamedTest()
+    [<Test; TestReferences("System.Core")>] member x.``Delegates - F# 6``() = x.DoNamedTest()
+
     [<Test; Description("RIDER-78171")>] member x.``Implicit conversions``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
     [<Test>] member x.``Overloads 01``() = x.DoNamedTest()

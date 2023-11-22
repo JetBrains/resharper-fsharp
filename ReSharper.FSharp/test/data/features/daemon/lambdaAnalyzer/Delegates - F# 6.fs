@@ -1,3 +1,6 @@
+open System
+open System.Linq.Expressions
+
 type Delegate = delegate of int -> int
 type DelegateAbbreviation = Delegate
 type Type1(x: Delegate) = 
@@ -7,6 +10,7 @@ type Type1(x: Delegate) =
 
     static member M4(x: int) = x
     static member M4(x: int, y: Delegate) = ()
+    static member M5(x: Expression<Func<int, int>>) = ()
 
 Type1(fun x -> x)
 Type1.M1(fun x -> x)
@@ -16,3 +20,4 @@ Type1.M3(0, y = fun x -> x)
 Type1.M3(0, y = (fun x -> x))
 Type1.M4(0, fun x -> x)
 Type1.M4(0, y = fun x -> Type1.M4 x)
+Type1.M5(fun x -> x)
