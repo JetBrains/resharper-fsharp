@@ -88,6 +88,7 @@ type FSharpLiteralType =
         if tokenType == FSharpTokenType.UNFINISHED_REGULAR_INTERPOLATED_STRING then FSharpLiteralType.InterpolatedString else
         if tokenType == FSharpTokenType.UNFINISHED_VERBATIM_INTERPOLATED_STRING then FSharpLiteralType.VerbatimInterpolatedString else
         if tokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING then FSharpLiteralType.TripleQuoteInterpolatedString else
+        if tokenType == FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING then FSharpLiteralType.RawInterpolatedString else
 
         failwithf $"Token {tokenType} is not a string literal"
 
