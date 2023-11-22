@@ -101,6 +101,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return;
       }
 
+      if (psiModule.ContainingProjectModule is not IProject)
+        return;
+
       var projectKey = FcsProjectKey.Create(psiModule);
 
       if (!psiModule.IsValid())
@@ -187,8 +190,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           Invalidate(sourceFile);
         else
         {
-          var projectKey = FcsProjectKey.Create(sourceFile.PsiModule);
-          InvalidateReferencingModules(projectKey);
+          var psiModule = sourceFile.PsiModule;
+          if (psiModule.ContainingProjectModule is IProject)
+          {
+            var projectKey = FcsProjectKey.Create(psiModule);
+            InvalidateReferencingModules(projectKey);  
+          }
+          
         }
       }
 
@@ -232,6 +240,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           ScriptCaches[psiModule] = scriptResolvedSymbols;
           return scriptResolvedSymbols;
         }
+
+        if (psiModule.ContainingProjectModule is not IProject)
+          return new FcsModuleResolvedSymbols(null);
 
         var projectKey = FcsProjectKey.Create(psiModule);
         if (ProjectSymbolsCaches.TryGetValue(projectKey, out var symbols))
