@@ -37,19 +37,20 @@ module ModulePathProvider =
 
 [<SolutionComponent>]
 type ModulePathProvider(moduleReferencesResolveStore: IModuleReferencesResolveStore) =
-    abstract GetModulePath: reference: IProjectToModuleReference -> VirtualFileSystemPath
+    abstract GetModulePath: reference: IProjectToModuleReference -> VirtualFileSystemPath option
     default this.GetModulePath(reference: IProjectToModuleReference) =
         let referenceTargetFrameworkId = reference.TargetFrameworkId
         match reference.ResolveResult(moduleReferencesResolveStore) with
         | null ->
             // todo: check logic in PsiModuleUtil.TryGetPsiModuleReferences
-            VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+            None
 
         | :? IAssembly as assembly ->
-            assembly.Location.ContainerPhysicalPath
+            Some assembly.Location.ContainerPhysicalPath
 
         | :? IProject as project ->
-            let targetFrameworkId = referenceTargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds)
-            project.GetOutputFilePath(targetFrameworkId)
+            match referenceTargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds) with
+            | null -> None
+            | targetFrameworkId -> Some(project.GetOutputFilePath(targetFrameworkId))
 
-        | _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+        | _ -> None

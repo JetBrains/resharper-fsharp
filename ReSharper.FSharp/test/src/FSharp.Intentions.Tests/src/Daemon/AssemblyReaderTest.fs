@@ -66,7 +66,7 @@ type TestModulePathProvider(shim: TestAssemblyReaderShim, moduleReferencesResolv
 
     override this.GetModulePath(moduleReference) =
         match moduleReference.ResolveResult(moduleReferencesResolveStore) with
-        | :? IProject as project when project == shim.ReferencedProject -> shim.Path
+        | :? IProject as project when project == shim.ReferencedProject -> Some(shim.Path)
         | _ -> base.GetModulePath(moduleReference)
 
     interface IHideImplementation<ModulePathProvider>

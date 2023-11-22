@@ -160,8 +160,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let tryGetReferencedProject (reference: IProjectToModuleReference) =
         match reference.ResolveResult(moduleReferencesResolveStore) with
         | :? IProject as project ->
-            let targetFrameworkId = reference.TargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds)
-            Some(FcsProjectKey.Create(project, targetFrameworkId))
+            match reference.TargetFrameworkId.SelectTargetFrameworkIdToReference(project.TargetFrameworkIds) with
+            | null -> None
+            | targetFrameworkId -> Some(FcsProjectKey.Create(project, targetFrameworkId))
         | _ -> None
 
     let getReferencedProjects (projectKey: FcsProjectKey) =
