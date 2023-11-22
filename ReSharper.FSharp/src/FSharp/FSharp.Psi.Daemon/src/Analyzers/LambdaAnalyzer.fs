@@ -149,6 +149,7 @@ type LambdaAnalyzer() =
                 parameterType.HasTypeDefinition &&
                 let abbreviatedType = getAbbreviatedEntity parameterType.TypeDefinition
                 abbreviatedType.IsDelegate ||
+                abbreviatedType.LogicalName = "Expression`1" &&
                 match abbreviatedType.TryFullName with
                 | Some "System.Linq.Expressions.Expression`1" -> true
                 | _ -> false
