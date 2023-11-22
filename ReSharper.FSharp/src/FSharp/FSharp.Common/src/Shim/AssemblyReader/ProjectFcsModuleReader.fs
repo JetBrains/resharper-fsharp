@@ -7,6 +7,7 @@ open System.Collections.Concurrent
 open System.Reflection
 open FSharp.Compiler.AbstractIL.IL
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open Internal.Utilities.Library
 open JetBrains.Application
 open JetBrains.Application.Threading
 open JetBrains.Diagnostics
@@ -776,7 +777,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             mkParam parameter ]
 
     let voidReturn = mkILReturn ILType.Void
-    let methodBodyUnavailable = lazy MethodBody.NotAvailable
+    let methodBodyUnavailable = InterruptibleLazy.FromValue(MethodBody.NotAvailable)
 
     let mkMethodReturn (method: IFunction) =
         let returnType = method.ReturnType
@@ -1239,9 +1240,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let membersTable = FcsTypeDefMembers.Create()
                 let nestedTypes = mkILTypeDefsComputed (fun _ -> getOrCreateNestedTypes membersTable this clrTypeName)
                 let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods membersTable clrTypeName)
-                let fields = mkILFieldsLazy (lazy getOrCreateFields membersTable clrTypeName)
-                let properties = mkILPropertiesLazy (lazy getOrCreateProperties membersTable clrTypeName)
-                let events = mkILEventsLazy (lazy getOrCreateEvents membersTable clrTypeName)
+                let fields = mkILFieldsLazy (InterruptibleLazy(fun _ -> getOrCreateFields membersTable clrTypeName))
+                let properties = mkILPropertiesLazy (InterruptibleLazy(fun _ -> getOrCreateProperties membersTable clrTypeName))
+                let events = mkILEventsLazy (InterruptibleLazy(fun _ -> getOrCreateEvents membersTable clrTypeName))
 
                 let customAttrs = mkTypeDefCustomAttrs typeElement
 

@@ -4,14 +4,14 @@ IFSharpImplFile
     IExpressionStatement
       IChameleonExpression
         IPrefixAppExpr
-          IReferenceExpr
-            FSharpIdentifierToken(type:IDENTIFIER, text:f)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IDotLambdaExpr
-            IDotLambdaId
-              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-            FSharpTokenType+DotTokenElement(type:DOT, text:.)
-            IPrefixAppExpr
+          IPrefixAppExpr
+            IReferenceExpr
+              FSharpIdentifierToken(type:IDENTIFIER, text:f)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IDotLambdaExpr
+              IDotLambdaId
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              FSharpTokenType+DotTokenElement(type:DOT, text:.)
               IItemIndexerExpr
                 IReferenceExpr
                   FSharpIdentifierToken(type:IDENTIFIER, text:P)
@@ -21,9 +21,9 @@ IFSharpImplFile
                   ILiteralExpr
                     FSharpToken(type:INT32, text:0)
                   FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IUnitExpr
-                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
