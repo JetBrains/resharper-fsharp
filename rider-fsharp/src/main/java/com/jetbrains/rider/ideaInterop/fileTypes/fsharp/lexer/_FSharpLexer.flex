@@ -116,6 +116,8 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
                   : FSharpTokenType.RAW_INTERPOLATED_STRING_MIDDLE;
           return MakeRawStringToken(tokenType);
         }
+
+        continue;
       }
 
       if (ch == '\"')
@@ -130,6 +132,8 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
           myInterpolatedStringStates.pop();
           return MakeRawStringToken(tokenType);
         }
+
+        continue;
       }
 
       zzCurrentPos++;

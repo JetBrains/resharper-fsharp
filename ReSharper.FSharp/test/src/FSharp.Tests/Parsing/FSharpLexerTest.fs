@@ -62,6 +62,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings - Interpolated - Raw 05``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Raw 06``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Raw 07``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 08``() = x.DoNamedTest()
 
     [<Test>] member x.``Strings - Interpolated - Regular 01 - No interpolation``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 02``() = x.DoNamedTest()

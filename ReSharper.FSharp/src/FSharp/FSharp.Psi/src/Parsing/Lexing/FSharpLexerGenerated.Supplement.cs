@@ -169,6 +169,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
               : FSharpTokenType.RAW_INTERPOLATED_STRING_MIDDLE;
             return MakeRawStringToken(tokenType);
           }
+          
+          continue;
         }
 
         if (ch == '\"')
@@ -183,6 +185,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
             myInterpolatedStringStates = myInterpolatedStringStates.Pop();
             return MakeRawStringToken(tokenType);
           }
+
+          continue;
         }
         
         yy_buffer_index++;

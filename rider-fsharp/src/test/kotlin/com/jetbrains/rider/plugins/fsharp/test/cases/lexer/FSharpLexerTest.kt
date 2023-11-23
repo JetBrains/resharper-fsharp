@@ -1371,6 +1371,17 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
     )
   }
 
+  @Test
+  fun `testStrings - Interpolated - Raw 10`() {
+    doTest(
+      "$$\"\"\" \"{{x}}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""} "{{')
+        |IDENT ('x')
+        |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')
+        |""".trimMargin()
+    )
+  }
+
 
 
   @Test
