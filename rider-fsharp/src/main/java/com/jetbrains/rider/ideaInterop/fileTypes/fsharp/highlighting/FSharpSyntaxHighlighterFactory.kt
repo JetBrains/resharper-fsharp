@@ -14,7 +14,6 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
     private val pp_keywords = PP_KEYWORDS.types.map { it to FSharpTextAttributeKeys.PREPROCESSOR_KEYWORD }
     private val strings = STRINGS.types.map { it to FSharpTextAttributeKeys.STRING }
     private val interpolated_strings = INTERPOLATED_STRINGS.types.map { it to FSharpTextAttributeKeys.STRING }
-    private val raw_strings = RAW_INTERPOLATED_STRINGS.types.map { it to FSharpTextAttributeKeys.STRING }
     private val block_comments = BLOCK_COMMENTS.types.map { it to FSharpTextAttributeKeys.BLOCK_COMMENT }
     private val numbers = NUMBERS.types.map { it to FSharpTextAttributeKeys.NUMBER }
 
@@ -23,7 +22,7 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
       BYTECHAR to FSharpTextAttributeKeys.STRING,
       LINE_COMMENT to FSharpTextAttributeKeys.COMMENT,
       TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
-    ) + keywords + pp_keywords + block_comments + strings + interpolated_strings + raw_strings + numbers
+    ) + keywords + pp_keywords + block_comments + strings + interpolated_strings + numbers
   }
 
   override fun getHighlightingLexer() = FSharpLexer()

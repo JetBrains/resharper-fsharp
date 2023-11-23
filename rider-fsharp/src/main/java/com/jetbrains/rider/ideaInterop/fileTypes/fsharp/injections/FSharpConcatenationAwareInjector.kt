@@ -4,8 +4,10 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.getDollarsCount
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageConcatenationAwareInjector
@@ -39,6 +41,8 @@ class FSharpConcatenationAwareInjector :
       part: ClrLanguageInterpolatedStringLiteralExpressionPart
     ): TextRange {
       val wholeLiteralRange = ElementManipulators.getValueTextRange(literal)
+      val fsharpLiteral = literal as FSharpInterpolatedStringLiteralExpression
+      val interpolationBracketsCount = fsharpLiteral.getDollarsCount()
       return when (part) {
         is FSharpInterpolatedStringLiteralExpressionPart -> {
           val partLength = part.textLength
@@ -52,14 +56,17 @@ class FSharpConcatenationAwareInjector :
               // can't reliably inspect injected PSI with interpolations
               disableInspections = true
               wholeLiteralRange.startOffset
-            } else part.startOffsetInParent + 1
+            } else part.startOffsetInParent + interpolationBracketsCount
 
           val endOffsetInPart =
             if (part.tokenType in INTERPOLATED_STRING_ENDS) wholeLiteralRange.endOffset
             else {
+              val formatSpecifierOffset = interpolationBracketsCount + 2
               val containsFormatSpecifier =
-                partLength > 3 && partText[partLength - 3] == '%' && partText[partLength - 2].isLetter()
-              part.startOffsetInParent + partLength - 1 - (if (containsFormatSpecifier) 2 else 0)
+                partLength > formatSpecifierOffset &&
+                  partText[partLength - formatSpecifierOffset] == '%' &&
+                  partText[partLength - formatSpecifierOffset + 1].isLetter()
+              part.startOffsetInParent + partLength - interpolationBracketsCount - (if (containsFormatSpecifier) 2 else 0)
             }
 
           TextRange(startOffsetInPart, endOffsetInPart)
