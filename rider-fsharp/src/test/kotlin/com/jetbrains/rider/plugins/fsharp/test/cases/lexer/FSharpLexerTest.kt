@@ -1454,4 +1454,13 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
       IDENT ('System')
       """.trimIndent());
   }
+
+  @Test
+  fun `test ident directive`() {
+    doTest("#Ident",
+      """
+      HASH ('#')
+      IDENT ('Ident')
+      """.trimIndent());
+  }
 }
