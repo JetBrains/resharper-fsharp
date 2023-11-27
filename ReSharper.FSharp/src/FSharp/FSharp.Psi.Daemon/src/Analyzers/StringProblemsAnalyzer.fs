@@ -37,15 +37,20 @@ type FSharpStringProblemAnalyzer() =
         | FSharpLiteralType.InterpolatedStringMiddle
         | FSharpLiteralType.InterpolatedStringEnd -> RegularInterpolatedStringMiddleEndLexer(buffer) :> _
 
+        | FSharpLiteralType.RawInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, getDollarCount literalToken)
+        | FSharpLiteralType.RawInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, getDollarCount literalToken) :> _
+        | FSharpLiteralType.RawInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, getDollarCount literalToken)
+        | FSharpLiteralType.RawInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, getDollarCount literalToken) :> _
+
         | FSharpLiteralType.VerbatimInterpolatedString
         | FSharpLiteralType.VerbatimInterpolatedStringStart -> VerbatimInterpolatedStringLexer(buffer) :> _
         | FSharpLiteralType.VerbatimInterpolatedStringMiddle
         | FSharpLiteralType.VerbatimInterpolatedStringEnd -> VerbatimInterpolatedStringMiddleEndLexer(buffer) :> _
 
-        | FSharpLiteralType.TripleQuoteInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, 1) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, 1) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, 1) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, 1) :> _
 
     let getCachedLexer (literalToken: FSharpString) =
         let isValid = literalToken.IsValid()

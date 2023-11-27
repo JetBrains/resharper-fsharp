@@ -55,6 +55,15 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings - Interpolated - Escape - Verbatim 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Escape - Verbatim 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Interpolated - Raw 01``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 02``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 03``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 04``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 05``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 06``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 07``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Interpolated - Raw 08``() = x.DoNamedTest()
+
     [<Test>] member x.``Strings - Interpolated - Regular 01 - No interpolation``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 02``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 03 - Record``() = x.DoNamedTest()
@@ -140,6 +149,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Hash directives 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 02 - Include``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 03 - Light``() = x.DoNamedTest()
+    [<Test>] member x.``Hash directives 04 - Ident``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators - Custom 3 - Multiplication decl``() = x.DoNamedTest()
 

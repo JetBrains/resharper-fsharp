@@ -107,6 +107,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         | Some referencedModule -> referencedModule.ReferencingProjects
 
     let isKnownModule (psiModule: IPsiModule) =
+        if not (psiModule.ContainingProjectModule :? IProject) then false else
+
         let fcsProjectProvider = getFcsProjectProvider ()
 
         assemblyReadersByModule.ContainsKey(psiModule) ||

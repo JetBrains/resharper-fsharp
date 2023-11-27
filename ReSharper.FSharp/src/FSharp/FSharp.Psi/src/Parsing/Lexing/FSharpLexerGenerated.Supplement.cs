@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Diagnostics;
@@ -29,7 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
   {
     Regular,
     Verbatim,
-    TripleQuote
+    TripleQuote,
+    Raw
   }
 
   public enum InterpolatedStringStackItem
@@ -42,6 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
   public struct FSharpLexerInterpolatedStringState
   {
     public FSharpInterpolatedStringKind Kind;
+    public int? DelimiterLength;
     public FSharpLexerContext PreviousLexerContext;
     public ImmutableStack<InterpolatedStringStackItem> InterpolatedStringStack;
   }
@@ -103,7 +106,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 
     private int Level => myParenLevel + myBrackLevel;
 
-    private void StartInterpolatedString(FSharpInterpolatedStringKind kind)
+    private void StartInterpolatedString(FSharpInterpolatedStringKind kind, int? delimiterLength = null)
     {
       var previousContext = new FSharpLexerContext
       {
@@ -116,11 +119,88 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       var interpolatedStringState = new FSharpLexerInterpolatedStringState
       {
         Kind = kind,
+        DelimiterLength = delimiterLength,
         PreviousLexerContext = previousContext,
         InterpolatedStringStack = ImmutableStack<InterpolatedStringStackItem>.Empty
       };
       myInterpolatedStringStates = myInterpolatedStringStates.Push(interpolatedStringState);
     }
+
+    public TokenNodeType StartRawInterpolatedString()
+    {
+      var index = yy_buffer_index;
+      yy_buffer_index = yy_buffer_start;
+      var dollarCount = ConsumeCharSequence('$');
+
+      StartInterpolatedString(FSharpInterpolatedStringKind.Raw, dollarCount);
+
+      yy_buffer_index = index;
+
+      return ContinueRawInterpolatedString(dollarCount, true);
+    }
+
+    private int ConsumeCharSequence(char ch, int? max = null)
+    {
+      var start = yy_buffer_index;
+
+      while (yy_buffer_index < yy_eof_pos && yy_buffer[yy_buffer_index] == ch && (max == null || yy_buffer_index - start < max))
+        yy_buffer_index++;
+
+      return yy_buffer_index - start;
+    }
+
+    private TokenNodeType ContinueRawInterpolatedString(int dollarCount, bool isStart)
+    {
+      while (yy_buffer_index < yy_eof_pos)
+      {
+        if (yy_buffer_index == yy_eof_pos)
+        {
+          return MakeRawStringToken(FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING);
+        }
+
+        var ch = yy_buffer[yy_buffer_index];
+        if (ch == '{')
+        {
+          var braceCount = ConsumeCharSequence('{');
+          if (braceCount >= dollarCount)
+          {
+            var tokenType = isStart
+              ? FSharpTokenType.RAW_INTERPOLATED_STRING_START
+              : FSharpTokenType.RAW_INTERPOLATED_STRING_MIDDLE;
+            return MakeRawStringToken(tokenType);
+          }
+          
+          continue;
+        }
+
+        if (ch == '\"')
+        {
+          var quoteCount = ConsumeCharSequence('\"', 3);
+          if (quoteCount == 3)
+          {
+            var tokenType = isStart
+              ? FSharpTokenType.RAW_INTERPOLATED_STRING
+              : FSharpTokenType.RAW_INTERPOLATED_STRING_END;
+
+            myInterpolatedStringStates = myInterpolatedStringStates.Pop();
+            return MakeRawStringToken(tokenType);
+          }
+
+          continue;
+        }
+        
+        yy_buffer_index++;
+      }
+
+      return MakeRawStringToken(FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING);
+
+      TokenNodeType MakeRawStringToken(TokenNodeType tokenType)
+      {
+        yy_buffer_end = yy_buffer_index;
+        return MakeToken(tokenType);
+      }
+    }
+
 
     private void FinishInterpolatedString()
     {
@@ -139,8 +219,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
 
     private void PushInterpolatedStringItem(InterpolatedStringStackItem item)
     {
-      if (!myInterpolatedStringStates.IsEmpty && myInterpolatedStringStates.Peek() is var state)
+      if (!myInterpolatedStringStates.IsEmpty)
       {
+        var state = myInterpolatedStringStates.Peek();
         myInterpolatedStringStates = myInterpolatedStringStates.Pop();
 
         state.InterpolatedStringStack = state.InterpolatedStringStack.Push(item);
@@ -148,9 +229,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       }
     }
 
-    private bool PopInterpolatedStringItem(InterpolatedStringStackItem item)
+    private TokenNodeType PopInterpolatedStringItem(InterpolatedStringStackItem item)
     {
-      if (myInterpolatedStringStates.IsEmpty || !(myInterpolatedStringStates.Peek() is var state)) return false;
+      if (myInterpolatedStringStates.IsEmpty)
+        return MakeToken(FSharpTokenType.RBRACE);
+
+      var state = myInterpolatedStringStates.Peek();
+      if (state is { Kind: FSharpInterpolatedStringKind.Raw, DelimiterLength: { } delimiterLength } && item == InterpolatedStringStackItem.Brace)
+      {
+        yy_buffer_index = yy_buffer_start;
+        var braceCount = ConsumeCharSequence('}');
+        if (braceCount < delimiterLength)
+        {
+          yy_buffer_index = yy_buffer_end = yy_buffer_start + 1;
+          return MakeToken(FSharpTokenType.RBRACE);
+        }
+
+        return ContinueRawInterpolatedString(delimiterLength, false);
+      }
+
 
       if (state.InterpolatedStringStack.IsEmpty && item == InterpolatedStringStackItem.Brace)
       {
@@ -158,7 +255,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yybegin(ToState(myInterpolatedStringStates.Peek()));
         Clear();
 
-        return true;
+        return null;
       }
 
       if (state.InterpolatedStringStack.Peek() == item)
@@ -168,7 +265,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         myInterpolatedStringStates = myInterpolatedStringStates.Push(state);
       }
 
-      return false;
+      return MakeToken(FSharpTokenType.RBRACE);
     }
 
     public static int ToState(FSharpLexerInterpolatedStringState interpolatedStringState) =>
@@ -369,6 +466,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       set => CurrentPosition = (FSharpLexerState) value;
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public TokenNodeType TokenType
     {
       get
@@ -378,6 +476,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       }
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public int TokenStart
     {
       get
@@ -387,6 +486,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       }
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public int TokenEnd
     {
       get

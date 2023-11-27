@@ -85,8 +85,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateReferencingModules(FcsProjectKey projectKey)
     {
-      myLocks.AssertWriteAccessAllowed();
-
       foreach (var referencingModule in myReferencingModules[projectKey])
       {
         if (ProjectSymbolsCaches.TryGetValue(referencingModule, out var moduleSymbols))
@@ -102,6 +100,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ScriptCaches.Remove(psiModule);
         return;
       }
+
+      if (psiModule.ContainingProjectModule is not IProject)
+        return;
 
       var projectKey = FcsProjectKey.Create(psiModule);
 
@@ -189,8 +190,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           Invalidate(sourceFile);
         else
         {
-          var projectKey = FcsProjectKey.Create(sourceFile.PsiModule);
-          InvalidateReferencingModules(projectKey);
+          var psiModule = sourceFile.PsiModule;
+          if (psiModule.ContainingProjectModule is IProject)
+          {
+            var projectKey = FcsProjectKey.Create(psiModule);
+            InvalidateReferencingModules(projectKey);  
+          }
+          
         }
       }
 
@@ -234,6 +240,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           ScriptCaches[psiModule] = scriptResolvedSymbols;
           return scriptResolvedSymbols;
         }
+
+        if (psiModule.ContainingProjectModule is not IProject)
+          return new FcsModuleResolvedSymbols(null);
 
         var projectKey = FcsProjectKey.Create(psiModule);
         if (ProjectSymbolsCaches.TryGetValue(projectKey, out var symbols))

@@ -127,32 +127,31 @@ type TripleQuoteStringLexer(buffer) =
 
     override x.AdvanceInternal() = StringTokenTypes.CHARACTER
 
-type TripleQuoteInterpolatedStringLexer(buffer) =
+type TripleQuoteInterpolatedStringLexer(buffer, dollarCount) =
     inherit TripleQuoteStringLexer(buffer)
 
-    override x.StartOffset = 4
+    override x.StartOffset = dollarCount + 3
 
     override x.AdvanceInternal() =
         match InterpolatedStringLexer.advance x with
         | null -> base.AdvanceInternal()
         | nodeType -> nodeType
 
-type TripleQuoteInterpolatedStringStartLexer(buffer) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer)
+type TripleQuoteInterpolatedStringStartLexer(buffer, dollarCount) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
 
-    override x.StartOffset = 4
-    override x.EndOffset = 1
+    override x.EndOffset = dollarCount
 
-type TripleQuoteInterpolatedStringMiddleLexer(buffer) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer)
+type TripleQuoteInterpolatedStringMiddleLexer(buffer, dollarCount) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
 
-    override x.StartOffset = 1
-    override x.EndOffset = 1
+    override x.StartOffset = dollarCount
+    override x.EndOffset = dollarCount
 
-type TripleQuoteInterpolatedStringEndLexer(buffer) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer)
+type TripleQuoteInterpolatedStringEndLexer(buffer, dollarCount) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
 
-    override x.StartOffset = 1
+    override x.StartOffset = dollarCount
     override x.EndOffset = 3
 
 

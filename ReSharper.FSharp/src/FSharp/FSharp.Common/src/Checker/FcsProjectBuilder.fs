@@ -230,7 +230,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let paths =
             references
             |> Array.ofSeq
-            |> Array.map modulePathProvider.GetModulePath
+            |> Array.choose modulePathProvider.GetModulePath
             |> Array.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
 
         let projectOptions =

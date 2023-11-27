@@ -30,10 +30,12 @@ type FSharpLiteralInjectionTarget() =
             false
 
         override _.GetStartOffsetForString(originalNode) =
-            originalNode.GetTokenType() |> getStringStartingQuotesLength
+            let token = originalNode :?> ITokenNode
+            getStringStartingQuotesLength token
 
         override _.GetEndOffsetForString(originalNode) =
-            originalNode.GetTokenType() |> getStringEndingQuotesLength
+            let token = originalNode :?> ITokenNode
+            getStringEndingQuotesLength token
 
         override _.UpdateNode(_, _, _, length, _, _, _, _) =
             length <- -1

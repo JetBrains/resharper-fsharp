@@ -36,3 +36,11 @@ FSharpFile
     PsiElement(INT32)('2')
     FSharpInterpolatedStringLiteralExpressionPart
       PsiElement(TRIPLE_QUOTED_STRING_END)('} 3"""')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
+  FSharpInterpolatedStringLiteralExpression
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(RAW_INTERPOLATED_STRING_START)('$$"""{1} {{')
+    PsiElement(INT32)('2')
+    FSharpInterpolatedStringLiteralExpressionPart
+      PsiElement(RAW_INTERPOLATED_STRING_END)('}}"""')

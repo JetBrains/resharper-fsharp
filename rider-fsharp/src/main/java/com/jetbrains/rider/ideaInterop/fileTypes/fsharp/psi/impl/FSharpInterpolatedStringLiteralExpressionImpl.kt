@@ -52,6 +52,10 @@ class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
             FSharpTokenType.TRIPLE_QUOTED_STRING ->
               FSharpStringLiteralType.TripleQuoteInterpolatedString
 
+            FSharpTokenType.RAW_INTERPOLATED_STRING_START,
+            FSharpTokenType.RAW_INTERPOLATED_STRING ->
+              FSharpStringLiteralType.RawInterpolatedString
+
             else -> error("invalid element type $tokenType")
           }
 

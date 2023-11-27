@@ -440,6 +440,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Slice - Star 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Slice - Star 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Interpolated string - Raw 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Interpolated string - Raw 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Interpolated string 03 - Whitespace``() = x.DoNamedTest()
@@ -716,6 +718,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Types intersection 02 - With type parameter``() = x.DoNamedTest()
     [<Test>] member x.``Types intersection 03 - Abstract member``() = x.DoNamedTest()
     [<Test>] member x.``Types intersection 04 - Subtype``() = x.DoNamedTest()
+
+    [<Test>] member x.``Hash type usage 01 - Underscore``() = x.DoNamedTest()
+    [<Test>] member x.``Hash type usage 02 - Next line``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

@@ -1267,6 +1267,124 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   }
 
   @Test
+  fun `testStrings - Interpolated - Raw 01`() {
+    doTest(
+      "$$\"\"\"{{ 1 }}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
+            |WHITESPACE (' ')
+            |INT32 ('1')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 02`() {
+    doTest(
+      "$$\"\"\"{{ 1 }} 2 {{ 3 }}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
+            |WHITESPACE (' ')
+            |INT32 ('1')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_MIDDLE ('}} 2 {{')
+            |WHITESPACE (' ')
+            |INT32 ('3')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 03`() {
+    doTest(
+      "$$\"\"\"{{ $\"{1}\" }}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
+            |WHITESPACE (' ')
+            |REGULAR_INTERPOLATED_STRING_START ('$"{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 04`() {
+    doTest(
+      "$$\"\"\"{{ $$\"\"\"{{1}}\"\"\" }}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_START ('${'$'}${'$'}${"\"\"\""}{{')
+            |INT32 ('1')
+            |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 05`() {
+    doTest(
+      "$$$\"\"\" { {{ {{{ 1 }}} }} } \"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$$${"\"\"\""} { {{ {{{')
+            |WHITESPACE (' ')
+            |INT32 ('1')
+            |WHITESPACE (' ')
+            |RAW_INTERPOLATED_STRING_END ('}}} }} } ${"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 06`() {
+    doTest(
+      "$$\"\"\"\"\"\"",
+      """RAW_INTERPOLATED_STRING ('$$${"\"\"\"\"\"\""}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 07`() {
+    doTest(
+      "$",
+      """DOLLAR ('${'$'}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 08`() {
+    doTest(
+      "$$",
+      """BAD_SYMBOLIC_OP ('$$')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 09`() {
+    doTest(
+      "$$\"\"\"\"\"\" $$ \"\"",
+      """RAW_INTERPOLATED_STRING ('$$${"\"\"\"\"\"\""}')
+        |WHITESPACE (' ')
+        |BAD_SYMBOLIC_OP ('$$')
+        |WHITESPACE (' ')
+        |STRING ('""')
+        |""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Raw 10`() {
+    doTest(
+      "$$\"\"\" \"{{x}}\"\"\"",
+      """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""} "{{')
+        |IDENT ('x')
+        |RAW_INTERPOLATED_STRING_END ('}}${"\"\"\""}')
+        |""".trimMargin()
+    )
+  }
+
+
+
+  @Test
   fun `testStrings - Interpolated - Regular 01 - No interpolation`() {
     doTest("$\"\"", "REGULAR_INTERPOLATED_STRING ('\$\"\"')")
   }
@@ -1334,6 +1452,15 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
       OPEN ('open')
       WHITESPACE (' ')
       IDENT ('System')
+      """.trimIndent());
+  }
+
+  @Test
+  fun `test ident directive`() {
+    doTest("#Ident",
+      """
+      HASH ('#')
+      IDENT ('Ident')
       """.trimIndent());
   }
 }

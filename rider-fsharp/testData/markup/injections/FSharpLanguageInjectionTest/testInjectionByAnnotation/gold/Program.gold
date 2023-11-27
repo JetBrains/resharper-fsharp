@@ -106,6 +106,9 @@ type C() =
                  </tag1>
                  </frontend:INJECTED_FRAGMENT>"""
 
+    [<LanguageInjection(InjectedLanguage.XML)>]
+    member x.XmlField6 = $$"""<frontend:INJECTED_FRAGMENT><tag1><tag2 attr=""{1} </frontend:INJECTED_FRAGMENT>{{s1}}<frontend:INJECTED_FRAGMENT>""/></tag1></frontend:INJECTED_FRAGMENT>"""
+
 
     member x.Foo0([<StringSyntax("css")>] _arg) = x.Foo0("<frontend:INJECTED_FRAGMENT>.my-awesome-class {}</frontend:INJECTED_FRAGMENT>")
 

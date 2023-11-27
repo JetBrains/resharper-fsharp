@@ -46,7 +46,7 @@ type FSharpScriptReferenceCompletionContextProvider() =
         match context.File with
         | :? IFSharpFile as fsFile ->
             let caretOffset = context.CaretTreeOffset
-            let token = fsFile.FindTokenAt(caretOffset - 1)
+            let token = fsFile.FindTokenAt(caretOffset - 1).As<ITokenNode>()
             if isNull token then false else
 
             match token.GetTokenType() with
@@ -56,11 +56,11 @@ type FSharpScriptReferenceCompletionContextProvider() =
                 let caretOffset = caretOffset.Offset
                 let tokenOffset = token.GetTreeStartOffset().Offset
                 let tokenText = token.GetText()
-                let valueStart = getStringStartingQuotesLength tokenType
+                let valueStart = getStringStartingQuotesLength token
                 let valueStartOffset = tokenOffset + valueStart
                 let tokenEndOffset = tokenOffset + tokenText.Length
 
-                let unfinishedLiteral = isUnfinishedString tokenType tokenText
+                let unfinishedLiteral = isUnfinishedString token
                 caretOffset >= valueStartOffset &&
                 (caretOffset = valueStartOffset || tokenText.IndexOf("nuget:", valueStart) = -1) &&
                 (caretOffset < tokenEndOffset || caretOffset = tokenEndOffset && unfinishedLiteral)
@@ -69,13 +69,11 @@ type FSharpScriptReferenceCompletionContextProvider() =
 
     override x.GetCompletionContext(context) =
         let fsFile = context.File :?> IFSharpFile
-        let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1)
+        let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1).As<ITokenNode>()
         let hashDirective = token.Parent :?> IHashDirective
 
-        let arg = token.GetText()
-        let tokenType = token.GetTokenType()
-        let startQuoteLength = getStringStartingQuotesLength tokenType
-        let argValue = getStringContent tokenType arg
+        let startQuoteLength = getStringStartingQuotesLength token
+        let argValue = getStringContent token
 
         let argOffset = token.GetTreeStartOffset().Offset
         let valueOffset = argOffset + startQuoteLength

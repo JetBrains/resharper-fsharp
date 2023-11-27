@@ -85,11 +85,13 @@ class InjectionEscapersTest : BaseTestWithSolution() {
   fun `escaping - triple quoted - interpolated`() = doFullEditingTest()
   fun `escaping - verbatim`() = doFullEditingTest()
   fun `escaping - verbatim - interpolated`() = doFullEditingTest()
+  fun `escaping - raw`() = doFullEditingTest()
 
   fun `backslash - simple`() = doBackslashTest()
   fun `backslash at the end - regular`() = doBackslashTest()
   fun `backslash at the end - verbatim`() = doBackslashTest()
   fun `backslash at the end - triple quoted`() = doBackslashTest()
+  fun `backslash at the end - raw`() = doBackslashTest()
   fun `backslash before hole - interpolated`() = doBackslashTest()
   fun `escaped backslash at the end - regular`() = doBackslashTest()
 }

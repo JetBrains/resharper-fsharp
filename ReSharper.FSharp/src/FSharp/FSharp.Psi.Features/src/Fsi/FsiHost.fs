@@ -88,7 +88,7 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
             | :? IAssembly as assembly -> assemblyFilter assembly.AssemblyName
             | _ -> true
         )
-        |> Seq.map modulePathProvider.GetModulePath
+        |> Seq.choose modulePathProvider.GetModulePath
         |> Seq.map (fun path -> path.FullPath)
         |> List
 

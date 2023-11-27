@@ -111,6 +111,8 @@ TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE=(\}{TRIPLE_QUOTE_INTERPOLATED_STRING_LIT
 TRIPLE_QUOTE_INTERPOLATED_STRING_END=(\}{TRIPLE_QUOTE_INTERPOLATED_STRING_LITERAL_CHARACTER}*\"\"\")
 
 
+RAW_INTERPOLATED_STRING_START=(\$(\$)+\"\"\")
+
 LET_BANG="let!"
 USE_BANG="use!"
 DO_BANG="do!"
@@ -276,13 +278,14 @@ PP_CONDITIONAL_SYMBOL={IDENT}
                                             RiseFromParenLevel(0);
                                             return MakeToken(LBRACE); }
 
-<SYMBOLIC_OPERATOR> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
-                                              break;
-                                            else
+<SYMBOLIC_OPERATOR> {RBRACE}              { var tokenType = PopInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                            if (tokenType != null)
                                             {
                                               RiseFromParenLevel(0);
-                                              return MakeToken(RBRACE);
-                                            } }
+                                              return tokenType;
+                                            }
+                                            else
+                                              break; }
 
 <SYMBOLIC_OPERATOR> {GREATER_BAR_RBRACK}  { RiseFromParenLevel(0); return MakeToken(GREATER_BAR_RBRACK); }
 <SYMBOLIC_OPERATOR> {COLON_QMARK_GREATER} { RiseFromParenLevel(0); return MakeToken(COLON_QMARK_GREATER); }
@@ -384,10 +387,11 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP> {LBRACE}              { PushInterpolatedStringItem(InterpolatedStringStackItem.Brace);
                                          return MakeToken(LBRACE); }
 
-<LINE, TYPE_APP> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
-                                           break;
+<LINE, TYPE_APP> {RBRACE}              { var tokenType = PopInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                         if (tokenType != null)
+                                           return tokenType;
                                          else
-                                           return MakeToken(RBRACE); }
+                                           break; }
 
 <LINE, TYPE_APP> {GREATER_BAR_RBRACK}  { return MakeToken(GREATER_BAR_RBRACK); }
 <LINE, TYPE_APP> {COLON_QMARK_GREATER} { return MakeToken(COLON_QMARK_GREATER); }
@@ -425,13 +429,14 @@ PP_CONDITIONAL_SYMBOL={IDENT}
                                         yybegin(LINE);
                                         return MakeToken(LBRACE); }
 
-<INIT_TYPE_APP> {RBRACE}              { if (PopInterpolatedStringItem(InterpolatedStringStackItem.Brace))
-                                           break;
-                                         else
-                                         {
-                                           yybegin(LINE);
-                                           return MakeToken(RBRACE);
-                                         } }
+<INIT_TYPE_APP> {RBRACE}              { var tokenType = PopInterpolatedStringItem(InterpolatedStringStackItem.Brace);
+                                        if (tokenType != null)
+                                        {
+                                          yybegin(LINE);
+                                          return tokenType;
+                                        }
+                                        else
+                                           break; }
 
 <INIT_TYPE_APP> {COLON_QMARK_GREATER} { yybegin(LINE); return MakeToken(COLON_QMARK_GREATER); }
 <INIT_TYPE_APP> {COLON_QMARK}         { yybegin(LINE); return MakeToken(COLON_QMARK); }
@@ -563,23 +568,25 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP, INIT_TYPE_APP> {BYTECHAR}                        { return MakeToken(BYTECHAR); }
 
 <LINE, TYPE_APP, INIT_TYPE_APP> {REGULAR_INTERPOLATED_STRING}            { return MakeToken(REGULAR_INTERPOLATED_STRING); }
-<LINE, TYPE_APP, INIT_TYPE_APP> {REGULAR_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.Regular); return MakeToken(REGULAR_INTERPOLATED_STRING_START); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {REGULAR_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.Regular, null); return MakeToken(REGULAR_INTERPOLATED_STRING_START); }
 <ISR>                           {REGULAR_INTERPOLATED_STRING_MIDDLE}     { yybegin(LINE); return MakeToken(REGULAR_INTERPOLATED_STRING_MIDDLE); }
 <ISR>                           {REGULAR_INTERPOLATED_STRING_END}        { FinishInterpolatedString(); return MakeToken(REGULAR_INTERPOLATED_STRING_END); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_REGULAR_INTERPOLATED_STRING} { return MakeToken(UNFINISHED_REGULAR_INTERPOLATED_STRING); }
 
 <LINE, TYPE_APP, INIT_TYPE_APP> {VERBATIM_INTERPOLATED_STRING}            { return MakeToken(VERBATIM_INTERPOLATED_STRING); }
-<LINE, TYPE_APP, INIT_TYPE_APP> {VERBATIM_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.Verbatim); return MakeToken(VERBATIM_INTERPOLATED_STRING_START); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {VERBATIM_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.Verbatim, null); return MakeToken(VERBATIM_INTERPOLATED_STRING_START); }
 <ISV>                           {VERBATIM_INTERPOLATED_STRING_MIDDLE}     { yybegin(LINE); return MakeToken(VERBATIM_INTERPOLATED_STRING_MIDDLE); }
 <ISV>                           {VERBATIM_INTERPOLATED_STRING_END}        { FinishInterpolatedString(); return MakeToken(VERBATIM_INTERPOLATED_STRING_END); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_VERBATIM_INTERPOLATED_STRING} { return MakeToken(UNFINISHED_VERBATIM_INTERPOLATED_STRING); }
 
 <LINE, TYPE_APP, INIT_TYPE_APP> {TRIPLE_QUOTE_INTERPOLATED_STRING}            { return MakeToken(TRIPLE_QUOTE_INTERPOLATED_STRING); }
-<LINE, TYPE_APP, INIT_TYPE_APP> {TRIPLE_QUOTE_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.TripleQuote); return MakeToken(TRIPLE_QUOTE_INTERPOLATED_STRING_START); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {TRIPLE_QUOTE_INTERPOLATED_STRING_START}      { StartInterpolatedString(FSharpInterpolatedStringKind.TripleQuote, null); return MakeToken(TRIPLE_QUOTE_INTERPOLATED_STRING_START); }
 <ISTQ>                          {TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE}     { yybegin(LINE); return MakeToken(TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE); }
 <ISTQ>                          {TRIPLE_QUOTE_INTERPOLATED_STRING_END}        { FinishInterpolatedString(); return MakeToken(TRIPLE_QUOTE_INTERPOLATED_STRING_END); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING} { return MakeToken(UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING); }
 
+
+<LINE, TYPE_APP, INIT_TYPE_APP> {RAW_INTERPOLATED_STRING_START}      { return StartRawInterpolatedString(); }
 
 <LINE, TYPE_APP> {RESERVED_SYMBOLIC_SEQUENCE} { return MakeToken(RESERVED_SYMBOLIC_SEQUENCE); }
 <LINE, TYPE_APP> {RESERVED_LITERAL_FORMATS}   { return MakeToken(RESERVED_LITERAL_FORMATS); }
@@ -651,7 +658,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
   yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 
-<PPDIRECTIVE> {HASH}{IDENT}                      { yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
+<PPDIRECTIVE> {HASH}{IDENT}                      { yypushback(yylength()); yybegin(LINE); Clear(); break; }
 
 <PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return MakeToken(PP_IF_SECTION); }
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return MakeToken(PP_ELSE_SECTION); }
