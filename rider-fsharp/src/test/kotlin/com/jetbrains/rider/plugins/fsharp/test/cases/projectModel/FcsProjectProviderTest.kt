@@ -121,7 +121,6 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     }
   }
 
-  @Mute("RIDER-100270")
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   @Mute("Need to somehow set setting before solution load")
   fun projectReferencesCSharpNoModuleReader() {
