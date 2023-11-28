@@ -51,11 +51,11 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   private fun doTest(expectedRuntime: String) {
     withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
       waitForDaemon()
-      this.project!!.fcsHost
-        .typeProvidersRuntimeVersion.sync(Unit)
+      val typeProvidersRuntimeVersion = this.project!!.fcsHost.typeProvidersRuntimeVersion.sync(Unit)
+      typeProvidersRuntimeVersion
         .shouldNotBeNull()
         .startsWith(expectedRuntime)
-        .shouldBeTrue()
+        .shouldBeTrue("'$typeProvidersRuntimeVersion' should start with '$expectedRuntime'")
       markupAdapter.hasErrors.shouldBeFalse()
     }
   }
