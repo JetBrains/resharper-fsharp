@@ -2,11 +2,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
@@ -33,10 +34,5 @@ type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
         dotLambda.SetExpression(expr) |> ignore
 
         let exprToReplace = lambda.IgnoreParentParens()
-        let addSpace =
-            match exprToReplace.PrevSibling with
-            | null -> false
-            | x when x.IsFiltered() -> false
-            | _ -> true
-        if addSpace then addNodeBefore exprToReplace (Whitespace(1))
-        replace exprToReplace dotLambda
+        let dotLambda = ModificationUtil.ReplaceChild(exprToReplace, dotLambda)
+        addParensIfNeeded dotLambda |> ignore
