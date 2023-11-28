@@ -1,5 +1,4 @@
 import com.jetbrains.rd.generator.gradle.RdGenExtension
-import com.jetbrains.rd.generator.gradle.RdGenTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.IntelliJPluginConstants
@@ -352,13 +351,34 @@ tasks {
     into(backendLexerSources)
   }
 
-  val generateFSharpLexer = task<GenerateLexerTask>("generateFSharpLexer") {
+  fun generateLexer(inMonorepo: Boolean, taskName: String) = register<GenerateLexerTask>(taskName) {
     dependsOn(copyBackendLexerSources, copyUnicodeLex)
     source.set("src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex")
-    targetDir.set("src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
-    targetClass.set("_FSharpLexer")
+
+    val relTargetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
+    val targetName = "_FSharpLexer"
+    val targetDirAbs =
+      if (inMonorepo) monorepoPreGeneratedFrontendDir.resolve(relTargetDir)
+      else File(repoRoot, "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
+    targetDir.set(targetDirAbs.toString())
+    targetClass.set(targetName)
     purgeOldFiles.set(true)
+
+    if (inMonorepo) {
+      // The generated file contains not constant comment with a source file abs path
+      // remove it to prevent changes on each generation
+      // Also, line endings may depend on the platform, so unify it to LF
+      doLast {
+        val targetFile = targetDirAbs.resolve("$targetName.java")
+        if (!targetFile.exists()) error("Lexer file $targetFile was not generated")
+
+        removeFirstMatchLineByRegexAndNormalizeEndings(targetFile, Regex("^( \\* from the specification file .*)\$"))
+      }
+    }
   }
+
+  val generateFSharpLexer = generateLexer(false, "generateFSharpLexer")
+  val generateFSharpLexerMonorepo = generateLexer(true, "generateFSharpLexerMonorepo")
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
@@ -428,7 +448,7 @@ tasks {
 
   val prepare = create("prepare") {
     group = riderFSharpTargetsGroup
-    dependsOn(rdgen, writeNuGetConfig, writeDotNetSdkPathProps)
+    dependsOn(rdgen, writeNuGetConfig, writeDotNetSdkPathProps, generateFSharpLexer)
   }
 
   create("buildReSharperPlugin") {
@@ -441,6 +461,11 @@ tasks {
       }
     }
   }
+
+  create("prepareMonorepo") {
+    dependsOn(generateFSharpLexerMonorepo, "rdgen")
+  }
+
   defaultTasks(prepare)
 }
 
@@ -455,4 +480,24 @@ fun getProductMonorepoRoot(): File? {
   }
 
   return null
+}
+
+fun removeFirstMatchLineByRegexAndNormalizeEndings(file: File, removeRegex: Regex) {
+  val tempFile = File.createTempFile("${file.name}.temp", null)
+  var found = false
+  file.useLines { lines ->
+    tempFile.bufferedWriter().use { writer ->
+      lines.forEach { line ->
+        if (!found && removeRegex.matches(line)) {
+          // do not write the line if it is matched with the regex
+          found = true
+        } else {
+          // rewrite the line with LF
+          writer.write(line + "\n")
+        }
+      }
+    }
+  }
+  file.delete()
+  tempFile.renameTo(file)
 }
