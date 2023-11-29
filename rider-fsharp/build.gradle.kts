@@ -359,10 +359,11 @@ tasks {
     val targetName = "_FSharpLexer"
     val targetDirAbs =
       if (inMonorepo) monorepoPreGeneratedFrontendDir.resolve(relTargetDir)
-      else File(repoRoot, "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
+      else File(repoRoot, "rider-fsharp/$relTargetDir")
     targetDir.set(targetDirAbs.toString())
     targetClass.set(targetName)
     purgeOldFiles.set(true)
+    outputs.upToDateWhen { false }
 
     if (inMonorepo) {
       // The generated file contains not constant comment with a source file abs path
