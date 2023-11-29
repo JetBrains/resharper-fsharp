@@ -669,7 +669,7 @@ recordExpr options { stubBase="ReferenceOwnerExprBase"; } extras {
   (
      (
        fSharpExpression<COPY_INFO, CopyInfoExpression>
-       WITH
+       WITH<WITH, WithKeyword>
      )
      |
      (
