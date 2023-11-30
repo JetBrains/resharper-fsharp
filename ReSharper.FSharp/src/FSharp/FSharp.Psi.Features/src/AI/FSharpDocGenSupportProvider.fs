@@ -60,7 +60,7 @@ type FSharpDocGenSupportProvider() =
             node.As<IDeclaration>()
         
         member this.GetText(declaration: IDeclaration) =
-            declaration.GetText()
+            Seq.singleton(declaration.GetText())
             
     member this.FindDocNode(declaration: IDeclaration) =
         match declaration with

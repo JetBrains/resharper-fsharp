@@ -11,7 +11,7 @@ Opened
        ...
      -Packages
       coverlet.collector/6.0.0
-      FSharp.Core/8.0.100-beta.23418.2
+      FSharp.Core/8.0.100
       Microsoft.NET.Test.Sdk/17.6.0
       xunit.runner.visualstudio/2.4.5
       xunit/2.4.2
