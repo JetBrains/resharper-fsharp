@@ -56,6 +56,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     let (|Version|) (version: Version) =
         version.Major, version.Minor
 
+    // TODO: more versions
     let getLanguageLevelByToolsetVersion () =
         match solutionToolset.GetBuildTool() with
         | null -> FSharpLanguageLevel.Latest
@@ -76,7 +77,11 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         match fscVersion with
         | Version (10, 1000) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
         | Version (11, 0) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.FSharp60)
-        | Version (12, 0) -> VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.Preview)
+        | Version (12, minor) ->
+            if minor < 4 then VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.FSharp70)
+            elif minor >= 4 && minor <= 7 then VersionMapping(FSharpLanguageLevel.FSharp70, FSharpLanguageLevel.FSharp80)
+            elif minor >= 8 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.Preview)
+            else null
         | _ -> null
 
     let getCompilerVersion (fscPath: VirtualFileSystemPath) =
@@ -97,8 +102,9 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
         if isNull configuration then VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext) else
 
-        let path = configuration.PropertiesCollection.GetPropertyValueSafe(FSharpProperties.DotnetFscCompilerPath)
-        VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)
+        match configuration.PropertiesCollection.TryGetValue(FSharpProperties.DotnetFscCompilerPath) with
+        | true, path -> path.Trim('"').ParseVirtualPathSafe(InteractionContext.SolutionContext)
+        | false, _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
 
     let convertToLanguageLevel (configuration: IFSharpProjectConfiguration) version =
         match version with
