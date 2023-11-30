@@ -68,10 +68,6 @@ fun runProcessWaitForExit(cmd: Path, args: List<String>, env: Map<String, String
   val cmdArray = mutableListOf(cmd.toAbsolutePath().toString())
   cmdArray.addAll(args)
 
-  if (!SystemInfo.isWindows) {
-    cmdArray.add(0, RiderEnvironment.getBundledFile("runtime-dotnet.sh").absolutePath)
-  }
-
   val cmdline = GeneralCommandLine()
     .withExePath(cmdArray.first().toString())
     .withEnvironment(env)
