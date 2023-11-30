@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfoType
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -51,6 +52,7 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 
   @Test
+  @Mute("RIDER-102632")
   @TestEnvironment(solution = "FableApp")
   fun testInjectionByExternalAnnotation() = doTest()
 }
