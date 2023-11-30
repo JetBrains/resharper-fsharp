@@ -7,6 +7,7 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
@@ -20,7 +21,8 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @Test
   @TestEnvironment(
     sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
-    buildTool = BuildTool.FULL, 
+    buildTool = BuildTool.FULL,
+    platform = [PlatformType.WINDOWS_ALL],
     solution = "TypeProviderLibrary"
   )
   fun framework461() = doTest(".NET Framework 4.8")
