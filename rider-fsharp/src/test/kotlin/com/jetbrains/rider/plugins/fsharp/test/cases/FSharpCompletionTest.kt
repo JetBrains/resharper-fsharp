@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -17,26 +16,21 @@ class FSharpCompletionTest : CompletionTestBase() {
   @Test
   fun namespaceKeyword() = doTestTyping("names")
 
-  @Mute("RIDER-100683")
   @Test
   fun listModule() = doTestChooseItem("List")
 
-  @Mute("RIDER-100683")
   @Test
   fun listModuleValue() = doTestTyping("filt")
 
   @Test(enabled = false)
   fun localVal01() = doTestChooseItem("x")
 
-  @Mute("RIDER-100683")
   @Test
   fun localVal02() = doTestTyping("x")
 
-  @Mute("RIDER-100683")
   @Test
   fun qualified01() = doTestChooseItem("a")
 
-  @Mute("RIDER-100683")
   @Test
   fun qualified02() = doTestChooseItem("a")
 
