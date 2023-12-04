@@ -89,7 +89,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         assemblyNameInfo.Version
 
     let getLanguageLevelByCompilerNoCache (fscPath: VirtualFileSystemPath): VersionMapping =
-        if fscPath.IsEmpty then getVersionMappingByToolset () else
+        if not fscPath.ExistsFile then getVersionMappingByToolset () else
 
         let version = getCompilerVersion fscPath
         match getLanguageLevelByCompilerVersion version with
