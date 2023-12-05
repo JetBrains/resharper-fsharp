@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageLock Include="Fantomas.Core" Version="6.2.2" />
     <PackageLock Include="FSharp.Core" Version="7.0.300" />
-    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2023.3.2" />
+    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2023.3.3" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2023.3.0" />
     <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.8.20231120.123" />
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.8.20231120.123" />
