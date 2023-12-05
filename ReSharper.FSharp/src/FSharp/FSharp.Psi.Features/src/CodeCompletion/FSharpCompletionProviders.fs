@@ -43,6 +43,13 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         let tokenType = getTokenType fsContext.TokenAtCaret
         let tokenBeforeType = getTokenType fsContext.TokenBeforeCaret
 
+        // 1.
+        // 1.m
+        // 1.ma
+        if tokenBeforeType == FSharpTokenType.DECIMAL ||
+           tokenBeforeType == FSharpTokenType.IEEE64 ||
+           tokenBeforeType == FSharpTokenType.RESERVED_LITERAL_FORMATS then null else
+
         // :{caret}:
         if fsContext.InsideToken && tokenType == FSharpTokenType.COLON_COLON then null else
 
