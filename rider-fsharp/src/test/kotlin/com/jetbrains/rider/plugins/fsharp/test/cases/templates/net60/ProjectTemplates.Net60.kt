@@ -60,7 +60,8 @@ object Net60 {
       Regex("UnitTestProject/obj/Debug/net6\\.0/ref(int)?/.*")
     )
     init {
-      addMute(Mute("No run configuration"), XUnitProjectTemplateTestBase::runConfiguration)
+      addMute(Mute("RIDER-102872"), ::createTemplateProject)
+      addMute(Mute("No run configuration"), ::runConfiguration)
       addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
     }
   }
