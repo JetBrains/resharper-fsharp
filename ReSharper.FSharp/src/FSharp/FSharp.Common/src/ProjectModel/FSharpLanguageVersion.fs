@@ -28,7 +28,7 @@ type FSharpLanguageLevel =
     /// Lowercase union cases
     | FSharp70 = 70
 
-    /// Nested record field copy and update
+    /// Nested record field copy and update/shorthand lambda
     | FSharp80 = 80
 
     | Latest = 80
