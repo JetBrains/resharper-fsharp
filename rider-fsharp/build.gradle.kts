@@ -118,6 +118,8 @@ val pluginFiles = listOf(
 )
 
 val typeProvidersFiles = listOf(
+  "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.dll",
+  "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.xml",
   "FSharp.TypeProviders.Host/FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe",
   "FSharp.TypeProviders.Host/FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.pdb",
   "FSharp.TypeProviders.Host/FSharp.TypeProviders.Host/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.exe.config",
