@@ -134,6 +134,8 @@ module FSharpPostfixTemplates =
 
         isBlockLike ArrayOrListExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike ComputationExprNavigator.GetByExpression isParentApplicable ||
+        isBlockLike AccessorDeclarationNavigator.GetByExpression isParentApplicable ||
+        isBlockLike AutoPropertyDeclarationNavigator.GetByExpression isParentApplicable ||
         isBlockLike BindingNavigator.GetByExpression isParentApplicable ||
         isBlockLike BinaryAppExprNavigator.GetByArgument isBinaryExprApplicable ||
         isBlockLike DoLikeExprNavigator.GetByExpression isParentApplicable ||
@@ -143,9 +145,11 @@ module FSharpPostfixTemplates =
         isBlockLike LambdaExprNavigator.GetByExpression isLambdaExprApplicable ||
         isBlockLike LetOrUseExprNavigator.GetByInExpression isLetExprApplicable ||
         isBlockLike MatchClauseNavigator.GetByExpression isParentApplicable ||
+        isBlockLike MemberDeclarationNavigator.GetByExpression isParentApplicable ||
         isBlockLike QuoteExprNavigator.GetByQuotedExpression isParentApplicable ||
         isBlockLike TryFinallyExprNavigator.GetByFinallyExpression isParentApplicable ||
         isBlockLike TryLikeExprNavigator.GetByTryExpression isParentApplicable ||
+        isBlockLike SecondaryConstructorDeclarationNavigator.GetByExpression isParentApplicable ||
         isBlockLike SequentialExprNavigator.GetByExpression isSequentialExprApplicable ||
         isBlockLike SetExprNavigator.GetByRightExpression isParentApplicable ||
         isBlockLike WhileExprNavigator.GetByDoExpression isParentApplicable
@@ -199,7 +203,11 @@ module FSharpPostfixTemplates =
 
                     indent
                 else
-                    contextExpr.Parent.Indent
+                    match contextExpr.Parent with
+                    | :? IAccessorDeclaration as decl when
+                            isNotNull (MemberDeclarationNavigator.GetByAccessorDeclaration(decl)) ->
+                        MemberDeclarationNavigator.GetByAccessorDeclaration(decl).Indent
+                    | parent -> parent.Indent
 
             addNodesBefore contextExpr [
                 NewLine(lineEnding)

@@ -287,12 +287,15 @@ type FSharpPostfixCompletionTest() =
     [<TestDefines("DEFINE")>]
     [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Context - Accessor 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Auto property 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 03``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 04``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - If 01``() = x.DoNamedTest()
@@ -311,6 +314,7 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Match - Context - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Match 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Try 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Try 02``() = x.DoNamedTest()
 
