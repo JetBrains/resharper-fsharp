@@ -60,7 +60,6 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
   fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
   fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
-  @Mute("RIDER-100683")
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
