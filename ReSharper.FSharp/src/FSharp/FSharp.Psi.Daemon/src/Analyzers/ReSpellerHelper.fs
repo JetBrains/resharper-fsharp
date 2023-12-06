@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Features.ReSpeller.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
 type ReSpellerPsiHelper() =
@@ -26,3 +27,15 @@ type ReSpellerPsiHelper() =
 
         memberDeclaration.IsOverride ||
         isNotNull (InterfaceImplementationNavigator.GetByTypeMember(memberDeclaration))
+
+    override this.GetNamespaceIdentifiers(identifier, declaration) =
+        let decl = declaration.As<INamedNamespaceDeclaration>()
+        if isNull decl then base.GetNamespaceIdentifiers(identifier, declaration) else
+
+        let rec loop acc (referenceName: IReferenceName) =
+            if isNull referenceName then List.rev acc else
+
+            let acc = struct (referenceName.Identifier :> ITreeNode, referenceName.ShortName) :: acc
+            loop acc referenceName.Qualifier
+
+        loop [identifier, identifier.Name] decl.QualifierReferenceName |> Array.ofList
