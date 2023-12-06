@@ -491,6 +491,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case - List 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case - List 02``() = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
+    [<Test>] member x.``Pattern - Union case - List 03``() = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
     [<Test>] member x.``To recursive - Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``NamedUnionCaseFieldsPat - 01`` () = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
