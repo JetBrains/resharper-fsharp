@@ -62,6 +62,7 @@ object Net80 {
     )
 
     init {
+      addMute(Mute("RIDER-102872"), ::createTemplateProject)
       addMute(Mute("No run configuration"), testMethod = XUnitProjectTemplateTestBase::runConfiguration)
       addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
     }
