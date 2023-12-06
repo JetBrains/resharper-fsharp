@@ -1,13 +1,89 @@
 # Release notes
 
-### 2023.1
+## 2023.3
+
+### Code analysis
+
+* **New**: This release brings F# 8 support:
+  * **New**: New analyzers and quick fixes suggest using the new syntax for lambda expressions and nested record updates
+  * **Improve**: Existing features like language injections and 'Extend selection' are updated for the new language constructs, including the new raw strings
+  * **Improve**: Analyzers like `Extension` attribute analyzer were updated for the newer language rules
+  * **Improve**: Analysis and code completion during typing were improved thanks to the newer indentation rules
+* **Improve**: Rewritten project model fixes various cases where project references could be missing in analysis, or where Rider could freeze after a project update
+* **Fix**: Many issues in C# project in-memory references, including missing types or references, were fixed
+* **Fix**: Explicit implementations in VB.NET weren't analyzed correctly when using in-memory project references
+* **Improve**: Faster startup and update on bigger solutions, thanks to the parallel references analysis option is now turned on by default in F# compiler service
+* **New**: `#nowarn` directives are now taken into account during analysis
+* **Fix**: Some values were considered unused in `query` computation expressions
+* **Fix**: `StringSyntax` attribute could be ignored when optional parameters are used, so language injections didn't work automatically
+* **Fix**: Language injections didn't work in `Literal` values
+* **Fix**: 'To interpolated string' was suggested when using older FSharp.Core package
+* **Fix**: Inferred type hints could stick to a wrong place during editing
+* **Improve**: Significantly improved performance of checking used names, which is used in analysis and refactoring features
+
+### Code completion
+
+* **Improve**: Suggestions sorting was improved. Generate suggestions now also stay on top of the list
+* **Fix**: Some required qualifiers weren't added automatically, resulting in errors after code completion or generation
+* **New**: When writing a new language injection comment, available languages are suggested ([#564](https://github.com/JetBrains/resharper-fsharp/pull/564))
+
+### Quick fixes
+
+* **Fix**: Some missing patterns couldn't be generated for union cases and tuples
+* **Improve**: Quick fixes now use additional diagnostic data from F# compiler service, which fixes various small issues
+
+### Misc
+
+* **Improve**: Find usages: improved icons help distinguish the ways anon records are accessed
+* **Fix**: Union cases could be duplicated in Parameter info popup
+
+
+## 2023.2
+
+The biggest changes in this release are improvements to language interop.
+
+We've enabled F# to C# in-memory references, so you don't have to build C# projects to see the changes in the referencing F# code. Together with previously working C# to F# in-memory references, it allows better cross-language refactorings, navigation, and analysis.
+
+We've also added support for IntelliJ language injections, so you can use various frontend languages, access database, open a web or an issue link and so on, see
+[#482](https://github.com/JetBrains/resharper-fsharp/pull/482),
+[#532](https://github.com/JetBrains/resharper-fsharp/pull/532),
+[#519](https://github.com/JetBrains/resharper-fsharp/pull/519).
+
+### Context actions and quick fixes
+
+* **New**: Convert fields to named patterns, by [@nojaf](https://github.com/nojaf) ([#493](https://github.com/JetBrains/resharper-fsharp/pull/493))
+* **Improve**: Annotate type action is available in more cases, by [@nojaf](https://github.com/nojaf) ([#541](https://github.com/JetBrains/resharper-fsharp/pull/541))
+* **Fix**: 'Generate missing patterns' quick fix uses improved exhaustiveness checks so extra patterns are not generated
+* **Improve**: 'Generate record fields' quick fix is available in more cases now
+
+### Code completion
+
+* **Improve**: We've reworked suggestions for union case fields, so the deconstruction popup doesn't prevent you from typing the pattern manually
+* **New**: There are new suggestions for named field patterns, by [@nojaf](https://github.com/nojaf) ([#500](https://github.com/JetBrains/resharper-fsharp/pull/500))
+
+### Editor
+
+* **New**: The new 'Go to File Member' popup is now available for F#, making it easier to see the file structure and to navigate to members from base types
+* **Improve**: Xml documentation comments highlighting was significantly improved
+* **Fix**: Fantomas now correctly uses default setting values, previously outdated defaults could be used
+* **Fix**: 'Parameter info' popup now shows signatures for custom operations available in computation expressions
+* **Fix**: Previously missing tooltips for some active patterns were fixed, by [dawedawe](https://github.com/dawedawe) ([#503](https://github.com/JetBrains/resharper-fsharp/pull/503))
+
+### Generate overrides
+
+* **Fix**: Generated members are now always placed to correct places, by [dawedawe](https://github.com/dawedawe) ([#525](https://github.com/JetBrains/resharper-fsharp/pull/525))
+* **Improve**: Type declarations are being reformatted now if needed for member generation, by [dawedawe](https://github.com/dawedawe) ([#512](https://github.com/JetBrains/resharper-fsharp/pull/512), [#507](https://github.com/JetBrains/resharper-fsharp/pull/507), [#530](https://github.com/JetBrains/resharper-fsharp/pull/530))
+* **Improve**: The Generate action is now available below the type end, by [dawedawe](https://github.com/dawedawe) ([#505](https://github.com/JetBrains/resharper-fsharp/pull/505))
+* **Fix**: Some generic and abstract members were analyzed incorrectly and could get an extra generated copy
+
+## 2023.1
 
 ### Code completion
 
 * **New**: When starting a `match` expression, the new 'Match values' suggestion generates all cases for union, enum, bool and tuple values
 * **New**: postfix templates:
   * `match`: rewrites the expressions and adds boilerplate needed to start a `match` expression
-  * `for`: makes it easier to iterate over a sequence, suggests name for the loop variable, and suggests deconstrucing it
+  * `for`: makes it easier to iterate over a sequence, suggests name for the loop variable, and suggests deconstructing it
   * `with`: simplifies updating possibly nested record values, with initial implementation by [@ieviev](https://github.com/ieviev) ([#436](https://github.com/JetBrains/resharper-fsharp/pull/436))
 * **New**: automatically insert ` = ` when completing record fields
 * **New**: show completion popup automatically when writing subsequent record fields and starting a new match branch
@@ -29,7 +105,7 @@
 * **Fix**: redundant parens analyzer now takes dynamic invocations and more indexer-like expressions into account
 * **Fix**: better generics analysis is now used in redundant qualifier analyzer
 * **Fix**: an empty tooltip could be shown when hovering punctuation symbols
-* **Fix**: tooltips could be unavailable on multi-tarteting projects
+* **Fix**: tooltips could be unavailable on multi-targeting projects
 * **Fix**: syntax highlighting could be broken after editing an unfinished escaped name
 * **Improve**: redundant attribute analysis is updated for upcoming F# 8
 
@@ -57,7 +133,7 @@
 ### Type providers
 
 * **New**: Provided types from generative type providers are properly seen in C# code now
-* **Fix**: Excetion or invalidation inside type provider could break analysis
+* **Fix**: Exception or invalidation inside type provider could break analysis
 * **Fix**: Host type providers in matching runtime when F# compiler is overridden in a project
 
 ### Code completion
@@ -203,7 +279,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * Better completion suggestions order
 * Rewrite getting completion context (allows adding new completion rules and better suggestions filtering)
 * **New**: 'To recursive function' rule, adding `rec` to containing function
-* When completing union case pattern, deconstucting its fields is suggested
+* When completing union case pattern, deconstructing its fields is suggested
 * Improved `Attribute` suffix cutting
 * Initial context-based keyword filtering (some keywords no longer show up when aren't applicable)
 
@@ -336,7 +412,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
   * Escape module names when importing types
   * **Fix** various cases of incorrect `open` placement
 * **FS0003**: Not a function / unexpected argument
-  * **Add** Remore unexpected arguments (by [@DedSec256](https://github.com/DedSec256) ([#89](https://github.com/JetBrains/fsharp-support/pull/89)))
+  * **Add** Remove unexpected arguments (by [@DedSec256](https://github.com/DedSec256) ([#89](https://github.com/JetBrains/fsharp-support/pull/89)))
 * **FS0026**: `match` rule is never matched
   * Remove never matching rules (by [@reacheight](https://github.com/reacheight) ([#74](https://github.com/JetBrains/fsharp-support/pull/74)))
 * **FS0005**: Field not mutable
@@ -456,7 +532,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * **Add** renaming anonymous records fields
 * **Fix** renaming union case fields when used as named args
 * **Fix** renaming typed parameters inside lambda functions
-* Better naming sugestions for predefined types
+* Better naming suggestions for predefined types
 
 ### Intentions / Context actions
 
@@ -487,7 +563,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 ### Highlighting
 
 * Separate highlighting options for F#:
-  * **Add** F#-specific symbols like Unions or Active Patterns can now be highligted differently
+  * **Add** F#-specific symbols like Unions or Active Patterns can now be highlighted differently
 * **Add** Highlight `byref` values as mutable
 * **Fix** unary operators highlighting
 
