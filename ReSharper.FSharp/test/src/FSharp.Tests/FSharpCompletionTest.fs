@@ -236,6 +236,8 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``For - Not available - Bool 02``() = x.DoNamedTest()
     [<Test>] member x.``For - Not available - Int 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Not available - Int 02``() = x.DoNamedTest()
+    [<Test>] member x.``For - Not available - Int 03``() = x.DoNamedTest()
+    [<Test>] member x.``For - Not available - Int 04``() = x.DoNamedTest()
     [<Test>] member x.``For - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``For - Type context - Arg 01``() = x.DoNamedTest()
@@ -287,12 +289,15 @@ type FSharpPostfixCompletionTest() =
     [<TestDefines("DEFINE")>]
     [<Test>] member x.``Let - Preprocessor 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match - Context - Accessor 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - App 02``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Auto property 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 03``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Binary 04``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Eof 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - If 01``() = x.DoNamedTest()
@@ -311,6 +316,7 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Match - Context - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Match 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match - Context - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Try 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Context - Try 02``() = x.DoNamedTest()
 
@@ -485,6 +491,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case - List 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union case - List 02``() = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
+    [<Test>] member x.``Pattern - Union case - List 03``() = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
     [<Test>] member x.``To recursive - Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``NamedUnionCaseFieldsPat - 01`` () = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
