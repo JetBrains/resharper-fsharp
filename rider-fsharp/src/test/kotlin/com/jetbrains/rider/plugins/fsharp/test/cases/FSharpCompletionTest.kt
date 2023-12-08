@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -60,6 +61,7 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
   fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
   fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
+  @Mute("RIDER-102515")
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")

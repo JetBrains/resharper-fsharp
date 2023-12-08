@@ -15,6 +15,7 @@ import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -107,6 +108,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
 
+  @Mute("RIDER-102738")
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   fun testUnloadReloadCSharp() {
     executeWithGold(testGoldFile) {
@@ -211,6 +213,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
 
+  @Mute("RIDER-102738")
   @TestEnvironment(solution = "ProjectReferencesCSharp2")
   fun testLoadReferenced() {
     executeWithGold(testGoldFile) {
