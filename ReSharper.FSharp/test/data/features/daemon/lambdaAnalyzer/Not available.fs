@@ -44,3 +44,6 @@ let (|One|Other|) x =
     | 1 -> One
     | x -> x |> fun a -> Other a
 
+<@ fun x -> x @>
+<@@ fun x -> x @@>
+<@ fun x -> f 1 x @>
