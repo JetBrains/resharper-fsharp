@@ -47,4 +47,3 @@ let (|One|Other|) x =
 <@ fun x -> x @>
 <@@ fun x -> x @@>
 <@ fun x -> f 1 x @>
-<@ fun y -> (fun x -> x) @>
