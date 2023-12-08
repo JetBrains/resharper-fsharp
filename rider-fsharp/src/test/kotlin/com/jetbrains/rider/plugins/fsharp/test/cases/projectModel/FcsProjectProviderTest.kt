@@ -122,7 +122,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
   }
 
   @TestEnvironment(solution = "ProjectReferencesCSharp")
-  @Mute("Need to somehow set setting before solution load")
+  @Mute("RIDER-100270 Need to somehow set setting before solution load")
   fun projectReferencesCSharpNoModuleReader() {
     assertAllProjectsWereLoaded(project)
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
