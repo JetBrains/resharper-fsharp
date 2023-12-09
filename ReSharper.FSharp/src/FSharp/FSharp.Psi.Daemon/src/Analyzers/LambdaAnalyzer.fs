@@ -122,6 +122,8 @@ type LambdaAnalyzer() =
         exprType <> lambdaReturnType
 
     let isLambdaArgOwnerSupported (lambda: IFSharpExpression) delegatesConversionSupported (replacementExprSymbol: FSharpSymbol voption) =
+        isNull (QuoteExprNavigator.GetByQuotedExpression(lambda.IgnoreParentParens())) &&
+
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
         let argExpr = argExpr.IgnoreParentParens()
