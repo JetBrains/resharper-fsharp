@@ -22,12 +22,9 @@ type InterpolatedStringCandidateAnalyzer() =
     inherit ElementProblemAnalyzer<IPrefixAppExpr>()
 
     let getFormatSpecifierLocationsAndArity (checkResults: FSharpParseAndCheckResults) (data: ElementProblemAnalyzerData) =
-        match data.GetData(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey) with
-        | null ->
-            let specifiers = checkResults.CheckResults.GetFormatSpecifierLocationsAndArity()
-            data.PutData(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey, specifiers)
-            specifiers
-        | data -> data
+        data.GetOrCreateDataUnderLock(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey, fun _ ->
+            checkResults.CheckResults.GetFormatSpecifierLocationsAndArity()
+        )
 
     let isDisallowedStringLiteral (literalExpr: ILiteralExpr) =
         let tokenType = getTokenType literalExpr.Literal
@@ -62,6 +59,7 @@ type InterpolatedStringCandidateAnalyzer() =
                 let textRange = getTextRange document r
                 DocumentRange(document, textRange), arity)
             |> Seq.filter (fun (range, _) -> argRange.Contains(range))
+            |> Seq.distinct
             |> List.ofSeq
 
         if matchingFormatSpecsAndArity.IsEmpty then () else
