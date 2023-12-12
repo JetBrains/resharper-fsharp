@@ -13,6 +13,7 @@ type InterpolatedStringCandidateTest() =
     override x.RelativeTestDataPath = "features/daemon/interpolatedStringCandidate"
 
     [<Test>] member x.``Ce 01``() = x.DoNamedTest()
+    [<Test>] member x.``Handler 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple 01 - sprintf``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - printfn``() = x.DoNamedTest()
