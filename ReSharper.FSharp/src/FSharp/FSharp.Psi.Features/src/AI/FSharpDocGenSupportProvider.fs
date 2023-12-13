@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Backend.Features.AI.DocGen
@@ -28,7 +29,10 @@ type FSharpDocGenSupportProvider() =
         member this.CalculateContext(declaration: IDeclaration) =
             let docNode = this.FindDocNode(declaration)
             let docRange = docNode.GetDocumentRange()
-            GenericContextEntry(declaration.DeclaredName, docRange.TextRange.ToRdTextRange())
+            let declaredName =
+                if declaration.DeclaredName == SharedImplUtil.MISSING_DECLARATION_NAME && isNotNull(declaration.DeclaredElement)
+                    then declaration.DeclaredElement.ShortName else declaration.DeclaredName
+            GenericContextEntry(declaredName, docRange.TextRange.ToRdTextRange())
         
         member this.UpdateDocText(document: IDocument, declaration: IDeclaration, text: string) =
             let solution = declaration.GetSolution()
