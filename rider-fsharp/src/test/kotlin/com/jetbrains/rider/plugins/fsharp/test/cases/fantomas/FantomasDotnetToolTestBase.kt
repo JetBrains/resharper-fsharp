@@ -2,7 +2,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
-import com.intellij.util.io.createFile
 import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
@@ -61,7 +60,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
   protected fun withFantomasLocalTool(name: String, version: String, restore: Boolean = true, function: () -> Unit) {
     val manifestFile = Paths.get(project.solutionDirectory.absolutePath, ".config", "dotnet-tools.json")
     frameworkLogger.info("Create '$manifestFile'")
-    val file = manifestFile.createFile()
+    val file = manifestFile.createParentDirectories()
 
     try {
       withDotnetToolsUpdate {
