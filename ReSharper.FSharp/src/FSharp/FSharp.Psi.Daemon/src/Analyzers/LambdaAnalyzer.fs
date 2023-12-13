@@ -207,7 +207,7 @@ type LambdaAnalyzer() =
             if hasOptionalArg then null else ctor arg
         | _ -> ctor arg
 
-    let tryCreateWarningForBuiltInFun (ctor: ILambdaExpr * string -> #IHighlighting) (lambda: ILambdaExpr, funName: string as arg) isFSharp6Supported =
+    let tryCreateWarningForBuiltInFun ctor (lambda: ILambdaExpr, funName: string as arg) isFSharp6Supported =
         if not (resolvesToPredefinedFunction lambda.RArrow funName "LambdaAnalyzer") then null else
         tryCreateWarning ctor arg isFSharp6Supported
 
