@@ -90,6 +90,9 @@ type LambdaAnalyzer() =
 
         compareArgsRec expr 0 null
 
+    let resolvesToPredefinedFunction (context: ILambdaExpr) funName =
+        resolvesToPredefinedFunction context.RArrow funName "LambdaAnalyzer"
+
     let hasExplicitConversion (lambda: ILambdaExpr) =
         let expr = lambda.Expression.IgnoreInnerParens()
 
@@ -338,14 +341,17 @@ type LambdaAnalyzer() =
                     if isFunctionInApp expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
+                        if not (resolvesToPredefinedFunction lambda "id") then null else
                         tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFSharp60Supported :> _
                 else
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
                         if compareArg tuplePats[0] expr then
+                            if not (resolvesToPredefinedFunction lambda "fst") then null else
                             tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFSharp60Supported :> _
                         elif compareArg tuplePats[1] expr then
+                            if not (resolvesToPredefinedFunction lambda "snd") then null else
                             tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFSharp60Supported :> _
                         else null
                     | :? ILocalReferencePat as pat when isFSharp80Supported ->
