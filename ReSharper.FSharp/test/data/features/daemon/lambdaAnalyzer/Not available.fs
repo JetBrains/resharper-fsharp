@@ -47,3 +47,8 @@ let (|One|Other|) x =
 <@ fun x -> x @>
 <@@ fun x -> x @@>
 <@ fun x -> f 1 x @>
+
+let id, fst, snd = 1, 2, 3
+fun x -> x
+fun (x, y) -> x
+fun (x, y) -> y
