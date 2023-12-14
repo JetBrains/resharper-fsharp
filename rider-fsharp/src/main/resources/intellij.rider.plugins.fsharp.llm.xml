@@ -1,0 +1,11 @@
+<idea-plugin package="com.jetbrains.rider.plugins.fsharp.llm">
+
+    <dependencies>
+        <plugin id="com.intellij.ml.llm"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.intellij">
+        <ml.llm.languageSummaryProvider
+                language="F#"
+                implementationClass="com.jetbrains.rider.plugins.fsharp.llm.FSharpFileSummarizer"/>
+    </extensions>
+</idea-plugin>
