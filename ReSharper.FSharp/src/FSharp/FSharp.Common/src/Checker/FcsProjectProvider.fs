@@ -606,7 +606,7 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
         typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim) =
     do
-        scheduler.EnqueueTask(SolutionLoadTask("FcsProjectProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
+        scheduler.EnqueueTask(SolutionLoadTask(typeof<OutputAssemblyChangeInvalidator>, "FcsProjectProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
                 // No FCS caches to invalidate.
