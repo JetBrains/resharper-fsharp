@@ -14,6 +14,9 @@ let f (a, (b, c)) = fun x -> _.ToString()
 match 1 with _ -> _.ToString()
 let _ = let _ = 3 in _.ToString()
 
+type A = static member M(x: int -> string) = ()
+A.M(_.ToString())
+
 // Not available
 ignore <| fun x -> x.Equals(x)
 ignore <| fun x -> x.ToString ()
@@ -30,3 +33,7 @@ ignore <| fun (x, y) -> x.ToString()
 (fun (a, (b, _)) -> fun y -> fun x -> x.ToString()) |> ignore
 type A2 = member _.M _ = fun x -> x.ToString()
 let g (a, (b, Some _)) = fun x -> fun x -> x.ToString()
+
+open System
+type A with static member M(x: int, y: Func<int, string>) = ()
+A.M(1, fun x -> x.ToString())

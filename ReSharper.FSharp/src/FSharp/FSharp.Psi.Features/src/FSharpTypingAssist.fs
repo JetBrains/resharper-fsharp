@@ -1423,7 +1423,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let skipEndQuote (lexer: CachingLexer) =
             typedChar = getStringEndingQuote lexer.TokenType &&
 
-            let endingQuotesLength = getStringEndingQuotesLength lexer.TokenType
+            let endingQuotesLength = getDefaultStringEndingQuotesLength lexer.TokenType
             endingQuotesLength > 0 && offset >= lexer.TokenEnd - endingQuotesLength
 
         let skipEscapedQuoteInVerbatim (lexer: CachingLexer) =

@@ -200,6 +200,11 @@
         <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING_MIDDLE" />
         <Token name="TRIPLE_QUOTE_INTERPOLATED_STRING_END" />
 
+        <Token name="RAW_INTERPOLATED_STRING" />
+        <Token name="RAW_INTERPOLATED_STRING_START" />
+        <Token name="RAW_INTERPOLATED_STRING_MIDDLE" />
+        <Token name="RAW_INTERPOLATED_STRING_END" />
+
         <Token name="UNFINISHED_STRING" />
         <Token name="UNFINISHED_VERBATIM_STRING" />
         <Token name="UNFINISHED_TRIPLE_QUOTED_STRING" />
@@ -207,6 +212,7 @@
         <Token name="UNFINISHED_REGULAR_INTERPOLATED_STRING" />
         <Token name="UNFINISHED_VERBATIM_INTERPOLATED_STRING" />
         <Token name="UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING" />
+        <Token name="UNFINISHED_RAW_INTERPOLATED_STRING" />
 
         <Token name="RESERVED_LITERAL_FORMATS" />
         <Token name="RESERVED_SYMBOLIC_SEQUENCE" />

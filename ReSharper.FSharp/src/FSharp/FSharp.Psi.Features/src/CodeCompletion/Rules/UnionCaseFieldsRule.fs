@@ -66,6 +66,8 @@ type UnionCaseFieldsPatternRule() =
         if isNull reference then null else
 
         let referenceName = reference.GetElement().As<IExpressionReferenceName>()
+        if isNull referenceName || isNotNull referenceName.Qualifier then null else
+
         let refPat = ReferencePatNavigator.GetByReferenceName(referenceName)
         let parenPat = ParenPatNavigator.GetByPattern(refPat)
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPat)

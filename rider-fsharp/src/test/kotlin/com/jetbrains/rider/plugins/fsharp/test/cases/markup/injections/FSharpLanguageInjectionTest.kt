@@ -39,6 +39,10 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   @Test
   fun testInjectionByCommentInTripleQuotedStrings() = doTest()
 
+  //TODO: fix lexer for second case
+  @Test
+  fun testInjectionByCommentInRawStrings() = doTest()
+
   @Test
   fun testInjectionByCommentInTripleQuotedInterpolatedStrings() = doTest()
 

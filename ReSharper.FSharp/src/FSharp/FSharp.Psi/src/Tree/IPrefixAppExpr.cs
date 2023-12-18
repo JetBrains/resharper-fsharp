@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 
@@ -11,5 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [CanBeNull] IFSharpExpression InvokedExpression { get; }
     [CanBeNull] IReferenceExpr InvokedReferenceExpression { get; }
     [CanBeNull] FSharpSymbolReference InvokedFunctionReference { get; }
+
+    IList<IFSharpExpression> AppliedExpressions { get; }
   }
 }

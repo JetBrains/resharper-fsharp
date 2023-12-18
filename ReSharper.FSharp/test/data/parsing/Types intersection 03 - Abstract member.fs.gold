@@ -1,0 +1,50 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      IFSharpTypeDeclaration
+        FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpIdentifierToken(type:IDENTIFIER, text:A)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IAbstractMemberDeclaration
+          FSharpTokenType+AbstractTokenElement(type:ABSTRACT, text:abstract)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:M)
+          IReturnTypeInfo
+            FSharpTokenType+ColonTokenElement(type:COLON, text::)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IFunctionTypeUsage
+              IParameterSignatureTypeUsage
+                IIntersectionTypeUsage
+                  IHashTypeUsage
+                    FSharpToken(type:HASH, text:#)
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:B)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+AmpTokenElement(type:AMP, text:&)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IHashTypeUsage
+                    FSharpToken(type:HASH, text:#)
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:seq)
+                        IPrefixAppTypeArgumentList
+                          FSharpTokenType+LessTokenElement(type:LESS, text:<)
+                          INamedTypeUsage
+                            ITypeReferenceName
+                              FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                          FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IParameterSignatureTypeUsage
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

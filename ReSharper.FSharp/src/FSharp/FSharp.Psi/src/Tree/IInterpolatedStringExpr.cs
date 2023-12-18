@@ -5,7 +5,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IInterpolatedStringExpr : IInjectionHostNode
   {
-    public bool IsTrivial();
-    public DocumentRange GetDollarSignRange();
+    bool IsTrivial();
+    DocumentRange GetDollarSignRange();
+    int DollarCount { get; }
   }
 }

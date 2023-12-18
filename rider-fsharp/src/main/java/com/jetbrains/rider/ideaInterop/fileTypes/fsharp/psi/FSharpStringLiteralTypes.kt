@@ -19,6 +19,9 @@ enum class FSharpStringLiteralType {
   /** $"""{string representation}""" */
   TripleQuoteInterpolatedString,
 
+  /** $$""" {string} {{interpolation hole}} """*/
+  RawInterpolatedString,
+
   /** "{string representation}"B */
   ByteArray
 }
@@ -29,10 +32,14 @@ val FSharpStringLiteralType.isRegular: Boolean
       this == FSharpStringLiteralType.RegularInterpolatedString
 
 val FSharpStringLiteralType.isInterpolated: Boolean
-  get() =
-    this == FSharpStringLiteralType.RegularInterpolatedString ||
-      this == FSharpStringLiteralType.VerbatimInterpolatedString ||
-      this == FSharpStringLiteralType.TripleQuoteInterpolatedString
+  get() = when (this) {
+    FSharpStringLiteralType.RegularInterpolatedString,
+    FSharpStringLiteralType.VerbatimInterpolatedString,
+    FSharpStringLiteralType.TripleQuoteInterpolatedString,
+    FSharpStringLiteralType.RawInterpolatedString -> true
+
+    else -> false
+  }
 
 val FSharpStringLiteralType.isVerbatim: Boolean
   get() =

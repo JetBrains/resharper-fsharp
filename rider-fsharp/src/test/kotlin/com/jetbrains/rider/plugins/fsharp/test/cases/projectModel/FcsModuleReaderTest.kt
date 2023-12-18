@@ -72,7 +72,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   ) {
     val project = project
     withOpenedEditor(project, "FSharpProject/Library.fs") {
-      waitForDaemon()
+      waitForNextDaemon()
       assert(markupAdapter.hasErrors == hasErrors)
       assertFcsStampAndReferencedProjectNames(this, expectedReferencedProjects)
       dumpModuleReader(printStream, caption, project)
@@ -150,7 +150,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
         withOpenedEditor(project, "CSharpProject/Class1.cs") {
           typeFromOffset(" ", 75)
-          waitForDaemon()
+          waitForNextDaemon()
         }
 
         waitForDaemonCloseAllOpenEditors(project)
@@ -265,7 +265,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
       assertAllProjectsWereLoaded(project)
 
       withOpenedEditor(project, "FSharpProject/Library.fs") {
-        waitForDaemon()
+        waitForNextDaemon()
       }
 
       waitForDaemonCloseAllOpenEditors(project)

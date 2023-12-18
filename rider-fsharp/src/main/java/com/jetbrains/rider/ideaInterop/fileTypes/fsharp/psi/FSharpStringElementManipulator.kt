@@ -45,17 +45,19 @@ class FSharpStringElementManipulator : ElementManipulator<FSharpStringLiteralExp
   ): FSharpStringLiteralExpression {
     val oldText = element.text
     var newText = newContent
-    val elementType = element.literalType
+    when (val elementType = element.literalType) {
+      FSharpStringLiteralType.RawInterpolatedString -> {}
+      else -> {
+        if (elementType.isRegular) newText = escapeRegularString(newText)
 
-    if (elementType.isRegular) newText = escapeRegularString(newText)
+        if (elementType.isInterpolated)
+          newText = newText
+            .replace("{{", "{").replace("}}", "}")
+            .replace("{", "{{").replace("}", "}}")
 
-    if (elementType.isInterpolated) newText =
-      newText
-        .replace("{{", "{").replace("}}", "}")
-        .replace("{", "{{").replace("}", "}}")
-
-    if (elementType.isVerbatim) newText =
-      newText.replace("\"\"", "\"").replace("\"", "\"\"")
+        if (elementType.isVerbatim) newText.replace("\"\"", "\"").replace("\"", "\"\"")
+      }
+    }
 
     newText = oldText.substring(0, range.startOffset) + newText + oldText.substring(range.endOffset)
     return element.updateText(newText) as FSharpStringLiteralExpression

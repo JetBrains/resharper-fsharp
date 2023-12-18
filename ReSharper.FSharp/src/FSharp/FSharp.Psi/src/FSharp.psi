@@ -669,7 +669,7 @@ recordExpr options { stubBase="ReferenceOwnerExprBase"; } extras {
   (
      (
        fSharpExpression<COPY_INFO, CopyInfoExpression>
-       WITH
+       WITH<WITH, WithKeyword>
      )
      |
      (
@@ -1845,7 +1845,9 @@ interface typeUsage:
   exprStaticConstantTypeUsage |
   namedStaticConstantTypeUsage |
   constrainedTypeUsage |
+  hashTypeUsage |
   orTypeUsage |
+  intersectionTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1924,6 +1926,17 @@ orTypeUsage:
   typeUsage
   OR
   typeUsage;
+
+hashTypeUsage:
+  HASH<HASH, Hash>
+  typeUsage<TYPE, TypeUsage>;
+
+intersectionTypeUsage:
+  (
+    typeReferenceName<TYPE_REFERENCE, ReferenceName>
+    AMP<AMP, Ands>
+  )?
+  LIST typeUsage<HASH_CONSTRAINT, HashConstrains> SEP AMP<AMP, Ands>;
 
 unsupportedTypeUsage:
   fakeSeparator;

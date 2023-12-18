@@ -26,7 +26,7 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END.Create($"}}{content}\"\"\"")
 
     let checkRegularStringLiteral (literal: ITokenNode) =
-        let tokenContent = getStringContent (literal.GetTokenType()) (literal.GetText())
+        let tokenContent = getStringContent literal
         let lexer = RegularInterpolatedStringLexer(StringBuffer(tokenContent))
 
         let mutable found = false
@@ -35,10 +35,9 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
             found <- lexer.TokenType == StringTokenTypes.ESCAPE_CHARACTER
         found
 
-    let processStringLiteral (textContentFactory: TokenNodeType -> string -> string) (literal: ITokenNode) =
-        let text = literal.GetText()
+    let processStringLiteral (textContentFactory: ITokenNode -> string) (literal: ITokenNode) =
         let tokenType = literal.GetTokenType()
-        let content = textContentFactory tokenType text
+        let content = textContentFactory literal
 
         let resultingNode: ITreeNode =
             match tokenType with
@@ -50,11 +49,11 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         if literal != resultingNode then
             ModificationUtil.ReplaceChild(literal, resultingNode) |> ignore
 
-    let regularStringContentFactory (tokenType: TokenNodeType) (text: string)  =
-        getStringContent tokenType text
+    let regularStringContentFactory (token: ITokenNode)  =
+        getStringContent token
 
-    let verbatimStringContentFactory (tokenType: TokenNodeType) (text: string) =
-        (getStringContent tokenType text).Replace("\"\"", "\"")
+    let verbatimStringContentFactory (token: ITokenNode) =
+        (getStringContent token).Replace("\"\"", "\"")
 
     override this.IsAvailable _ =
         if not <| isValid error.Expr then false else

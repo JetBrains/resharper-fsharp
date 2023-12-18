@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:match}
+module Module
+
+type T() =
+    member this.P = 
+      match 1 with
+      | {caret}

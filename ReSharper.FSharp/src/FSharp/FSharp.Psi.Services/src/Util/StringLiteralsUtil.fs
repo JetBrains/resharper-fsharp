@@ -2,7 +2,9 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 
 [<Extension>]
 type FSharpLiteralType =
@@ -20,11 +22,11 @@ type FSharpLiteralType =
     | ByteArray
     /// $"string"
     | InterpolatedString
-    /// $"{string}{
+    /// $"string{
     | InterpolatedStringStart
-    /// }{string}{
+    /// }string{
     | InterpolatedStringMiddle
-    /// }{string}"
+    /// }string"
     | InterpolatedStringEnd
     /// $@"{string}" @$"{string}"
     | VerbatimInterpolatedString
@@ -36,12 +38,20 @@ type FSharpLiteralType =
     | VerbatimInterpolatedStringEnd
     /// $"""{string}"""
     | TripleQuoteInterpolatedString
-    /// $"""{string}{
+    /// $"""{
     | TripleQuoteInterpolatedStringStart
     /// }{string}{
     | TripleQuoteInterpolatedStringMiddle
     /// }{string}"""
     | TripleQuoteInterpolatedStringEnd
+    /// $$"""string"""
+    | RawInterpolatedString
+    /// $$"""string{{
+    | RawInterpolatedStringStart
+    /// }}string{{
+    | RawInterpolatedStringMiddle
+    /// }}string"
+    | RawInterpolatedStringEnd
 
     [<Extension>]
     static member GetLiteralType(tokenType: TokenNodeType) =
@@ -51,6 +61,11 @@ type FSharpLiteralType =
         if tokenType == FSharpTokenType.VERBATIM_BYTEARRAY then FSharpLiteralType.VerbatimByteArray else
         if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then FSharpLiteralType.TripleQuoteString else
         if tokenType == FSharpTokenType.BYTEARRAY then FSharpLiteralType.ByteArray else
+
+        if tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING then FSharpLiteralType.RawInterpolatedString else
+        if tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING_START then FSharpLiteralType.RawInterpolatedStringStart else
+        if tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING_MIDDLE then FSharpLiteralType.RawInterpolatedStringMiddle else
+        if tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING_END then FSharpLiteralType.RawInterpolatedStringEnd else
 
         if tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING then FSharpLiteralType.InterpolatedString else
         if tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING_START then FSharpLiteralType.InterpolatedStringStart else
@@ -73,6 +88,7 @@ type FSharpLiteralType =
         if tokenType == FSharpTokenType.UNFINISHED_REGULAR_INTERPOLATED_STRING then FSharpLiteralType.InterpolatedString else
         if tokenType == FSharpTokenType.UNFINISHED_VERBATIM_INTERPOLATED_STRING then FSharpLiteralType.VerbatimInterpolatedString else
         if tokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING then FSharpLiteralType.TripleQuoteInterpolatedString else
+        if tokenType == FSharpTokenType.UNFINISHED_RAW_INTERPOLATED_STRING then FSharpLiteralType.RawInterpolatedString else
 
         failwithf $"Token {tokenType} is not a string literal"
 
@@ -81,7 +97,17 @@ let private assertStringTokenType (tokenType: TokenNodeType) =
     if not FSharpTokenType.Strings[tokenType] then
         failwithf $"Got token type: {tokenType}"
 
-let getStringStartingQuotesLength (tokenType: TokenNodeType) =
+let getDollarCount (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
+    if isNull tokenType || not FSharpTokenType.RawInterpolatedStrings[tokenType] then
+        failwithf $"Got token type: {tokenType}"
+
+    match token.Parent with
+    | :? IInterpolatedStringExpr as expr -> expr.DollarCount
+    | _ -> 1
+
+let getStringStartingQuotesLength (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
     assertStringTokenType tokenType
 
     match tokenType.GetLiteralType() with
@@ -104,15 +130,50 @@ let getStringStartingQuotesLength (tokenType: TokenNodeType) =
     | TripleQuoteInterpolatedString
     | TripleQuoteInterpolatedStringStart -> 4
 
+    | RawInterpolatedString
+    | RawInterpolatedStringStart ->
+        match token.Parent with
+        | :? IInterpolatedStringExpr as expr -> expr.DollarCount + 3 // $$"""
+        | _ -> 5 // $$""", assuming $$
+
+    | RawInterpolatedStringMiddle
+    | RawInterpolatedStringEnd ->
+        match token.Parent with
+        | :? IInterpolatedStringExpr as expr -> expr.DollarCount
+        | _ -> 2
+
+
 let getStringEndingQuote tokenType =
     assertStringTokenType tokenType
     if tokenType == FSharpTokenType.CHARACTER_LITERAL then '\'' else '\"'
 
-let getStringStartingQuotes (tokenType: TokenNodeType) (tokenText: string) =
-    assertStringTokenType tokenType
-    tokenText.Substring(0, getStringStartingQuotesLength tokenType)
+let getDefaultStringEndingQuotesLength (tokenType: TokenNodeType) =
+    match tokenType.GetLiteralType() with
+    | Character
+    | RegularString
+    | InterpolatedString
+    | InterpolatedStringStart
+    | InterpolatedStringMiddle
+    | InterpolatedStringEnd
+    | VerbatimString
+    | VerbatimInterpolatedString
+    | VerbatimInterpolatedStringStart
+    | VerbatimInterpolatedStringMiddle
+    | VerbatimInterpolatedStringEnd
+    | TripleQuoteInterpolatedStringStart
+    | TripleQuoteInterpolatedStringMiddle -> 1
+    | RawInterpolatedString
+    | RawInterpolatedStringEnd
+    | TripleQuoteString
+    | TripleQuoteInterpolatedString
+    | TripleQuoteInterpolatedStringEnd -> 3
+    | ByteArray
+    | RawInterpolatedStringStart
+    | RawInterpolatedStringMiddle
+    | VerbatimByteArray -> 2
 
-let getStringEndingQuotesLength (tokenType: TokenNodeType) =
+let getStringEndingQuotesLength (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
     assertStringTokenType tokenType
 
     match tokenType.GetLiteralType() with
@@ -129,31 +190,46 @@ let getStringEndingQuotesLength (tokenType: TokenNodeType) =
     | VerbatimInterpolatedStringEnd
     | TripleQuoteInterpolatedStringStart
     | TripleQuoteInterpolatedStringMiddle -> 1
+    | RawInterpolatedString
+    | RawInterpolatedStringEnd
     | TripleQuoteString
     | TripleQuoteInterpolatedString
     | TripleQuoteInterpolatedStringEnd -> 3
     | ByteArray
     | VerbatimByteArray -> 2
 
-let getStringEndingQuotes (tokenType: TokenNodeType) (tokenText: string) =
-    assertStringTokenType tokenType
-    let endingQuotesLength = getStringEndingQuotesLength tokenType
-    tokenText.Substring(tokenText.Length - endingQuotesLength, endingQuotesLength)
+    | RawInterpolatedStringStart
+    | RawInterpolatedStringMiddle ->
+        match token.Parent with
+        | :? IInterpolatedStringExpr as expr -> expr.DollarCount
+        | _ -> 2 // {{, assuming $$
 
-let isUnfinishedString (tokenType: TokenNodeType) (tokenText: string) =
-    assertStringTokenType tokenType
-    let startingQuotesLength = getStringStartingQuotesLength tokenType
-    let endingQuotesLength = getStringEndingQuotesLength tokenType
 
+let getStringEndingQuotes (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
+    assertStringTokenType tokenType
+    let endingQuotesLength = getStringEndingQuotesLength token
+    let text = token.GetText()
+    text.Substring(text.Length - endingQuotesLength, endingQuotesLength)
+
+let isUnfinishedString (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
+    assertStringTokenType tokenType
+    let startingQuotesLength = getStringStartingQuotesLength token
+    let endingQuotesLength = getStringEndingQuotesLength token
+
+    let tokenText = token.GetText()
     tokenText.Length < startingQuotesLength + endingQuotesLength ||
-    getStringEndingQuotes tokenType tokenText |> Seq.exists (fun x -> x <> '"')
+    getStringEndingQuotes token |> Seq.exists (fun x -> x <> '"')
 
-let getStringContent (tokenType: TokenNodeType) (tokenText: string) =
+let getStringContent (token: ITokenNode) =
+    let tokenType = token.GetTokenType()
     assertStringTokenType tokenType
 
-    let startBorderLength = getStringStartingQuotesLength tokenType
-    let endBorderLength = getStringEndingQuotesLength tokenType
+    let startBorderLength = getStringStartingQuotesLength token
+    let endBorderLength = getStringEndingQuotesLength token
 
+    let tokenText = token.GetText()
     tokenText.Substring(startBorderLength, tokenText.Length - endBorderLength - startBorderLength)
 
 let emptyString = "\"\""
