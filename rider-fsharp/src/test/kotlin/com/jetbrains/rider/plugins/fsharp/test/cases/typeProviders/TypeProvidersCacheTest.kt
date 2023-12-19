@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.env.enums.BuildTool
@@ -84,7 +85,8 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     }
   }
 
-  @Test(description = "RIDER-73091", enabled = false)
+  @Mute("RIDER-103648")
+  @Test(description = "RIDER-73091")
   fun script() {
     checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
 

@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -43,7 +44,7 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
   fun net7() = doTest(".NET 7")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103648")
   @TestEnvironment(
     sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
     solution = "FscTypeProviderLibrary"

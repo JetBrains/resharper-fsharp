@@ -23,7 +23,8 @@ class FSharpCompletionTest : CompletionTestBase() {
   @Test
   fun listModuleValue() = doTestTyping("filt")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103671")
+  @Test
   fun localVal01() = doTestChooseItem("x")
 
   @Test
@@ -61,12 +62,12 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
   fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
   fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
-  @Mute("RIDER-102515")
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103666")
+  @Test
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 
   fun `comments - language injections`() = doTestChooseItem("f#")
