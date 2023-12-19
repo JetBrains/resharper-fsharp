@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.markup
 
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
@@ -31,7 +32,8 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   @Test
   fun `test hover docs for a shorthand`() = doTest("Program.fs", "Program.fs")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103671")
+  @Test
   @TestEnvironment(solution = "ConsoleAppTwoTargetFrameworks")
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
