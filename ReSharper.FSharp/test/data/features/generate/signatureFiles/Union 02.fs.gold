@@ -1,0 +1,10 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+type Bar =
+  | Bar of a:int * b:int
+  /// comment that should be preserved
+  [<System.Obsolete "foo">]
+  static member Add: int -> int -> int

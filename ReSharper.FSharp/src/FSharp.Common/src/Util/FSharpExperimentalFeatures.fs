@@ -13,6 +13,7 @@ type ExperimentalFeature =
     | RedundantParenAnalysis = 3
     | AssemblyReaderShim = 4
     | TryRecoverFcsProjects = 5
+    | GenerateSignatureFile = 6
 
 type FSharpExperimentalFeatureCookie(feature: ExperimentalFeature) =
     static let cookies = OneToListMap<ExperimentalFeature, IDisposable>()
@@ -45,6 +46,7 @@ type FSharpExperimentalFeatures() =
         | ExperimentalFeature.PostfixTemplates -> experimentalFeatures.EnablePostfixTemplates.Value
         | ExperimentalFeature.RedundantParenAnalysis -> experimentalFeatures.RedundantParensAnalysis.Value
         | ExperimentalFeature.TryRecoverFcsProjects -> experimentalFeatures.TryRecoverFcsProjects.Value
+        | ExperimentalFeature.GenerateSignatureFile -> experimentalFeatures.GenerateSignatureFile.Value
         | _ -> failwith $"Unexpected feature: {feature}"
 
     [<Extension>]

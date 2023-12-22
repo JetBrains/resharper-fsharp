@@ -683,7 +683,7 @@ type FSharpSignatureParserTest() =
     inherit ParserTestBase<FSharpLanguage>()
 
     override x.RelativeTestDataPath = "parsing/signatures"
-
+    
     /// Use this test case to dump the psi tree for a given file, see `_.fsi`. 
     [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
 
@@ -767,7 +767,7 @@ type FSharpErrorsParserTest() =
     inherit ParserTestBase<FSharpLanguage>()
 
     override x.RelativeTestDataPath = "parsing/errors"
-
+    
     [<Test>] member x.``Expr - Unfinished let 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unfinished let 02 - In``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unfinished let 03 - Inline in``() = x.DoNamedTest()

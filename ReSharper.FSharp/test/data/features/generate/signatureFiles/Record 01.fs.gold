@@ -1,0 +1,9 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+/// comment that should be preserved
+[<System.Obsolete "foo">]
+type Bar =
+  { A:int; B: int }

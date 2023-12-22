@@ -86,7 +86,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
     let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Enable generative type providers analysis in C#/VB.NET projects"
     let [<Literal>] tryRecoverFcsProjects = "Try to reuse FCS results on project changes"
-
+    let [<Literal>] generateSignatureFile = "Generate signature file"
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
 type FSharpExperimentalFeatures =
@@ -109,8 +109,10 @@ type FSharpExperimentalFeatures =
       mutable GenerativeTypeProvidersInMemoryAnalysis: bool
 
       [<SettingsEntry(false, FSharpExperimentalFeatures.tryRecoverFcsProjects); DefaultValue>]
-      mutable TryRecoverFcsProjects: bool }
+      mutable TryRecoverFcsProjects: bool
 
+      [<SettingsEntry(false, FSharpExperimentalFeatures.generateSignatureFile); DefaultValue>]
+      mutable GenerateSignatureFile: bool }
 
 [<AllowNullLiteral>]
 type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive,
@@ -146,6 +148,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
     member val GenerativeTypeProvidersInMemoryAnalysis = base.GetValueProperty<bool>("GenerativeTypeProvidersInMemoryAnalysis")
     member val TryRecoverFcsProjects = base.GetValueProperty<bool>("TryRecoverFcsProjects")
+    member val GenerateSignatureFile = base.GetValueProperty<bool>("GenerateSignatureFile")
 
 
 [<SolutionInstanceComponent>]
@@ -225,6 +228,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
             this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
+            this.AddBoolOption((fun key -> key.GenerateSignatureFile), RichText(FSharpExperimentalFeatures.generateSignatureFile)) |> ignore
 
 
 [<ShellComponent>]

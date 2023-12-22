@@ -1,0 +1,8 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+type R =
+  { F: int }
+  member Func: (int -> int) option -> int

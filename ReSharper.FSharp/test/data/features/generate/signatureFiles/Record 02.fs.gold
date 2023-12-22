@@ -1,0 +1,8 @@
+﻿Provided elements:
+ 0: Generate signature file title
+
+{caret}module Foo
+
+type Bar =
+  { A:int; B: int }
+  static member Add: int -> int -> int
