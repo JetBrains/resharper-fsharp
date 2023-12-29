@@ -157,6 +157,20 @@ fun File.writeTextIfChanged(content: String) {
   }
 }
 
+val parentGradle = gradle.parent
+if (parentGradle != null && productMonorepoDir != null) {
+  val riderModelProject = parentGradle.rootProject.project("rider-model")
+
+  configurations.register("riderModel")
+  dependencies {
+    add("riderModel", riderModelProject)
+  }
+
+  tasks.named("rdgen") {
+    dependsOn(configurations.getByName("riderModel"))
+  }
+}
+
 tasks {
   val dotNetSdkPath by lazy {
     val sdkPath = setupDependencies.get().idea.get().classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
@@ -196,10 +210,9 @@ tasks {
     logger.info("Configuring rdgen params")
     // *** Classpath and sources ***
     if (inMonorepo) {
+      classpath(configurations.getByName("riderModel").resolve())
       sources(
         listOf(
-          File("$productMonorepoDir/rider/model/sources"),
-          File("$productMonorepoDir/remote-dev/rd-ide-model-sources"),
           File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
         )
       )
