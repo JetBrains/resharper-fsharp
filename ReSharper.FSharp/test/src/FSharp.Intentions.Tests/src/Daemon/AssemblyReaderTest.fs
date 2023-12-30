@@ -90,7 +90,7 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
             let sourceFile = projectFile.ToSourceFiles().Single()
 
             let stages =
-                DaemonStageManager.GetInstance(solution).Stages
+                DaemonStagesManager.GetInstance(solution).AllRegisteredStages
                 |> Seq.filter (fun stage -> stage :? TypeCheckErrorsStage)
                 |> List.ofSeq
 
