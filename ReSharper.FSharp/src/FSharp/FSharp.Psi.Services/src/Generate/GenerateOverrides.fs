@@ -152,12 +152,15 @@ let addEmptyLineBeforeIfNeeded (anchor: ITreeNode) =
         anchor
     |> getLastMatchingNodeAfter isInlineSpaceOrComment
 
-let addEmptyLineAfterIfNeeded (lastGeneratedNode: ITreeNode) =
+let addSpaceAfterIfNeeded (lastGeneratedNode: ITreeNode) =
     if isBeforeEmptyLine lastGeneratedNode then () else
 
     let nextNode = lastGeneratedNode.GetNextMeaningfulSibling()
     if nextNode :? ITypeBodyMemberDeclaration && not nextNode.IsSingleLine then
         addNodeAfter lastGeneratedNode (NewLine(lastGeneratedNode.GetLineEnding()))
+
+    if getTokenType lastGeneratedNode.NextSibling == FSharpTokenType.RBRACE then
+        addNodeAfter lastGeneratedNode (Whitespace())
 
 let getGeneratedSelectionTreeRange (lastNode: ITreeNode) (generatedNodes: seq<ITreeNode>) =
     generatedNodes
@@ -193,7 +196,7 @@ let canInsertAtNode (node: ITreeNode) =
     isNotNull node && isAtEmptyLine node &&
     canInsertBefore (node.GetNextMeaningfulSibling())
 
-let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeDeclaration): ITreeNode =
+let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration): ITreeNode =
     let memberDecl = psiView.GetSelectedTreeNode<ITypeBodyMemberDeclaration>()
     if isNotNull memberDecl && canInsertBefore (memberDecl.GetNextMeaningfulSibling()) then memberDecl else
 

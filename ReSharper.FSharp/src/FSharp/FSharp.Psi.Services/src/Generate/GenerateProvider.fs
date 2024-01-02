@@ -37,9 +37,12 @@ type FSharpGeneratorContextFactory() =
 
                 prevToken.GetContainingNode<IFSharpTypeDeclaration>()
 
-            let typeDeclaration =
+            let typeDeclaration: IFSharpTypeElementDeclaration =
                 match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
-                | null -> tryGetPreviousTypeDecl treeNode
+                | null ->
+                    match psiView.GetSelectedTreeNode<IObjExpr>() with
+                    | null -> tryGetPreviousTypeDecl treeNode
+                    | objExpr -> objExpr
                 | typeDeclaration -> typeDeclaration
 
             let anchor = GenerateOverrides.getAnchorNode psiView typeDeclaration
@@ -102,12 +105,21 @@ type FSharpOverridableMembersProvider() =
         let psiModule = typeElement.Module
         let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
 
-        let fcsEntity = typeDeclaration.GetFcsSymbol().As<FSharpEntity>()
+        let fcsSymbol, fcsSymbolUse =
+            match typeDeclaration with
+            | :? IObjExpr as objExpr ->
+                let reference = objExpr.TypeName.Reference
+                reference.GetFcsSymbol(), reference.GetSymbolUse()
+            | _ -> typeDeclaration.GetFcsSymbol(), typeDeclaration.GetFcsSymbolUse()
+
+        if isNull fcsSymbol then () else
+
+        let fcsEntity = fcsSymbol.As<FSharpEntity>()
         if isNull fcsEntity then () else
 
-        let displayContext = typeDeclaration.GetFcsSymbolUse().DisplayContext
+        let displayContext = fcsSymbolUse.DisplayContext
 
-        let rec getBaseTypes (fcsEntity: FSharpEntity) =
+        let rec getBaseTypes includeThis (fcsEntity: FSharpEntity) =
             let rec loop acc (fcsType: FSharpType) =
                 let fcsEntityInstance = FcsEntityInstance.create fcsType
                 let acc = if isNotNull fcsEntityInstance then fcsEntityInstance :: acc else acc
@@ -116,9 +128,14 @@ type FSharpOverridableMembersProvider() =
                 | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
                 | _ -> List.rev acc
 
+            let acc =
+                if not includeThis then [] else
+
+                [FcsEntityInstance.create (fcsEntity.AsType())]
+
             match fcsEntity.BaseType with
-            | Some baseType when baseType.HasTypeDefinition -> loop [] baseType
-            | _ -> []
+            | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
+            | _ -> acc
 
         let ownMembersDescriptors =
             typeElement.GetMembers()
@@ -137,7 +154,8 @@ type FSharpOverridableMembersProvider() =
             |> Seq.map (fun i -> i.Member.XMLDocId, i)
             |> dict
 
-        let baseFcsTypes = getBaseTypes fcsEntity
+        let isObjExpr = typeDeclaration :? IObjExpr
+        let baseFcsTypes = getBaseTypes isObjExpr fcsEntity
 
         let baseFcsMembers =
             baseFcsTypes |> List.map (fun fcsEntityInstance ->
@@ -317,113 +335,120 @@ type FSharpOverridingMembersBuilder() =
         use writeCookie = WriteLockCookie.Create(true)
         use disableFormatter = new DisableCodeFormatter()
 
-        let typeDecl = context.Root :?> IFSharpTypeDeclaration
-
-        match typeDecl.TypeRepresentation with
-        | :? IUnionRepresentation as unionRepr ->
-            unionRepr.UnionCasesEnumerable
-            |> Seq.tryHead
-            |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
-
-        | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
-            let factory = typeDecl.CreateElementFactory()
-            let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
-            let declGroup = factory.CreateModuleMember($"type U = | {caseName}") :?> ITypeDeclarationGroup
-            let typeDeclaration = declGroup.TypeDeclarations[0] :?> IFSharpTypeDeclaration
-            let repr = typeDeclaration.TypeRepresentation
-            let newRepr = typeDecl.SetTypeRepresentation(repr)
-            if context.Anchor == abbrRepr then context.Anchor <- newRepr
-
-        | _ -> ()
-
-        let typeRepr = typeDecl.TypeRepresentation
-        addNewLineBeforeReprIfNeeded typeDecl typeRepr
-
-        let anchor: ITreeNode =
-            let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
-                let equalsToken = typeDecl.EqualsToken.NotNull()
-
-                let equalsAnchor =
-                    let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
-                    let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
-                    if afterComment != afterSpace then afterComment else equalsToken :> _
-
-                let prev = typeRepr.GetPreviousNonWhitespaceToken()
-                if prev.IsCommentToken() then
-                    deleteChildRange prev.NextSibling typeRepr
-                    prev
-                else
-                    deleteChildRange equalsAnchor.NextSibling typeRepr
-                    equalsAnchor
-
-            let anchor =
-                let isEmptyClassRepr =
-                    match typeRepr with
-                    | :? IClassRepresentation as classRepr ->
-                        let classKeyword = classRepr.BeginKeyword
-                        let endKeyword = classRepr.EndKeyword
-
-                        isNotNull classKeyword && isNotNull endKeyword &&
-                        classKeyword.GetNextNonWhitespaceToken() == endKeyword
-                    | _ -> false
-
-                if isEmptyClassRepr then
-                    deleteTypeRepr typeDecl
-                else
-                    context.Anchor
-
-            if isNotNull anchor then anchor else
-
-            let typeMembers = typeDecl.TypeMembers
-            if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
-
-            if isNull typeRepr then
-                typeDecl.EqualsToken.NotNull() else
-
-            let objModelTypeRepr = typeRepr.As<IObjectModelTypeRepresentation>()
-            if isNull objModelTypeRepr then typeRepr :> _ else
-
-            let typeMembers = objModelTypeRepr.TypeMembers
-            if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
-
-            objModelTypeRepr
+        let typeDecl = context.Root :?> IFSharpTypeElementDeclaration
 
         let (anchor: ITreeNode), indent =
-            match anchor with
-            | :? IStructRepresentation as structRepr ->
-                structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+            match typeDecl with
+            | :? IFSharpTypeDeclaration as typeDecl ->
+                match typeDecl.TypeRepresentation with
+                | :? IUnionRepresentation as unionRepr ->
+                    unionRepr.UnionCasesEnumerable
+                    |> Seq.tryHead
+                    |> Option.iter EnumCaseLikeDeclarationUtil.addBarIfNeeded
 
-            | treeNode ->
-                let parent =
-                    if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent
-                match parent with
-                | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
-                    let indent =
-                        match repr.TypeMembersEnumerable |> Seq.tryHead with
-                        | Some memberDecl -> memberDecl.Indent
-                        | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
-                    let treeNode =
-                        let doOrLastLet =
-                            repr.TypeMembersEnumerable
-                            |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
-                            |> Seq.tryLast
-                        match doOrLastLet with
-                        | Some node -> node :> ITreeNode
-                        | _ -> treeNode
-                    treeNode, indent
-                | _ ->
+                | :? ITypeAbbreviationRepresentation as abbrRepr when abbrRepr.CanBeUnionCase ->
+                    let factory = typeDecl.CreateElementFactory()
+                    let caseName = FSharpNamingService.mangleNameIfNecessary abbrRepr.AbbreviatedTypeOrUnionCase.SourceName
+                    let declGroup = factory.CreateModuleMember($"type U = | {caseName}") :?> ITypeDeclarationGroup
+                    let typeDeclaration = declGroup.TypeDeclarations[0] :?> IFSharpTypeDeclaration
+                    let repr = typeDeclaration.TypeRepresentation
+                    let newRepr = typeDecl.SetTypeRepresentation(repr)
+                    if context.Anchor == abbrRepr then context.Anchor <- newRepr
 
-                let indent =
-                    match typeDecl.TypeMembersEnumerable |> Seq.tryHead with
-                    | Some memberDecl -> memberDecl.Indent
+                | _ -> ()
+
+                let typeRepr = typeDecl.TypeRepresentation
+                addNewLineBeforeReprIfNeeded typeDecl typeRepr
+
+                let anchor: ITreeNode =
+                    let deleteTypeRepr (typeDecl: IFSharpTypeDeclaration) : ITreeNode =
+                        let equalsToken = typeDecl.EqualsToken.NotNull()
+
+                        let equalsAnchor =
+                            let afterComment = getLastMatchingNodeAfter isInlineSpaceOrComment equalsToken
+                            let afterSpace = getLastMatchingNodeAfter isInlineSpace equalsToken
+                            if afterComment != afterSpace then afterComment else equalsToken :> _
+
+                        let prev = typeRepr.GetPreviousNonWhitespaceToken()
+                        if prev.IsCommentToken() then
+                            deleteChildRange prev.NextSibling typeRepr
+                            prev
+                        else
+                            deleteChildRange equalsAnchor.NextSibling typeRepr
+                            equalsAnchor
+
+                    let anchor =
+                        let isEmptyClassRepr =
+                            match typeRepr with
+                            | :? IClassRepresentation as classRepr ->
+                                let classKeyword = classRepr.BeginKeyword
+                                let endKeyword = classRepr.EndKeyword
+
+                                isNotNull classKeyword && isNotNull endKeyword &&
+                                classKeyword.GetNextNonWhitespaceToken() == endKeyword
+                            | _ -> false
+
+                        if isEmptyClassRepr then
+                            deleteTypeRepr typeDecl
+                        else
+                            context.Anchor
+
+                    if isNotNull anchor then anchor else
+
+                    let typeMembers = typeDecl.TypeMembers
+                    if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
+
+                    if isNull typeRepr then
+                        typeDecl.EqualsToken.NotNull() else
+
+                    let objModelTypeRepr = typeRepr.As<IObjectModelTypeRepresentation>()
+                    if isNull objModelTypeRepr then typeRepr :> _ else
+
+                    let typeMembers = objModelTypeRepr.TypeMembers
+                    if not typeMembers.IsEmpty then typeMembers.Last() :> _ else
+
+                    objModelTypeRepr
+
+                match anchor with
+                | :? IStructRepresentation as structRepr ->
+                    structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+
+                | treeNode ->
+                    let parent =
+                        if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent
+                    match parent with
+                    | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
+                        let indent =
+                            match repr.TypeMembersEnumerable |> Seq.tryHead with
+                            | Some memberDecl -> memberDecl.Indent
+                            | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+                        let treeNode =
+                            let doOrLastLet =
+                                repr.TypeMembersEnumerable
+                                |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
+                                |> Seq.tryLast
+                            match doOrLastLet with
+                            | Some node -> node :> ITreeNode
+                            | _ -> treeNode
+                        treeNode, indent
                     | _ ->
 
-                    if isNotNull typeRepr then typeDecl.Indent + typeDecl.GetIndentSize() else
+                    let indent =
+                        match typeDecl.TypeMembersEnumerable |> Seq.tryHead with
+                        | Some memberDecl -> memberDecl.Indent
+                        | _ ->
 
-                    let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
-                    typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
+                        if isNotNull typeRepr then typeDecl.Indent + typeDecl.GetIndentSize() else
 
-                anchor, indent
+                        let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
+                        typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
+
+                    anchor, indent
+
+            | :? IObjExpr as objExpr ->
+                objExpr.WithKeyword, objExpr.GetIndentSize()
+
+            | typeDecl -> failwith $"Unexpected typeDecl: {typeDecl}"
 
         let anchor =
             if isAtEmptyLine anchor then
@@ -463,7 +488,7 @@ type FSharpOverridingMembersBuilder() =
             |> Seq.collect (withNewLineAndIndentBefore indent)
             |> addNodesAfter anchor
 
-        GenerateOverrides.addEmptyLineAfterIfNeeded lastNode
+        GenerateOverrides.addSpaceAfterIfNeeded lastNode
 
         let nodes = anchor.RightSiblings()
         let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes

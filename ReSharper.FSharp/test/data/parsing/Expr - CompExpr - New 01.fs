@@ -1,0 +1,1 @@
+seq { new obj() }

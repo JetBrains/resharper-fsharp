@@ -17,7 +17,8 @@ type IFSharpGeneratorElement =
 
 
 [<AllowNullLiteral>]
-type FSharpGeneratorContext(kind, [<NotNull>] treeNode: ITreeNode, [<CanBeNull>] typeDecl: IFSharpTypeDeclaration) =
+type FSharpGeneratorContext(kind, [<NotNull>] treeNode: ITreeNode,
+        [<CanBeNull>] typeDecl: IFSharpTypeElementDeclaration) =
     inherit GeneratorContextBase(kind)
 
     let mutable selectedRange = TreeTextRange.InvalidRange
@@ -40,7 +41,8 @@ type FSharpGeneratorContext(kind, [<NotNull>] treeNode: ITreeNode, [<CanBeNull>]
     member x.SetSelectedRange(range) =
         selectedRange <- range
 
-    static member Create(kind, [<NotNull>] treeNode: ITreeNode, [<CanBeNull>] typeDecl: IFSharpTypeDeclaration, anchor) =
+    static member Create(kind, [<NotNull>] treeNode: ITreeNode, [<CanBeNull>] typeDecl: IFSharpTypeElementDeclaration,
+            anchor) =
         if isNotNull treeNode && treeNode.IsFSharpSigFile() then null else
 
         FSharpGeneratorContext(kind, treeNode, typeDecl, Anchor = anchor)
