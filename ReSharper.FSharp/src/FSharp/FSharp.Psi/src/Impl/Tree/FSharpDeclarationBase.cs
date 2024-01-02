@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual FSharpSymbol GetFcsSymbol() =>
       GetFcsSymbolUse()?.Symbol;
 
-    public FSharpSymbolUse GetFcsSymbolUse() =>
+    public virtual FSharpSymbolUse GetFcsSymbolUse() =>
       GetSymbolDeclaration(GetNameIdentifierRange());
 
     protected virtual FSharpSymbolUse GetSymbolDeclaration(TreeTextRange identifierRange) =>

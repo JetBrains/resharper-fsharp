@@ -70,19 +70,31 @@ type GenerateMissingMembersFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingMembers"
 
     [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Explicit impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Explicit impl 02``() = x.DoNamedTest()
     [<Test>] member x.``Explicit impl 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Default impl 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Object Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 03``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Property - Accessor - Setter 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 02``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 03``() = x.DoNamedTest()
     [<Test>] member x.``Property - Indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Same name 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Substitution 01``() = x.DoNamedTest()
     [<Test>] member x.``Substitution 02``() = x.DoNamedTest()
     [<Test>] member x.``Substitution 03``() = x.DoNamedTest()
+
     [<Test>] member x.``Super 01 - Different type parameter name``() = x.DoNamedTest()

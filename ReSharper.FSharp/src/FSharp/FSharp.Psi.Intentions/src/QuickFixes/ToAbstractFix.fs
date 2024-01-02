@@ -15,7 +15,7 @@ type ToAbstractFix(typeDecl: IFSharpTypeDeclaration) =
         ToAbstractFix(error.TypeDecl)
 
     new (error: NoImplementationGivenInTypeWithSuggestionError) =
-        ToAbstractFix(error.TypeDecl)
+        ToAbstractFix(error.TypeDecl.As<IFSharpTypeDeclaration>())
 
     override x.Text = "To abstract"
 

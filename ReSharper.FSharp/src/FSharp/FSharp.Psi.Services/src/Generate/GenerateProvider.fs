@@ -11,12 +11,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -49,7 +51,7 @@ type FSharpGeneratorContextFactory() =
             FSharpGeneratorContext.Create(kind, treeNode, typeDeclaration, anchor) :> _
 
         member x.TryCreate(kind, treeNode, anchor) =
-            let typeDecl = treeNode.As<IFSharpTypeDeclaration>()
+            let typeDecl = treeNode.As<IFSharpTypeElementDeclaration>()
             FSharpGeneratorContext.Create(kind, treeNode, typeDecl, anchor) :> _
 
         member x.TryCreate(_: string, _: IDeclaredElement): IGeneratorContext = null
@@ -446,6 +448,12 @@ type FSharpOverridingMembersBuilder() =
                     anchor, indent
 
             | :? IObjExpr as objExpr ->
+                if isNull objExpr.WithKeyword then
+                    addNodesAfter objExpr.TypeName [
+                        Whitespace()
+                        FSharpTokenType.WITH.CreateLeafElement()
+                    ] |> ignore
+            
                 objExpr.WithKeyword, objExpr.GetIndentSize()
 
             | typeDecl -> failwith $"Unexpected typeDecl: {typeDecl}"
