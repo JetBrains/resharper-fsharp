@@ -219,7 +219,12 @@ let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration):
 
         let selectedTreeNode = psiView.GetSelectedTreeNode()
         selectedTreeNode.LeftSiblings()
-        |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
+        |> Seq.tryPick (fun node ->
+            match node with
+            | :? ITypeDeclarationGroup as node -> Some (node.TypeDeclarations.Last() :> ITreeNode)
+            | :? ITypeBodyMemberDeclaration as node -> Some node
+            | :? ITypeRepresentation as node -> Some node
+            | _ -> None)
         |> Option.defaultValue null
 
 let canHaveOverrides (typeElement: ITypeElement) =
