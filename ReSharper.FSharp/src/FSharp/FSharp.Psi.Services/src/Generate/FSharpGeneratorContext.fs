@@ -1,10 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 
+open System
 open FSharp.Compiler.Symbols
 open JetBrains.Annotations
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
@@ -52,3 +54,26 @@ and FSharpGeneratorWorkflowPointer(context: FSharpGeneratorContext) =
     interface IGeneratorContextPointer with
         // todo: use actual pointers
         member x.TryRestoreContext() = context :> _
+
+[<Flags>]
+type PropertyOverrideState =
+    | None = 0
+    | Getter = 1
+    | Setter = 2
+
+type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInstance, addTypes) =
+    inherit GeneratorDeclaredElement(element)
+
+    member x.AddTypes = addTypes
+    member x.Mfv = mfvInstance.Mfv
+    member x.MfvInstance = mfvInstance
+    member x.Member = element
+
+    interface IFSharpGeneratorElement with
+        member x.Mfv = x.Mfv
+        member x.DisplayContext = mfvInstance.DisplayContext
+        member x.Substitution = mfvInstance.Substitution
+        member x.AddTypes = x.AddTypes
+        member x.IsOverride = true
+
+    override x.ToString() = element.ToString()
