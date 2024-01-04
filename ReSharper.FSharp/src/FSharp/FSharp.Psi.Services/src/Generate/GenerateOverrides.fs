@@ -221,7 +221,7 @@ let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration):
         selectedTreeNode.LeftSiblings()
         |> Seq.tryPick (fun node ->
             match node with
-            | :? ITypeDeclarationGroup as node -> Some (node.TypeDeclarations.Last() :> ITreeNode)
+            | :? ITypeDeclarationGroup as node -> node.TypeDeclarations.LastOrDefault().As<ITreeNode>() |> Option.ofObj
             | :? ITypeBodyMemberDeclaration as node -> Some node
             | :? ITypeRepresentation as node -> Some node
             | _ -> None)
