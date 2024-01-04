@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:f}
+module Module
+
+let rec f =
+    f{caret}
