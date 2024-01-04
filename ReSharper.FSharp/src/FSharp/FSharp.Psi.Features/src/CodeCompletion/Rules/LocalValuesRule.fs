@@ -63,9 +63,8 @@ type LocalValuesRule() =
                 | :? ILetBindings as letBindings ->
                     for binding in letBindings.Bindings do
                         addPatternValues binding.HeadPattern
-                    ()
+
                 | _ -> ()
-            ()
 
         for parentNode in context.ReparsedContext.TreeNode.ContainingNodes() do
             match parentNode with
@@ -76,7 +75,7 @@ type LocalValuesRule() =
                 Seq.iter addPatternValues binding.ParameterPatterns
 
                 let letBindings = LetBindingsNavigator.GetByBinding(binding)
-                if isNotNull letBindings (*&& letBindings.IsRecursive*) then
+                if isNotNull letBindings && letBindings.IsRecursive then
                     addLetBindingsValues letBindings
 
             | :? IAccessorDeclaration as decl ->
