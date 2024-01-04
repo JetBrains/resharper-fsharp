@@ -50,6 +50,8 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Repr 22``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 23``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 24``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Repr 25 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Repr 26``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 02``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 03``() = x.DoNamedTest()
@@ -113,8 +115,6 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Repr - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Union 02``() = x.DoNamedTest()
     
-    [<Test>] member x.``Repr - Record 01``() = x.DoNamedTest()
-
     [<Test>] member x.``Super - Substitution 01``() = x.DoNamedTest()
     [<Test>] member x.``Super - Substitution 02``() = x.DoNamedTest()
     [<Test>] member x.``Super - Substitution 03 - Abbreviations``() = x.DoNamedTest()
