@@ -238,6 +238,9 @@ type FSharpOverridingMembersBuilder() =
                 | :? IStructRepresentation as structRepr ->
                     structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
 
+                | :? ITypeRepresentation as typeRepr ->
+                    typeRepr, typeRepr.Indent
+
                 | treeNode ->
                     let parent =
                         if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent

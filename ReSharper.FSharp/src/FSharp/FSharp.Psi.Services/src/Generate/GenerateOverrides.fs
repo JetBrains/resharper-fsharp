@@ -201,11 +201,17 @@ let canInsertAtNode (node: ITreeNode) =
     isNotNull node && isAtEmptyLine node &&
     canInsertBefore (node.GetNextMeaningfulSibling())
 
-let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration): ITreeNode =
+let rec getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration): ITreeNode =
+    let selectedTreeNode = psiView.GetSelectedTreeNode()
+
+    if isNotNull typeDecl && not (typeDecl.Contains(selectedTreeNode)) &&
+            selectedTreeNode.GetTreeStartOffset().Offset >= typeDecl.GetTreeEndOffset().Offset then
+        let psiView = PsiFileView(typeDecl.GetContainingFile(), typeDecl.GetLastTokenIn().GetTreeTextRange())
+        getAnchorNode psiView typeDecl else
+
     let memberDecl = psiView.GetSelectedTreeNode<ITypeBodyMemberDeclaration>()
     if isNotNull memberDecl && canInsertBefore (memberDecl.GetNextMeaningfulSibling()) then memberDecl else
 
-    let selectedTreeNode = psiView.GetSelectedTreeNode()
     if canInsertAtNode selectedTreeNode then
         if isNull typeDecl || typeDecl.Contains(selectedTreeNode) then selectedTreeNode else
         typeDecl.FindLastTokenIn().GetPreviousMeaningfulToken(true)
@@ -217,14 +223,8 @@ let getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclaration):
         let typeRepresentation = psiView.GetSelectedTreeNode<ITypeRepresentation>()
         if isNotNull typeRepresentation then typeRepresentation else
 
-        let selectedTreeNode = psiView.GetSelectedTreeNode()
         selectedTreeNode.LeftSiblings()
-        |> Seq.tryPick (fun node ->
-            match node with
-            | :? ITypeDeclarationGroup as node -> node.TypeDeclarations.LastOrDefault().As<ITreeNode>() |> Option.ofObj
-            | :? ITypeBodyMemberDeclaration as node -> Some node
-            | :? ITypeRepresentation as node -> Some node
-            | _ -> None)
+        |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
         |> Option.defaultValue null
 
 let canHaveOverrides (typeElement: ITypeElement) =

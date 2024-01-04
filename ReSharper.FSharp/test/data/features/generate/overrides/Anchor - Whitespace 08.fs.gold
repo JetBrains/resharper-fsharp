@@ -9,7 +9,6 @@
 
 type T =
   struct
+    override this.ToString() = {selstart}failwith "todo"{selend}
   end
-
-  override this.ToString() = {selstart}failwith "todo"{selend}
   
