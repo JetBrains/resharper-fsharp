@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
 open System.Collections.Generic
+open System.IO
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
@@ -19,12 +20,20 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
+open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches
+open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
+open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
 
@@ -131,6 +140,60 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
     override this.OnAfterTestExecute _ =
         cookie.Dispose()
         cookie <- null
+
+[<SolutionComponent>]
+type TestModifiedFilesCache(psiFilesCache: IPsiFilesCache ) =
+    member val ModifiedFileCookies = Dictionary<IPsiSourceFile, IDisposable>()
+    member this.PsiFilesCache = psiFilesCache
+
+    interface IPsiCache with
+        member this.Invalidate(element: ITreeNode, _) =
+            if isNull element then () else
+
+            let sourceFile = element.GetSourceFile()
+            if isNull sourceFile then () else
+
+            if not (this.ModifiedFileCookies.ContainsKey(sourceFile)) then
+                this.ModifiedFileCookies[sourceFile] <- this.PsiFilesCache.GetTransientCookie(sourceFile)
+
+type AssertCorrectTreeStructureAttribute() =
+    inherit TestAspectAttribute()
+  
+    override this.OnAfterTestExecute(context: TestAspectAttribute.TestAspectContext) =
+        let dumpFile (sourceFile: IPsiSourceFile) =
+            let file = sourceFile.GetPrimaryPsiFile()
+            let writer = new StringWriter()
+            DebugUtil.DumpPsi(writer, file, fun n w -> DebugUtil.DumpNode(n, w))
+            writer.ToString()
+    
+        let solution = context.TestProject.GetSolution()
+        let modifiedFilesCache = solution.GetComponent<TestModifiedFilesCache>()
+        ReadLockCookie.Execute(fun _ -> solution.GetPsiServices().Files.CommitAllDocuments())
+    
+        try
+            for KeyValue(sourceFile, cookie) in modifiedFilesCache.ModifiedFileCookies do
+                if (not (sourceFile.IsValid())) then () else
+
+                let afterModification = dumpFile sourceFile
+
+                cookie.Dispose()
+                modifiedFilesCache.PsiFilesCache.Drop(sourceFile)
+
+                let afterParse = dumpFile sourceFile
+                if afterModification = afterParse then () else
+
+                let file = FileSystemDefinition.CreateTemporaryFile(
+                    extensionWithDot = ".gold",
+                    handler = fun stream ->
+                        let writer = new StreamWriter(stream)
+                        writer.Write(afterParse)
+                        writer.Flush()
+                    )
+
+                context.TestFixture.ExecuteWithSpecifiedGold(file, fun writer -> writer.Write(afterModification))
+                |> ignore
+        finally
+            modifiedFilesCache.ModifiedFileCookies.Clear()
 
 
 [<SolutionComponent>]
@@ -257,8 +320,8 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
 
             let fcsProject = getFcsProject sourceFile.PsiModule
-            match fcsProject.FileIndices.TryGetValue(sourceFile.GetLocation()) with
-            | true, index -> index
+            match tryGetValue (sourceFile.GetLocation()) fcsProject.FileIndices with
+            | Some index -> index
             | _ -> -1
 
         member x.ProjectRemoved = new Signal<_>("Todo") :> _

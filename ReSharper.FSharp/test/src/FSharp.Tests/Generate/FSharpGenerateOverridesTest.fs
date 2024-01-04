@@ -4,7 +4,7 @@ open JetBrains.ReSharper.FeaturesTestFramework.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; AssertCorrectTreeStructure>]
 type FSharpGenerateOverridesTest() =
     inherit GenerateTestBase()
 
