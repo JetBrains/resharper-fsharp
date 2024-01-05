@@ -53,8 +53,6 @@ class FSharpConcatenationAwareInjector :
 
           val startOffsetInPart =
             if (part.tokenType in INTERPOLATED_STRING_STARTS) {
-              // can't reliably inspect injected PSI with interpolations
-              disableInspections = true
               wholeLiteralRange.startOffset
             } else part.startOffsetInParent + interpolationBracketsCount
 
