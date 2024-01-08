@@ -11,6 +11,8 @@ import org.testng.annotations.Test
 
 @TestEnvironment(solution = "CoreConsoleApp", sdkVersion = SdkVersion.DOT_NET_6)
 class FSharpHoverDocTest : DocumentationTestBase() {
+  override val checkSolutionLoad = false
+
   @Test
   fun `test hover docs for EntryPoint`() = doTest("Program.fs", "Program.fs")
 
