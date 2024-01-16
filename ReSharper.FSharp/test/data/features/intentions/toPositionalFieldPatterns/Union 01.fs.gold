@@ -1,0 +1,9 @@
+﻿module Module
+
+type U =
+    | A
+    | B of int * hello: int option * world: string
+
+match A with
+| B(i, Some 1, world{caret}) -> ()
+| _ -> ()

@@ -92,11 +92,11 @@ module FSharpDeconstructionImpl =
                 usedNames.Add(names.Head.RemoveBackticks()) |> ignore
                 List.distinct names)
 
-    let createInnerPattern (pat: IFSharpPattern) (deconstruction: IFSharpDeconstruction) isStruct usedNames =
+    let createInnerPattern (pat: IFSharpPattern) (components: IReadOnlyList<IDeconstructionComponent>) isStruct usedNames =
         let binding, _ = pat.GetBinding(true)
         let factory = pat.CreateElementFactory()
 
-        let components: IDeconstructionComponent list = deconstruction.Components |> List.ofSeq
+        let components = List.ofSeq components
         let names = getComponentNames pat usedNames components
         let isTopLevel = binding :? ITopBinding
         let patternText = names |> Seq.map Seq.head |> String.concat ", "
@@ -241,7 +241,7 @@ type DeconstructionFromTuple(components: IDeconstructionComponent list, isStruct
         DeconstructionFromTuple(components, fcsType.IsStructTupleType) :> _
 
     override this.DeconstructInnerPatterns(pat, usedNames) =
-        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this isStruct usedNames
+        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this.Components isStruct usedNames
         let pattern = ModificationUtil.ReplaceChild(pat, pattern)
         null, pattern, names
 
@@ -271,7 +271,7 @@ type DeconstructionFromUnionCaseFields(name: string, components: IDeconstruction
 
     override this.DeconstructInnerPatterns(pat, usedNames) =
         let pat = ParametersOwnerPatNavigator.GetByParameter(pat.IgnoreParentParens()).NotNull()
-        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this false usedNames
+        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this.Components false usedNames
         pat :> _, ModificationUtil.ReplaceChild(pat.Parameters[0], pattern), names
 
 
@@ -309,7 +309,7 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
 
         let pattern, names =
             if hasFields then
-                FSharpDeconstructionImpl.createInnerPattern pat this false usedNames
+                FSharpDeconstructionImpl.createInnerPattern pat this.Components false usedNames
             else
                 null, []
 
@@ -357,7 +357,7 @@ type DeconstructionFromKeyValuePair(components: IDeconstructionComponent list) =
         let pat = ParenPatUtil.addParensIfNeeded pat
         let parametersOwnerPat = pat.IgnoreInnerParens() :?> IParametersOwnerPat
 
-        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this false usedNames
+        let pattern, names = FSharpDeconstructionImpl.createInnerPattern pat this.Components false usedNames
         parametersOwnerPat :> _, ModificationUtil.ReplaceChild(parametersOwnerPat.Parameters[0], pattern), names
 
 
