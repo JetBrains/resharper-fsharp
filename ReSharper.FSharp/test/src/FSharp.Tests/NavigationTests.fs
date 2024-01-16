@@ -56,6 +56,11 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
     [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union 01``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Union 02 - Compiled``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Union 03 - Compiled struct``() = x.DoNamedTest()
+    [<Test>] member x.``Union 04 - Compiled``() = x.DoNamedTest()
+
     [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestWithCSharp()
     [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestWithCSharp()
 

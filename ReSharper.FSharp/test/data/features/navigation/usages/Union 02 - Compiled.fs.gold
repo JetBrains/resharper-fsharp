@@ -1,0 +1,138 @@
+﻿## ShowUsagesProvider activity:
+  Async context menu shown `Usages of 'FSharpOption<T>'`:
+    TO: [R] var none = FSharpOption<int>.|None|; RANGE: (107,111) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var none = FSharpOption<int>.**None**;</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var none = FSharpOption<int>.**None**;
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+        public Class1()
+        {
+          var none = FSharpOption<int>.|CARET|None;
+          var someInt = FSharpOption<int>.Some(1);
+          var someTag = FSharpOption<int>.Tags.Some;
+      ------------------
+
+    TO: [O] var none = |FSharpOption|<int>.None; RANGE: (89,101) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageStaticClassMemberAccess
+      text: Class1.Class1      <font color="FFD5A286">var none = **FSharpOption**<int>.None;</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var none = **FSharpOption**<int>.None;
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+        public Class1()
+        {
+          var none = |CARET|FSharpOption<int>.None;
+          var someInt = FSharpOption<int>.Some(1);
+          var someTag = FSharpOption<int>.Tags.Some;
+      ------------------
+
+    TO: [I] var someInt = FSharpOption<int>.|Some|(1); RANGE: (149,153) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageInvocation
+      text: Class1.Class1      <font color="FFD5A286">var someInt = FSharpOption<int>.**Some**(1);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var someInt = FSharpOption<int>.**Some**(1);
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+        {
+          var none = FSharpOption<int>.None;
+          var someInt = FSharpOption<int>.|CARET|Some(1);
+          var someTag = FSharpOption<int>.Tags.Some;
+        }
+      ------------------
+
+    TO: [O] var someInt = |FSharpOption|<int>.Some(1); RANGE: (131,143) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageStaticClassMemberAccess
+      text: Class1.Class1      <font color="FFD5A286">var someInt = **FSharpOption**<int>.Some(1);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var someInt = **FSharpOption**<int>.Some(1);
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+        {
+          var none = FSharpOption<int>.None;
+          var someInt = |CARET|FSharpOption<int>.Some(1);
+          var someTag = FSharpOption<int>.Tags.Some;
+        }
+      ------------------
+
+    TO: [O] var someTag = |FSharpOption|<int>.Tags.Some; RANGE: (176,188) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageNestedClassAccess
+      text: Class1.Class1      <font color="FFD5A286">var someTag = **FSharpOption**<int>.Tags.Some;</font><font color="06C"> (9)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var someTag = **FSharpOption**<int>.Tags.Some;
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+          var none = FSharpOption<int>.None;
+          var someInt = FSharpOption<int>.Some(1);
+          var someTag = |CARET|FSharpOption<int>.Tags.Some;
+        }
+      }
+      ------------------
+
+    TO: [R] var someTag = FSharpOption<int>.Tags.|Some|; RANGE: (199,203) @ Union 02 - Compiled.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var someTag = FSharpOption<int>.Tags.**Some**;</font><font color="06C"> (9)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var someTag = FSharpOption<int>.Tags.**Some**;
+    Navigation result:
+      opened file: Union 02 - Compiled.cs
+      ------------------
+          var none = FSharpOption<int>.None;
+          var someInt = FSharpOption<int>.Some(1);
+          var someTag = FSharpOption<int>.Tags.|CARET|Some;
+        }
+      }
+      ------------------
+
+    TO: [O] | |Some| _ -> () RANGE: (62,66) @ Union 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsagePatternChecking
+      text: Module      <font color="FFD5A286">| **Some** _ -> ()</font><font color="06C"> (6)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: | **Some** _ -> ()
+    Navigation result:
+      opened file: Union 02 - Compiled.fs
+      ------------------
+
+      match None with
+      | |CARET|Some _ -> ()
+
+      ------------------
+
+    TO: [R] match |None| with RANGE: (50,54) @ Union 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module      <font color="FFD5A286">match **None** with</font><font color="06C"> (5)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: match **None** with
+    Navigation result:
+      opened file: Union 02 - Compiled.fs
+      ------------------
+      type intOption = int option
+
+      match |CARET|None with
+      | Some _ -> ()
+
+      ------------------
+
+    TO: [O] type intOption = int |option| RANGE: (36,42) @ Union 02 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module.intOption      <font color="FFD5A286">type intOption = int **option</font>**<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: type intOption = int **option**
+    Navigation result:
+      caret did not move
+
