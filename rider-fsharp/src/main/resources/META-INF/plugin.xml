@@ -11,6 +11,10 @@
   <depends>org.intellij.intelliLang</depends>
   <depends>rider.intellij.plugin.appender</depends>
 
+  <content>
+    <module name="intellij.rider.plugins.fsharp/llm" />
+  </content>
+
   <extensions defaultExtensionNs="org.intellij.intelliLang">
     <languageSupport implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections.FSharpInjectionSupport"/>
     <injectionConfig config="fsharpInjections.xml" />
