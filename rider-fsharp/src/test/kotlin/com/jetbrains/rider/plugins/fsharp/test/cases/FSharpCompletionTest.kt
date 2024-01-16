@@ -70,6 +70,7 @@ class FSharpCompletionTest : CompletionTestBase() {
   @Test
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 
+  @Mute("RIDER-104549")
   fun `comments - language injections`() = doTestChooseItem("f#")
   fun `doc comments - not available`(){
     dumpOpenedEditor("Program.fs", "Program.fs") {
