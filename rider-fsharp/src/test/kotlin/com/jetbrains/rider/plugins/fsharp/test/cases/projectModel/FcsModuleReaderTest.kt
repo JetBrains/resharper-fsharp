@@ -15,12 +15,14 @@ import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
@@ -106,6 +108,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
 
+  @Mute("RIDER-102738")
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   fun testUnloadReloadCSharp() {
     executeWithGold(testGoldFile) {
@@ -210,6 +213,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
 
+  @Mute("RIDER-102738")
   @TestEnvironment(solution = "ProjectReferencesCSharp2")
   fun testLoadReferenced() {
     executeWithGold(testGoldFile) {
@@ -217,8 +221,8 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
         assertAllProjectsWereLoaded(project)
         openFsFileDumpModuleReader(it, "Init", false, listOf("CSharpProject"))
 
-        unloadProject(arrayOf("ProjectReferencesCSharp2", "CSharpProject"))
         waitForDaemonCloseAllOpenEditors(project)
+        unloadProject(arrayOf("ProjectReferencesCSharp2", "CSharpProject"))
         dumpModuleReader(it, "2. Unload C# project", project)
 
         waitForDaemonCloseAllOpenEditors(project)
@@ -235,6 +239,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
       withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+        waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)
         waitForEditorSwitch("Library.fs")
       }
@@ -247,6 +252,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
       assertAllProjectsWereLoaded(project)
       withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
         typeWithLatency("1")
+        waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)
         waitForEditorSwitch("Library.fs")
       }

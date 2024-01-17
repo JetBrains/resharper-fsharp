@@ -21,7 +21,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
-[<ShellComponent>]
+[<SolutionInstanceComponent>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpTargetsProjectLoadModificator() =
     let fsTargets =

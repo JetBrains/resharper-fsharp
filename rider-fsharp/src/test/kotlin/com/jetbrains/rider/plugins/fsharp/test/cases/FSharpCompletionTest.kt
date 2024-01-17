@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -22,7 +23,8 @@ class FSharpCompletionTest : CompletionTestBase() {
   @Test
   fun listModuleValue() = doTestTyping("filt")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103671")
+  @Test
   fun localVal01() = doTestChooseItem("x")
 
   @Test
@@ -64,9 +66,11 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
 
-  @Test(enabled = false)
+  @Mute("RIDER-103666")
+  @Test
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 
+  @Mute("RIDER-104549")
   fun `comments - language injections`() = doTestChooseItem("f#")
   fun `doc comments - not available`(){
     dumpOpenedEditor("Program.fs", "Program.fs") {

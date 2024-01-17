@@ -1,4 +1,4 @@
-Language: PsiLanguageType:F#
+﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
     IExpressionStatement

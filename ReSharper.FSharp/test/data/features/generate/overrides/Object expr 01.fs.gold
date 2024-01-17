@@ -1,4 +1,4 @@
-Provided elements:
+﻿Provided elements:
  0: ToString():System.String
  1: Equals(System.Object):System.Boolean
  2: GetHashCode():System.Int32

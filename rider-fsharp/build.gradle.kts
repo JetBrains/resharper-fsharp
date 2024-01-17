@@ -9,7 +9,8 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("com.jetbrains.rdgen") version "2023.2.2-preview1"
+  // Version is configured in gradle.properties
+  id("com.jetbrains.rdgen")
   id("org.jetbrains.intellij") version "1.13.3" // https://github.com/JetBrains/gradle-intellij-plugin/releases
   id("org.jetbrains.grammarkit") version "2021.2.2"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
@@ -32,7 +33,7 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
 
-val baseVersion = "2023.3"
+val baseVersion = "2024.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -92,7 +93,7 @@ val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
 val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
 
 val productMonorepoDir = getProductMonorepoRoot()
-val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
+val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
 val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
 val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
 val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
@@ -197,8 +198,8 @@ tasks {
     if (inMonorepo) {
       sources(
         listOf(
-          File("$productMonorepoDir/Rider/Frontend/rider/model/sources"),
-          File("$productMonorepoDir/Rider/ultimate/remote-dev/rd-ide-model-sources"),
+          File("$productMonorepoDir/rider/model/sources"),
+          File("$productMonorepoDir/remote-dev/rd-ide-model-sources"),
           File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
         )
       )
@@ -286,7 +287,7 @@ tasks {
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
     if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-      val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
+      val testHostPath = "$resharperPluginPath/src/FSharp/FSharp.Tests.Host/$outputRelativePath"
       val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
       files = files + listOf("$testHostName.dll", "$testHostName.pdb")
     }
@@ -475,7 +476,7 @@ fun getProductMonorepoRoot(): File? {
   var currentDir = repoRoot
 
   while (currentDir.parent != null) {
-    if (currentDir.listFiles()?.any { it.name == ".dotnet-products.root.marker" } == true) {
+    if (currentDir.resolve(".ultimate.root.marker").exists()) {
       return currentDir
     }
     currentDir = currentDir.parentFile
