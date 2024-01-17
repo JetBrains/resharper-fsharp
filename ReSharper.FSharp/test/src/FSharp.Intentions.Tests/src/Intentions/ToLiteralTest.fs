@@ -21,5 +21,6 @@ type ToLiteralAvailabilityTest() =
     override x.ExtraPath = "toLiteral"
 
     [<Test>] member x.``Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Attributes 01``() = x.DoNamedTest()
