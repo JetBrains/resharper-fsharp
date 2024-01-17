@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 [<AbstractClass>]
 type T() =

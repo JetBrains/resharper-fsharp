@@ -1,4 +1,4 @@
-﻿## ShowUsagesProvider activity:
+## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'FSharpResult<T,TError>'`:
     TO: [O] let err = |Error| 1 RANGE: (54,59) @ Union 04 - Compiled.fs
     Menu item (enabled) :

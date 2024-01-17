@@ -1,4 +1,4 @@
-﻿## ShowUsagesProvider activity:
+## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'FSharpValueOption<T>'`:
     TO: [O] | |ValueSome| _ -> () RANGE: (68,77) @ Union 03 - Compiled struct.fs
     Menu item (enabled) :

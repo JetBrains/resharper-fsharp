@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 seq {
     sprintf |"%d"|(0) 1

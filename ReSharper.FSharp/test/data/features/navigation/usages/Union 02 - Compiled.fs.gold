@@ -1,4 +1,4 @@
-﻿## ShowUsagesProvider activity:
+## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'FSharpOption<T>'`:
     TO: [R] var none = FSharpOption<int>.|None|; RANGE: (107,111) @ Union 02 - Compiled.cs
     Menu item (enabled) :

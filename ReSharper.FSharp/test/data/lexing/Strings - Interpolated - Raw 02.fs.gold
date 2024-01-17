@@ -1,4 +1,4 @@
-﻿0000: RAW_INTERPOLATED_STRING '$$""" { } """'
+0000: RAW_INTERPOLATED_STRING '$$""" { } """'
 0013: NEW_LINE '\n'
 0014: RAW_INTERPOLATED_STRING '$$"""" { } """'
 0028: NEW_LINE '\n'
