@@ -984,6 +984,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             let expr = match expr with | SynExpr.ComputationExpr(expr = expr) -> expr | _ -> expr
             x.PushRangeAndProcessExpression(expr, range, if isArray then ElementType.ARRAY_EXPR else ElementType.LIST_EXPR)
 
+        | SynExpr.ComputationExpr(_, SynExpr.New(_, synType, argExpr, _), range) ->
+            x.PushRange(range, ElementType.OBJ_EXPR)
+            x.PushExpression(argExpr)
+            x.ProcessTypeAsTypeReferenceName(synType)
+
         | SynExpr.ComputationExpr(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
 

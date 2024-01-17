@@ -127,29 +127,31 @@ type TripleQuoteStringLexer(buffer) =
 
     override x.AdvanceInternal() = StringTokenTypes.CHARACTER
 
-type TripleQuoteInterpolatedStringLexer(buffer, dollarCount) =
+type TripleQuoteInterpolatedStringLexer(buffer, dollarCount, checkEscapedBraces) =
     inherit TripleQuoteStringLexer(buffer)
 
     override x.StartOffset = dollarCount + 3
 
     override x.AdvanceInternal() =
+        if not checkEscapedBraces then base.AdvanceInternal() else
+
         match InterpolatedStringLexer.advance x with
         | null -> base.AdvanceInternal()
         | nodeType -> nodeType
 
-type TripleQuoteInterpolatedStringStartLexer(buffer, dollarCount) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
+type TripleQuoteInterpolatedStringStartLexer(buffer, dollarCount, checkEscapedBraces) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount, checkEscapedBraces)
 
     override x.EndOffset = dollarCount
 
-type TripleQuoteInterpolatedStringMiddleLexer(buffer, dollarCount) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
+type TripleQuoteInterpolatedStringMiddleLexer(buffer, dollarCount, checkEscapedBraces) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount, checkEscapedBraces)
 
     override x.StartOffset = dollarCount
     override x.EndOffset = dollarCount
 
-type TripleQuoteInterpolatedStringEndLexer(buffer, dollarCount) =
-    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount)
+type TripleQuoteInterpolatedStringEndLexer(buffer, dollarCount, checkEscapedBraces) =
+    inherit TripleQuoteInterpolatedStringLexer(buffer, dollarCount, checkEscapedBraces)
 
     override x.StartOffset = dollarCount
     override x.EndOffset = 3
@@ -169,7 +171,7 @@ type ByteArrayLexer(buffer) =
 
 
 module InterpolatedStringLexer =
-    let private checkChar (lexer: FSharpStringLexerBase) c =
+    let private checkEscapedBrace (lexer: FSharpStringLexerBase) c =
         lexer.Position <- lexer.Position + 1
         if lexer.CanAdvance && lexer.Buffer[lexer.Position] = c then
             StringTokenTypes.ESCAPE_CHARACTER
@@ -179,8 +181,8 @@ module InterpolatedStringLexer =
 
     let advance (lexer: FSharpStringLexerBase) =
         match lexer.Buffer[lexer.Position] with
-        | '{' -> checkChar lexer '{'
-        | '}' -> checkChar lexer '}'
+        | '{' -> checkEscapedBrace lexer '{'
+        | '}' -> checkEscapedBrace lexer '}'
         | _ -> null
 
 

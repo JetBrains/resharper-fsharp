@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
@@ -71,15 +72,25 @@ type FcsErrorLookupItem(item: DeclarationListItem) =
             |> Option.bind (function | ToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
             |> Option.toObj
 
+[<AllowNullLiteral>]
+type IFcsLookupItemInfo =
+    abstract FcsSymbol: FSharpSymbol
+    abstract FcsSymbolUse: FSharpSymbolUse
+    abstract NamespaceToOpen: string array
 
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
     let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
 
-    member this.FcsSymbolUse = items.SymbolUses.Head 
+    member this.FcsSymbolUse = items.SymbolUses.Head
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
     member this.NamespaceToOpen = items.NamespaceToOpen
+
+    interface IFcsLookupItemInfo with
+        member this.FcsSymbol = this.FcsSymbol
+        member this.NamespaceToOpen = this.NamespaceToOpen
+        member this.FcsSymbolUse = this.FcsSymbolUse
 
     member x.Candidates =
         FcsLookupCandidate.getOverloads items.Description

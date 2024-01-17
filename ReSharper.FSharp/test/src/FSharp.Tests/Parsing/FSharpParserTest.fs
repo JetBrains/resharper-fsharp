@@ -252,6 +252,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - CompExpr - Arg 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - LetAnd 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - New 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()

@@ -9,6 +9,6 @@ let x =
     (* todo:
        multiline *)
 
-    (* todo
+    (* TODO:
          multiline *)
     123

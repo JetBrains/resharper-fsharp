@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -24,14 +25,19 @@ type FSharpRelevanceRule() =
                 refExpr |> Option.exists isInsideComputationExpressionForCustomOperation
 
         for item in items do
-            let fcsLookupItem = item.As<FcsLookupItem>()
-            if isNull fcsLookupItem then () else
+            let info =
+                match item with
+                | :? IFcsLookupItemInfo as info -> info
+                | :? IAspectLookupItem<ILookupItemInfo> as item -> item.Info.As<IFcsLookupItemInfo>()
+                | _ -> null
+            
+            if isNull info then () else
 
-            match fcsLookupItem.FcsSymbol with
+            match info.FcsSymbol with
             | :? FSharpEntity ->
                 markRelevance item CLRLookupItemRelevance.TypesAndNamespaces
 
-                if not (Array.isEmpty fcsLookupItem.NamespaceToOpen) then
+                if not (Array.isEmpty info.NamespaceToOpen) then
                     markRelevance item CLRLookupItemRelevance.NotImportedType
                 else
                     markRelevance item CLRLookupItemRelevance.ImportedType
@@ -49,7 +55,7 @@ type FSharpRelevanceRule() =
                 if mfv.IsMember && mfv.IsProperty then
                     markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                 else
-                    if fcsLookupItem.FcsSymbolUse.IsFromComputationExpression then
+                    if info.FcsSymbolUse.IsFromComputationExpression then
                         if isCustomOperationPossible.Value then
                             markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 

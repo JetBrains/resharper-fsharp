@@ -4,7 +4,7 @@ open JetBrains.ReSharper.FeaturesTestFramework.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; AssertCorrectTreeStructure>]
 type FSharpGenerateOverridesTest() =
     inherit GenerateTestBase()
 
@@ -50,6 +50,8 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Repr 22``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 23``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 24``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Repr 25 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - Repr 26``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 02``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr - Member 03``() = x.DoNamedTest()
@@ -92,6 +94,10 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Member - Property 02 - Setter``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 03 - Setter only``() = x.DoNamedTest()
 
+    [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Object expr 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Input elements - Overriden 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Repr - Empty - Class 01``() = x.DoNamedTest()
@@ -108,7 +114,7 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Repr - Union - No bar - Single 04``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Union 02``() = x.DoNamedTest()
-
+    
     [<Test>] member x.``Super - Substitution 01``() = x.DoNamedTest()
     [<Test>] member x.``Super - Substitution 02``() = x.DoNamedTest()
     [<Test>] member x.``Super - Substitution 03 - Abbreviations``() = x.DoNamedTest()

@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
-type GenerateMissingOverridesFix(typeDecl: IFSharpTypeDeclaration) =
+type GenerateMissingOverridesFix(typeDecl: IFSharpTypeElementDeclaration) =
     inherit FSharpQuickFixBase()
 
     let configureContext (context: IGeneratorContext) =
