@@ -48,6 +48,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         if not (isValid binding && binding.GetNameRange().Contains(dataProvider.SelectedTreeRange)) then false else
 
         if not (isSimplePattern binding.HeadPattern) then false else
+        if not (Seq.isEmpty binding.ParameterPatternsEnumerable) then false else
         if hasLiteralAttribute binding.AttributesEnumerable then false else
 
         let expr = binding.Expression
