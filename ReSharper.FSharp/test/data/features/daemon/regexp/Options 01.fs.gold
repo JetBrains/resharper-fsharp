@@ -1,4 +1,4 @@
-﻿open System.Text.RegularExpressions
+open System.Text.RegularExpressions
 
 let [<Literal>] options = RegexOptions.IgnorePatternWhitespace
 

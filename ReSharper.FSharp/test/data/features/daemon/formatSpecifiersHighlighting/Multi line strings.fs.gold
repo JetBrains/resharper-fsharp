@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 let _ = printfn "foo |%s|(0) |%d|(1)
                  |%A|(2) bar

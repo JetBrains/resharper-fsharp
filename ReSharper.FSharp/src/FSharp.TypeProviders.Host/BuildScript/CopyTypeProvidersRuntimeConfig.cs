@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Application.BuildScript;
 using JetBrains.Application.BuildScript.Compile;
 using JetBrains.Application.BuildScript.Solution;

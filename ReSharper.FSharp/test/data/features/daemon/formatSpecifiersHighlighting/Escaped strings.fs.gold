@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 let _ = sprintf @"|%A|(0)"
 

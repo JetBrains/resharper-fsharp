@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
@@ -76,6 +77,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (element is IFSharpProperty property)
         return property.GetExplicitAccessors().Select(member => new RelatedDeclaredElement(member));
 
+      if (element is IFSharpTypeElement typeElement && typeElement.IsUnion())
+      {
+        var result = new List<RelatedDeclaredElement>();
+        foreach (var sourceUnionCase in typeElement.GetSourceUnionCases())
+        {
+          result.Add(new RelatedDeclaredElement(sourceUnionCase));
+          result.AddRange(sourceUnionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member)));
+        }
+
+        return result;
+      }
+
+      if (element is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union union } fsCompiledTypeElement)
+      {
+        var result = new List<RelatedDeclaredElement>();
+        foreach (var name in union.cases)
+        {
+          var generatedMembers = GeneratedMembersUtil.GetCompiledUnionCaseGeneratedMembers(fsCompiledTypeElement, name);
+          result.AddRange(generatedMembers.Select(member => new RelatedDeclaredElement(member)));
+        }
+
+        return result;
+      }
+
       return EmptyList<RelatedDeclaredElement>.Instance;
     }
 
@@ -87,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
         return NavigateTargets.Empty;
 
-      return fsTypeMember.GetContainingType() is IDeclaredElement containingType
+      return fsTypeMember.ContainingType is IDeclaredElement containingType
         ? new NavigateTargets(containingType, false)
         : NavigateTargets.Empty;
     }

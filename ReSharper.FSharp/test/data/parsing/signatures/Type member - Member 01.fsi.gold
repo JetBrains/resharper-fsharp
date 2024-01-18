@@ -1,4 +1,4 @@
-﻿Language: PsiLanguageType:F#
+Language: PsiLanguageType:F#
 IFSharpSigFile
   INamedModuleDeclaration
     FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)

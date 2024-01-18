@@ -1,4 +1,4 @@
-﻿using JetBrains.Application.Build.Validation;
+using JetBrains.Application.Build.Validation;
 using JetBrains.Build;
 using JetBrains.ReSharper.Plugins.FSharp.RiderPlugin.BuildScript;
 using JetBrains.Util;

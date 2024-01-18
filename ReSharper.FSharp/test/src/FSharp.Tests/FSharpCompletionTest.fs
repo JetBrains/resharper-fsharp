@@ -62,8 +62,9 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Local val - New line 12``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 13``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 14``() = x.DoNamedTest()
-    [<Test; Explicit "Extra item">] member x.``Local val - New line 15``() = x.DoNamedTest()
-    [<Test; Explicit "Extra item">] member x.``Local val - New line 16``() = x.DoNamedTest()
+    [<Test; Explicit "Extra item from FCS">] member x.``Local val - New line 15``() = x.DoNamedTest()
+    [<Test; Explicit "Extra item from FCS">] member x.``Local val - New line 16``() = x.DoNamedTest()
+    [<Test; Explicit "Extra item from FCS">] member x.``Local val - New line 17``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried - Tuple 01 - First``() = x.DoNamedTest()
