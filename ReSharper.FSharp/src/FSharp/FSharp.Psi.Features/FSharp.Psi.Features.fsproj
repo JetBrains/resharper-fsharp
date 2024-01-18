@@ -44,7 +44,7 @@
     <Compile Include="src\CodeCompletion\Rules\NamedUnionCaseFieldsPatRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\LocalValuesRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpScriptReferenceCompletionProvider.fs" />
-    <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
+    <Compile Include="src\CodeCompletion\FSharpKeywordsRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\CodeStructure\FSharpGotoClassMemberProvider.fs" />

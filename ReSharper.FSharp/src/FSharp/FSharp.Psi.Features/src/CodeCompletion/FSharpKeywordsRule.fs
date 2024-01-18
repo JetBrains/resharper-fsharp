@@ -34,6 +34,46 @@ type KeywordSuffix =
     | None
 
 
+type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
+    inherit TextLookupItemBase()
+
+    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
+
+    override x.Text =
+        match keywordSuffix with
+        | KeywordSuffix.Space -> $"{keyword} "
+        | KeywordSuffix.Quotes -> $"{keyword} \"\""
+        | _ -> keyword
+
+    override x.GetDisplayName() =
+        LookupUtil.FormatLookupString(keyword, x.TextColor)
+
+    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
+        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
+
+        match keywordSuffix with
+        | KeywordSuffix.Quotes ->
+            // Move caret back inside inserted quotes.
+            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.RescheduleCompletion(solution)
+        | _ -> ()
+
+    interface IRiderAsyncCompletionLookupItem
+
+
+type FSharpKeywordLookupItem(keyword, description: string, isReparseContextAware) =
+    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
+
+    member val IsReparseContextAware = isReparseContextAware
+    
+    interface IDescriptionProvidingLookupItem with
+        member x.GetDescription() = RichTextBlock(description)
+
+
+type FSharpHashDirectiveLookupItem(directive, suffix) =
+    inherit FSharpKeywordLookupItemBase(directive, suffix)
+
+
 module FSharpKeywordsProvider =
     let reparseContextAwareKeywords =
         [| "abstract"
@@ -63,14 +103,21 @@ module FSharpKeywordsProvider =
            "yield!" |]
         |> HashSet
 
+    let keywordsWithDescription = FSharpKeywords.KeywordsWithDescription
+
     let alwaysSuggestedKeywords =
-        FSharpKeywords.KeywordsWithDescription
+        keywordsWithDescription
         |> List.filter (fun (keyword, _) ->
             not (reparseContextAwareKeywords.Contains(keyword)) &&
             not (PrettyNaming.IsOperatorDisplayName keyword))
+        |> List.map fst
 
-    let keywordDescriptions =
-        dict FSharpKeywords.KeywordsWithDescription
+    let keywordItems =
+        keywordsWithDescription
+        |> List.map (fun (keyword, description) ->
+            keyword, FSharpKeywordLookupItem(keyword, description, reparseContextAwareKeywords.Contains(keyword))
+        )
+        |> dict
 
     let getReferenceOwner (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
@@ -242,48 +289,9 @@ module FSharpKeywordsProvider =
             "const"
     }
 
-type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
-    inherit TextLookupItemBase()
-
-    override x.Image = PsiSymbolsThemedIcons.Keyword.Id
-
-    override x.Text =
-        match keywordSuffix with
-        | KeywordSuffix.Space -> $"{keyword} "
-        | KeywordSuffix.Quotes -> $"{keyword} \"\""
-        | _ -> keyword
-
-    override x.GetDisplayName() =
-        LookupUtil.FormatLookupString(keyword, x.TextColor)
-
-    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
-        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
-
-        match keywordSuffix with
-        | KeywordSuffix.Quotes ->
-            // Move caret back inside inserted quotes.
-            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
-            textControl.RescheduleCompletion(solution)
-        | _ -> ()
-
-    interface IRiderAsyncCompletionLookupItem
-
-
-type FSharpKeywordLookupItem(keyword, description: string, isReparseContextAware) =
-    inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
-
-    member val IsReparseContextAware = isReparseContextAware
-    
-    interface IDescriptionProvidingLookupItem with
-        member x.GetDescription() = RichTextBlock(description)
-
-
-type FSharpHashDirectiveLookupItem(directive, suffix) =
-    inherit FSharpKeywordLookupItemBase(directive, suffix)
-
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpKeywordsProvider() =
+type FSharpKeywordsRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let hashDirectives =
@@ -324,9 +332,12 @@ type FSharpKeywordsProvider() =
 
         if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else
 
-        let add isReparseContext keywords =
-            for keyword, description in keywords do
-                let item = FSharpKeywordLookupItem(keyword, description, isReparseContext)
+        let add (keywords: string seq) =
+            for keyword in keywords do
+                match tryGetValue keyword FSharpKeywordsProvider.keywordItems with
+                | None -> ()
+                | Some item ->
+
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 markRelevance item CLRLookupItemRelevance.Keywords
 
@@ -338,14 +349,13 @@ type FSharpKeywordsProvider() =
                 | _ -> ()
 
                 collector.Add(item)
-            ()
 
         if isNotNull reference && isNotNull (OpenStatementNavigator.GetByReferenceName(reference.GetElement().As())) then
-            add true ["type", ""; "global", ""]
+            add ["type"; "global"]
             true else
 
-        add false FSharpKeywordsProvider.alwaysSuggestedKeywords
-        add true (FSharpKeywordsProvider.suggestKeywords context |> Seq.map (fun k -> k, ""))
+        add FSharpKeywordsProvider.alwaysSuggestedKeywords
+        add (FSharpKeywordsProvider.suggestKeywords context)
 
         if context.BasicContext.File.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() then
             for keyword in scriptKeywords do
