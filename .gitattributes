@@ -1,4 +1,4 @@
-* text=auto
+* -text
 
 *.fs  linguist-language=fsharp
 *.fsi linguist-language=fsharp
