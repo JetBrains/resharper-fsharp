@@ -186,6 +186,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       foreach (var sourceFile in myDirtyFiles)
       {
+        if (!sourceFile.IsValid())
+          continue;
+
         if (IsFSharpFile(sourceFile))
           Invalidate(sourceFile);
         else
