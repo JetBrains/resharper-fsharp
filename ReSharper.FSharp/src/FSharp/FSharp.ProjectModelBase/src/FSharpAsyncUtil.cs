@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FSharp.Compiler;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
@@ -30,6 +31,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     /// </summary>
     public static void UsingReadLockInsideFcs(IShellLocks locks, Action action, Func<bool> upToDateCheck = null)
     {
+      // Capture FCS cancellation token so we can propagate cancellation in cases like F#->C#->F#,
+      // where the last FCS request is initiated from inside reading the C# metadata,
+      // and the initial request may get cancelled
+      var fcsToken = Cancellable.Token;
+      using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
+
       // Try to acquire read lock on the current thread.
       // It should be possible, unless there's a write lock request that prevents it.
 
@@ -53,9 +60,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       // Could not finish task under a read lock. Queue a request to be processed by a thread calling FCS.
       while (true)
       {
+        // To ensure FCS metadata consistency, we retry cancelled requests in this loop.
+        // This may happen when R# read lock is cancelled, but the corresponding FCS request in not (yet).
+        // We should check the FCS request cancellation separately via its cancellation token.
+        if (Cancellable.Token.IsCancellationRequested)
+          break;
+
         var tcs = new TaskCompletionSource<Unit>();
         ReadRequests.Enqueue(() =>
         {
+          // Add interruption source from the captured token on the thread executing the task. 
+
+          // ReSharper disable once VariableHidesOuterVariable
+          using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
           try
           {
             if (upToDateCheck == null || !upToDateCheck())
@@ -126,13 +143,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
       while (!task.IsCompleted)
       {
+        interruptChecker();
+
         var action = ReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
         action?.Invoke();
 
         if (task.IsCompleted)
           break;
-
-        interruptChecker();
       }
 
       return task.Result;
