@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Linq
 open System.Collections.Concurrent
 open System.Reflection
+open FSharp.Compiler
 open FSharp.Compiler.AbstractIL.IL
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open Internal.Utilities.Library
@@ -139,6 +140,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             ),
             fun _ -> not isInvalidating
         )
+        // The whole FCS request could've been cancelled and the call above silently exited.
+        // We need to throw the exception to make FCS handle it properly.
+        Cancellable.CheckAndThrow()
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         let projectProperties = project.ProjectProperties
