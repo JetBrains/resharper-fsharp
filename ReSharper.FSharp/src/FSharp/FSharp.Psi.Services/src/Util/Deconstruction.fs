@@ -213,6 +213,7 @@ type FSharpDeconstructionBase(components: IDeconstructionComponent list) =
 
     interface IFSharpDeconstruction with
         member this.Components = components :> _
+        member this.IsValid() = true
         member this.Text = this.Text
         member this.Type = failwith "todo"
 
