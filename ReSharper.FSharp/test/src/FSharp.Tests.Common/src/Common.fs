@@ -71,9 +71,6 @@ type FSharpTestAttribute(extension) =
         member x.GetTargetFrameworkId() = FSharpTestAttribute.targetFrameworkId
         member this.Inherits = false
 
-    interface ITestMsCorLibFlagProvider with
-        member this.GetMsCorLibFlag() = ReferenceDlls.MsCorLib
-
     interface ITestFileExtensionProvider with
         member x.Extension = extension
 
