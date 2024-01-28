@@ -25,7 +25,7 @@ type ISolution with
 
 type ITextControl with
     member x.RescheduleCompletion(solution: ISolution) =
-        solution.Locks.QueueReadLock("Next code completion", fun _ ->
+        solution.Locks.QueueReadLockOrRunSync(solution.GetSolutionLifetimes().MaximumLifetime, "Next code completion", fun _ ->
             solution.CompletionSessionManager
                 .ExecuteAutomaticCompletionAsync(x, FSharpLanguage.Instance, AutopopupType.SoftAutopopup))
 

@@ -41,14 +41,16 @@ type UnionCaseFieldsBehaviour(info) =
         let parametersOwnerPat = TextControlToPsi.GetElement<IParametersOwnerPat>(solution, nameRange.EndOffset)
         let psiServices = parametersOwnerPat.GetPsiServices()
 
-        use prohibitTypeCheckCookie = ProhibitTypeCheckCookie.Create()
-        use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
-        use cookie = CompilationContextCookie.GetOrCreate(parametersOwnerPat.GetPsiModule().GetContextFromModule())
-        use transactionCookie =
-            PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, nameof UnionCaseFieldsBehaviour)
+        let action =
+            use prohibitTypeCheckCookie = ProhibitTypeCheckCookie.Create()
+            use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
+            use cookie = CompilationContextCookie.GetOrCreate(parametersOwnerPat.GetPsiModule().GetContextFromModule())
+            use transactionCookie =
+                PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, nameof UnionCaseFieldsBehaviour)
 
-        let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
-        let action = FSharpDeconstruction.deconstruct false parametersOwnerPat info.Deconstruction pat
+            let pat = parametersOwnerPat.ParametersEnumerable.FirstOrDefault()
+            FSharpDeconstruction.deconstruct false parametersOwnerPat info.Deconstruction pat
+
         if isNotNull action then
             action.Invoke(textControl)
 
