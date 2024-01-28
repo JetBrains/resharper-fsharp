@@ -4,9 +4,11 @@ open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Threading
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
+open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
@@ -187,7 +189,19 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             forEachExpr.SetPattern(pat) |> ignore
         ) |> ignore
 
-        let dummy () =
+        let showHotspots (hotspotsRegistry: HotspotsRegistry) endOffset =
+            let hotspotInfos = hotspotsRegistry.CreateHotspots();
+            if hotspotInfos.Length > 0 then () else
+
+            let liveTemplatesManager = hotspotsRegistry.PsiServices.GetComponent<LiveTemplatesManager>()
+
+            let hotspotSession = liveTemplatesManager.CreateHotspotSessionAtopExistingText(
+                hotspotsRegistry.PsiServices.Solution, DocumentRange(&endOffset), textControl,
+                LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
+
+            hotspotSession.ExecuteAndForget()
+
+        let createHotspots () =
             use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, id)
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             use disableFormatter = new DisableCodeFormatter()
@@ -198,14 +212,16 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             let endOffset = forEachExpr.DoExpression.GetDocumentStartOffset()
             ModificationUtil.DeleteChild(forEachExpr.DoExpression)
 
-            BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset).Invoke(textControl)
+            // do after transaction
+            fun () -> showHotspots hotspotsRegistry endOffset
+
 
         match fcsType with
-        | None -> dummy ()
+        | None -> createHotspots () ()
         | Some fcsType ->
 
         match FSharpDeconstruction.tryGetDeconstruction forEachExpr fcsType with
-        | None -> dummy ()
+        | None -> createHotspots () ()
         | Some(deconstruction) ->
 
         textControl.Caret.MoveTo(forEachExpr.Pattern.GetDocumentEndOffset(), CaretVisualPlacement.DontScrollIfVisible)
@@ -224,18 +240,21 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             if isNull selectedOccurrence then () else
 
             let deconstruction = selectedOccurrence.Entities.FirstOrDefault()
-            if isNull deconstruction then dummy () else
+            if isNull deconstruction then createHotspots () () else
 
-            use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
-            use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, id)
-            use cookie = CompilationContextCookie.GetOrCreate(node.GetPsiModule().GetContextFromModule())
+            let hotspotsRegistry, endOffset =
+                use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+                use disableFormatter = new DisableCodeFormatter()
+                use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, id)
+                use cookie = CompilationContextCookie.GetOrCreate(node.GetPsiModule().GetContextFromModule())
 
-            match FSharpDeconstructionImpl.deconstructImpl false deconstruction forEachExpr.Pattern with
-            | Some(hotspotsRegistry, _) ->
-                let endOffset = forEachExpr.DoExpression.GetDocumentStartOffset()
-                ModificationUtil.DeleteChild(forEachExpr.DoExpression)
+                match FSharpDeconstructionImpl.deconstructImpl false deconstruction forEachExpr.Pattern with
+                | Some(hotspotsRegistry, _) ->
+                    let endOffset = forEachExpr.DoExpression.GetDocumentStartOffset()
+                    ModificationUtil.DeleteChild(forEachExpr.DoExpression)
 
-                BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset).Invoke(textControl)
-            | _ -> failwith id
+                    hotspotsRegistry, endOffset
+                | _ -> failwith id
+
+            showHotspots hotspotsRegistry endOffset
         )

@@ -56,27 +56,28 @@ type GenerateLambdaBehavior(info: GenerateLambdaInfo) =
         psiServices.Files.CommitAllDocuments()
         let refExpr = TextControlToPsi.GetElement<IReferenceExpr>(solution, nameRange.EndOffset)
 
-        use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
-        use transactionCookie =
-            PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, GenerateLambdaInfo.CreateLambda)
-
-        let text = if GenerateLambdaInfo.needsParens refExpr then $"({info.Text})" else info.Text
-        let expr = refExpr.CreateElementFactory().CreateExpr(text)
-        let insertedExpr = ModificationUtil.ReplaceChild(refExpr, expr)
-        let lambdaExpr = insertedExpr.IgnoreInnerParens().As<ILambdaExpr>()
-
-        let hotspotsRegistry = HotspotsRegistry(lambdaExpr.GetPsiServices())
-
-        (info.Names, lambdaExpr.Parameters.Patterns) ||> Seq.iter2 (fun names itemPattern ->
-            let nameSuggestionsExpression = NameSuggestionsExpression(names)
-            let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
-            hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))
-
         let hotspotSession =
+            use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
+            use transactionCookie =
+                PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, GenerateLambdaInfo.CreateLambda)
+
+            let text = if GenerateLambdaInfo.needsParens refExpr then $"({info.Text})" else info.Text
+            let expr = refExpr.CreateElementFactory().CreateExpr(text)
+            let insertedExpr = ModificationUtil.ReplaceChild(refExpr, expr)
+            let lambdaExpr = insertedExpr.IgnoreInnerParens().As<ILambdaExpr>()
+
+            let hotspotsRegistry = HotspotsRegistry(lambdaExpr.GetPsiServices())
+
+            (info.Names, lambdaExpr.Parameters.Patterns) ||> Seq.iter2 (fun names itemPattern ->
+                let nameSuggestionsExpression = NameSuggestionsExpression(names)
+                let rangeMarker = itemPattern.GetDocumentRange().CreateRangeMarker()
+                hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression))
+
             LiveTemplatesManager.Instance.CreateHotspotSessionAtopExistingText(
                 solution, lambdaExpr.Expression.GetDocumentEndOffset(), textControl,
                 LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotsRegistry.CreateHotspots())
 
+        // must be executed outside of transaction
         hotspotSession.ExecuteAndForget()
 
 
