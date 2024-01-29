@@ -324,7 +324,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     /// Dependencies are known to already have been checked due to the processing order inside `invalidateDirtyModules`.
     let checkDirtyProject (projectKey: FcsProjectKey) =
         match tryGetValue projectKey fcsProjects with
-        | None -> ()
+        | None ->
+            let fcsProject = createProject projectKey
+            addProject projectKey fcsProject |> ignore
+
         | Some existingFcsProject ->
             let fcsProject = createProject projectKey
 
@@ -348,8 +351,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let loop (project: IProject) =
             if not (isFSharpProject project) then () else
 
-            let projectKeys = projectsToProjectKeys[project] |> List.ofSeq
-            for projectKey in projectKeys do
+            let existingProjectKeys = projectsToProjectKeys[project] |> List.ofSeq
+            let newTargetFrameworks = project.TargetFrameworkIds
+            for tfm in newTargetFrameworks do
+                let projectKey = FcsProjectKey.Create(project, tfm)
                 if visited.Contains(projectKey) then () else
 
                 // Don't process project and its dependencies if it's already removed.
@@ -375,6 +380,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         projectsToInvalidate.Push(projectKey, true)
                         for referencedFSharpModule in referencedFSharpProjects do
                             projectsToInvalidate.Push(referencedFSharpModule, false)
+
+            for existingProjectKey in existingProjectKeys do
+                if not (newTargetFrameworks.Contains(existingProjectKey.TargetFrameworkId)) then
+                    removeProject existingProjectKey
 
         for dirtyProject in dirtyProjects do
             loop dirtyProject
