@@ -922,6 +922,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
         files.Add(path, item)
         addChild item
+        update item
 
     member x.AddFolder(path, relativeToPath, relativeToType, refreshFolder, update) =
         let info = createNewItemInfo path path relativeToPath relativeToType refreshFolder update
@@ -929,6 +930,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
         folders.AddValue(path, item)
         addChild item
+        update item
 
     member x.TryGetRelativeChildPath(modifiedViewItem, relativeItem: FSharpProjectModelElement, relativeToType) =
         let modifiedItemBuildAction =
