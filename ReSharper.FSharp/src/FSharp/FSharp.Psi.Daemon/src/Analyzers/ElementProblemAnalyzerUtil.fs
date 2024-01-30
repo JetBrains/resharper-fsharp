@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers.Util
 
 open System
 open JetBrains.Diagnostics
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
@@ -33,6 +34,9 @@ type ElementProblemAnalyzerData with
                     let psiModules = psiModule.GetPsiServices().Modules
                     psiModules.GetModuleReferences(psiModule) |> Seq.map (fun reference -> reference.Module)
                 | _ ->
+                    let project = psiModule.ContainingProjectModule.As<IProject>()
+                    if isNull project || not project.IsFSharp then Seq.empty else
+
                     psiModule |> getReferencedModules
 
             moduleReferences
