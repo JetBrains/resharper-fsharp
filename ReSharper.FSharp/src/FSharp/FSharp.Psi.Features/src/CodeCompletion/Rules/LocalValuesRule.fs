@@ -53,7 +53,7 @@ type LocalValuesRule() =
 
         let addSelfIdValue (selfId: ISelfId) =
             if isNotNull selfId then
-                values.TryAdd(selfId.NameIdentifier.Name, selfId.GetFcsSymbolUse()) |> ignore
+                values.TryAdd(selfId.SourceName, selfId.GetFcsSymbolUse()) |> ignore
 
         let addMembersValues (contextOffset: int) (members: ITreeNode seq) =
             let members = members |> Seq.takeWhile (fun m -> m.GetTreeStartOffset().Offset < contextOffset)
