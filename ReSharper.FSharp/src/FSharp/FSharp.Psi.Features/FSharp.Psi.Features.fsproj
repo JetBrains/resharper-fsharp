@@ -62,7 +62,7 @@
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
     <Compile Include="src\Search\FSharpItemOccurrenceKind.fs" />
     <Compile Include="src\Search\FSharpPathReference.fs" />
-    <Compile Include="src\Search\FSharpSearchGuru.fs" />
+    <Compile Include="src\Search\FSharpSearchFilter.fs" />
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />

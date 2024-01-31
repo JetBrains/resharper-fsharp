@@ -8,24 +8,25 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Modules
 
-type FSharpSearchGuruElementId =
+type FSharpSearchFilterKey =
     { DeclaredElement: IDeclaredElement
       PsiModule: IPsiModule
       FileIndex: int }
 
 
-[<SearchGuru(SearchGuruPerformanceEnum.FastFilterOutByLanguage)>]
-type FSharpSearchGuru(fsProjectOptionsProvider: IFcsProjectProvider) =
+[<PsiComponent>]
+type FSharpSearchFilter(fsProjectOptionsProvider: IFcsProjectProvider) =
     let getTypeElement (fsElement: IFSharpDeclaredElement) =
         match fsElement with
         | :? ITypeElement as typeElement -> typeElement
         | fsElement -> fsElement.GetContainingType()
 
-    interface ISearchGuru with
+    interface ISearchFilter with
         member x.IsAvailable _ = true
-        member x.BuzzWordFilter(_, words) = words
 
-        member x.GetElementId(element) =
+        member x.Kind = SearchFilterKind.Cache
+
+        member x.TryGetKey(element) =
             let fsDeclaredElement = element.As<IFSharpDeclaredElement>()
             if isNull fsDeclaredElement then null else
 
@@ -50,7 +51,7 @@ type FSharpSearchGuru(fsProjectOptionsProvider: IFcsProjectProvider) =
         member x.CanContainReferences(sourceFile, elementId) =
             if not (sourceFile.LanguageType.Is<FSharpProjectFileType>()) then true else
 
-            let fsElementId = elementId :?> FSharpSearchGuruElementId
+            let fsElementId = elementId :?> FSharpSearchFilterKey
 
             let typePrivateMember = fsElementId.DeclaredElement.As<ITypePrivateMember>()
             if isNotNull typePrivateMember then

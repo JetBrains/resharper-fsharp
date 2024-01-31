@@ -237,9 +237,9 @@ type FSharpDeclaredElementForRenameProvider() =
 type SingleUnionCaseRenameEvaluator() =
     interface IDerivedRenamesEvaluator with
         member x.SuggestedElementsHaveDerivedName = false
-        member x.CreateFromReference(_, _) = EmptyList.Instance :> _
+        member x.CreateFromReference(_, _, _) = EmptyList.Instance :> _
 
-        member x.CreateFromElement(initialElement, _) =
+        member x.CreateFromElement(initialElement, _, _) =
             let isApplicable (typeElement: ITypeElement) =
                 typeElement.IsUnion() &&
 
@@ -265,9 +265,9 @@ type SingleUnionCaseRenameEvaluator() =
 type AssociatedTypeRenameEvaluator() =
     interface IDerivedRenamesEvaluator with
         member x.SuggestedElementsHaveDerivedName = false
-        member x.CreateFromReference(_, _) = EmptyList.Instance :> _
+        member x.CreateFromReference(_, _, _) = EmptyList.Instance :> _
 
-        member x.CreateFromElement(initialElement, _) =
+        member x.CreateFromElement(initialElement, _, _) =
             match initialElement.FirstOrDefault() with
             | :? IFSharpModule as fsModule ->
                 let associatedTypeElement = fsModule.AssociatedTypeElement

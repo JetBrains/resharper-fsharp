@@ -42,9 +42,9 @@ type FSharpImportTypeHelper() =
             let factory = importTypeCacheFactory.Invoke(context)
 
             let canReferenceInsideProject typeElement =
-                let searchGuru = psiModule.GetSolution().GetComponent<FSharpSearchGuru>() :> ISearchGuru
-                let elementId = searchGuru.GetElementId(typeElement)
-                searchGuru.CanContainReferences(sourceFile, elementId)
+                let searchFilter = psiModule.GetSolution().GetComponent<FSharpSearchFilter>() :> ISearchFilter
+                let elementKey = searchFilter.TryGetKey(typeElement)
+                searchFilter.CanContainReferences(sourceFile, elementKey)
 
             let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>()
 
