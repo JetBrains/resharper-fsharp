@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "ToRecursiveLetBindings", Group = "F#", Description = "To recursive")>]
+[<ContextAction(Name = "ToRecursiveLetBindings", GroupType = typeof<FSharpContextActions>, Description = "To recursive")>]
 type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 

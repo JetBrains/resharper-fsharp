@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Resources.Shell
 module LetToUseAction =
     let [<Literal>] Description = "Convert to 'use' binding"
 
-[<ContextAction(Name = "LetToUse", Group = "F#", Description = ToLiteralAction.Description)>]
+[<ContextAction(Name = "LetToUse", GroupType = typeof<FSharpContextActions>, Description = ToLiteralAction.Description)>]
 type LetToUseAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

@@ -16,7 +16,7 @@ open JetBrains.Util
 module SetNameAction =
     let [<Literal>] Description = "Set name"
 
-//[<ContextAction(Name = "SetName", Group = "F#", Description = SetNameAction.Description)>]
+//[<ContextAction(Name = "SetName", GroupType = typeof<FSharpContextActions>, Description = SetNameAction.Description)>]
 type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

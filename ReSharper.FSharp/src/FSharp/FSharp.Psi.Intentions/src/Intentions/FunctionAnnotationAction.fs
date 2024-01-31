@@ -79,7 +79,7 @@ module SpecifyTypes =
         let returnTypeInfo = factory.CreateReturnTypeInfo(typeUsage)
         ModificationUtil.AddChildAfter(decl.Identifier, returnTypeInfo) |> ignore
 
-[<ContextAction(Name = "AnnotateFunction", Group = "F#",
+[<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
                 Description = "Annotate function with parameter types and return type")>]
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)

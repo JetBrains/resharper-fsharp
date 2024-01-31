@@ -34,7 +34,7 @@ type NegateConditionActionBase<'T when 'T: not struct and 'T :> IConditionOwnerE
         null
 
 
-[<ContextAction(Name = "NegateIfCondition", Group = "F#", Description = "Negate 'if' condition")>]
+[<ContextAction(Name = "NegateIfCondition", GroupType = typeof<FSharpContextActions>, Description = "Negate 'if' condition")>]
 type NegateIfConditionAction(dataProvider: FSharpContextActionDataProvider) =
     inherit NegateConditionActionBase<IIfThenElseExpr>(dataProvider)
 
@@ -44,7 +44,7 @@ type NegateIfConditionAction(dataProvider: FSharpContextActionDataProvider) =
     override x.GetKeyword(expr) = expr.IfKeyword
 
 
-[<ContextAction(Name = "NegateWhileCondition", Group = "F#", Description = "Negate 'while' condition")>]
+[<ContextAction(Name = "NegateWhileCondition", GroupType = typeof<FSharpContextActions>, Description = "Negate 'while' condition")>]
 type NegateWhileConditionAction(dataProvider: FSharpContextActionDataProvider) =
     inherit NegateConditionActionBase<IWhileExpr>(dataProvider)
 
