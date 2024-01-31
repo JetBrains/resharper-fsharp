@@ -69,7 +69,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       // workaround for RIDER-26985, FCS provides wrong info for abstract events.
       var logicalName = mfv.LogicalName;
       if (logicalName.StartsWith("add_", StringComparison.Ordinal) ||
-          logicalName.StartsWith("remove_", StringComparison.Ordinal))
+          logicalName.StartsWith("remove_", StringComparison.Ordinal) ||
+          logicalName.StartsWith("get_", StringComparison.Ordinal))
       {
         if (mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute))
           return new AbstractFSharpCliEvent(this);

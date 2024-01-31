@@ -9,9 +9,11 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
             FSharpIdentifierToken(type:SYMBOLIC_OP, text:|>)
-          IFromErrorExpr
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
-    FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IDotLambdaExpr
+            IDotLambdaId
+              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            IFromErrorExpr
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

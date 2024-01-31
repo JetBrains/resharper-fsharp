@@ -1,7 +1,8 @@
 ﻿using static Module;
 
-  public class Class1 : IT
+  public |class Class1 : IT|(0)
   {
   }
 
 ---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Interface member 'int Module.IT.Foo' is not implemented

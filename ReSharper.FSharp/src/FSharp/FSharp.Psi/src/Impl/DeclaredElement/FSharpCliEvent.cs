@@ -41,8 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     protected override FSharpType MfvType =>
-      Mfv?.CurriedParameterGroups.FirstOrDefault()?.FirstOrDefault() is { } parameter
-        ? parameter.Type
+      Mfv?.AccessorProperty?.Value.EventForFSharpProperty?.Value is { } fcsEvent
+        ? fcsEvent.FullType
         : null;
 
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol) => symbol;

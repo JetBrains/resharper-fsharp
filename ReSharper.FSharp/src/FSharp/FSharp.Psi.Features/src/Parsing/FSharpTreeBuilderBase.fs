@@ -490,37 +490,6 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     member x.ProcessLocalId(IdentRange range) =
         x.MarkAndDone(range, ElementType.LOCAL_DECLARATION)
 
-    member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
-        let range = pats.Range
-        let paramMark = x.Mark(range)
-
-        match pats with
-        | SynSimplePats.SimplePats([], _, _) ->
-            x.MarkAndDone(range, ElementType.UNIT_PAT)
-            x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
-
-        | _ ->
-
-        let parenPatMark = x.Mark()
-
-        match pats with
-        | SynSimplePats.SimplePats([pat], _, _) ->
-            x.ProcessImplicitCtorParam(pat)
-
-        | SynSimplePats.SimplePats(headPat :: _ as pats, _, range) ->
-            let tupleMark = x.Mark(headPat.Range)
-            for pat in pats do
-                x.ProcessImplicitCtorParam(pat)
-            x.Done(tupleMark, ElementType.TUPLE_PAT)
-            x.AdvanceToTokenOrRangeEnd(FSharpTokenType.RPAREN, range)
-            if x.TokenType == FSharpTokenType.RPAREN then
-                x.Advance()
-
-        | _ -> failwithf $"Unexpected simple pats: {pats}"
-
-        x.Done(range, parenPatMark, ElementType.PAREN_PAT)
-        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
-
     member x.ProcessReturnTypeInfo(valInfo: SynValInfo, synType: SynType) =
         let (SynValInfo(_, SynArgInfo(returnAttrs, _, _))) = valInfo
 
