@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
@@ -206,7 +207,7 @@ module FSharpProperties =
     let [<Literal>] WarnOn = "WarnOn"
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpProjectPropertiesRequest() =
     let properties =
         [| FSharpProperties.DotnetFscCompilerPath
