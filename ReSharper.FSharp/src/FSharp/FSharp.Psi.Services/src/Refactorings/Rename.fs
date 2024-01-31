@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -295,3 +296,11 @@ type AssociatedTypeRenameEvaluator() =
                 associatedModule |> Option.toList |> Seq.cast
 
             | _ -> [] :> _
+
+[<SolutionComponent>]
+type FSharpSuspiciousReferenceSearchService(searchFilter: FSharpSearchFilter) =
+    inherit SuspiciousReferencesSearchService()
+
+    override this.TryGetKey(declaredElement, newName) = searchFilter.TryGetKey(declaredElement)
+    override this.CanContainSuspiciousReferences(sourceFile, key) = searchFilter.CanContainReferences(sourceFile, key)
+

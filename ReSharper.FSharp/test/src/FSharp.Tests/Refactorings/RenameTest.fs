@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
+open System
 open System.Linq
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
@@ -32,6 +33,11 @@ type FSharpRenameTest() =
         let fsExt = FSharpProjectFileType.FsExtension
         let fsiExt = FSharpSignatureProjectFileType.FsiExtension
         x.DoTestSolution(testName + fsiExt, testName + fsExt, $"{testName} - Program" + fsExt)
+
+    member x.DoTestFiles([<ParamArray>] names: string[]) =
+        let testDir = x.TestDataPath / x.TestMethodName
+        let paths = names |> Array.map (fun name -> testDir.Combine(name).FullPath)
+        x.DoTestSolution(paths)
 
     [<Test>] member x.``Escaped name 01 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Escaped name 02 - Binding``() = x.DoNamedTest()
@@ -89,6 +95,13 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Type private function``() = x.DoNamedTest()
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
+
+    [<Ignore("""
+        Parameters of methods are currently implemented as local variables so inline rename is being executed.
+        Also for named arguments there is no reference to a parameter on callsite.
+        Revive `FSharpNamedArgumentLanguageService` when fixing this.
+        """)>]
+    [<Test>] member x.``Params - Named arguments 01``() = x.DoTestFiles("File1.fs", "File2.fs")
 
     [<Test>] member x.``Ctor params 01``() = x.DoNamedTest()
     [<Test>] member x.``Ctor params 02``() = x.DoNamedTest()
