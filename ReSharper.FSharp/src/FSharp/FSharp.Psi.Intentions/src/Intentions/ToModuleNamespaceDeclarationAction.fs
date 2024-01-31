@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpModulesUtil
 
-[<ContextAction(Name = "ToModuleNamespace", Group = "F#", Description = "To module/namespace")>]
+[<ContextAction(Name = "ToModuleNamespace", GroupType = typeof<FSharpContextActions>, Description = "To module/namespace")>]
 type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 

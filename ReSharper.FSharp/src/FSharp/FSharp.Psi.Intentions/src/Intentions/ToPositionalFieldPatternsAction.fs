@@ -19,7 +19,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "ToPositionalFieldPatternsAction", Group = "F#",
+[<ContextAction(Name = "ToPositionalFieldPatternsAction", GroupType = typeof<FSharpContextActions>,
                 Description = "Match union case fields explicitly")>]
 type ToPositionalFieldPatternsAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)

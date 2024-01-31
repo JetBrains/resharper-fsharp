@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "ToMultilineRecord", Group = "F#", Description = "Converts record expression to multiline")>]
+[<ContextAction(Name = "ToMultilineRecord", GroupType = typeof<FSharpContextActions>, Description = "Converts record expression to multiline")>]
 type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 

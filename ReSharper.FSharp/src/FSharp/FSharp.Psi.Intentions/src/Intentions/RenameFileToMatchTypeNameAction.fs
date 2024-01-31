@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
-[<ContextAction(Group = "F#", Name = "Match file name with type name", Priority = 1s,
+[<ContextAction(GroupType = typeof<FSharpContextActions>, Name = "Match file name with type name", Priority = 1s,
                 Description = "Renames current file to match the name of the single type or a top-level module.")>]
 type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)

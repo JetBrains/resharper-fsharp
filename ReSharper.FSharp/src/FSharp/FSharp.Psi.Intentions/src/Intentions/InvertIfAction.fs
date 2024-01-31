@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-[<ContextAction(Name = "InvertIf", Group = "F#", Description = "Invert 'if' expression")>]
+[<ContextAction(Name = "InvertIf", GroupType = typeof<FSharpContextActions>, Description = "Invert 'if' expression")>]
 type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
