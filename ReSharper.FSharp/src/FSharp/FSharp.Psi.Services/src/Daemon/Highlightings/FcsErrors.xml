@@ -514,6 +514,20 @@
     <QuickFix>ReplaceWithTypeRefExprFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="InvalidUseOfTypeName" ID="FS0800: Invalid use of type name">
+    <Parameter type="FSharpSymbolReference" name="reference"/>
+    <!-- todo: change to IReference? -->
+    <Parameter type="string" name="fcsMessage"/>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <!--todo: identifier null check-->
+    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="PropertyIsStatic" ID="FS0809: Static propery used on instance">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message resourceName="IsStaticMessage" resourceType="Strings">

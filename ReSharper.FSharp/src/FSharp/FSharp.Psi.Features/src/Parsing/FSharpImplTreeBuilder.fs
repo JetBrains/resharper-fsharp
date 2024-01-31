@@ -185,12 +185,18 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 else x.Mark()
 
             x.ProcessAttributeLists(attrs)
-            x.ProcessImplicitCtorSimplePats(args)
+            x.ProcessPrimaryCtorParams(args)
             x.ProcessCtorSelfId(selfId)
 
             x.Done(range, mark, ElementType.PRIMARY_CONSTRUCTOR_DECLARATION)
 
         | _ -> failwithf "Expecting primary constructor, got: %A" typeMember
+
+    member x.ProcessPrimaryCtorParams(pat: SynPat) =
+        let range = pat.Range
+        let paramMark = x.Mark(range)
+        x.ProcessPat(pat, true, false)
+        x.Done(range, paramMark, ElementType.PARAMETERS_PATTERN_DECLARATION)
 
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
         match typeMember with
@@ -313,7 +319,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 match lid with
                 | [_] ->
                     match valData with
-                    | SynValData(Some(flags), _, selfId, _) when flags.MemberKind = SynMemberKind.Constructor ->
+                    | SynValData(Some(flags), _, selfId) when flags.MemberKind = SynMemberKind.Constructor ->
                         x.ProcessPatternParams(memberParams, true, true) // todo: should check isLocal
                         x.ProcessCtorSelfId(selfId)
 
@@ -355,7 +361,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             | _ -> ElementType.MEMBER_DECLARATION
 
         match valData with
-        | SynValData(Some(flags), _, _, _) when
+        | SynValData(Some(flags), _, _) when
                 flags.MemberKind = SynMemberKind.PropertyGet || flags.MemberKind = SynMemberKind.PropertySet ->
             if expr.Range.End <> range.End then
                 unfinishedDeclaration <- Some(mark, range, ElementType.MEMBER_DECLARATION)

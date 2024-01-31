@@ -114,34 +114,42 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         {
           if (mfv != null)
           {
-            // workaround for auto-properties, see visualfsharp#3939
-            var mfvLogicalName = mfv.LogicalName;
-            if (mfvLogicalName.EndsWith("@", StringComparison.Ordinal))
-              continue;
-
-            // visualfsharp#3939
-            if (mfvLogicalName == "v" &&
-                resolvedSymbols.Declarations.ContainsKey(startOffset))
-              continue;
-
-            if (mfvLogicalName == StandardMemberNames.ClassConstructor)
-              continue;
-
-            // visualfsharp#3943, visualfsharp#3933
-            if (mfvLogicalName != StandardMemberNames.Constructor &&
-                !(lexer.FindTokenAt(endOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false) || mfv.IsActivePattern))
-              continue;
-
-            if (mfvLogicalName == "Invoke" && (mfv.DeclaringEntity?.Value?.IsDelegate ?? false))
-              continue;
-
-            var len = endOffset - startOffset;
-            if (mfvLogicalName == "op_Multiply" && len == 3)
+            try
             {
-              // The `*` pattern includes parens and is parsed as special token
-              // let (*) (_, _) = ()
-              startOffset++;
-              endOffset--;
+              // workaround for auto-properties, see visualfsharp#3939
+              var mfvLogicalName = mfv.LogicalName;
+              if (mfvLogicalName.EndsWith("@", StringComparison.Ordinal))
+                continue;
+
+              // visualfsharp#3939
+              if (mfvLogicalName == "v" &&
+                  resolvedSymbols.Declarations.ContainsKey(startOffset))
+                continue;
+
+              if (mfvLogicalName == StandardMemberNames.ClassConstructor)
+                continue;
+
+              // visualfsharp#3943, visualfsharp#3933
+              if (mfvLogicalName != StandardMemberNames.Constructor &&
+                  !(lexer.FindTokenAt(endOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false) || mfv.IsActivePattern))
+                continue;
+
+              if (mfvLogicalName == "Invoke" && (mfv.DeclaringEntity?.Value?.IsDelegate ?? false))
+                continue;
+
+              var len = endOffset - startOffset;
+              if (mfvLogicalName == "op_Multiply" && len == 3)
+              {
+                // The `*` pattern includes parens and is parsed as special token
+                // let (*) (_, _) = ()
+                startOffset++;
+                endOffset--;
+              }
+            }
+            // ReSharper disable once EmptyGeneralCatchClause
+            catch (Exception)
+            {
+              continue;
             }
           }
           else if (activePatternCase != null)
@@ -185,6 +193,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             ? new TextRange(startOffset, endOffset)
             : FixRange(startOffset, endOffset, null, buffer, lexer);
           startOffset = textRange.StartOffset;
+
+          if (IsPropertyGetter(resolvedSymbols.Declarations.TryGetValue(startOffset)?.SymbolUse))
+            continue;
 
           resolvedSymbols.Declarations[startOffset] = new FcsResolvedSymbolUse(symbolUse, textRange);
           resolvedSymbols.Uses.Remove(startOffset);
@@ -259,6 +270,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
 
       return resolvedSymbols;
+    }
+
+    private static bool IsPropertyGetter(FSharpSymbolUse fcsSymbolUse)
+    {
+      if (fcsSymbolUse?.Symbol is FSharpMemberOrFunctionOrValue mfv)
+      {
+        return mfv.AccessorProperty != null;
+      }
+
+      return false;
     }
 
     private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol, bool isCtor) =>
