@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ContextAction(Name = "ToRecursiveModule", Group = "F#", Description = "To recursive")>]
+[<ContextAction(Name = "ToRecursiveModule", GroupType = typeof<FSharpContextActions>, Description = "To recursive")>]
 type ToRecursiveModuleAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 

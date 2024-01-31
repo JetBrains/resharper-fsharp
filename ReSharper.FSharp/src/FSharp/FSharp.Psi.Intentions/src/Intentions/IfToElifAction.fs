@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.Util
 
-[<ContextAction(Name = "IfToElif", Group = "F#", Description = "Converts `if` expression to 'elif'")>]
+[<ContextAction(Name = "IfToElif", GroupType = typeof<FSharpContextActions>, Description = "Converts `if` expression to 'elif'")>]
 type IfToElifAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

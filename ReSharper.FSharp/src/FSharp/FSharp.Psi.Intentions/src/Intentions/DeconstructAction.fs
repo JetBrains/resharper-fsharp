@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
-[<ContextAction(Name = "Deconstruct variable", Group = "F#",
+[<ContextAction(Name = "Deconstruct variable", GroupType = typeof<FSharpContextActions>,
                 Description = "Deconstructs pattern into multiple positional components",
                 Priority = 1s)>]
 type DeconstructPatternContextAction(provider: FSharpContextActionDataProvider) =

@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open type JetBrains.Diagnostics.Assertion
 
-[<ContextAction(Name = "UseNamedAccess", Group = "F#", Description = "Use named access inside a DU pattern")>]
+[<ContextAction(Name = "UseNamedAccess", GroupType = typeof<FSharpContextActions>, Description = "Use named access inside a DU pattern")>]
 type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
     

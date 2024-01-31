@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Psi.Tree
 
 // todo: fix mutable inside binding range, then replace IRecordField usage below
 
-[<ContextAction(Name = "ToMutable", Group = "F#", Description = "Makes value mutable")>]
+[<ContextAction(Name = "ToMutable", GroupType = typeof<FSharpContextActions>, Description = "Makes value mutable")>]
 type ToMutableAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 

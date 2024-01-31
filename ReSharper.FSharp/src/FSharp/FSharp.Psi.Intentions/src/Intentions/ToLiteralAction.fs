@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Resources.Shell
 module ToLiteralAction =
     let [<Literal>] Description = "Make value literal (const) by adding Literal attribute"
 
-[<ContextAction(Name = "ToLiteral", Group = "F#", Description = ToLiteralAction.Description)>]
+[<ContextAction(Name = "ToLiteral", GroupType = typeof<FSharpContextActions>, Description = ToLiteralAction.Description)>]
 type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
