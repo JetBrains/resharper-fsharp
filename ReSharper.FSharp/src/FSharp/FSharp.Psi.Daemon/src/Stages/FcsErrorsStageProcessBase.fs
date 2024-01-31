@@ -82,6 +82,7 @@ module FSharpErrors =
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
+    let [<Literal>] InvalidUseOfTypeName = 800
     let [<Literal>] PropertyIsStatic = 809
     let [<Literal>] PropertyCannotBeSet = 810
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
@@ -426,6 +427,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
+
+        | InvalidUseOfTypeName ->
+            let identifier = fsFile.GetNode(range)
+            let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
+            if isNotNull referenceOwner then InvalidUseOfTypeNameError(referenceOwner.Reference, error.Message) :> _ else
+
+            createGenericHighlighting error range
 
         | PropertyIsStatic ->
             createHighlightingFromNode PropertyIsStaticError range
