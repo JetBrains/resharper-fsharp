@@ -61,10 +61,10 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix: KeywordSuffix) =
     interface IRiderAsyncCompletionLookupItem
 
 
-type FSharpKeywordLookupItem(keyword, description: string, isReparseContextAware) =
+type FSharpKeywordLookupItem(keyword, description: string) =
     inherit FSharpKeywordLookupItemBase(keyword, KeywordSuffix.None)
 
-    member val IsReparseContextAware = isReparseContextAware
+    member val IsReparseContextAware = false with get, set
     
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() = RichTextBlock(description)
@@ -113,11 +113,16 @@ module FSharpKeywordsProvider =
         |> List.map fst
 
     let keywordItems =
-        keywordsWithDescription
-        |> List.map (fun (keyword, description) ->
-            keyword, FSharpKeywordLookupItem(keyword, description, reparseContextAwareKeywords.Contains(keyword))
-        )
-        |> dict
+        let keywordItems = Dictionary()
+            
+        for keyword, description in keywordsWithDescription do
+            keywordItems.Add(keyword, FSharpKeywordLookupItem(keyword, description))
+
+        for keyword in reparseContextAwareKeywords do
+            if not (keywordItems.ContainsKey(keyword)) then
+                keywordItems.Add(keyword, FSharpKeywordLookupItem(keyword, ""))
+
+        keywordItems
 
     let getReferenceOwner (context: FSharpCodeCompletionContext) =
         let reference = context.ReparsedContext.Reference
@@ -332,13 +337,14 @@ type FSharpKeywordsRule() =
 
         if not fcsCompletionContext.PartialName.QualifyingIdents.IsEmpty then false else
 
-        let add (keywords: string seq) =
+        let add contextAware (keywords: string seq) =
             for keyword in keywords do
                 match tryGetValue keyword FSharpKeywordsProvider.keywordItems with
                 | None -> ()
                 | Some item ->
 
                 item.InitializeRanges(context.Ranges, context.BasicContext)
+                item.IsReparseContextAware <- contextAware
                 markRelevance item CLRLookupItemRelevance.Keywords
 
                 match keyword with
@@ -351,15 +357,15 @@ type FSharpKeywordsRule() =
                 collector.Add(item)
 
         if isNotNull reference && isNotNull (OpenStatementNavigator.GetByReferenceName(reference.GetElement().As())) then
-            add ["type"; "global"]
+            add true ["type"; "global"]
             true else
 
-        add FSharpKeywordsProvider.alwaysSuggestedKeywords
-        add (FSharpKeywordsProvider.suggestKeywords context)
+        add false FSharpKeywordsProvider.alwaysSuggestedKeywords
+        add true (FSharpKeywordsProvider.suggestKeywords context)
 
         if context.BasicContext.File.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() then
             for keyword in scriptKeywords do
-                let item = FSharpKeywordLookupItem(keyword, "", false)
+                let item = FSharpKeywordLookupItem(keyword, "")
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 collector.Add(item)
 
