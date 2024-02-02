@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Threading;
@@ -22,7 +23,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
-  [Language(typeof(FSharpLanguage))]
+  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadNotSafeBecauseOfSettingsSchemaCollector)]
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using JetBrains.Application.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
@@ -16,7 +17,7 @@ using Whitespace = JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.Whitespace;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
-  [Language(typeof(FSharpLanguage))]
+  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadNotSafeBecauseOfCalculatedSettingsSchema)]
   public class FSharpCodeFormatter : CodeFormatterBase<FSharpFormatSettingsKey>
   {
     private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;

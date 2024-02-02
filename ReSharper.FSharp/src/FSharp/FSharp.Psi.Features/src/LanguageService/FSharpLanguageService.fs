@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -24,7 +25,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>)>]
+[<Language(typeof<FSharpLanguage>, InstantiationEx.DemandAnyThreadNotSafeBecauseOfCalculatedSettingsSchema)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
         checkerService: FcsCheckerService, formatter: FSharpCodeFormatter) =
     inherit LanguageService(languageType, constantValueService)

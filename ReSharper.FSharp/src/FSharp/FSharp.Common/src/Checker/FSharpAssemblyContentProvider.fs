@@ -3,13 +3,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
     let entityCache = EntityCache()
     do

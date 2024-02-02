@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
@@ -263,7 +264,7 @@ type FSharpPostfixTemplateContextFactory() =
             null
 
 
-[<Language(typeof<FSharpLanguage>)>]
+[<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThread)>]
 type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
