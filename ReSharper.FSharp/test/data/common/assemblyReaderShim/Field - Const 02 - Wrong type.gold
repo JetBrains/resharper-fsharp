@@ -1,14 +1,15 @@
-﻿let _: int = Class.IntConst
-let _: string = Class.StringConst
+﻿|let _: int = Class.IntConst
+|(0)let _: string = Class.StringConst
 
 match 1 with
-| |Class.IntConst|(0) -> ()
+| |Class.IntConst|(1) -> ()
 | _ -> ()
 
 match "" with
-| |Class.StringConst|(1) -> ()
+| |Class.StringConst|(2) -> ()
 | _ -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(0): ReSharper Warning: The declarations in this file will be placed in an implicit module 'Field - Const 02 - Wrong type' based on the file name 'Field - Const 02 - Wrong type.fs'. However this is not a valid F# identifier, so the contents will not be accessible from other files. Consider renaming the file or adding a 'module' or 'namespace' declaration at the top of the file.
 (1): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(2): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern

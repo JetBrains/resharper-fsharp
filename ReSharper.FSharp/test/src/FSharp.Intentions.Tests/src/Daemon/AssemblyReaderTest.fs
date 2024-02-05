@@ -90,7 +90,7 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
             let sourceFile = projectFile.ToSourceFiles().Single()
 
             let daemon = {
-                new TestHighlightingDumper(sourceFile, writer, stages, fun highlighting sourceFile settingsStore ->
+                new TestHighlightingDumper(sourceFile, writer, fun highlighting sourceFile settingsStore ->
                   let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
                   severity = Severity.WARNING || severity = Severity.ERROR)
                 with

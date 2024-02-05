@@ -4,7 +4,7 @@ Class1.add_Event(fun (|_: System.EventArgs|(0)) -> ())
 Class1.add_Event(VoidDelegate(ignore))
 
 Class2.add_Event(fun (|_: System.EventArgs|(1)) -> ())
-Class2.add_Event(VoidDelegate(ignore)
+Class2.add_Event|(|(2)VoidDelegate(ignore)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: This expression was expected to have type
@@ -15,3 +15,4 @@ but here has type
     'unit'    
 but here has type
     'System.EventArgs'    
+(2): ReSharper Underlined Error Highlighting: Unmatched '('

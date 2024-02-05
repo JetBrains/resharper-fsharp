@@ -26,7 +26,7 @@ type CSharpResolveTestBase(fileExtension) =
             let sourceFile = projectFile.ToSourceFiles().Single()
             let psiFile = sourceFile.GetPrimaryPsiFile()
 
-            let daemon = TestHighlightingDumper(sourceFile, writer, null, Func<_,_,_,_>(x.ShouldHighlight))
+            let daemon = TestHighlightingDumper(sourceFile, writer, Func<_,_,_,_>(x.ShouldHighlight))
             daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
             daemon.Dump()
 
