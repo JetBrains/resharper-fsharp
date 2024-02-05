@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -33,10 +33,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
-    public IDeclaredType GetBaseClassType() =>
-      GetSuperClass() is { } baseClass
-        ? TypeFactory.CreateType(baseClass)
-        : null;
+    public IDeclaredType GetBaseClassType()
+    {
+      var type = GetDeclaration()?.TypeName?.Reference.ResolveType();
+      return type.IsClassType() ? type : null;
+    }
 
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.ObjectExpression;
@@ -83,38 +84,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public IEnumerable<IDeclaredType> GetSuperTypes() =>
-      GetSuperTypeElements().Select(TypeFactory.CreateType);
+      GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
 
-    public IEnumerable<ITypeElement> GetSuperTypeElements()
-    {
-      var objExpr = GetDeclaration();
-      if (objExpr == null)
-        return EmptyList<ITypeElement>.Instance;
+    public IEnumerable<ITypeElement> GetSuperTypeElements() =>
+      GetSuperTypes().SelectNotNull(type => type.GetTypeElement());
 
-      var result = new List<ITypeElement>();
-
-      if (objExpr.TypeName?.Reference.Resolve().DeclaredElement is ITypeElement superClassOrInterface)
-        result.Add(superClassOrInterface);
-
-      foreach (var interfaceImplementation in objExpr.InterfaceImplementations)
-        if (interfaceImplementation.TypeName?.Reference.Resolve().DeclaredElement is ITypeElement additionalInterface)
-          result.Add(additionalInterface);
-
-      return result;
-    }
-
-    public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
+    public MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.MAY_EQUALS_OVERRIDE; // todo: calculate member flags
 
     public IClass GetSuperClass() =>
-      GetSuperTypeElement() as IClass;
-
-    private ITypeElement GetSuperTypeElement()
-    {
-      var objExpr = GetDeclaration();
-      var reference = objExpr?.TypeName.Reference;
-      var resolveResult = reference?.Resolve();
-
-      return resolveResult?.DeclaredElement as ITypeElement;
-    }
+      GetBaseClassType()?.GetTypeElement() as IClass;
   }
 }

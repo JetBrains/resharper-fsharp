@@ -1,34 +1,57 @@
-## ShowUsagesProvider activity:
-  Async context menu shown `Usages of 'FSharpValueOption<T>'`:
-    TO: [O] | |ValueSome| _ -> () RANGE: (68,77) @ Union 03 - Compiled struct.fs
-    Menu item (enabled) :
-      icon: UsagePatternChecking
-      text: Module      <font color="FFD5A286">| **ValueSome** _ -> ()</font><font color="06C"> (6)</font>
-      tail: <font color="FF6D6D6D">in <Root Namespace></font>
-      tooltip: | **ValueSome** _ -> ()
-    Navigation result:
-      opened file: Union 03 - Compiled struct.fs
-      ------------------
+﻿## ShowUsagesProvider activity:
+  Multiple candidates execution (2):
+    Candidate:
+      Menu item (enabled) :
+        icon: u(PsiSymbolTypicalSizePlaceholder,Struct,ModifiersPublic)
+        text: FSharpValueOption<T>
+    Candidate execution:
+      Async context menu shown `Usages of 'FSharpValueOption<T>'`:
+        TO: [O] | |ValueSome| _ -> () RANGE: (68,77) @ Union 03 - Compiled struct.fs
+        Menu item (enabled) :
+          icon: UsagePatternChecking
+          text: Module      <font color="FFD5A286">| **ValueSome** _ -> ()</font><font color="06C"> (6)</font>
+          tail: <font color="FF6D6D6D">in <Root Namespace></font>
+          tooltip: | **ValueSome** _ -> ()
+        Navigation result:
+          opened file: Union 03 - Compiled struct.fs
+          ------------------
 
-      match ValueNone with
-      | |CARET|ValueSome _ -> ()
+          match ValueNone with
+          | |CARET|ValueSome _ -> ()
 
-      ------------------
+          ------------------
 
-    TO: [R] match |ValueNone| with RANGE: (51,60) @ Union 03 - Compiled struct.fs
-    Menu item (enabled) :
-      icon: UsageRead
-      text: Module      <font color="FFD5A286">match **ValueNone** with</font><font color="06C"> (5)</font>
-      tail: <font color="FF6D6D6D">in <Root Namespace></font>
-      tooltip: match **ValueNone** with
-    Navigation result:
-      opened file: Union 03 - Compiled struct.fs
-      ------------------
-      type intOption = int voption
+        TO: [R] match |ValueNone| with RANGE: (51,60) @ Union 03 - Compiled struct.fs
+        Menu item (enabled) :
+          icon: UsageRead
+          text: Module      <font color="FFD5A286">match **ValueNone** with</font><font color="06C"> (5)</font>
+          tail: <font color="FF6D6D6D">in <Root Namespace></font>
+          tooltip: match **ValueNone** with
+        Navigation result:
+          opened file: Union 03 - Compiled struct.fs
+          ------------------
+          type intOption = int voption
 
-      match |CARET|ValueNone with
-      | ValueSome _ -> ()
+          match |CARET|ValueNone with
+          | ValueSome _ -> ()
 
-      ------------------
+          ------------------
+
+    Candidate:
+      Menu item (enabled) :
+        icon: u(PsiSymbolTypicalSizePlaceholder,Struct,ModifiersPublic)
+        text: FSharpValueOption<int>
+    Candidate execution:
+      Immediate result:
+        TO: [R] match |ValueNone| with RANGE: (51,60) @ Union 03 - Compiled struct.fs
+        Navigation result:
+          opened file: Union 03 - Compiled struct.fs
+          ------------------
+          type intOption = int voption
+
+          match |CARET|ValueNone with
+          | ValueSome _ -> ()
+
+          ------------------
 
 

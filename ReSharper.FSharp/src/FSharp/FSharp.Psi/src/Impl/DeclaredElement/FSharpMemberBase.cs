@@ -3,7 +3,6 @@ using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -94,11 +93,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (mfv == null)
           return EmptyList<IExplicitImplementation>.Instance;
 
-        if (GetDeclaration() is IMemberDeclaration member && ObjExprNavigator.GetByMember(member) != null)
-          return mfv.DeclaringEntity?.Value is { } entity && entity.GetTypeElement(Module) is { } typeElement
-            ? new IExplicitImplementation[]
-              {new ExplicitImplementation(this, TypeFactory.CreateType(typeElement), ShortName, true)}
-            : EmptyList<IExplicitImplementation>.InstanceList;
+        var typeName = GetObjectExpressionMemberDeclaringTypeName(GetDeclaration() as IOverridableMemberDeclaration);
+        if (typeName?.Reference.ResolveType() is { } declaringType)
+          return new IExplicitImplementation[] { new ExplicitImplementation(this, declaringType, ShortName, true) };
 
         var implementations = mfv.ImplementedAbstractSignatures;
         if (implementations.IsNullOrEmpty())
@@ -111,6 +108,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
         return result.ResultingList();
       }
+    }
+
+    [CanBeNull]
+    private static ITypeReferenceName GetObjectExpressionMemberDeclaringTypeName([CanBeNull] IOverridableMemberDeclaration memberDecl)
+    {
+      if (ObjExprNavigator.GetByMemberDeclaration(memberDecl) is { } objExpr)
+        return objExpr.TypeName;
+
+      if (InterfaceImplementationNavigator.GetByTypeMember(memberDecl) is { } interfaceImpl &&
+          ObjExprNavigator.GetByInterfaceImplementation(interfaceImpl) != null)
+        return interfaceImpl.TypeName;
+
+      return null;
     }
 
     public override bool IsOverride =>
