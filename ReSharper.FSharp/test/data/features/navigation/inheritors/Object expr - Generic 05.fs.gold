@@ -1,0 +1,14 @@
+﻿## GotoInheritorsProvider activity:
+  Immediate result:
+    [*] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Generic 05.fs
+    Navigation result:
+      opened file: Object expr - Generic 05.fs
+      ------------------
+          let i =
+              { new I<_> with
+                  member _.|CARET|M x = ()
+              }
+
+      ------------------
+
+

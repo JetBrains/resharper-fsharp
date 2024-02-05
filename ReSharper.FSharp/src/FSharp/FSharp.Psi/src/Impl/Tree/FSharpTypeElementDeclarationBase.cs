@@ -19,13 +19,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IEnumerable<IDeclaredType> SuperTypes => GetFcsSymbol() is FSharpEntity entity
+    public virtual IEnumerable<IDeclaredType> SuperTypes => GetFcsSymbol() is FSharpEntity entity
       ? entity.GetSuperTypes(TypeParameters, GetPsiModule())
       : EmptyList<IDeclaredType>.Instance;
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IDeclaredType BaseClassType => GetFcsSymbol() is FSharpEntity entity
+    public virtual IDeclaredType BaseClassType => GetFcsSymbol() is FSharpEntity entity
       ? entity.MapBaseType(TypeParameters, GetPsiModule())
       : null;
 
