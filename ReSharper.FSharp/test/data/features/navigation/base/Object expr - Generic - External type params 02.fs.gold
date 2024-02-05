@@ -1,0 +1,13 @@
+﻿## NavigateToBaseProvider activity:
+  Immediate result:
+    DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Generic - External type params 02.fs
+    Navigation result:
+      opened file: Object expr - Generic - External type params 02.fs
+      ------------------
+      type I<'T1> =
+          abstract |CARET|M: 'T1 -> unit
+
+      type T<'T2>() =
+      ------------------
+
+
