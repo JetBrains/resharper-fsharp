@@ -82,12 +82,12 @@ type ScriptPsiModulesTest() =
 
 [<SolutionInstanceComponent>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
-type MyTestSolutionToolset(lifetime: Lifetime, settings, logger: ILogger) =
+type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger) =
     inherit DefaultSolutionToolset(lifetime, settings, logger)
 
     let changed = new Signal<_>("MySolutionToolset::Changed")
 
-    let cli = DotNetCoreInstallationsDetector.DetectSdkInstallations(InteractionContext.SolutionContext).FirstOrDefault().NotNull()
+    let cli = dotNetCoreInstallationsDetector.DetectSdkInstallations(InteractionContext.SolutionContext).FirstOrDefault().NotNull()
     let dotnetCoreToolset = DotNetCoreToolset(cli, cli.Sdks.FirstOrDefault().NotNull())
 
     let env = BuildToolEnvironment.Create(dotnetCoreToolset, null)
