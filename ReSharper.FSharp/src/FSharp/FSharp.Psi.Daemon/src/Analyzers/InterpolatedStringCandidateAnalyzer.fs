@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
+open FSharp.Compiler.Symbols
 open FSharp.Compiler.Text
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -16,18 +17,15 @@ open JetBrains.Util
 module InterpolatedStringCandidateAnalyzer =
     let formatSpecifiersKey = Key<(range * int)[]>("FormatSpecifiersKey")
 
-[<ElementProblemAnalyzer([| typeof<IPrefixAppExpr> |],
+[<ElementProblemAnalyzer([| typeof<ILiteralExpr> |],
                          HighlightingTypes = [| typeof<InterpolatedStringCandidateWarning> |])>]
 type InterpolatedStringCandidateAnalyzer() =
-    inherit ElementProblemAnalyzer<IPrefixAppExpr>()
+    inherit ElementProblemAnalyzer<ILiteralExpr>()
 
     let getFormatSpecifierLocationsAndArity (checkResults: FSharpParseAndCheckResults) (data: ElementProblemAnalyzerData) =
-        match data.GetData(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey) with
-        | null ->
-            let specifiers = checkResults.CheckResults.GetFormatSpecifierLocationsAndArity()
-            data.PutData(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey, specifiers)
-            specifiers
-        | data -> data
+        data.GetOrCreateDataUnderLock(InterpolatedStringCandidateAnalyzer.formatSpecifiersKey, fun _ ->
+            checkResults.CheckResults.GetFormatSpecifierLocationsAndArity()
+        )
 
     let isDisallowedStringLiteral (literalExpr: ILiteralExpr) =
         let tokenType = getTokenType literalExpr.Literal
@@ -37,13 +35,13 @@ type InterpolatedStringCandidateAnalyzer() =
         tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING ||
         tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING
 
-    override x.Run(prefixAppExpr, data, consumer) =
+    override x.Run(literalExpr, data, consumer) =
         if not data.IsFSharp50Supported || (data.FSharpCoreVersion.Major < 5 && not Shell.Instance.IsTestShell) then () else
 
-        let formatStringExpr = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().As<ILiteralExpr>()
-        if isNull formatStringExpr then () else
+        let prefixAppExpr = PrefixAppExprNavigator.GetByArgumentExpression(literalExpr.IgnoreParentParens())
+        if isNull prefixAppExpr then () else
 
-        let tokenType = getTokenType formatStringExpr.Literal
+        let tokenType = getTokenType literalExpr.Literal
         if tokenType != FSharpTokenType.STRING &&
            tokenType != FSharpTokenType.TRIPLE_QUOTED_STRING &&
            tokenType != FSharpTokenType.VERBATIM_STRING then () else
@@ -62,12 +60,22 @@ type InterpolatedStringCandidateAnalyzer() =
                 let textRange = getTextRange document r
                 DocumentRange(document, textRange), arity)
             |> Seq.filter (fun (range, _) -> argRange.Contains(range))
+            |> Seq.distinct
             |> List.ofSeq
 
         if matchingFormatSpecsAndArity.IsEmpty then () else
 
         // Interpolated strings only support 1-arity format specifiers
         if matchingFormatSpecsAndArity |> List.exists (fun (_, arity) -> arity <> 1) then () else
+
+        let funReference = prefixAppExpr.InvokedFunctionReference
+        if isNull funReference then () else
+
+        let mfv = funReference.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
+        if isNull mfv then () else
+
+        let parameterGroups = mfv.CurriedParameterGroups
+        if prefixAppExpr.AppliedExpressions.Count <> parameterGroups.Count then () else
 
         // Find the outermost IPrefixAppExpr and all applied exprs (excluding the format string itself)
         let outerPrefixAppExpr, appliedExprs =
@@ -82,6 +90,7 @@ type InterpolatedStringCandidateAnalyzer() =
                 match PrefixAppExprNavigator.GetByFunctionExpression (expr.IgnoreParentParens()) with
                 | null -> expr.IgnoreParentParens(), acc
                 | parent -> loop (getArgExpr parent.ArgumentExpression :: acc) parent
+
             loop [] prefixAppExpr
 
         if appliedExprs.Length <> matchingFormatSpecsAndArity.Length then () else
@@ -108,5 +117,5 @@ type InterpolatedStringCandidateAnalyzer() =
             |> Seq.map (fun ((r, _), expr) -> r, expr)
             |> List.ofSeq
 
-        InterpolatedStringCandidateWarning(formatStringExpr, prefixAppExpr, outerPrefixAppExpr, formatSpecsAndExprs)
+        InterpolatedStringCandidateWarning(literalExpr, prefixAppExpr, outerPrefixAppExpr, formatSpecsAndExprs)
         |> consumer.AddHighlighting

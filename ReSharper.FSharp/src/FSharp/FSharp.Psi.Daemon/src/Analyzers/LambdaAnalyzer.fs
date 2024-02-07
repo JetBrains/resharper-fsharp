@@ -122,6 +122,8 @@ type LambdaAnalyzer() =
         exprType <> lambdaReturnType
 
     let isLambdaArgOwnerSupported (lambda: IFSharpExpression) delegatesConversionSupported (replacementExprSymbol: FSharpSymbol voption) =
+        isNull (QuoteExprNavigator.GetByQuotedExpression(lambda.IgnoreParentParens())) &&
+
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
         let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
         let argExpr = argExpr.IgnoreParentParens()
@@ -204,6 +206,10 @@ type LambdaAnalyzer() =
                 |> Seq.exists (fun x -> x.IsOptionalArg)
             if hasOptionalArg then null else ctor arg
         | _ -> ctor arg
+
+    let tryCreateWarningForBuiltInFun ctor (lambda: ILambdaExpr, funName: string as arg) isFSharp6Supported =
+        if not (resolvesToPredefinedFunction lambda.RArrow funName "LambdaAnalyzer") then null else
+        tryCreateWarning ctor arg isFSharp6Supported
 
     let rec containsForcedCalculations (expression: IFSharpExpression) =
         let mutable containsForcedCalculations = false
@@ -336,15 +342,15 @@ type LambdaAnalyzer() =
                     if isFunctionInApp expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
-                        tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFSharp60Supported :> _
+                        tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFSharp60Supported :> _
                 else
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
                         if compareArg tuplePats[0] expr then
-                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFSharp60Supported :> _
+                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFSharp60Supported :> _
                         elif compareArg tuplePats[1] expr then
-                            tryCreateWarning LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFSharp60Supported :> _
+                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFSharp60Supported :> _
                         else null
                     | :? ILocalReferencePat as pat when isFSharp80Supported ->
                         let referenceExpr = getRootRefExprIfCanBeConvertedToDotLambda pat lambda

@@ -1,0 +1,7 @@
+// ${COMPLETE_ITEM:match}
+module Module
+
+type T() =
+    new () = 
+      match 1 with
+      | {caret}

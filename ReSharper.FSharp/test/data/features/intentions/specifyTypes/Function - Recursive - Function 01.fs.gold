@@ -1,6 +1,6 @@
 ﻿module Module
 
-let rec f{caret} (a: int): unit =
+let rec f{caret} (a: int) : unit =
     ignore<int> a
 
 and g b = ()

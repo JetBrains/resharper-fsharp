@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 let _ = printfn ""
 let _ = printfn "|%s|(0) |%s|(1)"

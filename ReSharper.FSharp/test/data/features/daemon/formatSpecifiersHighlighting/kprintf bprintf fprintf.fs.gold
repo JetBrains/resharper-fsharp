@@ -1,4 +1,4 @@
-﻿module Module
+module Module
 
 let _ = fprintf null "|%A|(0)" 0
 let _ = Microsoft.FSharp.Core.Printf.fprintf null "|%A|(1)" 0

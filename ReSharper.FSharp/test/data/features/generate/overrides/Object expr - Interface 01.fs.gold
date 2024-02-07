@@ -1,0 +1,10 @@
+Provided elements:
+ 0: Dispose():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:Dispose():System.Void}
+
+open System
+
+{ new IDisposable with 
+  override this.Dispose() = {selstart}failwith "todo"{selend} }

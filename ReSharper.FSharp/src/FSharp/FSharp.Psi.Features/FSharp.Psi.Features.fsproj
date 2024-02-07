@@ -42,6 +42,7 @@
     <Compile Include="src\CodeCompletion\Rules\ImportRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\GenerateMatchExprPatternsRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\NamedUnionCaseFieldsPatRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\LocalValuesRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpScriptReferenceCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
@@ -113,6 +114,7 @@
     <Compile Include="src\AI\FSharpLanguageOrTechnologyChatContextProvider.fs" />
     <Compile Include="src\AI\ZoneMarker.fs" />
     <Compile Include="src\AI\FSharpDocGenSupportProvider.fs" />
+    <Compile Include="src\AI\FSharpFileSummarizer.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

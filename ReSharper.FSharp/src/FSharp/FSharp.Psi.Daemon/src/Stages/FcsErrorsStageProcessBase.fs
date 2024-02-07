@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 #nowarn "57"
@@ -369,7 +370,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 error
         
         | NoImplementationGiven ->
-            let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
                 NoImplementationGivenInTypeError(typeDecl, error.Message) :> _
@@ -382,10 +383,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
                 NoImplementationGivenInInterfaceError(impl, error.Message) :> _
 
+            | _ ->
+                
+            match node with
+            | :? IObjExpr as objExpr -> NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
             | _ -> createGenericHighlighting error range
 
         | NoImplementationGivenWithSuggestion ->
-            let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
                 NoImplementationGivenInTypeWithSuggestionError(typeDecl, error.Message) :> _
@@ -398,6 +403,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
                 NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _
 
+            | _ ->
+
+            match node with
+            | :? IObjExpr as objExpr -> NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
             | _ -> createGenericHighlighting error range
 
         | MemberIsNotAccessible ->

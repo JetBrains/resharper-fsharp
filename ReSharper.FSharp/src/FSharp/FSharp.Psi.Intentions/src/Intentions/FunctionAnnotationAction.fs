@@ -1,21 +1,17 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Symbols
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Util
 
 module SpecifyTypes =
     let specifyBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -46,8 +42,7 @@ module SpecifyTypes =
 
         let returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage))
 
-        let settingsStore = anchor.GetSettingsStoreWithEditorConfig()
-        if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
+        if parameters.Count > 0 then
             ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
 
     let private addParens (factory: IFSharpElementFactory) (pattern: IFSharpPattern) =

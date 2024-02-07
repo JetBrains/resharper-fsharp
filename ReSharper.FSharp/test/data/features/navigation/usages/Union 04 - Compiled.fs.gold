@@ -1,0 +1,42 @@
+## ShowUsagesProvider activity:
+  Async context menu shown `Usages of 'FSharpResult<T,TError>'`:
+    TO: [O] let err = |Error| 1 RANGE: (54,59) @ Union 04 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module.err<a>      <font color="FFD5A286">let err = **Error** 1</font><font color="06C"> (5)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let err = **Error** 1
+    Navigation result:
+      opened file: Union 04 - Compiled.fs
+      ------------------
+
+      let ok: Result<_, _> = Ok 1
+      let err = |CARET|Error 1
+
+      ------------------
+
+    TO: [O] let ok: Result<_, _> = |Ok| 1 RANGE: (39,41) @ Union 04 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module.ok<a>      <font color="FFD5A286">let ok: Result<_, _> = **Ok** 1</font><font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let ok: Result<_, _> = **Ok** 1
+    Navigation result:
+      opened file: Union 04 - Compiled.fs
+      ------------------
+
+
+      let ok: Result<_, _> = |CARET|Ok 1
+      let err = Error 1
+
+      ------------------
+
+    TO: [O] let ok: |Result|<_, _> = Ok 1 RANGE: (24,30) @ Union 04 - Compiled.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module.ok<a>      <font color="FFD5A286">let ok: **Result**<_, _> = Ok 1</font><font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let ok: **Result**<_, _> = Ok 1
+    Navigation result:
+      caret did not move
+

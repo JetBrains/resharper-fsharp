@@ -1,0 +1,8 @@
+module Module
+
+seq {
+    sprintf |"%d"|(0) 1
+} |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string

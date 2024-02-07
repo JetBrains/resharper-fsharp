@@ -1,4 +1,4 @@
-﻿## GotoDeclarationProvider activity:
+## GotoDeclarationProvider activity:
   Immediate result:
     TO: [O] member x.|Prop| = 3 RANGE: (39,43) @ Dot lambda 01.fs
     Navigation result:

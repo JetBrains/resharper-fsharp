@@ -37,20 +37,20 @@ type FSharpStringProblemAnalyzer() =
         | FSharpLiteralType.InterpolatedStringMiddle
         | FSharpLiteralType.InterpolatedStringEnd -> RegularInterpolatedStringMiddleEndLexer(buffer) :> _
 
-        | FSharpLiteralType.RawInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, getDollarCount literalToken)
-        | FSharpLiteralType.RawInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, getDollarCount literalToken) :> _
-        | FSharpLiteralType.RawInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, getDollarCount literalToken)
-        | FSharpLiteralType.RawInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, getDollarCount literalToken) :> _
+        | FSharpLiteralType.RawInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, getDollarCount literalToken, false)
+        | FSharpLiteralType.RawInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, getDollarCount literalToken, false)
+        | FSharpLiteralType.RawInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, getDollarCount literalToken, false)
+        | FSharpLiteralType.RawInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, getDollarCount literalToken, false)
 
         | FSharpLiteralType.VerbatimInterpolatedString
         | FSharpLiteralType.VerbatimInterpolatedStringStart -> VerbatimInterpolatedStringLexer(buffer) :> _
         | FSharpLiteralType.VerbatimInterpolatedStringMiddle
         | FSharpLiteralType.VerbatimInterpolatedStringEnd -> VerbatimInterpolatedStringMiddleEndLexer(buffer) :> _
 
-        | FSharpLiteralType.TripleQuoteInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, 1) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, 1) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, 1) :> _
-        | FSharpLiteralType.TripleQuoteInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, 1) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedString -> TripleQuoteInterpolatedStringLexer(buffer, 1, true) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringStart -> TripleQuoteInterpolatedStringStartLexer(buffer, 1, true) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringMiddle -> TripleQuoteInterpolatedStringMiddleLexer(buffer, 1, true) :> _
+        | FSharpLiteralType.TripleQuoteInterpolatedStringEnd -> TripleQuoteInterpolatedStringEndLexer(buffer, 1, true) :> _
 
     let getCachedLexer (literalToken: FSharpString) =
         let isValid = literalToken.IsValid()

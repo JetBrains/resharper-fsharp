@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -101,6 +103,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       result.Add(new FSharpUnionCaseIsCaseProperty(unionCase));
       result.Add(new FSharpUnionCaseTag(unionCase));
+
+      return result;
+    }
+
+    public static IEnumerable<IDeclaredElement> GetCompiledUnionCaseGeneratedMembers(
+      [NotNull] ITypeElement typeElement, string caseName)
+    {
+      var result = new List<IDeclaredElement>();
+
+      result.AddRange(typeElement.EnumerateMembers(caseName, true));
+      result.AddRange(typeElement.EnumerateMembers("Is" + caseName, true).Where(member => member is IProperty));
+      result.AddRange(typeElement.EnumerateMembers("New" + caseName, true).Where(member => member is IMethod));
+
+      if (typeElement.NestedTypes.FirstOrDefault(element => element.ShortName == "Tags") is IClass tagsClass)
+        result.AddRange(tagsClass.EnumerateMembers(caseName, true));
+
+      if (typeElement.NestedTypes.FirstOrDefault(element => element.ShortName == caseName) is IClass caseClass)
+        result.Add(caseClass);
 
       return result;
     }

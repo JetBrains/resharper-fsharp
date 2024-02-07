@@ -349,8 +349,7 @@
     <Parameter type="string list" name="fieldQualifiedName" isValid="skip"/>
     <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Range>outerBinding.EqualsToken.GetHighlightingRange()</Range>
-    <SecondaryRanges>outerBinding.Expression.IgnoreInnerParens() |> getBracketsRange</SecondaryRanges>
+    <Range>getNestedRecordUpdateRange outerBinding innerBinding</Range>
     <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>
   </Warning>
 </Errors>

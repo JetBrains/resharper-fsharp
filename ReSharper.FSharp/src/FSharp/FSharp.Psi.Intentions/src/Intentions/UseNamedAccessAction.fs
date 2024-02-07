@@ -24,6 +24,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     override x.IsAvailable _ =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>()
         if isNull pattern then false else
+
         // We expect a single IParenPat here
         if pattern.Parameters.Count <> 1 then false else
         let parenPat = pattern.ParametersEnumerable.SingleItem.As<IParenPat>()
@@ -85,9 +86,10 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
         
         match namedPattern with
         | :? IParametersOwnerPat as ownerPat ->
-            assert (ownerPat.Parameters.Count = 1)
+            let parameters = ownerPat.Parameters
+            assert (parameters.Count = 1)
 
-            match ownerPat.Parameters.[0] with
+            match parameters[0] with
             | :? INamedUnionCaseFieldsPat as namedUnionCaseFieldsPat ->
                 for name, pat in usedFieldsWithPatterns do
                     let fieldPat =
@@ -98,7 +100,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
                     | None -> ()
                     | Some fieldPat -> ModificationUtil.ReplaceChild(fieldPat.Pattern, pat) |> ignore
 
-                ModificationUtil.ReplaceChild(pattern.Parameters.[0], namedUnionCaseFieldsPat)
+                ModificationUtil.ReplaceChild(pattern.Parameters[0], namedUnionCaseFieldsPat)
                 |> ignore
             | _ -> ()
         | _ -> ()

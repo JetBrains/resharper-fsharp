@@ -7,6 +7,7 @@ ignore <| fun x -> (x.ToString())
 ignore <| fun x -> (x.ToString())
 ignore <| fun x -> x.Prop[0]
 ignore <| fun x -> x.Prop.[0]
+ignore <| <@ fun x -> fun y -> y.ToString() @>
 [1] |> (fun x -> x.ToString(fun x -> x.ToString())) |> ignore
 [1] |> (fun x -> x.Equals(let x = 5 in x)) |> ignore
 type A1 = member _.M() = fun x -> x.ToString()
@@ -26,6 +27,8 @@ ignore <| fun x -> (x.ToString)()
 [1] |> (fun x -> x.[0]) |> ignore
 ignore <| fun x -> x.ToString()[0]
 ignore <| fun (x, y) -> x.ToString()
+ignore <| <@ fun x -> x.ToString() @>
+ignore <| <@@ fun x -> x.ToString() @@>
 [1] |> (fun x -> x.Select(_.ToString())) |> ignore 
 [1] |> _.Select(fun x -> x.ToString()) |> ignore
 (fun _ -> fun x -> x.ToString()) |> ignore

@@ -13,6 +13,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</AssemblyName>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup>
     <JetNonProductAssembly>true</JetNonProductAssembly>

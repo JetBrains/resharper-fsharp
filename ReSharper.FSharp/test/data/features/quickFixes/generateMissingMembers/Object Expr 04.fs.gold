@@ -1,0 +1,8 @@
+module Module
+
+[<AbstractClass>]
+type T() =
+    abstract M: unit -> string
+
+{ new T() with 
+  override this.M() = {selstart}failwith "todo"{selend} }

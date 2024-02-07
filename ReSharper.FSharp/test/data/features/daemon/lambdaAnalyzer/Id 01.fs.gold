@@ -1,8 +1,10 @@
 ﻿|fun x -> x|(0)
 |fun (x, y) -> (x, y)|(1)
 |fun struct(a, b) -> struct(a, b)|(2)
+<@ fun y -> (|fun x -> x|(3)) @>
 
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'id'
 (1): ReSharper Hint: Lambda can be replaced with 'id'
 (2): ReSharper Hint: Lambda can be replaced with 'id'
+(3): ReSharper Hint: Lambda can be replaced with 'id'

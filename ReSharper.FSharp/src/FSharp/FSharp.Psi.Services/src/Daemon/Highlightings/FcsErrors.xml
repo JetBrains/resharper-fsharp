@@ -328,7 +328,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInTypeWithSuggestion" ID="FS0366: No implementation given">
-    <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
+    <Parameter type="IFSharpTypeElementDeclaration" name="typeDecl"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>

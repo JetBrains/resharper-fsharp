@@ -1,0 +1,274 @@
+## ShowUsagesProvider activity:
+  Async context menu shown `Usages of 'U'`:
+    TO: [O] |U| a = U.A; RANGE: (70,71) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageLocalVariableDeclaration
+      text: Class1.Class1      **<font color="FFD5A286">U** a = U.A;</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: **U** a = U.A;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        public Class1()
+        {
+          |CARET|U a = U.A;
+          U.B b = (U.B)U.NewB(123);
+
+      ------------------
+
+    TO: [R] U a = U.|A|; RANGE: (78,79) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">U a = U.**A**;</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U a = U.**A**;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        public Class1()
+        {
+          U a = U.|CARET|A;
+          U.B b = (U.B)U.NewB(123);
+
+      ------------------
+
+    TO: [O] U a = |U|.A; RANGE: (76,77) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageStaticClassMemberAccess
+      text: Class1.Class1      <font color="FFD5A286">U a = **U**.A;</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U a = **U**.A;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        public Class1()
+        {
+          U a = |CARET|U.A;
+          U.B b = (U.B)U.NewB(123);
+
+      ------------------
+
+    TO: [I] U.B b = (U.B)U.|NewB|(123); RANGE: (100,104) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageInvocation
+      text: Class1.Class1      <font color="FFD5A286">U.B b = (U.B)U.**NewB**(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U.B b = (U.B)U.**NewB**(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          U.B b = (U.B)U.|CARET|NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] U.|B| b = (U.B)U.NewB(123); RANGE: (87,88) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageLocalVariableDeclaration
+      text: Class1.Class1      <font color="FFD5A286">U.**B** b = (U.B)U.NewB(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U.**B** b = (U.B)U.NewB(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          U.|CARET|B b = (U.B)U.NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] |U|.B b = (U.B)U.NewB(123); RANGE: (85,86) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageNestedClassAccess
+      text: Class1.Class1      **<font color="FFD5A286">U**.B b = (U.B)U.NewB(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: **U**.B b = (U.B)U.NewB(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          |CARET|U.B b = (U.B)U.NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] U.B b = (|U|.B)U.NewB(123); RANGE: (94,95) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageNestedClassAccess
+      text: Class1.Class1      <font color="FFD5A286">U.B b = (**U**.B)U.NewB(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U.B b = (**U**.B)U.NewB(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          U.B b = (|CARET|U.B)U.NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] U.B b = (U.B)|U|.NewB(123); RANGE: (98,99) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageStaticClassMemberAccess
+      text: Class1.Class1      <font color="FFD5A286">U.B b = (U.B)**U**.NewB(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U.B b = (U.B)**U**.NewB(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          U.B b = (U.B)|CARET|U.NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] U.B b = (U.|B|)U.NewB(123); RANGE: (96,97) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageTypeConversions
+      text: Class1.Class1      <font color="FFD5A286">U.B b = (U.**B**)U.NewB(123);</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: U.B b = (U.**B**)U.NewB(123);
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+        {
+          U a = U.A;
+          U.B b = (U.|CARET|B)U.NewB(123);
+
+          var isA = a.IsA;
+      ------------------
+
+    TO: [O] var aTag = |U|.Tags.A; RANGE: (170,171) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageNestedClassAccess
+      text: Class1.Class1      <font color="FFD5A286">var aTag = **U**.Tags.A;</font><font color="06C"> (13)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var aTag = **U**.Tags.A;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+          var isB = b.IsB;
+
+          var aTag = |CARET|U.Tags.A;
+          var bTag = U.Tags.B;
+        }
+      ------------------
+
+    TO: [R] var aTag = U.Tags.|A|; RANGE: (177,178) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var aTag = U.Tags.**A**;</font><font color="06C"> (13)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var aTag = U.Tags.**A**;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+          var isB = b.IsB;
+
+          var aTag = U.Tags.|CARET|A;
+          var bTag = U.Tags.B;
+        }
+      ------------------
+
+    TO: [O] var bTag = |U|.Tags.B; RANGE: (195,196) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageNestedClassAccess
+      text: Class1.Class1      <font color="FFD5A286">var bTag = **U**.Tags.B;</font><font color="06C"> (14)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var bTag = **U**.Tags.B;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+
+          var aTag = U.Tags.A;
+          var bTag = |CARET|U.Tags.B;
+        }
+      }
+      ------------------
+
+    TO: [R] var bTag = U.Tags.|B|; RANGE: (202,203) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var bTag = U.Tags.**B**;</font><font color="06C"> (14)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var bTag = U.Tags.**B**;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+
+          var aTag = U.Tags.A;
+          var bTag = U.Tags.|CARET|B;
+        }
+      }
+      ------------------
+
+    TO: [R] var isA = a.|IsA|; RANGE: (128,131) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var isA = a.**IsA**;</font><font color="06C"> (10)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var isA = a.**IsA**;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+          U.B b = (U.B)U.NewB(123);
+
+          var isA = a.|CARET|IsA;
+          var isB = b.IsB;
+
+      ------------------
+
+    TO: [R] var isB = b.|IsB|; RANGE: (149,152) @ Union 01.cs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Class1.Class1      <font color="FFD5A286">var isB = b.**IsB**;</font><font color="06C"> (11)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: var isB = b.**IsB**;
+    Navigation result:
+      opened file: Union 01.cs
+      ------------------
+
+          var isA = a.IsA;
+          var isB = b.|CARET|IsB;
+
+          var aTag = U.Tags.A;
+      ------------------
+
+    TO: [O] | |B| _ -> () RANGE: (63,64) @ Union 01.fs
+    Menu item (enabled) :
+      icon: UsagePatternChecking
+      text: Module      <font color="FFD5A286">| **B** _ -> ()</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: | **B** _ -> ()
+    Navigation result:
+      opened file: Union 01.fs
+      ------------------
+
+      match A with
+      | |CARET|B _ -> ()
+
+      ------------------
+
+    TO: [O] match |A| with RANGE: (54,55) @ Union 01.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module      <font color="FFD5A286">match **A** with</font><font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: match **A** with
+    Navigation result:
+      opened file: Union 01.fs
+      ------------------
+          | B of int
+
+      match |CARET|A with
+      | B _ -> ()
+
+      ------------------
+
+

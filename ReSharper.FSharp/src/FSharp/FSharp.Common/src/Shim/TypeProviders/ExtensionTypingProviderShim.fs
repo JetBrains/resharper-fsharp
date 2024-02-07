@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
+namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
 open System
 open FSharp.Compiler
