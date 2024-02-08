@@ -30,7 +30,6 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     }
   }
 
-  @Mute("RIDER-103648")
   @Test
   fun checkCachesWhenProjectReloading() {
     checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
