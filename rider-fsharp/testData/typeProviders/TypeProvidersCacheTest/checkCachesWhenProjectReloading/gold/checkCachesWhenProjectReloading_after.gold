@@ -125,6 +125,7 @@ dce00951-82ce-4a47-a91c-b8046aea6ae8(TypeProviderLibrary)-B9287C3D[.NETStandard,
 [Out-Process dump]:
 
 Type Providers:
+36 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
 35 ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
 34 SwaggerProvider.SwaggerTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 33 SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
@@ -133,7 +134,6 @@ Type Providers:
 30 FSharp.Management.PowerShellProvider.PowerShellProvider, FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 29 FSharp.Management.NamespaceProvider+StringReaderProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 28 FSharp.Management.NamespaceProvider+SystemTimeZonesProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-36 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
 27 FSharp.Management.NamespaceProvider+RelativeFileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 26 FSharp.Management.NamespaceProvider+FileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 25 FSharp.Management.NamespaceProvider+RegistrySystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
@@ -237,8 +237,8 @@ System.Threading.Tasks.Task`1[Microsoft.FSharp.Core.Unit] tps: 33 (from netstand
 System.Threading.Tasks.Task`1[System.Object] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.Threading.Tasks.Task`1[System.String] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.TimeSpan tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.ValueType tps: 32|33|35 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.ValueType tps: 27 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+System.ValueType tps: 32|33|35 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.Void tps: 35|36 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 T tps: 32|35 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 TResult tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
