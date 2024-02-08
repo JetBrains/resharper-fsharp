@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
-using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using ClientRdFakeTcImports = JetBrains.Rider.FSharp.TypeProviders.Protocol.Client.RdFakeTcImports;
 using ClientRdFakeDllInfo = JetBrains.Rider.FSharp.TypeProviders.Protocol.Client.RdFakeDllInfo;
@@ -45,12 +44,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       public bool SystemRuntimeContainsType(string _) => true; // todo: smart implementation
     }
 
-    record FakeSystemRuntimeContainsTypeRef(RdFakeTcImports fakeTcImports)
-    {
-      public FSharpFunc<string, bool> Value =>
-        new FakeTcImportsClosure(new FakeTcImports(fakeTcImports.DllInfos, fakeTcImports.Base));
-    }
-
     private sealed class FakeTcImportsClosure : FSharpFunc<string, bool>
     {
       private readonly FakeTcImports tcImports;
@@ -58,16 +51,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       public FakeTcImportsClosure(FakeTcImports tcImports) => this.tcImports = tcImports;
 
       public override bool Invoke(string x) => tcImports.SystemRuntimeContainsType(x);
-    }
-
-    private sealed class SystemRuntimeContainsTypeRefClosure : FSharpFunc<string, bool>
-    {
-      private readonly FakeSystemRuntimeContainsTypeRef systemRuntimeContainsTypeRef;
-
-      public SystemRuntimeContainsTypeRefClosure(FakeSystemRuntimeContainsTypeRef systemRuntimeContainsTypeRef) =>
-        this.systemRuntimeContainsTypeRef = systemRuntimeContainsTypeRef;
-
-      public override bool Invoke(string x) => systemRuntimeContainsTypeRef.Value.Invoke(x);
     }
 
 
@@ -80,8 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         .Select(dllInfo => new ClientRdFakeDllInfo(dllInfo.GetProperty("FileName") as string))
         .ToArray();
 
-      var tcImports =
-        runtimeContainsType.GetField("systemRuntimeContainsTypeRef").GetProperty("Value").GetField("tcImports");
+      var tcImports = runtimeContainsType.GetField("tcImports");
 
       var tcImportsDllInfos = getDllInfos(tcImports);
       var baseTcImports = tcImports.GetProperty("Base").GetProperty("Value");
@@ -92,6 +74,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     }
 
     public static FSharpFunc<string, bool> InjectFakeTcImports(RdFakeTcImports fakeTcImports) =>
-      new SystemRuntimeContainsTypeRefClosure(new FakeSystemRuntimeContainsTypeRef(fakeTcImports));
+      new FakeTcImportsClosure(new FakeTcImports(fakeTcImports.DllInfos, fakeTcImports.Base));
   }
 }
