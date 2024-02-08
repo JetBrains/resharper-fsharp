@@ -158,7 +158,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
         // currently ProjectTemplates.Sdk.Net6 should be used in LATEST_STABLE tests
-        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net6.FSharp.classLibrary)
+        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net6.FSharp.classLibrary, targetFramework = "netstandard2.1")
       }
       dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
