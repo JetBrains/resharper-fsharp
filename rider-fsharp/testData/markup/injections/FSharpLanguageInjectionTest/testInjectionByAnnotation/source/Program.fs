@@ -107,7 +107,7 @@ type C() =
                  """
 
     [<LanguageInjection(InjectedLanguage.XML)>]
-    member x.XmlField6 = $$"""<tag1><tag2 attr=""{1} {{s1}}""/></tag1>"""
+    member x.XmlField6 = $$"""<tag1><tag2 attr1="{1}" attr2="{{s1}}"/></tag1>"""
 
 
     member x.Foo0([<StringSyntax("css")>] _arg) = x.Foo0(".my-awesome-class {}")
