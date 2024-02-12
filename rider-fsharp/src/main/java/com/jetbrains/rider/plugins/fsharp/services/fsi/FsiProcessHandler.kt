@@ -28,7 +28,7 @@ class FsiProcessHandler(
 
   override fun isSilentlyDestroyOnClose(): Boolean = true
 
-  private val channel = Channel<Pair<String, Key<*>>>(1).also {
+  private val channel = Channel<Pair<String, Key<*>>>(0).also {
     lifetime.onTermination { it.close() }
     lifetime.launchOnUi {
       it.consumeEach { (text, outputType) ->
