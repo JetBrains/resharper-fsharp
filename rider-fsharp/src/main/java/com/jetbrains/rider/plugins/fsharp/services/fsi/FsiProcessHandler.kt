@@ -2,7 +2,6 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.execution.process.ProcessOutputType
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.rd.util.launchOnUi
