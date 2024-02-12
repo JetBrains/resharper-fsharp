@@ -15,4 +15,4 @@ type A() =
 type T() =
     inherit A()
 
-    override this.P = {selstart}failwith "todo"{selend}
+    override this.P = {selstart}base.P{selend}

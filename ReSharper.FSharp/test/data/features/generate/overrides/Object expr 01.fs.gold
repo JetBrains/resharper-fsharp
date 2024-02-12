@@ -8,4 +8,4 @@ Provided elements:
 // ${SELECT0:ToString():System.String}
 
 { new obj() with 
-  override this.ToString() = {selstart}failwith "todo"{selend} }
+  override this.ToString() = {selstart}base.ToString(){selend} }

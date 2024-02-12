@@ -14,5 +14,5 @@ type C() =
     // comment
     let f = 23
 
-    override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}base.ToString(){selend}
   end

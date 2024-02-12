@@ -1,4 +1,4 @@
-Provided elements:
+﻿Provided elements:
  0: Equals(System.Object):System.Boolean
  1: GetHashCode():System.Int32
  2: ToString():System.String
@@ -9,6 +9,6 @@ Provided elements:
 
 type T =
   struct
-    override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}base.ToString(){selend}
   end
   

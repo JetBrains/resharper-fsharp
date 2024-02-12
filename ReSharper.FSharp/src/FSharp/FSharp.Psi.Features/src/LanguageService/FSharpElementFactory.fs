@@ -101,6 +101,23 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let exprStatement = getExpressionStatement source
         exprStatement.AttributeLists[0]
 
+    let setParamDecls isAccessor (paramDecls: TreeNodeCollection<IParametersPatternDeclaration>) (parameters: List<IParametersPatternDeclaration>) =
+        let maySkipParens = isAccessor || paramDecls.Count <> 1  
+        for i, (realArg, fakeArg) in Seq.zip parameters paramDecls |> Seq.indexed do
+            let parenPat = realArg.Pattern.As<IParenPat>()
+            if maySkipParens && isNotNull parenPat then
+                match parenPat.Pattern with
+                | :? IReferencePat as refPat ->
+                    replaceWithCopy parenPat refPat
+                | _ -> ()
+
+            let param = ModificationUtil.ReplaceChild(fakeArg, realArg)
+            if i = 0 && not (isWhitespace param.PrevSibling) then
+                match param.Pattern with
+                | :? IUnitPat
+                | :? IParenPat -> ()
+                | _ -> ModificationUtil.AddChildBefore(param, Whitespace()) |> ignore
+
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -188,13 +205,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let source = $"let {patternText} = ()"
             getModuleMember source :?> ILetBindingsDeclaration
 
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, preferNoParens, displayContext) =
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
             let printParam (name, fcsType: FSharpType) =
                 let name = PrettyNaming.NormalizeIdentifierBackticks name
                 if not addTypes then name else
 
                 let fcsType = fcsType.Format(displayContext)
-                sprintf "%s: %s" name fcsType
+                $"{name}: {fcsType}" 
 
             let parametersSource =
                 curriedParameterNames
@@ -203,10 +220,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                         paramNames
                         |> List.map printParam
                         |> String.concat (if isSpaceAfterComma then ", " else ",") 
-
-                    match preferNoParens, paramNames with
-                    | true, [_] -> concatenatedNames
-                    | _ -> $"({concatenatedNames})")
+                    $"({concatenatedNames})"
+                )
                 |> String.concat " "
 
             let memberBinding = createMemberDecl "P" List.empty parametersSource true
@@ -215,9 +230,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl name typeParameters parsedParams false
+            
+            // Force chameleon opening before the change
+            memberDecl.Expression |> ignore
 
-            for realArg, fakeArg in Seq.zip parameters memberDecl.ParametersDeclarations do
-                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+            setParamDecls false memberDecl.ParametersDeclarations parameters
             memberDecl
 
         member x.CreatePropertyWithAccessor(name, accessorName, parameters) =
@@ -226,10 +243,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let memberSource = $"member this.{name} with {accessorName} {parametersString} = failwith \"todo\""
             let typeDecl = getTypeDecl memberSource
             let memberDecl = typeDecl.TypeMembers[0] :?> IMemberDeclaration
+            let accessorDecl = memberDecl.AccessorDeclarations[0]
 
-            for realArg, fakeArg in Seq.zip parameters memberDecl.AccessorDeclarations[0].ParametersDeclarations do
-                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+            // Force chameleon opening before the change
+            accessorDecl.Expression |> ignore
 
+            setParamDecls true accessorDecl.ParametersDeclarations parameters
             memberDecl
         
         member x.CreateConstExpr(text) =
