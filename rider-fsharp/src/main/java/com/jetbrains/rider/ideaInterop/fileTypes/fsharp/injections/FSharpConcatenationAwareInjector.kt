@@ -4,25 +4,24 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.getDollarsCount
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
+import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageStringLiteralExpression
 import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageConcatenationAwareInjector
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
 
 class FSharpConcatenationAwareInjector :
   ClrLanguageConcatenationAwareInjector(FSharpInjectionSupport.FSHARP_SUPPORT_ID) {
-  override fun getInjectionProcessor(injection: BaseInjection) = FSharpInjectionProcessor(injection)
+  override fun getInjectionProcessor(injection: BaseInjection,
+                                     host: ClrLanguageStringLiteralExpression): InjectionProcessor = FSharpInjectionProcessor(injection, host)
   override fun isInjectionHost(concatenationOperand: PsiElement) = concatenationOperand is FSharpStringLiteralExpression
 
-  protected class FSharpInjectionProcessor(injection: BaseInjection) :
+  private class FSharpInjectionProcessor(injection: BaseInjection, host: ClrLanguageStringLiteralExpression) :
     InjectionProcessor(
       injection,
       mapOf(SLASH_NEWLINE to "\\\\\\n", PLACEHOLDER_IDENTIFIER to "\\{\\d+}"),
-      mapOf(SLASH_NEWLINE to "\\\\\\n")
+      mapOf(SLASH_NEWLINE to "\\\\\\n", PLACEHOLDER_IDENTIFIER to createInterpolatedStringFormattingPlaceholderRegex(host))
     ) {
 
     override fun getFragmentStartAfterTemplate(matchResult: MatchResult) =
@@ -76,6 +75,27 @@ class FSharpConcatenationAwareInjector :
 
     companion object {
       const val SLASH_NEWLINE = "slashNewLine"
+
+      private fun createInterpolatedStringFormattingPlaceholderRegex(host: ClrLanguageStringLiteralExpression): String {
+        if (host !is FSharpStringLiteralExpression) {
+          // language=RegExp
+          return "\\{\\d+}"
+        }
+
+        if (host.literalType !in rawStringTypes) {
+          // language=RegExp
+          return "\\{\\{\\d+}}"
+        }
+
+        // language=RegExp
+        return "\\{\\d+}"
+      }
+
+      private val rawStringTypes = listOf(
+        FSharpStringLiteralType.TripleQuoteString,
+        FSharpStringLiteralType.TripleQuoteInterpolatedString,
+        FSharpStringLiteralType.RawInterpolatedString
+      )
     }
   }
 }
