@@ -47,7 +47,7 @@ let isApplicableMethod (binding: IBinding) =
     isNotNull method && RunMarkerUtil.IsSuitableStaticMethod(method)
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderBackendFeatureZone>)>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpRunMarkerProvider() =
     interface IRunMarkerProvider with
         member this.CollectRunMarkers(file, settings, consumer) =
