@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.execution.console.LanguageConsoleImpl
-import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.execution.impl.ConsoleViewUtil
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.editor.ex.util.EditorUtil
@@ -16,16 +15,6 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
 
   private val fSharpSyntaxHighlighter = FSharpSyntaxHighlighter()
 
-  private fun textOffsets(text: String): Pair<Int, Int> {
-    (fsiRunner.consoleView as ConsoleViewImpl).flushDeferredText()
-
-    val historyEditor = fsiRunner.consoleView.historyViewer
-    val startOffset = historyEditor.document.textLength
-    val endOffset = startOffset + text.length
-
-    return Pair(startOffset, endOffset)
-  }
-
   private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType): IconWithTooltip? {
     if (nextOutputTextIsFirst) {
       when (outputType) {
@@ -38,6 +27,7 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
   }
 
   fun printInputText(text: String, outputType: ConsoleViewContentType) {
+    ThreadingAssertions.assertEventDispatchThread()
     printText(text + "\n", FsiIcons.COMMAND_MARKER, fSharpSyntaxHighlighter, outputType)
     EditorUtil.scrollToTheEnd(fsiRunner.consoleView.historyViewer)
 
@@ -67,14 +57,6 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
     text: String, iconWithTooltip: IconWithTooltip?, highlighter: FSharpSyntaxHighlighter?,
     outputType: ConsoleViewContentType
   ) {
-    var startOffset: Int? = null
-    var endOffset: Int? = null
-    if (iconWithTooltip != null) {
-      val (startOffset1, endOffset1) = textOffsets(text)
-      startOffset = startOffset1
-      endOffset = endOffset1
-    }
-
     if (highlighter == null) {
       fsiRunner.consoleView.print(text, outputType)
     } else {
@@ -84,8 +66,10 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
     if (iconWithTooltip == null) return
 
     (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
+    val endOffset = fsiRunner.consoleView.historyViewer.document.textLength
+    val startOffset = endOffset - text.length
     fsiRunner.consoleView.historyViewer.markupModel.addRangeHighlighter(
-      startOffset!!, endOffset!!, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
+      startOffset, endOffset, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
     ).apply { gutterIconRenderer = FsiConsoleIndicatorRenderer(iconWithTooltip) }
   }
 
