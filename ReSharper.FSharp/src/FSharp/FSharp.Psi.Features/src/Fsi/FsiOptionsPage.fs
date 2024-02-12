@@ -145,7 +145,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
 
 [<ShellComponent>]
-[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderBackendFeatureZone>)>]
 type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"
 
