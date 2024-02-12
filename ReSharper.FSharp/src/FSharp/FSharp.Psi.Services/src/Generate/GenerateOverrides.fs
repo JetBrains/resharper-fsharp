@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate.GenerateOverrides
 
 open System.Collections.Generic
+open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
@@ -19,6 +20,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
@@ -105,7 +107,7 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
 
     let paramGroups =
         if not generateParameters then [] else
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, isPropertyAccessor, displayContext)
+        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
 
     let memberDeclaration =
         if isPropertyAccessor && generateParameters then
@@ -113,6 +115,33 @@ let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGen
             factory.CreatePropertyWithAccessor(memberName, accessorName, paramGroups)
         else
             factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
+
+    let shouldCallBase (element: IFSharpGeneratorElement) =
+        let fsGeneratorElement = element.As<FSharpGeneratorElement>()
+        isNotNull fsGeneratorElement &&
+
+        let overridableMember = fsGeneratorElement.DeclaredElement.As<IOverridableMember>()
+        not overridableMember.IsAbstract &&
+
+        (not (overridableMember :? IAccessor) || not generateParameters)
+
+    if shouldCallBase element then
+        let args =
+            if argNames.IsEmpty || not generateParameters then "" else
+
+            argNames
+            |> List.mapi (fun i paramNames ->
+                match paramNames, i with
+                | [head, _], 0 -> $" {head}"
+                | [head, _], _ -> head
+                | _ ->
+                    let names = paramNames |> List.map fst |> String.concat ", "
+                    $"({names})"
+            )
+            |> String.concat " "
+
+        let expr = factory.CreateExpr($"base.{memberName}{args}")
+        ModificationUtil.ReplaceChild(memberDeclaration.Expression, expr) |> ignore
 
     if element.IsOverride then
         memberDeclaration.SetOverride(true)

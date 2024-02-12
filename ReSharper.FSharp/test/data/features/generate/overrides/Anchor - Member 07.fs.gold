@@ -11,5 +11,5 @@ type T() =
     member x.P1 =
         1  //
 
-    override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}base.ToString(){selend}
     member x.P2 = 1

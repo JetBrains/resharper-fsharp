@@ -16,4 +16,4 @@ type T() =
     inherit A<int>()
 
     override this.P = 1
-    override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}base.ToString(){selend}
