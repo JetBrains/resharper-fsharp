@@ -8,6 +8,6 @@
 // ${SELECT0:ToString():System.String}
 
 type A() =
-  override this.ToString() = {selstart}failwith "todo"{selend} // some comment
+  override this.ToString() = {selstart}base.ToString(){selend} // some comment
 
   

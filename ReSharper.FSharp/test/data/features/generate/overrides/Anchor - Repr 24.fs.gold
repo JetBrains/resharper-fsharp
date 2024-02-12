@@ -13,6 +13,6 @@ type T() =
   class
     do ()
 
-    override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}base.ToString(){selend}
     member this.P = 1
   end
