@@ -266,65 +266,68 @@ let canHaveOverrides (typeElement: ITypeElement) =
 let getTestDescriptor (overridableMember: ITypeMember) =
     GeneratorElementBase.GetTestDescriptor(overridableMember, overridableMember.IdSubstitution)
 
-let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missingMembersOnly : FSharpGeneratorElement seq =
-    if isNull typeDeclaration then [] else
+let private getMemberDescriptors missingMembersOnly (typeElement: ITypeElement) =
+    if isNull typeElement then Seq.empty else
 
-    let typeElement = typeDeclaration.DeclaredElement
-    if not (canHaveOverrides typeElement) then [] else
+    typeElement.GetMembers()
+    |> Seq.collect (fun typeMember ->
+        if typeMember :? IFSharpGeneratedElement then Seq.empty else
+        if not missingMembersOnly then Seq.singleton typeMember else
 
-    let psiModule = typeElement.Module
+        match typeMember with
+        | :? IProperty as prop -> prop.GetAllAccessors() |> Seq.cast
+        | _ -> [typeMember]
+    )
+    |> Seq.map getTestDescriptor
 
-    let fcsSymbol, fcsSymbolUse =
-        match typeDeclaration with
-        | :? IObjExpr as objExpr ->
-            let reference = objExpr.TypeName.Reference
-            reference.GetFcsSymbol(), reference.GetSymbolUse()
-        | _ -> typeDeclaration.GetFcsSymbol(), typeDeclaration.GetFcsSymbolUse()
+let private getOverridableMemberIds typeElement (fcsEntity: FSharpEntity) psiModule =
+    let typeElement = if isNull typeElement then fcsEntity.GetTypeElement(psiModule) else typeElement
 
-    if isNull fcsSymbol then [] else
+    GenerateUtil.GetOverridableMembersOrder(typeElement, false)
+    |> Seq.map (fun i -> i.Member.XMLDocId, i)
 
-    let fcsEntity = fcsSymbol.As<FSharpEntity>()
-    if isNull fcsEntity then [] else
+let private getFcsEntity (fcsSymbolUse: FSharpSymbolUse) =
+    match fcsSymbolUse.Symbol with
+    | :? FSharpEntity as fcsEntity -> fcsEntity
+    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity
+    | _ -> Unchecked.defaultof<_>
 
-    let displayContext = fcsSymbolUse.DisplayContext
+let private getFcsTypeArgs (fcsEntity: FSharpEntity) (fcsSymbolUse: FSharpSymbolUse) =
+    let fcsEntityTypeArgs = fcsEntity.GenericArguments
+    if fcsEntityTypeArgs.Count <> 0 then
+        (fcsEntity.GenericParameters, fcsEntityTypeArgs) ||> Seq.zip
+    else
+        fcsSymbolUse.GenericArguments
+    |> List.ofSeq
 
-    let rec getBaseTypes includeThis (fcsEntity: FSharpEntity) =
-        let rec loop acc (fcsType: FSharpType) =
-            let fcsEntityInstance = FcsEntityInstance.create fcsType
-            let acc = if isNotNull fcsEntityInstance then fcsEntityInstance :: acc else acc
+let rec private getBaseTypes includeThis (fcsEntity: FSharpEntity) (fcsSymbolUse: FSharpSymbolUse) =
+    let rec loop acc (fcsType: FSharpType) =
+        let fcsEntityInstance = FcsEntityInstance.create fcsType
+        let acc = if isNotNull fcsEntityInstance then fcsEntityInstance :: acc else acc
 
-            match fcsType.BaseType with
-            | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
-            | _ -> List.rev acc
-
-        let acc =
-            if not includeThis then [] else
-
-            [FcsEntityInstance.create (fcsEntity.AsType())]
-
-        match fcsEntity.BaseType with
+        match fcsType.BaseType with
         | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
-        | _ -> acc
+        | _ -> List.rev acc
 
-    let ownMembersDescriptors =
-        typeElement.GetMembers()
-        |> Seq.collect (fun typeMember ->
-            if typeMember :? IFSharpGeneratedElement then Seq.empty else
-            if not missingMembersOnly then Seq.singleton typeMember else
+    let acc =
+        if not includeThis then [] else
 
-            match typeMember with
-            | :? IProperty as prop -> prop.GetAllAccessors() |> Seq.cast
-            | _ -> [typeMember])
-        |> Seq.map getTestDescriptor
-        |> HashSet
+        let fcsTypeArgs = getFcsTypeArgs fcsEntity fcsSymbolUse
+        let t = fcsEntity.AsType().Instantiate(fcsTypeArgs)
+        [FcsEntityInstance.create t]
 
-    let memberInstances =
-        GenerateUtil.GetOverridableMembersOrder(typeElement, false)
-        |> Seq.map (fun i -> i.Member.XMLDocId, i)
-        |> dict
+    match fcsEntity.BaseType with
+    | Some baseType when baseType.HasTypeDefinition -> loop acc baseType
+    | _ -> acc
 
-    let isObjExpr = typeDeclaration :? IObjExpr
-    let baseFcsTypes = getBaseTypes isObjExpr fcsEntity
+let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSharpSymbolUse) missingMembersOnly isObjExpr (psiModule: IPsiModule) =
+    let displayContext = fcsSymbolUse.DisplayContext
+    let fcsEntity = getFcsEntity fcsSymbolUse
+
+    let ownMembersDescriptors = getMemberDescriptors missingMembersOnly typeElement |> HashSet
+    let memberInstances = getOverridableMemberIds typeElement fcsEntity psiModule |> dict
+
+    let baseFcsTypes = getBaseTypes isObjExpr fcsEntity fcsSymbolUse
 
     let baseFcsMembers =
         baseFcsTypes |> List.map (fun fcsEntityInstance ->
@@ -332,7 +335,8 @@ let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missi
                 fcsEntityInstance.Entity.MembersFunctionsAndValues
                 |> Seq.map (fun mfv -> FcsMfvInstance.create mfv displayContext fcsEntityInstance.Substitution)
                 |> Seq.toList
-            fcsEntityInstance, mfvInstances)
+            fcsEntityInstance, mfvInstances
+        )
 
     let alreadyOverriden = Dictionary<OverridableMemberInstance, PropertyOverrideState>()
 
@@ -414,3 +418,34 @@ let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missi
     |> Seq.filter (fun i -> not (ownMembersDescriptors.Contains(i.TestDescriptor)))
     |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
+
+let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missingMembersOnly : FSharpGeneratorElement seq =
+    if isNull typeDeclaration then [] else
+
+    let typeElement = typeDeclaration.DeclaredElement
+    if not (canHaveOverrides typeElement) then [] else
+
+    let psiModule = typeElement.Module
+
+    let fcsSymbol, fcsSymbolUse =
+        match typeDeclaration with
+        | :? IObjExpr as objExpr ->
+            let reference = objExpr.TypeName.Reference
+            reference.GetFcsSymbol(), reference.GetSymbolUse()
+        | _ -> typeDeclaration.GetFcsSymbol(), typeDeclaration.GetFcsSymbolUse()
+
+    if isNull fcsSymbol then [] else
+
+    let isObjExpr = typeDeclaration :? IObjExpr
+    getOverridableMembersForType typeElement fcsSymbolUse missingMembersOnly isObjExpr psiModule
+
+let addMembers inputElements typeDecl indent anchor =
+    let lastNode =
+        inputElements
+        |> Seq.cast
+        |> Seq.map (generateMember typeDecl indent)
+        |> Seq.collect (withNewLineAndIndentBefore indent)
+        |> addNodesAfter anchor
+
+    addSpaceAfterIfNeeded lastNode
+    lastNode

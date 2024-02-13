@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       if (symbol is FSharpMemberOrFunctionOrValue mfv)
       {
-        if (mfv.IsConstructor) return mfv.DeclaringEntity?.Value;
+        if (mfv.IsConstructor) return mfv.ApparentEnclosingEntity;
         if (mfv.LiteralValue != null) return mfv;
       }
 

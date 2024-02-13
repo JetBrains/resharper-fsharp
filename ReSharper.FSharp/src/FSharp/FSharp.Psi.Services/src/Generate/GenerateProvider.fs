@@ -154,7 +154,10 @@ type FSharpOverridingMembersBuilder() =
         reindentRange 0 (TreeRange(typeDecl.TypeRepresentation.NextSibling, typeDecl.LastChild))
 
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
-        isNotNull context.TypeDeclaration && isNotNull context.TypeDeclaration.DeclaredElement
+        let typeDecl = context.TypeDeclaration
+        typeDecl :? IObjExpr ||
+
+        isNotNull typeDecl && isNotNull typeDecl.DeclaredElement
 
     override x.Process(context: FSharpGeneratorContext, _: IProgressIndicator) =
         use writeCookie = WriteLockCookie.Create(true)
@@ -275,12 +278,31 @@ type FSharpOverridingMembersBuilder() =
 
             | :? IObjExpr as objExpr ->
                 if isNull objExpr.WithKeyword then
-                    addNodesAfter objExpr.TypeName [
+                    let node: ITreeNode =
+                        match objExpr.ArgExpression with
+                        | null -> objExpr.TypeName
+                        | argExpr -> argExpr
+                    addNodesAfter node [
                         Whitespace()
                         FSharpTokenType.WITH.CreateLeafElement()
                     ] |> ignore
-            
-                objExpr.WithKeyword, objExpr.GetIndentSize()
+
+                let memberDeclarations = objExpr.MemberDeclarations
+
+                let indent =
+                    memberDeclarations
+                    |> Seq.tryHead
+                    |> Option.map (fun memberDecl -> memberDecl.Indent)
+                    |> Option.defaultWith (fun _ -> objExpr.Indent + objExpr.GetIndentSize())
+
+                let anchor: ITreeNode =
+                    objExpr.InterfaceImplementationsEnumerable
+                    |> Seq.cast
+                    |> Seq.tryLast
+                    |> Option.orElseWith (fun _ -> memberDeclarations |> Seq.cast |> Seq.tryHead)
+                    |> Option.defaultWith (fun _ -> objExpr.WithKeyword)
+
+                anchor, indent
 
             | typeDecl -> failwith $"Unexpected typeDecl: {typeDecl}"
 
@@ -296,7 +318,6 @@ type FSharpOverridingMembersBuilder() =
                 anchor
 
         let anchor = GenerateOverrides.addEmptyLineBeforeIfNeeded anchor
-
         let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
 
         let inputElements =
@@ -315,15 +336,7 @@ type FSharpOverridingMembersBuilder() =
                   if isNotNull prop.Setter && mfv.HasSetterMethod then
                       FSharpGeneratorElement(prop.Setter, { e.MfvInstance with Mfv = mfv.SetterMethod }, e.AddTypes) ])
 
-        let lastNode =
-            inputElements
-            |> Seq.cast
-            |> Seq.map (GenerateOverrides.generateMember typeDecl indent)
-            |> Seq.collect (withNewLineAndIndentBefore indent)
-            |> addNodesAfter anchor
-
-        GenerateOverrides.addSpaceAfterIfNeeded lastNode
-
+        let lastNode = GenerateOverrides.addMembers inputElements typeDecl indent anchor
         let nodes = anchor.RightSiblings()
         let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
         context.SetSelectedRange(selectedRange)

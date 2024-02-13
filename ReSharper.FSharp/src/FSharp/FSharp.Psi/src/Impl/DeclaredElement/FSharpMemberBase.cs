@@ -125,7 +125,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsOverride =>
       GetDeclaration() is { } decl &&
-      (decl.IsOverride || InterfaceImplementationNavigator.GetByTypeMember(decl as IMemberDeclaration) != null);
+      (decl.IsOverride || GetObjectExpressionMemberDeclaringTypeName(decl as IOverridableMemberDeclaration) != null);
 
     public override bool IsAbstract =>
       GetDeclaration() is IAbstractMemberDeclaration { HasDefaultImplementation: false };
