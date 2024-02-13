@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:with}
+module Module
+
+{ new System.IDisposable with
+  override this.Dispose() = failwith "todo"{caret} }
