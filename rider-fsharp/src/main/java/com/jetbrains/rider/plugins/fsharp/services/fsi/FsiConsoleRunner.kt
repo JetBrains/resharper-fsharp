@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.util.lifetime
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
@@ -280,7 +281,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
   }
 
   override fun createProcessHandler(process: Process): OSProcessHandler {
-    val fsiProcessHandler = FsiProcessHandler(fsiInputOutputProcessor, process, cmdLine.commandLineString)
+    val fsiProcessHandler = FsiProcessHandler(fsiHost.project.lifetime, fsiInputOutputProcessor, process, cmdLine.commandLineString)
 
     val sandboxInfoUpdater = FsiSandboxInfoUpdater(fsiHost.project, consoleView.consoleEditor, commandHistory)
     fsiProcessHandler.addSandboxInfoUpdater(sandboxInfoUpdater)
