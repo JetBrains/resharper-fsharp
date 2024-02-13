@@ -63,7 +63,7 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Nested interface 03 - Partially base implemented``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
+[<FSharpTest; AssertCorrectTreeStructure>]
 type GenerateMissingMembersFixTest() =
     inherit FSharpQuickFixTestBase<GenerateMissingOverridesFix>()
 
@@ -77,10 +77,12 @@ type GenerateMissingMembersFixTest() =
 
     [<Test>] member x.``Default impl 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Object Expr - Generic 01``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 02``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 03``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 04``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
 

@@ -14,6 +14,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Core;
 
@@ -57,9 +58,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (element == null)
         return ResolveResultWithInfo.Ignore;
 
-      if (element is ITypeElement typeElement && GetSymbolUse() is { GenericArguments: var inst } && !inst.IsEmpty)
+      if (element is ITypeElement typeElement && GetFcsSymbol() is FSharpEntity { GenericArguments: var inst } && !inst.IsEmpty())
       {
-        var types = inst.Select(tuple => tuple.Item2.MapType(myOwner)).ToList();
+        var types = inst.Select(fcsTypeArg => fcsTypeArg.MapType(myOwner)).ToList();
         var substitution = typeElement.IdSubstitution.Extend(typeElement.TypeParameters, types);
 
         var resolveResult = new SimpleResolveResultWithSubstitution(element, substitution);
