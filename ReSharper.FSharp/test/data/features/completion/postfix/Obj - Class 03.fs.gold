@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:with}
+module Module
+
+{ new obj() with }{caret}
