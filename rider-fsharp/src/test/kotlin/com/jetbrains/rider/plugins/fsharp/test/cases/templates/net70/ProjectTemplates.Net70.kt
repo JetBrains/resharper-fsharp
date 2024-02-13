@@ -15,8 +15,6 @@ import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK )
 object Net70 {
   class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.classLibrary) {
-    override val expectedNumOfAnalyzedFiles: Int = 1
-    override val expectedNumOfSkippedFiles: Int = 0
     override val targetFramework: String = "net7.0"
     override val buildFilesIgnoreList: Set<Regex> = setOf(
       Regex("ClassLibrary/bin/Debug/net7\\.0/ClassLibrary\\.deps\\.json"),
@@ -28,8 +26,6 @@ object Net70 {
   }
 
   class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.consoleApplication) {
-    override val expectedNumOfAnalyzedFiles: Int = 3
-    override val expectedNumOfSkippedFiles: Int = 0
     override val breakpointLine: Int = 2
     override val expectedOutput: String = "Hello from F#"
     override val debugFileName: String = "Program.fs"
@@ -46,8 +42,6 @@ object Net70 {
   }
 
   class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase(ProjectTemplates.Sdk.Net7.FSharp.xUnit) {
-    override val expectedNumOfAnalyzedFiles: Int = 1
-    override val expectedNumOfSkippedFiles: Int = 0
     override val sessionElements: Int = 3
     override val debugFileName: String = "Tests.fs"
     override val breakpointLine: Int = 8
