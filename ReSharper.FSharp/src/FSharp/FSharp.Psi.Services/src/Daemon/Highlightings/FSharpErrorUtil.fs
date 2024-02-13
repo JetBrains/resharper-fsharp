@@ -133,12 +133,9 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     | _ -> "Lambda can be simplified"
 
 let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
-    let last =
-        match interfaceImpl.WithKeyword with
-        | null -> interfaceImpl.TypeName :> ITreeNode
-        | withKeyword -> withKeyword :> ITreeNode
-
-    getTreeNodesDocumentRange interfaceImpl.InterfaceKeyword last
+    match interfaceImpl.NameIdentifier with
+    | null -> interfaceImpl.GetNavigationRange()
+    | identifier -> identifier.GetNavigationRange()
 
 let getSecondBindingKeyword (bindings: ILetBindings) =
     let bindings = bindings.Bindings

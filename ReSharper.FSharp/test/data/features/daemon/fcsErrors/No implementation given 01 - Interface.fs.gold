@@ -5,13 +5,13 @@ type I =
     abstract P2: int
 
 type T1() =
-    |interface I|(0)
+    interface |I|(0)
 
 type T2() =
-    |interface I with|(1)
+    interface |I|(1) with
 
 type T3() =
-    |interface I with|(2)
+    interface |I|(2) with
         member x.P1 = 1
 
 ---------------------------------------------------------

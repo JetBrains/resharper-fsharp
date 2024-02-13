@@ -5,4 +5,4 @@ type I<'T> =
   abstract M: double -> unit
 
 type T() =
-  interface I<int>{caret}
+  interface I{caret}<int>
