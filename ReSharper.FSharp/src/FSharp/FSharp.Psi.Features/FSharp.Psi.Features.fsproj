@@ -88,6 +88,7 @@
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\NewRecordPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\MatchPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\ForPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\WithPostfixTemplate.fs" />

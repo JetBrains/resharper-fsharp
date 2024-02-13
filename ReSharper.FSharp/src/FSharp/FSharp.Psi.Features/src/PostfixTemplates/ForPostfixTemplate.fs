@@ -4,11 +4,8 @@ open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Threading
-open JetBrains.DocumentModel
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
-open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
@@ -100,7 +97,7 @@ type ForPostfixTemplate() =
         fcsType.IsGenericParameter && Seq.isEmpty fcsType.AllInterfaces
 
     let isApplicable (expr: IFSharpExpression) =
-        if not (FSharpPostfixTemplates.canBecomeStatement expr) then false else
+        if not (FSharpPostfixTemplates.canBecomeStatement true expr) then false else
 
         let wholeExpr =
             expr
@@ -189,18 +186,6 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             forEachExpr.SetPattern(pat) |> ignore
         ) |> ignore
 
-        let showHotspots (hotspotsRegistry: HotspotsRegistry) endOffset =
-            let hotspotInfos = hotspotsRegistry.CreateHotspots();
-            if hotspotInfos.Length > 0 then () else
-
-            let liveTemplatesManager = hotspotsRegistry.PsiServices.GetComponent<LiveTemplatesManager>()
-
-            let hotspotSession = liveTemplatesManager.CreateHotspotSessionAtopExistingText(
-                hotspotsRegistry.PsiServices.Solution, DocumentRange(&endOffset), textControl,
-                LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
-
-            hotspotSession.ExecuteAndForget()
-
         let createHotspots () =
             use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, id)
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
@@ -213,7 +198,7 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             ModificationUtil.DeleteChild(forEachExpr.DoExpression)
 
             // do after transaction
-            fun () -> showHotspots hotspotsRegistry endOffset
+            fun () -> FSharpPostfixTemplates.showHotspots textControl hotspotsRegistry endOffset
 
 
         match fcsType with
@@ -256,5 +241,5 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
                     hotspotsRegistry, endOffset
                 | _ -> failwith id
 
-            showHotspots hotspotsRegistry endOffset
+            FSharpPostfixTemplates.showHotspots textControl hotspotsRegistry endOffset
         )

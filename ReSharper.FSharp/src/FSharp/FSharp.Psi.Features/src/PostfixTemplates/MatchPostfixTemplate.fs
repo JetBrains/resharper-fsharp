@@ -23,7 +23,7 @@ type MatchPostfixTemplate() =
 
     override this.IsApplicable(node) =
         let expr = node.As<IFSharpExpression>()
-        FSharpPostfixTemplates.canBecomeStatement expr
+        FSharpPostfixTemplates.canBecomeStatement true expr
 
     override this.IsEnabled _ = true
 

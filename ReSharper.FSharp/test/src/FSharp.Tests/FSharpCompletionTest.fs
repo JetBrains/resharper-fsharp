@@ -340,6 +340,8 @@ type FSharpPostfixCompletionTest() =
     [<Test>] member x.``Match - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Tuple 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``New 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not available - Let - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Match 01``() = x.DoNamedTest()
