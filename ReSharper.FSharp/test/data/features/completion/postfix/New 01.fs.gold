@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:new}
+module Module
+
+type R = { F1: int; F2: int; F3: int }
+
+{ F1 = failwith "todo"
+  F2 = failwith "todo"
+  F3 = failwith "todo" }{caret}

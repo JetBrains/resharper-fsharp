@@ -645,12 +645,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => typeElement.HasAttributeInstance(FSharpPredefinedType.AutoOpenAttrTypeName, false)
       };
 
-    public static bool IsRecord([NotNull] this ITypeElement typeElement) =>
+    public static bool IsRecord([CanBeNull] this ITypeElement typeElement) =>
       typeElement switch
       {
         IFSharpTypeElement fsTypeElement => (fsTypeElement.GetPart<IRecordPart>() != null),
         ICompiledElement compiledElement when compiledElement.Module.IsFSharpAssembly() =>
-        (compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType),
+          compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType,
         _ => false
       };
 

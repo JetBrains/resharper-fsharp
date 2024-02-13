@@ -2,8 +2,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
+open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
+open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp
@@ -77,7 +80,7 @@ module FSharpPostfixTemplates =
         else
             expr
 
-    let canBecomeStatement (initialExpr: IFSharpExpression) : bool =
+    let canBecomeStatement checkExpressionQualifier (initialExpr: IFSharpExpression) : bool =
         let expr = 
             initialExpr
             |> (getContainingAppExprFromLastArg false)
@@ -85,8 +88,8 @@ module FSharpPostfixTemplates =
 
         if isNull expr then false else
 
-        if not (FSharpIntroduceVariable.CanIntroduceVar(expr, true) &&
-                FSharpIntroduceVariable.CanIntroduceVar(initialExpr, true)) then false else
+        if not (FSharpIntroduceVariable.CanIntroduceVar(expr, checkExpressionQualifier) &&
+                FSharpIntroduceVariable.CanIntroduceVar(initialExpr, checkExpressionQualifier)) then false else
 
         let formatter = expr.Language.LanguageServiceNotNull().CodeFormatter
 
@@ -214,6 +217,17 @@ module FSharpPostfixTemplates =
                 Whitespace(contextIndent + expr.GetIndentSize())
             ] |> ignore
 
+    let showHotspots textControl (hotspotsRegistry: HotspotsRegistry) endOffset =
+        let hotspotInfos = hotspotsRegistry.CreateHotspots()
+        if hotspotInfos.Length > 0 then () else
+
+        let liveTemplatesManager = hotspotsRegistry.PsiServices.GetComponent<LiveTemplatesManager>()
+
+        let hotspotSession = liveTemplatesManager.CreateHotspotSessionAtopExistingText(
+            hotspotsRegistry.PsiServices.Solution, DocumentRange(&endOffset), textControl,
+            LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
+
+        hotspotSession.ExecuteAndForget()
 
 [<AllowNullLiteral>]
 type FSharpPostfixTemplateContext(node: ITreeNode, executionContext: PostfixTemplateExecutionContext) =
