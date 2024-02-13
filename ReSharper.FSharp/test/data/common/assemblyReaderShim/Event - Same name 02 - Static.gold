@@ -1,32 +1,57 @@
 ﻿module Module
 
-Class1.add_Event|(fun (_: System.EventArgs) -> ())|(0)
-Class1.add_Event(|VoidDelegate(ignore)|(1))
+|Class1.add_Event|(0)(fun (_: System.EventArgs) -> ())
+|Class1.add_Event|(1)(VoidDelegate(ignore))
+Class1.add_StaticEvent|(fun (_: System.EventArgs) -> ())|(2)
+Class1.add_StaticEvent(|VoidDelegate(ignore)|(3))
 
-Class1().add_Event(fun (|_: System.EventArgs|(2)) -> ())
+Class1().add_Event(fun (|_: System.EventArgs|(4)) -> ())
 Class1().add_Event(VoidDelegate(ignore))
+Class1().|add_StaticEvent|(5)(fun (_: System.EventArgs) -> ())
+Class1().|add_StaticEvent|(6)(VoidDelegate(ignore))
 
-Class2.add_Event(fun (|_: System.EventArgs|(3)) -> ())
-Class2.add_Event(VoidDelegate(ignore)
+|Class2.add_Event|(7)(fun (_: System.EventArgs) -> ())
+|Class2.add_Event|(8)(VoidDelegate(ignore))
+Class2.add_StaticEvent(fun (|_: System.EventArgs|(9)) -> ())
+Class2.add_StaticEvent(VoidDelegate(ignore))
 
-Class2().add_Event(fun (_: System.EventArgs) -> ())
-Class2().add_Event(VoidDelegate(ignore)
+Class2().add_Event|(fun (_: System.EventArgs) -> ())|(10)
+Class2().add_Event(|VoidDelegate(ignore)|(11))
+Class2().|add_StaticEvent|(12)(fun (_: System.EventArgs) -> ())
+Class2().|add_StaticEvent|(13)(VoidDelegate(ignore))
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+(0): ReSharper Underlined Error Highlighting: Method or object constructor 'add_Event' is not static
+(1): ReSharper Underlined Error Highlighting: Method or object constructor 'add_Event' is not static
+(2): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'System.EventArgs -> unit'    
 is not compatible with type
     'System.EventHandler'    
 
-(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'System.EventHandler'    
 but here has type
     'VoidDelegate'    
-(2): ReSharper Underlined Error Highlighting: This expression was expected to have type
+(4): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'unit'    
 but here has type
     'System.EventArgs'    
-(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
+(5): ReSharper Underlined Error Highlighting: 'add_StaticEvent' is static
+(6): ReSharper Underlined Error Highlighting: 'add_StaticEvent' is static
+(7): ReSharper Underlined Error Highlighting: Method or object constructor 'add_Event' is not static
+(8): ReSharper Underlined Error Highlighting: Method or object constructor 'add_Event' is not static
+(9): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'unit'    
 but here has type
     'System.EventArgs'    
+(10): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'System.EventArgs -> unit'    
+is not compatible with type
+    'System.EventHandler'    
+
+(11): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'System.EventHandler'    
+but here has type
+    'VoidDelegate'    
+(12): ReSharper Underlined Error Highlighting: 'add_StaticEvent' is static
+(13): ReSharper Underlined Error Highlighting: 'add_StaticEvent' is static

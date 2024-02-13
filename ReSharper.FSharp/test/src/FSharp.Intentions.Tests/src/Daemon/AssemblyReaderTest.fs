@@ -89,14 +89,13 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne
             let sourceFile = projectFile.ToSourceFiles().Single()
 
-            let stages =
-                DaemonStageManager.GetInstance(solution).Stages
-                |> Seq.filter (fun stage -> stage :? TypeCheckErrorsStage)
-                |> List.ofSeq
-
-            let daemon = TestHighlightingDumper(sourceFile, writer, stages, fun highlighting sourceFile settingsStore ->
-                let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
-                severity = Severity.WARNING || severity = Severity.ERROR)
+            let daemon = {
+                new TestHighlightingDumper(sourceFile, writer, fun highlighting sourceFile settingsStore ->
+                  let severity = manager.GetSeverity(highlighting, sourceFile, solution, settingsStore)
+                  severity = Severity.WARNING || severity = Severity.ERROR)
+                with
+                  override this.ShouldRunStage stage = stage :? TypeCheckErrorsStage
+                }
 
             daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
             daemon.Dump()) |> ignore

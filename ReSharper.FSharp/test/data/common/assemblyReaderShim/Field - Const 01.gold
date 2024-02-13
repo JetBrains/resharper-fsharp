@@ -1,4 +1,6 @@
-﻿match |Class.ConstZero|(0) with
+﻿module Module
+
+match |Class.ConstZero|(0) with
 | 1 -> ()
 
 

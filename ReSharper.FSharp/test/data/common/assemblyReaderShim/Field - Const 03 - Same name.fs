@@ -1,3 +1,5 @@
+module Module
+
 match 1 with
 | Class1.Const -> ()
 | Class2.Const -> ()

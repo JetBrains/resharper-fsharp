@@ -58,7 +58,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
         let globalProcessor = GlobalProcessor(x, consumer)
         fsFile.ProcessThisAndDescendants(globalProcessor)
 
-        let fibers = daemonProcess.CreateFibers()
+        let fibers = daemonProcess.CreateTaskBarrierForStageExecution()
         for node in globalProcessor.MemberDeclarations do
             fibers.EnqueueJob((fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer))), x.ResolveContext)
         fibers.Dispose()
