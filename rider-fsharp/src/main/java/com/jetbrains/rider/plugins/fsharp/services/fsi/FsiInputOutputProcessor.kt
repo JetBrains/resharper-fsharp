@@ -1,13 +1,12 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.execution.console.LanguageConsoleImpl
-import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.execution.impl.ConsoleViewUtil
 import com.intellij.execution.ui.ConsoleViewContentType
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.util.concurrency.ThreadingAssertions
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter
 
 class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
@@ -15,16 +14,6 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
   private var nextOutputTextIsFirst = true
 
   private val fSharpSyntaxHighlighter = FSharpSyntaxHighlighter()
-
-  private fun textOffsets(text: String): Pair<Int, Int> {
-    (fsiRunner.consoleView as ConsoleViewImpl).flushDeferredText()
-
-    val historyEditor = fsiRunner.consoleView.historyViewer
-    val startOffset = historyEditor.document.textLength
-    val endOffset = startOffset + text.length
-
-    return Pair(startOffset, endOffset)
-  }
 
   private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType): IconWithTooltip? {
     if (nextOutputTextIsFirst) {
@@ -38,6 +27,7 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
   }
 
   fun printInputText(text: String, outputType: ConsoleViewContentType) {
+    ThreadingAssertions.assertEventDispatchThread()
     printText(text + "\n", FsiIcons.COMMAND_MARKER, fSharpSyntaxHighlighter, outputType)
     EditorUtil.scrollToTheEnd(fsiRunner.consoleView.historyViewer)
 
@@ -45,8 +35,9 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
   }
 
   fun printOutputText(text: String, outputType: ConsoleViewContentType) {
+    ThreadingAssertions.assertEventDispatchThread()
     if (isInitialText) {
-      printOutputInitialText(text, outputType)
+      fsiRunner.consoleView.print(text, outputType)
     } else {
       val fsiResultIconWithTooltip = fsiIconWithTooltipOnOutputText(outputType)
 
@@ -65,29 +56,22 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
   private fun printText(
     text: String, iconWithTooltip: IconWithTooltip?, highlighter: FSharpSyntaxHighlighter?,
     outputType: ConsoleViewContentType
-  ) =
-    WriteCommandAction.runWriteCommandAction(fsiRunner.project) {
-      val (startOffset, endOffset) = textOffsets(text)
-
-      if (highlighter == null) {
-        fsiRunner.consoleView.print(text, outputType)
-      } else {
-        ConsoleViewUtil.printWithHighlighting(fsiRunner.consoleView, text, highlighter)
-      }
-
-      (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
-
-      if (iconWithTooltip == null) return@runWriteCommandAction
-
-      fsiRunner.consoleView.historyViewer.markupModel.addRangeHighlighter(
-        startOffset, endOffset, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
-      ).apply { gutterIconRenderer = FsiConsoleIndicatorRenderer(iconWithTooltip) }
-    }
-
-  private fun printOutputInitialText(text: String, outputType: ConsoleViewContentType) =
-    WriteCommandAction.runWriteCommandAction(fsiRunner.project) {
+  ) {
+    if (highlighter == null) {
       fsiRunner.consoleView.print(text, outputType)
+    } else {
+      ConsoleViewUtil.printWithHighlighting(fsiRunner.consoleView, text, highlighter)
     }
+
+    if (iconWithTooltip == null) return
+
+    (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
+    val endOffset = fsiRunner.consoleView.historyViewer.document.textLength
+    val startOffset = endOffset - text.length
+    fsiRunner.consoleView.historyViewer.markupModel.addRangeHighlighter(
+      startOffset, endOffset, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
+    ).apply { gutterIconRenderer = FsiConsoleIndicatorRenderer(iconWithTooltip) }
+  }
 
   fun onServerPrompt() {
     isInitialText = false
