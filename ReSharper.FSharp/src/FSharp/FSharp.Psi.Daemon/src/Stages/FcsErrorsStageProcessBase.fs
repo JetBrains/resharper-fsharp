@@ -407,8 +407,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ ->
 
             match node with
-            | :? IObjExpr as objExpr -> NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
-            | _ -> createGenericHighlighting error range
+            | :? IInterfaceImplementation as impl when
+                    isNotNull (ObjExprNavigator.GetByInterfaceImplementation(impl)) ->
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _
+            | :? IObjExpr as objExpr ->
+                NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
+            | _ ->
+                createGenericHighlighting error range
 
         | MemberIsNotAccessible ->
             createHighlightingFromNode MemberIsNotAccessibleError range

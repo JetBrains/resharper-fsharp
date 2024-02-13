@@ -8,4 +8,4 @@ type IB<'T2> =
   abstract M: 'T2 * int -> unit
 
 type T() =
-  interface IB<int>{caret}
+  interface IB{caret}<int>
