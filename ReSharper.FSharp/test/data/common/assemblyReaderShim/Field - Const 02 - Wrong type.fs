@@ -1,3 +1,5 @@
+module Module
+
 let _: int = Class.IntConst
 let _: string = Class.StringConst
 

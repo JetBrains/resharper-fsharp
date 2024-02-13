@@ -1,3 +1,5 @@
+module Module
+
 match Class.ConstZero with
 | 1 -> ()
 
