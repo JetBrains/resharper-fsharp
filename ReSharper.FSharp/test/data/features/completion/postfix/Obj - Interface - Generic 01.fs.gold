@@ -1,0 +1,10 @@
+﻿// ${COMPLETE_ITEM:with}
+module Module
+
+type IBase<'T> =
+    abstract M: string -> unit
+    abstract M: 'T -> unit
+
+{ new IBase<int> with
+  override this.M(var0: string): unit = failwith "todo"{caret}
+  override this.M(var0: int): unit = failwith "todo" }
