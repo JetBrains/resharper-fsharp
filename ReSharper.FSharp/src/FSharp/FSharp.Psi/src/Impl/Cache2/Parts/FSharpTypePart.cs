@@ -3,6 +3,7 @@ using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -81,11 +82,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override HybridCollection<IMethod> FindExtensionMethod(ExtensionMethodInfo info)
     {
-      if (!TypeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false))
+      var typeElement = TypeElement;
+      if (typeElement == null)
         return HybridCollection<IMethod>.Empty;
 
       var declaration = GetDeclaration();
       if (declaration == null)
+        return HybridCollection<IMethod>.Empty;
+
+      var languageLevel = declaration.GetFSharpLanguageLevel();
+      if (languageLevel < FSharpLanguageLevel.FSharp80 && 
+          !typeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false))
         return HybridCollection<IMethod>.Empty;
 
       var result = HybridCollection<IMethod>.Empty;

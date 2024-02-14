@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -104,6 +105,11 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 19 - Simple property with getter``() = x.DoNamedTest()
     [<Test>] member x.``Properties 20 - Simple property with accessors``() = x.DoNamedTest()
     [<Test>] member x.``Properties 21 - static val``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>]
+    [<Test>] member x.``Module bindings - Extension 01 - F# 7``() = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Module bindings - Extension 02 - F# 8``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
