@@ -236,6 +236,7 @@ type FSharpLanguageSpecificItemsProvider() =
         EnumEx.GetValues<FSharpLanguageVersion>()
         |> Seq.filter (fun version -> not (Array.contains version specialVersions))
         |> Seq.filter (fun version -> projectProperty.IsAvailable(version, project, targetFrameworkId))
+        |> Seq.sortDescending
         |> Seq.append specialVersions
         |> Seq.toList :> _
 
