@@ -162,6 +162,17 @@
     <QuickFix>ToUpcastFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="AbstractTypeCannotBeInstantiated" ID="FS0759: Abstract type cannot be instantiated">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToObjectExpressionFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment" ID="FS0764: Field requires assignment">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
