@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:override ToString}
+module Foo
+
+type C () =
+    class
+        override this.ToString() = failwith "todo"{caret}
+    end

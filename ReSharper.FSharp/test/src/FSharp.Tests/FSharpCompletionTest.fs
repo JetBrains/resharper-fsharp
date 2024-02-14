@@ -217,6 +217,16 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
 
+    [<Test>] member x.``Override member 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 04`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 05`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 06`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 07`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 08`` () = x.DoNamedTest()
+
+
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()
@@ -588,6 +598,7 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``Space - NamedUnionCaseField 01`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 02`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type FSharpSelectionCompletionTest() =
