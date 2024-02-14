@@ -1,0 +1,11 @@
+﻿// ${TEXT: }
+// ${DUMP_LOOKUP:true}
+module Foo
+
+type A() =
+    {caret}
+    member _.Bar = 1
+
+================
+<no lookup>
+================

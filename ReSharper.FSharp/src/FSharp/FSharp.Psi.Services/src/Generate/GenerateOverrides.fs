@@ -41,7 +41,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGeneratorElement) =
+let generateMember (context: ITreeNode) (indent: int) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
     let displayContext = element.DisplayContext
     let addTypes = element.AddTypes
@@ -255,7 +255,12 @@ let rec getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclarati
         if isNotNull typeRepresentation then typeRepresentation else
 
         selectedTreeNode.LeftSiblings()
-        |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
+        |> Seq.tryPick (fun node ->
+            match node with
+            | :? ITypeDeclarationGroup as node -> Some (node.TypeDeclarations.Last() :> ITreeNode)
+            | :? ITypeBodyMemberDeclaration as node -> Some node
+            | :? ITypeRepresentation as node -> Some node
+            | _ -> None)
         |> Option.defaultValue null
 
 let canHaveOverrides (typeElement: ITypeElement) =

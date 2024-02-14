@@ -99,4 +99,8 @@ type FSharpDeclaredElementIconProvider() =
                 | AccessRights.INTERNAL -> compose icon PsiSymbolsThemedIcons.ModifiersInternal.Id
                 | _ -> icon
 
+            | :? IFSharpMethod ->
+                canApplyExtensions <- false
+                PsiSymbolsThemedIcons.Method.Id
+
             | _ -> null

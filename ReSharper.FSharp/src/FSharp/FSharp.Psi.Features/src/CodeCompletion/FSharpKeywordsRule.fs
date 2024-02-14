@@ -277,7 +277,6 @@ module FSharpKeywordsProvider =
             "default"
             "inherit"
             "member"
-            "override"
             "static"
             "val"
 
