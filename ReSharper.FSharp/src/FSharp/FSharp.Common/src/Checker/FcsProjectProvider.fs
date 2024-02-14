@@ -285,6 +285,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             match scriptFcsProjectProvider.GetScriptOptions(sourceFile) with
             | None -> None
             | Some projectOptions ->
+                
+            // let snapshot = FSharpProjectSnapshot.FromOptions projectOptions
 
             let parsingOptions = 
                 { FSharpParsingOptions.Default with

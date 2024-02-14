@@ -39,6 +39,7 @@ module FcsCheckerService =
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
       ProjectOptions: FSharpProjectOptions
+      ProjectSnapshot: FSharpProjectSnapshot option
       ParsingOptions: FSharpParsingOptions
       FileIndices: IDictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
@@ -88,25 +89,27 @@ type FcsProjectInvalidationType =
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
         settingsStore: ISettingsStore, locks: IShellLocks, configurations: RunsProducts.ProductConfigurations) =
 
+    let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
+    let getSettingProperty name =
+        let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+        settingsStoreLive.GetValueProperty(lifetime, setting, null)
+
+    let useTransparentCompiler = (getSettingProperty "UseTransparentCompiler").Value
+    
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-
-        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-
-        let getSettingProperty name =
-            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty(lifetime, setting, null)
-
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
         let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
-
+    
         lazy
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
                                      enablePartialTypeChecking = skipImpl.Value,
-                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
+                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value,
+                                     useTransparentCompiler = useTransparentCompiler)
 
             checker
 
@@ -156,11 +159,15 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | Some(parseResults, checkResults) -> Some({ ParseResults = parseResults; CheckResults = checkResults })
         | _ ->
 
+
+        
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
         locks.AssertReadAccessAllowed()
         x.AssertFcsAccessThread()
 
         let psiModule = sourceFile.PsiModule
+        // check if is active ...
+        if useTransparentCompiler then ()
         match x.FcsProjectProvider.GetFcsProject(psiModule) with
         | None -> None
         | Some fcsProject ->
