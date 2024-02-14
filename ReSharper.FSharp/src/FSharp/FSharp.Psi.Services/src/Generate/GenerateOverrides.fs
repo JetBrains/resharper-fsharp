@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -23,6 +24,7 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.TextControl
 
 let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     let sameParamNumberMembersGroups =
@@ -449,3 +451,25 @@ let addMembers inputElements typeDecl indent anchor =
 
     addSpaceAfterIfNeeded lastNode
     lastNode
+
+let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiModule) (expr: IFSharpExpression) =
+    let reference = NewObjPostfixTemplate.getReference expr
+    let fcsSymbolUse = reference.GetSymbolUse()
+
+    let objExpr = NewObjPostfixTemplate.createObjExpr factory expr
+    let inputElements = getOverridableMembersForType null fcsSymbolUse true true psiModule
+    let indent = expr.Indent + expr.GetIndentSize()
+    addMembers inputElements objExpr indent objExpr.WithKeyword |> ignore
+    ModificationUtil.ReplaceChild(expr, objExpr)
+
+let selectObjExprMemberOrCallCompletion (objExpr: IObjExpr) (textControl: ITextControl) =
+    objExpr.MemberDeclarationsEnumerable
+    |> Seq.tryHead
+    |> Option.iter (fun decl ->
+        let memberDecl = decl.As<IMemberDeclaration>()
+        if isNull memberDecl then () else
+
+        let expr = memberDecl.Expression
+        textControl.Caret.MoveTo(expr.GetDocumentEndOffset(), CaretVisualPlacement.DontScrollIfVisible)
+        textControl.Selection.SetRange(expr.GetDocumentRange())
+    )

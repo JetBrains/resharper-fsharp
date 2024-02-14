@@ -1,0 +1,8 @@
+﻿module Module
+
+[<AbstractClass>]
+type AbstractBaseClass(i: int) =
+    abstract P: int
+
+{ new AbstractBaseClass(1) with
+  override this.P = {selstart}failwith "todo"{selend} }
