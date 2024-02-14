@@ -1,6 +1,8 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 
+#nowarn "57"
+
 open System.Threading
 open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
@@ -19,13 +21,13 @@ type CheckResults =
     | StillRunning of Task<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
 type FSharpChecker with
-    member internal x.ParseAndCheckDocument(path, source: ISourceText, options, allowStale: bool, opName) =
-        let version = source.GetHashCode()
+    member internal x.ParseAndCheckDocument(path, projectSnapshot: FSharpProjectSnapshot, allowStale: bool, opName) =
+        // let version = source.GetHashCode()
 
         let parseAndCheckFile =
             async {
                 let! parseResults, checkFileAnswer =
-                    x.ParseAndCheckFileInProject(path, version, source, options, userOpName = opName)
+                    x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
 
                 return
                     match checkFileAnswer with
@@ -60,28 +62,30 @@ type FSharpChecker with
                 Some (parseResults, checkResults)
             | _ -> None
 
-        async {
-            match x.TryGetRecentCheckResultsForFile(path, options, source) with
-            | None ->
-                // No stale results available, wait for fresh results
-                return! parseAndCheckFile
-
-            | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
-                // Avoid queueing on the reactor thread by using the recent results
-                return Some (parseResults, checkFileResults)
-
-            | Some (staleParseResults, staleCheckFileResults, _) ->
-
-            match! tryGetFreshResultsWithTimeout() with
-            | Ready x ->
-                // Fresh results were ready quickly enough
-                return x
-
-            | StillRunning _ when allowStale ->
-                // Still waiting for fresh results - just use the stale ones for now
-                return Some (staleParseResults, staleCheckFileResults)
-
-            | StillRunning worker ->
-                return! Async.AwaitTask worker
-        }
-        |> map bindParsedInput
+        map bindParsedInput parseAndCheckFile
+        // async {
+        //     // TODO: TryGetRecentCheckResultsForFile is missing on the Transparent compiler
+        //     match x.TryGetRecentCheckResultsForFile(path, options, source) with
+        //     | None ->
+        //         // No stale results available, wait for fresh results
+        //         return! parseAndCheckFile
+        //
+        //     | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
+        //         // Avoid queueing on the reactor thread by using the recent results
+        //         return Some (parseResults, checkFileResults)
+        //
+        //     | Some (staleParseResults, staleCheckFileResults, _) ->
+        //
+        //     match! tryGetFreshResultsWithTimeout() with
+        //     | Ready x ->
+        //         // Fresh results were ready quickly enough
+        //         return x
+        //
+        //     | StillRunning _ when allowStale ->
+        //         // Still waiting for fresh results - just use the stale ones for now
+        //         return Some (staleParseResults, staleCheckFileResults)
+        //
+        //     | StillRunning worker ->
+        //         return! Async.AwaitTask worker
+        // }
+        // |> map bindParsedInput

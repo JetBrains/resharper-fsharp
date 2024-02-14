@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -38,8 +40,7 @@ module FcsCheckerService =
 
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
-      ProjectOptions: FSharpProjectOptions
-      ProjectSnapshot: FSharpProjectSnapshot option
+      ProjectSnapshot: FSharpProjectSnapshot
       ParsingOptions: FSharpParsingOptions
       FileIndices: IDictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
@@ -54,23 +55,26 @@ type FcsProject =
         tryGetValue path x.FileIndices |> Option.defaultValue -1
 
     member x.TestDump(writer: TextWriter) =
-        let projectOptions = x.ProjectOptions
+        let projectSnapshot = x.ProjectSnapshot
+        let (ProjectSnapshot.FSharpProjectIdentifier(projectFileName, _)) = projectSnapshot.Identifier
 
-        writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
-        writer.WriteLine($"Stamp: {projectOptions.Stamp}")
-        writer.WriteLine($"Load time: {projectOptions.LoadTime}")
-
-        writer.WriteLine("Source files:")
-        for sourceFile in projectOptions.SourceFiles do
-            writer.WriteLine($"  {sourceFile}")
-
-        writer.WriteLine("Other options:")
-        for option in projectOptions.OtherOptions do
-            writer.WriteLine($"  {option}")
-
-        writer.WriteLine("Referenced projects:")
-        for referencedProject in projectOptions.ReferencedProjects do
-            writer.WriteLine($"  {referencedProject.OutputFile}")
+        writer.WriteLine($"Project file: {projectFileName}")
+        // TODO: the ProjectSnapshot exposes less information than the ProjectOptions
+        
+        // writer.WriteLine($"Stamp: {projectSnapshot.}")
+        // writer.WriteLine($"Load time: {projectSnapshot.LoadTime}")
+        //
+        // writer.WriteLine("Source files:")
+        // for sourceFile in projectSnapshot.SourceFiles do
+        //     writer.WriteLine($"  {sourceFile}")
+        //
+        // writer.WriteLine("Other options:")
+        // for option in projectSnapshot.OtherOptions do
+        //     writer.WriteLine($"  {option}")
+        //
+        // writer.WriteLine("Referenced projects:")
+        // for referencedProject in projectSnapshot.ReferencedProjects do
+        //     writer.WriteLine($"  {referencedProject.OutputFile}")
 
         writer.WriteLine()
 
@@ -172,8 +176,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | None -> None
         | Some fcsProject ->
 
-        let options = fcsProject.ProjectOptions
-        if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
+        let snapshot = fcsProject.ProjectSnapshot
+        // if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
@@ -182,7 +186,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match x.Checker.ParseAndCheckDocument(path, snapshot, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
