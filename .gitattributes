@@ -1,5 +1,10 @@
-* -text
+* text=auto
 
 *.fs  linguist-language=fsharp
 *.fsi linguist-language=fsharp
 *.fsx linguist-language=fsharp
+
+*.cs text eol=lf
+*.fs text eol=lf
+*.fsi text eol=lf
+*.fsx text eol=lf
