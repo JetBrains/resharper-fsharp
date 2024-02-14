@@ -80,6 +80,7 @@ module FSharpErrors =
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
+    let [<Literal>] AbstractTypeCannotBeInstantiated = 759
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] InvalidUseOfTypeName = 800
@@ -479,6 +480,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | ObjectOfIndeterminateTypeUsedRequireTypeConstraint ->
             createHighlightingFromNode IndexerIndeterminateTypeError range
+
+        | AbstractTypeCannotBeInstantiated ->
+            createHighlightingFromNodeWithMessage AbstractTypeCannotBeInstantiatedError range error
 
         | FieldRequiresAssignment ->
             createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error
