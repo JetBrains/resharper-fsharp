@@ -33,5 +33,12 @@
     <PsiFeaturesTestSubplatform>$(Subplatform).Psi.Features_test_Framework.Props</PsiFeaturesTestSubplatform>
     <RdBackendCommonSubplatform>$(Subplatform).Rider_RdBackend.Common.Props</RdBackendCommonSubplatform>
     <RiderBackendSubplatform>$(Subplatform).Rider_Rider.Backend.Props</RiderBackendSubplatform>
+   <UseLocalFSharpCompilerService>true</UseLocalFSharpCompilerService>
+   <LocalFCSProject>$(MSBuildThisFileDirectory)../../fsharp/src/Compiler/FSharp.Compiler.Service.fsproj</LocalFCSProject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Condition="'$(UseLocalFSharpCompilerService)' == 'false'" Include="JetBrains.FSharp.Compiler.Service" />
+    <ProjectReference Condition="'$(UseLocalFSharpCompilerService)' == 'true'" Include="$(LocalFCSProject)" />
+  </ItemGroup>
 </Project>
