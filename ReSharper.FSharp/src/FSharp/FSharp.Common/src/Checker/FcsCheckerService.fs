@@ -202,25 +202,27 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | _ -> { new IDisposable with member this.Dispose() = () }
 
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
-        match x.FcsProjectProvider.GetProjectOptions(file) with
+        match x.FcsProjectProvider.GetProjectSnapshot(file) with
         | None -> None
-        | Some options ->
+        | Some snapshot ->
 
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
-        | Some (_, checkResults, _) ->
-            logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
-            Some checkResults
+        // TODO: TryGetRecentCheckResultsForFile for Snapshot
+        Unchecked.defaultof<FSharpProjectSnapshot option>
+        // match x.Checker.TryGetRecentCheckResultsForFile(path, snapshot) with
+        // | Some (_, checkResults, _) ->
+        //     logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
+        //     Some checkResults
+        //
+        // | _ ->
+        //     logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
+        //     None
 
-        | _ ->
-            logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
-            None
-
-    member x.GetCachedScriptOptions(path) =
+    member x.GetCachedScriptSnapshot(path) =
         if checker.IsValueCreated then
-            checker.Value.GetCachedScriptOptions(path)
+            checker.Value.GetCachedScriptSnapshot(path)
         else None
     
     member x.InvalidateFcsProject(projectSnapshot: FSharpProjectSnapshot, invalidationType: FcsProjectInvalidationType) =
@@ -275,8 +277,8 @@ type IFcsProjectProvider =
     abstract GetFcsProject: psiModule: IPsiModule -> FcsProject option
     abstract GetPsiModule: outputPath: VirtualFileSystemPath -> IPsiModule option
 
-    abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetProjectOptions: psiModule: IPsiModule -> FSharpProjectOptions option
+    abstract GetProjectSnapshot: sourceFile: IPsiSourceFile -> FSharpProjectSnapshot option
+    abstract GetProjectSnapshot: psiModule: IPsiModule -> FSharpProjectSnapshot option
 
     abstract GetFileIndex: IPsiSourceFile -> int
     abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions
@@ -304,7 +306,7 @@ type IScriptFcsProjectProvider =
     abstract GetScriptSnapshot: IPsiSourceFile -> FSharpProjectSnapshot option
     // TODO: unused?
     // abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
-    abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
+    abstract SnapshotUpdated: Signal<VirtualFileSystemPath * FSharpProjectSnapshot>
     abstract SyncUpdate: bool
 
 

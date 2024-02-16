@@ -319,8 +319,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | None -> None
             | Some projectSnapshot ->
                 
-            // let snapshot = FSharpProjectSnapshot.FromOptions projectOptions
-
             let parsingOptions = 
                 { FSharpParsingOptions.Default with
                     SourceFiles = [| sourceFile.GetLocation().FullPath |]
