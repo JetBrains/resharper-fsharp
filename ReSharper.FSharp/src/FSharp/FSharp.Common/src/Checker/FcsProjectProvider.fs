@@ -1,10 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.IO
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open JetBrains.Annotations
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Settings
@@ -128,22 +131,22 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         projectsToProjectKeys.Remove(projectKey.Project, projectKey) |> ignore
 
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        let rec loop (newOptions: FSharpProjectOptions) (oldOptions: FSharpProjectOptions) =
+        let rec loop (newOptions: FSharpProjectSnapshot) (oldOptions: FSharpProjectSnapshot) =
             newOptions.ProjectFileName = oldOptions.ProjectFileName &&
             newOptions.SourceFiles = oldOptions.SourceFiles &&
             newOptions.OtherOptions = oldOptions.OtherOptions &&
 
             newOptions.ReferencedProjects.Length = oldOptions.ReferencedProjects.Length &&
             (newOptions.ReferencedProjects, oldOptions.ReferencedProjects)
-            ||> Array.forall2 (fun r1 r2 ->
+            ||> List.forall2 (fun r1 r2 ->
                 match r1, r2 with
-                | FSharpReferencedProject.FSharpReference (_, r1),
-                  FSharpReferencedProject.FSharpReference (_, r2) -> loop r1 r2
-                | FSharpReferencedProject.ILModuleReference(_, _, getReader1),
-                  FSharpReferencedProject.ILModuleReference(_, _, getReader2) -> getReader1 () = getReader2 ()
+                | FSharpReferencedProjectSnapshot.FSharpReference (_, r1),
+                  FSharpReferencedProjectSnapshot.FSharpReference (_, r2) -> loop r1 r2
+                | FSharpReferencedProjectSnapshot.ILModuleReference(_, _, getReader1),
+                  FSharpReferencedProjectSnapshot.ILModuleReference(_, _, getReader2) -> getReader1 () = getReader2 ()
                 | _ -> false
             )
-            
+
         loop newProject.ProjectSnapshot oldProject.ProjectSnapshot
 
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
@@ -192,7 +195,22 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | None ->
 
         let stamp = Some(getNextStamp ())
-        let fcsProject = { fcsProject with ProjectOptions = { fcsProject.ProjectOptions with Stamp = stamp } }
+        let updatedSnapshot =
+            FSharpProjectSnapshot.Create(
+                fcsProject.ProjectSnapshot.ProjectFileName,
+                fcsProject.ProjectSnapshot.ProjectId,
+                fcsProject.ProjectSnapshot.SourceFiles,
+                fcsProject.ProjectSnapshot.ReferencesOnDisk,
+                fcsProject.ProjectSnapshot.OtherOptions,
+                fcsProject.ProjectSnapshot.ReferencedProjects,
+                fcsProject.ProjectSnapshot.IsIncompleteTypeCheckEnvironment,
+                fcsProject.ProjectSnapshot.UseScriptResolutionRules,
+                fcsProject.ProjectSnapshot.LoadTime,
+                fcsProject.ProjectSnapshot.UnresolvedReferences,
+                fcsProject.ProjectSnapshot.OriginalLoadReferences,
+                stamp
+            )
+        let fcsProject = { fcsProject with ProjectSnapshot = updatedSnapshot }
 
         if logger.IsTraceEnabled() then
             use writer = new StringWriter()
@@ -249,24 +267,39 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         if isFSharpProject referencedProject then
                             let referencedFcsProject = getOrCreateFcsProject referencedProjectKey
                             let path = referencedFcsProject.OutputPath.FullPath
-                            Some(FSharpReferencedProject.FSharpReference(path, referencedFcsProject.ProjectOptions))
+                            Some(FSharpReferencedProjectSnapshot.FSharpReference(path, referencedFcsProject.ProjectSnapshot))
 
                         elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
                             fcsAssemblyReaderShim.TryGetModuleReader(referencedProjectKey)
                             |> Option.map (fun reader ->
                                 let getTimestamp () = reader.Timestamp
                                 let getReader () = reader :> ILModuleReader
-                                FSharpReferencedProject.ILModuleReference(reader.Path.FullPath, getTimestamp, getReader)
+                                FSharpReferencedProjectSnapshot.ILModuleReference(reader.Path.FullPath, getTimestamp, getReader)
                             )
                         else
                             None
                     )
-                    |> Seq.toArray
+                    |> Seq.toList
 
                 fcsProject.ReferencedModules.AddRange(moduleReferences |> Seq.choose tryGetReferencedProject)
 
-                let optionsWithReferences = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
-                let fcsProject = { fcsProject with ProjectOptions = optionsWithReferences }
+                let updatedSnapshot =
+                    FSharpProjectSnapshot.Create(
+                        fcsProject.ProjectSnapshot.ProjectFileName,
+                        fcsProject.ProjectSnapshot.ProjectId,
+                        fcsProject.ProjectSnapshot.SourceFiles,
+                        fcsProject.ProjectSnapshot.ReferencesOnDisk,
+                        fcsProject.ProjectSnapshot.OtherOptions,
+                        referencedFcsProjects,
+                        fcsProject.ProjectSnapshot.IsIncompleteTypeCheckEnvironment,
+                        fcsProject.ProjectSnapshot.UseScriptResolutionRules,
+                        fcsProject.ProjectSnapshot.LoadTime,
+                        fcsProject.ProjectSnapshot.UnresolvedReferences,
+                        fcsProject.ProjectSnapshot.OriginalLoadReferences,
+                        fcsProject.ProjectSnapshot.Stamp
+                    )
+                
+                let fcsProject = { fcsProject with  ProjectSnapshot = updatedSnapshot }
 
                 if projectKey <> initialProjectKey then
                     addProject projectKey fcsProject |> ignore
@@ -401,7 +434,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 if invalidated.Contains(fcsProjectToInvalidate) then () else
 
                 let fcsProject, invalidationType = fcsProjectToInvalidate
-                checkerService.InvalidateFcsProject(fcsProject.ProjectOptions, invalidationType)
+                checkerService.InvalidateFcsProject(fcsProject.ProjectSnapshot, invalidationType)
 
                 invalidated.Add(fcsProjectToInvalidate) |> ignore
         )
