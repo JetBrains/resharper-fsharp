@@ -223,15 +223,16 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             checker.Value.GetCachedScriptOptions(path)
         else None
     
-    member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
+    member x.InvalidateFcsProject(projectSnapshot: FSharpProjectSnapshot, invalidationType: FcsProjectInvalidationType) =
         if checker.IsValueCreated then
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
-                logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.ClearCache(Seq.singleton projectOptions)
+                logger.Trace("Remove FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                checker.Value.ClearCache(Seq.singleton projectSnapshot.Identifier)
             | FcsProjectInvalidationType.Remove ->
-                logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.InvalidateConfiguration(projectOptions)
+                logger.Trace("Invalidate FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                // See: https://github.com/dotnet/fsharp/pull/16718
+                checker.Value.InvalidateConfiguration(projectSnapshot)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
@@ -300,8 +301,9 @@ type IFcsProjectProvider =
 
 type IScriptFcsProjectProvider =
     abstract GetFcsProject: IPsiSourceFile -> FcsProject option
-    abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
+    abstract GetScriptSnapshot: IPsiSourceFile -> FSharpProjectSnapshot option
+    // TODO: unused?
+    // abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
     abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
     abstract SyncUpdate: bool
 

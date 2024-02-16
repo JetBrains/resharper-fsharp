@@ -1,7 +1,10 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
+open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
@@ -193,26 +196,61 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let fileIndices = Dictionary<VirtualFileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
-        let projectOptions =
-            { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
-              ProjectId = None
-              SourceFiles = Array.map (fun (p: VirtualFileSystemPath ) -> p.FullPath) filePaths
-              OtherOptions = otherOptions.ToArray()
-              ReferencedProjects = Array.empty
-              IsIncompleteTypeCheckEnvironment = false
-              UseScriptResolutionRules = false
-              LoadTime = DateTime.Now
-              OriginalLoadReferences = List.empty
-              UnresolvedReferences = None
-              Stamp = None }
+        let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
+        
+        let sourceFiles =
+            psiModule.SourceFiles
+            |> Seq.map (fun psiSourceFile ->
+                // TODO: I assume the Create will expect the full path of the file?
+                let name = psiSourceFile.Name
+                let version = string psiSourceFile.Document.LastModificationStamp.Value
+                let getSource () = psiSourceFile.Document.GetText() |> FSharp.Compiler.Text.SourceTextNew.ofString |> Task.FromResult
+                ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
+            )
+            |> Seq.toList
+        
+        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
+        let referencesOnDisk: ProjectSnapshot.ReferenceOnDisk list =
+            references
+            |> Seq.choose (fun projectToModuleReference ->
+                projectToModuleReference
+                |> modulePathProvider.GetModulePath
+                |> Option.bind (fun path ->
+                    if path.IsEmpty then
+                        None
+                    else
+                        Some ({
+                            Path = path.FullPath
+                            LastModified = path.FileModificationTimeUtc
+                        } : ProjectSnapshot.ReferenceOnDisk))
+            )
+            |> Seq.toList
+
+        let otherOptions = Seq.toList otherOptions
+        
+        let projectSnapshot =
+            FSharpProjectSnapshot.Create(
+                projectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj",
+                projectId = None,
+                sourceFiles = sourceFiles,
+                referencesOnDisk = referencesOnDisk,
+                otherOptions = Seq.toList otherOptions,
+                referencedProjects = List.empty,
+                isIncompleteTypeCheckEnvironment = false,
+                useScriptResolutionRules = false,
+                loadTime = DateTime.Now,
+                unresolvedReferences = None,
+                originalLoadReferences = List.empty,
+                stamp = None
+            )
 
         let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(otherOptions)
 
         let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
 
         let parsingOptions = { parsingOptions with
-                                 SourceFiles = projectOptions.SourceFiles
+                                 SourceFiles = sourceFiles |> List.map (fun sf -> sf.FileName) |> Array.ofList
                                  ConditionalDefines = defines }
 
         if not errors.IsEmpty then
@@ -220,21 +258,10 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         let fcsProject =
             { OutputPath = outPath
-              ProjectOptions = projectOptions
+              ProjectSnapshot = projectSnapshot 
               ParsingOptions = parsingOptions
               FileIndices = fileIndices
               ImplementationFilesWithSignatures = implsWithSig
               ReferencedModules = HashSet() }
-        
-        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
-        let paths =
-            references
-            |> Array.ofSeq
-            |> Array.choose modulePathProvider.GetModulePath
-            |> Array.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
 
-        let projectOptions =
-            { fcsProject.ProjectOptions with
-                OtherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths }
-
-        { fcsProject with ProjectOptions = projectOptions }
+        fcsProject

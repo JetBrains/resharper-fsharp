@@ -144,7 +144,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 | _ -> false
             )
             
-        loop newProject.ProjectOptions oldProject.ProjectOptions
+        loop newProject.ProjectSnapshot oldProject.ProjectSnapshot
 
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
         locks.AssertReadAccessAllowed()
@@ -282,9 +282,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | :? FSharpScriptPsiModule as scriptModule ->
             let path = scriptModule.Path
             let sourceFile = scriptModule.SourceFile
-            match scriptFcsProjectProvider.GetScriptOptions(sourceFile) with
+            match scriptFcsProjectProvider.GetScriptSnapshot(sourceFile) with
             | None -> None
-            | Some projectOptions ->
+            | Some projectSnapshot ->
                 
             // let snapshot = FSharpProjectSnapshot.FromOptions projectOptions
 
@@ -298,7 +298,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             let indices = Dictionary()
 
             { OutputPath = path
-              ProjectOptions = projectOptions
+              ProjectSnapshot = projectSnapshot 
               ParsingOptions = parsingOptions
               FileIndices = indices
               ImplementationFilesWithSignatures = EmptySet.Instance
@@ -486,18 +486,18 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             let psiModule = sourceFile.PsiModule
             match psiModule with
             | :? FSharpScriptPsiModule ->
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+                scriptFcsProjectProvider.GetScriptSnapshot(sourceFile)
 
             | :? SandboxPsiModule ->
                 let settings = sourceFile.GetSettingsStore()
                 if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
 
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+                scriptFcsProjectProvider.GetScriptSnapshot(sourceFile)
 
             | _ ->
 
             match tryGetFcsProject psiModule with
-            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
+            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectSnapshot
             | _ -> None
 
         member x.GetProjectOptions(psiModule: IPsiModule) =
@@ -505,7 +505,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             processInvalidatedFcsProjects ()
 
             match tryGetFcsProject psiModule with
-            | Some fcsProject -> Some fcsProject.ProjectOptions
+            | Some fcsProject -> Some fcsProject.ProjectSnapshot
             | _ -> None
 
         member x.HasPairFile(sourceFile) =

@@ -56,13 +56,17 @@ type FSharpChecker with
                     return StillRunning t
             }
 
-        let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
-            match results with
-            | Some(parseResults, checkResults) ->
-                Some (parseResults, checkResults)
-            | _ -> None
+        // let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
+        //     match results with
+        //     | Some(parseResults, checkResults) ->
+        //         Some (parseResults, checkResults)
+        //     | _ -> None
 
-        map bindParsedInput parseAndCheckFile
+        // Additional map seems weird here?
+        // map bindParsedInput
+
+        parseAndCheckFile
+
         // async {
         //     // TODO: TryGetRecentCheckResultsForFile is missing on the Transparent compiler
         //     match x.TryGetRecentCheckResultsForFile(path, options, source) with

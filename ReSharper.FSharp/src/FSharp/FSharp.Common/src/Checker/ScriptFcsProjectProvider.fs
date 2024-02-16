@@ -205,14 +205,15 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             else
                 getDefaultOptions path |> createFcsProject path
 
-    let getOptions path source : FSharpProjectOptions option =
-        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectOptions)
+    let getOptions path source : FSharpProjectSnapshot option =
+        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectSnapshot)
 
     interface IScriptFcsProjectProvider with
-        member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
-            getOptions path source
+        // TODO: unused ?
+        // member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
+        //     getOptions path source
 
-        member x.GetScriptOptions(file: IPsiSourceFile) =
+        member x.GetScriptSnapshot(file: IPsiSourceFile) =
             let path = file.GetLocation()
             let source = file.Document.GetText()
             getOptions path source

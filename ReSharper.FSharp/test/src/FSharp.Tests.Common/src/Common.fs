@@ -271,7 +271,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile) else
+                scriptFcsProjectProvider.GetScriptSnapshot(sourceFile) else
 
             getProjectOptions sourceFile
 
