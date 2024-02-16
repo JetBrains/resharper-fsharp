@@ -85,13 +85,9 @@ module FSharpLanguageLevel =
 
         levelProvider.GetLanguageLevel(psiModule)
 
-    let private ofTreeNodeNoCache (treeNode: ITreeNode) =
-        let psiModule = treeNode.GetPsiModule()
-        ofPsiModuleNoCache psiModule
-
     [<Extension; CompiledName("GetFSharpLanguageLevel")>]
     let ofTreeNode (treeNode: ITreeNode) =
-        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofTreeNodeNoCache)
+        PsiFileCachedDataUtil.GetPsiModuleData<FSharpLanguageLevel>(treeNode, key, ofPsiModuleNoCache)
 
     [<Extension; CompiledName("IsFSharp47Supported")>]
     let isFSharp47Supported (treeNode: ITreeNode) =
