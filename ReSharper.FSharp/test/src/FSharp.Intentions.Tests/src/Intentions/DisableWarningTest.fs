@@ -5,7 +5,7 @@ open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; AssertCorrectTreeStructure>]
 type DisableWarningTest() =
     inherit BulbActionTestBase<IBulbAction>()
 
