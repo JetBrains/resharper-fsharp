@@ -59,6 +59,3 @@ Desktop.ini
 
 # NCrunch
 _NCrunch*
-
-# User defined props
-Directory.Build.props.user
