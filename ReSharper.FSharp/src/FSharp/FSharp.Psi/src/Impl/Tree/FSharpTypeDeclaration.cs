@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -30,5 +31,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     
     public override IList<ITypeParameterDeclaration> TypeParameterDeclarations => this.GetTypeParameterDeclarations();
+
+    public ITypeInherit TypeInheritMember
+    {
+      get
+      {
+        ITypeInherit TryFindTypeInherit(TreeNodeEnumerable<ITypeBodyMemberDeclaration> memberDecls) =>
+          memberDecls.OfType<ITypeInherit>().SingleItem();
+
+        return TypeRepresentation switch
+        {
+          null => TryFindTypeInherit(TypeMembersEnumerable),
+          IClassRepresentation classRepr => TryFindTypeInherit(classRepr.TypeMembersEnumerable),
+          _ => null
+        };
+      }
+    }
   }
 }

@@ -1,5 +1,4 @@
-// ${COMPLETE_ITEM:override A1 (int -> unit)}
-// ${COMPLETE_ITEM:override A1 (int * int -> unit)}
+// ${COMPLETE_ITEM:override A1(int, int)}
 module Foo
 
 type A() =

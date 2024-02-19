@@ -10,8 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -324,17 +322,8 @@ type FSharpOverridingMembersBuilder() =
             if missingMembersOnly then context.InputElements |> Seq.cast<FSharpGeneratorElement> else
 
             context.InputElements
-            |> Seq.collect (fun generatorElement ->
-                let e = generatorElement :?> FSharpGeneratorElement
-                let mfv = e.Mfv
-                let prop = e.Member.As<IProperty>()
-
-                if isNull prop || not (mfv.IsNonCliEventProperty()) then [e] else
-
-                [ if isNotNull prop.Getter && mfv.HasGetterMethod then
-                      FSharpGeneratorElement(prop.Getter, { e.MfvInstance with Mfv = mfv.GetterMethod }, e.AddTypes)
-                  if isNotNull prop.Setter && mfv.HasSetterMethod then
-                      FSharpGeneratorElement(prop.Setter, { e.MfvInstance with Mfv = mfv.SetterMethod }, e.AddTypes) ])
+            |> Seq.cast<FSharpGeneratorElement>
+            |> GenerateOverrides.sanitizeMembers
 
         let lastNode = GenerateOverrides.addMembers inputElements typeDecl indent anchor
         let nodes = anchor.RightSiblings()

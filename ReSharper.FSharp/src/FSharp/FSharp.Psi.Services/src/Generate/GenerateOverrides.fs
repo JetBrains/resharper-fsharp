@@ -446,7 +446,27 @@ let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missi
     let isObjExpr = typeDeclaration :? IObjExpr
     getOverridableMembersForType typeElement fcsSymbolUse missingMembersOnly isObjExpr psiModule
 
-let addMembers inputElements typeDecl indent anchor =
+let mayHaveBaseCalls (typeDecl: IFSharpTypeElementDeclaration) =
+    match typeDecl with
+    | :? IFSharpTypeDeclaration as typeDecl -> isNotNull typeDecl.TypeInheritMember
+    | :? IObjExpr -> true
+    | _ -> false
+
+let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
+    inputElements
+    |> Seq.collect (fun element ->
+        let mfv = element.Mfv
+        let prop = element.Member.As<IProperty>()
+
+        if isNull prop || not (mfv.IsNonCliEventProperty()) then [element] else
+
+        [ if isNotNull prop.Getter && mfv.HasGetterMethod then
+              FSharpGeneratorElement(prop.Getter, { element.MfvInstance with Mfv = mfv.GetterMethod }, element.AddTypes)
+          if isNotNull prop.Setter && mfv.HasSetterMethod then
+              FSharpGeneratorElement(prop.Setter, { element.MfvInstance with Mfv = mfv.SetterMethod }, element.AddTypes) ]
+    )
+
+let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) indent anchor =
     let lastNode =
         inputElements
         |> Seq.cast

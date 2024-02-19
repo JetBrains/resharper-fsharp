@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:override ToString}
+// ${COMPLETE_ITEM:override ToString()}
 module Foo
 
 type C () =
