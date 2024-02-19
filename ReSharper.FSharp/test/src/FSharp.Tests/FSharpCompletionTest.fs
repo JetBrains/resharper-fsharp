@@ -217,6 +217,10 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Interpolated string 03 - Middle``() = x.DoNamedTest()
     [<Test>] member x.``Interpolated string 03 - End``() = x.DoNamedTest()
 
+    [<Test>] member x.``Override member - ObjExpr - Interface 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr 03`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 03`` () = x.DoNamedTest()
