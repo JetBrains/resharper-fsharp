@@ -55,3 +55,6 @@ type ErrorsHighlightingTest() =
     [<TestCustomInspectionSeverity(InvalidXmlDocPositionWarningHighlightingId, Severity.ERROR)>]
     [<HighlightOnly(typeof<InvalidXmlDocPositionWarning>)>]
     [<Test>] member x.``Invalid XmlDoc position 03 - As error``() = x.DoNamedTest()
+
+    [<Test>] member x.``Disable ReSharper inspections 01``() = x.DoNamedTest()
+    [<Test>] member x.``Disable ReSharper inspections 02``() = x.DoNamedTest()

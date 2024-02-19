@@ -1,0 +1,5 @@
+﻿// ${QF_TO_EXECUTE:Disable and restore with comments}
+
+// ReSharper disable FSharpRedundantApplication
+let _ = id{caret} 1
+// ReSharper restore FSharpRedundantApplication

@@ -1,0 +1,22 @@
+﻿module Module
+
+// ReSharper disable once FSharpRedundantParens
+let _ =
+    (1)
+
+let _ =
+    // ReSharper disable once FSharpRedundantParens
+    (
+     1), |(|(0)1|)|(1)
+
+let _ =
+    // ReSharper disable FSharpRedundantParens
+    ((1), (1)) |> ignore
+    // ReSharper restore FSharpRedundantParens
+    |(|(2)1|)|(3)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -38,6 +38,9 @@ type FSharpFileStructure(fsFile: IFSharpFile) =
                     for id in FSharpCompilerWarningProcessor.parseCompilerIds text do
                         base.WarningDisableRange.AddValue(id, DisableByNowarnCodeInspectionSection(id, range))
 
+        for comment in fsFile.Descendants<FSharpComment>() do base.ProcessComment(comment, comment.CommentText)
+        base.CloseAllRanges(fsFile)
+
 
 [<FileStructureExplorer>]
 type FSharpFileStructureExplorer() =

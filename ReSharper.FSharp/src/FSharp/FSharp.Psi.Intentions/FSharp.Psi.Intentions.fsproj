@@ -13,6 +13,15 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>JetResourceGenerator</Generator>
+      <LastGenOutput>Strings.Designer.fs</LastGenOutput>
+    </EmbeddedResource>
+    <Compile Include="Resources\Strings.Designer.fs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="src\ReadLockCookieUtil.fs" />
     <Compile Include="src\Intentions\FSharpContextActions.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
@@ -34,6 +43,7 @@
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
     <Compile Include="src\Intentions\UseNamedAccessAction.fs" />
     <Compile Include="src\Intentions\ToPositionalFieldPatternsAction.fs" />
+    <Compile Include="src\Intentions\DisableWarningActions.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
@@ -111,6 +121,7 @@
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithDotLambdaFix.fs" />
     <Compile Include="src\QuickFixes\ToObjectExpressionFix.fs" />
+    <Compile Include="src\DisableWarning\DisableWarningActionProvider.fs" />
     <Compile Include="src\ZoneMarker.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
