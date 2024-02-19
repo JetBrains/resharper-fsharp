@@ -74,23 +74,28 @@ type OverrideMemberRule() =
                 let equalsToken = typeDecl.EqualsToken
                 isNotNull equalsToken && caretLine > equalsToken.StartLine
 
+            | :? IObjExpr as objExpr ->
+                let equalsToken = objExpr.WithKeyword
+                isNotNull equalsToken && caretLine > equalsToken.StartLine
+
             | _ -> false
 
-        let isCorrectIndent (memberOwner: ITreeNode) (members: TreeNodeEnumerable<ITypeBodyMemberDeclaration>) =
+        let isCorrectIndent (memberOwner: ITreeNode) (members: ITypeBodyMemberDeclaration seq) =
             match Seq.tryHead members with
             | Some memberDecl -> memberDecl.Indent = caretColumn
             | None -> caretColumn > memberOwner.Indent
 
-        let isAligned (memberOwner: ITreeNode) (members: TreeNodeEnumerable<ITypeBodyMemberDeclaration>) =
+        let isAligned (memberOwner: ITreeNode) (members: ITypeBodyMemberDeclaration seq) =
             isInsideOwnerBody memberOwner && isCorrectIndent memberOwner members
 
-        let memberOwner, members : ITreeNode * _ =
+        let (memberOwner: ITreeNode), (members: ITypeBodyMemberDeclaration seq) =
             let anchor = generatorContext.Anchor
             let repr = if isNull anchor then null else anchor.GetContainingNode<IObjectModelTypeRepresentation>()
 
             match repr with
             | null ->
                 match generatorContext.TypeDeclaration with
+                | :? IObjExpr as objExpr -> objExpr, objExpr.MemberDeclarationsEnumerable |> Seq.cast
                 | :? IFSharpTypeDeclaration as typeDecl -> typeDecl, typeDecl.TypeMembersEnumerable
                 | _ -> null, TreeNodeEnumerable.Empty
             | repr -> repr, repr.TypeMembersEnumerable
