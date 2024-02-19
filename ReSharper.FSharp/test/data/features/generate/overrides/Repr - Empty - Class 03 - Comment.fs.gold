@@ -8,4 +8,4 @@
 // ${SELECT0:ToString():System.String}
 
 type T() = // comment
-  override this.ToString() = {selstart}base.ToString(){selend}
+  override this.ToString() = {selstart}failwith "todo"{selend}

@@ -3,4 +3,4 @@ module Foo
 
 type C () =
     member val B1 : string = "foo"
-    override this.ToString() = base.ToString(){caret}
+    override this.ToString() = failwith "todo"{caret}

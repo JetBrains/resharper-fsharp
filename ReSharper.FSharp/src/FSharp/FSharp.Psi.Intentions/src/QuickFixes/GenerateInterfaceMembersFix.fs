@@ -171,8 +171,9 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
                 existingMemberDecls.Last().Indent
 
         let generatedMembers =
+            let mayHaveBaseCalls = GenerateOverrides.mayHaveBaseCalls typeDeclaration
             membersToGenerate
-            |> List.map (GenerateOverrides.generateMember impl indent)
+            |> List.map (GenerateOverrides.generateMember impl mayHaveBaseCalls indent)
             |> List.collect (withNewLineAndIndentBefore indent)
 
         let existingMembers = impl.TypeMembers

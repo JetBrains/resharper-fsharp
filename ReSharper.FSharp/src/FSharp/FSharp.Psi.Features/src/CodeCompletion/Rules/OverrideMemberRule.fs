@@ -106,6 +106,7 @@ type OverrideMemberRule() =
     override this.AddLookupItems(context, collector) =
         let iconManager = context.NodeInFile.GetSolution().GetComponent<PsiIconManager>()
         let generatorContext = getGeneratorContext context
+        let mayHaveBaseCalls = GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
 
         let generatorElements =
             GenerateOverrides.getOverridableMembers generatorContext.TypeDeclaration false
@@ -119,7 +120,7 @@ type OverrideMemberRule() =
                 let owner = if isNotNull accessor then accessor.OwnerMember else null
                 if isNotNull owner then owner else elementMember
 
-            let memberDecl = GenerateOverrides.generateMember context.NodeInFile 0 generatorElement
+            let memberDecl = GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls 0 generatorElement
             let overrideItem =
                 let info =
                     let text = memberDecl.GetText()

@@ -41,7 +41,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: ITreeNode) (indent: int) (element: IFSharpGeneratorElement) =
+let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
     let displayContext = element.DisplayContext
     let addTypes = element.AddTypes
@@ -127,7 +127,7 @@ let generateMember (context: ITreeNode) (indent: int) (element: IFSharpGenerator
 
         (not (overridableMember :? IAccessor) || not generateParameters)
 
-    if shouldCallBase element then
+    if mayHaveBaseCalls && shouldCallBase element then
         let args =
             if argNames.IsEmpty || not generateParameters then "" else
 
@@ -467,10 +467,11 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
     )
 
 let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) indent anchor =
+    let mayHaveBaseCalls = mayHaveBaseCalls typeDecl
     let lastNode =
         inputElements
         |> Seq.cast
-        |> Seq.map (generateMember typeDecl indent)
+        |> Seq.map (generateMember typeDecl mayHaveBaseCalls indent)
         |> Seq.collect (withNewLineAndIndentBefore indent)
         |> addNodesAfter anchor
 

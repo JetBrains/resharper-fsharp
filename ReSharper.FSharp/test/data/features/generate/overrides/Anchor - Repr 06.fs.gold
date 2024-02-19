@@ -12,4 +12,4 @@ type MyRecord =
     Field2: int
     Field3: int }
 
-  override this.ToString() = {selstart}base.ToString(){selend}
+  override this.ToString() = {selstart}failwith "todo"{selend}

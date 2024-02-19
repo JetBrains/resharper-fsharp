@@ -18,4 +18,4 @@ type R =
     F5: int; F6: int
   }
 
-  override this.ToString() = {selstart}base.ToString(){selend}
+  override this.ToString() = {selstart}failwith "todo"{selend}

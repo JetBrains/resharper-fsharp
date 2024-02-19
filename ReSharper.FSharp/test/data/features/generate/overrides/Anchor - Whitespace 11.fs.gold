@@ -9,6 +9,6 @@
 
 module Nested =
   type A() =
-    override this.ToString() = {selstart}base.ToString(){selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}
 
   

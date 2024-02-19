@@ -10,7 +10,7 @@
 type R = 
   { F: int }
 
-  override this.ToString() = {selstart}base.ToString(){selend}
+  override this.ToString() = {selstart}failwith "todo"{selend}
   override this.GetHashCode() = failwith "todo"
 
   member this.P = [ 1

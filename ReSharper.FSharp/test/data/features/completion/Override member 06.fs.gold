@@ -3,5 +3,5 @@ module Foo
 
 type S(a:int) =
     struct
-        override this.ToString() = base.ToString(){caret}
+        override this.ToString() = failwith "todo"{caret}
     end
