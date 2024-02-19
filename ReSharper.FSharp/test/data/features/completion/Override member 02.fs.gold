@@ -1,5 +1,4 @@
-﻿// ${COMPLETE_ITEM:override A1 (int -> unit)}
-// ${COMPLETE_ITEM:override A1 (int * int -> unit)}
+﻿// ${COMPLETE_ITEM:override A1(int, int)}
 module Foo
 
 type A() =
@@ -10,5 +9,5 @@ type A() =
 
 type B () =
     inherit A()
-    override this.A1(x) = failwith "todo"{caret}
+    override this.A1(x, y) = base.A1(x, y){caret}
     member val B1 : string = "foo"

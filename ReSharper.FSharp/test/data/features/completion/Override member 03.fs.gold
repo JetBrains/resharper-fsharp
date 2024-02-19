@@ -1,6 +1,6 @@
-﻿// ${COMPLETE_ITEM:override ToString}
+﻿// ${COMPLETE_ITEM:override ToString()}
 module Foo
 
 type C () =
     member val B1 : string = "foo"
-    override this.ToString() = failwith "todo"{caret}
+    override this.ToString() = base.ToString(){caret}

@@ -1,8 +1,8 @@
-﻿// ${COMPLETE_ITEM:override ToString}
+﻿// ${COMPLETE_ITEM:override ToString()}
 module Foo
 
 type S(a:int) =
     struct
-        override this.ToString() = failwith "todo"{caret}
+        override this.ToString() = base.ToString(){caret}
         member x.Foo () = ()
     end
