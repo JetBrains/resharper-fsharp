@@ -221,6 +221,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - ObjExpr 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr 04`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property 03`` () = x.DoNamedTest()
@@ -233,6 +234,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member 06`` () = x.DoNamedTest()
     [<Test>] member x.``Override member 07`` () = x.DoNamedTest()
     [<Test>] member x.``Override member 08`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member 09`` () = x.DoNamedTest()
 
 
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]

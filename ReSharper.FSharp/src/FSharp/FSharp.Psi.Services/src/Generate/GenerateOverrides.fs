@@ -379,7 +379,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
         if isNull fsTypeMember || fsTypeMember.IsVisibleFromFSharp then
             addOverrides memberInstance
 
-    let overridableMemberInstances =
+    let allOverridableMemberInstances =
         baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
             mfvInstances |> List.choose (fun mfvInstance ->
                 let mfv = mfvInstance.Mfv
@@ -390,23 +390,28 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
                     | null -> mfv.GetXmlDocId()
                     | typeMember -> XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
 
-                if ownMembersDescriptors.Contains(xmlDocId) then None else
-
                 let mutable memberInstance = Unchecked.defaultof<_>
                 if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
 
-                if isOverridden memberInstance then None else
+                let isAvailable =
+                    not (ownMembersDescriptors.Contains(xmlDocId)) &&
+                    not (isOverridden memberInstance)
 
                 addOverrides memberInstance
-                Some (memberInstance.Member, mfvInstance)
+                Some (memberInstance.Member, mfvInstance, isAvailable)
             )
             |> Seq.toList
         )
 
+    let overridableMemberInstances =
+        allOverridableMemberInstances
+        |> List.filter (fun (_, _, isAvailable) -> isAvailable)
+        |> List.map (fun (overridableMember, fcsMfvInstance, _) -> overridableMember, fcsMfvInstance)
+
     let needsTypesAnnotations =
-        overridableMemberInstances
-        |> List.distinctBy (fst >> getTestDescriptor)
-        |> List.map snd
+        allOverridableMemberInstances
+        |> List.distinctBy (fun (overridableMember, _, _) -> getTestDescriptor overridableMember)
+        |> List.map (fun (_, fcsMfvInstance, _) -> fcsMfvInstance)
         |> getMembersNeedingTypeAnnotations
 
     overridableMemberInstances
