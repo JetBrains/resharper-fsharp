@@ -9,6 +9,6 @@
 
 type T() =
     class //
-      override this.ToString() = {selstart}base.ToString(){selend}
+      override this.ToString() = {selstart}failwith "todo"{selend}
     end
     member x.P2 = 1

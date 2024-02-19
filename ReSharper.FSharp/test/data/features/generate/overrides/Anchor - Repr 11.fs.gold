@@ -9,7 +9,7 @@
 
 type C() = 
   class
-    override this.ToString() = {selstart}base.ToString(){selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}
 
     member this.X = [ 1
                       // comment 1

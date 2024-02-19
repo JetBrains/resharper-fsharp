@@ -3,5 +3,5 @@ module Foo
 
 type C () =
     class
-        override this.ToString() = base.ToString(){caret}
+        override this.ToString() = failwith "todo"{caret}
     end

@@ -11,7 +11,7 @@
 
 type MyClass() = 
   class
-    override this.ToString() = {selstart}base.ToString(){selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}
 
     interface IA<int> with
       member x.Get() = 1

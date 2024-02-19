@@ -4,5 +4,5 @@ module Foo
 type C () =
     class
         member val Foo: int = 99
-        override this.ToString() = base.ToString(){caret}
+        override this.ToString() = failwith "todo"{caret}
     end
