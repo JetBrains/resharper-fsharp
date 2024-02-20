@@ -12,10 +12,9 @@ open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil.ParentTraversal
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -96,12 +95,12 @@ type UnionCaseFieldsPatternRule() =
         let matchExpr = MatchExprNavigator.GetByClause(matchClause)
         isNotNull matchExpr &&
 
-        let topLevelPattern, patternPath = ParentTraversal.makePatPath parametersOwnerPat
+        let topLevelPattern, patternPath = makePatPath parametersOwnerPat
         topLevelPattern == matchClause.Pattern &&
 
-        let matchType = MatchTree.getMatchExprMatchType matchExpr
+        let matchType = getMatchExprMatchType matchExpr
         let matchValue = { Type = matchType; Path = [] }
-        let pattern = MatchTree.ofMatchClause matchValue matchClause
+        let pattern = ofMatchClause matchValue matchClause
         let matchNode = MatchNode.Create(matchValue, pattern)
 
         let rec navigatePath (path: PatternParentTraverseStep list) (matchNode: MatchNode) =
@@ -115,7 +114,7 @@ type UnionCaseFieldsPatternRule() =
                 |> List.tryItem i
                 |> Option.bind (navigatePath restPath)
 
-            | PatternParentTraverseStep.Or(i, _), (MatchTest.Or _, nodes) ->
+            | PatternParentTraverseStep.Or(i, _), (MatchTest.Or, nodes) ->
                 nodes
                 |> List.tryItem i
                 |> Option.bind (navigatePath restPath)

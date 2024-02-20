@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -168,6 +169,9 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
 
         member x.GetDefaultRanges(context) = base.GetDefaultRanges(context)
         member x.AddLookupItems(context, collector, _) =
+            let basicContext = context.BasicContext
+            if FSharpCodeCompletionContext.isFullEvaluationDisabled basicContext then false else
+
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
         member x.TransformItems(_, _, _) = ()
