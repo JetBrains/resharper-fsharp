@@ -1,5 +1,5 @@
 // ${COMPLETE_ITEM:override ToString()}
-module Foo
+module Module
 
 type S(a:int) =
     struct

@@ -1,5 +1,5 @@
 // ${COMPLETE_ITEM:override P}
-module Foo
+module Module
 
 [<AbstractClass>]
 type Base() =
