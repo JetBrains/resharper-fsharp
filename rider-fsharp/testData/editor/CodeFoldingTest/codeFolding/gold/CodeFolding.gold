@@ -1,10 +1,10 @@
 namespace Folding
 
-/// Single line xmldoc
+<folding>/// Single line xmldoc</folding>
 [<<folding AutoOpen>] ...>AutoOpen>]
 [<YetAnotherAttribute</folding>>]
 module Test<folding  = ...> =
-    <folding /// A ...>/// A
-    /// B</folding>
+    <folding><folding /// A ...>/// A
+    /// B</folding></folding>
     let f x<folding  = ...> =
         x + 1</folding></folding>
