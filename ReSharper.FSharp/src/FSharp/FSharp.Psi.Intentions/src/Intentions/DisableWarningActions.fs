@@ -35,7 +35,10 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
         isValid file && highlightingRanges |> Seq.forall (fun x -> x.IsValid())
 
     override this.ExecutePsiTransaction(_, _) =
+        use writeCookie = WriteLockCookie.Create(file.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
+
+        let highlightingRanges = highlightingRanges |> Array.sortBy _.StartOffset.Offset
         let lineEnding = file.GetLineEnding()
 
         let firstRange = highlightingRanges[0]
@@ -45,7 +48,6 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
         let lastNode = file.FindNodeAt(lastRange)
 
         let document = firstRange.Document
-        use writeCookie = WriteLockCookie.Create(firstNode.IsPhysical())
 
         match this.DisableNode with
         | null -> null
