@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Resources.Shell
 [<AbstractClass>]
 type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharpFile) =
     inherit ContextActionBase()
+
     let rec skipParentsWithSameOffset (node: ITreeNode) checkStartOffset =
         match node.Parent with
         | null
@@ -138,11 +139,12 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
     override this.IsAvailable _ = isValid file
 
     override this.ExecutePsiTransaction(_, _) =
+        use writeCookie = WriteLockCookie.Create(file.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
+
         let lineEnding = file.GetLineEnding()
         let firstNode, lastNode, needsAdditionalNewLine = findInsertRange file severityId
 
-        use writeCookie = WriteLockCookie.Create(file.IsPhysical())
         let treeNodes: ITreeNode list =
             [
                 FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisablePrefix} {severityId}")
