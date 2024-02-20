@@ -11,9 +11,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -73,6 +73,15 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
 
 
 module FSharpCodeCompletionContext =
+    let private disableFullEvaluationKey = Key<obj>("FSharpCodeCompletionContext.disableFullEvaluationKey") 
+
+    let isFullEvaluationDisabled (context: CodeCompletionContext) =
+        let prevResult = context.Parameters.PreviousResult
+        isNull prevResult || isNotNull (prevResult.GetData(disableFullEvaluationKey))
+
+    let disableFullEvaluation (context: CodeCompletionContext) =
+        context.PutData(disableFullEvaluationKey, disableFullEvaluationKey)
+
     let canBeIdentifierStart (token: ITreeNode) =
         let nodeType = getTokenType token
         if isNull nodeType then false else

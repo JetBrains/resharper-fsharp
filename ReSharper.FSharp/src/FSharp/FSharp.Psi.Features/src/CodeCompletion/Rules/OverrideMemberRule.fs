@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -131,12 +132,14 @@ type OverrideMemberRule() =
                     let text = memberDecl.GetText()
                     TextualInfo(text, text, Ranges = context.Ranges)
 
+                let name = mainMember.ShortName
+                let presentationText = $"override {name}"
                 let icon = iconManager.GetImage(mainMember, context.NodeInFile.Language, true)
 
                 LookupItemFactory
                     .CreateLookupItem(info)
                         .WithPresentation(fun _ ->
-                            let name = mainMember.ShortName
+                            
 
                             let accessorName =
                                 if isNull accessor || accessor.Parameters.Count = 0 then "" else
@@ -165,14 +168,25 @@ type OverrideMemberRule() =
                                 )
                                 |> String.concat " "
 
-                            let text = RichText($"override {name}")
+                            let text = RichText(presentationText)
                             text.Append(accessorName, TextStyle(JetFontStyles.Regular, JetSystemColors.GrayText)) |> ignore
                             text.Append(signature, TextStyle(JetFontStyles.Regular, JetSystemColors.GrayText)) |> ignore
                             TextualPresentation(text, info, image = icon)
                         )
                         .WithBehavior(fun _ -> OverrideBehavior(info))
-                        .WithMatcher(fun _ -> TextualMatcher(info))
+                        .WithMatcher(fun _ -> TextualMatcher(presentationText, info))
 
             collector.Add(overrideItem)
 
         false
+
+    override this.TransformItems(context, collector) =
+        collector.RemoveWhere(fun (item: ILookupItem) ->
+            match item with
+            | :? FSharpKeywordLookupItem -> false
+            | :? IAspectLookupItemBase as aspectItem ->
+                not (aspectItem.Behavior :? OverrideBehavior)
+            | _ -> true
+        )
+
+        FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext

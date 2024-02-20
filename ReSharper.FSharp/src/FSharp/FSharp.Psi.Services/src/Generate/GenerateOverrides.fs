@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -491,16 +492,27 @@ let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiM
     let inputElements = getOverridableMembersForType null fcsSymbolUse true true psiModule
     let indent = expr.Indent + expr.GetIndentSize()
     addMembers inputElements objExpr indent objExpr.WithKeyword |> ignore
+
+    if Seq.isEmpty objExpr.MemberDeclarationsEnumerable then
+        deleteChildRange objExpr.WithKeyword.NextSibling objExpr.RightBrace.PrevSibling
+        addNodesAfter objExpr.WithKeyword [
+            NewLine(expr.GetLineEnding())
+            Whitespace(indent + 1)
+        ] |> ignore
+
     ModificationUtil.ReplaceChild(expr, objExpr)
 
 let selectObjExprMemberOrCallCompletion (objExpr: IObjExpr) (textControl: ITextControl) =
-    objExpr.MemberDeclarationsEnumerable
-    |> Seq.tryHead
-    |> Option.iter (fun decl ->
+    match objExpr.MemberDeclarationsEnumerable |> Seq.tryHead with
+    | Some decl ->
         let memberDecl = decl.As<IMemberDeclaration>()
         if isNull memberDecl then () else
 
         let expr = memberDecl.Expression
         textControl.Caret.MoveTo(expr.GetDocumentEndOffset(), CaretVisualPlacement.DontScrollIfVisible)
         textControl.Selection.SetRange(expr.GetDocumentRange())
-    )
+
+    | None ->
+        let rBraceOffset = objExpr.RightBrace.GetDocumentStartOffset()
+        textControl.Caret.MoveTo(rBraceOffset - 1, CaretVisualPlacement.DontScrollIfVisible)
+        textControl.RescheduleCompletion(objExpr.GetSolution())
