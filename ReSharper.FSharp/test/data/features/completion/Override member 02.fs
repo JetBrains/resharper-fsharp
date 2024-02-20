@@ -1,5 +1,5 @@
 // ${COMPLETE_ITEM:override A1(int, int)}
-module Foo
+module Module
 
 type A() =
     abstract A1: x:int -> unit

@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:with}
+﻿// ${COMPLETE_ITEM:new}
 module Module
 
 { new System.IDisposable with

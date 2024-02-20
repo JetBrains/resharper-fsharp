@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
 
-[<PostfixTemplate("with", "Create object expression", "{ new T with }")>]
+[<PostfixTemplate("new", "Create object expression", "{ new T with }")>]
 type NewObjPostfixTemplate() =
     inherit FSharpPostfixTemplateBase()
 
@@ -29,7 +29,7 @@ type NewObjPostfixTemplate() =
     override this.IsEnabled _ = true
 
 and NewObjPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
-    inherit PostfixTemplateInfo("with", expressionContext)
+    inherit PostfixTemplateInfo("new", expressionContext)
 
 and NewObjPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
