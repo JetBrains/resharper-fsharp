@@ -32,7 +32,7 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
 
-val baseVersion = "2023.3"
+val baseVersion = "2024.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -286,7 +286,7 @@ tasks {
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
     if (name == IntelliJPluginConstants.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-      val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/$outputRelativePath"
+      val testHostPath = "$resharperPluginPath/src/FSharp/FSharp.Tests.Host/$outputRelativePath"
       val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
       files = files + listOf("$testHostName.dll", "$testHostName.pdb")
     }
