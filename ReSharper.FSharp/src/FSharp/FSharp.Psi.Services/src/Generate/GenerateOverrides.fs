@@ -61,7 +61,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
 
     let paramGroups = mfv.CurriedParameterGroups
 
-    let argNames =
+    let argNameGroups =
         let getParamType (param: FSharpParameter) =
             param.Type.Instantiate(element.Substitution)
 
@@ -110,7 +110,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
 
     let paramGroups =
         if not generateParameters then [] else
-        factory.CreateMemberParamDeclarations(argNames, spaceAfterComma, addTypes, displayContext)
+        factory.CreateMemberParamDeclarations(argNameGroups, spaceAfterComma, addTypes, displayContext)
 
     let memberDeclaration =
         if isPropertyAccessor && generateParameters then
@@ -130,13 +130,15 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
 
     if mayHaveBaseCalls && shouldCallBase element then
         let args =
-            if argNames.IsEmpty || not generateParameters then "" else
+            if argNameGroups.IsEmpty || not generateParameters then "" else
 
-            argNames
+            let groupCount = argNameGroups.Length
+
+            argNameGroups
             |> List.mapi (fun i paramNames ->
                 match paramNames, i with
-                | [head, _], 0 -> $" {head}"
-                | [head, _], _ -> head
+                | [head, _], 0 when groupCount > 1 -> $" {head}"
+                | [head, _], _ when groupCount > 1 -> head
                 | _ ->
                     let names = paramNames |> List.map fst |> String.concat ", "
                     $"({names})"
