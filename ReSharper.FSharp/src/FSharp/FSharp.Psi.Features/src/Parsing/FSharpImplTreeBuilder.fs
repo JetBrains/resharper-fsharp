@@ -1385,10 +1385,12 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             x.PushExpressionList(rest)
             x.ProcessExpression(expr)
 
-    member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, _, _, memberDefns, range)) =
-        x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
+    member x.ProcessInterfaceImplementation(SynInterfaceImpl(interfaceType, withKeyword, _, memberDefns, range)) =
+        x.AdvanceToStart(range)
+        x.PushStep({ Mark = x.Mark(); ElementType = ElementType.INTERFACE_IMPLEMENTATION }, endNodeProcessor)
         x.PushStep((), finishObjectExpressionMemberListProcessor)
         x.ProcessTypeAsTypeReferenceName(interfaceType)
+        withKeyword |> Option.iter x.AdvanceToEnd
         x.PushStepList(memberDefns, objectExpressionMemberListProcessor)
 
     member x.ProcessRecordFieldBindingList(fields: SynExprRecordField list) =

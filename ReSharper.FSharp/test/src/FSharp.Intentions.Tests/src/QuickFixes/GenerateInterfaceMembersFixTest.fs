@@ -62,6 +62,11 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 03 - Partially base implemented``() = x.DoNamedTest()
 
+    [<Test>] member x.``ObjExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``ObjExpr 02``() = x.DoNamedTest()
+    [<Test>] member x.``ObjExpr 03``() = x.DoNamedTest()
+    [<Test>] member x.``ObjExpr 04``() = x.DoNamedTest()
+
 
 [<FSharpTest; AssertCorrectTreeStructure>]
 type GenerateMissingMembersFixTest() =

@@ -1,0 +1,14 @@
+﻿module Module
+
+type I<'a> =
+    abstract P: int
+    abstract M: 'a -> unit
+    abstract M: string -> unit
+
+{ new obj() with
+    override this.ToString() = ""
+
+  interface I<_> with
+    member this.M(var0: obj): unit = failwith "todo"
+    member this.M(var0: string): unit = failwith "todo"
+    member this.P = {selstart}failwith "todo"{selend} }
