@@ -106,6 +106,7 @@
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
     <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageSpecificCopyPasteBehavior.fs" />
+    <Compile Include="src\StickyLines\FSharpStickyLinesProcessorFactory.fs" />
     <Compile Include="src\Internal\FSharpInternalActionGroup.fs" />
     <Compile Include="src\Injected\FSharpInjectionUtil.fs" />
     <Compile Include="src\Injected\FSharpLiteralInjectionTarget.fs" />
