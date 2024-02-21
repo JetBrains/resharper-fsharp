@@ -47,13 +47,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   /// Record field compiled to a property.
   internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IRecordField
   {
-    private readonly bool myIsMutable;
-
-    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration) : base(declaration) =>
-      myIsMutable = declaration.IsMutable;
+    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration) : base(declaration)
+    {
+    }
 
     public bool IsMutable =>
-      myIsMutable || GetContainingType().IsCliMutableRecord();
+      GetDeclaration() is { IsMutable: true } || GetContainingType().IsCliMutableRecord();
 
     public void SetIsMutable(bool value)
     {

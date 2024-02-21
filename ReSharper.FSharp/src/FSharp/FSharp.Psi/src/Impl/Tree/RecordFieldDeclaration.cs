@@ -10,13 +10,34 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class RecordFieldDeclaration
   {
+    private bool? myIsMutable;
+    
     protected override string DeclaredElementName => NameIdentifier.GetSourceName();
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpRecordField(this);
 
-    public bool IsMutable => MutableKeyword != null;
+    protected override void ClearCachedData()
+    {
+      base.ClearCachedData();
+      myIsMutable = null;
+    }
+
+    public bool IsMutable
+    {
+      get
+      {
+        lock (this)
+        {
+          if (myIsMutable is { } isMutable)
+            return isMutable;
+
+          myIsMutable = isMutable = MutableKeyword != null;
+          return isMutable;
+        }
+      }
+    }
 
     public void SetIsMutable(bool value)
     {
