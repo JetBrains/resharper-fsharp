@@ -151,6 +151,7 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Property - Implementation 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Duplicate 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Explicit impl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Explicit impl 03 - Record``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 02 - Accessibility``() = x.DoNamedTest()
 

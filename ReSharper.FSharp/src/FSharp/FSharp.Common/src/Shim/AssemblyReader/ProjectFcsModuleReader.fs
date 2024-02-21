@@ -898,13 +898,24 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         result
 
+    let isInaccessibleExplicitImpl (typeMember: ITypeMember) =
+        let overridableMember = typeMember.As<IOverridableMember>()
+        isNotNull overridableMember && overridableMember.IsExplicitImplementation &&
+
+        // Checking access rights is required, because VB.NET explicit implementations may be accessible
+        match overridableMember.GetAccessRights() with
+        | AccessRights.PRIVATE
+        | AccessRights.FILE_LOCAL
+        | AccessRights.NONE -> true
+        | _ -> false
+
     let getSignature (parametersOwner: IParametersOwner) =
         parametersOwner.GetSignature(parametersOwner.IdSubstitution)
 
     let mkMethods (typeElement: ITypeElement) =
         let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
         [| for method in typeElement.GetMembers().OfType<IFunction>() do
-            if seenMethods.Add(getSignature method) then
+            if not (isInaccessibleExplicitImpl method) && seenMethods.Add(getSignature method) then
                 yield mkMethodDef method |]
 
     let mkFields (typeElement: ITypeElement) =
@@ -927,12 +938,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkProperties (typeElement: ITypeElement) =
         let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
         [ for property in typeElement.Properties do
-            if seenProperties.Add(getSignature property) then
+            if not (isInaccessibleExplicitImpl property) && seenProperties.Add(getSignature property) then
                 yield mkPropertyDef property ]
 
     let mkEvents (typeElement: ITypeElement) =
         [ for event in typeElement.Events do
-            yield mkEventDef event ]
+            if not (isInaccessibleExplicitImpl event) then
+                yield mkEventDef event ]
 
     let mkNestedTypes reader (typeElement: ITypeElement) =
         [| for typeElement in typeElement.NestedTypes do
