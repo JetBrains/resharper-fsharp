@@ -65,7 +65,7 @@ type GenerateMatchExprPatternsBehavior(info) =
 
             MatchTree.generateClauses matchExpr value nodes deconstructions
 
-        let range = matchExpr.Clauses[0].Expression.GetNavigationRange()
+        let range = matchExpr.Clauses[0].Expression.GetDocumentRange()
         textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
         textControl.Selection.SetRange(range)
 

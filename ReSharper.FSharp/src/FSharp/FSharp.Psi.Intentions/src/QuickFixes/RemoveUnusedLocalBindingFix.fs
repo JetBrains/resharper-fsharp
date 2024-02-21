@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
@@ -121,5 +122,5 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
             Action<_>(fun textControl ->
                 let anchorIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
-                let offset = letBindings.Bindings[anchorIndex].GetNavigationRange().EndOffset
+                let offset = letBindings.Bindings[anchorIndex].GetDocumentRange().EndOffset
                 textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))

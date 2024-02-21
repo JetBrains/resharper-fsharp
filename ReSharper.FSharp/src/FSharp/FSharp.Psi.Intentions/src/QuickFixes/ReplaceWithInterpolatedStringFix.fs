@@ -61,7 +61,7 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         use disableFormatter = new DisableCodeFormatter()
 
         let appliedExprFormatSpecs =
-            let startOffset = formatStringExpr.GetNavigationRange().StartOffset.Offset
+            let startOffset = formatStringExpr.GetDocumentRange().StartOffset.Offset
 
             warning.FormatSpecsAndExprs
             |> Seq.map (fun (specifierRange, expr) ->

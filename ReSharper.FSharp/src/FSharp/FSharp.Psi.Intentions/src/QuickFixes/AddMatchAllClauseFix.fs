@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 
@@ -86,6 +87,6 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
         lastClause |> Option.iter (MatchTree.moveSubsequentCommentToMatchClause expr)
 
         Action<_>(fun textControl ->
-            let range = clause.Expression.GetNavigationRange()
+            let range = clause.Expression.GetDocumentRange()
             textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
             textControl.Selection.SetRange(range))

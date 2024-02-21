@@ -134,8 +134,8 @@ let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
 
 let getInterfaceImplHeaderRange (interfaceImpl: IInterfaceImplementation) =
     match interfaceImpl.NameIdentifier with
-    | null -> interfaceImpl.GetNavigationRange()
-    | identifier -> identifier.GetNavigationRange()
+    | null -> interfaceImpl.GetDocumentRange()
+    | identifier -> identifier.GetDocumentRange()
 
 let getSecondBindingKeyword (bindings: ILetBindings) =
     let bindings = bindings.Bindings

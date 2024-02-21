@@ -57,7 +57,7 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
             |> Option.iter (fun (clause: IMatchClause) ->
                 let newClause = clause.GetNextMeaningfulSibling().As<IMatchClause>()
                 if isNotNull newClause then
-                    let range = newClause.Expression.GetNavigationRange()
+                    let range = newClause.Expression.GetDocumentRange()
                     textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
                     textControl.Selection.SetRange(range)
             )
