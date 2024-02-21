@@ -13,7 +13,6 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\ZoneMarkerServices.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -23,10 +22,11 @@
       <DependentUpon>Strings.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="src\ReadLockCookieUtil.fs" />
+    <Compile Include="src\ZoneMarkerServices.fs" />
     <EmbeddedResource Include="src\FileTemplates\FileTemplates.xml">
       <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
     </EmbeddedResource>
-    <Compile Include="src\ReadLockCookieUtil.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FcsLookupItem.fs" />
