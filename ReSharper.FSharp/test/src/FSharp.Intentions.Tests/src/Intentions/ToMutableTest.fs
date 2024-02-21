@@ -12,6 +12,17 @@ type ToMutableRecordFieldActionTest() =
 
     [<Test>] member x.``Record field 01``() = x.DoNamedTest()
 
+
+type ToImmutableRecordFieldActionTest() =
+    inherit FSharpContextActionExecuteTestBase<ToImmutableFieldAction>()
+
+    override x.ExtraPath = "toMutable"
+
+    [<Test>] member x.``Record - To Immutable 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record - To Immutable 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record - To Immutable 03``() = x.DoNamedTest()
+
+
 type ToMutableRecordFieldActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ToMutableAction>()
 
