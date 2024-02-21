@@ -1,0 +1,48 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IExpressionStatement
+      IChameleonExpression
+        IObjExpr
+          FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+NewTokenElement(type:NEW, text:new)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:obj)
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          IMemberDeclaration
+            FSharpTokenType+OverrideTokenElement(type:OVERRIDE, text:override)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            INamedSelfId
+              FSharpIdentifierToken(type:IDENTIFIER, text:this)
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            FSharpIdentifierToken(type:IDENTIFIER, text:P)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IChameleonExpression
+              IUnitExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+          IInterfaceImplementation
+            FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:I)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

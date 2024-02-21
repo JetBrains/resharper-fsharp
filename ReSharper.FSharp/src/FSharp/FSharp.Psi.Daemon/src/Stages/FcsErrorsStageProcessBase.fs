@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -392,6 +393,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ -> createGenericHighlighting error range
 
         | NoImplementationGivenWithSuggestion ->
+            let token = fsFile.FindTokenAt(range.StartOffset + 1)
+            let impl = (getParent token).As<IInterfaceImplementation>()
+            if getTokenType token == FSharpTokenType.INTERFACE &&
+                    isNotNull (ObjExprNavigator.GetByInterfaceImplementation(impl)) then
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _ else
+
             let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->

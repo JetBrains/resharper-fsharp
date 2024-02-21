@@ -1,0 +1,7 @@
+﻿module Module
+
+{ new obj() with
+    override this.ToString() = ""
+
+  interface System.IDisposable with
+    member this.Dispose() = {selstart}failwith "todo"{selend} }
