@@ -35,7 +35,7 @@ type FSharpQuickFixBase() =
         let occurrences =
             expressions
             |> Array.map (fun (expr, text) ->
-                let getRange (expr: ITreeNode) = [| expr.GetNavigationRange() |]
+                let getRange (expr: ITreeNode) = [| expr.GetDocumentRange() |]
                 WorkflowPopupMenuOccurrence(RichText(text), RichText.Empty, expr, getRange))
 
         let occurrence =

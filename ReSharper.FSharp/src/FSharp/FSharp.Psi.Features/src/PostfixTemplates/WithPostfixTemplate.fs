@@ -151,7 +151,7 @@ and WithPostfixTemplateBehavior(info) =
                 )
 
             let innermostExpr = WithPostfixTemplate.getInnermostRecordExpr recordExpr
-            let range = innermostExpr.GetNavigationRange()
+            let range = innermostExpr.GetDocumentRange()
             textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
             textControl.RescheduleCompletion(solution)
         ) |> ignore

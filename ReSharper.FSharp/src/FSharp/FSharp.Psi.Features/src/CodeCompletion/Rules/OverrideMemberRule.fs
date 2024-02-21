@@ -32,7 +32,7 @@ type OverrideBehavior(info) =
         let memberDeclaration = node.GetContainingNode<IMemberDeclaration>()
 
         if isNotNull memberDeclaration then
-            let range = memberDeclaration.Expression.GetNavigationRange()
+            let range = memberDeclaration.Expression.GetDocumentRange()
             textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
             textControl.Selection.SetRange(range)
 

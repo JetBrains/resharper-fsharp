@@ -13,11 +13,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ProjectModel
 open JetBrains.UI.RichText
-open JetBrains.Util
 
 module AddParensToApplicationFix =
     let [<Literal>] AppPopupName = "AppPopup"
@@ -129,7 +129,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             |> Seq.map (fun x ->
                 WorkflowPopupMenuOccurrence(
                     RichText(toDisplay (x.App.GetText())), RichText.Empty, x,
-                    (fun appData -> [| appData.App.GetNavigationRange() |])))
+                    (fun appData -> [| appData.App.GetDocumentRange() |])))
             |> Array.ofSeq
 
         let appOccurrence = showPopup appOccurrences AddParensToApplicationFix.AppPopupName
