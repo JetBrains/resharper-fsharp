@@ -1,0 +1,3 @@
+// ${QF_TO_EXECUTE:Disable all inspections in file}
+
+let _ = id{caret} 1

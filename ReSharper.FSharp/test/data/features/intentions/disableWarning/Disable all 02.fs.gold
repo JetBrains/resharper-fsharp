@@ -1,0 +1,8 @@
+﻿// ReSharper disable all
+
+/// It's M
+module M
+
+// ReSharper disable once A
+let _ = id{caret} 1
+// ${QF_TO_EXECUTE:Disable all inspections in file}

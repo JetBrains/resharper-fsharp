@@ -1,0 +1,29 @@
+﻿module Module
+
+let _ = |id|(0) 1
+
+// ReSharper disable once FSharpRedundantApplication
+let _ = id 1
+
+let _ = |id|(1) 1
+
+// ReSharper disable FSharpRedundantApplication
+let _ =
+    id 1 |> ignore
+    id 1
+// ReSharper restore FSharpRedundantApplication
+
+let _ = |id|(2) 1
+
+// ReSharper disable FSharpRedundantApplication
+
+let _ = id 1
+let _ = id 1
+
+let _ = |fun x -> x|(3)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application
+(3): ReSharper Hint: Lambda can be replaced with 'id'

@@ -1,0 +1,5 @@
+﻿// ${QF_TO_EXECUTE:Disable once with comment}
+
+let _ =
+    // ReSharper disable once FSharpRedundantParens
+    (1{caret})

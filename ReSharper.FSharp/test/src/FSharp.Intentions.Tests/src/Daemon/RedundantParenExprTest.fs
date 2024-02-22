@@ -136,3 +136,5 @@ type RedundantParenExprTest() =
     [<Test>] member x.``YieldOrReturn 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Set expression``() = x.DoNamedTest()
+
+    [<Test>] member x.``Disable ReSharper inspections 01``() = x.DoNamedTest()

@@ -1,0 +1,14 @@
+﻿module Module
+
+let _ = |id|(0) 1
+
+
+// ReSharper disable All
+
+let _ = id 1
+
+type A(|x|(1)) = class end
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code [FS1182]: The value 'x' is unused

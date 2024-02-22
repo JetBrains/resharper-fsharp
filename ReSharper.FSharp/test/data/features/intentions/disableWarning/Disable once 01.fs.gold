@@ -1,0 +1,4 @@
+﻿// ${QF_TO_EXECUTE:Disable once with comment}
+
+// ReSharper disable once FSharpRedundantApplication
+let _ = id{caret} 1

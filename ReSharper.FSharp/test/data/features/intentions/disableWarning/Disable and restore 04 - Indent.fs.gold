@@ -1,0 +1,8 @@
+﻿// ${QF_TO_EXECUTE:Disable and restore with comments}
+
+let _ =
+    // ReSharper disable FSharpRedundantParens
+    ({caret}
+     5
+      )
+    // ReSharper restore FSharpRedundantParens
