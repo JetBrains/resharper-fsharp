@@ -99,7 +99,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
         settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
-    let useTransparentCompiler = (getSettingProperty "UseTransparentCompiler").Value
+    let useTransparentCompiler = true
+        // (getSettingProperty "UseTransparentCompiler").Value
     
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")

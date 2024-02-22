@@ -34,11 +34,13 @@
     <RdBackendCommonSubplatform>$(Subplatform).Rider_RdBackend.Common.Props</RdBackendCommonSubplatform>
     <RiderBackendSubplatform>$(Subplatform).Rider_Rider.Backend.Props</RiderBackendSubplatform>
     <UseLocalFSharpCompilerService>true</UseLocalFSharpCompilerService>
-    <LocalFCSProject>$(MSBuildThisFileDirectory)../../fsharp/src/Compiler/FSharp.Compiler.Service.fsproj</LocalFCSProject>
+    <LocalFSharpRepository>$(MSBuildThisFileDirectory)../../fsharp</LocalFSharpRepository>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Condition="'$(UseLocalFSharpCompilerService)' == 'false'" Include="JetBrains.FSharp.Compiler.Service" />
-    <ProjectReference Condition="'$(UseLocalFSharpCompilerService)' == 'true'" Include="$(LocalFCSProject)" />
+    <ProjectReference Condition="'$(UseLocalFSharpCompilerService)' == 'true'" Include="$(LocalFSharpRepository)/src/Compiler/FSharp.Compiler.Service.fsproj" />
+    <ProjectReference Condition="'$(UseLocalFSharpCompilerService)' == 'true'" Include="$(LocalFSharpRepository)/src/FSharp.Compiler.Interactive.Settings/FSharp.Compiler.Interactive.Settings.fsproj" />
+    <ProjectReference Condition="'$(UseLocalFSharpCompilerService)' == 'true'" Include="$(LocalFSharpRepository)/src/FSharp.DependencyManager.Nuget/FSharp.DependencyManager.Nuget.fsproj" />
   </ItemGroup>
 </Project>
