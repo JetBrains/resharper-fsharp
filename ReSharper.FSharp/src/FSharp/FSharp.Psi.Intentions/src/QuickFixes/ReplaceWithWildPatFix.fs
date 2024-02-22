@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Scopes
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -93,7 +92,7 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
 
 
 type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(pat)
 
     let patOwner = ReplaceWithWildPat.getPatOwner pat
 
@@ -104,6 +103,35 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
         ReplaceWithWildPatFix(error.Pat, false)
 
     override x.Text = "Replace with '_'"
+    override x.ScopedText = "Replace unused values with '_'"
+
+    override x.FileCollectorInfo =
+        if not isFromUnusedValue then FileCollectorInfo.Empty else
+
+        match patOwner with
+        | null -> FileCollectorInfo.Default
+        | pat ->
+
+        let (scopeNode: ITreeNode), scopeText =
+            match pat.Parent with
+            | :? IMatchClause ->
+                let patternText =
+                    match pat with
+                    | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
+                    | _ -> "match clause"
+                pat :> _, sprintf "'%s' pattern" patternText
+
+            | :? IParametersPatternDeclaration as p ->
+                match BindingNavigator.GetByParametersDeclaration(p) with
+                | null -> pat :> _, "parameter list"
+                | binding -> binding :> _, "binding patterns"
+
+            | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
+            | :? IBinding -> pat :> _, "binding patterns"
+            | :? IForEachExpr -> pat :> _, "'for' pattern"
+            | _ -> invalidArg "patOwner.Parent" "unexpected type"
+
+        FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, $"in {scopeText}"))
 
     override x.IsAvailable _ = ReplaceWithWildPat.isAvailable pat
 
@@ -112,44 +140,5 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
         use disableFormatter = new DisableCodeFormatter()
         ReplaceWithWildPat.replaceWithWildPat pat
 
-    interface IHighlightingsSetScopedAction with
-        member x.ScopedText = "Replace unused values with '_'"
-
-        member x.FileCollectorInfo =
-            if not isFromUnusedValue then FileCollectorInfo.Empty else
-
-            match patOwner with
-            | null -> FileCollectorInfo.Default
-            | pat ->
-
-            let (scopeNode: ITreeNode), scopeText =
-                match pat.Parent with
-                | :? IMatchClause ->
-                    let patternText =
-                        match pat with
-                        | :? IParametersOwnerPat as owner -> owner.ReferenceName.ShortName
-                        | _ -> "match clause"
-                    pat :> _, sprintf "'%s' pattern" patternText
-
-                | :? IParametersPatternDeclaration as p ->
-                    match BindingNavigator.GetByParametersDeclaration(p) with
-                    | null -> pat :> _, "parameter list"
-                    | binding -> binding :> _, "binding patterns"
-
-                | :? ILambdaParametersList as parametersList -> parametersList :> _, "parameter list"
-                | :? IBinding -> pat :> _, "binding patterns"
-                | :? IForEachExpr -> pat :> _, "'for' pattern"
-                | _ -> invalidArg "patOwner.Parent" "unexpected type"
-
-            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, $"in {scopeText}"))
-
-        member x.ExecuteAction(highlightingInfos, _, _) =
-            use writeLock = WriteLockCookie.Create(true)
-            use disableFormatter = new DisableCodeFormatter()
-
-            for highlightingInfo in highlightingInfos do
-                let warning = highlightingInfo.Highlighting.As<UnusedValueWarning>()
-                if isNotNull warning && ReplaceWithWildPat.isAvailable warning.Pat then
-                    ReplaceWithWildPat.replaceWithWildPat warning.Pat
-
-            null
+    override x.GetScopedQuickFixExecutor(solution, fixingStrategy, highlighting, languageType) =
+        ScopedNonIncrementalQuickFixExecutor(solution, fixingStrategy, highlighting.GetType(), languageType)
