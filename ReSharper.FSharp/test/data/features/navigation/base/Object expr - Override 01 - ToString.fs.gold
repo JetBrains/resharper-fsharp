@@ -18,7 +18,7 @@
 
     DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
     Menu item (enabled) :
-      icon: u(PsiSymbolTypicalSizePlaceholder,Method,ModifiersPublic)
+      icon: u(PsiSymbolTypicalSizePlaceholder,Method)
       text: Object expr - Override 01 - ToString.T <font color="FF6D6D6D"> (in Object expr - Override 01 - ToString.T)</font>
       tail: <font color="FF6D6D6D">TestProject</font>
       tail icon: FsharpProject
