@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:override ToString()}
+module Foo
+
+type A() =
+    override this.ToString() = base.ToString(){caret}
+    member _.Bar = 1

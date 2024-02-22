@@ -41,7 +41,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: IFSharpTreeNode) (indent: int) (element: IFSharpGeneratorElement) =
+let generateMember (context: ITreeNode) (indent: int) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
     let displayContext = element.DisplayContext
     let addTypes = element.AddTypes
@@ -255,7 +255,12 @@ let rec getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclarati
         if isNotNull typeRepresentation then typeRepresentation else
 
         selectedTreeNode.LeftSiblings()
-        |> Seq.tryFind (fun node -> node :? ITypeBodyMemberDeclaration || node :? ITypeRepresentation)
+        |> Seq.tryPick (fun node ->
+            match node with
+            | :? ITypeDeclarationGroup as node -> Some (node.TypeDeclarations.Last() :> ITreeNode)
+            | :? ITypeBodyMemberDeclaration as node -> Some node
+            | :? ITypeRepresentation as node -> Some node
+            | _ -> None)
         |> Option.defaultValue null
 
 let canHaveOverrides (typeElement: ITypeElement) =
@@ -441,7 +446,27 @@ let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missi
     let isObjExpr = typeDeclaration :? IObjExpr
     getOverridableMembersForType typeElement fcsSymbolUse missingMembersOnly isObjExpr psiModule
 
-let addMembers inputElements typeDecl indent anchor =
+let mayHaveBaseCalls (typeDecl: IFSharpTypeElementDeclaration) =
+    match typeDecl with
+    | :? IFSharpTypeDeclaration as typeDecl -> isNotNull typeDecl.TypeInheritMember
+    | :? IObjExpr -> true
+    | _ -> false
+
+let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
+    inputElements
+    |> Seq.collect (fun element ->
+        let mfv = element.Mfv
+        let prop = element.Member.As<IProperty>()
+
+        if isNull prop || not (mfv.IsNonCliEventProperty()) then [element] else
+
+        [ if isNotNull prop.Getter && mfv.HasGetterMethod then
+              FSharpGeneratorElement(prop.Getter, { element.MfvInstance with Mfv = mfv.GetterMethod }, element.AddTypes)
+          if isNotNull prop.Setter && mfv.HasSetterMethod then
+              FSharpGeneratorElement(prop.Setter, { element.MfvInstance with Mfv = mfv.SetterMethod }, element.AddTypes) ]
+    )
+
+let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) indent anchor =
     let lastNode =
         inputElements
         |> Seq.cast
