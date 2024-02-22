@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -11,7 +10,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.TreeNode)
 
     let treeNode = warning.TreeNode
 
@@ -29,6 +28,7 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
         ModificationUtil.DeleteChildRange(qualifier, getLastMatchingNodeAfter isInlineSpace delimiter)
 
     override x.Text = "Remove redundant qualifier"
+    override x.ScopedText = "Remove redundant qualifiers"
 
     override x.IsAvailable _ =
         isValid treeNode
@@ -37,20 +37,5 @@ type RemoveRedundantQualifierFix(warning: RedundantQualifierWarning) =
         use writeCookie = WriteLockCookie.Create(treeNode.IsPhysical())
         removeQualifiers treeNode
 
-    interface IHighlightingsSetScopedAction with
-        member x.ScopedText = "Remove redundant qualifiers"
-        member x.FileCollectorInfo = FileCollectorInfo.Default
-
-        member x.ExecuteAction(highlightingInfos, _, _) =
-            for highlightingInfo in highlightingInfos do
-                match highlightingInfo.Highlighting.As<RedundantQualifierWarning>() with
-                | null -> ()
-                | warning ->
-
-                let qualifier = warning.TreeNode
-                if not (isValid qualifier) then () else
-
-                use writeLock = WriteLockCookie.Create(qualifier.IsPhysical())
-                removeQualifiers qualifier
-
-            null
+    override x.GetScopedQuickFixExecutor(solution, fixingStrategy, highlighting, languageType) =
+        ScopedNonIncrementalQuickFixExecutor(solution, fixingStrategy, highlighting.GetType(), languageType)

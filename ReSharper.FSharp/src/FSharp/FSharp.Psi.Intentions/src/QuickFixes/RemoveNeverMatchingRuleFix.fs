@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -9,7 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.MatchClause)
 
     let removeMatchClause (clause : IMatchClause) =
         if isLastChild clause then
@@ -23,6 +22,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         deleteChildRange clause last
 
     override x.Text = "Remove never matching rule"
+    override x.ScopedText = "Remove never matching rules"
     override x.IsAvailable _ = isValid warning.MatchClause
 
     override x.ExecutePsiTransaction _ =
@@ -31,18 +31,5 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         use writeLock = WriteLockCookie.Create(clause.IsPhysical())
         removeMatchClause clause
 
-    interface IHighlightingsSetScopedAction with
-        member x.ScopedText = "Remove never matching rules"
-        member x.FileCollectorInfo = FileCollectorInfo.Default
-
-        member x.ExecuteAction(highlightingInfos, _, _) =
-            use enableFormatter = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
-
-            for highlightingInfo in highlightingInfos do
-                match highlightingInfo.Highlighting.As<RuleNeverMatchedWarning>() with
-                | null -> ()
-                | warning ->
-                    let clause = warning.MatchClause
-                    use writeLock = WriteLockCookie.Create(clause.IsPhysical())
-                    removeMatchClause clause
-            null
+    override x.GetScopedQuickFixExecutor(solution, fixingStrategy, highlighting, languageType) =
+        ScopedNonIncrementalQuickFixExecutor(solution, fixingStrategy, highlighting.GetType(), languageType)
