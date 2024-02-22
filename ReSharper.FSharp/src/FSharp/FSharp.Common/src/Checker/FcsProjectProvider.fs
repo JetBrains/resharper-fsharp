@@ -510,7 +510,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             dirtyProjects.Clear()
 
     interface IFcsProjectProvider with
-        member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
+        member x.GetProjectSnapshot(sourceFile: IPsiSourceFile) =
             locks.AssertReadAccessAllowed()
             processInvalidatedFcsProjects ()
 
@@ -531,7 +531,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectSnapshot
             | _ -> None
 
-        member x.GetProjectOptions(psiModule: IPsiModule) =
+        member x.GetProjectSnapshot(psiModule: IPsiModule) =
             locks.AssertReadAccessAllowed()
             processInvalidatedFcsProjects ()
 

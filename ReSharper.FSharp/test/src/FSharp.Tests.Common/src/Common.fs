@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -236,11 +238,11 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        let getReferencedProjectOutputs (options: FSharpProjectOptions) =
-            options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
+        let getReferencedProjectOutputs (options: FSharpProjectSnapshot) =
+            options.ReferencedProjects |> List.map (fun project -> project.OutputFile)
 
-        let newOptions = newProject.ProjectOptions
-        let oldOptions = oldProject.ProjectOptions
+        let newOptions = newProject.ProjectSnapshot
+        let oldOptions = oldProject.ProjectSnapshot
 
         newOptions.ProjectFileName = oldOptions.ProjectFileName &&
         newOptions.SourceFiles = oldOptions.SourceFiles &&
@@ -258,9 +260,9 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 newFcsProject
         )
 
-    let getProjectOptions (sourceFile: IPsiSourceFile) =
+    let getProjectSnapshot (sourceFile: IPsiSourceFile) =
         let fcsProject = getFcsProject sourceFile.PsiModule
-        Some fcsProject.ProjectOptions
+        Some fcsProject.ProjectSnapshot
 
     interface IHideImplementation<FcsProjectProvider>
 
@@ -269,11 +271,11 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
             let fcsProject = getFcsProject sourceFile.PsiModule
             fcsProject.ImplementationFilesWithSignatures.Contains(sourceFile.GetLocation())
 
-        member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
+        member x.GetProjectSnapshot(sourceFile: IPsiSourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
                 scriptFcsProjectProvider.GetScriptSnapshot(sourceFile) else
 
-            getProjectOptions sourceFile
+            getProjectSnapshot sourceFile
 
         member x.GetParsingOptions(sourceFile) =
             if isNull sourceFile then sandboxParsingOptions else
@@ -328,7 +330,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.HasFcsProjects = false
         member this.GetAllFcsProjects() = []
 
-        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
+        member this.GetProjectSnapshot(_: IPsiModule): FSharpProjectSnapshot option = failwith "todo"
         member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
         member this.PrepareAssemblyShim _ = ()
         member this.GetReferencedModule _ = None

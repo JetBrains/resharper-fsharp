@@ -201,7 +201,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             new PinTypeCheckResultsCookie(sourceFile, parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
         | _ -> { new IDisposable with member this.Dispose() = () }
 
-    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
+    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) : FSharpCheckFileResults option =
         match x.FcsProjectProvider.GetProjectSnapshot(file) with
         | None -> None
         | Some snapshot ->
@@ -210,7 +210,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
         // TODO: TryGetRecentCheckResultsForFile for Snapshot
-        Unchecked.defaultof<FSharpProjectSnapshot option>
+        // https://github.com/dotnet/fsharp/pull/16720
+        None
         // match x.Checker.TryGetRecentCheckResultsForFile(path, snapshot) with
         // | Some (_, checkResults, _) ->
         //     logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
