@@ -75,7 +75,7 @@ type InferredTypeCodeVisionProvider() =
         member x.OnExtraActionClick(_, _, _) = ()
 
 
-[<DaemonStage>]
+[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
     inherit FSharpDaemonStageBase()
 
