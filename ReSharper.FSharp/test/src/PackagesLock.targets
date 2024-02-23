@@ -5,9 +5,9 @@
     <PackageLock Include="FSharp.Core" Version="8.0.101" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2024.1.1" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2024.1.0" />
-    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.8.20231120.123" />
-    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.8.20231120.123" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.8.20231120.123" />
+    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.9.20240222.127" />
+    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.9.20240222.127" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.9.20240222.127" />
     <PackageLock Include="JetBrains.RdFramework" Version="2024.1.0" />
     <PackageLock Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="1.1.1" />
