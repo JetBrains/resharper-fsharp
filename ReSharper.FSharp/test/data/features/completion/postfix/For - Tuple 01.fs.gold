@@ -2,5 +2,5 @@
 // ${OCCURRENCE:Deconstruct tuple}
 module Module
 
-for i, s{caret} in [1, ""] do
-  
+for i, s in [1, ""] do
+  {caret}
