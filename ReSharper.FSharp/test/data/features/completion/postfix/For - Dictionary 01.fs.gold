@@ -6,5 +6,5 @@ open System.Collections.Generic
 
 let d: IDictionary<string, bool> = null
 
-for KeyValue(s, b){caret} in d do
-  
+for KeyValue(s, b) in d do
+  {caret}
