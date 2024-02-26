@@ -9,6 +9,7 @@ open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
@@ -209,10 +210,17 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 let name =
                     match psiSourceFile.Document with
                     | :? RiderDocument as rd -> rd.FullPath
+                    | :? StandaloneDocument as sd -> sd.Moniker
                     | _ -> psiSourceFile.Name
 
                 let version = string psiSourceFile.Document.LastModificationStamp.Value
-                let getSource () = psiSourceFile.Document.GetText() |> FSharp.Compiler.Text.SourceTextNew.ofString |> Task.FromResult
+
+                let getSource () =
+                    use cookie = ReadLockCookie.Create()
+                    psiSourceFile.Document.GetText()
+                    |> FSharp.Compiler.Text.SourceTextNew.ofString
+                    |> Task.FromResult
+
                 ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
             )
             |> Seq.toList
