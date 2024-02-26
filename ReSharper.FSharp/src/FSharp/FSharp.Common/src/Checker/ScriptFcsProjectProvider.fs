@@ -68,7 +68,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
     let getSnapshotImpl (path: VirtualFileSystemPath) source : FSharpProjectSnapshot option =
         let path = path.FullPath
-        let source = SourceText.ofString source
+        let source = SourceTextNew.ofString source
         let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
 
         let toolset = toolset.GetDotNetCoreToolset()
@@ -76,17 +76,14 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             if isNotNull toolset && isNotNull toolset.Sdk then
                 let sdkRootFolder = toolset.Cli.NotNull("cli").SdkRootFolder.NotNull("sdkRootFolder")
                 let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
-                // TODO: GetProjectOptionsFromScript does not exists for Snapshot
-                Unchecked.defaultof<Async<FSharpProjectSnapshot * FSharp.Compiler.Diagnostics.FSharpDiagnostic list>>
-                // checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                //     otherFlags = otherFlags.Value.Value,
-                //     assumeDotNetFramework = targetNetFramework,
-                //     sdkDirOverride = sdkFolderPath.FullPath)
+                checkerService.Checker.GetProjectSnapshotFromScript(path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = targetNetFramework,
+                    sdkDirOverride = sdkFolderPath.FullPath)
             else
-                Unchecked.defaultof<Async<FSharpProjectSnapshot * FSharp.Compiler.Diagnostics.FSharpDiagnostic list>>
-                // checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                //     otherFlags = otherFlags.Value.Value,
-                //     assumeDotNetFramework = targetNetFramework)
+                checkerService.Checker.GetProjectSnapshotFromScript(path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = targetNetFramework)
 
         try
             let snapshot, errors = getScriptSnapshotAsync.RunAsTask()
