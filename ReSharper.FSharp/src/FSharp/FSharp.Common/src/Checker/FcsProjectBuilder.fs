@@ -237,7 +237,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                     else
                         Some ({
                             Path = path.FullPath
-                            LastModified = path.FileModificationTimeUtc
+                            LastModified = if path.ExistsFile then path.FileModificationTimeUtc else DateTime.MinValue
                         } : ProjectSnapshot.ReferenceOnDisk))
             )
             |> Seq.toList
