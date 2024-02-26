@@ -59,22 +59,20 @@ type FcsProject =
         let (ProjectSnapshot.FSharpProjectIdentifier(projectFileName, _)) = projectSnapshot.Identifier
 
         writer.WriteLine($"Project file: {projectFileName}")
-        // TODO: the ProjectSnapshot exposes less information than the ProjectOptions
+        writer.WriteLine($"Stamp: {projectSnapshot.Stamp}")
+        writer.WriteLine($"Load time: {projectSnapshot.LoadTime}")
         
-        // writer.WriteLine($"Stamp: {projectSnapshot.}")
-        // writer.WriteLine($"Load time: {projectSnapshot.LoadTime}")
-        //
-        // writer.WriteLine("Source files:")
-        // for sourceFile in projectSnapshot.SourceFiles do
-        //     writer.WriteLine($"  {sourceFile}")
-        //
-        // writer.WriteLine("Other options:")
-        // for option in projectSnapshot.OtherOptions do
-        //     writer.WriteLine($"  {option}")
-        //
-        // writer.WriteLine("Referenced projects:")
-        // for referencedProject in projectSnapshot.ReferencedProjects do
-        //     writer.WriteLine($"  {referencedProject.OutputFile}")
+        writer.WriteLine("Source files:")
+        for sourceFile in projectSnapshot.SourceFiles do
+            writer.WriteLine($"  {sourceFile}")
+        
+        writer.WriteLine("Other options:")
+        for option in projectSnapshot.OtherOptions do
+            writer.WriteLine($"  {option}")
+        
+        writer.WriteLine("Referenced projects:")
+        for referencedProject in projectSnapshot.ReferencedProjects do
+            writer.WriteLine($"  {referencedProject.OutputFile}")
 
         writer.WriteLine()
 
