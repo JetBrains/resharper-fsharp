@@ -22,8 +22,6 @@ type CheckResults =
 
 type FSharpChecker with
     member internal x.ParseAndCheckDocument(path, projectSnapshot: FSharpProjectSnapshot, allowStale: bool, opName) =
-        // let version = source.GetHashCode()
-
         let parseAndCheckFile =
             async {
                 let! parseResults, checkFileAnswer =
@@ -56,40 +54,34 @@ type FSharpChecker with
                     return StillRunning t
             }
 
-        // let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
-        //     match results with
-        //     | Some(parseResults, checkResults) ->
-        //         Some (parseResults, checkResults)
-        //     | _ -> None
+        let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
+            match results with
+            | Some(parseResults, checkResults) ->
+                Some (parseResults, checkResults)
+            | _ -> None
 
-        // Additional map seems weird here?
-        // map bindParsedInput
-
-        parseAndCheckFile
-
-        // async {
-        //     // TODO: TryGetRecentCheckResultsForFile is missing on the Transparent compiler
-        //     match x.TryGetRecentCheckResultsForFile(path, options, source) with
-        //     | None ->
-        //         // No stale results available, wait for fresh results
-        //         return! parseAndCheckFile
-        //
-        //     | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
-        //         // Avoid queueing on the reactor thread by using the recent results
-        //         return Some (parseResults, checkFileResults)
-        //
-        //     | Some (staleParseResults, staleCheckFileResults, _) ->
-        //
-        //     match! tryGetFreshResultsWithTimeout() with
-        //     | Ready x ->
-        //         // Fresh results were ready quickly enough
-        //         return x
-        //
-        //     | StillRunning _ when allowStale ->
-        //         // Still waiting for fresh results - just use the stale ones for now
-        //         return Some (staleParseResults, staleCheckFileResults)
-        //
-        //     | StillRunning worker ->
-        //         return! Async.AwaitTask worker
-        // }
-        // |> map bindParsedInput
+        async {
+            match x.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
+            | None ->
+                // No stale results available, wait for fresh results
+                return! parseAndCheckFile
+        
+            // | Some (parseResults, checkFileResults) when allowStale && cachedVersion = int64 version ->
+            //     // Avoid queueing on the reactor thread by using the recent results
+            //     return Some (parseResults, checkFileResults)
+        
+            | Some (staleParseResults, staleCheckFileResults) ->
+        
+            match! tryGetFreshResultsWithTimeout() with
+            | Ready x ->
+                // Fresh results were ready quickly enough
+                return x
+        
+            | StillRunning _ when allowStale ->
+                // Still waiting for fresh results - just use the stale ones for now
+                return Some (staleParseResults, staleCheckFileResults)
+        
+            | StillRunning worker ->
+                return! Async.AwaitTask worker
+        }
+        |> map bindParsedInput
