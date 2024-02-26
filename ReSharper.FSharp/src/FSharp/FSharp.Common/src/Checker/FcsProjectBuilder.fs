@@ -15,6 +15,7 @@ open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.RdBackend.Common.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -200,9 +201,16 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         
         let sourceFiles =
             psiModule.SourceFiles
+            |> Seq.filter(fun psiSourceFile ->
+                isNotNull psiSourceFile.PrimaryPsiLanguage
+                && psiSourceFile.PrimaryPsiLanguage.Name = "F#"
+            )
             |> Seq.map (fun psiSourceFile ->
-                // TODO: I assume the Create will expect the full path of the file?
-                let name = psiSourceFile.Name
+                let name =
+                    match psiSourceFile.Document with
+                    | :? RiderDocument as rd -> rd.FullPath
+                    | _ -> psiSourceFile.Name
+
                 let version = string psiSourceFile.Document.LastModificationStamp.Value
                 let getSource () = psiSourceFile.Document.GetText() |> FSharp.Compiler.Text.SourceTextNew.ofString |> Task.FromResult
                 ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
