@@ -176,7 +176,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | Some fcsProject ->
 
         let snapshot = fcsProject.ProjectSnapshot
-        // if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
+        if not (fcsProject.IsKnownFile(sourceFile)) && not snapshot.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
@@ -208,17 +208,14 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        // TODO: TryGetRecentCheckResultsForFile for Snapshot
-        // https://github.com/dotnet/fsharp/pull/16720
-        None
-        // match x.Checker.TryGetRecentCheckResultsForFile(path, snapshot) with
-        // | Some (_, checkResults, _) ->
-        //     logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
-        //     Some checkResults
-        //
-        // | _ ->
-        //     logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
-        //     None
+        match x.Checker.TryGetRecentCheckResultsForFile(path, snapshot) with
+        | Some (_, checkResults) ->
+            logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
+            Some checkResults
+        
+        | _ ->
+            logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
+            None
 
     member x.GetCachedScriptSnapshot(path) =
         if checker.IsValueCreated then
