@@ -21,6 +21,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -207,19 +208,15 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 && psiSourceFile.PrimaryPsiLanguage.Name = "F#"
             )
             |> Seq.map (fun psiSourceFile ->
-                let name =
-                    match psiSourceFile.Document with
-                    | :? RiderDocument as rd -> rd.FullPath
-                    | :? StandaloneDocument as sd -> sd.Moniker
-                    | _ -> psiSourceFile.Name
-
+                let name = psiSourceFile.GetLocation().FullPath
                 let version = string psiSourceFile.Document.LastModificationStamp.Value
 
                 let getSource () =
-                    use cookie = ReadLockCookie.Create()
-                    psiSourceFile.Document.GetText()
-                    |> FSharp.Compiler.Text.SourceTextNew.ofString
-                    |> Task.FromResult
+                    task {
+                        use cookie = ReadLockCookie.Create()
+                        let text = psiSourceFile.Document.GetText()
+                        return FSharp.Compiler.Text.SourceTextNew.ofString text
+                    }
 
                 ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
             )
