@@ -8,3 +8,4 @@
 *.fs text eol=lf
 *.fsi text eol=lf
 *.fsx text eol=lf
+*.gold text eol=lf
