@@ -209,8 +209,8 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModules) =
-    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger, psiModules)
+type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModules, locks) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger, psiModules, locks)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()

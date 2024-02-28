@@ -8,6 +8,7 @@ open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Threading
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -17,6 +18,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.RdBackend.Common.Features.Documents
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -68,7 +70,7 @@ module FcsProjectBuilder =
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =
+        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules, locks: IShellLocks) =
 
     let defaultOptions =
         [| "--noframework"
@@ -209,16 +211,35 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             )
             |> Seq.map (fun psiSourceFile ->
                 let name = psiSourceFile.GetLocation().FullPath
+                (*
+                
+                In order to create the snapshot, we need to ensure that Resharper read lock rules are respected when getting the source.
+                Today, this happens in DelegatingFileSystemShim.cs.
+                So we can rely on the file system (that is shimmed) and use FSharpFileSnapshot.CreateFromFileSystem.
+                
+                Alternatively we can construct the snapshot via getSource:
+                ```fsharp
                 let version = string psiSourceFile.Document.LastModificationStamp.Value
 
                 let getSource () =
                     task {
-                        use cookie = ReadLockCookie.Create()
-                        let text = psiSourceFile.Document.GetText()
+                        let mutable text = ""
+                        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
+                            text <- psiSourceFile.Document.GetText()
+                        )
                         return FSharp.Compiler.Text.SourceTextNew.ofString text
                     }
 
                 ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
+                ``` 
+
+                This also worked but for now going with the FileSystemShim seems better?
+                I favour the getSource option (or a better version of it) over the FileSystemShim 
+                as it makes it more explicit where the source is really coming from. 
+                However, I don't have enough understanding about the plugin to really make this judgement call.
+
+                *)
+                ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name)
             )
             |> Seq.toList
         
