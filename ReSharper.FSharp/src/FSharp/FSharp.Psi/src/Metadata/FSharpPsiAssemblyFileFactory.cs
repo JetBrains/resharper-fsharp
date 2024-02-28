@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -10,7 +11,7 @@ using JetBrains.Util.Caches;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
-  [PsiComponent]
+  [PsiComponent(Instantiation.DemandAnyThreadSafe)]
   public class FSharpPsiAssemblyFileFactory : IPsiAssemblyFileFactory
   {
     public int Priority => 20;

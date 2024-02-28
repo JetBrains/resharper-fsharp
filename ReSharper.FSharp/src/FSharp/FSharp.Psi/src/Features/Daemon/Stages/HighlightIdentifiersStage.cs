@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
@@ -16,7 +17,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
-  [DaemonStage(StagesAfter = new[] {typeof(CollectUsagesStage)})]
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightIdentifiersStage : FSharpDaemonStageBase
   {
     protected override bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>

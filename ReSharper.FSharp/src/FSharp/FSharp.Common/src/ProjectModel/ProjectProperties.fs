@@ -135,7 +135,7 @@ type FSharpProjectMarkTypeGuidProvider() =
     override x.GetActualTypeGuid _ = fsProjectTypeGuid
 
 
-[<ProjectModelExtension>]
+[<ProjectModelExtension(Instantiation.DemandAnyThreadSafe)>]
 type FSharpProjectPropertiesFactory() =
     inherit UnknownProjectPropertiesFactory()
 
