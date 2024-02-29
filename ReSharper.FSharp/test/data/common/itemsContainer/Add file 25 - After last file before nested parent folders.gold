@@ -12,6 +12,7 @@ Folder/Sub/File2
 =======
 Add 'Folder/File3' After 'File1'
 Update view Folder/Sub[1]
+Update view Folder/File3
 
 Project
 1:File1

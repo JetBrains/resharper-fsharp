@@ -12,6 +12,7 @@ File2
 =======
 Add 'Folder/Another/File3' Before 'File2'
 Refresh Folder[1]
+Update view Folder/Another/File3
 
 Project
 1:Folder[1]

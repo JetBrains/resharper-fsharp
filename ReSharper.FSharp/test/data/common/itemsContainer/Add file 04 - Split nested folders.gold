@@ -13,6 +13,7 @@ Folder/SubFolder/File2
 Add 'Folder/File3' Before 'Folder/SubFolder/File2'
 Refresh Folder[1]
 Update view Folder/SubFolder[2]
+Update view Folder/File3
 
 Project
 1:Folder[1]
@@ -32,6 +33,7 @@ Folder/SubFolder/File2
 Add 'Folder/File3' After 'Folder/SubFolder/File1'
 Refresh Folder[1]
 Update view Folder/SubFolder[2]
+Update view Folder/File3
 
 Project
 1:Folder[1]

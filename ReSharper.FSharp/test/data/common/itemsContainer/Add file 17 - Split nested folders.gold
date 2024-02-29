@@ -17,6 +17,7 @@ Folder/File4
 Add 'File5' Before 'Folder/SubFolder/File3'
 Refresh whole project
 Update view Folder[2]
+Update view File5
 
 Project
 1:Folder[1]
@@ -40,6 +41,7 @@ Folder/File4
 Add 'File5' After 'Folder/File2'
 Refresh whole project
 Update view Folder[2]
+Update view File5
 
 Project
 1:Folder[1]

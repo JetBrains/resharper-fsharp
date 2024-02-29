@@ -21,6 +21,7 @@ File6
 Add 'Folder/Another/File7' After 'Folder/Subfolder/File4'
 Refresh Folder[1]
 Update view Folder/File5
+Update view Folder/Another/File7
 
 Project
 1:File1

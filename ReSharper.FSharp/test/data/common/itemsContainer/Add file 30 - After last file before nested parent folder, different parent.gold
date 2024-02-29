@@ -13,6 +13,7 @@ Folder/Sub/File2
 Add 'Folder/Another/File3' After 'File1'
 Refresh Folder[1]
 Update view Folder/Sub[1]
+Update view Folder/Another/File3
 
 Project
 1:File1

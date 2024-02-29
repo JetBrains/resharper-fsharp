@@ -22,6 +22,7 @@ Add 'File7' Before 'Folder/SubFolder/File4'
 Refresh whole project
 Update view File6
 Update view Folder[2]
+Update view File7
 
 Project
 1:File1
@@ -50,6 +51,7 @@ Add 'File7' After 'Folder/File3'
 Refresh whole project
 Update view File6
 Update view Folder[2]
+Update view File7
 
 Project
 1:File1
