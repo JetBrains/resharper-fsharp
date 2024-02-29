@@ -220,7 +220,7 @@ module FSharpPostfixTemplates =
 
     let showHotspots textControl (hotspotsRegistry: HotspotsRegistry) endOffset =
         let hotspotInfos = hotspotsRegistry.CreateHotspots()
-        if hotspotInfos.Length > 0 then () else
+        if hotspotInfos.Length = 0 then () else
 
         let liveTemplatesManager = hotspotsRegistry.PsiServices.GetComponent<LiveTemplatesManager>()
 
