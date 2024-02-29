@@ -17,6 +17,7 @@ File5
 Add 'File6' Before 'File4'
 Update view File4
 Update view File5
+Update view File6
 
 Project
 1:File1
@@ -39,6 +40,7 @@ File5
 Add 'File6' After 'File3'
 Update view File4
 Update view File5
+Update view File6
 
 Project
 1:File1

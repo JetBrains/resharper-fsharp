@@ -16,6 +16,7 @@ Move 'Folder/File4' after 'File1':
 Remove 'Folder/File4'
 Add 'File4' After 'File1'
 Update view Folder[1]
+Update view File4
 
 Project
 1:File1

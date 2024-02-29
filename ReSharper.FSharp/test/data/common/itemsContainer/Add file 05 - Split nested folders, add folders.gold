@@ -21,6 +21,7 @@ Refresh Folder[1]
 Update view Folder/Another[1]
 Update view Folder/File4
 Update view Folder/SubFolder[2]
+Update view Folder/Another/SubFolder/File5
 
 Project
 1:Folder[1]
@@ -50,6 +51,7 @@ Refresh Folder[1]
 Update view Folder/Another[1]
 Update view Folder/File4
 Update view Folder/SubFolder[2]
+Update view Folder/Another/SubFolder/File5
 
 Project
 1:Folder[1]

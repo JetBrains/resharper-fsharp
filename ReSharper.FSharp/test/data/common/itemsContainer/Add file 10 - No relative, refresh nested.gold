@@ -12,6 +12,7 @@ Folder/SubFolder/File2
 =======
 Add 'Folder/Subfolder/Another/File1'
 Refresh Folder/SubFolder[1]
+Update view Folder/Subfolder/Another/File1
 
 Project
 1:File1
