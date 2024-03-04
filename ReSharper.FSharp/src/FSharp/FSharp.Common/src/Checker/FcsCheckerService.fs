@@ -70,6 +70,10 @@ type FcsProject =
         for option in projectSnapshot.OtherOptions do
             writer.WriteLine($"  {option}")
         
+        writer.WriteLine("References on disk:")
+        for r in projectSnapshot.ReferencesOnDisk do
+            writer.WriteLine($"  %s{r.Path}")
+        
         writer.WriteLine("Referenced projects:")
         for referencedProject in projectSnapshot.ReferencedProjects do
             writer.WriteLine($"  {referencedProject.OutputFile}")
@@ -97,6 +101,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
         settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
+    // Hard coded for now.
     let useTransparentCompiler = true
         // (getSettingProperty "UseTransparentCompiler").Value
     
@@ -180,6 +185,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
+        // TODO: should this be the non virtual path?
         let path = sourceFile.GetLocation().FullPath
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)

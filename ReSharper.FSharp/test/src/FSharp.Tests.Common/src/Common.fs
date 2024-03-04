@@ -247,6 +247,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         newOptions.ProjectFileName = oldOptions.ProjectFileName &&
         newOptions.SourceFiles = oldOptions.SourceFiles &&
         newOptions.OtherOptions = oldOptions.OtherOptions &&
+        newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
         getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
 
     let getFcsProject (psiModule: IPsiModule) =

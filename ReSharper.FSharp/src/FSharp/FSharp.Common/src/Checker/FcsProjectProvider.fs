@@ -135,6 +135,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             newOptions.ProjectFileName = oldOptions.ProjectFileName &&
             newOptions.SourceFiles = oldOptions.SourceFiles &&
             newOptions.OtherOptions = oldOptions.OtherOptions &&
+            newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
 
             newOptions.ReferencedProjects.Length = oldOptions.ReferencedProjects.Length &&
             (newOptions.ReferencedProjects, oldOptions.ReferencedProjects)

@@ -68,10 +68,9 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
     let getScriptReferences (scriptPath: VirtualFileSystemPath) (scriptSnapshot: FSharpProjectSnapshot) =
         let assembliesPaths = HashSet<VirtualFileSystemPath>()
-        for o in scriptSnapshot.OtherOptions do
-            if o.StartsWith("-r:", StringComparison.Ordinal) then
-                let path = VirtualFileSystemPath.TryParse(o.Substring(3), InteractionContext.SolutionContext)
-                if not path.IsEmpty then assembliesPaths.Add(path) |> ignore
+        for { Path = r } in scriptSnapshot.ReferencesOnDisk do
+            let path = VirtualFileSystemPath.TryParse(r, InteractionContext.SolutionContext)
+            if not path.IsEmpty then assembliesPaths.Add(path) |> ignore
 
         let filesPaths = HashSet<VirtualFileSystemPath>()
         for file in scriptSnapshot.SourceFiles do

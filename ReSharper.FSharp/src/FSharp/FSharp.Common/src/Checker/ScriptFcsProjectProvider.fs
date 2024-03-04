@@ -196,6 +196,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                                 List.length l1 = List.length l2 && List.forall2 (=) l1 l2
 
                             listEq options1.OtherOptions options2.OtherOptions &&
+                            listEq options1.ReferencesOnDisk options2.ReferencesOnDisk &&
                             listEq options1.SourceFiles options2.SourceFiles
 
                         if not (areEqualForChecking oldOptions.ProjectSnapshot newSnapshot) then
