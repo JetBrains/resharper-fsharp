@@ -41,6 +41,7 @@ open class SendToFsiActionBase(
   private val debug: Boolean, private val sendLineText: String,
   private val sendSelectionText: String
 ) : AnAction(), DumbAware {
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
@@ -52,8 +53,7 @@ open class SendToFsiActionBase(
   override fun update(e: AnActionEvent) {
     if (debug && !SystemInfo.isWindows) {
       // todo: enable when we can read needed metadata on Mono, RIDER-7148
-      e.presentation.isEnabled = false
-      e.presentation.isVisible = false
+      e.presentation.isEnabledAndVisible = false
       return
     }
     val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)
