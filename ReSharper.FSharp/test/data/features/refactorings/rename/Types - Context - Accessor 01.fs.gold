@@ -1,0 +1,6 @@
+﻿module Module
+
+type zzz = int
+
+type T =
+    member this.P with get(): zzz = 1

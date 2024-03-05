@@ -1480,6 +1480,7 @@ accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
   IDENTIFIER<IDENTIFIER, Identifier>
   (
     parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
+    returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, BodyExpression>
   )?;

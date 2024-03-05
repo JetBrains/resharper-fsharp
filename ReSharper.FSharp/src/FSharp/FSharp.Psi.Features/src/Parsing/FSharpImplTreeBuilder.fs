@@ -329,7 +329,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                     | _ ->
                         match accessorId with
                         | Some _ ->
-                            x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart)
+                            x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart, returnInfo)
                             ElementType.MEMBER_DECLARATION
                         | _ ->
 
@@ -344,7 +344,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
                     match accessorId with
                     | Some _ ->
-                        x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart)
+                        x.ProcessAccessor(range, memberParams, expr, attrLists, accessorsStart, returnInfo)
                         ElementType.MEMBER_DECLARATION
                     | _ ->
 
@@ -370,7 +370,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         elType
 
-    member x.ProcessAccessor(range: range, memberParams, expr, attrLists, accessorsStart) =
+    member x.ProcessAccessor(range: range, memberParams, expr, attrLists, accessorsStart, returnInfo) =
         let attrs =
             match accessorsStart with
             | Some pos -> attrLists |> List.skipWhile (fun attrList -> Position.posLt attrList.Range.Start pos)
@@ -390,6 +390,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
             | _ -> memberParams
 
         x.ProcessPatternParams(memberParams, true, true)
+        x.ProcessReturnInfo(returnInfo)
         x.MarkChameleonExpression(expr)
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
 

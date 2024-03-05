@@ -113,6 +113,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Record 02 - Struct``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types - Context - Accessor 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Types - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Interface 01``() = x.DoNamedTest()
