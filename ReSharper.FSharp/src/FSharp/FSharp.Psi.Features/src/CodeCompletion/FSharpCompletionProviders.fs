@@ -68,9 +68,10 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         obj()
 
     member x.AddLookupItems(context: FSharpCodeCompletionContext, collector: IItemsCollector) =
-        let fcsContext = context.FcsCompletionContext
+        let reparsedContext = context.ReparsedContext
+        let reparsedFcsContext = reparsedContext.GetFcsContext()
 
-        match fcsContext.CompletionContext with
+        match reparsedFcsContext.CompletionContext with
         | Some(CompletionContext.Invalid) -> false
         | _ ->
 
@@ -90,6 +91,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
                 item.Name.StartsWith(PrettyNaming.FsiDynamicModulePrefix, StringComparison.Ordinal)
 
             let parseResults = fsFile.ParseResults
+            let fcsContext = context.FcsCompletionContext
             let line = int fcsContext.Coords.Line + 1
 
             let isAttributeReferenceContext = context.IsInAttributeContext
