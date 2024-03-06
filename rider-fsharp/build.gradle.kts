@@ -75,7 +75,7 @@ intellij {
       "org.intellij.intelliLang",
       "DatabaseTools",
       "css-impl",
-      "javascript-impl",
+      "javascript-plugin",
       "com.intellij.ml.llm"
     )
   )
