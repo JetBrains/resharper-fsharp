@@ -71,12 +71,12 @@ intellij {
   // org.intellij.intelliLang needed for tests with language injection marks
   plugins.set(
     listOf(
-      "rider-plugins-appender",
+      "com.intellij.css",
+      "com.intellij.database",
+      "com.intellij.ml.llm",
+      "JavaScript",
       "org.intellij.intelliLang",
-      "DatabaseTools",
-      "css-impl",
-      "javascript-plugin",
-      "com.intellij.ml.llm"
+      "rider-plugins-appender"
     )
   )
 }
