@@ -149,7 +149,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
       ProxyProvidedConstructorInfoWithContext.Create(myProvidedType.GetConstructors(), Context);
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context) =>
-      Create(this, context);
+      Create(myProvidedType, context);
 
     public override ProvidedAssembly Assembly => myProvidedType.Assembly;
 
