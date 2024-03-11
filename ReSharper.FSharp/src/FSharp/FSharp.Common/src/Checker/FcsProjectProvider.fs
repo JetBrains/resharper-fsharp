@@ -15,6 +15,9 @@ open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
+open JetBrains.DocumentManagers
+open JetBrains.DocumentManagers.impl
+open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
@@ -72,7 +75,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         scriptFcsProjectProvider: IScriptFcsProjectProvider,
         fsFileService: IFSharpFileService, fsItemsContainer: IFSharpItemsContainer,
         locks: IShellLocks, logger: ILogger, fcsAssemblyReaderShim: IFcsAssemblyReaderShim, psiModules: IPsiModules,
-        moduleReferencesResolveStore: IModuleReferencesResolveStore) as this =
+        moduleReferencesResolveStore: IModuleReferencesResolveStore,
+        solutionDocumentChangeProvider: SolutionDocumentChangeProvider) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     /// The main cache for FCS project model and related things.
@@ -464,6 +468,36 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         if isNotNull change && not change.IsClosingSolution  then
             x.VisitDelta(change)
 
+        let documentChange = obj.ChangeMap.GetChange<DocumentChange>(solutionDocumentChangeProvider)
+        if isNotNull documentChange then
+            let projectFile =
+                match documentChange with
+                | :? ProjectFileDocumentChange as change -> change.ProjectFile
+                | :? ProjectFileDocumentCopyChange as change -> change.ProjectFile
+                | _ -> null
+                
+            if isNotNull projectFile then
+                // call .Replace() ?
+                let impactedProjects =
+                    fcsProjects
+                    |> Seq.filter(fun (KeyValue(_, fcsProject)) ->
+                        fcsProject.ProjectSnapshot.SourceFiles
+                        |> List.exists (fun sf -> sf.FileName = projectFile.Location.FullPath))
+                
+                for KeyValue(fcsProjectKey, fcsProject) in impactedProjects do
+                    let updatedFiles =
+                        fcsProject.ProjectSnapshot.SourceFiles
+                        |> List.map (fun sf ->
+                            if sf.FileName <> projectFile.Location.FullPath then
+                                sf
+                            else
+                                FSharpFileSnapshot.CreateFromFileSystem(projectFile.Location.FullPath)
+                        )
+
+                    let updatedProject =
+                        { fcsProject with ProjectSnapshot = fcsProject.ProjectSnapshot.Replace(updatedFiles) }
+                    fcsProjects.Add(fcsProjectKey, updatedProject)
+        
         if dirtyProjects.Count = 0 then () else
 
         use cookie = WriteLockCookie.Create()

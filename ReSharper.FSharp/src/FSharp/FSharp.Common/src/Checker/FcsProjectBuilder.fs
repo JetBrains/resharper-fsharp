@@ -203,43 +203,59 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
         
-        let sourceFiles =
+        let projectItems: (VirtualFileSystemPath * BuildAction) array = x.GetProjectItemsPaths(project, targetFrameworkId)
+        
+        let tryFindPsiSourceFile name =
             psiModule.SourceFiles
-            |> Seq.filter(fun psiSourceFile ->
-                isNotNull psiSourceFile.PrimaryPsiLanguage
-                && psiSourceFile.PrimaryPsiLanguage.Name = "F#"
-            )
-            |> Seq.map (fun psiSourceFile ->
-                let name = psiSourceFile.GetLocation().FullPath
-                (*
-                
-                In order to create the snapshot, we need to ensure that Resharper read lock rules are respected when getting the source.
-                Today, this happens in DelegatingFileSystemShim.cs.
-                So we can rely on the file system (that is shimmed) and use FSharpFileSnapshot.CreateFromFileSystem.
-                
-                Alternatively we can construct the snapshot via getSource:
-                ```fsharp
-                let version = string psiSourceFile.Document.LastModificationStamp.Value
+            |> Seq.tryFind (fun sf -> sf.GetLocation().FullPath = name)
+        
+        let sourceFiles =
+            projectItems
+            |> Seq.choose (fun (virtualFileSystemPath, buildAction) ->
+                match buildAction, tryFindPsiSourceFile virtualFileSystemPath.FullPath with
+                | SourceFile, Some psiSourceFile ->
+                    let name = virtualFileSystemPath.FullPath
+                    (*
+                    
+                    In order to create the snapshot, we need to ensure that Resharper read lock rules are respected when getting the source.
+                    Today, this happens in DelegatingFileSystemShim.cs.
+                    So we can rely on the file system (that is shimmed) and use FSharpFileSnapshot.CreateFromFileSystem.
+                    
+                    Alternatively we can construct the snapshot via getSource:
+                    ```fsharp
+                    let version = string psiSourceFile.Document.LastModificationStamp.Value
 
-                let getSource () =
-                    task {
-                        let mutable text = ""
-                        FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
-                            text <- psiSourceFile.Document.GetText()
-                        )
-                        return FSharp.Compiler.Text.SourceTextNew.ofString text
-                    }
+                    let getSource () =
+                        task {
+                            let mutable text = ""
+                            FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
+                                text <- psiSourceFile.Document.GetText()
+                            )
+                            return FSharp.Compiler.Text.SourceTextNew.ofString text
+                        }
 
-                ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
-                ``` 
+                    ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
+                    ``` 
 
-                This also worked but for now going with the FileSystemShim seems better?
-                I favour the getSource option (or a better version of it) over the FileSystemShim 
-                as it makes it more explicit where the source is really coming from. 
-                However, I don't have enough understanding about the plugin to really make this judgement call.
+                    This also worked but for now going with the FileSystemShim seems better?
+                    I favour the getSource option (or a better version of it) over the FileSystemShim 
+                    as it makes it more explicit where the source is really coming from. 
+                    However, I don't have enough understanding about the plugin to really make this judgement call.
 
-                *)
-                ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name)
+                    *)
+                    let getSource () =
+                        task {
+                            let mutable text = ""
+                            FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
+                                text <- psiSourceFile.Document.GetText()
+                            )
+                            return FSharp.Compiler.Text.SourceTextNew.ofString text
+                        }
+                    
+                    let hash = string (psiSourceFile.Document.GetText().GetHashCode())
+                    // let sf = ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name)
+                    Some(ProjectSnapshot.FSharpFileSnapshot(name, hash, getSource))
+                | _ -> None
             )
             |> Seq.toList
         
@@ -277,7 +293,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 originalLoadReferences = List.empty,
                 stamp = None
             )
-
+        
         let parsingOptions, errors =
             checkerService.Checker.GetParsingOptionsFromCommandLineArgs(otherOptions)
 

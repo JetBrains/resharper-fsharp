@@ -228,6 +228,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     do
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
+        
 
     let mutable currentFcsProject = None
 
@@ -238,19 +239,21 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        let getReferencedProjectOutputs (options: FSharpProjectSnapshot) =
-            options.ReferencedProjects |> List.map (fun project -> project.OutputFile)
-
-        let newOptions = newProject.ProjectSnapshot
-        let oldOptions = oldProject.ProjectSnapshot
-
-        newOptions.ProjectFileName = oldOptions.ProjectFileName &&
-        newOptions.SourceFiles = oldOptions.SourceFiles &&
-        newOptions.OtherOptions = oldOptions.OtherOptions &&
-        newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
-        getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
+        false
+        // let getReferencedProjectOutputs (options: FSharpProjectSnapshot) =
+        //     options.ReferencedProjects |> List.map (fun project -> project.OutputFile)
+        //
+        // let newOptions = newProject.ProjectSnapshot
+        // let oldOptions = oldProject.ProjectSnapshot
+        //
+        // newOptions.ProjectFileName = oldOptions.ProjectFileName &&
+        // newOptions.SourceFiles = oldOptions.SourceFiles &&
+        // newOptions.OtherOptions = oldOptions.OtherOptions &&
+        // newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
+        // getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
 
     let getFcsProject (psiModule: IPsiModule) =
+        
         lock this (fun _ ->
             let newFcsProject = getNewFcsProject psiModule
             match currentFcsProject with
