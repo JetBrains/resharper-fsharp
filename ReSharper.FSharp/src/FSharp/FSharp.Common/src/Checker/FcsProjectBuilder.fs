@@ -242,19 +242,8 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                     as it makes it more explicit where the source is really coming from. 
                     However, I don't have enough understanding about the plugin to really make this judgement call.
 
-                    *)
-                    let getSource () =
-                        task {
-                            let mutable text = ""
-                            FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
-                                text <- psiSourceFile.Document.GetText()
-                            )
-                            return FSharp.Compiler.Text.SourceTextNew.ofString text
-                        }
-                    
-                    let hash = string (psiSourceFile.Document.GetText().GetHashCode())
-                    // let sf = ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name)
-                    Some(ProjectSnapshot.FSharpFileSnapshot(name, hash, getSource))
+                    *)                    
+                    Some (ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name))
                 | _ -> None
             )
             |> Seq.toList

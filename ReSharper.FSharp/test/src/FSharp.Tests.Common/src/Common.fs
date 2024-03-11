@@ -239,18 +239,17 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        false
-        // let getReferencedProjectOutputs (options: FSharpProjectSnapshot) =
-        //     options.ReferencedProjects |> List.map (fun project -> project.OutputFile)
-        //
-        // let newOptions = newProject.ProjectSnapshot
-        // let oldOptions = oldProject.ProjectSnapshot
-        //
-        // newOptions.ProjectFileName = oldOptions.ProjectFileName &&
-        // newOptions.SourceFiles = oldOptions.SourceFiles &&
-        // newOptions.OtherOptions = oldOptions.OtherOptions &&
-        // newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
-        // getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
+        let getReferencedProjectOutputs (options: FSharpProjectSnapshot) =
+            options.ReferencedProjects |> List.map (fun project -> project.OutputFile)
+        
+        let newOptions = newProject.ProjectSnapshot
+        let oldOptions = oldProject.ProjectSnapshot
+        
+        newOptions.ProjectFileName = oldOptions.ProjectFileName &&
+        newOptions.SourceFiles = oldOptions.SourceFiles &&
+        newOptions.OtherOptions = oldOptions.OtherOptions &&
+        newOptions.ReferencesOnDisk = oldOptions.ReferencesOnDisk &&
+        getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
 
     let getFcsProject (psiModule: IPsiModule) =
         
