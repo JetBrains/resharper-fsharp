@@ -496,7 +496,42 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                     let updatedProject =
                         { fcsProject with ProjectSnapshot = fcsProject.ProjectSnapshot.Replace(updatedFiles) }
-                    fcsProjects.Add(fcsProjectKey, updatedProject)
+                    fcsProjects.[fcsProjectKey] <- updatedProject
+                    
+                    let referencedModule: ReferencedModule = referencedModules.TryGetValue(fcsProjectKey)
+
+                    if isNull referencedModule then () else
+                    
+                    for referencingProject in referencedModule.ReferencingProjects do
+                        let referencedFcsProject = fcsProjects.[referencingProject]
+                        let referencedProjects =
+                            referencedFcsProject.ProjectSnapshot.ReferencedProjects
+                            |> List.map (function
+                                | FSharpReferencedProjectSnapshot.PEReference _
+                                | FSharpReferencedProjectSnapshot.ILModuleReference _ as r -> r
+                                | FSharpReferencedProjectSnapshot.FSharpReference(projectOutputFile = projectOutputFile) ->
+                                    FSharpReferencedProjectSnapshot.FSharpReference(projectOutputFile, updatedProject.ProjectSnapshot))
+
+                        fcsProjects.[referencingProject] <-
+                            { referencedFcsProject with
+                                ProjectSnapshot =
+                                    FSharpProjectSnapshot.Create(
+                                        referencedFcsProject.ProjectSnapshot.ProjectFileName,
+                                        referencedFcsProject.ProjectSnapshot.ProjectId,
+                                        referencedFcsProject.ProjectSnapshot.SourceFiles,
+                                        referencedFcsProject.ProjectSnapshot.ReferencesOnDisk,
+                                        referencedFcsProject.ProjectSnapshot.OtherOptions,
+                                        referencedProjects,
+                                        referencedFcsProject.ProjectSnapshot.IsIncompleteTypeCheckEnvironment,
+                                        referencedFcsProject.ProjectSnapshot.UseScriptResolutionRules,
+                                        referencedFcsProject.ProjectSnapshot.LoadTime,
+                                        referencedFcsProject.ProjectSnapshot.UnresolvedReferences,
+                                        referencedFcsProject.ProjectSnapshot.OriginalLoadReferences,
+                                        referencedFcsProject.ProjectSnapshot.Stamp
+                                    )
+                            }
+
+                    // TODO: we need to replace the reference snapshots (recursively)
         
         if dirtyProjects.Count = 0 then () else
 
