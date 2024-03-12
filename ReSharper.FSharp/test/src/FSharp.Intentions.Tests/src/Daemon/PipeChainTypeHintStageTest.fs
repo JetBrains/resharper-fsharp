@@ -26,8 +26,12 @@ type PipeChainTypeHintStageTest() =
     [<TestSettings("{HideSameLine:All}")>]
     [<Test>] member x.``Multi line 03 - Same line``() = x.DoNamedTest()
 
+    [<Test>] member x.``Multi line 04 - Last pipe``() = x.DoNamedTest()
+    [<Test>] member x.``Multi line 05``() = x.DoNamedTest()
+
     [<Test>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
     [<Test>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()
+    [<Test>] member x.``Error 03 - Without right argument``() = x.DoNamedTest()
 
     [<Test>] member x.``Skipped 01 - Other binary op``() = x.DoNamedTest()
     [<Test>] member x.``Skipped 02 - Shadowed pipe op``() = x.DoNamedTest()

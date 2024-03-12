@@ -5,8 +5,9 @@
 
 ================
 HideSameLine = False
-[ 1; 2; 3; 4; 5; 6 ]||(0) |> List.groupBy (fun i -> i / 2)||(1) |> List.toSeq
+[ 1; 2; 3; 4; 5; 6 ]||(0) |> List.groupBy (fun i -> i / 2)||(1) |> List.toSeq||(2)
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int list
 (1): ReSharper Parameter Name Hint: : (int * int list) list
+(2): ReSharper Parameter Name Hint: : (int * int list) seq
