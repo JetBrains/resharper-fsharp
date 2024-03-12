@@ -5,7 +5,6 @@ open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -13,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util.Logging
@@ -24,22 +24,36 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode>>()
+    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode * bool>>()
 
     let showSameLineHints =
         match sameLinePipeHints with
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode>) =
+    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode * bool>) =
         if not (isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
-        let exprToAdorn = binaryAppExpr.LeftArgument
-        if isNull exprToAdorn then () else
-
         let opExpr = binaryAppExpr.Operator
-        if showSameLineHints || exprToAdorn.EndLine <> opExpr.StartLine then
-            context.Add(opExpr, exprToAdorn :> _)
+
+        let leftArgument = binaryAppExpr.LeftArgument
+        let rightArgument = binaryAppExpr.RightArgument
+
+        if isNull leftArgument then () else
+
+        if showSameLineHints || leftArgument.EndLine <> opExpr.StartLine then
+            context.Add(opExpr, leftArgument, true)
+
+        if isNull rightArgument || rightArgument :? IFromErrorExpr then () else
+
+        let isTopPipe =
+            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(binaryAppExpr.IgnoreParentParens())
+            isNull binaryAppExpr || not (isPredefinedInfixOpApp "|>" binaryAppExpr)
+
+        if not isTopPipe then () else
+
+        if showSameLineHints || leftArgument.EndLine <> rightArgument.StartLine then
+            context.Add(opExpr, rightArgument, false)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -54,17 +68,17 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
 type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode)[]) =
+    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
         use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
-        for refExpr, exprToAdorn in exprs do
+        for refExpr, exprToAdorn, isLeft in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
             let symbolUse = refExpr.Reference.GetSymbolUse()
             if isNull symbolUse then () else
 
-            let _, fcsType = symbolUse.GenericArguments[0]
+            let _, fcsType = symbolUse.GenericArguments[if isLeft then 0 else 1]
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
             highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(symbolUse.DisplayContext), range))
 
@@ -91,7 +105,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
                 let visible, notVisible =
                     allHighlightings
-                    |> Array.partition (fun (_, exprToAdorn) ->
+                    |> Array.partition (fun (_, exprToAdorn, _) ->
                         exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
                     )
 
