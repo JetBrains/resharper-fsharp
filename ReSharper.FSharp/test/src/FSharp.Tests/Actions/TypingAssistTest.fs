@@ -348,6 +348,10 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
 
+    member x.``Brackets - left angle - disabled``() = x.DoNamedTest()
+    member x.``Brackets - quotation - disabled``() = x.DoNamedTest()
+    member x.``Brackets - bar - disabled``() = x.DoNamedTest()
+
     [<Test>] member x.``Backticks - Skip 02 - End``() = x.DoNamedTest()
     [<Test>] member x.``Backticks - Skip 01 - Start``() = x.DoNamedTest()
     [<Test>] member x.``Backticks - Skip 03 - No skip``() = x.DoNamedTest()
