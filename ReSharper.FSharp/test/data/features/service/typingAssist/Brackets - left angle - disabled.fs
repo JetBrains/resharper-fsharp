@@ -1,0 +1,6 @@
+// ${SMART_PARENTH_INSERT:false}
+// ${CHAR:<}
+module Module
+
+[{caret}]
+let foo = 123
