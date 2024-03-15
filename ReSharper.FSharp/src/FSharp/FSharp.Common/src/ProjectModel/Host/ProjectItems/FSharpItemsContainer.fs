@@ -31,6 +31,7 @@ open JetBrains.RdBackend.Common.Env
 open JetBrains.RdBackend.Common.Features.ProjectModel.View
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Appenders
 open JetBrains.RdBackend.Common.Features.ProjectModel.View.Ordering
+open JetBrains.RdBackend.Common.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -353,10 +354,14 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
             let projectMark = project.GetProjectMark()
             this.ProjectMappings.Remove(projectMark) |> ignore
 
+        member this.IsValid(item) =
+            this.IsValid(item)
+
 type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
 
+    abstract member IsValid: FSharpViewItem -> bool
     abstract member ProjectUpdated: ISignal<IProjectMark>
     abstract member RemoveProject: IProject -> unit
     abstract member TryGetSortKey: FSharpViewItem -> int option
@@ -1128,8 +1133,16 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                     | None -> ()
                     | Some viewItem ->
 
-                    if solution.GetComponent<FSharpItemsContainer>().IsValid(viewItem) then
-                        viewHost.UpdateItemIfExists(viewItem)))
+                    let container = solution.GetComponent<IFSharpItemsContainer>()
+                    if container.IsValid(viewItem) then
+                        let parentFolder = viewItem.ProjectItem.ParentFolder
+                        container.TryGetParentFolderIdentity(viewItem)
+                        |> Option.iter (fun identity ->
+                            let parentItem = FSharpViewFolder(parentFolder, identity)
+                            viewHost.AddOrUpdateItem(viewItem, parentItem)
+                        )
+            )
+        )
 
     interface IFSharpItemsContainerRefresher with
         member x.RefreshProject(projectMark, _) =
