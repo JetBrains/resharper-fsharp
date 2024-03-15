@@ -2,4 +2,4 @@
 module Module
 
 "id
-    ()"{caret}
+    (){caret}"
