@@ -276,7 +276,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
     member x.GetCachedScriptOptions(path) =
         if checker.IsValueCreated then
-            checker.Value.GetCachedScriptOptions(path)
+            None
+            // TODO: checker.Value.GetCachedScriptOptions(path)
         else None
     
     member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
