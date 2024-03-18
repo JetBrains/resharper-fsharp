@@ -149,6 +149,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
         settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
+    // TODO: double check setting
     let useTransparentCompiler = true //(getSettingProperty "UseTransparentCompiler").Value
 
     let checker =
@@ -177,6 +178,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
+    member val UseTransparentCompiler = useTransparentCompiler
 
     member this.AssertFcsAccessThread() =
         ()
@@ -267,20 +269,34 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
-        | Some (_, checkResults, _) ->
+        let recentCheckResults =
+            if not useTransparentCompiler then
+                x.Checker.TryGetRecentCheckResultsForFile(path, options)
+                |> Option.map (fun (_, checkResults, _) -> checkResults)
+            else
+                match x.FcsProjectProvider.GetFcsProject(file.PsiModule) with
+                | None -> None
+                | Some fcsProject ->
+
+                let projectKey = FcsProjectKey.Create(file.PsiModule)
+                let fcsSnapshotCache = file.GetSolution().GetComponent<FcsSnapshotCache>()
+                let snapshot = fcsSnapshotCache.GetProjectSnapshot(projectKey, fcsProject.ProjectOptions)
+                x.Checker.TryGetRecentCheckResultsForFile(path, snapshot)
+                |> Option.map snd
+
+        match recentCheckResults with
+        | Some checkResults ->
             logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
             Some checkResults
-
         | _ ->
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
     member x.GetCachedScriptOptions(path) =
         if checker.IsValueCreated then
+            checker.Value.GetCachedScriptOptions(path)
+        else
             None
-            // TODO: checker.Value.GetCachedScriptOptions(path)
-        else None
     
     member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
         if checker.IsValueCreated then
@@ -290,7 +306,13 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 checker.Value.ClearCache(Seq.singleton projectOptions)
             | FcsProjectInvalidationType.Remove ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.InvalidateConfiguration(projectOptions)
+                if useTransparentCompiler then
+                    // InvalidateConfiguration isn't required for the transparent compiler as it works differently.
+                    // InvalidateConfiguration in the BackgroundCompiler will recreate the createBuilderNode.
+                    // This is not required in the TransparentCompiler and so Clearing the cache would be the proper equivalent.
+                    checker.Value.ClearCache(Seq.singleton projectOptions)
+                else
+                    checker.Value.InvalidateConfiguration(projectOptions)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
