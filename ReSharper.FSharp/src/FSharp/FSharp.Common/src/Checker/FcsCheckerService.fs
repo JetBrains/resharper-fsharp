@@ -80,17 +80,19 @@ type FcsProject =
 type FcsSnapshotCache(fcsProjectProvider: IFcsProjectProvider, locks: IShellLocks) =
     let snapshots = Dictionary<FcsProjectKey, FSharpProjectSnapshot>()
 
-    let remove (psiModule: IPsiModule) =
-        let projectKey = FcsProjectKey.Create(psiModule)
-        snapshots.Remove(projectKey) |> ignore
-
+    let rec removeReferences (projectKey: FcsProjectKey) =
         match fcsProjectProvider.GetReferencedModule(projectKey) with
         | None -> ()
         | Some referencedModule ->
 
-        // todo: recursive update?
         for referencingProject in referencedModule.ReferencingProjects do
+            removeReferences referencingProject
             snapshots.Remove(referencingProject) |> ignore
+    
+    let remove (psiModule: IPsiModule) =
+        let projectKey = FcsProjectKey.Create(psiModule)
+        snapshots.Remove(projectKey) |> ignore
+        removeReferences projectKey
 
     member this.GetProjectSnapshot(projectKey: FcsProjectKey, options: FSharpProjectOptions) =
         // todo: use source files in file snapshots?
