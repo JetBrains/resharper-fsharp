@@ -1,21 +1,29 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
+open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Threading
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.RdBackend.Common.Features.Documents
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -62,7 +70,7 @@ module FcsProjectBuilder =
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =
+        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules, locks: IShellLocks) =
 
     let defaultOptions =
         [| "--noframework"
@@ -193,26 +201,95 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let fileIndices = Dictionary<VirtualFileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
-        let projectOptions =
-            { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
-              ProjectId = None
-              SourceFiles = Array.map (fun (p: VirtualFileSystemPath ) -> p.FullPath) filePaths
-              OtherOptions = otherOptions.ToArray()
-              ReferencedProjects = Array.empty
-              IsIncompleteTypeCheckEnvironment = false
-              UseScriptResolutionRules = false
-              LoadTime = DateTime.Now
-              OriginalLoadReferences = List.empty
-              UnresolvedReferences = None
-              Stamp = None }
+        let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
+        
+        let projectItems: (VirtualFileSystemPath * BuildAction) array = x.GetProjectItemsPaths(project, targetFrameworkId)
+        
+        let tryFindPsiSourceFile name =
+            psiModule.SourceFiles
+            |> Seq.tryFind (fun sf -> sf.GetLocation().FullPath = name)
+        
+        let sourceFiles =
+            projectItems
+            |> Seq.choose (fun (virtualFileSystemPath, buildAction) ->
+                match buildAction, tryFindPsiSourceFile virtualFileSystemPath.FullPath with
+                | SourceFile, Some psiSourceFile ->
+                    let name = virtualFileSystemPath.FullPath
+                    (*
+                    
+                    In order to create the snapshot, we need to ensure that Resharper read lock rules are respected when getting the source.
+                    Today, this happens in DelegatingFileSystemShim.cs.
+                    So we can rely on the file system (that is shimmed) and use FSharpFileSnapshot.CreateFromFileSystem.
+                    
+                    Alternatively we can construct the snapshot via getSource:
+                    ```fsharp
+                    let version = string psiSourceFile.Document.LastModificationStamp.Value
 
+                    let getSource () =
+                        task {
+                            let mutable text = ""
+                            FSharpAsyncUtil.UsingReadLockInsideFcs(locks, fun () ->
+                                text <- psiSourceFile.Document.GetText()
+                            )
+                            return FSharp.Compiler.Text.SourceTextNew.ofString text
+                        }
+
+                    ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
+                    ``` 
+
+                    This also worked but for now going with the FileSystemShim seems better?
+                    I favour the getSource option (or a better version of it) over the FileSystemShim 
+                    as it makes it more explicit where the source is really coming from. 
+                    However, I don't have enough understanding about the plugin to really make this judgement call.
+
+                    *)                    
+                    Some (ProjectSnapshot.FSharpFileSnapshot.CreateFromFileSystem(name))
+                | _ -> None
+            )
+            |> Seq.toList
+        
+        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
+        let referencesOnDisk: ProjectSnapshot.ReferenceOnDisk list =
+            references
+            |> Seq.choose (fun projectToModuleReference ->
+                projectToModuleReference
+                |> modulePathProvider.GetModulePath
+                |> Option.bind (fun path ->
+                    if path.IsEmpty then
+                        None
+                    else
+                        Some ({
+                            Path = path.FullPath
+                            LastModified = if path.ExistsFile then path.FileModificationTimeUtc else DateTime.MinValue
+                        } : ProjectSnapshot.ReferenceOnDisk))
+            )
+            |> Seq.toList
+
+        let otherOptions = Seq.toList otherOptions
+        
+        let projectSnapshot =
+            FSharpProjectSnapshot.Create(
+                projectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj",
+                projectId = None,
+                sourceFiles = sourceFiles,
+                referencesOnDisk = referencesOnDisk,
+                otherOptions = Seq.toList otherOptions,
+                referencedProjects = List.empty,
+                isIncompleteTypeCheckEnvironment = false,
+                useScriptResolutionRules = false,
+                loadTime = DateTime.Now,
+                unresolvedReferences = None,
+                originalLoadReferences = List.empty,
+                stamp = None
+            )
+        
         let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(otherOptions)
 
         let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
 
         let parsingOptions = { parsingOptions with
-                                 SourceFiles = projectOptions.SourceFiles
+                                 SourceFiles = sourceFiles |> List.map (fun sf -> sf.FileName) |> Array.ofList
                                  ConditionalDefines = defines }
 
         if not errors.IsEmpty then
@@ -220,21 +297,10 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         let fcsProject =
             { OutputPath = outPath
-              ProjectOptions = projectOptions
+              ProjectSnapshot = projectSnapshot 
               ParsingOptions = parsingOptions
               FileIndices = fileIndices
               ImplementationFilesWithSignatures = implsWithSig
               ReferencedModules = HashSet() }
-        
-        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
-        let paths =
-            references
-            |> Array.ofSeq
-            |> Array.choose modulePathProvider.GetModulePath
-            |> Array.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
 
-        let projectOptions =
-            { fcsProject.ProjectOptions with
-                OtherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths }
-
-        { fcsProject with ProjectOptions = projectOptions }
+        fcsProject

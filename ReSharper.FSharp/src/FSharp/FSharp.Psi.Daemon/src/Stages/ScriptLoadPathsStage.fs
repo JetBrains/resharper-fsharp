@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
+#nowarn "57"
+
 open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.ReSharper.Daemon.Stages
@@ -51,7 +53,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
 
-        match fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(daemonProcess.SourceFile) with
+        match fsFile.CheckerService.FcsProjectProvider.GetProjectSnapshot(daemonProcess.SourceFile) with
         | Some options when not options.OriginalLoadReferences.IsEmpty ->
             let document = daemonProcess.Document
             let linesCount = document.GetLineCount() |> int

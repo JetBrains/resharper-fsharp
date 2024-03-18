@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
+#nowarn "57"
+
 open System.Collections.Generic
 open System.Globalization
 open System.Linq
@@ -52,13 +54,12 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
             psiModule.SourceFiles
             |> Seq.find (fun sourceFile -> sourceFile.LanguageType.Is<FSharpProjectFileType>())
 
-        projectProvider.GetProjectOptions(sourceFile)
+        projectProvider.GetProjectSnapshot(sourceFile)
         |> Option.map (fun options ->
-            options.OtherOptions
-            |> Array.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
-            |> Array.map (fun p -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
-            |> Array.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
-            |> Array.map (fun p -> p.Name)
+            options.ReferencesOnDisk
+            |> List.map (fun { Path = p } -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
+            |> List.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
+            |> List.map (fun p -> p.Name)
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
@@ -67,7 +68,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 
         let project = projectModelViewHost.GetItemById<IProject>(projectModelId)
         let psiModule = psiModules.GetPsiModules(project) |> Seq.exactlyOne
-        projectProvider.GetProjectOptions(psiModule).Value
+        projectProvider.GetProjectSnapshot(psiModule).Value
 
     let dumpFcsProjectStamp (projectModelId: int) =
         let projectOptions = getProjectOptions projectModelId
@@ -76,7 +77,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
     let dumpFcsProjectReferences (projectModelId: int) =
         let projectOptions = getProjectOptions projectModelId
         projectOptions.ReferencedProjects
-        |> Array.map (fun project ->
+        |> List.map (fun project ->
             let outputPath = VirtualFileSystemPath.Parse(project.OutputFile, InteractionContext.SolutionContext)
             outputPath.NameWithoutExtension)
         |> List

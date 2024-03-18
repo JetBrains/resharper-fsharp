@@ -1,7 +1,10 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
+open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
@@ -24,13 +27,13 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
     let scriptFcsProjects = Dictionary<VirtualFileSystemPath, FcsProject option>()
 
-    let mutable defaultOptions: FSharpProjectOptions option option = None
+    let mutable defaultSnapshot: FSharpProjectSnapshot option option = None
 
     let currentRequests = HashSet<VirtualFileSystemPath>()
     let dirtyPaths = HashSet<VirtualFileSystemPath>()
 
-    let optionsUpdated =
-        new Signal<VirtualFileSystemPath * FSharpProjectOptions>("ScriptFcsProjectProvider.optionsUpdated")
+    let snapshotUpdated =
+        new Signal<VirtualFileSystemPath * FSharpProjectSnapshot>("ScriptFcsProjectProvider.optionsUpdated")
 
     let isHeadless =
         let var = Environment.GetEnvironmentVariable("JET_HEADLESS_MODE") |> Option.ofObj |> Option.defaultValue "false"
@@ -63,30 +66,30 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             IPropertyEx.FlowInto(languageVersion, lifetime, flags, getOtherFlags)
             flags
 
-    let getOptionsImpl (path: VirtualFileSystemPath) source =
+    let getSnapshotImpl (path: VirtualFileSystemPath) source : FSharpProjectSnapshot option =
         let path = path.FullPath
-        let source = SourceText.ofString source
+        let source = SourceTextNew.ofString source
         let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
 
         let toolset = toolset.GetDotNetCoreToolset()
-        let getScriptOptionsAsync =
+        let getScriptSnapshotAsync: Async<FSharpProjectSnapshot * FSharp.Compiler.Diagnostics.FSharpDiagnostic list> =
             if isNotNull toolset && isNotNull toolset.Sdk then
                 let sdkRootFolder = toolset.Cli.NotNull("cli").SdkRootFolder.NotNull("sdkRootFolder")
                 let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
-                checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                checkerService.Checker.GetProjectSnapshotFromScript(path, source,
                     otherFlags = otherFlags.Value.Value,
                     assumeDotNetFramework = targetNetFramework,
                     sdkDirOverride = sdkFolderPath.FullPath)
             else
-                checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                checkerService.Checker.GetProjectSnapshotFromScript(path, source,
                     otherFlags = otherFlags.Value.Value,
                     assumeDotNetFramework = targetNetFramework)
 
         try
-            let options, errors = getScriptOptionsAsync.RunAsTask()
+            let snapshot, errors = getScriptSnapshotAsync.RunAsTask()
             if not errors.IsEmpty then
                 logErrors logger (sprintf "Script options for %s" path) errors
-            Some options
+            Some snapshot
         with
         | OperationCanceled -> reraise()
         | exn ->
@@ -94,29 +97,50 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             logger.LogExceptionSilently(exn)
             None
 
-    let getDefaultOptions (path: VirtualFileSystemPath) =
-        let withPath (options: FSharpProjectOptions option) =
-            match options with
-            | Some options -> Some { options with SourceFiles = [| path.FullPath |] }
-            | _ -> None
+    let getDefaultSnapshot (path: VirtualFileSystemPath) (source: string): ProjectSnapshot.FSharpProjectSnapshot option =
+        let withPath (snapshot: FSharpProjectSnapshot option) =
+            snapshot
+            |> Option.map (fun snapshot ->
+                let name = path.Name
+                let version = string path.Info.ModificationTimeUtc.Ticks
+                let getSource () = SourceTextNew.ofString source |> Task.FromResult
+                let sourceFiles =
+                    ProjectSnapshot.FSharpFileSnapshot.Create(name, version, getSource)
+                    |> List.singleton
+                
+                FSharpProjectSnapshot.Create(
+                    snapshot.ProjectFileName,
+                    snapshot.ProjectId,
+                    sourceFiles,
+                    snapshot.ReferencesOnDisk,
+                    snapshot.OtherOptions,
+                    snapshot.ReferencedProjects,
+                    snapshot.IsIncompleteTypeCheckEnvironment,
+                    snapshot.UseScriptResolutionRules,
+                    snapshot.LoadTime,
+                    snapshot.UnresolvedReferences,
+                    snapshot.OriginalLoadReferences,
+                    snapshot.Stamp
+                )
+            )
 
-        match defaultOptions with
+        match defaultSnapshot with
         | Some options -> withPath options
         | _ ->
 
         lock defaultOptionsLock (fun _ ->
-            match defaultOptions with
+            match defaultSnapshot with
             | Some options -> withPath options
             | _ ->
 
-            let newOptions = getOptionsImpl path ""
-            defaultOptions <- Some newOptions
+            let newOptions = getSnapshotImpl path ""
+            defaultSnapshot <- Some newOptions
             newOptions
         )
 
-    let createFcsProject (path: VirtualFileSystemPath) options =
-        options
-        |> Option.map (fun options ->
+    let createFcsProject (path: VirtualFileSystemPath) snapshot =
+        snapshot
+        |> Option.map (fun snapshot ->
             let parsingOptions = 
                 { FSharpParsingOptions.Default with
                     SourceFiles = [| path.FullPath |]
@@ -125,7 +149,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                     IsExe = true }
 
             { OutputPath = path
-              ProjectOptions = options
+              ProjectSnapshot = snapshot
               ParsingOptions = parsingOptions
               FileIndices = dict [path, 0]
               ImplementationFilesWithSignatures = EmptySet.Instance
@@ -143,11 +167,11 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                     currentRequests.Add(path) |> ignore
                     dirtyPaths.Remove(path) |> ignore
                     let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id
-                    let newOptions = getOptionsImpl path source
+                    let newSnapshot = getSnapshotImpl path source
 
                     scriptFcsProjects[path] <-
-                        newOptions
-                        |> Option.map (fun options ->
+                        newSnapshot
+                        |> Option.map (fun snapshot ->
                             let parsingOptions = 
                                 { FSharpParsingOptions.Default with
                                     SourceFiles = [| path.FullPath |]
@@ -158,27 +182,28 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                             let indices = Dictionary()
 
                             { OutputPath = path
-                              ProjectOptions = options
+                              ProjectSnapshot = snapshot
                               ParsingOptions = parsingOptions
                               FileIndices = indices
                               ImplementationFilesWithSignatures = EmptySet.Instance
                               ReferencedModules = EmptySet.Instance }
                         )
 
-                    match oldOptions, newOptions with
-                    | Some oldOptions, Some newOptions ->
-                        let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
-                            let arrayEq a1 a2 =
-                                Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
+                    match oldOptions, newSnapshot with
+                    | Some oldOptions, Some newSnapshot ->
+                        let areEqualForChecking (options1: FSharpProjectSnapshot) (options2: FSharpProjectSnapshot) =
+                            let listEq l1 l2 =
+                                List.length l1 = List.length l2 && List.forall2 (=) l1 l2
 
-                            arrayEq options1.OtherOptions options2.OtherOptions &&
-                            arrayEq options1.SourceFiles options2.SourceFiles
+                            listEq options1.OtherOptions options2.OtherOptions &&
+                            listEq options1.ReferencesOnDisk options2.ReferencesOnDisk &&
+                            listEq options1.SourceFiles options2.SourceFiles
 
-                        if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
-                            optionsUpdated.Fire((path, newOptions))
+                        if not (areEqualForChecking oldOptions.ProjectSnapshot newSnapshot) then
+                            snapshotUpdated.Fire((path, newSnapshot))
 
                     | _, Some newOptions ->
-                        optionsUpdated.Fire((path, newOptions))
+                        snapshotUpdated.Fire((path, newOptions))
 
                     | _ -> ()
 
@@ -203,16 +228,17 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             if isHeadless && allowRetry then
                 getFcsProject path source false
             else
-                getDefaultOptions path |> createFcsProject path
+                getDefaultSnapshot path source |> createFcsProject path
 
-    let getOptions path source : FSharpProjectOptions option =
-        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectOptions)
+    let getOptions path source : FSharpProjectSnapshot option =
+        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectSnapshot)
 
     interface IScriptFcsProjectProvider with
-        member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
-            getOptions path source
+        // TODO: unused ?
+        // member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
+        //     getOptions path source
 
-        member x.GetScriptOptions(file: IPsiSourceFile) =
+        member x.GetScriptSnapshot(file: IPsiSourceFile) =
             let path = file.GetLocation()
             let source = file.Document.GetText()
             getOptions path source
@@ -222,5 +248,5 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let source = sourceFile.Document.GetText()
             getFcsProject path source true
 
-        member this.OptionsUpdated = optionsUpdated
+        member this.SnapshotUpdated = snapshotUpdated
         member this.SyncUpdate = isHeadless

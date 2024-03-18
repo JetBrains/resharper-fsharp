@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Searching
 
+#nowarn "57"
+
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -48,9 +50,9 @@ type FSharpPathReference(owner, sourceFile) =
         let fsFile = owner.GetContainingFile() :?> IFSharpFile
         let document = sourceFile.Document
         let tokenStartOffset = owner.Parent.GetTreeStartOffset()
-        fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(sourceFile)
-        |> Option.bind (fun options ->
-            options.OriginalLoadReferences
+        fsFile.CheckerService.FcsProjectProvider.GetProjectSnapshot(sourceFile)
+        |> Option.bind (fun snapshot ->
+            snapshot.OriginalLoadReferences
             |> List.tryFind (fun (range, _, _) -> getTreeStartOffset document range = tokenStartOffset)
             |> Option.bind (fun (_, _, path) ->
                 let path = VirtualFileSystemPath.TryParse(path, InteractionContext.SolutionContext)

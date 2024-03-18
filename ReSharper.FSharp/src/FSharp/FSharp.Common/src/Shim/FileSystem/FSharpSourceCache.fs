@@ -25,6 +25,9 @@ type FSharpSource =
         | Exists(source, timestamp) -> RdFSharpSource(Encoding.UTF8.GetString(source), timestamp)
         | _ -> RdFSharpSource("NotExists", DateTime.MinValue)
 
+// Potentially drop this cache if transparent compiler is used?
+// Might not be used if transparent compiler
+
 [<SolutionComponent>]
 type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
         solutionDocumentChangeProvider: SolutionDocumentChangeProvider, fileExtensions: IProjectFileExtensions,
