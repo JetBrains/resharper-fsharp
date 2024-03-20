@@ -37,3 +37,4 @@ type StubFSharpItemsContainer() =
         member this.OnUpdateFolder(_, _, _) = ()
 
         member val ProjectUpdated = new Signal<IProjectMark>("todo")
+        member this.IsValid _ = true
