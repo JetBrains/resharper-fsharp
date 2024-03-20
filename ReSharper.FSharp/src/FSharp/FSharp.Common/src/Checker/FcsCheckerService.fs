@@ -25,6 +25,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.VB
@@ -36,6 +37,7 @@ module FcsCheckerService =
         SourceText.ofString(document.GetText())
 
 
+// add the project key?
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
       ProjectOptions: FSharpProjectOptions
@@ -74,6 +76,59 @@ type FcsProject =
         writer.WriteLine()
 
 
+[<SolutionComponent>]
+type FcsSnapshotCache(fcsProjectProvider: IFcsProjectProvider, locks: IShellLocks) =
+    let snapshots = Dictionary<FcsProjectKey, FSharpProjectSnapshot>()
+
+    let rec removeReferences (projectKey: FcsProjectKey) =
+        match fcsProjectProvider.GetReferencedModule(projectKey) with
+        | None -> ()
+        | Some referencedModule ->
+
+        for referencingProject in referencedModule.ReferencingProjects do
+            removeReferences referencingProject
+            snapshots.Remove(referencingProject) |> ignore
+    
+    let remove (psiModule: IPsiModule) =
+        let projectKey = FcsProjectKey.Create(psiModule)
+        snapshots.Remove(projectKey) |> ignore
+        removeReferences projectKey
+
+    member this.GetProjectSnapshot(projectKey: FcsProjectKey, options: FSharpProjectOptions) =
+        // todo: use source files in file snapshots?
+        lock this (fun _ ->
+            snapshots.GetOrCreateValue(projectKey, fun (projectKey: FcsProjectKey) ->
+                FSharpProjectSnapshot.FromOptions(options).RunAsTask()
+            )
+        )
+
+    interface IPsiSourceFileCache with
+        member this.MarkAsDirty(sourceFile) =
+            locks.AssertWriteAccessAllowed()
+            remove sourceFile.PsiModule
+
+        member this.OnDocumentChange(sourceFile, _) =
+            locks.AssertWriteAccessAllowed()
+            remove sourceFile.PsiModule
+
+        member this.OnPsiChange(elementContainingChanges, _) =
+            if isNotNull elementContainingChanges then
+                locks.AssertWriteAccessAllowed()
+                remove (elementContainingChanges.GetPsiModule())
+
+        member this.HasDirtyFiles = false
+        member this.UpToDate _ = true
+        member this.SyncUpdate _ = ()
+
+        member this.Build(_, _) = null
+        member this.Drop _ = ()
+        member this.Dump(_, _) = ()
+        member this.Load(_, _) = null
+        member this.Merge(_, _) = ()
+        member this.MergeLoaded _ = ()
+        member this.Save(_, _) = ()
+
+
 [<RequireQualifiedAccess>]
 type FcsProjectInvalidationType =
     /// Used when invalidation is needed for a project still known to FCS.
@@ -88,14 +143,17 @@ type FcsProjectInvalidationType =
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
         settingsStore: ISettingsStore, locks: IShellLocks, configurations: RunsProducts.ProductConfigurations) =
 
+    let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
+    let getSettingProperty name =
+        let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+        settingsStoreLive.GetValueProperty(lifetime, setting, null)
+
+    // TODO: double check setting
+    let useTransparentCompiler = true //(getSettingProperty "UseTransparentCompiler").Value
+
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-
-        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-
-        let getSettingProperty name =
-            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty(lifetime, setting, null)
 
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
         let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
@@ -106,7 +164,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
                                      enablePartialTypeChecking = skipImpl.Value,
-                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
+                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value,
+                                     useTransparentCompiler = useTransparentCompiler)
 
             checker
 
@@ -119,6 +178,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
+    member val UseTransparentCompiler = useTransparentCompiler
 
     member this.AssertFcsAccessThread() =
         ()
@@ -174,8 +234,19 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
+        let getParseAndCheckResults () =
+            if useTransparentCompiler then
+                let projectKey = FcsProjectKey.Create(psiModule)
+                let fcsSnapshotCache = sourceFile.GetSolution().GetComponent<FcsSnapshotCache>()
+                let snapshot = fcsSnapshotCache.GetProjectSnapshot(projectKey, options)
+                match x.Checker.ParseAndCheckFileInProject(path, snapshot).RunAsTask() with
+                | _, FSharpCheckFileAnswer.Aborted -> None
+                | parseFileResults, FSharpCheckFileAnswer.Succeeded checkFileResults -> Some(parseFileResults, checkFileResults)
+            else
+                x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask()
+
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match getParseAndCheckResults () with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -198,11 +269,25 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
-        | Some (_, checkResults, _) ->
+        let recentCheckResults =
+            if not useTransparentCompiler then
+                x.Checker.TryGetRecentCheckResultsForFile(path, options)
+                |> Option.map (fun (_, checkResults, _) -> checkResults)
+            else
+                match x.FcsProjectProvider.GetFcsProject(file.PsiModule) with
+                | None -> None
+                | Some fcsProject ->
+
+                let projectKey = FcsProjectKey.Create(file.PsiModule)
+                let fcsSnapshotCache = file.GetSolution().GetComponent<FcsSnapshotCache>()
+                let snapshot = fcsSnapshotCache.GetProjectSnapshot(projectKey, fcsProject.ProjectOptions)
+                x.Checker.TryGetRecentCheckResultsForFile(path, snapshot)
+                |> Option.map snd
+
+        match recentCheckResults with
+        | Some checkResults ->
             logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
             Some checkResults
-
         | _ ->
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
@@ -210,7 +295,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     member x.GetCachedScriptOptions(path) =
         if checker.IsValueCreated then
             checker.Value.GetCachedScriptOptions(path)
-        else None
+        else
+            None
     
     member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
         if checker.IsValueCreated then
@@ -220,7 +306,13 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 checker.Value.ClearCache(Seq.singleton projectOptions)
             | FcsProjectInvalidationType.Remove ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.InvalidateConfiguration(projectOptions)
+                if useTransparentCompiler then
+                    // InvalidateConfiguration isn't required for the transparent compiler as it works differently.
+                    // InvalidateConfiguration in the BackgroundCompiler will recreate the createBuilderNode.
+                    // This is not required in the TransparentCompiler and so Clearing the cache would be the proper equivalent.
+                    checker.Value.ClearCache(Seq.singleton projectOptions)
+                else
+                    checker.Value.InvalidateConfiguration(projectOptions)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =

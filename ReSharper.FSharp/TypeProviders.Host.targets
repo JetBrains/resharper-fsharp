@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="FSharp.Core" />
-        <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+        <PackageReference Condition="'$(UseLocalFSharpCompilerService)' == 'false'" Include="JetBrains.FSharp.Compiler.Service" />
     </ItemGroup>
 
 </Project>
