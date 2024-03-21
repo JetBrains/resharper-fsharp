@@ -108,10 +108,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected FSharpTypePart(IReader reader) : base(reader)
     {
       SourceName = reader.ReadString();
-      Modifiers = MemberDecoration.FromInt(reader.ReadInt());
+      Modifiers = MemberDecoration.FromRawValue(reader.ReadUShort());
       AttributeClassNames = reader.ReadStringArray();
-      var extensionMethodCount = reader.ReadInt();
-      if (extensionMethodCount <= 0)
+      var extensionMethodCount = reader.ReadOftenSmallPositiveInt();
+      if (extensionMethodCount == 0)
         return;
 
       var methods = new ExtensionMethodInfo[extensionMethodCount];
@@ -124,10 +124,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       base.Write(writer);
       writer.WriteString(SourceName);
-      writer.WriteInt(Modifiers.ToInt());
+      writer.WriteUShort(Modifiers.ToRawValue());
       writer.WriteStringArray(AttributeClassNames);
 
-      writer.WriteInt(ExtensionMethodInfos.Length);
+      writer.WriteOftenSmallPositiveInt(ExtensionMethodInfos.Length);
       foreach (var info in ExtensionMethodInfos)
         info.Write(writer);
     }
