@@ -265,9 +265,9 @@ type FSharpPostfixTemplateContextFactory() =
 
 
 [<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThread)>]
-type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStatistics) =
+type FSharpPostfixTemplatesProvider(templatesManager, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
-        templatesManager, sessionExecutor, usageStatistics)
+        templatesManager, usageStatistics)
 
     override this.TryCreatePostfixContext(fsCompletionContext) =
         if fsCompletionContext.NodeInFile.IsFSharpSigFile() then null else
