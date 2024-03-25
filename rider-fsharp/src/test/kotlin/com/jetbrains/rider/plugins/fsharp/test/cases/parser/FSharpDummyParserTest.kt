@@ -1,9 +1,19 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.parser
 
+import com.intellij.psi.PsiFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
 import com.jetbrains.rider.test.RiderFrontendParserTest
+import org.junit.Assert
 
 class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDefinition()) {
+  override fun parseFile(name: String?, text: String?): PsiFile {
+    val file = super.parseFile(name, text)
+    Assert.assertTrue(file is FSharpFileImpl)
+    return file
+  }
+
   fun `test empty`() = doTest()
   fun `test concatenation 01 - simple`() = doTest()
   fun `test concatenation 02 - space before plus`() = doTest()
@@ -30,4 +40,15 @@ class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDef
   fun `test unfinished 02 - interpolated 01`() = doTest()
   fun `test unfinished 02 - interpolated 02`() = doTest()
   fun `test unfinished 03 - interpolated in interpolated`() = doTest()
+}
+
+
+class FSharpScriptDummyParserTests : RiderFrontendParserTest("", "fsx", FSharpParserDefinition()) {
+  override fun parseFile(name: String?, text: String?): PsiFile {
+    val file = super.parseFile(name, text)
+    Assert.assertTrue(file is FSharpScriptFileImpl)
+    return file
+  }
+
+  fun `test empty`() = doTest()
 }
