@@ -219,7 +219,7 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
         member this.LanguageVersionModifier = failwith "todo"
 
 [<ShellFeaturePart>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostCoreFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     inherit LanguageSpecificItemsProviderBase<FSharpLanguageVersion, FSharpLanguageLevel>()
 

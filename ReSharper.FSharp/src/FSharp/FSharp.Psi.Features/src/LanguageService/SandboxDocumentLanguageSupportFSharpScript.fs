@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.RdBackend.Common.Env
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IResharperHostCoreFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostCoreFeatureZone>)>]
 type SandboxDocumentLanguageSupportFSharpScript() =
     interface ISandboxDocumentLanguageSupport with
         member x.DocumentFileExtension = FSharpScriptProjectFileType.FsxExtension
