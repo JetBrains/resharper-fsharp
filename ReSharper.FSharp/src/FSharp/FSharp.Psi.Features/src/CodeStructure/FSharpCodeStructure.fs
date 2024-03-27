@@ -25,7 +25,7 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 
 [<SolutionComponent>]
-[<ZoneMarker(typeof<IReSharperHostCoreFeatureZone>, typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpExtendedFileStructureLanguage() =
     let filters : IStructureTreeElementFilter array = [| StructureTreeElementFilter() |]
     interface IExtendedFileStructureLanguage with
