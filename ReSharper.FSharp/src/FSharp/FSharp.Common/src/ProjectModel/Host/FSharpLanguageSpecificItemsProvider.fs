@@ -42,7 +42,7 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
 
 
 [<SolutionComponent>]
-[<ZoneMarker(typeof<IReSharperHostCoreFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     interface IMsBuildConfigurationTabProvider with
         member x.Order = Int32.MaxValue
