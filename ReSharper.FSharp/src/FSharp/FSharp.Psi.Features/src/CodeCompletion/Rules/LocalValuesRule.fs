@@ -41,11 +41,18 @@ type LocalValuesRule() =
     override this.AddLookupItems(context, collector) =
         let values = Dictionary<string, FSharpSymbolUse>()
 
+        let addValue (decl: IFSharpDeclaration) =
+            let sourceName = decl.SourceName
+            if sourceName <> "_" then
+                values.TryAdd(sourceName, decl.GetFcsSymbolUse()) |> ignore
+
         let addPatternValues (pat: IFSharpPattern) =
+            if isNull pat then () else
+
             for declPattern in pat.Declarations do
                 let pat = declPattern.As<IFSharpPattern>()
                 if pat.IsDeclaration then
-                    values.TryAdd(declPattern.SourceName, declPattern.GetFcsSymbolUse()) |> ignore
+                    addValue declPattern
 
         let addLetBindingsValues (letBindings: ILetBindings) =
             for otherBinding in letBindings.Bindings do
@@ -53,7 +60,7 @@ type LocalValuesRule() =
 
         let addSelfIdValue (selfId: ISelfId) =
             if isNotNull selfId then
-                values.TryAdd(selfId.SourceName, selfId.GetFcsSymbolUse()) |> ignore
+                addValue selfId
 
         let addMembersValues (contextOffset: int) (members: ITreeNode seq) =
             let members = members |> Seq.takeWhile (fun m -> m.GetTreeStartOffset().Offset < contextOffset)
@@ -92,6 +99,19 @@ type LocalValuesRule() =
                 if isNotNull letExpr then
                     addLetBindingsValues letExpr
 
+                match expr with
+                | :? ILambdaExpr as lambdaExpr ->
+                    for pattern in lambdaExpr.PatternsEnumerable do
+                        addPatternValues pattern
+
+                | :? IForEachExpr as forExpr ->
+                    addPatternValues forExpr.Pattern
+
+                | :? IForExpr as forExpr ->
+                    addValue forExpr.Identifier
+
+                | _ -> ()
+
             | :? IModuleMember as moduleMember ->
                 let moduleDecl = ModuleLikeDeclarationNavigator.GetByMember(moduleMember)
                 if isNotNull moduleDecl then
@@ -117,6 +137,7 @@ type LocalValuesRule() =
                 let memberDecl = typeMember.As<IMemberDeclaration>()
                 if isNotNull memberDecl then
                     addSelfIdValue memberDecl.SelfId
+                    Seq.iter addPatternValues memberDecl.ParameterPatterns
 
             | _ -> ()
 
