@@ -63,7 +63,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
             fibers.EnqueueJob((fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer))), x.ResolveContext)
         fibers.Dispose()
 
-        committer.Invoke(DaemonStageResult(consumer.Highlightings))
+        committer.Invoke(DaemonStageResult(consumer.CollectHighlightings()))
 
 
 and private Processor(daemonProcess: FSharpDaemonStageProcessBase, consumer: IHighlightingConsumer) =

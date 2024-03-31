@@ -68,7 +68,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
             highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(symbolUse.DisplayContext), range))
 
-        highlightingConsumer.Highlightings
+        highlightingConsumer.CollectHighlightings()
 
     override x.Execute(committer) =
         let sameLinePipeHints =
