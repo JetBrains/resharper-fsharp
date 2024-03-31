@@ -148,7 +148,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         if not isDisabled then
             fsFile.ProcessThisAndDescendants(Processor(x, consumer))
 
-        committer.Invoke(DaemonStageResult(consumer.Highlightings))
+        committer.Invoke(DaemonStageResult(consumer.CollectHighlightings()))
 
     override x.VisitTopBinding(binding, consumer) =
         let headPattern = binding.HeadPattern.IgnoreInnerParens()

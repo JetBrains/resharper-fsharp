@@ -575,4 +575,4 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             Interruption.Current.CheckAndThrow()
 
-        committer.Invoke(DaemonStageResult(consumer.Highlightings))
+        committer.Invoke(DaemonStageResult(consumer.CollectHighlightings()))
