@@ -70,7 +70,7 @@ type OverrideMemberRule() =
 
             | :? IFSharpTypeDeclaration as typeDecl ->
                 let repr = typeDecl.TypeRepresentation
-                isNotNull repr && caretLine > repr.EndLine ||
+                (isNull repr || isNotNull repr && caretLine > repr.EndLine) &&
 
                 let equalsToken = typeDecl.EqualsToken
                 isNotNull equalsToken && caretLine > equalsToken.StartLine
