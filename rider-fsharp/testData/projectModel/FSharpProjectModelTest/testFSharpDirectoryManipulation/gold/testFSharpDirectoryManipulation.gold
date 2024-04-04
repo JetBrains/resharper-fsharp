@@ -198,8 +198,8 @@ Library.fs
      -Frameworks
       NETStandard.Library
    Library.fs
-   NewFolder
    NewSub
+   NewFolder
 
 
 Project [Name:&, GUID:GUID]
