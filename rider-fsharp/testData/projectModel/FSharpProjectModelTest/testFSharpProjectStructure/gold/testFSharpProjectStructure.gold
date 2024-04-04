@@ -556,9 +556,9 @@ AfterFile.fs
     -Sub
      Class2.fs
    LinkedFile1.fs
-   AfterFile.fs [CompileAfter]
    -LinkedFolder
     LinkedFile2.fs
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:GUID]
@@ -1331,6 +1331,7 @@ AfterFile.fs
    -Folder
     File3.fs
    EmptyFolder
+   Foo.fs
    File2.fs
    -Folder
     File4.fs
@@ -1339,7 +1340,6 @@ AfterFile.fs
      Class1.fs
     File5.fs
     Class2.fs
-   Foo.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
