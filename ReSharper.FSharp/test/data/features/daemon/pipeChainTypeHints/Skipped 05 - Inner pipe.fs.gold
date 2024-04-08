@@ -54,7 +54,7 @@ match true with
 [1]||(27)
 |> List.map (fun x ->
       x||(28)
-      |> id||(29))||(30)
+      |> id)||(29)
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
@@ -86,5 +86,4 @@ match true with
 (26): ReSharper Parameter Name Hint: : int
 (27): ReSharper Parameter Name Hint: : int list
 (28): ReSharper Parameter Name Hint: : int
-(29): ReSharper Parameter Name Hint: : int
-(30): ReSharper Parameter Name Hint: : int list
+(29): ReSharper Parameter Name Hint: : int list
