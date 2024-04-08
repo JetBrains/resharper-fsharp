@@ -38,3 +38,6 @@ type PipeChainTypeHintStageTest() =
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "false")>]
     [<Test>] member x.``Skipped 03 - Setting disabled``() = x.DoNamedTest()
+    [<Test>] member x.``Skipped 04 - Unit``() = x.DoNamedTest()
+
+    [<Test>] member x.``Display context 01``() = x.DoNamedTest()

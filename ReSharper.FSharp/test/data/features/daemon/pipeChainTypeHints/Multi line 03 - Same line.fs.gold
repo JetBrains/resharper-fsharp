@@ -8,7 +8,7 @@
 |> Set.ofSeq |>
 Set.toSeq||(4)
 |> Set.ofSeq||(5)
-|> ignore||(6)
+|> id||(6)
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int list
@@ -17,7 +17,7 @@ Set.toSeq||(4)
 (3): ReSharper Parameter Name Hint: : (int * int list) seq
 (4): ReSharper Parameter Name Hint: : (int * int list) seq
 (5): ReSharper Parameter Name Hint: : Set<int * int list>
-(6): ReSharper Parameter Name Hint: : unit
+(6): ReSharper Parameter Name Hint: : Set<int * int list>
 
 ================
 HideSameLine = False
@@ -30,7 +30,7 @@ HideSameLine = False
 |> Set.ofSeq||(5) |>
 Set.toSeq||(6)
 |> Set.ofSeq||(7)
-|> ignore||(8)
+|> id||(8)
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int list
@@ -41,4 +41,4 @@ Set.toSeq||(6)
 (5): ReSharper Parameter Name Hint: : Set<int * int list>
 (6): ReSharper Parameter Name Hint: : (int * int list) seq
 (7): ReSharper Parameter Name Hint: : Set<int * int list>
-(8): ReSharper Parameter Name Hint: : unit
+(8): ReSharper Parameter Name Hint: : Set<int * int list>

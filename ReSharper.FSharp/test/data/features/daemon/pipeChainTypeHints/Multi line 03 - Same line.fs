@@ -7,4 +7,4 @@
 |> Set.ofSeq |>
 Set.toSeq
 |> Set.ofSeq
-|> ignore
+|> id

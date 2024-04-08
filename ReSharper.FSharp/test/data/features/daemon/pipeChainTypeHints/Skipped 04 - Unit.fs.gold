@@ -1,0 +1,76 @@
+﻿()||(0)
+|> id||(1)
+
+()||(2)
+|> (id)||(3)
+
+1||(4)
+|> ignore
+
+[1, 2]||(5)
+|> dict||(6)
+
+[1]||(7)
+|> List.iter ignore
+
+[1]||(8)
+|> List.map ignore||(9)
+
+5||(10)
+|> Some||(11)
+
+
+
+let f _ _ = ()
+
+1||(12)
+|> f||(13)
+
+1||(14)
+|> f 1
+
+
+
+type A =
+    static member F = fun _ -> 5
+    static member F1 = fun _ -> fun _ -> ()
+
+1||(15)
+|> A.F||(16)
+
+1||(17)
+|> A.F1||(18)
+
+1||(19)
+|> A.F1 1
+
+
+
+open System.Collections.Generic
+
+[1]||(20)
+|> List||(21)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : unit
+(1): ReSharper Parameter Name Hint: : unit
+(2): ReSharper Parameter Name Hint: : unit
+(3): ReSharper Parameter Name Hint: : unit
+(4): ReSharper Parameter Name Hint: : int
+(5): ReSharper Parameter Name Hint: : (int * int) list
+(6): ReSharper Parameter Name Hint: : IDictionary<int,int>
+(7): ReSharper Parameter Name Hint: : int list
+(8): ReSharper Parameter Name Hint: : int list
+(9): ReSharper Parameter Name Hint: : unit list
+(10): ReSharper Parameter Name Hint: : int
+(11): ReSharper Parameter Name Hint: : int option
+(12): ReSharper Parameter Name Hint: : int
+(13): ReSharper Parameter Name Hint: : obj -> unit
+(14): ReSharper Parameter Name Hint: : int
+(15): ReSharper Parameter Name Hint: : int
+(16): ReSharper Parameter Name Hint: : int
+(17): ReSharper Parameter Name Hint: : int
+(18): ReSharper Parameter Name Hint: : int -> unit
+(19): ReSharper Parameter Name Hint: : int
+(20): ReSharper Parameter Name Hint: : int list
+(21): ReSharper Parameter Name Hint: : List<int>

@@ -3,4 +3,4 @@
 
 ([ 1 ]
  |> _.ToString())
-|> ignore
+|> id
