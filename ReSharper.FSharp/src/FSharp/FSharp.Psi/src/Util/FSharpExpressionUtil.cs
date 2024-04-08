@@ -66,6 +66,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           continue;
         }
 
+        if (ElifExprNavigator.GetByBranchExpression(currentExpr) is {ElseExpr: { }} elifExpr)
+        {
+          currentExpr = elifExpr;
+          continue;
+        }
+
+        if (LambdaExprNavigator.GetByExpression(currentExpr) is LambdaExpr lambdaExpr)
+        {
+          currentExpr = lambdaExpr;
+          continue;
+        }
+
         if (LetOrUseExprNavigator.GetByInExpression(currentExpr) is { } letOrUseExpr)
         {
           currentExpr = letOrUseExpr;

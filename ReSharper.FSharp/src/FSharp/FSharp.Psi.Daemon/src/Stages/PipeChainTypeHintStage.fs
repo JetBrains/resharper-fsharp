@@ -35,8 +35,11 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
+    let isApplicable binaryAppExpr =
+        isPredefinedInfixOpApp "|>" binaryAppExpr
+
     let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode * bool>) =
-        if not (isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
+        if not (isApplicable binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
 
@@ -50,11 +53,14 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
 
         if isNull rightArgument || rightArgument :? IFromErrorExpr then () else
 
-        let isTopPipe =
-            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(binaryAppExpr.IgnoreParentParens())
-            isNull binaryAppExpr || not (isPredefinedInfixOpApp "|>" binaryAppExpr)
+        let isTopBinary =
+            let binaryAppExpr =
+                binaryAppExpr.IgnoreParentParens().GetOutermostParentExpressionFromItsReturn()
+                |> _.IgnoreParentParens()
+                |> BinaryAppExprNavigator.GetByArgument
+            isNull binaryAppExpr || not (isApplicable binaryAppExpr)
 
-        if not isTopPipe then () else
+        if not isTopBinary then () else
 
         if showSameLineHints || leftArgument.EndLine <> rightArgument.StartLine then
             context.Add(opExpr, rightArgument, false)

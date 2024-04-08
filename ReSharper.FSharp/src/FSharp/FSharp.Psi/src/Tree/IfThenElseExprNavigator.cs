@@ -12,11 +12,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     public static IIfThenElseExpr GetByBranchExpression([CanBeNull] IFSharpExpression param) =>
       GetByThenExpr(param) ?? GetByElseExpr(param);
   }
-  
+
   public partial class IfExprNavigator
   {
     [CanBeNull]
     public static IIfExpr GetByBranchExpression([CanBeNull] IFSharpExpression param) =>
+      GetByThenExpr(param) ?? GetByElseExpr(param);
+  }
+
+  public partial class ElifExprNavigator
+  {
+    [CanBeNull]
+    public static IElifExpr GetByBranchExpression([CanBeNull] IFSharpExpression param) =>
       GetByThenExpr(param) ?? GetByElseExpr(param);
   }
 }
