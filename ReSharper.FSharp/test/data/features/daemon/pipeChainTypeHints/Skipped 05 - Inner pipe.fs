@@ -55,3 +55,9 @@ match true with
 |> List.map (fun x ->
       x
       |> id)
+
+let f x y z = 0
+[1]
+|> f (fun x ->
+        x
+        |> id) 1

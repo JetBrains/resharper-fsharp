@@ -56,6 +56,12 @@ match true with
       x||(28)
       |> id)||(29)
 
+let f x y z = 0
+[1]||(30)
+|> f (fun x ->
+        x||(31)
+        |> id||(32)) 1||(33)
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
 (1): ReSharper Parameter Name Hint: : int
@@ -87,3 +93,7 @@ match true with
 (27): ReSharper Parameter Name Hint: : int list
 (28): ReSharper Parameter Name Hint: : int
 (29): ReSharper Parameter Name Hint: : int list
+(30): ReSharper Parameter Name Hint: : int list
+(31): ReSharper Parameter Name Hint: : obj
+(32): ReSharper Parameter Name Hint: : obj
+(33): ReSharper Parameter Name Hint: : int
