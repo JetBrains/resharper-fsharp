@@ -81,7 +81,9 @@ type FSharpRegexNodeProvider() =
 
             let result =
                 match node.Parent with
-                | :? IInterpolatedStringExpr as expr -> checkForAttributes expr
+                //TODO: Support raw strings
+                | :? IInterpolatedStringExpr as expr when expr.IsTrivial() ->
+                    checkForAttributes expr
 
                 | :? ILiteralExpr as expr ->
                     let checkAttributesResult = checkForAttributes expr

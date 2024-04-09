@@ -12,7 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var tokenType = Literals.SingleItem?.GetTokenType();
       return tokenType == FSharpTokenType.REGULAR_INTERPOLATED_STRING ||
              tokenType == FSharpTokenType.VERBATIM_INTERPOLATED_STRING ||
-             tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING;
+             tokenType == FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING ||
+             tokenType == FSharpTokenType.RAW_INTERPOLATED_STRING;
     }
 
     public DocumentRange GetDollarSignRange()
