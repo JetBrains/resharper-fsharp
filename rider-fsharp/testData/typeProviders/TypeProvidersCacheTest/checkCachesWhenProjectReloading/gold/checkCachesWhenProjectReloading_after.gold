@@ -115,7 +115,7 @@ Provided Assemblies:
 35 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
-dce00951-82ce-4a47-a91c-b8046aea6ae8(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] = 
+GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] = 
 	TypeProviderLibrary.SimpleGenerativeProvider+S
 	TypeProviderLibrary.SimpleGenerativeProvider+S+GenerativeSubtype
 	TypeProviderLibrary.SwaggerProvider+PetStore
