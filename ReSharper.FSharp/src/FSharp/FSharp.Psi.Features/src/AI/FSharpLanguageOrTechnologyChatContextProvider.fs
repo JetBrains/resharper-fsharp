@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Feature.Services.ChatContexts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
-[<SolutionComponent(Instantiation.DemandAnyThread)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLanguageOrTechnologyChatContextProvider() =
     interface ILanguageOrTechnologyChatContextProvider with
         member this.GetLanguageOrTechnologyPresentation(psiModule) =
