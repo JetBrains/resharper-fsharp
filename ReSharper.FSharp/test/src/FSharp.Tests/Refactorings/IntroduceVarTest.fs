@@ -115,6 +115,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Record field binding - Anon 02 - In app``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding 01``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding 02 - In app``() = x.DoNamedTest()
+    [<Test>] member x.``Record field binding 03 - Multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Shift - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Shift - Decl 02``() = x.DoNamedTest()

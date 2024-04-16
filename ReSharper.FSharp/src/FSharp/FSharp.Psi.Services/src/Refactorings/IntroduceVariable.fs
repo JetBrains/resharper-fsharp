@@ -127,7 +127,7 @@ module FSharpIntroduceVariable =
         | _ -> expr
 
     let getCommonParentExpr (data: IntroduceVariableData) (sourceExpr: IFSharpExpression): IFSharpExpression =
-        let commonParent = data.Usages.FindLCA() :?> IFSharpExpression |> notNull
+        let commonParent = data.Usages.FindLCA().GetContainingNode<IFSharpExpression>(true) |> notNull
 
         let seqExpr = commonParent.As<ISequentialExpr>()
         if isNull seqExpr then commonParent else

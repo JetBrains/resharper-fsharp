@@ -1,0 +1,9 @@
+﻿Suggested names: identity, s
+//${OCCURRENCE0:Replace 2 occurrences}
+
+module Module
+
+type R = { Foo: string; Bar: string }
+
+let identity = id ""
+let _ = { Foo = identity; Bar = identity }
