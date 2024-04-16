@@ -57,6 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override IList<ITypeParameter> TypeParameters => GetTypeParameters();
+    public int TypeParametersCount => GetTypeParameters().Count; // todo: optimize?
 
     protected virtual IList<FSharpGenericParameter> MfvTypeParameters =>
       Mfv?.GenericParameters.Where(fcsTypeParameter => !fcsTypeParameter.IsMeasure).ToIList() ??

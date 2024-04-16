@@ -30,6 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       CLRDeclaredElementType.METHOD;
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+    public int TypeParametersCount => 0;
+
     public override IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
 
     public override ISubstitution IdSubstitution =>

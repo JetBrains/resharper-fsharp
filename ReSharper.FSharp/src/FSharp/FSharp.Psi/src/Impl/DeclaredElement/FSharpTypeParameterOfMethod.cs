@@ -39,6 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override ITypeMember GetContainingTypeMember() => Method;
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+    public int TypeParametersCount => 0;
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 
     public IClrTypeName GetClrName() => EmptyClrTypeName.Instance;

@@ -61,6 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IList<ITypeElement> NestedTypes => myMembersConverter.NestedTypes;
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+    public int TypeParametersCount => 0;
 
     public override AccessRights GetAccessRights() =>
       ProvidedType.IsPublic || ProvidedType.IsNestedPublic ? AccessRights.PUBLIC : AccessRights.PRIVATE;
