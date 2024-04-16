@@ -29,6 +29,7 @@ module FSharpOptions =
     let [<Literal>] nonFSharpProjectInMemoryReferences = "Analyze C# and VB.NET project references in-memory"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
+    let [<Literal>] useTransparentCompilerDescription = "Use TransparentCompiler"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -46,7 +47,10 @@ type FSharpOptions =
       mutable EnableOutOfScopeCompletion: bool
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-      mutable TopLevelOpenCompletion: bool }
+      mutable TopLevelOpenCompletion: bool
+      
+      [<SettingsEntry(false, useTransparentCompilerDescription)>]
+      mutable UseTransparentCompiler: bool }
 
 type FantomasLocationSettings =
     | AutoDetected = 0
@@ -154,6 +158,9 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
 
     member val NonFSharpProjectInMemoryReferences =
         base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value with get, set
+        
+    member val UseTransparentCompiler =
+        base.GetValueProperty<bool>("UseTransparentCompiler").Value
 
     member this.UpdateAssemblyReaderSetting() =
         this.NonFSharpProjectInMemoryReferences <-
@@ -210,6 +217,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.ParallelProjectReferencesAnalysis), parallelProjectReferencesAnalysis, "Requires restart") |> ignore
         this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), useTransparentCompilerDescription, "Requires restart") |> ignore
 
         do
             use indent = this.Indent()

@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.llm
 
+/*
 import com.intellij.ml.llm.smartChat.psiSummarization.LanguageSummaryProvider
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -27,4 +28,4 @@ class FSharpFileSummarizer: LanguageSummaryProvider {
     return null
   }
 }
-
+*/

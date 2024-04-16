@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.Lifetimes" />
   </ItemGroup>

@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -64,16 +66,15 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
         platformInfo.TargetFrameworkId
 
-    let getScriptReferences (scriptPath: VirtualFileSystemPath) scriptOptions =
+    let getScriptReferences (scriptPath: VirtualFileSystemPath) (scriptSnapshot: FSharpProjectSnapshot) =
         let assembliesPaths = HashSet<VirtualFileSystemPath>()
-        for o in scriptOptions.OtherOptions do
-            if o.StartsWith("-r:", StringComparison.Ordinal) then
-                let path = VirtualFileSystemPath.TryParse(o.Substring(3), InteractionContext.SolutionContext)
-                if not path.IsEmpty then assembliesPaths.Add(path) |> ignore
+        for { Path = r } in scriptSnapshot.ReferencesOnDisk do
+            let path = VirtualFileSystemPath.TryParse(r, InteractionContext.SolutionContext)
+            if not path.IsEmpty then assembliesPaths.Add(path) |> ignore
 
         let filesPaths = HashSet<VirtualFileSystemPath>()
-        for file in scriptOptions.SourceFiles do
-            let path = VirtualFileSystemPath.TryParse(file, InteractionContext.SolutionContext)
+        for file in scriptSnapshot.SourceFiles do
+            let path = VirtualFileSystemPath.TryParse(file.FileName, InteractionContext.SolutionContext)
             if not path.IsEmpty && not (path.Equals(scriptPath)) then
                 filesPaths.Add(path) |> ignore
 
@@ -148,7 +149,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             locks.QueueReadLock(lifetime, "AssemblyGC after removing F# script reference", fun _ ->
                 solution.GetComponent<AssemblyGC>().ForceGC())
 
-    and queueUpdateReferences (path: VirtualFileSystemPath) (newOptions: FSharpProjectOptions) =
+    and queueUpdateReferences (path: VirtualFileSystemPath) (newSnapshot: FSharpProjectSnapshot) =
         locks.QueueReadLock(lifetime, "Request new F# script references", fun _ ->
             let oldReferences =
                 let mutable oldReferences = Unchecked.defaultof<ScriptReferences>
@@ -161,7 +162,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
             ira.FuncRun <-
                 fun _ ->
-                    let newReferences = getScriptReferences path newOptions
+                    let newReferences = getScriptReferences path newSnapshot
                     Interruption.Current.CheckAndThrow()
 
                     let getDiff oldPaths newPaths =
@@ -181,7 +182,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
             ira.FuncCancelled <-
                 // Reschedule again
-                fun _ -> queueUpdateReferences path newOptions
+                fun _ -> queueUpdateReferences path newSnapshot
 
             ira.DoStart() |> ignore
         )
@@ -190,7 +191,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         changeManager.RegisterChangeProvider(lifetime, this)
 
         if not scriptOptionsProvider.SyncUpdate then
-            scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
+            scriptOptionsProvider.SnapshotUpdated.Advise(lifetime, fun (path, options) ->
                 queueUpdateReferences path options
             )
 
@@ -230,7 +231,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         if scriptOptionsProvider.SyncUpdate then
             scriptOptionsProvider.GetFcsProject(psiModule.SourceFile)
             |> Option.iter (fun fcsProject ->
-                let references = getScriptReferences path fcsProject.ProjectOptions
+                let references = getScriptReferences path fcsProject.ProjectSnapshot
                 updateReferences path references references.Assemblies [] changeBuilder 
             )
 
@@ -261,8 +262,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
-            match checkerService.GetCachedScriptOptions(path.FullPath) with
-            | Some options -> checkerService.InvalidateFcsProject(options, FcsProjectInvalidationType.Remove)
+            match checkerService.GetCachedScriptSnapshot(path.FullPath) with
+            | Some snapshot -> checkerService.InvalidateFcsProject(snapshot, FcsProjectInvalidationType.Remove)
             | None -> ()
 
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore

@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
+#nowarn "57"
+
 open System
 open System.Collections.Generic
 open System.IO
@@ -38,7 +40,7 @@ module FcsCheckerService =
 
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
-      ProjectOptions: FSharpProjectOptions
+      ProjectSnapshot: FSharpProjectSnapshot
       ParsingOptions: FSharpParsingOptions
       FileIndices: IDictionary<VirtualFileSystemPath, int>
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
@@ -53,22 +55,27 @@ type FcsProject =
         tryGetValue path x.FileIndices |> Option.defaultValue -1
 
     member x.TestDump(writer: TextWriter) =
-        let projectOptions = x.ProjectOptions
+        let projectSnapshot = x.ProjectSnapshot
+        let (ProjectSnapshot.FSharpProjectIdentifier(projectFileName, _)) = projectSnapshot.Identifier
 
-        writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
-        writer.WriteLine($"Stamp: {projectOptions.Stamp}")
-        writer.WriteLine($"Load time: {projectOptions.LoadTime}")
-
+        writer.WriteLine($"Project file: {projectFileName}")
+        writer.WriteLine($"Stamp: {projectSnapshot.Stamp}")
+        writer.WriteLine($"Load time: {projectSnapshot.LoadTime}")
+        
         writer.WriteLine("Source files:")
-        for sourceFile in projectOptions.SourceFiles do
+        for sourceFile in projectSnapshot.SourceFiles do
             writer.WriteLine($"  {sourceFile}")
-
+        
         writer.WriteLine("Other options:")
-        for option in projectOptions.OtherOptions do
+        for option in projectSnapshot.OtherOptions do
             writer.WriteLine($"  {option}")
-
+        
+        writer.WriteLine("References on disk:")
+        for r in projectSnapshot.ReferencesOnDisk do
+            writer.WriteLine($"  %s{r.Path}")
+        
         writer.WriteLine("Referenced projects:")
-        for referencedProject in projectOptions.ReferencedProjects do
+        for referencedProject in projectSnapshot.ReferencedProjects do
             writer.WriteLine($"  {referencedProject.OutputFile}")
 
         writer.WriteLine()
@@ -88,25 +95,29 @@ type FcsProjectInvalidationType =
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
         settingsStore: ISettingsStore, locks: IShellLocks, configurations: RunsProducts.ProductConfigurations) =
 
+    let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
+    let getSettingProperty name =
+        let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+        settingsStoreLive.GetValueProperty(lifetime, setting, null)
+
+    // Hard coded for now.
+    let useTransparentCompiler = true
+        // (getSettingProperty "UseTransparentCompiler").Value
+    
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-
-        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-
-        let getSettingProperty name =
-            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty(lifetime, setting, null)
-
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
         let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
-
+    
         lazy
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
                                      enablePartialTypeChecking = skipImpl.Value,
-                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
+                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value,
+                                     useTransparentCompiler = useTransparentCompiler)
 
             checker
 
@@ -156,26 +167,31 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         | Some(parseResults, checkResults) -> Some({ ParseResults = parseResults; CheckResults = checkResults })
         | _ ->
 
+
+        
         ProhibitTypeCheckCookie.AssertTypeCheckIsAllowed()
         locks.AssertReadAccessAllowed()
         x.AssertFcsAccessThread()
 
         let psiModule = sourceFile.PsiModule
+        // check if is active ...
+        if useTransparentCompiler then ()
         match x.FcsProjectProvider.GetFcsProject(psiModule) with
         | None -> None
         | Some fcsProject ->
 
-        let options = fcsProject.ProjectOptions
-        if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
+        let snapshot = fcsProject.ProjectSnapshot
+        if not (fcsProject.IsKnownFile(sourceFile)) && not snapshot.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
+        // TODO: should this be the non virtual path?
         let path = sourceFile.GetLocation().FullPath
         let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match x.Checker.ParseAndCheckDocument(path, snapshot, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -190,37 +206,38 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             new PinTypeCheckResultsCookie(sourceFile, parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
         | _ -> { new IDisposable with member this.Dispose() = () }
 
-    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
-        match x.FcsProjectProvider.GetProjectOptions(file) with
+    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) : FSharpCheckFileResults option =
+        match x.FcsProjectProvider.GetProjectSnapshot(file) with
         | None -> None
-        | Some options ->
+        | Some snapshot ->
 
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
-        | Some (_, checkResults, _) ->
+        match x.Checker.TryGetRecentCheckResultsForFile(path, snapshot) with
+        | Some (_, checkResults) ->
             logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
             Some checkResults
-
+        
         | _ ->
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
-    member x.GetCachedScriptOptions(path) =
+    member x.GetCachedScriptSnapshot(path) =
         if checker.IsValueCreated then
-            checker.Value.GetCachedScriptOptions(path)
+            checker.Value.GetCachedScriptSnapshot(path)
         else None
     
-    member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
+    member x.InvalidateFcsProject(projectSnapshot: FSharpProjectSnapshot, invalidationType: FcsProjectInvalidationType) =
         if checker.IsValueCreated then
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
-                logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.ClearCache(Seq.singleton projectOptions)
+                logger.Trace("Remove FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                checker.Value.ClearCache(Seq.singleton projectSnapshot.Identifier)
             | FcsProjectInvalidationType.Remove ->
-                logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.InvalidateConfiguration(projectOptions)
+                logger.Trace("Invalidate FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                // See: https://github.com/dotnet/fsharp/pull/16718
+                checker.Value.InvalidateConfiguration(projectSnapshot)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
@@ -263,8 +280,8 @@ type IFcsProjectProvider =
     abstract GetFcsProject: psiModule: IPsiModule -> FcsProject option
     abstract GetPsiModule: outputPath: VirtualFileSystemPath -> IPsiModule option
 
-    abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetProjectOptions: psiModule: IPsiModule -> FSharpProjectOptions option
+    abstract GetProjectSnapshot: sourceFile: IPsiSourceFile -> FSharpProjectSnapshot option
+    abstract GetProjectSnapshot: psiModule: IPsiModule -> FSharpProjectSnapshot option
 
     abstract GetFileIndex: IPsiSourceFile -> int
     abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions
@@ -289,9 +306,10 @@ type IFcsProjectProvider =
 
 type IScriptFcsProjectProvider =
     abstract GetFcsProject: IPsiSourceFile -> FcsProject option
-    abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
-    abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
+    abstract GetScriptSnapshot: IPsiSourceFile -> FSharpProjectSnapshot option
+    // TODO: unused?
+    // abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
+    abstract SnapshotUpdated: Signal<VirtualFileSystemPath * FSharpProjectSnapshot>
     abstract SyncUpdate: bool
 
 
