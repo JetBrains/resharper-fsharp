@@ -33,6 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override string ShortName => TagsClassName;
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+    public int TypeParametersCount => 0;
 
     public IClrTypeName GetClrName() =>
       new ClrTypeName($"{Union.GetClrName().FullName}+{TagsClassName}");

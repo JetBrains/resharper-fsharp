@@ -13,6 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.InstanceList;
+    public int TypeParametersCount => 0;
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.METHOD;
     public override IType ReturnType => Info.ReturnType.MapType(Module);
     public override bool IsAbstract => Info.IsAbstract;
