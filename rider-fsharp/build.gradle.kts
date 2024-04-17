@@ -263,7 +263,7 @@ tasks {
     into(backendLexerSources)
   }
   val fsharpLexerTargetDir = if (isMonorepo) {
-    val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+    val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
     monoRepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
   } else {
     repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
@@ -368,19 +368,6 @@ tasks {
   }
 
   defaultTasks(prepare)
-}
-
-fun getProductMonorepoRoot(): File? {
-  var currentDir = repoRoot
-
-  while (currentDir.parent != null) {
-    if (currentDir.resolve(".ultimate.root.marker").exists()) {
-      return currentDir
-    }
-    currentDir = currentDir.parentFile
-  }
-
-  return null
 }
 
 fun removeFirstMatchLineByRegexAndNormalizeEndings(file: File, removeRegex: Regex) {
