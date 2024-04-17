@@ -1,31 +1,145 @@
+import com.jetbrains.rd.generator.gradle.RdGenTask
+
 plugins {
+  // Version is configured in gradle.properties
+  id("com.jetbrains.rdgen")
   id("org.jetbrains.kotlin.jvm")
 }
 
-val rdLibDirectory: () -> File by rootProject.extra
-
 repositories {
-  mavenCentral()
-  maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
-  flatDir {
-    dir(rdLibDirectory())
-  }
+  maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+  maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
-tasks {
-  withType<JavaCompile> {
-    sourceSets {
-      main {
-        java {
-          srcDir("src/kotlin/model")
-        }
-      }
+val isMonorepo = rootProject.projectDir != projectDir.parentFile
+val fsharpRepoRoot: File = projectDir.parentFile.parentFile
+
+sourceSets {
+  main {
+    kotlin {
+      srcDir(File(fsharpRepoRoot, "rider-fsharp/protocol/src/kotlin/model"))
     }
   }
 }
 
+data class FsharpGeneratorSettings(
+  val csOutput: File,
+  val ktOutput: File,
+  val typeProviderClientOutput: File,
+  val typeProviderServerOutput: File,
+  val fantomasServerOutput: File,
+  val fantomasClientOutput: File,
+  val suffix: String)
+
+val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
+
+val fsharpGeneratorSettings = if (isMonorepo) {
+  val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+  val monorepoPreGeneratedRootDir by lazy { monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
+  val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
+  val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
+  val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
+  FsharpGeneratorSettings (
+    monorepoPreGeneratedBackendDir.resolve("FSharp.ProjectModelBase/src/Protocol"),
+    monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath),
+    monorepoPreGeneratedBackendDir.resolve("FSharp.TypeProviders.Protocol/src/Client"),
+    monorepoPreGeneratedBackendDir.resolve("FSharp.TypeProviders.Protocol/src/Server"),
+    monorepoPreGeneratedBackendDir.resolve("FSharp.Fantomas.Protocol/src/Server"),
+    monorepoPreGeneratedBackendDir.resolve("FSharp.Fantomas.Protocol/src/Client"),
+    ".Pregenerated"
+  )
+} else {
+  FsharpGeneratorSettings (
+    fsharpRepoRoot.resolve("ReSharper.FSharp/src/FSharp/FSharp.ProjectModelBase/src/Protocol"),
+    fsharpRepoRoot.resolve("rider-fsharp/$ktOutputRelativePath"),
+    fsharpRepoRoot.resolve("ReSharper.FSharp/src/FSharp/FSharp.TypeProviders.Protocol/src/Client"),
+    fsharpRepoRoot.resolve("ReSharper.FSharp/src/FSharp/FSharp.TypeProviders.Protocol/src/Server"),
+    fsharpRepoRoot.resolve("ReSharper.FSharp/src/FSharp/FSharp.Fantomas.Protocol/src/Server"),
+    fsharpRepoRoot.resolve("ReSharper.FSharp/src/FSharp/FSharp.Fantomas.Protocol/src/Client"),
+    ""
+  )
+}
+
+rdgen {
+  verbose = true
+  hashFolder = "build/rdgen"
+  packages = "model"
+
+  generator {
+    language = "kotlin"
+    transform = "asis"
+    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+    namespace = "com.jetbrains.rider.model"
+    directory = fsharpGeneratorSettings.ktOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+
+  generator {
+    language = "csharp"
+    transform = "reversed"
+    root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
+    namespace = "JetBrains.Rider.Model"
+    directory = fsharpGeneratorSettings.csOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+
+  generator {
+    language = "csharp"
+    transform = "asis"
+    root = "model.RdFSharpTypeProvidersModel"
+    namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Client"
+    directory = fsharpGeneratorSettings.typeProviderClientOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+  generator {
+    language = "csharp"
+    transform = "reversed"
+    root = "model.RdFSharpTypeProvidersModel"
+    namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
+    directory = fsharpGeneratorSettings.typeProviderServerOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+
+  generator {
+    language = "csharp"
+    transform = "asis"
+    root = "model.RdFantomasModel"
+    namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
+    directory = fsharpGeneratorSettings.fantomasClientOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+
+  generator {
+    language = "csharp"
+    transform = "reversed"
+    root = "model.RdFantomasModel"
+    namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
+    directory = fsharpGeneratorSettings.fantomasServerOutput.absolutePath
+    generatedFileSuffix = fsharpGeneratorSettings.suffix
+  }
+}
+
+tasks.withType<RdGenTask> {
+  dependsOn(sourceSets["main"].runtimeClasspath)
+  classpath(sourceSets["main"].runtimeClasspath)
+}
+
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-stdlib")
-  implementation(group = "", name = "rd-gen")
-  implementation(group = "", name = "rider-model")
+  if (isMonorepo) {
+    implementation(project(":rider-model"))
+  } else {
+    val rdVersion: String by project
+    val rdKotlinVersion: String by project
+
+    implementation("com.jetbrains.rd:rd-gen:$rdVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$rdKotlinVersion")
+    implementation(
+      project(
+        mapOf(
+          "path" to ":",
+          "configuration" to "riderModel"
+        )
+      )
+    )
+  }
 }
