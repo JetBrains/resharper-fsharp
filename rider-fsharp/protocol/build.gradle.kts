@@ -34,11 +34,11 @@ data class FsharpGeneratorSettings(
 val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
 
 val fsharpGeneratorSettings = if (isMonorepo) {
-  val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
-  val monorepoPreGeneratedRootDir by lazy { monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
-  val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
-  val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
-  val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
+  val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+  val monorepoPreGeneratedRootDir = monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
+  val monorepoPreGeneratedFrontendDir = monorepoPreGeneratedRootDir.resolve("Frontend")
+  val monorepoPreGeneratedBackendDir = monorepoPreGeneratedRootDir.resolve("BackendModel")
+  val ktOutputMonorepoRoot = monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath)
   FsharpGeneratorSettings (
     monorepoPreGeneratedBackendDir.resolve("FSharp.ProjectModelBase/src/Protocol"),
     monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath),
