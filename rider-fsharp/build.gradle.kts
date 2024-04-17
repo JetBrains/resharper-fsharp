@@ -1,6 +1,4 @@
-import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.IntelliJPluginConstants
 import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
@@ -10,11 +8,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   // Version is configured in gradle.properties
-  id("com.jetbrains.rdgen")
   id("org.jetbrains.intellij") version "1.13.3" // https://github.com/JetBrains/gradle-intellij-plugin/releases
   id("org.jetbrains.grammarkit") version "2021.2.2"
   id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
-  kotlin("jvm") version "1.8.0"
+  kotlin("jvm")
 }
 
 dependencies {
@@ -81,8 +78,9 @@ intellij {
   )
 }
 
-val repoRoot = projectDir.parentFile!!
-val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
+val isMonorepo = rootProject.projectDir != projectDir
+val repoRoot: File = projectDir.parentFile
+val resharperPluginPath = repoRoot.resolve("ReSharper.FSharp")
 
 val rdLibDirectory: () -> File = { file("${tasks.setupDependencies.get().idea.get().classes}/lib/rd") }
 extra["rdLibDirectory"] = rdLibDirectory
@@ -91,12 +89,6 @@ val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 val primaryTargetFramework = "net472"
 val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
 val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
-
-val productMonorepoDir = getProductMonorepoRoot()
-val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated") ?: error("Building not in monorepo") }
-val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
-val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
-val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
 
 val libFiles = listOf(
   "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.dll",
@@ -157,17 +149,21 @@ fun File.writeTextIfChanged(content: String) {
   }
 }
 
-val parentGradle = gradle.parent
-if (parentGradle != null && productMonorepoDir != null) {
-  val riderModelProject = parentGradle.rootProject.project("rider-model")
+val riderModel: Configuration by configurations.creating {
+  isCanBeConsumed = true
+  isCanBeResolved = false
+}
 
-  configurations.register("riderModel")
-  dependencies {
-    add("riderModel", riderModelProject)
-  }
-
-  tasks.named("rdgen") {
-    dependsOn(configurations.getByName("riderModel"))
+artifacts {
+  add(riderModel.name, provider {
+    val sdkRoot = tasks.setupDependencies.get().idea.get().classes
+    sdkRoot.resolve("lib/rd/rider-model.jar").also {
+      check(it.isFile) {
+        "rider-model.jar is not found at $riderModel"
+      }
+    }
+  }) {
+    builtBy(tasks.setupDependencies)
   }
 }
 
@@ -178,105 +174,6 @@ tasks {
 
     println("SDK path: $sdkPath")
     return@lazy sdkPath
-  }
-
-  configure<RdGenExtension> {
-    val inMonorepo = productMonorepoDir != null
-    logger.info("Configuring rdgen with inMonorepo=$inMonorepo")
-
-    val csOutput =
-      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.ProjectModelBase/src/Protocol")
-      else File(repoRoot, "ReSharper.FSharp/src/FSharp/FSharp.ProjectModelBase/src/Protocol")
-    val ktOutput =
-      if (inMonorepo) File(monorepoPreGeneratedFrontendDir, ktOutputRelativePath)
-      else File(repoRoot, "rider-fsharp/$ktOutputRelativePath")
-
-    val typeProviderClientOutput =
-      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.TypeProviders.Protocol/src/Client")
-      else File(repoRoot, "ReSharper.FSharp/src/FSharp/FSharp.TypeProviders.Protocol/src/Client")
-    val typeProviderServerOutput =
-      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.TypeProviders.Protocol/src/Server")
-      else File(repoRoot, "ReSharper.FSharp/src/FSharp/FSharp.TypeProviders.Protocol/src/Server")
-
-    val fantomasServerOutput =
-      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.Fantomas.Protocol/src/Server")
-      else File(repoRoot, "ReSharper.FSharp/src/FSharp/FSharp.Fantomas.Protocol/src/Server")
-    val fantomasClientOutput =
-      if (inMonorepo) File(monorepoPreGeneratedBackendDir, "FSharp.Fantomas.Protocol/src/Client")
-      else File(repoRoot, "ReSharper.FSharp/src/FSharp/FSharp.Fantomas.Protocol/src/Client")
-
-    verbose = true
-    hashFolder = "build/rdgen"
-    logger.info("Configuring rdgen params")
-    // *** Classpath and sources ***
-    if (inMonorepo) {
-      classpath(configurations.getByName("riderModel").resolve())
-      sources(
-        listOf(
-          File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
-        )
-      )
-    }
-    else {
-      classpath({
-        logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${rdLibDirectory().canonicalPath}")
-        rdLibDirectory().resolve("rider-model.jar").canonicalPath
-      })
-      sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
-    }
-    packages = "model"
-
-    generator {
-      language = "kotlin"
-      transform = "asis"
-      root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-      namespace = "com.jetbrains.rider.model"
-      directory = "$ktOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-
-    generator {
-      language = "csharp"
-      transform = "reversed"
-      root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-      namespace = "JetBrains.Rider.Model"
-      directory = "$csOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-
-    generator {
-      language = "csharp"
-      transform = "asis"
-      root = "model.RdFSharpTypeProvidersModel"
-      namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Client"
-      directory = "$typeProviderClientOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-    generator {
-      language = "csharp"
-      transform = "reversed"
-      root = "model.RdFSharpTypeProvidersModel"
-      namespace = "JetBrains.Rider.FSharp.TypeProviders.Protocol.Server"
-      directory = "$typeProviderServerOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-
-    generator {
-      language = "csharp"
-      transform = "asis"
-      root = "model.RdFantomasModel"
-      namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client"
-      directory = "$fantomasClientOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-    generator {
-      language = "csharp"
-      transform = "reversed"
-      root = "model.RdFantomasModel"
-      namespace = "JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server"
-      directory = "$fantomasServerOutput"
-      if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
   }
 
   withType<InstrumentCodeTask> {
@@ -365,40 +262,32 @@ tasks {
     }
     into(backendLexerSources)
   }
+  val fsharpLexerTargetDir = if (isMonorepo) {
+    val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+    monoRepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
+  } else {
+    repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
+  }
 
-  fun generateLexer(inMonorepo: Boolean, taskName: String) = register<GenerateLexerTask>(taskName) {
+  generateLexer.configure {
     dependsOn(copyBackendLexerSources, copyUnicodeLex)
-    source.set("src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex")
 
-    val relTargetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
-    val targetName = "_FSharpLexer"
-    val targetDirAbs =
-      if (inMonorepo) monorepoPreGeneratedFrontendDir.resolve(relTargetDir)
-      else File(repoRoot, "rider-fsharp/$relTargetDir")
-    targetDir.set(targetDirAbs.toString())
-    targetClass.set(targetName)
+    source.set(repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex").absolutePath)
     purgeOldFiles.set(true)
     outputs.upToDateWhen { false }
-
-    if (inMonorepo) {
-      // The generated file contains not constant comment with a source file abs path
-      // remove it to prevent changes on each generation
-      // Also, line endings may depend on the platform, so unify it to LF
-      doLast {
-        val targetFile = targetDirAbs.resolve("$targetName.java")
-        if (!targetFile.exists()) error("Lexer file $targetFile was not generated")
-
-        removeFirstMatchLineByRegexAndNormalizeEndings(targetFile, Regex("^( \\* from the specification file .*)\$"))
-      }
+    targetDir.set(fsharpLexerTargetDir.absolutePath)
+    val targetName = "_FSharpLexer"
+    targetClass.set(targetName)
+    doLast {
+      val targetFile = fsharpLexerTargetDir.resolve("$targetName.java")
+      if (!targetFile.exists()) error("Lexer file $targetFile was not generated")
+      removeFirstMatchLineByRegexAndNormalizeEndings(targetFile, Regex("^( \\* from the specification file .*)\$"))
     }
   }
 
-  val generateFSharpLexer = generateLexer(false, "generateFSharpLexer")
-  val generateFSharpLexerMonorepo = generateLexer(true, "generateFSharpLexerMonorepo")
-
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
-    dependsOn(generateFSharpLexer, rdgen)
+    dependsOn(":protocol:rdgen", generateLexer)
   }
 
   val parserTest by register<Test>("parserTest") {
@@ -464,7 +353,7 @@ tasks {
 
   val prepare = create("prepare") {
     group = riderFSharpTargetsGroup
-    dependsOn(rdgen, writeNuGetConfig, writeDotNetSdkPathProps, generateFSharpLexer)
+    dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, generateLexer)
   }
 
   create("buildReSharperPlugin") {
@@ -476,10 +365,6 @@ tasks {
         args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
       }
     }
-  }
-
-  create("prepareMonorepo") {
-    dependsOn(generateFSharpLexerMonorepo, "rdgen")
   }
 
   defaultTasks(prepare)
