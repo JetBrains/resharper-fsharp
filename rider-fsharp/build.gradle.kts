@@ -8,9 +8,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   // Version is configured in gradle.properties
-  id("org.jetbrains.intellij") version "1.13.3" // https://github.com/JetBrains/gradle-intellij-plugin/releases
-  id("org.jetbrains.grammarkit") version "2021.2.2"
-  id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
+  id("me.filippov.gradle.jvm.wrapper")
+  id("org.jetbrains.grammarkit")
+  id("org.jetbrains.intellij")
   kotlin("jvm")
 }
 
@@ -25,9 +25,10 @@ apply {
 }
 
 repositories {
-  mavenCentral()
-  maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+  maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
+  maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
+  maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
 val baseVersion = "2024.2"
@@ -263,11 +264,11 @@ tasks {
     into(backendLexerSources)
   }
   val fsharpLexerTargetDir = if (isMonorepo) {
-    val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+    val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
     check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
       error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
     }
-    monoRepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
+    monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
   } else {
     repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
   }
@@ -275,7 +276,7 @@ tasks {
   generateLexer.configure {
     dependsOn(copyBackendLexerSources, copyUnicodeLex)
 
-    source.set(repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex").absolutePath)
+    sourceFile.set(repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex"))
     purgeOldFiles.set(true)
     outputs.upToDateWhen { false }
     targetDir.set(fsharpLexerTargetDir.absolutePath)
@@ -368,6 +369,11 @@ tasks {
         args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
       }
     }
+  }
+
+  wrapper {
+    gradleVersion = "8.7"
+    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
   }
 
   defaultTasks(prepare)
