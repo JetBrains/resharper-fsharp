@@ -17,7 +17,7 @@ val fsharpRepoRoot: File = projectDir.parentFile.parentFile
 sourceSets {
   main {
     kotlin {
-      srcDir(File(fsharpRepoRoot, "rider-fsharp/protocol/src/kotlin/model"))
+      srcDir(fsharpRepoRoot.resolve("rider-fsharp/protocol/src/kotlin/model"))
     }
   }
 }
@@ -62,7 +62,6 @@ val fsharpGeneratorSettings = if (isMonorepo) {
 
 rdgen {
   verbose = true
-  hashFolder = "build/rdgen"
   packages = "model"
 
   generator {
