@@ -35,6 +35,9 @@ val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/pro
 
 val fsharpGeneratorSettings = if (isMonorepo) {
   val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
+  check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
+    error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
+  }
   val monorepoPreGeneratedRootDir = monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
   val monorepoPreGeneratedFrontendDir = monorepoPreGeneratedRootDir.resolve("Frontend")
   val monorepoPreGeneratedBackendDir = monorepoPreGeneratedRootDir.resolve("BackendModel")
