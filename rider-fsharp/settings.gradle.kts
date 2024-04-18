@@ -36,4 +36,4 @@ dependencyResolutionManagement {
   }
 }
 
-include("protocol")
+include(":protocol")
