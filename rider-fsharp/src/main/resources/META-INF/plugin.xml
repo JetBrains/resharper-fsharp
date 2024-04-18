@@ -46,6 +46,10 @@
     <lang.psiStructureViewFactory language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderProtocolPsiStructureViewFactory" />
     <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
     <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
+    <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
+    <configurationType implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfigurationType" />
+    <runLineMarkerContributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptMarkerContributor"/>
+    <programRunner order="first" implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptFsiRunner" />
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>

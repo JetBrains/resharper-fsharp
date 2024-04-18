@@ -64,7 +64,7 @@ type FsiOptions =
       [<SettingsEntry("--optimize+", fsiArgsText); DefaultValue>]
       mutable FsiArgs: string
 
-      [<SettingsEntry("--fsi-server:0 --readline-", fsiInternalArgsText); DefaultValue>]
+      [<SettingsEntry("--readline-", fsiInternalArgsText); DefaultValue>]
       mutable FsiInternalArgs: string
 
       [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]

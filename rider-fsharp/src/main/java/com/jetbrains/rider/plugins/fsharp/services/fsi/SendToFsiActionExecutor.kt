@@ -3,8 +3,9 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FSharpConsoleRunnerWithHistory
 
-class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
+class SendToFsiActionExecutor(private val consoleRunner: FSharpConsoleRunnerWithHistory) {
   fun execute(editor: Editor, file: PsiFile, debug: Boolean) {
     val selectionModel = editor.selectionModel
     val hasSelection = selectionModel.hasSelection()
@@ -16,7 +17,7 @@ class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
         "# ${getTextStartLine(editor, hasSelection) + 1} @\"${file.virtualFile.path}\" \n" +
         visibleText + "\n" +
         "# 1 \"stdin\"\n;;\n"
-      consoleRunner.sendText(visibleText, fsiText, debug)
+      consoleRunner.sendText(visibleText, fsiText)
     }
     if (!hasSelection && consoleRunner.fsiHost.moveCaretOnSendLine.value)
       editor.caretModel.moveCaretRelatively(0, 1, false, false, true)

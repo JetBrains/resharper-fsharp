@@ -8,8 +8,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FSharpConsoleRunnerWithHistory
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiDefaultConsoleRunner
 
-class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner) :
+class CommandHistoryAction(private val consoleRunner: FSharpConsoleRunnerWithHistory) :
   DumbAwareAction(FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"), null, AllIcons.Vcs.History) {
   companion object {
     val copyTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.copy.to.editor.title")

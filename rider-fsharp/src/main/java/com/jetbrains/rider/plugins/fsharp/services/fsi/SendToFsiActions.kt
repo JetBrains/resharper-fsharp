@@ -30,7 +30,7 @@ object Fsi {
 class StartFsiAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-    project.getComponent<FsiHost>().resetFsiConsole(false)
+    project.getComponent<FsiHost>().resetFsiDefaultConsole()
   }
 }
 
