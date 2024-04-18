@@ -264,6 +264,9 @@ tasks {
   }
   val fsharpLexerTargetDir = if (isMonorepo) {
     val monoRepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
+    check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
+      error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
+    }
     monoRepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
   } else {
     repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
