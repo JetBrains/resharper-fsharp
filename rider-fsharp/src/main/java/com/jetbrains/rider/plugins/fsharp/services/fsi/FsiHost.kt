@@ -188,7 +188,7 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
       return result
     }
     val cmdLine = executable.createRunCommandLine(runtime)
-    val consoleRunner = getOrCreateConsoleRunner("") { FsiDefaultConsoleRunner(cmdLine, this, false) }
+    val consoleRunner = getOrCreateConsoleRunner("") { FsiDefaultConsoleRunner(cmdLine, this) }
     result.setResult(consoleRunner)
 
     return result
