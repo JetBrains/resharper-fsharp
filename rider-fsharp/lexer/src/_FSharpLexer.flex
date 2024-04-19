@@ -384,9 +384,9 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   }
 %}
 
-%include ../../../../../../../../../../build/backend-lexer-sources/Unicode.lex
+%include ../../build/backend-lexer-sources/Unicode.lex
 
 // Unfortunately, this rule can not be shared with the backend.
 OP_CHAR=([!%&*+\-./<=>@\^|~\?])
 
-%include ../../../../../../../../../../build/backend-lexer-sources/FSharpRules.lex
+%include ../../build/backend-lexer-sources/FSharpRules.lex

@@ -83,13 +83,21 @@ val isMonorepo = rootProject.projectDir != projectDir
 val repoRoot: File = projectDir.parentFile
 val resharperPluginPath = repoRoot.resolve("ReSharper.FSharp")
 
-val rdLibDirectory: () -> File = { file("${tasks.setupDependencies.get().idea.get().classes}/lib/rd") }
-extra["rdLibDirectory"] = rdLibDirectory
-
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 val primaryTargetFramework = "net472"
 val outputRelativePath = "bin/$buildConfiguration/$primaryTargetFramework"
 val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
+
+if (!isMonorepo) {
+  sourceSets.getByName("main") {
+    java {
+      srcDir(repoRoot.resolve("rider-fsharp/src/generated/java"))
+    }
+    kotlin {
+      srcDir(repoRoot.resolve("rider-fsharp/src/generated/kotlin"))
+    }
+  }
+}
 
 val libFiles = listOf(
   "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.dll",
@@ -137,7 +145,6 @@ val externalAnnotationsDirectory = "$resharperPluginPath/src/FSharp/annotations"
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
 val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
-val backendLexerSources = "$repoRoot/rider-fsharp/build/backend-lexer-sources/"
 
 val riderFSharpTargetsGroup = "rider-fsharp"
 
@@ -237,61 +244,9 @@ tasks {
     maxHeapSize = "1500m"
   }
 
-  val resetLexerDirectory = create("resetLexerDirectory") {
-    doFirst {
-      File(backendLexerSources).deleteRecursively()
-      File(backendLexerSources).mkdirs()
-    }
-  }
-
-  // Cannot use ordinary copy here, because it requires eager evaluation of locations
-  val copyUnicodeLex = create("copyUnicodeLex") {
-    dependsOn(resetLexerDirectory)
-    doFirst {
-      val libPath = File("$dotNetSdkPath").parent
-      File(libPath, "ReSharperHost/PsiTasks").listFiles { it -> it.extension == "lex" }!!.forEach {
-        println(it)
-        it.copyTo(File(backendLexerSources, it.name))
-      }
-    }
-  }
-
-  val copyBackendLexerSources = create<Copy>("copyBackendLexerSources") {
-    dependsOn(resetLexerDirectory)
-    from("$resharperPluginPath/src/FSharp/FSharp.Psi/src/Parsing/Lexing") {
-      include("*.lex")
-    }
-    into(backendLexerSources)
-  }
-  val fsharpLexerTargetDir = if (isMonorepo) {
-    val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Monorepo root not found")
-    check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
-      error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
-    }
-    monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated")
-  } else {
-    repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
-  }
-
-  generateLexer.configure {
-    dependsOn(copyBackendLexerSources, copyUnicodeLex)
-
-    sourceFile.set(repoRoot.resolve("rider-fsharp/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex"))
-    purgeOldFiles.set(true)
-    outputs.upToDateWhen { false }
-    targetDir.set(fsharpLexerTargetDir.absolutePath)
-    val targetName = "_FSharpLexer"
-    targetClass.set(targetName)
-    doLast {
-      val targetFile = fsharpLexerTargetDir.resolve("$targetName.java")
-      if (!targetFile.exists()) error("Lexer file $targetFile was not generated")
-      removeFirstMatchLineByRegexAndNormalizeEndings(targetFile, Regex("^( \\* from the specification file .*)\$"))
-    }
-  }
-
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
-    dependsOn(":protocol:rdgen", generateLexer)
+    dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
 
   val parserTest by register<Test>("parserTest") {
@@ -357,7 +312,7 @@ tasks {
 
   val prepare = create("prepare") {
     group = riderFSharpTargetsGroup
-    dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, generateLexer)
+    dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, ":lexer:generateLexer")
   }
 
   create("buildReSharperPlugin") {
@@ -377,24 +332,4 @@ tasks {
   }
 
   defaultTasks(prepare)
-}
-
-fun removeFirstMatchLineByRegexAndNormalizeEndings(file: File, removeRegex: Regex) {
-  val tempFile = File.createTempFile("${file.name}.temp", null)
-  var found = false
-  file.useLines { lines ->
-    tempFile.bufferedWriter().use { writer ->
-      lines.forEach { line ->
-        if (!found && removeRegex.matches(line)) {
-          // do not write the line if it is matched with the regex
-          found = true
-        } else {
-          // rewrite the line with LF
-          writer.write(line + "\n")
-        }
-      }
-    }
-  }
-  file.delete()
-  tempFile.renameTo(file)
 }

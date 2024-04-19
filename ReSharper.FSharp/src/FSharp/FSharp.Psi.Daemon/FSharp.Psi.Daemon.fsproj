@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <InternalBuild Condition="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'Product.Root')) != ''">True</InternalBuild>
+    <InternalBuild Condition="'$(SolutionFileName)' != 'ReSharper.FSharp.sln'">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
@@ -87,6 +87,9 @@
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
+  <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
+    <RemoveDir Directories="obj" />
+  </Target>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />

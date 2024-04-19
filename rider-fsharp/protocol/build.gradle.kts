@@ -31,7 +31,7 @@ data class FsharpGeneratorSettings(
   val fantomasClientOutput: File,
   val suffix: String)
 
-val ktOutputRelativePath = "src/main/java/com/jetbrains/rider/plugins/fsharp/protocol"
+val ktOutputRelativePath = "src/generated/kotlin/com/jetbrains/rider/plugins/fsharp/protocol"
 
 val fsharpGeneratorSettings = if (isMonorepo) {
   val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
