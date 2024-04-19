@@ -36,7 +36,7 @@ class StartFsiAction : AnAction() {
 
 class SendToFsiAction : SendToFsiActionBase(false, Fsi.sendLineText, Fsi.sendSelectionText)
 
-class DebugInFsiAction : SendToFsiActionBase(true, Fsi.debugLineText, Fsi.debugSelectionText)
+//class DebugInFsiAction : SendToFsiActionBase(true, Fsi.debugLineText, Fsi.debugSelectionText)
 
 open class SendToFsiActionBase(
   private val debug: Boolean, private val sendLineText: String,
@@ -71,13 +71,13 @@ open class SendToFsiActionBase(
 class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText, Fsi.sendToFsiActionId),
   HighPriorityAction
 
-class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText, Fsi.debugInFsiActionId)
+//class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText, Fsi.debugInFsiActionId)
 
 class SendSelectionToFsiIntentionAction :
   SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText, Fsi.sendToFsiActionId), HighPriorityAction
 
-class DebugSelectionInFsiIntentionAction :
-  SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText, Fsi.debugInFsiActionId)
+/*class DebugSelectionInFsiIntentionAction :
+  SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText, Fsi.debugInFsiActionId)*/
 
 open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) :
   BaseSendToFsiIntentionAction(debug, actionId) {

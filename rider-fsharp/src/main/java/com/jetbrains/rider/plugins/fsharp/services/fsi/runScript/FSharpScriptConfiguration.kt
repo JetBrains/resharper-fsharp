@@ -38,7 +38,9 @@ class FSharpScriptConfiguration(name: String,
   override fun readExternal(element: Element) {
     super.readExternal(element)
     scriptFile = JDOMExternalizerUtil.readField(element, SCRIPT_PATH)?.toVirtualFile(true)
-    EnvironmentVariablesComponent.readExternal(element, envs)
+    val savedEnvs = mutableMapOf<String, String>()
+    EnvironmentVariablesComponent.readExternal(element, savedEnvs)
+    envs = savedEnvs
   }
 
   override fun writeExternal(element: Element) {
