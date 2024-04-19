@@ -26,6 +26,9 @@ type FSharpCompletionTest() =
         let paths = names |> Array.map (fun name -> testDir.Combine(name).FullPath)
         x.DoTestSolution(paths)
 
+    member x.DoNamedTestFsCs() =
+        x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
     [<Test>] member x.``Attribute - Top level module 01``() = x.DoNamedTest()
@@ -46,6 +49,10 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 03``() = x.DoNamedTest() // todo: fix in 233
+
+    [<Test>] member x.``Import - Extension 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Import - Extension 02``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Import - Extension 03``() = x.DoNamedTestFsCs()
 
     [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()

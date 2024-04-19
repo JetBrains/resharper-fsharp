@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:M (in CSharpLib)}
+module Module
+
+open System.Collections.Generic
+open CSharpLib
+
+let l = List<int>()
+l.M{caret}

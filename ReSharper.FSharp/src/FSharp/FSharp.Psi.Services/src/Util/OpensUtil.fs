@@ -373,7 +373,8 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
 
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
-    let symbolScope = getModuleOnlySymbolScope psiModule false
+    // todo: use scope with references?
+    let symbolScope = getSymbolScope psiModule false
 
 //    let getQualifiedName (element: IClrDeclaredElement) =
 //        match toQualifiedList element with
