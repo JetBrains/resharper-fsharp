@@ -12,7 +12,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadNotSafeBecauseOfSettingsStore)]
+  [Language(typeof(FSharpLanguage))]
   public class FSharpCacheProvider : ILanguageCacheProvider, ILanguageCacheInvalidator
   {
     private readonly FcsCheckerService myCheckerService;
