@@ -44,3 +44,4 @@ dependencyResolutionManagement {
 }
 
 include(":protocol")
+include(":lexer")
