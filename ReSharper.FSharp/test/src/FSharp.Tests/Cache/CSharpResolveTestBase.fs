@@ -19,7 +19,7 @@ type CSharpResolveTestBase(fileExtension) =
 
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
-    override x.DoTest(project: IProject, _: IProject) =
+    override x.DoTest(_, project: IProject) =
         x.Solution.GetPsiServices().Files.CommitAllDocuments()
         x.ExecuteWithGold(fun writer ->
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne

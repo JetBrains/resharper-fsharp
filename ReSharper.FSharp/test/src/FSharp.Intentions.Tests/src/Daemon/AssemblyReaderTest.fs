@@ -3,10 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open System
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
-open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
@@ -17,47 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
 open NUnit.Framework
-
-[<SolutionComponent>]
-[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
-        fsOptionsProvider, symbolCache, solution, locks, logger) =
-    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
-        fsOptionsProvider, symbolCache, solution, locks, logger)
-
-    let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
-    let mutable referencedProject = Unchecked.defaultof<_>
-    let mutable reader = Unchecked.defaultof<_>
-
-    member this.ReferencedProject = referencedProject
-    member this.Path = projectPath
-
-    override this.DebugReadRealAssemblies = false
-
-    member this.CreateReferencedProjectCookie(project: IProject) =
-        let path = project.Location / (project.Name + ".dll")
-        let psiModule = psiModules.GetPrimaryPsiModule(project, project.TargetFrameworkIds.SingleItem())
-
-        projectPath <- path
-        referencedProject <- project
-        reader <- new ProjectFcsModuleReader(psiModule, cache, path, this, None)
-
-        { new IDisposable with
-            member x.Dispose() =
-                projectPath <- VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
-                referencedProject <- Unchecked.defaultof<_>
-                reader <- Unchecked.defaultof<_> }
-
-    override this.ExistsFile(path) =
-        path = projectPath || base.ExistsFile(path)
-
-    override this.GetLastWriteTime(path) =
-        if path = projectPath then DateTime.MinValue else base.GetLastWriteTime(path)
-
-    override this.GetModuleReader(path, readerOptions) =
-        if path = projectPath then reader :> _ else base.GetModuleReader(path, readerOptions)
-
-    interface IHideImplementation<AssemblyReaderShim>
 
 [<SolutionComponent>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
@@ -79,7 +38,7 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
 
      // todo: test InternalsVisibleTo
 
-    override this.DoTest(project: IProject, _: IProject) =
+    override this.DoTest(_: Lifetime, project: IProject) =
         let solution = this.Solution
         let manager = HighlightingSettingsManager.Instance
 
@@ -99,12 +58,6 @@ type AssemblyReaderTestBase(mainFileExtension: string, secondFileExtension: stri
 
             daemon.DoHighlighting(DaemonProcessKind.VISIBLE_DOCUMENT)
             daemon.Dump()) |> ignore
-
-    override this.DoTest(lifetime: Lifetime, project: IProject) =
-        let testAssemblyReaderShim = this.Solution.GetComponent<TestAssemblyReaderShim>()
-        use cookie = testAssemblyReaderShim.CreateReferencedProjectCookie(this.SecondProject)
-
-        base.DoTest(lifetime, project)
 
 type AssemblyReaderCSharpTest() =
     inherit AssemblyReaderTestBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)

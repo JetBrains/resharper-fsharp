@@ -37,6 +37,18 @@ open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
 
+module FSharpTestUtil =
+    let referencedProjectGuid = "C13207C7-045E-485A-BC1A-AFA1472CD8BC"
+
+    let createTestFileSets (test: BaseTestNoShell) (mainExtension: string) (referencedExtension: string) =
+        let mainFilePath = test.TestDataPath / (test.TestMethodName + mainExtension)
+        let secondFilePath = test.TestDataPath / (test.TestMethodName + referencedExtension)
+    
+        [| [| mainFilePath.FullPath; referencedProjectGuid |]; [| secondFilePath.FullPath |] |]
+
+    let referenceCSharpProject (test: BaseTestNoShell) =
+        createTestFileSets test FSharpProjectFileType.FsExtension CSharpProjectFileType.CS_EXTENSION
+
 module FSharpTestAttribute =
     let extensions =
         [| FSharpProjectFileType.FsExtension
@@ -54,20 +66,29 @@ module PackageReferences =
     let [<Literal>] SqlProviderPackage = "SQLProvider/1.1.101"
     let [<Literal>] FsPickler = "FsPickler/5.3.2"
 
+type ITestAssemblyReaderShim =
+    abstract CreateReferencedProjectCookie: IProject -> IDisposable
+    abstract Dispose: unit -> unit
 
 type FSharpTestAttribute(extension) =
-    inherit TestPackagesAttribute()
+    inherit TestAspectAttribute()
 
     member val ReferenceFSharpCore = true with get, set
 
     new () =
         FSharpTestAttribute(FSharpProjectFileType.FsExtension)
 
+    interface ITestPackagesProvider with
+        override this.GetPackages _ =
+            [| if this.ReferenceFSharpCore then
+                TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+
+        member this.Inherits = false
+
     interface ITestLibraryReferencesProvider with
         member this.GetReferences(_, _, _) = JetBrains.Util.EmptyArray.Instance
         member this.Inherits = false
 
-        
     interface ITestTargetFrameworkIdProvider with
         member x.GetTargetFrameworkId() = FSharpTestAttribute.targetFrameworkId
         member this.Inherits = false
@@ -89,9 +110,24 @@ type FSharpTestAttribute(extension) =
                 for targetFrameworkId in projectDescriptor.ProjectProperties.ActiveConfigurations.TargetFrameworkIds do
                     properties.SetBuildAction(BuildAction.COMPILE, targetFrameworkId)
 
-    override this.GetPackages _ =
-        [| if this.ReferenceFSharpCore then
-               TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+    override this.OnBeforeTestExecute(context) =
+        let context = context
+        let testProject = context.TestProject
+        let referencedProjects = testProject.GetReferencedProjects(testProject.GetCurrentTargetFrameworkId())
+        for referencedProject in referencedProjects do
+            let isCSharpOrVb (projectFile: IProjectFile) =
+                let fileType = projectFile.LanguageType
+                fileType.Is<CSharpProjectFileType>() || fileType.Is<VBProjectFileType>()
+
+            let files = referencedProject.GetAllProjectFiles()
+            if files |> Seq.exists isCSharpOrVb then
+                let testAssemblyReaderShim = referencedProject.GetSolution().GetComponent<ITestAssemblyReaderShim>()
+                testAssemblyReaderShim.CreateReferencedProjectCookie(referencedProject) |> ignore
+
+    override this.OnAfterTestExecute(context) =
+        let solution = context.TestProject.GetSolution()
+        let testAssemblyReaderShim = solution.GetComponent<ITestAssemblyReaderShim>()
+        testAssemblyReaderShim.Dispose()
 
 type FSharpSignatureTestAttribute() =
     inherit FSharpTestAttribute(FSharpSignatureProjectFileType.FsiExtension)
@@ -334,6 +370,56 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
+
+
+[<SolutionComponent>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
+type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
+        fsOptionsProvider, symbolCache, solution, locks, logger) =
+    inherit AssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
+        fsOptionsProvider, symbolCache, solution, locks, logger)
+
+    let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+    let mutable referencedProject = Unchecked.defaultof<_>
+    let mutable reader = Unchecked.defaultof<_>
+
+    member this.ReferencedProject = referencedProject
+    member this.Path = projectPath
+
+    override this.DebugReadRealAssemblies = false
+
+    member this.Dispose() =
+            projectPath <- VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+            referencedProject <- Unchecked.defaultof<_>
+            reader <- Unchecked.defaultof<_>
+
+    interface ITestAssemblyReaderShim with
+        member this.CreateReferencedProjectCookie(project: IProject) =
+            Assertion.Assert(isNull reader)
+
+            let path = project.Location / (project.Name + ".dll")
+            let psiModule = psiModules.GetPrimaryPsiModule(project, project.TargetFrameworkIds.SingleItem())
+
+            projectPath <- path
+            referencedProject <- project
+            reader <- new ProjectFcsModuleReader(psiModule, cache, path, this, None)
+
+            { new IDisposable with
+                member x.Dispose() =
+                    this.Dispose() }
+
+        member this.Dispose() = this.Dispose()
+
+    override this.ExistsFile(path) =
+        path = projectPath || base.ExistsFile(path)
+
+    override this.GetLastWriteTime(path) =
+        if path = projectPath then DateTime.MinValue else base.GetLastWriteTime(path)
+
+    override this.GetModuleReader(path, readerOptions) =
+        if path = projectPath then reader :> _ else base.GetModuleReader(path, readerOptions)
+
+    interface IHideImplementation<AssemblyReaderShim>
 
 
 module FSharpTestPopup =
