@@ -59,3 +59,8 @@ Desktop.ini
 
 # NCrunch
 _NCrunch*
+
+src/FSharp/FSharp.Fantomas.Protocol/src/Client/
+src/FSharp/FSharp.Fantomas.Protocol/src/Server/
+src/FSharp/FSharp.TypeProviders.Protocol/src/Client/
+src/FSharp/FSharp.TypeProviders.Protocol/src/Server/

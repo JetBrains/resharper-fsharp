@@ -5,3 +5,4 @@ classes
 testData/**/.idea
 .gradle
 *.iml
+src/generated/
