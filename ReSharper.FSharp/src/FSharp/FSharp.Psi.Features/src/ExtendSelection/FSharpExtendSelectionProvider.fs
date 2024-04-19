@@ -15,7 +15,7 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>, InstantiationEx.DemandAnyThreadNotSafeBecauseOfSettingsStore)>]
+[<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadSafe)>]
 type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
     static member ExtendNodeSelection(fsFile: IFSharpFile, node: ITreeNode): ISelectedRange =
         match node with
