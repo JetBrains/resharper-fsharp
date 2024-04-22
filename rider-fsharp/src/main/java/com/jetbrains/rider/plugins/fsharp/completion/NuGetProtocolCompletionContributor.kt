@@ -4,7 +4,7 @@ import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiFile
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import com.jetbrains.rdclient.document.textControlModel
 import com.jetbrains.rider.completion.FrontendCompletionHost
 import com.jetbrains.rider.completion.ProtocolCompletionContributor
