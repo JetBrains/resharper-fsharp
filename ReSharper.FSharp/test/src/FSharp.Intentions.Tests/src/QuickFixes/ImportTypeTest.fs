@@ -55,3 +55,15 @@ type ImportTypeTest() =
     [<Test>] member x.``Qualifiers - Namespace 01``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ImportExtensionMemberTest() =
+    inherit FSharpQuickFixTestBase<FSharpImportExtensionMemberFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/extension"
+
+    member x.DoNamedTestFsCs() =
+        x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+
+    [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()

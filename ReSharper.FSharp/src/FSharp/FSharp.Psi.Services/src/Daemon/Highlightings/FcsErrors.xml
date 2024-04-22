@@ -253,6 +253,7 @@
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpImportExtensionMemberFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
