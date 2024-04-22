@@ -9,6 +9,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.project.isDirectoryBased
@@ -39,7 +40,10 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.util.*
 
-fun getFsiRunOptions(project: Project, configuration: FSharpScriptConfiguration? = null): Pair<DotNetExecutable, DotNetRuntime> {
+fun getFsiRunOptions(
+  project: Project,
+  configuration: FSharpScriptConfiguration? = null
+): Pair<DotNetExecutable, DotNetRuntime> {
   val fsiHost = project.getComponent(FsiHost::class.java)
   lateinit var sessionInfo: RdFsiSessionInfo
   UIUtil.invokeLaterIfNeeded {
@@ -59,11 +63,12 @@ fun getFsiRunOptions(project: Project, configuration: FSharpScriptConfiguration?
 
   val workingDirectory =
     if (project.isDirectoryBased) {
-      val projectDir = project.baseDir
-      val workingDir = if (projectDir.exists()) projectDir else VfsUtil.getUserHomeDir()
+      val projectDir = project.guessProjectDir()
+      val workingDir =
+        if (projectDir != null && projectDir.exists()) projectDir
+        else VfsUtil.getUserHomeDir()
       workingDir?.path ?: ""
-    }
-    else ""
+    } else ""
 
 
   val runtimeType = when (sessionInfo.runtime) {
@@ -90,7 +95,8 @@ fun getFsiRunOptions(project: Project, configuration: FSharpScriptConfiguration?
     executeAsIs = false,
     assemblyToDebug = null,
     runtimeType = runtimeType,
-    runtimeArguments = "")
+    runtimeArguments = ""
+  )
 
   val dotNetExecutable = parameters.toDotNetExecutable()
   val dotNetRuntime = DotNetRuntime.detectRuntimeForExeOrThrow(
@@ -121,7 +127,8 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
 
   fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) {
     synchronized(lockObject) {
-      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null } ?: tryCreateDefaultConsoleRunner()).onSuccess {
+      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null }
+        ?: tryCreateDefaultConsoleRunner()).onSuccess {
         it.sendActionExecutor.execute(editor, file, debug)
       }
     }
@@ -129,7 +136,8 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
 
   fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
     synchronized(lockObject) {
-      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null } ?: tryCreateDefaultConsoleRunner()).onSuccess {
+      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null }
+        ?: tryCreateDefaultConsoleRunner()).onSuccess {
         it.sendText(visibleText, fsiText) //WHY NOT SENDER
       }
     }
@@ -182,8 +190,7 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     val (executable, runtime) = getFsiRunOptions(project)
     try {
       executable.validate()
-    }
-    catch (t: Throwable) {
+    } catch (t: Throwable) {
       notifyFsiNotFound(t.message!!)
       return result
     }
@@ -194,11 +201,13 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     return result
   }
 
-  fun createConsoleRunner(title: String,
-                          scriptPath: String,
-                          project: Project,
-                          executor: Executor,
-                          commandLine: GeneralCommandLine) =
+  fun createConsoleRunner(
+    title: String,
+    scriptPath: String,
+    project: Project,
+    executor: Executor,
+    commandLine: GeneralCommandLine
+  ) =
     getOrCreateConsoleRunner(scriptPath) { FsiScriptProfileConsoleRunner(title, project, executor, commandLine) }
 
   private fun notifyFsiNotFound(@NlsSafe content: String) {
