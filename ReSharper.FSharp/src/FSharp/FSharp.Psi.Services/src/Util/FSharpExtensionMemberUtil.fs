@@ -35,21 +35,32 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
         let scopes = scopes.GetValuesSafe(ns.ShortName) // todo: use qualified names in the map
         if OpenScope.inAnyScope context scopes then () else
 
-        let ns = ns.As<Namespace>()
-        // todo: compiled
-        for extensionMethodsIndex in ns.SourceExtensionMethods do
-            for extensionMethodProxy in extensionMethodsIndex.Lookup() do
+        let addExtensionMethods (methodsIndex: IExtensionMethodsIndex) =
+            if isNull methodsIndex then () else
+
+            for extensionMethodProxy in methodsIndex.Lookup() do
+                // C#-compatible extension methods are only seen as extensions in other languages
+                // todo: expose language instead of checking source file
                 let sourceFile = extensionMethodProxy.TryGetSourceFile()
-                if not (isValid sourceFile) || sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>() then () else
+                if isValid sourceFile && sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>() then () else
 
                 let methods = extensionMethodProxy.FindExtensionMethod()
                 for method in methods do
+                    if isFSharpAssembly method.Module then () else
+
                     let parameters = method.Parameters
                     if parameters.Count = 0 then () else
 
                     let thisParam = parameters[0]
                     if exprType.IsSubtypeOf(thisParam.Type) then
                         result.Add(method)
+
+        let ns = ns.As<Namespace>()
+
+        for extensionMethodsIndex in ns.SourceExtensionMethods do
+            addExtensionMethods extensionMethodsIndex
+
+        addExtensionMethods ns.CompiledExtensionMethods
 
     while namespaceQueue.Count > 0 do
         let ns = namespaceQueue.Dequeue()
