@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
   id("org.jetbrains.grammarkit")
   id("org.jetbrains.intellij")
@@ -25,7 +28,7 @@ tasks {
     check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
       error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
     }
-    monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated/Frontend/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/")
+    monorepoRoot.resolve("dotnet/Plugins/_ReSharperFSharp.Pregenerated/Frontend/src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
   } else {
     fsharpRepoRoot.resolve("rider-fsharp/src/generated/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
   }
@@ -118,5 +121,5 @@ fun removeFirstMatchLineByRegexAndNormalizeEndings(file: File, removeRegex: Rege
     }
   }
   file.delete()
-  tempFile.renameTo(file)
+  Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
 }
