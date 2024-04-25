@@ -6,8 +6,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util.DataStructures.Collections
