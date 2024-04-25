@@ -8,9 +8,9 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter
-import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FSharpConsoleRunnerWithHistory
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
-class FsiInputOutputProcessor(private val fsiRunner: FSharpConsoleRunnerWithHistory) {
+class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
   private var isInitialText = true
   private var nextOutputTextIsFirst = true
 

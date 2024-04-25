@@ -3,9 +3,9 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FSharpConsoleRunnerWithHistory
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
-class SendToFsiActionExecutor(private val consoleRunner: FSharpConsoleRunnerWithHistory) {
+class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunnerBase) {
   fun execute(editor: Editor, file: PsiFile, debug: Boolean) {
     val selectionModel = editor.selectionModel
     val hasSelection = selectionModel.hasSelection()

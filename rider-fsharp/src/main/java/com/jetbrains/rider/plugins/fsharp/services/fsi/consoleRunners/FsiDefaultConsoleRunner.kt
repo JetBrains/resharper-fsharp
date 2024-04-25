@@ -10,7 +10,7 @@ import com.jetbrains.rider.plugins.fsharp.services.fsi.CommandHistoryAction
 import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost
 
 class FsiDefaultConsoleRunner(commandLine: GeneralCommandLine, fsiHost: FsiHost) :
-  FSharpConsoleRunnerWithHistory(fsiHost.project, fsiTitle, commandLine) {
+  FsiConsoleRunnerBase(fsiHost.project, fsiTitle, commandLine) {
 
   companion object {
     val fsiTitle = FSharpBundle.message("Fsi.ConsoleRunner.title")

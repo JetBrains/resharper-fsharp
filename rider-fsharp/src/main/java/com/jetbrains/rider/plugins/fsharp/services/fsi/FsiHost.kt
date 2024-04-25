@@ -19,7 +19,7 @@ import com.jetbrains.rd.util.reactive.Property
 import com.jetbrains.rd.util.reactive.flowInto
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rider.plugins.fsharp.*
-import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FSharpConsoleRunnerWithHistory
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiDefaultConsoleRunner
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiScriptProfileConsoleRunner
 import com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfiguration
@@ -138,7 +138,7 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     synchronized(lockObject) {
       (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null }
         ?: tryCreateDefaultConsoleRunner()).onSuccess {
-        it.sendText(visibleText, fsiText) //WHY NOT SENDER
+        it.sendText(visibleText, fsiText)
       }
     }
   }
@@ -154,14 +154,14 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     }
   }
 
-  private val sessions = mutableMapOf<String?, FSharpConsoleRunnerWithHistory>()
+  private val sessions = mutableMapOf<String?, FsiConsoleRunnerBase>()
   private val lockObject = Object()
-  var lastFocusedSession: FSharpConsoleRunnerWithHistory? = null
+  var lastFocusedSession: FsiConsoleRunnerBase? = null
 
   private fun getOrCreateConsoleRunner(
     sessionId: String,
-    factory: () -> FSharpConsoleRunnerWithHistory
-  ): FSharpConsoleRunnerWithHistory {
+    factory: () -> FsiConsoleRunnerBase
+  ): FsiConsoleRunnerBase {
     val session = sessions.getOrPut(sessionId) {
       val session = factory()
       session.initAndRun()
@@ -185,8 +185,8 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     return session
   }
 
-  private fun tryCreateDefaultConsoleRunner(): Promise<FSharpConsoleRunnerWithHistory> {
-    val result = AsyncPromise<FSharpConsoleRunnerWithHistory>()
+  private fun tryCreateDefaultConsoleRunner(): Promise<FsiConsoleRunnerBase> {
+    val result = AsyncPromise<FsiConsoleRunnerBase>()
     val (executable, runtime) = getFsiRunOptions(project)
     try {
       executable.validate()

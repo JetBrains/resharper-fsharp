@@ -29,9 +29,9 @@ import com.jetbrains.rider.plugins.fsharp.services.fsi.*
 import org.jetbrains.annotations.Nls
 import javax.swing.BorderFactory
 
-abstract class FSharpConsoleRunnerWithHistory(project: Project,
-                                              @Nls consoleTitle: String,
-                                              private val commandLine: GeneralCommandLine) :
+abstract class FsiConsoleRunnerBase(project: Project,
+                                    @Nls consoleTitle: String,
+                                    private val commandLine: GeneralCommandLine) :
   AbstractConsoleRunnerWithHistory<LanguageConsoleView>(project,
                                                         consoleTitle,
                                                         commandLine.workDirectory.path) {

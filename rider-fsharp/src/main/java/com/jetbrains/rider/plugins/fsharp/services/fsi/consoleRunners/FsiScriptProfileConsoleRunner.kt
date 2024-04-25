@@ -12,7 +12,7 @@ class FsiScriptProfileConsoleRunner(@NlsSafe consoleName: String,
                                     project: Project,
                                     private val executor: Executor,
                                     commandLine: GeneralCommandLine) :
-  FSharpConsoleRunnerWithHistory(project, consoleName, commandLine) {
+  FsiConsoleRunnerBase(project, consoleName, commandLine) {
   override fun getExecutor() = executor
   override fun getToolBarActions() =
     mutableListOf(
