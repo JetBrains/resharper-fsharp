@@ -87,13 +87,22 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let isRightPipeArgApplicable (expr: ITreeNode) (pipeResultType: FSharpType) =
-        if not (isUnit pipeResultType) then true else
-
         let rec skipFunArgs (t: FSharpType) =
             if t.IsFunctionType then skipFunArgs t.GenericArguments[1] else t
 
+        let expr = expr.As<IFSharpExpression>().IgnoreInnerParens()
+        let exprType = expr.TryGetFcsType()
+        if isNull exprType then false else
+
+        match expr with
+        // TODO: TryGetFcsType returns type of DotLambda return type
+        | :? IDotLambdaExpr -> exprType = pipeResultType
+        | _ ->
+        if not exprType.IsFunctionType || exprType.GenericArguments[1] <> pipeResultType then false else
+        if not (isUnit pipeResultType) then true else
+
         let invokedRefExpr =
-            match expr.As<IFSharpExpression>().IgnoreInnerParens() with
+            match expr with
             | :? IReferenceExpr as refExpr ->
                 refExpr
             | :? IPrefixAppExpr as expr ->
@@ -104,6 +113,8 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         let returnType = invokedRefExpr.Reference.GetFcsSymbol() |> getReturnType
         match returnType with
         | Some t ->
+            // We know that the result of the pipe is unit.
+            // We want to get the very last returned value and make sure that it is not generic, but strictly unit.
             skipFunArgs t
             |> isUnit
             |> not

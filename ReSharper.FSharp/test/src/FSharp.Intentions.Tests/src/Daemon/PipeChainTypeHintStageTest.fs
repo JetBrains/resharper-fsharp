@@ -32,6 +32,7 @@ type PipeChainTypeHintStageTest() =
     [<Test>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
     [<Test>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()
     [<Test>] member x.``Error 03 - Without right argument``() = x.DoNamedTest()
+    [<Test>] member x.``Error 04 - Wrong type``() = x.DoNamedTest()
 
     [<Test>] member x.``Skipped 01 - Other binary op``() = x.DoNamedTest()
     [<Test>] member x.``Skipped 02 - Shadowed pipe op``() = x.DoNamedTest()
