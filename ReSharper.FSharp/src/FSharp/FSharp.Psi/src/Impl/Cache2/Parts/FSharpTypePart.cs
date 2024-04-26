@@ -80,22 +80,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return part;
     }
 
-    public override HybridCollection<IMethod> FindExtensionMethod(ExtensionMethodInfo info)
+    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMethodInfo info)
     {
       var typeElement = TypeElement;
       if (typeElement == null)
-        return HybridCollection<IMethod>.Empty;
+        return HybridCollection<ITypeMember>.Empty;
 
       var declaration = GetDeclaration();
       if (declaration == null)
-        return HybridCollection<IMethod>.Empty;
+        return HybridCollection<ITypeMember>.Empty;
 
       var languageLevel = declaration.GetFSharpLanguageLevel();
       if (languageLevel < FSharpLanguageLevel.FSharp80 && 
           !typeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false))
-        return HybridCollection<IMethod>.Empty;
+        return HybridCollection<ITypeMember>.Empty;
 
-      var result = HybridCollection<IMethod>.Empty;
+      var result = HybridCollection<ITypeMember>.Empty;
       foreach (var memberDeclaration in declaration.MemberDeclarations)
         if (info.ShortName == memberDeclaration.DeclaredName &&
             info.Hash == memberDeclaration.GetTreeStartOffset().Offset &&

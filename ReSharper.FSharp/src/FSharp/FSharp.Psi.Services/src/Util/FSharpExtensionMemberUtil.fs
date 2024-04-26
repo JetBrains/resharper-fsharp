@@ -46,8 +46,9 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
                 let sourceFile = extensionMethodProxy.TryGetSourceFile()
                 if isValid sourceFile && sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>() then () else
 
-                let methods = extensionMethodProxy.FindExtensionMethod()
-                for method in methods do
+                let members = extensionMethodProxy.FindExtensionMember()
+                for typeMember in members do
+                    let method = typeMember.As<IMethod>()
                     if isFSharpAssembly method.Module then () else
 
                     let parameters = method.Parameters
