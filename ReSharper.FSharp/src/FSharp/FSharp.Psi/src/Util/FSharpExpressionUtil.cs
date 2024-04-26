@@ -47,6 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var currentExpr = expression;
       while (true)
       {
+        currentExpr = currentExpr.IgnoreParentParens();
+
         if (MatchClauseListOwnerExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
         {
           currentExpr = matchExpr as IFSharpExpression;
