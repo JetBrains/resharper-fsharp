@@ -4,14 +4,17 @@ let x = 5
 
 let _ = Regex("|[|(0)123|]|(1) |\\b|(2)")
 let _ = Regex($"|[|(3)123|]|(4) |\\b|(5)")
-let _ = Regex($"|[|(6)123|]|(7) {x} |\\b|(8)")
-let _ = Regex(@"|[|(9)123|]|(10) |\\|(11)b")
-let _ = Regex(@"|[|(12)123|]|(13) |\b|(14)")
-let _ = Regex(@$"|[|(15)123|]|(16) |\b|(17)")
-let _ = Regex(@$"|[|(18)123|]|(19) {x} |\b|(20)")
-let _ = Regex("""|[|(21)123|]|(22) |\b|(23)""")
-let _ = Regex($"""|[|(24)123|]|(25) |\b|(26)""")
-let _ = Regex($"""|[|(27)123|]|(28) {x} |\b|(29)""")
+let _ = Regex(@"|[|(6)123|]|(7) |\\|(8)b")
+let _ = Regex(@"|[|(9)123|]|(10) |\b|(11)")
+let _ = Regex(@$"|[|(12)123|]|(13) |\b|(14)")
+let _ = Regex("""|[|(15)123|]|(16) |\b|(17)""")
+let _ = Regex($"""|[|(18)123|]|(19) |\b|(20)""")
+let _ = Regex($$"""[123] \b""")
+
+let _ = Regex($"[123] {x} \\b")
+let _ = Regex(@$"[123] {x} \b")
+let _ = Regex($"""[123] {x} \b""")
+let _ = Regex($$"""[123] {{x}} \b""")
 
 ---------------------------------------------------------
 (0): ReSharper Regex Set: 
@@ -22,10 +25,10 @@ let _ = Regex($"""|[|(27)123|]|(28) {x} |\b|(29)""")
 (5): ReSharper Regex Identifier: 
 (6): ReSharper Regex Set: 
 (7): ReSharper Regex Set: 
-(8): ReSharper Regex Identifier: 
+(8): ReSharper Regex Escape Character 1: 
 (9): ReSharper Regex Set: 
 (10): ReSharper Regex Set: 
-(11): ReSharper Regex Escape Character 1: 
+(11): ReSharper Regex Identifier: 
 (12): ReSharper Regex Set: 
 (13): ReSharper Regex Set: 
 (14): ReSharper Regex Identifier: 
@@ -35,12 +38,3 @@ let _ = Regex($"""|[|(27)123|]|(28) {x} |\b|(29)""")
 (18): ReSharper Regex Set: 
 (19): ReSharper Regex Set: 
 (20): ReSharper Regex Identifier: 
-(21): ReSharper Regex Set: 
-(22): ReSharper Regex Set: 
-(23): ReSharper Regex Identifier: 
-(24): ReSharper Regex Set: 
-(25): ReSharper Regex Set: 
-(26): ReSharper Regex Identifier: 
-(27): ReSharper Regex Set: 
-(28): ReSharper Regex Set: 
-(29): ReSharper Regex Identifier: 
