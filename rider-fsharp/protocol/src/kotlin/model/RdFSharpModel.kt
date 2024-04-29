@@ -22,7 +22,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
       field("isCustomTool", bool)
       field("args", immutableList(string))
       field("fixArgsForAttach", bool)
-    })
+    }).async
     call("getProjectReferences", int, immutableList(string))
     field("fsiTools", aggregatedef("RdFSharpInteractiveTools") {
       call("prepareCommands", structdef("RdFsiPrepareCommandsArgs") {

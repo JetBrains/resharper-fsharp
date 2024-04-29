@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull
 
 class FSharpRunScriptConfigurationFactory(type: FSharpScriptConfigurationType) :
   DotNetConfigurationFactoryBase<FSharpScriptConfiguration>(type) {
-  override fun getId() = "F# Script"
+  override fun getId() = "FSharpScript"
   override fun getSingletonPolicy() = RunConfigurationSingletonPolicy.SINGLE_INSTANCE_ONLY
   override fun createTemplateConfiguration(@NotNull project: Project) =
     FSharpScriptConfiguration("F# Script", null, mapOf(), project, this)

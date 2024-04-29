@@ -36,7 +36,6 @@ abstract class FsiConsoleRunnerBase(project: Project,
                                                         consoleTitle,
                                                         commandLine.workDirectory.path) {
   val fsiHost = project.getComponent(FsiHost::class.java)
-  val sendActionExecutor = SendToFsiActionExecutor(this)
   val commandHistory = CommandHistory()
   private val inputSeparatorGutterContentProvider = InputSeparatorGutterContentProvider(true)
   private val fsiInputOutputProcessor = FsiInputOutputProcessor(this)

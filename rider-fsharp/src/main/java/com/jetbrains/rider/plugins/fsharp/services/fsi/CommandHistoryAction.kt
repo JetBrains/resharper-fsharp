@@ -31,7 +31,7 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunnerBase) :
             consoleView.editorDocument.setText(selectedValue.visibleText)
           }
         else
-          consoleRunner.fsiHost.sendToFsi(selectedValue.visibleText, selectedValue.executableText, false)
+          consoleRunner.sendText(selectedValue.visibleText, selectedValue.executableText)
         return PopupStep.FINAL_CHOICE
       }
     }

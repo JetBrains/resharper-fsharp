@@ -11,14 +11,19 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.NlsSafe
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.project.isDirectoryBased
 import com.intellij.psi.PsiFile
-import com.intellij.util.ui.UIUtil
+import com.intellij.util.concurrency.annotations.RequiresEdt
+import com.intellij.util.execution.ParametersListUtil
 import com.jetbrains.rd.util.reactive.Property
 import com.jetbrains.rd.util.reactive.flowInto
 import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.plugins.fsharp.*
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
+import com.jetbrains.rider.plugins.fsharp.FSharpIcons
+import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiDefaultConsoleRunner
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiScriptProfileConsoleRunner
@@ -33,27 +38,20 @@ import com.jetbrains.rider.runtime.dotNetCore.DotNetCoreRuntimeType
 import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.runtime.mono.MonoRuntimeType
 import com.jetbrains.rider.runtime.msNet.MsNetRuntimeType
-import org.jetbrains.concurrency.AsyncPromise
-import org.jetbrains.concurrency.Promise
-import org.jetbrains.concurrency.resolvedPromise
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
-import java.util.*
 
+@RequiresEdt
 fun getFsiRunOptions(
   project: Project,
   configuration: FSharpScriptConfiguration? = null
 ): Pair<DotNetExecutable, DotNetRuntime> {
   val fsiHost = project.getComponent(FsiHost::class.java)
-  lateinit var sessionInfo: RdFsiSessionInfo
-  UIUtil.invokeLaterIfNeeded {
-    sessionInfo = fsiHost.rdFsiHost.requestNewFsiSessionInfo.sync(Unit)
-  }
-
+  val sessionInfo = fsiHost.rdFsiHost.requestNewFsiSessionInfo.sync(Unit)
   val runtimeHost = RiderDotNetActiveRuntimeHost.getInstance(project)
 
   val exePath = when (sessionInfo.runtime) {
-    RdFsiRuntime.Core -> runtimeHost.dotNetCoreRuntime.value!!.cliExePath
+    RdFsiRuntime.Core -> runtimeHost.dotNetCoreRuntime.value?.cliExePath
     RdFsiRuntime.NetFramework -> sessionInfo.fsiPath
     RdFsiRuntime.Mono -> {
       val runtime = runtimeHost.getCurrentClassicNetRuntime(false).runtime as MonoRuntime
@@ -86,8 +84,8 @@ fun getFsiRunOptions(
 
   val parameters = DotNetExeConfigurationParameters(
     project = project,
-    exePath = exePath,
-    programParameters = args.joinToString(" "),
+    exePath = exePath ?: "",
+    programParameters = ParametersListUtil.join(args),
     workingDirectory = workingDirectory,
     envs = configuration?.envs ?: mapOf(),
     isPassParentEnvs = true,
@@ -101,7 +99,7 @@ fun getFsiRunOptions(
   val dotNetExecutable = parameters.toDotNetExecutable()
   val dotNetRuntime = DotNetRuntime.detectRuntimeForExeOrThrow(
     project,
-    RiderDotNetActiveRuntimeHost.getInstance(project),
+    runtimeHost,
     dotNetExecutable.exePath,
     dotNetExecutable.runtimeType,
     dotNetExecutable.projectTfm
@@ -115,8 +113,8 @@ fun getFsiRunOptions(
 class FsiHost(project: Project) : LifetimedProjectComponent(project) {
   val rdFsiHost = project.solution.rdFSharpModel.fSharpInteractiveHost
 
-  val moveCaretOnSendLine = Property(true)
-  val moveCaretOnSendSelection = Property(true)
+  private val moveCaretOnSendLine = Property(true)
+  private val moveCaretOnSendSelection = Property(true)
   val copyRecentToEditor = Property(false)
 
   init {
@@ -126,20 +124,45 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
   }
 
   fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) {
-    synchronized(lockObject) {
-      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null }
-        ?: tryCreateDefaultConsoleRunner()).onSuccess {
-        it.sendActionExecutor.execute(editor, file, debug)
+    val selectionModel = editor.selectionModel
+    val hasSelection = selectionModel.hasSelection()
+
+    val visibleText =
+      if (hasSelection) editor.selectionModel.selectedText!!
+      else {
+        val caretModel = editor.caretModel
+        editor.document.getText(TextRange(caretModel.visualLineStart, caretModel.visualLineEnd))
+          .substringBeforeLast("\n")
       }
+
+    if (visibleText.isNotEmpty()) {
+      val textLineStart =
+        if (hasSelection) editor.document.getLineNumber(editor.selectionModel.selectionStart)
+        else editor.caretModel.logicalPosition.line
+      val fsiText = "\n" +
+        "# silentCd @\"${file.containingDirectory.virtualFile.path}\" ;; \n" +
+        (if (debug) "# dbgbreak\n" else "") +
+        "# ${textLineStart + 1} @\"${file.virtualFile.path}\" \n" +
+        visibleText + "\n" +
+        "# 1 \"stdin\"\n;;\n"
+      sendToFsi(visibleText, fsiText, debug)
+    }
+
+    if (!hasSelection && moveCaretOnSendLine.value)
+      editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
+
+    if (hasSelection && moveCaretOnSendSelection.value) {
+      editor.caretModel.moveToOffset(selectionModel.selectionEnd)
+      editor.caretModel.currentCaret.removeSelection()
     }
   }
 
   fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
     synchronized(lockObject) {
-      (lastFocusedSession?.let { if (it.isValid()) resolvedPromise(it) else null }
-        ?: tryCreateDefaultConsoleRunner()).onSuccess {
-        it.sendText(visibleText, fsiText)
-      }
+      val fsiRunner =
+        if (lastFocusedSession?.isValid() == true) lastFocusedSession
+        else tryCreateDefaultConsoleRunner()
+      fsiRunner?.sendText(visibleText, fsiText)
     }
   }
 
@@ -174,7 +197,9 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
       })
       session.getRunContentDescriptor().preferredFocusComputable.compute().addFocusListener(object : FocusListener {
         override fun focusGained(e: FocusEvent?) {
-          lastFocusedSession = session
+          synchronized(lockObject) {
+            lastFocusedSession = session
+          }
         }
 
         override fun focusLost(e: FocusEvent?) {}
@@ -185,20 +210,16 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     return session
   }
 
-  private fun tryCreateDefaultConsoleRunner(): Promise<FsiConsoleRunnerBase> {
-    val result = AsyncPromise<FsiConsoleRunnerBase>()
+  private fun tryCreateDefaultConsoleRunner(): FsiConsoleRunnerBase? {
     val (executable, runtime) = getFsiRunOptions(project)
     try {
       executable.validate()
     } catch (t: Throwable) {
       notifyFsiNotFound(t.message!!)
-      return result
+      return null
     }
     val cmdLine = executable.createRunCommandLine(runtime)
-    val consoleRunner = getOrCreateConsoleRunner("") { FsiDefaultConsoleRunner(cmdLine, this) }
-    result.setResult(consoleRunner)
-
-    return result
+    return getOrCreateConsoleRunner("") { FsiDefaultConsoleRunner(cmdLine, this) }
   }
 
   fun createConsoleRunner(
