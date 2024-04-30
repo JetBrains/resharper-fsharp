@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
-open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.Application.Settings
@@ -12,6 +11,8 @@ open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Client
 open JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorConfig
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.EditorConfig
 open JetBrains.Util
 
 module internal Reflection =
@@ -24,7 +25,7 @@ module internal Reflection =
 
 [<SolutionComponent>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
-                  schema: SettingsSchema) =
+                  schema: SettingsSchema, settingsStore: ISettingsStore) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
@@ -55,19 +56,25 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         | Some caretPosition -> RdFcsPos(int caretPosition.Line, int caretPosition.Column)
         | None -> null
 
-    let toRdFormatSettings (settings: FSharpFormatSettingsKey) =
+    let toRdFormatSettings (settings: FSharpFormatSettingsKey) (settingsStore: IContextBoundSettingsStore) =
         [| for field in formatConfigFields ->
             let fieldName =
                 match field with
-                    | "IndentSize" -> "INDENT_SIZE"
-                    | "MaxLineLength" -> "WRAP_LIMIT"
-                    | x -> x
+                | "IndentSize" -> "INDENT_SIZE"
+                | "MaxLineLength" -> "WRAP_LIMIT"
+                | "InsertFinalNewline" -> "LINE_FEED_AT_FILE_END"
+                | x -> x
             let value =
                 match Reflection.getFieldValue settings fieldName with
                 | null -> null
                 | x ->
                 match schema.GetEntry(typeof<FSharpFormatSettingsKey>, fieldName) with
-                | :? SettingsScalarEntry as entry when entry.RawDefaultValue <> x -> x
+                | :? SettingsScalarEntry as entry ->
+                    if entry.RawDefaultValue <> x then x else
+                    let settingsStore = settingsStore.As<IContextBoundSettingsStoreImplementation>()
+                    if isNull settingsStore then "" else
+                    let layer = settingsStore.FindLayerWhereSettingValueComeFrom(entry, null)
+                    if isNotNull layer && startsWith ConfigFileUtils.EditorConfigName layer.Name then x else ""
                 | _ -> ""
             let value =
                 if isNull value then settings.FantomasSettings.TryGet(toEditorConfigName fieldName)
@@ -81,18 +88,18 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
 
     do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
 
-    member x.FormatSelection(filePath, range, source, settings, options, newLineText) =
+    member x.FormatSelection(filePath, range, source, settings, options, newLineText, settingsStore) =
         connect()
         let args =
-            RdFantomasFormatSelectionArgs(toRdFcsRange range, filePath, source, toRdFormatSettings settings,
+            RdFantomasFormatSelectionArgs(toRdFcsRange range, filePath, source, toRdFormatSettings settings settingsStore,
                 toRdFcsParsingOptions options, newLineText, null)
 
         connection.Execute(fun () -> connection.ProtocolModel.FormatSelection.Sync(args, RpcTimeouts.Maximal))
 
-    member x.FormatDocument(filePath, source, settings, options, newLineText, cursorPosition: DocumentCoords option) =
+    member x.FormatDocument(filePath, source, settings, options, newLineText, cursorPosition: DocumentCoords option, settingsStore) =
         connect()
         let args =
-            RdFantomasFormatDocumentArgs(filePath, source, toRdFormatSettings settings, toRdFcsParsingOptions options,
+            RdFantomasFormatDocumentArgs(filePath, source, toRdFormatSettings settings settingsStore, toRdFcsParsingOptions options,
                 newLineText, toRdFcsPos cursorPosition)
 
         connection.Execute(fun () -> connection.ProtocolModel.FormatDocument.Sync(args, RpcTimeouts.Maximal))
