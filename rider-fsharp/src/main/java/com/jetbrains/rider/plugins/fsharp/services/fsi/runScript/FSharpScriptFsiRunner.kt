@@ -4,6 +4,7 @@ import com.intellij.execution.configurations.RunProfile
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.runners.showRunContent
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -16,9 +17,11 @@ class FSharpScriptFsiRunner : DotNetProgramRunner() {
     executorId == DefaultRunExecutor.EXECUTOR_ID && runConfiguration is FSharpScriptConfiguration
 
   override suspend fun executeAsync(environment: ExecutionEnvironment, state: RunProfileState): RunContentDescriptor? {
-    withContext(Dispatchers.EDT) {
+    if (state !is FSharpScriptRunProfileState) return null
+    val result = withContext(Dispatchers.EDT) {
       FileDocumentManager.getInstance().saveAllDocuments()
+      state.executeSuspending(environment.executor)
     }
-    return super.executeAsync(environment, state)
+    return showRunContent(result, environment)
   }
 }

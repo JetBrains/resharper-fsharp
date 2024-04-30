@@ -100,9 +100,6 @@
 
   <project-components>
     <component>
-      <implementation-class>com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost</implementation-class>
-    </component>
-    <component>
       <implementation-class>com.jetbrains.rider.plugins.fsharp.FSharpHost</implementation-class>
     </component>
   </project-components>

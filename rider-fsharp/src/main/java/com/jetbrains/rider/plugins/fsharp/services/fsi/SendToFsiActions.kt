@@ -10,7 +10,6 @@ import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import icons.ReSharperIcons
@@ -30,7 +29,8 @@ object Fsi {
 class StartFsiAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-    project.getComponent<FsiHost>().resetFsiDefaultConsole()
+    val fsiHost = FsiHost.getInstance(project)
+    fsiHost.resetFsiDefaultConsole()
   }
 }
 
@@ -46,7 +46,8 @@ open class SendToFsiActionBase(
     val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
     val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)!!
     val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-    project.getComponent(FsiHost::class.java).sendToFsi(editor, file, debug)
+    val fsiHost = FsiHost.getInstance(project)
+    fsiHost.sendToFsi(editor, file, debug)
   }
 
   override fun update(e: AnActionEvent) {
@@ -99,7 +100,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   override fun checkFile(file: PsiFile) = file.language is FSharpLanguageBase
 
   override fun invoke(project: Project, editor: Editor, element: PsiElement) {
-    project.getComponent<FsiHost>().sendToFsi(editor, element.containingFile, debug)
+    FsiHost.getInstance(project).sendToFsi(editor, element.containingFile, debug)
   }
 
   override fun getIcon(flags: Int): Icon = ReSharperIcons.Bulb.GhostBulb

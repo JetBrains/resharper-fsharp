@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.DumbAwareAction
@@ -11,7 +12,11 @@ import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
 class CommandHistoryAction(private val consoleRunner: FsiConsoleRunnerBase) :
-  DumbAwareAction(FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"), null, AllIcons.Vcs.History) {
+  DumbAwareAction(
+    FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"),
+    null,
+    AllIcons.Vcs.History
+  ) {
   companion object {
     val copyTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.copy.to.editor.title")
     val executeTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.execute.title")
@@ -45,6 +50,7 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunnerBase) :
     }
   }
 
+  override fun getActionUpdateThread() = ActionUpdateThread.EDT
   override fun update(e: AnActionEvent) {
     e.presentation.isEnabled = commandHistory.entries.isNotEmpty() && consoleView.isEditable
   }
