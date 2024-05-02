@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -49,6 +50,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
+  @Mute("RIDER-110482")
   @TestEnvironment(
     solution = "FSharpProjectTree",
     sdkVersion = SdkVersion.DOT_NET_5
@@ -152,6 +154,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
+  @Mute("RIDER-110482")
   @Issues(Issue("RIDER-69084"), Issue("RIDER-69562"))
   @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
   fun testFSharpDirectoryManipulation() {
