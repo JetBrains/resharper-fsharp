@@ -6,11 +6,12 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.Application.Help
 open JetBrains.Util
 
 [<AutoOpen>]
 module FsiOptions =
-    let [<Literal>] fsiHelpKeyword            = "Settings_Languages_FSHARP_Interactive"
+    let [<Literal>] fsiHelpKeyword            = HelpId.Settings_Languages_FSHARP_Interactive
 
     let [<Literal>] launchOptionsSectionTitle = "Launch options"
     let [<Literal>] debugSectionTitle         = "Debug"
