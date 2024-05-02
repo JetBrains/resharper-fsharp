@@ -2,7 +2,9 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
@@ -15,6 +17,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   override fun getSolutionDirectoryName() = "TypeProviderLibrary"
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun swaggerProvider() = doTest("SwaggerProvider")
 
   @Test
@@ -24,6 +27,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun simpleGenerativeProvider() = doTest("SimpleGenerativeProvider")
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun providersErrors() = doTest("ProvidersErrors")
 
   @Test(description = "RIDER-60909")
@@ -31,6 +35,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @TestEnvironment(
     solution = "CsvTypeProvider",
     sdkVersion = SdkVersion.DOT_NET_6

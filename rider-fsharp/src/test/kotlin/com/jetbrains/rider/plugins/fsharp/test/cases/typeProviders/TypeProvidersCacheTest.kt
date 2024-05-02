@@ -4,6 +4,7 @@ import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -31,6 +32,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   }
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun checkCachesWhenProjectReloading() {
     checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
 
@@ -41,6 +43,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   }
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun invalidation() {
     val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
@@ -66,6 +69,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   }
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun typing() {
     withOpenedEditor(project, defaultSourceFile) {
       waitForDaemon()
@@ -75,6 +79,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   }
 
   @Test
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun projectsWithEqualProviders() {
     withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
       waitForDaemon()
