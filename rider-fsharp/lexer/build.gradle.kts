@@ -1,9 +1,10 @@
+import org.jetbrains.grammarkit.GrammarKitConstants
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 plugins {
   id("org.jetbrains.grammarkit")
-  id("org.jetbrains.intellij")
 }
 
 repositories {
@@ -11,20 +12,30 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
-intellij {
-  version.set("2024.1")
-  type.set("RD")
-}
-
 val isMonorepo = rootProject.projectDir != projectDir.parentFile
 val fsharpRepoRoot: File = projectDir.parentFile.parentFile
 val backendLexerSources = fsharpRepoRoot.resolve("rider-fsharp/build/backend-lexer-sources/")
 val resharperPluginPath = fsharpRepoRoot.resolve("ReSharper.FSharp")
 
+val platformLibConfiguration by configurations.registering
+val flexConfiguration by configurations.registering
+
+dependencies {
+  @Suppress("UnstableApiUsage")
+  flexConfiguration("org.jetbrains.intellij.deps.jflex:jflex:${GrammarKitConstants.JFLEX_DEFAULT_VERSION}")
+  @Suppress("UnstableApiUsage")
+  platformLibConfiguration(project(
+    mapOf(
+      "path" to ":",
+      "configuration" to "platformLibConfiguration"
+    )
+  ))
+}
+
 tasks {
   val fsharpLexerTargetDir = if (isMonorepo) {
     val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile
-      ?: error("Monorepo root not found")
+                       ?: error("Monorepo root not found")
     check(monorepoRoot.resolve(".ultimate.root.marker").isFile) {
       error("Incorrect location in monorepo: monorepoRoot='$monorepoRoot'")
     }
@@ -33,69 +44,49 @@ tasks {
     fsharpRepoRoot.resolve("rider-fsharp/src/generated/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer")
   }
 
-  val resetLexerDirectory = create("resetLexerDirectory") {
-    group = "grammarkit"
-    doFirst {
-      delete {
-        delete(backendLexerSources)
-      }
-    }
-  }
+  val unicodeLexDst = backendLexerSources.resolve("Unicode.lex")
 
   val copyUnicodeLex = create("copyUnicodeLex") {
     group = "grammarkit"
-    dependsOn(resetLexerDirectory)
+    outputs.file(unicodeLexDst)
     if (isMonorepo) {
       val monorepoRoot = buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile
-        ?: error("Monorepo root not found")
+                         ?: error("Monorepo root not found")
       val unicodeLexSrc = monorepoRoot.resolve("dotnet/Psi.Features/Tasks/CsLex/Resources/Unicode.lex")
-      val unicodeLexDst = backendLexerSources.resolve("Unicode.lex")
       inputs.file(unicodeLexSrc)
-      outputs.file(unicodeLexDst)
       doFirst {
-        copy {
-          from(unicodeLexSrc)
-          into(backendLexerSources)
-        }
+        unicodeLexDst.writeBytes(unicodeLexSrc.readBytes())
       }
     } else {
-      val dotNetSdkPath by lazy {
-        val sdkPath = setupDependencies.get().idea.get().classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
-        if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
-
-        return@lazy sdkPath
-      }
-      val unicodeLexSrc = dotNetSdkPath.resolve("../ReSharperHost/PsiTasks/Unicode.lex")
-      val unicodeLexDst = backendLexerSources.resolve("Unicode.lex")
-      inputs.file(unicodeLexSrc)
-      outputs.file(unicodeLexDst)
+      inputs.files(platformLibConfiguration)
       doFirst {
-        copy {
-          from(unicodeLexSrc)
-          into(backendLexerSources)
-        }
+        val libFile = platformLibConfiguration.get().singleFile
+        val libPath = File(libFile.readText().trim())
+        val unicodeLexSrc = libPath.resolve("ReSharperHost/PsiTasks/Unicode.lex")
+        unicodeLexDst.writeBytes(unicodeLexSrc.readBytes())
       }
     }
   }
 
   val copyBackendLexerSources = create<Copy>("copyBackendLexerSources") {
     group = "grammarkit"
-    dependsOn(resetLexerDirectory)
     from("$resharperPluginPath/src/FSharp/FSharp.Psi/src/Parsing/Lexing") {
       include("*.lex")
     }
     into(backendLexerSources)
   }
 
-  generateLexer.configure {
+  create<GenerateLexerTask>("generateLexer") {
     dependsOn(copyBackendLexerSources, copyUnicodeLex)
 
+    inputs.file(unicodeLexDst)
     sourceFile.set(fsharpRepoRoot.resolve("rider-fsharp/lexer/src/_FSharpLexer.flex"))
     purgeOldFiles.set(true)
-    outputs.upToDateWhen { false }
     targetDir.set(fsharpLexerTargetDir.absolutePath)
     val targetName = "_FSharpLexer"
     targetClass.set(targetName)
+    classpath(flexConfiguration)
+
     doLast {
       val targetFile = fsharpLexerTargetDir.resolve("$targetName.java")
       if (!targetFile.exists()) error("Lexer file $targetFile was not generated")
