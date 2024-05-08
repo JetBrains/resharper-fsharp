@@ -23,7 +23,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
-  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadNotSafeBecauseOfSettingsSchemaCollector)]
+  [Language(typeof(FSharpLanguage))]
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {

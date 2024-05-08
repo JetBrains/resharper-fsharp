@@ -13,7 +13,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 {
-  [SolutionComponent(Instantiation.DemandAnyThread)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public class TypeProvidersExternalProcessFactory
   {
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;
