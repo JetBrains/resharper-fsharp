@@ -3,4 +3,4 @@ module Module =
 
 open System.Text.RegularExpressions
 
-let _ = Regex($"{5} {caret}")
+let _ = Regex($""" {caret}""")
