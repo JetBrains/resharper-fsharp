@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -314,7 +315,7 @@ type DeconstructionFromUnionCase(fcsUnionCase: FSharpUnionCase,
             else
                 null, []
 
-        let pat = FSharpPatternUtil.bindFcsSymbol pat fcsUnionCase opName
+        let pat = FSharpBindUtil.bindFcsSymbol pat fcsUnionCase opName
         if not hasFields then pat, null, [] else
 
         let parametersOwnerPat = FSharpPatternUtil.toParameterOwnerPat pat opName

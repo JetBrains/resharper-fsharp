@@ -100,7 +100,7 @@ and MatchNode =
                 |> String.concat ", "
             $"{case.DisplayName}({items})"
 
-        | (MatchTest.As _, [node1; node2]), _ ->
+        | (MatchTest.As, [node1; node2]), _ ->
             $"{string node1} as {string node2}"
 
         | (MatchTest.ActivePatternCase(index, group), nodes), _ ->
@@ -118,7 +118,7 @@ and MatchNode =
 
             $"{(group.Names[index])} {nodes}"
 
-        | (MatchTest.Error _, _), _ -> "error"
+        | (MatchTest.Error, _), _ -> "error"
 
         | (MatchTest.EmptyList, _), _ -> "[]"
 
@@ -497,7 +497,7 @@ module MatchNode =
 
                 let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
                 let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                FSharpPatternUtil.bindFcsSymbolToReference context pat.ReferenceName unionCase "get pattern"
+                FSharpBindUtil.bindFcsSymbolToReference context pat.ReferenceName.Reference unionCase "get pattern"
 
                 if not unionCase.HasFields then () else
 
@@ -523,7 +523,7 @@ module MatchNode =
                     let field, _ = fields |> Array.find (snd >> ((=) constantValue))
                     let patText = field.DisplayNameCore
                     let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                    FSharpPatternUtil.bindFcsSymbolToReference pat pat.ReferenceName field "get pattern"
+                    FSharpBindUtil.bindFcsSymbolToReference pat pat.ReferenceName.Reference field "get pattern"
                     match node.Value.Type with
                     | MatchType.Enum(enumEntity, _) ->
                         markSeenType enumEntity
@@ -1291,7 +1291,7 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
 
         case
         |> Option.iter (fun fcsSymbol ->
-            FSharpPatternUtil.bindFcsSymbol tempMatchClause.Pattern fcsSymbol "get pattern" |> ignore
+            FSharpBindUtil.bindFcsSymbol tempMatchClause.Pattern fcsSymbol "get pattern" |> ignore
         )
 
     let newClauses = TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild) |> Seq.toArray

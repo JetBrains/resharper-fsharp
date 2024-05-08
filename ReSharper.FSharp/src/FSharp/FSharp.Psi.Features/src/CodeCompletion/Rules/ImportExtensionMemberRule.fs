@@ -40,9 +40,15 @@ type ImportExtensionMemberRule() =
 
         for method in members do
             let name = method.ShortName
-            let containingType = method.ContainingType
-            let ns = containingType.GetContainingNamespace().QualifiedName
-            let info = ImportInfo(containingType, name, Ranges = context.Ranges)
+            let ns =
+                match method.ContainingType with
+                | :? IFSharpModule as fsModule ->
+                    fsModule.QualifiedSourceName
+
+                | containingType ->
+                    containingType.GetContainingNamespace().QualifiedName 
+
+            let info = ImportInfo(method, name, Ranges = context.Ranges)
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->

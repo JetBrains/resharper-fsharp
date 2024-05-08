@@ -1,19 +1,12 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
 
-open FSharp.Compiler.Symbols
-open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
-open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 let getReferenceName (pattern: IFSharpPattern) =
@@ -39,46 +32,6 @@ let toParameterOwnerPat (pat: IFSharpPattern) opName =
         ModificationUtil.ReplaceChild(newPat.ReferenceName, referenceName) |> ignore
         newPat
     | _ -> failwith $"Unexpected pattern: {pat}"
-
-let bindFcsSymbolToReference (context: ITreeNode) (referenceName: IReferenceName) (fcsSymbol: FSharpSymbol) opName =
-    let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
-    if isNull referenceName || referenceName.IsQualified || isNull declaredElement then () else
-
-    let reference = referenceName.Reference
-    FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, declaredElement, context)
-
-    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
-        // todo: use declared element directly
-        let typeElement = declaredElement.GetContainingType()
-        addOpens reference typeElement |> ignore
-
-// todo: replace Fcs symbols with R# elements when possible
-let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
-    // todo: move to reference binding
-    let bind name =
-        let factory = pattern.CreateElementFactory()
-
-        let name = PrettyNaming.NormalizeIdentifierBackticks name
-        let newPattern = factory.CreatePattern(name, false)
-        let pat = ModificationUtil.ReplaceChild(pattern, newPattern)
-
-        let referenceName = getReferenceName pat
-
-        let oldQualifierWithDot =
-            let referenceName = getReferenceName pattern
-            if isNotNull referenceName then TreeRange(referenceName.Qualifier, referenceName.Delimiter) else null
-
-        if isNotNull oldQualifierWithDot then
-            ModificationUtil.AddChildRangeAfter(referenceName, null, oldQualifierWithDot) |> ignore
-
-        bindFcsSymbolToReference pat referenceName fcsSymbol opName
-
-        pat
-    
-    match fcsSymbol with
-    | :? FSharpUnionCase as unionCase -> bind unionCase.Name
-    | :? FSharpField as field when FSharpSymbolUtil.isEnumMember field -> bind field.Name
-    | _ -> failwith $"Unexpected symbol: {fcsSymbol}"
 
 let rec ignoreParentAsPatsFromRight (pat: IFSharpPattern) =
     match AsPatNavigator.GetByRightPattern(pat.IgnoreParentParens()) with

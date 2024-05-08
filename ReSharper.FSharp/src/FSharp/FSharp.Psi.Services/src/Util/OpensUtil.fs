@@ -92,10 +92,10 @@ let getContainingEntity (typeElement: ITypeElement): IClrDeclaredElement =
     | null -> typeElement.GetContainingNamespace() :> _
     | containingType -> containingType :> _
 
-let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
-    match typeElement.GetContainingType() with
+let rec getModuleToOpen (declaredElement: IClrDeclaredElement): IClrDeclaredElement =
+    match declaredElement.GetContainingType() with
     | null ->
-        typeElement.GetContainingNamespace() :> _
+        declaredElement.GetNamespace()
 
     | containingType ->
         if containingType.IsModule() && containingType.GetAccessType() = ModuleMembersAccessKind.Normal then
@@ -318,13 +318,14 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
 
     insertAfterAnchor ns anchor indent
 
-let addOpens (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
-    if typeElement.IsAutoImported() then reference else
+let addOpens (reference: FSharpSymbolReference) (declaredElement: IClrDeclaredElement) =
+    let containingType = declaredElement.GetContainingType()
+    if isNotNull containingType && containingType.IsAutoImported() then reference else
 
     let referenceOwner = reference.GetElement()
     use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
-    let moduleToOpen = getModuleToOpen typeElement
+    let moduleToOpen = getModuleToOpen declaredElement
     let fsFile = referenceOwner.FSharpFile
 
     let qualifiedModuleToOpen = toQualifiedList moduleToOpen

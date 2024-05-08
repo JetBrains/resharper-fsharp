@@ -6,10 +6,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util.DataStructures.Collections
@@ -20,12 +20,25 @@ let getQualifierExpr (reference: IReference) =
 
     refExpr.Qualifier
 
+[<return: Struct>]
+let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
+    match typeMember with
+    | :? IFSharpTypeMember as fsTypeMember ->
+        let mfv = fsTypeMember.Symbol.As<FSharpMemberOrFunctionOrValue>()
+        if isNull mfv || not mfv.IsExtensionMember then ValueNone else
+
+        match mfv.DeclaringEntity with
+        | Some fcsEntity when fcsEntity.IsFSharpModule -> ValueSome mfv
+        | _ -> ValueNone
+    | _ -> ValueNone
+
 let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
+    let psiModule = context.GetPsiModule()
+    use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
     let exprType = fcsType.MapType(context)
 
-    let psiModule = context.GetPsiModule()
-    let symbolScope = getSymbolScope psiModule true
     use namespaceQueue = PooledQueue<INamespace>.GetInstance()
+    let symbolScope = getSymbolScope psiModule true
     namespaceQueue.Enqueue(symbolScope.GlobalNamespace)
 
     let openedModulesProvider = OpenedModulesProvider(context.FSharpFile)
@@ -33,10 +46,42 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
     let result = List()
 
-    let addMethods (ns: INamespace) =
-        let scopes = scopes.GetValuesSafe(ns.ShortName) // todo: use qualified names in the map
-        if OpenScope.inAnyScope context scopes then () else
+    let isInScope (typeMember: ITypeMember) =
+        let isInScope name =
+            // todo: use qualified names in the map
+            let scopes = scopes.GetValuesSafe(name)
+            OpenScope.inAnyScope context scopes
+        
+        match typeMember.ContainingType with
+        | :? IFSharpModule as fsModule ->
+            isInScope fsModule.SourceName
 
+        | containingType ->
+            let ns = containingType.GetContainingNamespace()
+            isInScope ns.ShortName
+
+    let matchesType (typeMember: ITypeMember) (exprType: IType) : bool =
+        match typeMember with
+        | FSharpExtensionMember mfv ->
+            // todo: arrays and other non-declared-types?
+            let exprTypeElement = exprType.GetTypeElement()
+            if isNull exprTypeElement then false else
+
+            let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
+            if isNull extendedTypeElement then false else
+
+            exprTypeElement.Equals(extendedTypeElement) ||
+            exprTypeElement.GetSuperTypeElements() |> Seq.exists extendedTypeElement.Equals
+
+        | :? IMethod as method ->
+            let parameters = method.Parameters
+            if parameters.Count = 0 then false else
+
+            exprType.IsSubtypeOf(parameters[0].Type)
+
+        | _ -> false
+
+    let addMethods (ns: INamespace) =
         let addExtensionMethods (methodsIndex: IExtensionMethodsIndex) =
             if isNull methodsIndex then () else
 
@@ -44,19 +89,16 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
                 // C#-compatible extension methods are only seen as extensions in other languages
                 // todo: expose language instead of checking source file
                 let sourceFile = extensionMethodProxy.TryGetSourceFile()
-                if isValid sourceFile && sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>() then () else
+                if not (isValid sourceFile) then () else
 
                 let members = extensionMethodProxy.FindExtensionMember()
                 for typeMember in members do
-                    let method = typeMember.As<IMethod>()
-                    if isFSharpAssembly method.Module then () else
+                    // todo: check module/member is accessible
+                    // todo: use extension member info to check kind and skip namespaces
+                    if isInScope typeMember then () else
 
-                    let parameters = method.Parameters
-                    if parameters.Count = 0 then () else
-
-                    let thisParam = parameters[0]
-                    if exprType.IsSubtypeOf(thisParam.Type) then
-                        result.Add(method)
+                    if matchesType typeMember exprType then
+                        result.Add(typeMember)
 
         let ns = ns.As<Namespace>()
 

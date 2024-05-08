@@ -20,5 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     /// Same-source-named type element defined in the same namespace group, forcing the module to have `Module` suffix.
     [CanBeNull] ITypeElement AssociatedTypeElement { get; }
+
+    string QualifiedSourceName { get; }
   }
 }

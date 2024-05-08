@@ -4,12 +4,13 @@
     {
         int m1 = Module.M1("");
         int m2 = Module.M2("", 1);
-        int p = Module.|Prop|(0);
+        |int|(0) p = Module.|Prop|(1);
     }
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal property 'Prop' here
+(0):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'method group' to target type 'int'
+(1): ReSharper Underlined Error Highlighting: The property 'Module.Prop' cannot be used in this context because the 'get' accessor is inaccessible
 M:Module.M1(System.String)
 M:Module.M1(System.String)
 M:Module.M2(System.String,System.Int32)

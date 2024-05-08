@@ -362,21 +362,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool HasModuleSuffix([NotNull] this string shortName) =>
       shortName.EndsWith(ModuleSuffix, StringComparison.Ordinal);
 
+    /// Not fully correct, since type parameter count doesn't fully follow logic used for source elements.
+    /// Current implementation allows good enough results in FSharpResolveUtil.resolvesToAssociatedModule.
     public static ITypeElement TryGetAssociatedType([NotNull] this CompiledTypeElement moduleTypeElement, string sourceName)
     {
       Assertion.Assert(moduleTypeElement is FSharpCompiledModule, "moduleTypeElement.IsCompiledModule()");
 
       bool IsAssociatedType(ITypeElement t) =>
-        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 &&
-        t is not FSharpCompiledModule && t.GetSourceName() == sourceName;
+        !t.Equals(moduleTypeElement) && t is not FSharpCompiledModule && t.GetSourceName() == sourceName;
+
+      ITypeElement ChooseType(ICollection<ITypeElement> typeElements)
+      {
+        var possiblyAssociatedTypes = typeElements.Where(IsAssociatedType).AsIList();
+        if (possiblyAssociatedTypes.Count == 1)
+          return possiblyAssociatedTypes[0];
+
+        var typeWithoutTypeParams = possiblyAssociatedTypes.SingleItem(element => element.TypeParametersCount == 0);
+        if (typeWithoutTypeParams != null)
+          return typeWithoutTypeParams;
+
+        return possiblyAssociatedTypes.FirstOrDefault();
+      }
 
       var containingType = moduleTypeElement.GetContainingType();
       if (containingType != null)
-        return containingType.NestedTypes.FirstOrDefault(IsAssociatedType);
+        return ChooseType(containingType.NestedTypes);
 
       var ns = moduleTypeElement.GetContainingNamespace();
       var symbolScope = moduleTypeElement.Module.GetModuleOnlySymbolScope(false);
-      return ns.GetNestedTypeElements(symbolScope).FirstOrDefault(IsAssociatedType);
+      return ChooseType(ns.GetNestedTypeElements(symbolScope));
     }
 
     public static string GetSourceName([NotNull] this CompiledTypeElement typeElement)

@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   public abstract class FSharpTypePart<T> : TypePartImplBase<T>, IFSharpTypePart
     where T : class, IFSharpTypeElementDeclaration
   {
-    public override ExtensionMethodInfo[] ExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
+    public ExtensionMethodInfo[] CSharpExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
     public string SourceName { get; }
 
     protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
@@ -55,8 +55,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (methods.IsEmpty())
         return;
 
-      ExtensionMethodInfos = methods.ToArray();
+      CSharpExtensionMethodInfos = methods.ToArray();
     }
+
+    public override ExtensionMethodInfo[] ExtensionMethodInfos =>
+      CSharpExtensionMethodInfos;
 
     [NotNull]
     public TypePart GetFirstPart()
@@ -117,7 +120,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       var methods = new ExtensionMethodInfo[extensionMethodCount];
       for (var i = 0; i < extensionMethodCount; i++)
         methods[i] = new ExtensionMethodInfo(reader, this);
-      ExtensionMethodInfos = methods;
+      CSharpExtensionMethodInfos = methods;
     }
 
     protected override void Write(IWriter writer)

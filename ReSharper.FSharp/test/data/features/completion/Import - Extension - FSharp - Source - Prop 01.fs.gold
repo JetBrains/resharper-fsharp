@@ -1,0 +1,16 @@
+﻿// ${COMPLETE_ITEM:Prop (in Ns1.Module)}
+namespace Ns1
+
+open System
+
+module Module =
+    type Int32 with
+        member this.Prop = ""
+
+namespace Ns2
+
+open Ns1.Module
+
+module Module =
+    let i = 1
+    i.Prop{caret}

@@ -5,10 +5,11 @@ public class Class1
   public Class1()
   {
     T t = new T();
-    int f = t.|Foo|(0);
+    |int|(0) f = t.|Foo|(1);
   }
 }
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: Cannot resolve symbol 'Foo'
+(0):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'method group' to target type 'int'
+(1): ReSharper Underlined Error Highlighting: The delegate type could not be inferred
 M:Module.T.#ctor

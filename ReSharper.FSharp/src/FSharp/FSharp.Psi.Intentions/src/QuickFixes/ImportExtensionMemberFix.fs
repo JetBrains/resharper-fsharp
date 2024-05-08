@@ -41,12 +41,12 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
         |> Seq.isEmpty
         |> not
 
-    override this.ExecutePsiTransaction(solution) =
+    override this.ExecutePsiTransaction _ =
         let reference = reference :?> FSharpSymbolReference
+        let referenceOwner = reference.GetElement()
         let typeMember = findExtensionMembers () |> Seq.head
 
-        use writeCookie = WriteLockCookie.Create(reference.GetElement().IsPhysical())
+        use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        OpensUtil.addOpens reference typeMember.ContainingType |> ignore
-        base.ExecutePsiTransaction(solution)
+        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeMember "bind"

@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -77,7 +78,7 @@ type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikeP
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, UnionCasePatternInfo.Id)
 
-            FSharpPatternUtil.bindFcsSymbol pat info.Case UnionCasePatternInfo.Id
+            FSharpBindUtil.bindFcsSymbol pat info.Case UnionCasePatternInfo.Id
 
         textControl.Caret.MoveTo(pat.GetDocumentRange().EndOffset, CaretVisualPlacement.DontScrollIfVisible)
 
