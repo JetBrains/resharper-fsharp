@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
-  [SolutionComponent(Instantiation.DemandAnyThread)]
+  [SolutionComponent(Instantiation.DemandAnyThreadSafe)]
   public class FantomasProcessFactory
   {
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;
