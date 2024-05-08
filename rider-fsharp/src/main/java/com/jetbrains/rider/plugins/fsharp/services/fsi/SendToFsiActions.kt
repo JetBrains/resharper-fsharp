@@ -11,7 +11,6 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.jetbrains.rd.platform.util.getComponent
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import icons.ReSharperIcons
@@ -102,9 +101,9 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   override fun startInWriteAction() = false
 
   override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
-    isAvailable && file.language is FSharpLanguageBase && editor.caretModel.caretCount == 1
+    isAvailable && editor.caretModel.caretCount == 1
 
-  override fun checkFile(file: PsiFile) = file.language is FSharpLanguage
+  override fun checkFile(file: PsiFile) = file.language is FSharpLanguageBase
 
   override fun invoke(project: Project, editor: Editor, element: PsiElement) {
     project.getComponent<FsiHost>().sendToFsi(editor, element.containingFile, debug)
