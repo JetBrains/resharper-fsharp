@@ -33,7 +33,7 @@ class FsiProcessHandler(
     lifetime.onTermination { it.close() }
     lifetime.launchOnUi {
       it.consumeEach { (text, outputType) ->
-        if (!text.startsWith("> ") || !text.endsWith("> ")) {
+        if (text != "> ") {
           when (outputType) {
             ProcessOutputTypes.STDOUT -> {
               fsiInputOutputProcessor.printOutputText(text, ConsoleViewContentType.NORMAL_OUTPUT)
