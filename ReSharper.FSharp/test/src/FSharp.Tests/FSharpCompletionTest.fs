@@ -577,14 +577,15 @@ type FSharpRegexCompletionTest() =
     override x.TestType = CodeCompletionTestType.Action
 
     [<Test>] member x.``Non-verbatim string completion 01``() = x.DoNamedTest()
-    [<Test>] member x.``Non-verbatim string completion 02``() = x.DoNamedTest()
-    [<Test>] member x.``Non-verbatim string completion 03``() = x.DoNamedTest()
-    [<Test>] member x.``Non-verbatim string completion 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Verbatim string completion 01``() = x.DoNamedTest()
     [<Test>] member x.``Verbatim string completion 02``() = x.DoNamedTest()
-    [<Test>] member x.``Verbatim string completion 03``() = x.DoNamedTest()
-    [<Test>] member x.``Verbatim string completion 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Interpolated string completion 01 - Regular``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string completion 02 - Verbatim``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string completion 03 - Triple quoted``() = x.DoNamedTest()
+    [<Test>] member x.``Interpolated string completion 04 - Raw``() = x.DoNamedTest() //TODO: should be available
+    [<Test>] member x.``Interpolated string completion 05 - Not available``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets 02 - Interpolation``() = x.DoNamedTest()
