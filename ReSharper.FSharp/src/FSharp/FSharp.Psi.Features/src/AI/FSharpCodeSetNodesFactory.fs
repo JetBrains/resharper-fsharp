@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.AI.FSharpCodeSetNodesFact
 
 open System.Text
 open JetBrains.Application
+open JetBrains.Application.Parts;
 open JetBrains.ReSharper.Feature.Services.AI.CodeSetsProviding
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -16,7 +17,7 @@ type FSharpGraphNode(graph:CodeSetsGraph, treeNode:ITreeNode) =
     override this.GetCost() =
         myFsharpNode.GetCost(this.Graph.CodeSetNodesFactory, this.Graph.TokenCounter)
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpCodeSetNodesFactory() =
     interface ICodeSetNodesFactory with
         member _.CreateGraphNode(treeNode: ITreeNode, graph: CodeSetsGraph) = 
