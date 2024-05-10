@@ -54,6 +54,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
     use namespaceQueue = PooledQueue<INamespace>.GetInstance()
     let symbolScope = getSymbolScope psiModule true
+    let accessContext = ElementAccessContext(context)
     namespaceQueue.Enqueue(symbolScope.GlobalNamespace)
 
     let openedModulesProvider = OpenedModulesProvider(context.FSharpFile)
@@ -102,6 +103,17 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
         | _ -> false
 
+    let isAccessible (typeMember: ITypeMember) =
+        let isTypeAccessible = 
+            let containingType = typeMember.ContainingType
+            let accessRightsOwner = containingType :?> IAccessRightsOwner
+            match accessRightsOwner.GetAccessRights() with
+            | AccessRights.PUBLIC -> true
+            | _ -> containingType.Module.AreInternalsVisibleTo(psiModule)
+
+        isTypeAccessible &&
+        AccessUtil.IsSymbolAccessible(typeMember, accessContext)
+
     let addMethods (ns: INamespace) =
         let addExtensionMethods (methodsIndex: IExtensionMethodsIndex) =
             if isNull methodsIndex then () else
@@ -109,9 +121,9 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
             for extensionMethodProxy in methodsIndex.Lookup() do
                 let members = extensionMethodProxy.FindExtensionMember()
                 for typeMember in members do
-                    // todo: check module/member is accessible
                     // todo: use extension member info to check kind and skip namespaces
                     if isInScope typeMember then () else
+                    if not (isAccessible typeMember) then () else
 
                     if matchesType typeMember exprType then
                         result.Add(typeMember)
