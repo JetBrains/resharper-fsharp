@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
 using JetBrains.Lifetimes;
@@ -7,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
 {
-  [SolutionComponent]
+  [SolutionComponent(Instantiation.DemandAnyThread)]
   public class FantomasProcessFactory
   {
     [NotNull] private readonly ISolutionProcessStartInfoPatcher mySolutionProcessStartInfoPatcher;

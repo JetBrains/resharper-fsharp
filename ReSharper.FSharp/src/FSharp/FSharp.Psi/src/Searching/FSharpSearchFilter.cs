@@ -1,3 +1,4 @@
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Psi;
@@ -8,7 +9,7 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
-  [PsiComponent]
+  [PsiComponent(Instantiation.DemandAnyThread)]
   public sealed class FSharpSearchFilter : ISearchFilter
   {
     private readonly IFcsProjectProvider myFsProjectProvider;
