@@ -135,7 +135,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
               ReferencedModules = EmptySet.Instance }
         )
 
-    let rec queueUpdateOptionsIfNeeded path source oldOptionsExistence =
+    let rec updateOptionsIfNeeded path source oldOptionsExistence =
         let lifetimeDefinition = new LifetimeDefinition()
         if not (requiringUpdate.TryUpdate(path, lifetimeDefinition, null)) then () else
         let lifetime = lifetimeDefinition.Lifetime
@@ -195,11 +195,11 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     let rec getFcsProject path source allowRetry : FcsProject option =
         match tryGetValue path scriptFcsProjects with
         | Some fcsProject as scriptFcsProject ->
-            queueUpdateOptionsIfNeeded path source scriptFcsProject
+            updateOptionsIfNeeded path source scriptFcsProject
             fcsProject
         | _ ->
             requiringUpdate.TryAdd(path, null) |> ignore
-            queueUpdateOptionsIfNeeded path source None
+            updateOptionsIfNeeded path source None
 
             if isHeadless && allowRetry then
                 getFcsProject path source false
