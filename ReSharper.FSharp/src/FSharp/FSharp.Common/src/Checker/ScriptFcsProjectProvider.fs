@@ -3,7 +3,6 @@
 open System
 open System.Collections.Concurrent
 open System.Collections.Generic
-open System.Threading
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.DataFlow
@@ -16,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.Threading
 open JetBrains.Util
 
 [<SolutionComponent>]
@@ -25,7 +25,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     let defaultOptionsLock = obj()
 
     let scriptFcsProjects = ConcurrentDictionary<VirtualFileSystemPath, FcsProject option>()
-    let requiringUpdate = ConcurrentDictionary<VirtualFileSystemPath, CancellationTokenSource>()
+    let requiringUpdate = ConcurrentDictionary<VirtualFileSystemPath, LifetimeDefinition>()
 
     let mutable defaultOptions: FSharpProjectOptions option option = None
 
@@ -43,7 +43,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             | "fsx" | "fsscript" ->
                   requiringUpdate.AddOrUpdate(path,
                       (fun path -> null),
-                      (fun path work -> (if isNull work then () else work.Cancel()); null)) |> ignore
+                      (fun path work -> (if isNull work then () else work.Terminate()); null)) |> ignore
             | _ -> ())
 
     let defaultFlags =
@@ -135,13 +135,15 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
               ReferencedModules = EmptySet.Instance }
         )
 
-    let rec queueUpdateOptionsIfNeeded path source (oldOptionsExistence: _ option option) =
-        let cts = new CancellationTokenSource()
-        if not (requiringUpdate.TryUpdate(path, cts, null)) then () else
+    let rec queueUpdateOptionsIfNeeded path source oldOptionsExistence =
+        let lifetimeDefinition = new LifetimeDefinition()
+        if not (requiringUpdate.TryUpdate(path, lifetimeDefinition, null)) then () else
+        let lifetime = lifetimeDefinition.Lifetime
 
         let updateOptionsAsync =
-            async {
-                if cts.IsCancellationRequested then () else
+            task {
+                if not lifetime.IsAlive then () else
+
                 let newOptions = getOptionsImpl path source //TODO: do not block?
                 let oldOptions = oldOptionsExistence |> Option.bind id
 
@@ -164,10 +166,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                           ImplementationFilesWithSignatures = EmptySet.Instance
                           ReferencedModules = EmptySet.Instance }
                     )
-                if cts.IsCancellationRequested then () else //TODO: allow stale results?
-                scriptFcsProjects[path] <- fcsProject
 
-                if cts.IsCancellationRequested then () else
+                if not (lifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then () else
+
                 match oldOptions, newOptions with
                 | Some oldOptions, Some newOptions ->
                     let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
@@ -187,9 +188,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             }
 
         if isHeadless then
-            Async.RunSynchronously updateOptionsAsync
+            updateOptionsAsync.GetAwaiter().GetResult()
         else
-            updateOptionsAsync |> Async.Catch |> Async.Ignore |> Async.Start
+            updateOptionsAsync.NoAwait()
 
     let rec getFcsProject path source allowRetry : FcsProject option =
         match tryGetValue path scriptFcsProjects with
