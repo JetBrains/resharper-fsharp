@@ -263,7 +263,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         |> Option.iter (fun psiModule ->
             match checkerService.GetCachedScriptOptions(path.FullPath) with
             | Some options -> checkerService.InvalidateFcsProject(options, FcsProjectInvalidationType.Remove)
-            | None -> ()
+            | None ->
+                if checkerService.UseTransparentCompiler then
+                    // The transparent compiler always returns GetCachedScriptOptions
+                    // We can easily construct the project identifier (as it is done in GetProjectOptionsFromScript/GetProjectSnapshotFromScript)
+                    // and clear the cache that way.
+                    let projectIdentifier = ProjectSnapshot.FSharpProjectIdentifier($"%s{path.FullPath}.fsproj", "")
+                    checkerService.Checker.ClearCache(Seq.singleton projectIdentifier)
 
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore
             removePsiModule psiModule
