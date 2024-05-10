@@ -1,11 +1,45 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Metadata
 
+open System
 open System.Text
 open JetBrains.Util.Extension
 
+type FSharpMetadataTypeReference =
+    | Local of index: int
+    | NonLocal of compilationUnitName: string * typeNames: string[]
+
+    member this.ShortName =
+        match this with
+        | Local _ -> None
+        | NonLocal(_, typeNames) ->
+            typeNames
+            |> Array.tryLast
+            |> Option.map _.SubstringBeforeLast("`", StringComparison.Ordinal)
+
+[<RequireQualifiedAccess>]
+type FSharpMetadataType =
+    | TypeRef of typeRef: FSharpMetadataTypeReference
+    | App of typeRef: FSharpMetadataTypeReference * inst: FSharpMetadataType[]
+    | Other
+
+type FSharpMetadataMemberInfo =
+    { ApparentEnclosingEntity: FSharpMetadataTypeReference }
+
+type FSharpMetadataValue =
+    { LogicalName: string
+      CompiledName: string option
+      IsExtensionMember: bool
+      ApparentEnclosingTypeReference: FSharpMetadataTypeReference }
+
+[<RequireQualifiedAccess>]
+type FSharpMetadataModuleNameKind =
+    | Normal
+    | HasModuleSuffix
+    | Anon
+
 [<RequireQualifiedAccess>]
 type FSharpCompiledTypeRepresentation =
-    | Module of hasModuleSuffix: bool
+    | Module of nameKind: FSharpMetadataModuleNameKind * values: FSharpMetadataValue[]
     | Union of cases: string[]
     | Other
 

@@ -12,3 +12,7 @@ type EntityFlags =
     | IsModuleOrNamespace = 0b000000000000001L
     | IsStruct            = 0b000000000100000L
     | ReservedBit         = 0b000000000010000L
+
+[<Flags>]
+type ValueFlags =
+    | IsExtensionMember = 0b00000000000100000000L

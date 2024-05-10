@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.UI.RichText
+open JetBrains.Util.Extension
 
 [<Language(typeof<FSharpLanguage>)>]
 type ImportExtensionMemberRule() =
@@ -39,7 +40,8 @@ type ImportExtensionMemberRule() =
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
         for method in members do
-            let name = method.ShortName
+            let name = method.ShortName.SubstringAfter("get_").SubstringAfter("set_")
+
             let ns =
                 match method.ContainingType with
                 | :? IFSharpModule as fsModule ->

@@ -655,7 +655,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       typeElement switch
       {
         FSharpModule fsModule => HasAttribute(fsModule, AutoOpen),
-        IFSharpTypeElement _ => false,
+        IFSharpTypeElement and not IFSharpModule => false,
         _ => typeElement.HasAttributeInstance(FSharpPredefinedType.AutoOpenAttrTypeName, false)
       };
 
@@ -684,8 +684,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
     }
 
-    public static bool IsModule(this ITypeElement typeElement) =>
-      typeElement is IFSharpModule || typeElement is FSharpCompiledModule;
+    public static bool IsModule(this ITypeElement typeElement) => typeElement is IFSharpModule;
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
     {

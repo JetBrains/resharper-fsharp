@@ -21,15 +21,30 @@ let getQualifierExpr (reference: IReference) =
     refExpr.Qualifier
 
 [<return: Struct>]
-let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
+let (|FSharpSourceExtensionMember|_|) (typeMember: ITypeMember) =
     match typeMember with
     | :? IFSharpTypeMember as fsTypeMember ->
-        let mfv = fsTypeMember.Symbol.As<FSharpMemberOrFunctionOrValue>()
-        if isNull mfv || not mfv.IsExtensionMember then ValueNone else
-
-        match mfv.DeclaringEntity with
-        | Some fcsEntity when fcsEntity.IsFSharpModule -> ValueSome mfv
+        match fsTypeMember.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsExtensionMember ->
+            match mfv.DeclaringEntity with
+            | Some fcsEntity when fcsEntity.IsFSharpModule -> ValueSome mfv
+            | _ -> ValueNone
         | _ -> ValueNone
+    | _ -> ValueNone
+
+[<return: Struct>]
+let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
+    match typeMember with
+    | :? IMethod as method ->
+        let containingType = method.ContainingType
+        if containingType :? IFSharpModule && containingType :? IFSharpCompiledTypeElement then
+            let parameters = method.Parameters
+            if parameters.Count = 0 then ValueNone else
+
+            ValueSome(parameters[0].Type.GetTypeElement())
+        else
+            ValueNone
+
     | _ -> ValueNone
 
 let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
@@ -61,17 +76,23 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
             isInScope ns.ShortName
 
     let matchesType (typeMember: ITypeMember) (exprType: IType) : bool =
-        match typeMember with
-        | FSharpExtensionMember mfv ->
+        let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =
+            if isNull extendedTypeElement then false else
+
             // todo: arrays and other non-declared-types?
             let exprTypeElement = exprType.GetTypeElement()
             if isNull exprTypeElement then false else
-
-            let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
-            if isNull extendedTypeElement then false else
-
+                
             exprTypeElement.Equals(extendedTypeElement) ||
             exprTypeElement.GetSuperTypeElements() |> Seq.exists extendedTypeElement.Equals
+
+        match typeMember with
+        | FSharpSourceExtensionMember mfv ->
+            let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
+            matchesWithoutSubstitution extendedTypeElement
+
+        | FSharpCompiledExtensionMember extendedTypeElement ->
+            matchesWithoutSubstitution extendedTypeElement
 
         | :? IMethod as method ->
             let parameters = method.Parameters
@@ -86,11 +107,6 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
             if isNull methodsIndex then () else
 
             for extensionMethodProxy in methodsIndex.Lookup() do
-                // C#-compatible extension methods are only seen as extensions in other languages
-                // todo: expose language instead of checking source file
-                let sourceFile = extensionMethodProxy.TryGetSourceFile()
-                if not (isValid sourceFile) then () else
-
                 let members = extensionMethodProxy.FindExtensionMember()
                 for typeMember in members do
                     // todo: check module/member is accessible

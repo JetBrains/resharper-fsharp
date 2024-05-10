@@ -238,7 +238,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsProvided)
         return typeElement;
 
-      return typeElement is IFSharpTypeElement fsTypeElement && !mfv.IsConstructor
+      return typeElement is IFSharpTypeElement fsTypeElement and not ICompiledElement && !mfv.IsConstructor
         ? GetFSharpSourceTypeMember(mfv, fsTypeElement)
         : GetTypeMember(mfv, typeElement);
     }
