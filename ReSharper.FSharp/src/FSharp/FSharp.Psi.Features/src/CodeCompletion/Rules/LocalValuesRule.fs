@@ -35,6 +35,8 @@ type LocalValuesRule() =
         context.IsBasicOrSmartCompletion &&
 
         let node = context.ReparsedContext.TreeNode
+        isNotNull node &&
+
         let refExpr = node.Parent.As<IReferenceExpr>()
         isNotNull refExpr && isNull refExpr.Qualifier && refExpr.Identifier == node
 
