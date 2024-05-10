@@ -39,24 +39,32 @@ type ImportExtensionMemberRule() =
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
-        for method in members do
-            let name = method.ShortName.SubstringAfter("get_").SubstringAfter("set_")
+        let members =
+            members |> Seq.groupBy (fun typeMember ->
+                let name = typeMember.ShortName.SubstringAfter("get_").SubstringAfter("set_")
 
-            let ns =
-                match method.ContainingType with
-                | :? IFSharpModule as fsModule ->
-                    fsModule.QualifiedSourceName
+                let ns =
+                    match typeMember.ContainingType with
+                    | :? IFSharpModule as fsModule ->
+                        fsModule.QualifiedSourceName
 
-                | containingType ->
-                    containingType.GetContainingNamespace().QualifiedName 
+                    | containingType ->
+                        containingType.GetContainingNamespace().QualifiedName
+                
+                ns, name
+            )
 
-            let info = ImportInfo(method, name, Ranges = context.Ranges)
+        for (ns, name), typeMembers in members do
+            // todo: use all candidates for signatures
+            let typeMember = typeMembers |> Seq.head
+
+            let info = ImportInfo(typeMember, name, Ranges = context.Ranges)
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
                         let name = RichText(name)
                         LookupUtil.AddInformationText(name, $"(in {ns})")
-                        TextualPresentation(name, info, iconManager.GetImage(method, method.PresentationLanguage, true)))
+                        TextualPresentation(name, info, iconManager.GetImage(typeMember, typeMember.PresentationLanguage, true)))
                     .WithBehavior(fun _ -> ImportBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
                     .WithRelevance(CLRLookupItemRelevance.ImportedType)
