@@ -1,10 +1,11 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.util.NlsSafe
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import javax.swing.Icon
 
-data class IconWithTooltip(val icon: Icon, val tooltip: String?)
+data class IconWithTooltip(val icon: Icon, @NlsSafe val tooltip: String?)
 
 object FsiIcons {
   val COMMAND_MARKER = IconWithTooltip(AllIcons.Actions.Execute, FSharpBundle.message("Fsi.icons.command.marker.tooltip.text"))

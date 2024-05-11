@@ -1,9 +1,40 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.parser
 
+import com.intellij.lang.ParserDefinition
+import com.intellij.mock.MockFileTypeManager
+import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.psi.PsiFile
+import com.jetbrains.rider.ideaInterop.fileTypes.RiderLanguageFileTypeBase
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
 import com.jetbrains.rider.test.RiderFrontendParserTest
+import org.junit.Assert
 
-class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDefinition()) {
+abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) :
+  RiderFrontendParserTest("", fileType.defaultExtension, FSharpParserDefinition()) {
+
+  protected open fun assertFileImpl(file: PsiFile) {}
+
+  override fun parseFile(name: String?, text: String?): PsiFile {
+    val file = super.parseFile(name, text)
+    assertFileImpl(file)
+    return file
+  }
+
+  override fun configureFromParserDefinition(definition: ParserDefinition, extension: String?) {
+    super.configureFromParserDefinition(definition, extension)
+    application.picoContainer.unregisterComponent(FileTypeManager::class.java.name)
+    application.registerService(FileTypeManager::class.java, MockFileTypeManager(fileType), testRootDisposable)
+  }
+}
+
+
+class FSharpDummyParserTests : FSharpFrontendParserTest(FSharpFileType) {
+  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpFileImpl)
+
   fun `test empty`() = doTest()
   fun `test concatenation 01 - simple`() = doTest()
   fun `test concatenation 02 - space before plus`() = doTest()
@@ -30,4 +61,11 @@ class FSharpDummyParserTests : RiderFrontendParserTest("", "fs", FSharpParserDef
   fun `test unfinished 02 - interpolated 01`() = doTest()
   fun `test unfinished 02 - interpolated 02`() = doTest()
   fun `test unfinished 03 - interpolated in interpolated`() = doTest()
+}
+
+
+class FSharpScriptDummyParserTests : FSharpFrontendParserTest(FSharpScriptFileType) {
+  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpScriptFileImpl)
+
+  fun `test empty`() = doTest()
 }

@@ -18,7 +18,7 @@ class CommandHistory {
   val listeners = arrayListOf<HistoryUpdateListener>()
 
   fun addEntry(entry: Entry) {
-    if (!StringUtil.isEmptyOrSpaces(entry.visibleText))
+    if (entry.visibleText.isNotBlank())
       entries.add(entry)
     listeners.forEach { it.onNewEntry(entry) }
   }

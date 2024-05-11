@@ -1,112 +1,249 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
+import com.intellij.execution.Executor
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.NlsSafe
+import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.project.isDirectoryBased
 import com.intellij.psi.PsiFile
-import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
-import com.jetbrains.rider.projectView.solution
+import com.intellij.util.execution.ParametersListUtil
+import com.jetbrains.rd.platform.util.idea.LifetimedService
 import com.jetbrains.rd.util.reactive.Property
 import com.jetbrains.rd.util.reactive.flowInto
-import com.jetbrains.rider.plugins.fsharp.*
-import org.jetbrains.concurrency.AsyncPromise
-import org.jetbrains.concurrency.Promise
+import com.jetbrains.rider.plugins.fsharp.FSharpBundle
+import com.jetbrains.rider.plugins.fsharp.FSharpIcons
+import com.jetbrains.rider.plugins.fsharp.RdFsiRuntime
+import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiDefaultConsoleRunner
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiScriptProfileConsoleRunner
+import com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfiguration
+import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.run.configurations.dotNetExe.DotNetExeConfigurationParameters
+import com.jetbrains.rider.run.createRunCommandLine
+import com.jetbrains.rider.runtime.DotNetExecutable
+import com.jetbrains.rider.runtime.DotNetRuntime
+import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
+import com.jetbrains.rider.runtime.dotNetCore.DotNetCoreRuntimeType
+import com.jetbrains.rider.runtime.mono.MonoRuntime
+import com.jetbrains.rider.runtime.mono.MonoRuntimeType
+import com.jetbrains.rider.runtime.msNet.MsNetRuntimeType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 
-class FsiHost(project: Project) : LifetimedProjectComponent(project) {
-  private val rdFsiHost = project.solution.rdFSharpModel.fSharpInteractiveHost
+suspend fun getFsiRunOptions(
+  project: Project,
+  configuration: FSharpScriptConfiguration? = null
+): Pair<DotNetExecutable, DotNetRuntime> {
+  val fsiHost = FsiHost.getInstance(project)
+  val sessionInfo = fsiHost.rdFsiHost.requestNewFsiSessionInfo.startSuspending(Unit)
+  val runtimeHost = RiderDotNetActiveRuntimeHost.getInstance(project)
 
-  val moveCaretOnSendLine = Property(true)
-  val moveCaretOnSendSelection = Property(true)
+  val exePath = when (sessionInfo.runtime) {
+    RdFsiRuntime.Core -> runtimeHost.dotNetCoreRuntime.value?.cliExePath
+    RdFsiRuntime.NetFramework -> sessionInfo.fsiPath
+    RdFsiRuntime.Mono -> {
+      val runtime = runtimeHost.getCurrentClassicNetRuntime(false).runtime as MonoRuntime
+      runtime.getMonoExe().path
+    }
+  }
+
+  val workingDirectory =
+    if (project.isDirectoryBased) {
+      val projectDir = project.guessProjectDir()
+      val workingDir =
+        if (projectDir != null && projectDir.exists()) projectDir
+        else VfsUtil.getUserHomeDir()
+      workingDir?.path ?: ""
+    } else ""
+
+
+  val runtimeType = when (sessionInfo.runtime) {
+    RdFsiRuntime.NetFramework -> MsNetRuntimeType
+    RdFsiRuntime.Mono -> MonoRuntimeType
+    RdFsiRuntime.Core -> DotNetCoreRuntimeType
+  }
+
+  val args = ArrayList<String>()
+  if (sessionInfo.runtime != RdFsiRuntime.NetFramework)
+    args.add(sessionInfo.fsiPath)
+  if (configuration != null)
+    args.add("--use:${configuration.scriptFile?.path}")
+  args.addAll(sessionInfo.args)
+
+  val parameters = DotNetExeConfigurationParameters(
+    project = project,
+    exePath = exePath ?: "",
+    programParameters = ParametersListUtil.join(args),
+    workingDirectory = workingDirectory,
+    envs = configuration?.envs ?: mapOf(),
+    isPassParentEnvs = true,
+    useExternalConsole = false,
+    executeAsIs = false,
+    assemblyToDebug = null,
+    runtimeType = runtimeType,
+    runtimeArguments = ""
+  )
+
+  val dotNetExecutable = parameters.toDotNetExecutable()
+  val dotNetRuntime = DotNetRuntime.detectRuntimeForExeOrThrow(
+    project,
+    runtimeHost,
+    dotNetExecutable.exePath,
+    dotNetExecutable.runtimeType,
+    dotNetExecutable.projectTfm
+  )
+
+  val patchedExecutable = dotNetExecutable.copy(usePty = false)
+  return Pair(patchedExecutable, dotNetRuntime)
+}
+
+@Service(Service.Level.PROJECT)
+class FsiHost(val project: Project, val coroutineScope: CoroutineScope) : LifetimedService() {
+  companion object {
+    fun getInstance(project: Project) = project.service<FsiHost>()
+  }
+
+  val rdFsiHost = project.solution.rdFSharpModel.fSharpInteractiveHost
+
+  private val moveCaretOnSendLine = Property(true)
+  private val moveCaretOnSendSelection = Property(true)
   val copyRecentToEditor = Property(false)
 
   init {
-    rdFsiHost.moveCaretOnSendLine.flowInto(componentLifetime, moveCaretOnSendLine)
-    rdFsiHost.moveCaretOnSendSelection.flowInto(componentLifetime, moveCaretOnSendSelection)
-    rdFsiHost.copyRecentToEditor.flowInto(componentLifetime, copyRecentToEditor)
+    rdFsiHost.moveCaretOnSendLine.flowInto(serviceLifetime, moveCaretOnSendLine)
+    rdFsiHost.moveCaretOnSendSelection.flowInto(serviceLifetime, moveCaretOnSendSelection)
+    rdFsiHost.copyRecentToEditor.flowInto(serviceLifetime, copyRecentToEditor)
   }
-
-  var consoleRunner: FsiConsoleRunner? = null
-    private set
-
-  private val lockObj = Object()
 
   fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) {
-    getOrCreateConsoleRunner(debug).onSuccess {
-      it.sendActionExecutor.execute(editor, file, debug)
-    }
-  }
+    val selectionModel = editor.selectionModel
+    val hasSelection = selectionModel.hasSelection()
 
-  fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
-    getOrCreateConsoleRunner(debug).onSuccess {
-      it.sendText(visibleText, fsiText, debug)
-    }
-  }
-
-  fun resetFsiConsole(forceOptimizeForDebug: Boolean, attach: Boolean = false) {
-    synchronized(lockObj) {
-      if (consoleRunner?.isValid() == true) {
-        consoleRunner!!.processHandler.destroyProcess()
-      }
-      tryCreateConsoleRunner(forceOptimizeForDebug, attach)
-    }
-  }
-
-  private fun getOrCreateConsoleRunner(forceOptimizeForDebug: Boolean): Promise<FsiConsoleRunner> {
-    if (consoleRunner?.isValid() == true) {
-      val result = AsyncPromise<FsiConsoleRunner>()
-      result.setResult(consoleRunner!!)
-      return result
-    }
-
-    return tryCreateConsoleRunner(forceOptimizeForDebug)
-  }
-
-  private fun createConsoleRunner(
-    sessionInfo: RdFsiSessionInfo,
-    forceOptimizeForDebug: Boolean,
-    attach: Boolean
-  ): FsiConsoleRunner? =
-    synchronized(lockObj) {
-      // Might have already been created.
-      if (consoleRunner?.isValid() == true)
-        return consoleRunner
-
-      val fsiPath = sessionInfo.fsiPath
-      if (sessionInfo.runtime != RdFsiRuntime.Core && !FileUtil.exists(fsiPath)) {
-        notifyFsiNotFound(fsiPath)
-        return null
+    val visibleText =
+      if (hasSelection) editor.selectionModel.selectedText!!
+      else {
+        val caretModel = editor.caretModel
+        editor.document.getText(TextRange(caretModel.visualLineStart, caretModel.visualLineEnd))
+          .substringBeforeLast("\n")
       }
 
-      val runner = FsiConsoleRunner(sessionInfo, this, forceOptimizeForDebug)
-      runner.initAndRun()
-      this.consoleRunner = runner
+    if (visibleText.isEmpty()) return
 
-      if (attach)
-        runner.attachToProcess()
+    val textLineStart =
+      if (hasSelection) editor.document.getLineNumber(editor.selectionModel.selectionStart)
+      else editor.caretModel.logicalPosition.line
+    val fsiText = "\n" +
+      "# silentCd @\"${file.containingDirectory.virtualFile.path}\" ;; \n" +
+      (if (debug) "# dbgbreak\n" else "") +
+      "# ${textLineStart + 1} @\"${file.virtualFile.path}\" \n" +
+      visibleText + "\n" +
+      "# 1 \"stdin\"\n;;\n"
 
-      return runner
+    coroutineScope.launch {
+      sendToFsi(visibleText, fsiText, debug)
+      withContext(Dispatchers.EDT) {
+        if (!hasSelection && moveCaretOnSendLine.value)
+          editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
+
+        if (hasSelection && moveCaretOnSendSelection.value) {
+          editor.caretModel.moveToOffset(selectionModel.selectionEnd)
+          editor.caretModel.currentCaret.removeSelection()
+        }
+      }
     }
-
-  private fun tryCreateConsoleRunner(
-    forceOptimizeForDebug: Boolean,
-    attach: Boolean = false
-  ): Promise<FsiConsoleRunner> {
-    val result = AsyncPromise<FsiConsoleRunner>()
-    rdFsiHost.requestNewFsiSessionInfo.start(componentLifetime, Unit).result.advise(componentLifetime) {
-      val consoleRunner = createConsoleRunner(it.unwrap(), forceOptimizeForDebug, attach)
-      if (consoleRunner != null)
-        result.setResult(consoleRunner)
-    }
-    return result
   }
 
-  private fun notifyFsiNotFound(fsiPath: String) {
+  suspend fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
+    val fsiRunner = synchronized(lockObject) {
+      if (lastFocusedSession?.isValid() == true) lastFocusedSession
+      else null
+    } ?: tryCreateDefaultConsoleRunner()
+    fsiRunner?.sendText(visibleText, fsiText)
+  }
+
+  fun resetFsiDefaultConsole() {
+    coroutineScope.launch {
+      synchronized(lockObject) {
+        val session = defaultFsiSession
+        if (session?.isValid() == true) session.stop()
+        defaultFsiSession = null
+      }
+      tryCreateDefaultConsoleRunner()
+    }
+  }
+
+  private val lockObject = Object()
+  var lastFocusedSession: FsiConsoleRunnerBase? = null
+  private var defaultFsiSession: FsiDefaultConsoleRunner? = null
+
+  private suspend fun <T : FsiConsoleRunnerBase> getOrCreateConsoleRunner(factory: () -> T): T {
+    val session = factory()
+    withContext(Dispatchers.EDT) {
+      session.initAndRun()
+      session.getRunContentDescriptor().preferredFocusComputable.compute().addFocusListener(object : FocusListener {
+        override fun focusGained(e: FocusEvent?) {
+          synchronized(lockObject) {
+            lastFocusedSession = session
+          }
+        }
+
+        override fun focusLost(e: FocusEvent?) {}
+      })
+    }
+    synchronized(lockObject) {
+      lastFocusedSession = session
+    }
+    return session
+  }
+
+  private suspend fun tryCreateDefaultConsoleRunner(): FsiDefaultConsoleRunner? {
+    synchronized(lockObject) {
+      val session = defaultFsiSession
+      if (session?.isValid() == true) return session
+    }
+
+    val (executable, runtime) = getFsiRunOptions(project)
+    try {
+      executable.validate()
+    } catch (t: Throwable) {
+      notifyFsiNotFound(t.message!!)
+      return null
+    }
+    val cmdLine = executable.createRunCommandLine(runtime)
+    val session = getOrCreateConsoleRunner { FsiDefaultConsoleRunner(cmdLine, this) }
+    synchronized(lockObject) {
+      defaultFsiSession = session
+    }
+    return session
+  }
+
+  suspend fun createConsoleRunner(
+    title: String,
+    scriptPath: String,
+    project: Project,
+    executor: Executor,
+    commandLine: GeneralCommandLine
+  ) =
+    getOrCreateConsoleRunner { FsiScriptProfileConsoleRunner(title, project, executor, commandLine) }
+
+  private fun notifyFsiNotFound(@NlsSafe content: String) {
     val title = FSharpBundle.message("Fsi.notifications.fsi.not.found.title")
-    val content = FSharpBundle.message("Fsi.notifications.fsi.not.found.description", fsiPath)
-    val notification = Notification(FsiConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
+    val notification = Notification(FsiDefaultConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
     notification.icon = FSharpIcons.FSharpConsole
     Notifications.Bus.notify(notification, project)
   }

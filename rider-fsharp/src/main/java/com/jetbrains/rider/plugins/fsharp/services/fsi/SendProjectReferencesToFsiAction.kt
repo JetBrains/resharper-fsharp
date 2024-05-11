@@ -1,29 +1,26 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rd.platform.util.getComponent
-import com.jetbrains.rd.platform.util.lifetime
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rd.util.reactive.adviseOnce
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.actions.ProjectViewActionBase
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.isProject
+import kotlinx.coroutines.launch
 
 class SendProjectReferencesToFsiAction : ProjectViewActionBase() {
   override fun actionPerformedInternal(entity: ProjectModelEntity, project: Project) {
     val id = entity.getId(project) ?: return
     val fSharpInteractiveHost = project.solution.rdFSharpModel.fSharpInteractiveHost
-    fSharpInteractiveHost.getProjectReferences.start(
-      project.lifetime,
-      id
-    ).result.adviseOnce(Lifetime.Eternal) { result ->
-      val text = result.unwrap().joinToString("\n") { "#r @\"$it\"" } +
+    val fsiHost = FsiHost.getInstance(project)
+
+    fsiHost.coroutineScope.launch {
+      val references = fSharpInteractiveHost.getProjectReferences.startSuspending(id)
+      val text = references.joinToString("\n") { "#r @\"$it\"" } +
         "\n" +
         "# 1 \"stdin\"\n;;\n"
-      project.getComponent<FsiHost>().sendToFsi(text, text, false)
+      fsiHost.sendToFsi(text, text, false)
     }
   }
 

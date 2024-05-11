@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.DumbAwareAction
@@ -8,9 +9,14 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
+import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
-class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner) :
-  DumbAwareAction(FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"), null, AllIcons.Vcs.History) {
+class CommandHistoryAction(private val consoleRunner: FsiConsoleRunnerBase) :
+  DumbAwareAction(
+    FSharpBundle.message("Fsi.CommandHistoryAction.popup.title.recent.commands"),
+    null,
+    AllIcons.Vcs.History
+  ) {
   companion object {
     val copyTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.copy.to.editor.title")
     val executeTitle = FSharpBundle.message("Fsi.CommandHistoryAction.behaviour.execute.title")
@@ -30,7 +36,7 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner) :
             consoleView.editorDocument.setText(selectedValue.visibleText)
           }
         else
-          consoleRunner.fsiHost.sendToFsi(selectedValue.visibleText, selectedValue.executableText, false)
+          consoleRunner.sendText(selectedValue.visibleText, selectedValue.executableText)
         return PopupStep.FINAL_CHOICE
       }
     }
@@ -44,6 +50,7 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner) :
     }
   }
 
+  override fun getActionUpdateThread() = ActionUpdateThread.EDT
   override fun update(e: AnActionEvent) {
     e.presentation.isEnabled = commandHistory.entries.isNotEmpty() && consoleView.isEditable
   }

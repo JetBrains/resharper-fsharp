@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.rd.util.launchOnUi
@@ -32,7 +33,7 @@ class FsiProcessHandler(
     lifetime.onTermination { it.close() }
     lifetime.launchOnUi {
       it.consumeEach { (text, outputType) ->
-        if (text != "SERVER-PROMPT>\n") {
+        if (text != "> ") {
           when (outputType) {
             ProcessOutputTypes.STDOUT -> {
               fsiInputOutputProcessor.printOutputText(text, ConsoleViewContentType.NORMAL_OUTPUT)
@@ -68,6 +69,12 @@ class FsiProcessHandler(
     super.startNotify()
 
     fsiProcessOutputListeners.forEach { it.startNotified(ProcessEvent(this, "")) }
+  }
+
+  override fun addProcessListener(listener: ProcessListener) {
+    super.addProcessListener(listener)
+    if (isStartNotified && process.isAlive)
+      listener.startNotified(ProcessEvent(this))
   }
 
   override fun notifyProcessTerminated(exitCode: Int) {

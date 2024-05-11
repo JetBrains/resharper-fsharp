@@ -14,6 +14,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
 
 class FSharpParserDefinition : ParserDefinition {
     private val logger = getLogger<FSharpParserDefinition>()
@@ -32,6 +33,12 @@ class FSharpParserDefinition : ParserDefinition {
         return PsiUtilCore.NULL_PSI_ELEMENT
     }
 
-    override fun createFile(viewProvider: FileViewProvider) = FSharpFileImpl(viewProvider)
+    override fun createFile(viewProvider: FileViewProvider) =
+        when (val fileType = viewProvider.fileType) {
+            FSharpFileType -> FSharpFileImpl(viewProvider)
+            FSharpScriptFileType -> FSharpScriptFileImpl(viewProvider)
+            else -> error("Unexpected file type $fileType")
+      }
+
     override fun getFileNodeType(): IFileElementType = FSharpElementTypes.FILE
 }
