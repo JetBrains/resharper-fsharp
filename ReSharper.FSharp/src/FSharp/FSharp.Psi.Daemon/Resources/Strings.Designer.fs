@@ -16,17 +16,14 @@ type public Strings() =
     static let mutable resourceManager = null
 
     static do
-        CultureContextComponent.Instance.WhenNotNull(Lifetime.Eternal, fun lifetime instance ->
-            lifetime.Bracket(
-                (fun () ->
-                    resourceManager <-
-                        lazy
-                            instance.CreateResourceManager("JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources.Strings",
-                                typeof<Strings>.Assembly)),
-                (fun () -> resourceManager <- null)
-            )
-        )
-
+        CultureContextComponent.Instance.Change.Advise(Lifetime.Eternal, fun (args:PropertyChangedEventArgs<CultureContextComponent>) ->
+            let instance = if args.HasNew then args.New else null
+            if instance <> null then
+                resourceManager <- Lazy<JetResourceManager>(fun _ ->
+                    instance.CreateResourceManager("DPA.Monitoring.Resources.Strings", typeof<Strings>.Assembly))
+            else
+                resourceManager <- null)
+        
     [<global.System.ComponentModel.EditorBrowsable(global.System.ComponentModel.EditorBrowsableState.Advanced)>]
     static member ResourceManager: JetResourceManager =
         match resourceManager with
