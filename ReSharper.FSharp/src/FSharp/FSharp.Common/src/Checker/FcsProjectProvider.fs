@@ -93,7 +93,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     do
         // todo: schedule listening after project model is ready; create fcs projects for all projects
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
-        fsItemsContainer.ProjectUpdated.Advise(lifetime, this.ProcessItemsChange)
+        fsItemsContainer.ProjectLoaded.Advise(lifetime, this.ProcessItemsContainerUpdate)
+        fsItemsContainer.ProjectUpdated.Advise(lifetime, this.ProcessItemsContainerUpdate)
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
@@ -469,7 +470,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         if isNotNull project then
             dirtyProjects.Add(project) |> ignore
 
-    member this.ProcessItemsChange(projectMark: IProjectMark) =
+    member this.ProcessItemsContainerUpdate(projectMark: IProjectMark) =
         let project = solution.GetProjectByMark(projectMark)
         if isNotNull project then
             dirtyProjects.Add(project) |> ignore

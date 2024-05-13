@@ -35,6 +35,7 @@ open JetBrains.RdBackend.Common.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Serialization
 open JetBrains.Threading
 open JetBrains.UI.RichText
@@ -94,14 +95,15 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
-type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainerLoader,
-        projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider) =
+type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
+        projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider, locks: IShellLocks) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy containerLoader.GetMap()
     let targetFrameworkIdsIntern = DataIntern(setComparer)
 
     let projectUpdated = new Signal<IProjectMark>("fsItemsUpdated")
+    let projectLoaded = new Signal<IProjectMark>("fsProjectLoaded")
  
     let tryGetProjectMark (projectItem: IProjectItem) =
         match projectItem.GetProject() with
@@ -209,7 +211,15 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
 
+    abstract NotifyProjectLoaded: IProjectMark -> unit
+    default x.NotifyProjectLoaded(projectMark) =
+        locks.QueueReadLock(lifetime, "F# project loaded", fun _ ->
+            let _ = WriteLockCookie.Create()
+            projectLoaded.Fire(projectMark)
+        )
+
     interface IFSharpItemsContainer with
+        member x.ProjectLoaded = projectLoaded
         member x.ProjectUpdated = projectUpdated
 
         member x.OnProjectLoaded(projectMark, projectDescriptor, msBuildProject) =
@@ -246,6 +256,7 @@ type FSharpItemsContainer(logger: ILogger, containerLoader: FSharpItemsContainer
 
                 addProjectMapping targetFrameworkIds items projectMark
                 projectRefresher.RefreshProject(projectMark, true)
+                x.NotifyProjectLoaded(projectMark)
             | _ -> ()
 
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
@@ -362,6 +373,7 @@ type IFSharpItemsContainer =
     inherit IMsBuildProjectModificationListener
 
     abstract member IsValid: FSharpViewItem -> bool
+    abstract member ProjectLoaded: ISignal<IProjectMark>
     abstract member ProjectUpdated: ISignal<IProjectMark>
     abstract member RemoveProject: IProject -> unit
     abstract member TryGetSortKey: FSharpViewItem -> int option

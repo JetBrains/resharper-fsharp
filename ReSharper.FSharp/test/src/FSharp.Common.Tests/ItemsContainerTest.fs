@@ -1013,8 +1013,8 @@ let itemFilterProvider =
 
 
 type LoggingFSharpItemsContainer(writer, refresher) as this =
-    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher,
-        itemFilterProvider)
+    inherit FSharpItemsContainer(Lifetime.Eternal, DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, 
+    refresher, itemFilterProvider, null)
 
     let container = this :> IFSharpItemsContainer
 
@@ -1044,6 +1044,7 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
     member x.TryGetSortKey(viewItem) = container.TryGetSortKey(viewItem)
     member x.TryGetParentFolderIdentity(viewItem) = container.TryGetParentFolderIdentity(viewItem)
     member x.CreateFoldersWithParents(folder) = container.CreateFoldersWithParents(folder)
+    member x.NotifyProjectLoaded _ = ()
 
 
 type DummyFSharpItemsContainerLoader() =
