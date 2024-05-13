@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
+open System.Collections.Concurrent
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
@@ -14,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.Threading
 open JetBrains.Util
 
 [<SolutionComponent>]
@@ -22,12 +24,10 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
     let defaultOptionsLock = obj()
 
-    let scriptFcsProjects = Dictionary<VirtualFileSystemPath, FcsProject option>()
+    let scriptFcsProjects = ConcurrentDictionary<VirtualFileSystemPath, FcsProject option>()
+    let requiringUpdate = ConcurrentDictionary<VirtualFileSystemPath, LifetimeDefinition>()
 
     let mutable defaultOptions: FSharpProjectOptions option option = None
-
-    let currentRequests = HashSet<VirtualFileSystemPath>()
-    let dirtyPaths = HashSet<VirtualFileSystemPath>()
 
     let optionsUpdated =
         new Signal<VirtualFileSystemPath * FSharpProjectOptions>("ScriptFcsProjectProvider.optionsUpdated")
@@ -40,7 +40,10 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     do
         fsSourceCache.FileUpdated.Advise(lifetime, fun (path: VirtualFileSystemPath) ->
             match path.ExtensionNoDot with
-            | "fsx" | "fsscript" -> dirtyPaths.Add(path) |> ignore
+            | "fsx" | "fsscript" ->
+                  requiringUpdate.AddOrUpdate(path,
+                      (fun path -> null),
+                      (fun path work -> (if isNull work then () else work.Terminate()); null)) |> ignore
             | _ -> ())
 
     let defaultFlags =
@@ -132,73 +135,52 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
               ReferencedModules = EmptySet.Instance }
         )
 
-    let rec updateOptions path source =
-        if currentRequests.Contains(path) then () else
+    let rec updateOptionsIfNeeded path source oldOptionsExistence =
+        let lifetimeDefinition = new LifetimeDefinition()
+        if not (requiringUpdate.TryUpdate(path, lifetimeDefinition, null)) then () else
+        let lifetime = lifetimeDefinition.Lifetime
 
-        let updateOptionsAsync = 
-            async {
-                if currentRequests.Contains(path) then () else
+        let updateOptionsAsync =
+            task {
+                if not lifetime.IsAlive then () else
 
-                try
-                    currentRequests.Add(path) |> ignore
-                    dirtyPaths.Remove(path) |> ignore
-                    let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id
-                    let newOptions = getOptionsImpl path source
+                let newOptions = getOptionsImpl path source
+                let oldOptions = oldOptionsExistence |> Option.bind id
+                let fcsProject = createFcsProject path newOptions
 
-                    scriptFcsProjects[path] <-
-                        newOptions
-                        |> Option.map (fun options ->
-                            let parsingOptions = 
-                                { FSharpParsingOptions.Default with
-                                    SourceFiles = [| path.FullPath |]
-                                    ConditionalDefines = ImplicitDefines.scriptDefines
-                                    IsInteractive = true
-                                    IsExe = true }
+                if not (lifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then () else
 
-                            let indices = Dictionary()
+                match oldOptions, newOptions with
+                | Some oldOptions, Some newOptions ->
+                    let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
+                        let arrayEq a1 a2 =
+                            Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
-                            { OutputPath = path
-                              ProjectOptions = options
-                              ParsingOptions = parsingOptions
-                              FileIndices = indices
-                              ImplementationFilesWithSignatures = EmptySet.Instance
-                              ReferencedModules = EmptySet.Instance }
-                        )
+                        arrayEq options1.OtherOptions options2.OtherOptions &&
+                        arrayEq options1.SourceFiles options2.SourceFiles
 
-                    match oldOptions, newOptions with
-                    | Some oldOptions, Some newOptions ->
-                        let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
-                            let arrayEq a1 a2 =
-                                Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
-
-                            arrayEq options1.OtherOptions options2.OtherOptions &&
-                            arrayEq options1.SourceFiles options2.SourceFiles
-
-                        if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
-                            optionsUpdated.Fire((path, newOptions))
-
-                    | _, Some newOptions ->
+                    if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
                         optionsUpdated.Fire((path, newOptions))
 
-                    | _ -> ()
+                | _, Some newOptions ->
+                    optionsUpdated.Fire((path, newOptions))
 
-                finally
-                    currentRequests.Remove(path) |> ignore
+                | _ -> ()
             }
 
         if isHeadless then
-            Async.RunSynchronously updateOptionsAsync
+            updateOptionsAsync.GetAwaiter().GetResult()
         else
-            Async.Start updateOptionsAsync
+            updateOptionsAsync.NoAwait()
 
     let rec getFcsProject path source allowRetry : FcsProject option =
         match tryGetValue path scriptFcsProjects with
-        | Some fcsProject ->
-            if dirtyPaths.Contains(path) then
-                updateOptions path source
+        | Some fcsProject as scriptFcsProject ->
+            updateOptionsIfNeeded path source scriptFcsProject
             fcsProject
         | _ ->
-            updateOptions path source
+            requiringUpdate.TryAdd(path, null) |> ignore
+            updateOptionsIfNeeded path source None
 
             if isHeadless && allowRetry then
                 getFcsProject path source false
