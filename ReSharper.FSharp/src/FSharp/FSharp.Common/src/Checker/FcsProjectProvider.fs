@@ -139,12 +139,16 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             ||> Array.forall2 (fun r1 r2 ->
                 match r1, r2 with
                 | FSharpReferencedProject.FSharpReference (_, r1),
-                  FSharpReferencedProject.FSharpReference (_, r2) -> loop r1 r2
+                  FSharpReferencedProject.FSharpReference (_, r2) ->
+                    r1.Stamp = r2.Stamp
+
                 | FSharpReferencedProject.ILModuleReference(_, _, getReader1),
-                  FSharpReferencedProject.ILModuleReference(_, _, getReader2) -> getReader1 () = getReader2 ()
+                  FSharpReferencedProject.ILModuleReference(_, _, getReader2) ->
+                    getReader1 () = getReader2 ()
+
                 | _ -> false
             )
-            
+
         loop newProject.ProjectOptions oldProject.ProjectOptions
 
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
