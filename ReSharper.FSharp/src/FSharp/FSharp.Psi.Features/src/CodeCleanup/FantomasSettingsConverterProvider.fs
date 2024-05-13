@@ -36,7 +36,7 @@ type FantomasSettingsConverterProvider(lifetime: Lifetime, schema: SettingsSchem
     do
         let fantomasSettingsEntry =
             schema.GetEntry(typeof<FSharpFormatSettingsKey>, "FantomasSettings") :?> SettingsIndexedEntry
-        items.Add(FantomasSettingsConverter(fantomasSettingsEntry.NotNull()))
+        items.Add(FantomasSettingsConverter(fantomasSettingsEntry.NotNull())) |> ignore
 
     interface IProvider<IEditorConfigConverter> with
         member this.Items = items :> _
