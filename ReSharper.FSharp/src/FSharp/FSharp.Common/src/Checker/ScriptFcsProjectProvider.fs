@@ -144,28 +144,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             task {
                 if not lifetime.IsAlive then () else
 
-                let newOptions = getOptionsImpl path source //TODO: do not block?
+                let newOptions = getOptionsImpl path source
                 let oldOptions = oldOptionsExistence |> Option.bind id
-
-                let fcsProject =
-                    newOptions //TODO: use createFcsProject?
-                    |> Option.map (fun options ->
-                        let parsingOptions =
-                            { FSharpParsingOptions.Default with
-                                SourceFiles = [| path.FullPath |]
-                                ConditionalDefines = ImplicitDefines.scriptDefines
-                                IsInteractive = true
-                                IsExe = true }
-
-                        let indices = Dictionary()
-
-                        { OutputPath = path
-                          ProjectOptions = options
-                          ParsingOptions = parsingOptions
-                          FileIndices = indices
-                          ImplementationFilesWithSignatures = EmptySet.Instance
-                          ReferencedModules = EmptySet.Instance }
-                    )
+                let fcsProject = createFcsProject path newOptions
 
                 if not (lifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then () else
 
