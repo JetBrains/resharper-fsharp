@@ -41,7 +41,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public XmlNode GetXMLDoc(bool inherit)
     {
-      Assertion.Fail("Unexpected call TopBinding.GetXMLDoc");
+      // The binding should not be used as an XMLDoc source by the logic of the F# PSI,
+      // but when the nodes get bunch-processed as abstract instances of IXmlDocOwnerTreeNode,
+      // it is quite unexpected to get an exception thrown at you as a PSI consumer.
+      // Hence, the assertion is commented out.
+      // Assertion.Fail("Unexpected call TopBinding.GetXMLDoc");
       return null;
     }
 
