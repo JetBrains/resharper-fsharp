@@ -10,7 +10,6 @@ open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Environment
-open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -19,16 +18,12 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.CSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.VB
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 module FcsCheckerService =
@@ -69,7 +64,11 @@ type FcsProject =
 
         writer.WriteLine("Referenced projects:")
         for referencedProject in projectOptions.ReferencedProjects do
-            writer.WriteLine($"  {referencedProject.OutputFile}")
+            let stamp =
+                match referencedProject with
+                | FSharpReferencedProject.FSharpReference(_, options) -> $"{options.Stamp}: "
+                | _ -> ""
+            writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
 
         writer.WriteLine()
 
