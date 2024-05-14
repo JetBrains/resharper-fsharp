@@ -9,6 +9,8 @@ import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rd.platform.util.lifetime
+import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.enums.PlatformType
 import org.testng.annotations.Test
 import java.io.File
 import java.time.Duration
@@ -19,6 +21,7 @@ class FileSystemShimTest : BaseTestWithSolution() {
   override fun getSolutionDirectoryName() = "CoreConsoleApp"
 
   @Test
+  @Mute("RIDER-111885", platforms= [PlatformType.LINUX_ALL])
   fun externalFileChange() {
     val file = activeSolutionDirectory.resolve("Program.fs")
     val stampBefore = getTimestamp(file)
