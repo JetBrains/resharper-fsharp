@@ -44,6 +44,7 @@
     <Compile Include="src\Intentions\UseNamedAccessAction.fs" />
     <Compile Include="src\Intentions\ToPositionalFieldPatternsAction.fs" />
     <Compile Include="src\Intentions\DisableWarningActions.fs" />
+    <Compile Include="src\Intentions\ConvertPartiallyAppliedFunctionToLambdaAction.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />

@@ -39,6 +39,14 @@ let getReturnType (symbol: FSharpSymbol) =
     | :? FSharpUnionCase as case -> Some case.ReturnType
     | _ -> None
 
+// todo: union cases
+let tryGetFunctionType (symbol: FSharpSymbol) =
+    match symbol with
+    | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv.FullType
+    | :? FSharpField as field -> Some field.FieldType
+    | :? FSharpParameter as param -> Some param.Type
+    | _ -> None
+
 let addAccessibility (iconId: IconId) (accessibility: FSharpAccessibility) =
     if accessibility.IsPublic then iconId else
     if accessibility.IsInternal then compose iconId PsiSymbolsThemedIcons.ModifiersInternal.Id else
