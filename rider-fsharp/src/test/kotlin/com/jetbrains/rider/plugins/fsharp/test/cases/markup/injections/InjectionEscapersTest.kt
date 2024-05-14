@@ -8,8 +8,10 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.jetbrains.rider.editors.getPsiFile
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.getHighlighters
@@ -80,6 +82,7 @@ class InjectionEscapersTest : BaseTestWithSolution() {
   }
 
   fun `escaping - regular`() = doFullEditingTest()
+  @Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun `escaping - regular - interpolated`() = doFullEditingTest()
   fun `escaping - triple quoted`() = doFullEditingTest()
   fun `escaping - triple quoted - interpolated`() = doFullEditingTest()
