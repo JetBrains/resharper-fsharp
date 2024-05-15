@@ -214,7 +214,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
     abstract NotifyProjectLoaded: IProjectMark -> unit
     default x.NotifyProjectLoaded(projectMark) =
         locks.QueueReadLock(lifetime, "F# project loaded", fun _ ->
-            let _ = WriteLockCookie.Create()
+            use _ = WriteLockCookie.Create()
             projectLoaded.Fire(projectMark)
         )
 
