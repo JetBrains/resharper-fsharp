@@ -53,6 +53,7 @@ dependencies {
     bundledPlugin("org.intellij.intelliLang")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
+    bundledLibrary("lib/testFramework.jar")
     instrumentationTools()
   }
 }
