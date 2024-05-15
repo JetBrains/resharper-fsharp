@@ -19,6 +19,7 @@ open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.ProjectModel
 open JetBrains.Util.Media
+open JetBrains.Util.NetFX.Media.Colors
 
 type OverrideBehavior(info) =
     inherit TextualBehavior<TextualInfo>(info)
