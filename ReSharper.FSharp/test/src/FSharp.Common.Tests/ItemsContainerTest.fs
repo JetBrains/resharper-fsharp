@@ -1044,7 +1044,8 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
     member x.TryGetSortKey(viewItem) = container.TryGetSortKey(viewItem)
     member x.TryGetParentFolderIdentity(viewItem) = container.TryGetParentFolderIdentity(viewItem)
     member x.CreateFoldersWithParents(folder) = container.CreateFoldersWithParents(folder)
-    member x.NotifyProjectLoaded _ = ()
+
+    override x.NotifyProjectLoaded _ = ()
 
 
 type DummyFSharpItemsContainerLoader() =
