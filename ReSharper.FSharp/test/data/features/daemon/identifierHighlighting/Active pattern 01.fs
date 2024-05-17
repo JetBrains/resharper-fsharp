@@ -12,5 +12,5 @@ let _ = (|A|_|)
 let _ = Nested.(|G|_|)
 
 match () with
-| D (|A|_|) () -> ()
-| D Nested.(|G|_|) () -> ()
+| D (|A|_|) -> ()
+| D Nested.(|G|_|) -> ()
