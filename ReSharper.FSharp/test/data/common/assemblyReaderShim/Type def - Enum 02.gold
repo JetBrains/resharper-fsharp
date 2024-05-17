@@ -28,23 +28,23 @@ match |EnumWrongBaseType.A|(7) with
 | EnumWrongBaseType.A -> ()
 | EnumWrongBaseType.B -> ()
 
-match EnumWrongValueType.A with
-| |EnumWrongValueType.A|(8) -> ()
+match |EnumWrongValueType.A|(8) with
+| |EnumWrongValueType.A|(9) -> ()
 
-match EnumOverflowValue.A with
-| |EnumOverflowValue.A|(9) -> ()
+match |EnumOverflowValue.A|(10) with
+| |EnumOverflowValue.A|(11) -> ()
 | EnumOverflowValue.B -> ()
 
-match |EnumSameFields.A|(10) with
+match |EnumSameFields.A|(12) with
 | EnumSameFields.A -> ()
 
-match |EnumSameFields.A|(11) with
+match |EnumSameFields.A|(13) with
 | EnumSameFields.A -> ()
-|| EnumSameFields.A -> ()|(12)
+|| EnumSameFields.A -> ()|(14)
 
 
 type InheritEnum() =
-    |inherit Enum()|(13)
+    |inherit Enum()|(15)
 
 type InheritClass() =
     inherit Class()
@@ -61,9 +61,11 @@ but here has type
 (5): ReSharper Dead Code: This rule will never be matched
 (6): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumShort> (2s)' may indicate a case not covered by the pattern(s).
 (7): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<EnumWrongBaseType> (2)' may indicate a case not covered by the pattern(s).
-(8): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(8): ReSharper Warning: Incomplete pattern matches on this expression.
 (9): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
-(10): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
-(11): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
-(12): ReSharper Dead Code: This rule will never be matched
-(13): ReSharper Underlined Error Highlighting: Cannot inherit a sealed type
+(10): ReSharper Warning: Incomplete pattern matches on this expression.
+(11): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern
+(12): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(13): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value 'EnumSameFields.A' may indicate a case not covered by the pattern(s).
+(14): ReSharper Dead Code: This rule will never be matched
+(15): ReSharper Underlined Error Highlighting: Cannot inherit a sealed type

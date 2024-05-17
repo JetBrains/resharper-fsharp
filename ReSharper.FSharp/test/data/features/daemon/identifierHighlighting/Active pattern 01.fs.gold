@@ -12,8 +12,8 @@ let _ = (||A|_||(23))
 let _ = |Nested|(24).(||G|_||(25))
 
 match () with
-| |D|(26) (||A|_||(27)) () -> ()
-| |D|(28) |Nested|(29).(||G|_||(30)) () -> ()
+| |D|(26) (|A|_|) -> ()
+| |D|(27) |Nested|(28).(|G|_|) -> ()
 
 ---------------------------------------------------------
 (0): ReSharper F# Module Identifier: 
@@ -44,6 +44,4 @@ match () with
 (25): ReSharper F# Active Pattern Case Identifier: 
 (26): ReSharper F# Active Pattern Case Identifier: 
 (27): ReSharper F# Active Pattern Case Identifier: 
-(28): ReSharper F# Active Pattern Case Identifier: 
-(29): ReSharper F# Module Identifier: 
-(30): ReSharper F# Active Pattern Case Identifier: 
+(28): ReSharper F# Module Identifier: 

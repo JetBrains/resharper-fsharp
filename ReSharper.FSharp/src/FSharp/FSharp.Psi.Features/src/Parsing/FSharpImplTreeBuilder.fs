@@ -1220,7 +1220,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.Fixed(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)
 
-        | SynExpr.Sequential(_, _, expr1, expr2, _) ->
+        | SynExpr.Sequential(_, _, expr1, expr2, _, _) ->
             x.PushRange(range, ElementType.SEQUENTIAL_EXPR)
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
@@ -1511,12 +1511,12 @@ type SequentialExpressionProcessor() =
 
     override x.Process(expr, builder) =
         match expr with
-        | SynExpr.Sequential(_, _, currentExpr, SynExpr.Sequential(_, _, nextExpr1, nextExpr2, _), _) ->
+        | SynExpr.Sequential(_, _, currentExpr, SynExpr.Sequential(_, _, nextExpr1, nextExpr2, _, _), _, _) ->
             builder.PushSequentialExpression(nextExpr2)
             builder.PushExpression(nextExpr1)
             builder.ProcessExpression(currentExpr)
 
-        | SynExpr.Sequential(_, _, currentExpr, nextExpr, _) ->
+        | SynExpr.Sequential(_, _, currentExpr, nextExpr, _, _) ->
             builder.PushExpression(nextExpr)
             builder.ProcessExpression(currentExpr)
 
