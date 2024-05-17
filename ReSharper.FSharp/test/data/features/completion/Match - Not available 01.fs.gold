@@ -908,7 +908,6 @@ FSharpInterfaceDataVersionAttribute
 FSharpInterfaceDataVersionAttribute (in Microsoft.FSharp.Core)
 FSharpReflectionExtensions (in Microsoft.FSharp.Reflection)
 FSharpType (in Microsoft.FSharp.Reflection)
-FSharpTypeFunc
 FSharpTypeFunc (in Microsoft.FSharp.Core)
 FSharpValue (in Microsoft.FSharp.Reflection)
 FUNCDESC (in System.Runtime.InteropServices)
@@ -917,7 +916,6 @@ FUNCFLAGS (in System.Runtime.InteropServices)
 FUNCFLAGS (in System.Runtime.InteropServices.ComTypes)
 FUNCKIND (in System.Runtime.InteropServices)
 FUNCKIND (in System.Runtime.InteropServices.ComTypes)
-Failure
 FieldAccessException (in System)
 FieldAttributes (in System.Reflection)
 FieldBuilder (in System.Reflection.Emit)
@@ -2725,179 +2723,82 @@ _SignatureHelper (in System.Runtime.InteropServices)
 _Thread (in System.Runtime.InteropServices)
 _Type (in System.Runtime.InteropServices)
 _TypeBuilder (in System.Runtime.InteropServices)
-abs
 abstract
-acos
 ampere (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 and
 array
-array2D
 as
-asin
 assert
-async
-atan
-atan2
 base
 begin
 bigint
 bool
-box
 byref
-byte
 candela (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
-ceil
-char
 class
-compare
-cos
-cosh
-decimal
 decimal (in Microsoft.FSharp.Core)
-decr
 default
-defaultArg
-defaultValueArg
 delegate
-dict
 do
 done
-double
 downcast
 downto
 elif
 else
 end
-enum
-eprintf
-eprintfn
-exit
 exn
-exp
-failwith
-failwithf
 false
 finally
-float
 float (in Microsoft.FSharp.Core)
-float32
 float32 (in Microsoft.FSharp.Core)
-floor
 for
-fprintf
-fprintfn
-fst
 fun
 function
 global
-hash
-id
 if
-ignore
 ilsigptr
 in
-incr
-infinity
-infinityf
 inherit
 inref
-int
 int (in Microsoft.FSharp.Core)
-int16
 int16 (in Microsoft.FSharp.Core)
-int32
-int64
 int64 (in Microsoft.FSharp.Core)
-int8
 interface
 internal
-invalidArg
-invalidOp
-isNull
 kelvin (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 kilogram (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 lazy
 let
-limitedHash
 list
-lock
-log
-log10
 match
-max
 member
 metre (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
-min
 mole (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
-nameof
-nan
-nanf
-nativeint
 nativeptr
 new
 not
-not
 null
-nullArg
 obj
 option
 or
 outref
 override
-pown
-printf
-printfn
 private
 public
-query
-raise
-readOnlyDict
 rec
-ref
-reraise
 return
-round
-sbyte
 sbyte (in Microsoft.FSharp.Core)
 second (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
-seq
-set
 sig
-sign
-sin
-single
-sinh
-sizeof
-snd
-sprintf
-sqrt
 static
-stderr
-stdin
-stdout
-string
 struct
-tan
-tanh
 then
 to
 true
-truncate
 try
-tryUnbox
-typedefof
-typeof
-uint
-uint16
-uint32
-uint64
-uint8
-unativeint
-unbox
 unit
 upcast
 use
-using
 val
 void
 voidptr

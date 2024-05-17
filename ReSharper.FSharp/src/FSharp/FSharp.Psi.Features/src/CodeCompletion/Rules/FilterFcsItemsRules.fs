@@ -5,15 +5,19 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.Util.Extension
 
 [<Language(typeof<FSharpLanguage>)>]
-type RemoveReparsePatternRule() =
+type FilterFcsPatternRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    let isReferencePat (referenceOwner: IFSharpReferenceOwner) =
+        isNotNull (ReferencePatNavigator.GetByReferenceName(referenceOwner.As()))
+
+    let isTypeLikePat (referenceOwner: IFSharpReferenceOwner) =
+        let typeUsage = NamedTypeUsageNavigator.GetByReferenceName(referenceOwner.As())
+        isNotNull (TypedLikePatNavigator.GetByTypeUsage(typeUsage))
 
     override this.IsAvailable(context) =
         context.IsBasicOrSmartCompletion && not context.IsQualified &&
@@ -21,31 +25,24 @@ type RemoveReparsePatternRule() =
         let reference = context.ReparsedContext.Reference.As<FSharpSymbolReference>()
         isNotNull reference &&
 
-        let refPat = ReferencePatNavigator.GetByReferenceName(reference.GetElement().As())
-        isNotNull refPat && isNotNull refPat.NameIdentifier
+        let referenceOwner = reference.GetElement()
+        (isReferencePat referenceOwner || isTypeLikePat referenceOwner)
 
-    override this.TransformItems(context, collector) =
-        let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
-        let referencePat = ReferencePatNavigator.GetByReferenceName(reference.GetElement() :?> _)
-
-        let reparsedName = referencePat.NameIdentifier.Name
-        let name = reparsedName.SubstringBeforeLast(FSharpCompletionUtil.DummyIdentifier)
-        if reparsedName.Length = name.Length then () else
-
-        let document = context.BasicContext.Document
-        let treeStartOffset = referencePat.GetTreeStartOffset()
+    override this.TransformItems(_, collector) =
         collector.RemoveWhere(fun item ->
             let lookupItem = item.As<FcsLookupItem>()
-            isNotNull lookupItem && lookupItem.Text = name &&
+            isNotNull lookupItem &&
 
             match lookupItem.FcsSymbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                not mfv.IsModuleValueOrMember && getTreeStartOffset document mfv.DeclarationLocation = treeStartOffset
-            | _ -> false)
+                mfv.IsModuleValueOrMember && Option.isNone mfv.LiteralValue
+            | _ -> false
+        )
+
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FilterFcsRule() =
+type FilterFcsExpressionRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override this.IsAvailable(context) =

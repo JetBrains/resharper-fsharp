@@ -37,7 +37,7 @@
     <Compile Include="src\CodeCompletion\Rules\UnionCasePatternRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\UnionCaseFieldsRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\RecordFieldRule.fs" />
-    <Compile Include="src\CodeCompletion\Rules\RemoveReparsePatternRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\FilterFcsItemsRules.fs" />
     <Compile Include="src\CodeCompletion\Rules\ImportRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\GenerateMatchExprPatternsRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\NamedUnionCaseFieldsPatRule.fs" />

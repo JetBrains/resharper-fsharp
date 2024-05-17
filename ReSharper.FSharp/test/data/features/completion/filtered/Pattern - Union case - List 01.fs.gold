@@ -1,4 +1,4 @@
-﻿# 2910 ITEMS #
+﻿# 2811 ITEMS #
 
 + Match values
 #I
@@ -86,8 +86,6 @@ ExtraTopLevelOperators
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc    FSharpTypeFunc
-Failure    exn
 Format
 FuncConvert
 GeneralizableValueAttribute
@@ -157,165 +155,68 @@ ValueSome    'T voption
 VolatileFieldAttribute
 WebExtensions
 []
-abs    ^T
 abstract
-acos    ^T
 and
 array
-array2D    'T array2d
 as
-asin    ^T
 assert
-async    AsyncBuilder
-atan    ^T
-atan2    'T2
 base
 begin
 bigint
 bool
-box    obj
 byref
-byte    byte
-ceil    ^T
-char    char
 class
-compare    int
-cos    ^T
-cosh    ^T
-decimal    decimal
-decr    unit
 default
-defaultArg    'T
-defaultValueArg    'T
 delegate
-dict    IDictionary<'Key,'Value>
 do
 done
-double    double
 downcast
 downto
 elif
 else
 end
-enum    ^U
-eprintf    'T
-eprintfn    'T
-exit    'T
 exn
-exp    ^T
-failwith    'T
-failwithf    'T
 false
 finally
-float    float
-float32    float32
-floor    ^T
 for
-fprintf    'T
-fprintfn    'T
-fst    'T1
 fun
 function
 global
-hash    int
-id    'T
 if
-ignore    unit
 ilsigptr
 in
-incr    unit
-infinity    float
-infinityf    float32
 inherit
 inref
-int    int
-int16    int16
-int32    int32
-int64    int64
-int8    int8
 interface
 internal
-invalidArg    'T
-invalidOp    'T
-isNull    bool
 lazy
 let
-limitedHash    int
 list
-lock    'T
-log    ^T
-log10    ^T
 match
-max    'T
 member
-min    'T
-nameof    string
-nan    float
-nanf    float32
-nativeint    nativeint
 nativeptr
 new
 not
-not    bool
 null
-nullArg    'T
 obj
 option
 or
 outref
 override
-pown    ^T
-printf    'T
-printfn    'T
 private
 public
-query    QueryBuilder
-raise    'T
-readOnlyDict    IReadOnlyDictionary<'Key,'Value>
 rec
-ref    'T ref
-reraise    'T
 return
-round    ^T
-sbyte    sbyte
-seq    'T seq
-set    Set<'T>
 sig
-sign    int
-sin    ^T
-single    single
-sinh    ^T
-sizeof    int
-snd    'T2
-sprintf    'T
-sqrt    ^U
 static
-stderr    TextWriter
-stdin    TextReader
-stdout    TextWriter
-string    string
 struct
-tan    ^T
-tanh    ^T
 then
 to
 true
-truncate    ^T
 try
-tryUnbox    'T option
-typedefof    Type
-typeof    Type
-uint    uint
-uint16    uint16
-uint32    uint32
-uint64    uint64
-uint8    uint8
-unativeint    unativeint
-unbox    'T
 unit
 upcast
 use
-using    'U
 val
 void
 voidptr
