@@ -323,6 +323,9 @@ type FSharpKeywordsRule() =
         let tokenBeforeCaret = context.TokenBeforeCaret
         let fcsCompletionContext = reparsedContext.GetFcsContext()
 
+        let prevMeaningfulToken = skipMatchingTokensBefore isInlineSpaceOrComment tokenBeforeCaret
+        if getTokenType prevMeaningfulToken == FSharpTokenType.AS then false else
+
         match fcsCompletionContext.CompletionContext, getTokenType tokenBeforeCaret with
         | Some(CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
         | _, tokenBeforeType ->

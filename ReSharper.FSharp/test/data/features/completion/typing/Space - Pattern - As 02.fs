@@ -1,0 +1,8 @@
+// ${TEXT: }
+// ${DUMP_LOOKUP:true}
+module Module
+
+open System
+
+match obj() with
+| :? IDisposable as{caret}

@@ -60,6 +60,11 @@ type FSharpOnSpaceAutopopupStrategy() =
 
                 | _ -> false
 
+            | TokenType FSharpTokenType.AS asKeyword ->
+                match asKeyword.Parent with
+                | :? IAsPat -> true
+                | _ -> false
+
             | TokenType FSharpTokenType.SEMICOLON semi ->
                 match semi.Parent with
                 | :? IRecordFieldBinding

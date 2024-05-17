@@ -32,12 +32,17 @@ open JetBrains.TextControl
 module UnionCasePatternInfo =
     let [<Literal>] Id = "Union case pattern"
 
+type IEnumCaseLikePatternInfo =
+    inherit ILookupItemInfo
+
 type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEntityInstance: FcsEntityInstance,
         context: FSharpCodeCompletionContext) =
     inherit TextualInfo(text, UnionCasePatternInfo.Id)
 
     member val Case = symbol
     member val EntityInstance = fcsEntityInstance
+
+    interface IEnumCaseLikePatternInfo
 
     interface IDescriptionProvidingLookupItem with
         member this.GetDescription() =

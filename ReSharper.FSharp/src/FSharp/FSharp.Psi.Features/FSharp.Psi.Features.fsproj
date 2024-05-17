@@ -45,6 +45,7 @@
     <Compile Include="src\CodeCompletion\Rules\FSharpKeywordsRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\OverrideMemberRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\ImportExtensionMemberRule.fs" />
+    <Compile Include="src\CodeCompletion\Rules\NameSuggestionRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpScriptReferenceCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />

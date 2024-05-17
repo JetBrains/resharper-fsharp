@@ -607,6 +607,9 @@ type FSharpCodeCompletionTypingTest() =
     override this.GetDoNotCompleteOnSetting() = this.Quote(fun key -> key.NonCompletingCharacters)
     override this.GetAutopopupTypeSetting() = this.Quote(fun key -> key.OnIdent)
 
+    [<Test>] member x.``Space - Pattern - As 01``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Pattern - As 02``() = x.DoNamedTest()
+    [<Test>] member x.``Space - Pattern - As 03``() = x.DoNamedTest()
     [<Test>] member x.``Space - Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Space - Pattern 02``() = x.DoNamedTest()
     [<Test; Explicit("dotnet/fsharp#16055")>] member x.``Space - Pattern 03``() = x.DoNamedTest()
