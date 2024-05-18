@@ -25,7 +25,7 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
     flushFileChanges(project)
   }
 
-  private fun doEditorConfigEnumTest(fantomasVersion: String) {
+  private fun doEditorConfigTestWithVersion(fantomasVersion: String) {
     withEditorConfig(project) {
       withFantomasLocalTool("fantomas", fantomasVersion) {
         withOpenedEditor("Program.fs", "Brackets.fs") {
@@ -39,9 +39,27 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
     }
   }
 
+  private fun doEditorConfigTest() {
+    withEditorConfig(project) {
+      withOpenedEditor("Program.fs", "Newline.fs") {
+        waitForDaemon()
+        reformatCode()
+        executeWithGold(testGoldFile) {
+          dumpOpenedDocument(it, project!!, false)
+        }
+      }
+    }
+  }
+
   @Test(description = "Doesn't support experimental_stroustrup, 'cramped' should be used instead")
-  fun `editorconfig enum values 01`() = doEditorConfigEnumTest("6.0.1")
+  fun `editorconfig enum values 01`() = doEditorConfigTestWithVersion("6.0.1")
 
   @Test(description = "Supports stroustrup")
-  fun `editorconfig enum values 02`() = doEditorConfigEnumTest("6.0.1")
+  fun `editorconfig enum values 02`() = doEditorConfigTestWithVersion("6.0.1")
+
+  @Test(description = "RIDER-111743")
+  fun `editorconfig overrides 01 - final newline`() = doEditorConfigTest()
+
+  @Test(description = "RIDER-111743")
+  fun `editorconfig overrides 02 - final newline`() = doEditorConfigTest()
 }

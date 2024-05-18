@@ -59,9 +59,9 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
             let text = document.GetText()
 
             let solution = fsFile.GetSolution()
-            let settings = sourceFile.GetSettingsStoreWithEditorConfig()
+            let settingsStore = sourceFile.GetSettingsStoreWithEditorConfig()
             let formatter = fsFile.Language.LanguageServiceNotNull().CodeFormatter
-            let settings = formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> _
+            let settings = formatter.GetFormatterSettings(solution, sourceFile, settingsStore, false) :?> _
             let fantomasHost = solution.GetComponent<FantomasHost>()
 
             let stamp = document.LastModificationStamp
@@ -72,7 +72,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
             if isNotNull rangeMarker then
                 try
                     let range = ofDocumentRange rangeMarker.DocumentRange
-                    let formatted = fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText)
+                    let formatted = fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText, settingsStore)
                     let offset = rangeMarker.DocumentRange.StartOffset.Offset
                     let oldLength = rangeMarker.DocumentRange.Length
                     let documentChange = DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide)
@@ -84,7 +84,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                 let textControl = textControlManager.VisibleTextControls
                                   |> Seq.tryFind (fun c -> c.Document == document && c.Window.IsFocused.Value)
                 let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
-                let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition)
+                let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition, settingsStore)
                 let newCursorPosition = formatResult.CursorPosition
 
                 document.ReplaceText(document.DocumentRange, formatResult.Code)
