@@ -17,3 +17,6 @@ let abstractInstance = AbstractType()
 SimpleErasedType().ReadonlyStringProperty <- ""
 
 type NumberRegex = Regex< 1 >
+
+let f (x: PetStore.Pet): string = x.Category.Name
+let g (x: PetStore.OperationTypes.UpdatePetWithForm_formUrlEncoded): string = x.Name
