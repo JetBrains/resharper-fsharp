@@ -119,8 +119,16 @@ GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] =
 	TypeProviderLibrary.SimpleGenerativeProvider+S
 	TypeProviderLibrary.SimpleGenerativeProvider+S+GenerativeSubtype
 	TypeProviderLibrary.SwaggerProvider+PetStore
+	TypeProviderLibrary.SwaggerProvider+PetStore+ApiResponse
+	TypeProviderLibrary.SwaggerProvider+PetStore+Category
 	TypeProviderLibrary.SwaggerProvider+PetStore+Client
 	TypeProviderLibrary.SwaggerProvider+PetStore+OperationTypes
+	TypeProviderLibrary.SwaggerProvider+PetStore+OperationTypes+UpdatePetWithForm_formUrlEncoded
+	TypeProviderLibrary.SwaggerProvider+PetStore+OperationTypes+UploadFile_formData
+	TypeProviderLibrary.SwaggerProvider+PetStore+Order
+	TypeProviderLibrary.SwaggerProvider+PetStore+Pet
+	TypeProviderLibrary.SwaggerProvider+PetStore+Tag
+	TypeProviderLibrary.SwaggerProvider+PetStore+User
 
 [Out-Process dump]:
 
@@ -193,6 +201,7 @@ SwaggerProvider.PetStore+OperationTypes+UploadFile_formData tp: 15 (from generat
 SwaggerProvider.PetStore+Order tp: 15 (from generated assembly)
 SwaggerProvider.PetStore+Pet tp: 15 (from generated assembly)
 SwaggerProvider.PetStore+Tag tp: 15 (from generated assembly)
+SwaggerProvider.PetStore+Tag[] tp: 15 (from generated assembly)
 SwaggerProvider.PetStore+User tp: 15 (from generated assembly)
 SwaggerProvider.SwaggerClientProvider tp: 16 (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] tp: 14 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
@@ -210,6 +219,7 @@ Microsoft.FSharp.Control.FSharpHandler`1 tps: 17 (from FSharp.Core, Version=6.0.
 Microsoft.FSharp.Control.FSharpHandler`1[System.String] tps: 17 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 Microsoft.FSharp.Core.FSharpFunc`2 tps: 14 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] tps: 14 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[System.Int64] tps: 15 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 Microsoft.FSharp.Core.Unit tps: 15|17 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 ProviderImplementation.InternalType tps: 17 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
 ProviderImplementation.IPrintable tps: 17 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
@@ -226,6 +236,7 @@ System.Object tps: 1|14|15|16|17|18 (from netstandard, Version=2.0.0.0, Culture=
 System.Object tps: 7|8|10|11|12|13|20 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
 System.String tps: 14|15|17|18 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.String tps: 20 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+System.String[] tps: 15 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.Text.RegularExpressions.Capture tps: 14 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.Text.RegularExpressions.Group tps: 14 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.Text.RegularExpressions.Match tps: 14 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
@@ -239,7 +250,7 @@ System.Threading.Tasks.Task`1[System.String] tps: 15 (from netstandard, Version=
 System.TimeSpan tps: 14 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.ValueType tps: 14|15|17 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 System.ValueType tps: 20 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-System.Void tps: 17|18 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Void tps: 15|17|18 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 T tps: 14|17 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 TResult tps: 14 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
 TResult tps: 15 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
@@ -259,12 +270,12 @@ SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral tps: 15|16
 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae tps: 17|18
 
 ProvidedConstructorInfo:
-Count: 14
+Count: 20
 
 ProvidedMethodInfo:
-Count: 128
+Count: 177
 
 ProvidedPropertyInfo:
-Count: 15
+Count: 25
 
 SevereHighlighters:

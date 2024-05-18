@@ -21,6 +21,7 @@ Provided Assemblies:
 Provided Abbreviations:
 GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr
+	GenerativeTypeProvider.SimpleGenerativeTypeAbbr+GenerativeSubtype
 
 [Out-Process dump]:
 
@@ -77,6 +78,7 @@ Provided Assemblies:
 Provided Abbreviations:
 GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
 	GenerativeTypeProvider.SimpleGenerativeTypeAbbr1
+	GenerativeTypeProvider.SimpleGenerativeTypeAbbr1+GenerativeSubtype
 
 [Out-Process dump]:
 
