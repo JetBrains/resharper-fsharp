@@ -26,6 +26,7 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/maven-central")
   intellijPlatform {
     defaultRepositories()
+    jetbrainsRuntime()
   }
 }
 
@@ -46,6 +47,7 @@ dependencies {
       logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
       rider("$riderBaseVersion-SNAPSHOT")
     }
+    jetbrainsRuntime()
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
