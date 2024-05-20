@@ -1,5 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
+import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
+import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
@@ -21,6 +23,9 @@ import java.io.File
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   override fun getSolutionDirectoryName() = "TypeProviderLibrary"
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
+
+  override val traceScenarios: Set<LogTraceScenario>
+    get() = super.traceScenarios + RdLogTraceScenarios.Daemon
 
   private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
     withOpenedEditor(project, sourceFile) {
