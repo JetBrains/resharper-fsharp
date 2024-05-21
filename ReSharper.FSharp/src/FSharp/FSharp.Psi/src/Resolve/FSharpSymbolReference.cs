@@ -63,7 +63,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         var types = inst.Select(fcsTypeArg => fcsTypeArg.MapType(myOwner)).ToList();
         var substitution = typeElement.IdSubstitution.Extend(typeElement.TypeParameters, types);
 
-        var resolveResult = new SimpleResolveResultWithSubstitution(element, substitution);
+        var resolveResult = substitution.IsEmpty()
+          ? new SimpleResolveResult(element)
+          : new SimpleResolveResultWithSubstitution(element, substitution);
+
         return new ResolveResultWithInfo(resolveResult, ResolveErrorType.OK);
       }
 
