@@ -25,7 +25,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>, InstantiationEx.DemandAnyThreadNotSafeBecauseOfCalculatedSettingsSchema)>]
+[<Language(typeof<FSharpLanguage>, InstantiationEx.DemandAnyThreadNotSafeBecauseOfEditorConfigSchema)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
         checkerService: FcsCheckerService, formatter: FSharpCodeFormatter) =
     inherit LanguageService(languageType, constantValueService)
