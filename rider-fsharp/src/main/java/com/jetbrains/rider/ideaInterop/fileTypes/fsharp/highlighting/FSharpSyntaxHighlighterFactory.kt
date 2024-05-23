@@ -8,8 +8,10 @@ import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
 
-class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
+open class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
   companion object {
+    val Instance = FSharpSyntaxHighlighter()
+
     private val keywords = IDENT_KEYWORDS.types.map { it to FSharpTextAttributeKeys.KEYWORD }
     private val pp_keywords = PP_KEYWORDS.types.map { it to FSharpTextAttributeKeys.PREPROCESSOR_KEYWORD }
     private val strings = STRINGS.types.map { it to FSharpTextAttributeKeys.STRING }
@@ -27,4 +29,16 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
 
   override fun getHighlightingLexer() = FSharpLexer()
   override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> = pack(ourKeys[tokenType])
+}
+
+
+class FsiOutputSyntaxHighlighter : FSharpSyntaxHighlighter() {
+  companion object {
+    val Instance = FsiOutputSyntaxHighlighter()
+  }
+
+  override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
+    return if (tokenType == TokenType.BAD_CHARACTER) TextAttributesKey.EMPTY_ARRAY
+    else super.getTokenHighlights(tokenType)
+  }
 }

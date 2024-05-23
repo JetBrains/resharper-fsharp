@@ -8,13 +8,15 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FsiOutputSyntaxHighlighter
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
 class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
   private var isInitialText = true
   private var nextOutputTextIsFirst = true
 
-  private val fSharpSyntaxHighlighter = FSharpSyntaxHighlighter()
+  private val fSharpSyntaxHighlighter = FSharpSyntaxHighlighter.Instance
+  private val fsiOutputSyntaxHighlighter = FsiOutputSyntaxHighlighter.Instance
 
   private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType): IconWithTooltip? {
     if (nextOutputTextIsFirst) {
@@ -44,7 +46,7 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
 
       when (outputType) {
         ConsoleViewContentType.NORMAL_OUTPUT ->
-          printText(text, fsiResultIconWithTooltip, fSharpSyntaxHighlighter, outputType)
+          printText(text, fsiResultIconWithTooltip, fsiOutputSyntaxHighlighter, outputType)
 
         ConsoleViewContentType.ERROR_OUTPUT ->
           printText(text, fsiResultIconWithTooltip, null, outputType)
