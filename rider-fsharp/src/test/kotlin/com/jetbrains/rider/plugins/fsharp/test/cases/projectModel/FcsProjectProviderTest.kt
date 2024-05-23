@@ -81,7 +81,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
         "Dependencies",
         ".NETStandard 2.0",
         "Projects",
-        "ReferenceTo/1.0.0"
+        "ReferenceTo"
       )
     )
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, emptyList())
