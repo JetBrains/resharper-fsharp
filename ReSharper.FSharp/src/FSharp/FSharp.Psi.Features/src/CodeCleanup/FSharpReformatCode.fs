@@ -18,7 +18,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.Util.Text
 
-[<CodeCleanupModule(InstantiationEx.DemandAnyThreadNotSafeBecauseOfTextControlProperties)>]
+[<CodeCleanupModule(Instantiation.DemandAnyThreadSafe)>]
 type FSharpReformatCode(textControlManager: ITextControlManager) =
     let REFORMAT_CODE_DESCRIPTOR = CodeCleanupOptionDescriptor<bool>(
         "FSharpReformatCode",
