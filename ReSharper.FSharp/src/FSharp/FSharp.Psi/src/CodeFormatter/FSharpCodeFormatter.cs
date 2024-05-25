@@ -17,7 +17,7 @@ using Whitespace = JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.Whitespace;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 {
-  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadNotSafeBecauseOfEditorConfigSchema)]
+  [Language(typeof(FSharpLanguage), InstantiationEx.DemandAnyThreadUnsafeBecauseOfEditorConfigSchema)]
   public class FSharpCodeFormatter : CodeFormatterBase<FSharpFormatSettingsKey>
   {
     private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;

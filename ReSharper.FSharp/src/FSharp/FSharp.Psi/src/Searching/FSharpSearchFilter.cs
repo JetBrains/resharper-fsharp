@@ -9,7 +9,7 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
-  [PsiComponent(Instantiation.DemandAnyThread)]
+  [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
   public sealed class FSharpSearchFilter : ISearchFilter
   {
     private readonly IFcsProjectProvider myFsProjectProvider;
