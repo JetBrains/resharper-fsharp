@@ -1,0 +1,99 @@
+﻿if true then
+      1||(0)
+      |> id
+else 1||(1)
+     |> id||(2)
+|> id||(3)
+
+if true then
+      1||(4)
+      |> id
+elif true then
+      1||(5)
+      |> id
+else 1||(6)
+      |> id||(7)
+|> id||(8)
+
+
+
+match true with
+| true ->
+      1||(9)
+      |> id||(10)
+| false ->
+      1||(11)
+      |> id||(12)
+
+match true with
+| true ->
+      1||(13)
+      |> id
+| false ->
+      1||(14)
+      |> id||(15)
+|> id||(16)
+
+
+
+1||(17)
+|> fun x -> x||(18)
+          |> id||(19)
+
+1||(20)
+|> (fun x -> x||(21)
+             |> id)||(22)
+
+1||(23)
+|> fun x -> (x||(24)
+             |> id)||(25)
+|> id||(26)
+
+
+
+[1]||(27)
+|> List.map (fun x ->
+      x||(28)
+      |> id)||(29)
+
+let f x y z = 0
+[1]||(30)
+|> f (fun x ->
+        x||(31)
+        |> id||(32)) 1||(33)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : int
+(4): ReSharper Parameter Name Hint: : int
+(5): ReSharper Parameter Name Hint: : int
+(6): ReSharper Parameter Name Hint: : int
+(7): ReSharper Parameter Name Hint: : int
+(8): ReSharper Parameter Name Hint: : int
+(9): ReSharper Parameter Name Hint: : int
+(10): ReSharper Parameter Name Hint: : int
+(11): ReSharper Parameter Name Hint: : int
+(12): ReSharper Parameter Name Hint: : int
+(13): ReSharper Parameter Name Hint: : int
+(14): ReSharper Parameter Name Hint: : int
+(15): ReSharper Parameter Name Hint: : int
+(16): ReSharper Parameter Name Hint: : int
+(17): ReSharper Parameter Name Hint: : int
+(18): ReSharper Parameter Name Hint: : int
+(19): ReSharper Parameter Name Hint: : int
+(20): ReSharper Parameter Name Hint: : int
+(21): ReSharper Parameter Name Hint: : int
+(22): ReSharper Parameter Name Hint: : int
+(23): ReSharper Parameter Name Hint: : int
+(24): ReSharper Parameter Name Hint: : int
+(25): ReSharper Parameter Name Hint: : int
+(26): ReSharper Parameter Name Hint: : int
+(27): ReSharper Parameter Name Hint: : int list
+(28): ReSharper Parameter Name Hint: : int
+(29): ReSharper Parameter Name Hint: : int list
+(30): ReSharper Parameter Name Hint: : int list
+(31): ReSharper Parameter Name Hint: : obj
+(32): ReSharper Parameter Name Hint: : obj
+(33): ReSharper Parameter Name Hint: : int

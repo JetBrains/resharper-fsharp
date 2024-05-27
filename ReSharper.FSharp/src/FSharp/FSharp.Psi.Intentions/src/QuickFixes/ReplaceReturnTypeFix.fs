@@ -49,7 +49,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         $"Change type of {name} to '{replacementTypeName}'"
 
     override this.IsAvailable _ =
-        if isNull binding || isNull binding.ReturnTypeInfo then false else
+        if isNull binding || mostOuterParentExpr :? ILambdaExpr || isNull binding.ReturnTypeInfo then false else
         if not (binding.HeadPattern :? IReferencePat) then false else
 
         // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.

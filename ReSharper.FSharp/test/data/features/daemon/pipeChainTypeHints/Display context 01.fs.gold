@@ -1,0 +1,19 @@
+﻿module A =
+    open System.IO
+
+    let f _ = new StreamReader("")
+
+    let _ = ""||(0)
+            |> f||(1)
+
+module B =
+    open A
+
+    let _ = ""||(2)
+            |> f||(3)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : string
+(1): ReSharper Parameter Name Hint: : StreamReader
+(2): ReSharper Parameter Name Hint: : string
+(3): ReSharper Parameter Name Hint: : StreamReader

@@ -2,10 +2,10 @@
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -13,7 +13,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util.Logging
 
@@ -24,22 +28,50 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode>>()
+    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode * bool>>()
 
     let showSameLineHints =
         match sameLinePipeHints with
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode>) =
-        if not (isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
+    let isApplicable binaryAppExpr =
+        isPredefinedInfixOpApp "|>" binaryAppExpr
 
-        let exprToAdorn = binaryAppExpr.LeftArgument
-        if isNull exprToAdorn then () else
+    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode * bool>) =
+        if not (isApplicable binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
-        if showSameLineHints || exprToAdorn.EndLine <> opExpr.StartLine then
-            context.Add(opExpr, exprToAdorn :> _)
+
+        let leftArgument = binaryAppExpr.LeftArgument
+        let rightArgument = binaryAppExpr.RightArgument
+
+        if isNull leftArgument then () else
+
+        if showSameLineHints || leftArgument.EndLine <> opExpr.StartLine then
+            context.Add(opExpr, leftArgument, true)
+
+        if isNull rightArgument || rightArgument :? IFromErrorExpr then () else
+
+        let isTopBinary =
+            let outermostParent = binaryAppExpr.GetOutermostParentExpressionFromItsReturn()
+
+            let binaryAppExpr =
+                outermostParent
+                |> BinaryAppExprNavigator.GetByArgument
+
+            if isNotNull binaryAppExpr then not (isApplicable binaryAppExpr) else
+
+            let binaryAppExpr =
+                PrefixAppExprNavigator.GetByArgumentExpression(outermostParent)
+                |> BinaryAppExprNavigator.GetByArgument
+
+            isNull binaryAppExpr || not (isApplicable binaryAppExpr)
+
+        if not isTopBinary then () else
+
+        if showSameLineHints || leftArgument.EndLine <> rightArgument.StartLine then
+            context.Add(opExpr, rightArgument, false)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -54,19 +86,57 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
 type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode)[]) =
+    let isRightPipeArgApplicable (expr: ITreeNode) (pipeResultType: FSharpType) =
+        let rec skipFunArgs (t: FSharpType) =
+            if t.IsFunctionType then skipFunArgs t.GenericArguments[1] else t
+
+        let expr = expr.As<IFSharpExpression>().IgnoreInnerParens()
+        let exprType = expr.TryGetFcsType()
+        if isNull exprType then false else
+
+        match expr with
+        // TODO: TryGetFcsType returns type of DotLambda return type
+        | :? IDotLambdaExpr -> exprType = pipeResultType
+        | _ ->
+        if not exprType.IsFunctionType || exprType.GenericArguments[1] <> pipeResultType then false else
+        if not (isUnit pipeResultType) then true else
+
+        let invokedRefExpr =
+            match expr with
+            | :? IReferenceExpr as refExpr ->
+                refExpr
+            | :? IPrefixAppExpr as expr ->
+                expr.InvokedReferenceExpression
+            | _ -> null
+
+        if isNull invokedRefExpr then true else
+        let returnType = invokedRefExpr.Reference.GetFcsSymbol() |> getReturnType
+        match returnType with
+        | Some t ->
+            // We know that the result of the pipe is unit.
+            // We want to get the very last returned value and make sure that it is not generic, but strictly unit.
+            skipFunArgs t
+            |> isUnit
+            |> not
+        | None -> false
+
+    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
         use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
-        for refExpr, exprToAdorn in exprs do
+        for refExpr, exprToAdorn, isLeft in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
             let symbolUse = refExpr.Reference.GetSymbolUse()
             if isNull symbolUse then () else
 
-            let _, fcsType = symbolUse.GenericArguments[0]
+            let _, fcsType = symbolUse.GenericArguments[if isLeft then 0 else 1]
+            let isApplicable = isLeft || isRightPipeArgApplicable exprToAdorn fcsType
+
+            if not isApplicable then () else
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
-            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(symbolUse.DisplayContext), range))
+            let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
+            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(displayContext), range))
 
         highlightingConsumer.CollectHighlightings()
 
@@ -91,7 +161,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
                 let visible, notVisible =
                     allHighlightings
-                    |> Array.partition (fun (_, exprToAdorn) ->
+                    |> Array.partition (fun (_, exprToAdorn, _) ->
                         exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
                     )
 

@@ -1,0 +1,13 @@
+﻿([ 1 ]||(0)
+ |> _.ToString()||(1))
+
+([ 1 ]||(2)
+ |> _.ToString())||(3)
+|> id||(4)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int list
+(1): ReSharper Parameter Name Hint: : string
+(2): ReSharper Parameter Name Hint: : int list
+(3): ReSharper Parameter Name Hint: : string
+(4): ReSharper Parameter Name Hint: : string

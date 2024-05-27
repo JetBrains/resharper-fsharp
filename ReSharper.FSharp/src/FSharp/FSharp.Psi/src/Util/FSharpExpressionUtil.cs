@@ -47,6 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var currentExpr = expression;
       while (true)
       {
+        currentExpr = currentExpr.IgnoreParentParens();
+
         if (MatchClauseListOwnerExprNavigator.GetByClauseExpression(currentExpr) is { } matchExpr)
         {
           currentExpr = matchExpr as IFSharpExpression;
@@ -63,6 +65,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if ((IfThenElseExprNavigator.GetByBranchExpression(currentExpr)) is {ElseExpr: { }} ifExpr)
         {
           currentExpr = ifExpr;
+          continue;
+        }
+
+        if (ElifExprNavigator.GetByBranchExpression(currentExpr) is {ElseExpr: { }} elifExpr)
+        {
+          currentExpr = elifExpr;
+          continue;
+        }
+
+        if (LambdaExprNavigator.GetByExpression(currentExpr) is LambdaExpr lambdaExpr)
+        {
+          currentExpr = lambdaExpr;
           continue;
         }
 
