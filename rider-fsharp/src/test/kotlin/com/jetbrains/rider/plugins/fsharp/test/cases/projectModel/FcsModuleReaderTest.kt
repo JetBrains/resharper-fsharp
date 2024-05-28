@@ -136,6 +136,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
+  @Mute("Temporary because of RIDER-20984")
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   fun testTypeInsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
@@ -188,6 +189,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
+  @Mute
   @TestEnvironment(solution = "ProjectReferencesCSharp")
   fun testTypeOutsideClassUnloadReload() {
     executeWithGold(testGoldFile) {

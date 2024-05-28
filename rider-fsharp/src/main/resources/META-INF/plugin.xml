@@ -45,6 +45,7 @@
     <code.cleanup.support language="F#" implementationClass="com.jetbrains.rider.actions.impl.cleanup.BackendCodeCleanupSupportPolicy" />
     <lang.psiStructureViewFactory language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderProtocolPsiStructureViewFactory" />
     <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
+    <navbar.members.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.navbar.FSharpNavBarMembersSupport"/>
     <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
     <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
     <configurationType implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfigurationType" />
