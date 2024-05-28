@@ -19,8 +19,8 @@ class FSharpScriptConsoleViewProvider : DotNetProfileConsoleViewProviderExtensio
   ): ProcessHandler {
     val project = executionEnvironment.project
     val fsiHost = FsiHost.getInstance(project)
-    val presentableCommandLineString = if (state is DebugProfileStateBase) state.createPresentableCommandLine()
-    else null
+    val presentableCommandLineString =
+      if (state is DebugProfileStateBase) state.createPresentableCommandLine() else null
 
     val fsiRunner = fsiHost.createConsoleRunner(
       "", executionEnvironment.project, executionEnvironment.executor, commandLine, presentableCommandLineString
