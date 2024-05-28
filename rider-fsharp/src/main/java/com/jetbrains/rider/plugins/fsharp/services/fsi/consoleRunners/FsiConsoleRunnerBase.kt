@@ -32,12 +32,13 @@ import javax.swing.BorderFactory
 abstract class FsiConsoleRunnerBase(
     project: Project,
     @Nls consoleTitle: String,
-    private val commandLine: GeneralCommandLine
+    private val commandLine: GeneralCommandLine,
+    private val presentableCommandLineString: String? = null
 ) :
     AbstractConsoleRunnerWithHistory<LanguageConsoleView>(
         project,
         consoleTitle,
-        commandLine.workDirectory.path
+        commandLine.workDirectory?.path ?: ""
     ) {
     val fsiHost = FsiHost.getInstance(project)
     val commandHistory = CommandHistory()
@@ -49,8 +50,7 @@ abstract class FsiConsoleRunnerBase(
     override fun createProcess() = commandLine.createProcess()
 
     override fun createProcessHandler(process: Process): OSProcessHandler {
-        val fsiProcessHandler =
-            FsiProcessHandler(fsiHost.project.lifetime, fsiInputOutputProcessor, process, commandLine.commandLineString)
+        val fsiProcessHandler = FsiProcessHandler(fsiHost.project.lifetime, fsiInputOutputProcessor, process, presentableCommandLineString ?: commandLine.commandLineString)
         val sandboxInfoUpdater = FsiSandboxInfoUpdater(fsiHost.project, consoleView.consoleEditor, commandHistory)
         fsiProcessHandler.addSandboxInfoUpdater(sandboxInfoUpdater)
         return fsiProcessHandler

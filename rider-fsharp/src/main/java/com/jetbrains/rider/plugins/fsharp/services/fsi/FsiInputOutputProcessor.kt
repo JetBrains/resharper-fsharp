@@ -11,7 +11,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSynta
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FsiOutputSyntaxHighlighter
 import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiConsoleRunnerBase
 
-class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
+class FsiInputOutputProcessor(val fsiRunner: FsiConsoleRunnerBase) {
   private var isInitialText = true
   private var nextOutputTextIsFirst = true
 

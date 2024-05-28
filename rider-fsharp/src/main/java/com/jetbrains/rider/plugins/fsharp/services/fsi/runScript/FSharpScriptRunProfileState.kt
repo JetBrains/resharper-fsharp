@@ -13,6 +13,7 @@ import com.jetbrains.rider.run.createRunCommandLine
 import com.jetbrains.rider.runtime.DotNetExecutable
 import com.jetbrains.rider.runtime.DotNetRuntime
 
+//TODO: unify in platform
 class FSharpScriptRunProfileState(
   private val dotNetExecutable: DotNetExecutable,
   private val dotNetRuntime: DotNetRuntime,
@@ -26,8 +27,7 @@ class FSharpScriptRunProfileState(
       val project = environment.project
       val profile = environment.runProfile as FSharpScriptConfiguration
       val fsiHost = FsiHost.getInstance(project)
-      val fsiRunner =
-        fsiHost.createConsoleRunner(profile.name, profile.scriptFile!!.path, project, environment.executor, commandLine)
+      val fsiRunner = fsiHost.createConsoleRunner(profile.name, project, environment.executor, commandLine)
       dotNetExecutable.onBeforeProcessStarted(environment, environment.runProfile, fsiRunner.processHandler)
 
       return DefaultExecutionResult(

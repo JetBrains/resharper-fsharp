@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi.runScript
 
 import com.intellij.execution.CantRunException
 import com.intellij.execution.configurations.RunProfileState
+import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.diagnostic.thisLogger
@@ -14,11 +15,13 @@ class FSharpScriptExecutorFactory : AsyncExecutorFactory {
   override suspend fun create(executorId: String, environment: ExecutionEnvironment, lifetime: Lifetime): RunProfileState {
     val project = environment.project
     val configuration = environment.runProfile as FSharpScriptConfiguration
-    val (dotNetExecutable, runtimeToExecute) = getFsiRunOptions(project, configuration)
+    val isDebug = executorId == DefaultDebugExecutor.EXECUTOR_ID
+    val (dotNetExecutable, runtimeToExecute) = getFsiRunOptions(project, configuration, isDebug)
 
     thisLogger().info("Configuration will be executed on ${runtimeToExecute.javaClass.name}")
     return when (executorId) {
       DefaultRunExecutor.EXECUTOR_ID -> FSharpScriptRunProfileState(dotNetExecutable, runtimeToExecute, environment)
+      DefaultDebugExecutor.EXECUTOR_ID -> runtimeToExecute.createDebugState(dotNetExecutable, environment)
       else -> throw CantRunException(RiderRunBundle.message("dialog.message.unsupported.executor.error", executorId))
     }
   }

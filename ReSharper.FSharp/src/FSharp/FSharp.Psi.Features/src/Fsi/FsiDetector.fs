@@ -20,7 +20,7 @@ open NuGet.Versioning
 
 let [<Literal>] defaultFsiName        = "fsi.exe"
 let [<Literal>] defaultAnyCpuFsiName  = "fsiAnyCpu.exe"
-let [<Literal>] coreFsiName = "fsi"
+let [<Literal>] coreFsiName = "fsi.dll"
 let [<Literal>] monoFsiName           = "fsharpi"
 let [<Literal>] monoAnyCpuMonoFsiName = "fsharpiAnyCpu"
 
@@ -65,7 +65,7 @@ type FsiTool =
 
     member x.GetFsiPath(useAnyCpu) =
         match x.Runtime with
-        | RdFsiRuntime.Core -> CoreFsiProvider.FsiPath
+        | RdFsiRuntime.Core -> x.Directory / coreFsiName
         | _ -> x.Directory / x.GetFsiName(useAnyCpu)
 
     member x.IsCustom = x == customTool
@@ -257,8 +257,6 @@ type CustomFsiProvider() =
 
 
 type CoreFsiProvider() =
-    static member val FsiPath = VirtualFileSystemPath.Parse("fsi", InteractionContext.SolutionContext)
-
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =
             if isNull solution then [] :> _ else
@@ -270,6 +268,6 @@ type CoreFsiProvider() =
             | toolset ->
 
             [| { Title = ".NET Core SDK " + toolset.Sdk.Version.ToString()
-                 Directory = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+                 Directory = toolset.Cli.SdkRootFolder / toolset.Sdk.FolderName / "FSharp"
                  Runtime = RdFsiRuntime.Core
                  ShadowCopyAllowed = true } |] :> _

@@ -25,6 +25,8 @@ class FsiProcessHandler(
   private val fsiProcessOutputListeners =
     mutableListOf<FsiSandboxInfoUpdater.FsiSandboxInfoUpdaterProcessOutputListener>()
 
+  val consoleRunner = fsiInputOutputProcessor.fsiRunner
+
   private val lifetime = LifetimeDefinition(parentLifetime)
 
   override fun isSilentlyDestroyOnClose(): Boolean = true
