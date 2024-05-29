@@ -1,5 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Tests.Features.IconProvider
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
@@ -20,9 +21,9 @@ type FSharpIconProviderTest() =
     [<Test>] member x.``Union case property 03 - internal``() = x.DoNamedTest()
     [<Test>] member x.``Union case class``() = x.DoNamedTest()
 
-    override x.DoTest(lifetime, _) =
+    override x.DoTest(lifetime, project: IProject) =
         let textControl = x.OpenTextControl(lifetime)
-        let declaration = TextControlToPsi.GetElementFromCaretPosition<IDeclaration>(x.Solution, textControl)
+        let declaration = TextControlToPsi.GetElementFromCaretPosition<IDeclaration>(project.GetSolution(), textControl)
         let declaredElement = declaration.DeclaredElement
 
         let declaredElement =

@@ -10,9 +10,6 @@ type InlineVarTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/inlineVar"
 
-    override x.DoTest(lifetime, project) =
-        base.DoTest(lifetime, project)
-
     // todo: remove parens
     [<Test>] member x.``Expr - If - Binary 01``() = x.DoNamedTest()
 

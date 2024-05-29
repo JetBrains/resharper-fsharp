@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
 open System.IO
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
@@ -19,7 +20,7 @@ type CSharpResolveTestBase(fileExtension) =
 
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
-    override x.DoTest(_, project: IProject) =
+    override x.DoTest(_: Lifetime, project: IProject) =
         x.Solution.GetPsiServices().Files.CommitAllDocuments()
         x.ExecuteWithGold(fun writer ->
             let projectFile = project.GetAllProjectFiles() |> Seq.exactlyOne

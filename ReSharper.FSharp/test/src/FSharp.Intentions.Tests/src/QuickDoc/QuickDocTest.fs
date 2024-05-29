@@ -22,9 +22,9 @@ type QuickDocTest() =
 
     override x.RelativeTestDataPath = "features/quickdoc"
 
-    override this.DoTest(lifetime, _) =
+    override this.DoTest(lifetime, project: IProject) =
         let textControl = this.OpenTextControl(lifetime)
-        let solution = this.Solution
+        let solution = project.GetSolution()
         let document = textControl.Document
 
         let createDataContext () =
