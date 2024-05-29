@@ -105,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool IsNotNullableValueOrReferenceType => false;
 
-    public bool AllowByRefLike => false;
+    public bool AllowsByRefLikeType => false;
 
     public bool HasTypeConstraints =>
       FcsConstraints.Any(constraint => constraint.IsCoercesToConstraint);
