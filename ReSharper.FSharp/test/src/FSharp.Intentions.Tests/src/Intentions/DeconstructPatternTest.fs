@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions
 
 open System.Linq
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
@@ -13,8 +14,8 @@ type DeconstructPatternTest() =
 
     override this.ExtraPath = "deconstruct"
 
-    override this.DoTest(lifetime, testProject) =
-        let popupMenu = this.Solution.GetComponent<TestWorkflowPopupMenu>()
+    override this.DoTest(lifetime: Lifetime, testProject: IProject) =
+        let popupMenu = testProject.GetSolution().GetComponent<TestWorkflowPopupMenu>()
         popupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ -> occurrences.FirstOrDefault())
         base.DoTest(lifetime, testProject)
 

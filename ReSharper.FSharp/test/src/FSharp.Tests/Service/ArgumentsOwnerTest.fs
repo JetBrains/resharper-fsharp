@@ -24,7 +24,7 @@ type ArgumentsOwnerTest() =
 
     override x.RelativeTestDataPath = "features/service/arguments"
 
-    override x.DoTest(lifetime, _) =
+    override x.DoTest(lifetime, _: IProject) =
         let textControl = x.OpenTextControl(lifetime)
         let fsFile = textControl.GetFSharpFile(x.Solution)
 

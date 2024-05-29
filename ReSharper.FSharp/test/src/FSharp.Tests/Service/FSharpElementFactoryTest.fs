@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System.Linq
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
@@ -23,7 +24,7 @@ type FSharpElementFactoryTest() =
         testAction <- action
         x.DoTestSolution Array.empty<string>
 
-    override x.DoTest(_, project: IProject) =
+    override x.DoTest(_: Lifetime, project: IProject) =
         let psiModule = project.GetPsiModules().Single()
         let elementFactory = languageService.CreateElementFactory(null, psiModule)
         testAction elementFactory

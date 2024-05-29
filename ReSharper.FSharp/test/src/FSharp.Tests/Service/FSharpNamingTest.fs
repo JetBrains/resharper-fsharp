@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Psi.Tree
@@ -58,7 +59,7 @@ type FSharpNamingTest() =
 
     [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()
 
-    override x.DoTest(lifetime, _) =
+    override x.DoTest(lifetime, _: IProject) =
         let textControl = x.OpenTextControl(lifetime)
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)
 

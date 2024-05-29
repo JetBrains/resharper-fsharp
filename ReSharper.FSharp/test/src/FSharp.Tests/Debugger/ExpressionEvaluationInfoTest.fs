@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Debugger
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
@@ -14,9 +15,9 @@ type ExpressionEvaluationInfoTest() =
 
     override x.RelativeTestDataPath = "features/debugger/evaluateExpression"
 
-    override x.DoTest(lifetime, _) =
+    override x.DoTest(lifetime, project: IProject) =
         let textControl = x.OpenTextControl(lifetime)
-        let expr = TextControlToPsi.GetElementFromCaretPosition<IFSharpExpression>(x.Solution, textControl)
+        let expr = TextControlToPsi.GetElementFromCaretPosition<IFSharpExpression>(project.GetSolution(), textControl)
         let textToEvaluate = FSharpExpressionEvaluationInfoProvider.GetTextToEvaluate(expr)
         x.ExecuteWithGold(fun writer ->
             writer.WriteLine(textToEvaluate)) |> ignore

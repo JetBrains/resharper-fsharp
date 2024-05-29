@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -37,7 +38,7 @@ type NameResolutionTest() =
 
     [<Test>] member x.``Module 01``() = x.DoNamedTest()
 
-    override x.DoTest(lifetime, _) =
+    override x.DoTest(lifetime, _: IProject) =
         let textControl = x.OpenTextControl(lifetime)
         let checkerService = x.ShellInstance.GetComponent<FcsCheckerService>()
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)
