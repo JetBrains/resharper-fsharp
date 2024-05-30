@@ -84,8 +84,6 @@ abstract class FsiConsoleRunnerBase(
         val historyEditor = consoleView.historyViewer
         historyEditor.settings.isLineMarkerAreaShown = true
         historyEditor.settings.isFoldingOutlineShown = true
-        historyEditor.settings.isLineNumbersShown = true
-        historyEditor.gutter.setLineNumberConverter(null)
         historyEditor.gutterComponentEx.isPaintBackground = true
 
         historyEditor.colorsScheme.setColor(EditorColors.GUTTER_BACKGROUND, JBColor(Gray.xF2, Gray.x41))
