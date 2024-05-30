@@ -3,6 +3,8 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.execution.console.LanguageConsoleImpl
 import com.intellij.execution.impl.ConsoleViewUtil
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LineNumberConverter
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
@@ -29,8 +31,21 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
     return null
   }
 
-  fun printInputText(text: String, outputType: ConsoleViewContentType) {
+  fun printInputText(text: String, outputType: ConsoleViewContentType, lineStart: Int) {
     ThreadingAssertions.assertEventDispatchThread()
+
+    val historyViewer = fsiRunner.consoleView.historyViewer
+    val linesCount = historyViewer.document.lineCount
+    val linesToAddCount = text.count { it == '\n' }
+
+    historyViewer.gutter.setLineNumberConverter(object : LineNumberConverter.Increasing {
+      override fun convert(p0: Editor, index: Int) = lineStart + (index - linesCount)
+
+      override fun convertLineNumberToString(editor: Editor, lineNumber: Int) =
+        if (lineNumber < linesCount || lineNumber > linesCount + linesToAddCount) null
+        else super.convertLineNumberToString(editor, lineNumber)
+    })
+
     printText(text + "\n", FsiIcons.COMMAND_MARKER, fSharpSyntaxHighlighter, outputType)
     EditorUtil.scrollToTheEnd(fsiRunner.consoleView.historyViewer)
 
