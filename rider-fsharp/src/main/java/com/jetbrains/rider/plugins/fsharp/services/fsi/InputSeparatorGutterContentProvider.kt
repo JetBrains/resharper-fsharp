@@ -14,6 +14,10 @@ class InputSeparatorGutterContentProvider(isLineRelationshipComputable: Boolean)
     return separatorLines.contains(actualEditorLine)
   }
 
+  override fun documentCleared(editor: Editor) {
+    separatorLines.clear()
+  }
+
   fun addLineSeparator(line: Int) {
     separatorLines.add(line)
   }
