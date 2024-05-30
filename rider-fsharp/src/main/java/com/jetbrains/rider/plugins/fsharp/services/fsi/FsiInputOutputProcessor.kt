@@ -34,17 +34,19 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunnerBase) {
   fun printInputText(text: String, outputType: ConsoleViewContentType, lineStart: Int) {
     ThreadingAssertions.assertEventDispatchThread()
 
+    (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
     val historyViewer = fsiRunner.consoleView.historyViewer
-    // If the console was cleared, we won't be able to add a separator before the input
-    // Since the line numbers take separator into account, in such a case we assume linesCount = 1
+    // In case the console was cleared before the input, a separator won't be added.
+    // In such a case we assume linesCount = 1
     val linesCount = maxOf(historyViewer.document.lineCount, 1)
     val linesToAddCount = 1 + text.count { it == '\n' }
 
     historyViewer.settings.isLineNumbersShown = true
     historyViewer.gutter.setLineNumberConverter(object : LineNumberConverter.Increasing {
       override fun convert(p0: Editor, index: Int) = lineStart + (index - linesCount)
+      override fun getMaxLineNumber(editor: Editor) = linesToAddCount
       override fun convertLineNumberToString(editor: Editor, lineNumber: Int) =
-        if (lineNumber < linesCount || lineNumber >= linesCount + linesToAddCount) null
+        if (lineNumber < linesCount || lineNumber > linesCount + linesToAddCount - 1) null
         else super.convertLineNumberToString(editor, lineNumber)
     })
 
