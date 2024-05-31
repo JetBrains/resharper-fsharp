@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
 open System
 open System.Collections.Generic
+open System.Linq
 open FSharp.Compiler.Text
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp
@@ -63,4 +64,4 @@ type FSharpBreakpointVariantsProvider() =
                             isMultiMethodBreakpoint = true)
                 | _ -> ()
 
-            result.Values :> _
+            result.Values |> CollectionUtil.ToIReadOnlyList
