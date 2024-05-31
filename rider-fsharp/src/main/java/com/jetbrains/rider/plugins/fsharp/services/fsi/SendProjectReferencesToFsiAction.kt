@@ -20,7 +20,7 @@ class SendProjectReferencesToFsiAction : ProjectViewActionBase() {
       val text = references.joinToString("\n") { "#r @\"$it\"" } +
         "\n" +
         "# 1 \"stdin\"\n;;\n"
-      fsiHost.sendToFsi(text, text, false)
+      fsiHost.sendToFsi(text, text)
     }
   }
 

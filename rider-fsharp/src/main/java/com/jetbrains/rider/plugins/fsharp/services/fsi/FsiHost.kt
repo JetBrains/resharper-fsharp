@@ -155,7 +155,7 @@ class FsiHost(val project: Project, val coroutineScope: CoroutineScope) : Lifeti
       "# 1 \"stdin\"\n;;\n"
 
     coroutineScope.launch {
-      sendToFsi(visibleText, fsiText, debug)
+      sendToFsi(visibleText, fsiText, textLineStart + 1)
       withContext(Dispatchers.EDT) {
         if (!hasSelection && moveCaretOnSendLine.value)
           editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
@@ -168,12 +168,12 @@ class FsiHost(val project: Project, val coroutineScope: CoroutineScope) : Lifeti
     }
   }
 
-  suspend fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
+  suspend fun sendToFsi(visibleText: String, fsiText: String, lineStart: Int = 1) {
     val fsiRunner = synchronized(lockObject) {
       if (lastFocusedSession?.isValid() == true) lastFocusedSession
       else null
     } ?: tryCreateDefaultConsoleRunner()
-    fsiRunner?.sendText(visibleText, fsiText)
+    fsiRunner?.sendText(visibleText, fsiText, lineStart)
   }
 
   fun resetFsiDefaultConsole() {

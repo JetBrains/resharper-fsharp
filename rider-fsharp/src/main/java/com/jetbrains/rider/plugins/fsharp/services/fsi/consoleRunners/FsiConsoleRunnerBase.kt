@@ -92,7 +92,7 @@ abstract class FsiConsoleRunnerBase(
     override fun createExecuteActionHandler(): ProcessBackedConsoleExecuteActionHandler {
         return object : ProcessBackedConsoleExecuteActionHandler(processHandler, false) {
             override fun runExecuteAction(consoleView: LanguageConsoleView) {
-                val visibleText = consoleView.consoleEditor.document.text
+                val visibleText = consoleView.consoleEditor.document.text.removeSuffix(";;")
                 if (visibleText.isBlank()) return
 
                 val fsiText = "\n$visibleText\n# 1 \"stdin\"\n;;\n"
@@ -122,11 +122,11 @@ abstract class FsiConsoleRunnerBase(
     fun getRunContentDescriptor() = contentDescriptor
     fun isValid() = !processHandler.isProcessTerminated && !processHandler.isProcessTerminating
 
-    fun sendText(visibleText: String, fsiText: String) {
+    fun sendText(visibleText: String, fsiText: String, lineStart: Int = 1) {
         UIUtil.invokeLaterIfNeeded {
             inputSeparatorGutterContentProvider.addLineSeparator(consoleView.historyViewer.document.lineCount)
 
-            fsiInputOutputProcessor.printInputText(visibleText, ConsoleViewContentType.USER_INPUT)
+            fsiInputOutputProcessor.printInputText(visibleText, ConsoleViewContentType.USER_INPUT, lineStart)
 
             commandHistory.addEntry(CommandHistory.Entry(visibleText, fsiText))
 
