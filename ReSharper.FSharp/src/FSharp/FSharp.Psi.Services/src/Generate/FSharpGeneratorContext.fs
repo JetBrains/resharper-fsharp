@@ -74,6 +74,6 @@ type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInst
         member x.DisplayContext = mfvInstance.DisplayContext
         member x.Substitution = mfvInstance.Substitution
         member x.AddTypes = x.AddTypes
-        member x.IsOverride = true
+        member x.IsOverride = not (element.ContainingType :? IInterface)
 
     override x.ToString() = element.ToString()

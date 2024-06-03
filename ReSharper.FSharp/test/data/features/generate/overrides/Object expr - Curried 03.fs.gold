@@ -1,22 +1,16 @@
 ﻿Provided elements:
- 0: M(System.Int32,System.Int32,System.String,System.Double,System.Double):System.Void
- 1: M(System.Int32,System.Int32,System.Object,System.Double,System.Double):System.Void
- 2: M(e,f,System.String,g,h):System.Void
- 3: M(a,b,System.Object,c,d):System.Void
- 4: ToString():System.String
- 5: Equals(System.Object):System.Boolean
- 6: GetHashCode():System.Int32
- 7: Finalize():System.Void
+ 0: M(System.Int32,System.Double,System.Double):System.Void
+ 1: ToString():System.String
+ 2: Equals(System.Object):System.Boolean
+ 3: GetHashCode():System.Int32
+ 4: Finalize():System.Void
 
 // ${KIND:Overrides}
-// ${SELECT0:M(System.Int32,System.Int32,System.Object,System.Double,System.Double):System.Void}
+// ${SELECT0:M(System.Int32,System.Double,System.Double):System.Void}
 
 type T() =
-    abstract M: int * int -> string -> double * double -> unit
-    default this.M(i1, i2) (s: string) (d1, d2) = ()
-
-    abstract M: int * int -> obj -> double * double -> unit
-    default this.M(i1, i2) (o: obj) (d1, d2) = ()
+    abstract M: int -> double * double -> unit
+    default this.M i1 (d1, d2) = ()
 
 { new T() with 
-  override this.M(var0: int, var1: int) (var2: obj) (var3: double, var4: double): unit = {selstart}failwith "todo"{selend} }
+  override this.M var0 (var1, var2) = {selstart}base.M var0 (var1, var2){selend} }

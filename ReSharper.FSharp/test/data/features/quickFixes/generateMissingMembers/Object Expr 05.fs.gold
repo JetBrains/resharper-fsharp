@@ -1,4 +1,4 @@
-module Module
+﻿module Module
 
 type Base() =
     abstract P1: int

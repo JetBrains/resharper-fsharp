@@ -1,4 +1,4 @@
-Provided elements:
+﻿Provided elements:
  0: Dispose():System.Void
 
 // ${KIND:Overrides}
@@ -7,4 +7,4 @@ Provided elements:
 open System
 
 { new IDisposable with 
-  override this.Dispose() = {selstart}failwith "todo"{selend} }
+  member this.Dispose() = {selstart}failwith "todo"{selend} }

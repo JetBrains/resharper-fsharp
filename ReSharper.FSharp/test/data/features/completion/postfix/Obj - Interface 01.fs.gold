@@ -6,5 +6,5 @@ type IBase =
     abstract M: System.Text.StringBuilder -> unit
 
 { new IBase with
-  override this.M(var0: int): unit = failwith "todo"{caret}
-  override this.M(var0: System.Text.StringBuilder): unit = failwith "todo" }
+  member this.M(var0: int): unit = failwith "todo"{caret}
+  member this.M(var0: System.Text.StringBuilder): unit = failwith "todo" }

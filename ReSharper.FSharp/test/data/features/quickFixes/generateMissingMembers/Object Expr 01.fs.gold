@@ -1,6 +1,6 @@
-module Module
+﻿module Module
 
 open System
 
 { new IDisposable with 
-  override this.Dispose() = {selstart}failwith "todo"{selend} }
+  member this.Dispose() = {selstart}failwith "todo"{selend} }
