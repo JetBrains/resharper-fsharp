@@ -115,7 +115,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
         AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let addMethods (ns: INamespace) =
-        let addExtensionMethods (methodsIndex: IExtensionMethodsIndex) =
+        let addExtensionMethods (methodsIndex: IExtensionMembersIndex) =
             if isNull methodsIndex then () else
 
             for extensionMethodProxy in methodsIndex.Lookup() do
@@ -133,7 +133,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
         for extensionMethodsIndex in ns.SourceExtensionMethods do
             addExtensionMethods extensionMethodsIndex
 
-        addExtensionMethods ns.CompiledExtensionMethods
+        addExtensionMethods ns.CompiledExtensionMembers
 
     while namespaceQueue.Count > 0 do
         let ns = namespaceQueue.Dequeue()

@@ -613,7 +613,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if isNull typeElement then false else
 
             typeElement.EnumerateParts()
-            |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMethodInfos))
+            |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
 
         let customAttributes = mkCustomAttributes typeElement
         [ yield! customAttributes

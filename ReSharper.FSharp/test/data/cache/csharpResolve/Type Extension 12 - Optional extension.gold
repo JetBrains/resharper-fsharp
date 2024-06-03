@@ -9,7 +9,7 @@
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Cannot access internal method 'Method(string)' here
-(1): ReSharper Underlined Error Highlighting: The property 'Module.Prop' cannot be used in this context because the 'get' accessor is inaccessible
+(1): ReSharper Underlined Error Highlighting: Cannot access internal property 'Prop' here
 M:Module.Method(System.String)
 M:Module.Method(System.String)
 P:Module.Prop
