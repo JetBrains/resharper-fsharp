@@ -271,6 +271,7 @@ tasks {
   val writeNuGetConfig = create("writeNuGetConfig") {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     group = riderFSharpTargetsGroup
+    inputs.property("platformPath") { intellijPlatform.platformPath.toString() }
     outputs.file(nugetConfigPath)
     doLast {
       nugetConfigPath.writeTextIfChanged(
