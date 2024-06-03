@@ -61,7 +61,7 @@ type GenerateMatchExprPatternsBehavior(info) =
             let value, nodes, _ = MatchTree.ofMatchExpr matchExpr
 
             let deconstructions = OneToListMap()
-            MatchTree.markToLevelDeconstructions deconstructions value
+            MatchTree.markTopLevelDeconstructions deconstructions value
 
             MatchTree.generateClauses matchExpr value nodes deconstructions
 

@@ -2729,6 +2729,7 @@ and
 array
 as
 assert
+b
 base
 begin
 bigint

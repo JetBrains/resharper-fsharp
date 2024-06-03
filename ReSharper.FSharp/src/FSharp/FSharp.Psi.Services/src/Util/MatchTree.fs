@@ -5,6 +5,7 @@ open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil.ParentTraversal
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
@@ -124,6 +125,9 @@ and MatchNode =
 
         | (MatchTest.ListCons, [node1; node2]), _ ->
             $"({string node1} :: {string node2})"
+
+        | (MatchTest.Or, [node1; node2]), _ ->
+            $"({string node1}) | ({string node2})"
 
         | _ -> "other case"
 
@@ -1179,9 +1183,12 @@ let ofMatchClause (value: MatchValue) (matchClause: IMatchClause) =
     let deconstructions = OneToListMap()
     getMatchPattern deconstructions value false matchClause.Pattern
 
-let ofMatchExpr (matchExpr: IMatchExpr) =
+let getMatchValue (matchExpr: IMatchExpr) =
     let matchType = getMatchExprMatchType matchExpr
-    let matchValue = { Type = matchType; Path = [] }
+    { Type = matchType; Path = [] }
+
+let ofMatchExpr (matchExpr: IMatchExpr) =
+    let matchValue = getMatchValue matchExpr
 
     let matchNodes = List()
     let deconstructions = OneToListMap()
@@ -1273,7 +1280,6 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
     while MatchNode.increment deconstructions matchExpr true node do
         tryAddClause node
 
-
     let tempMatchClause = ModificationUtil.AddChild(matchExpr, bindContext.Factory.CreateMatchClause())
 
     for fcsEntity in bindContext.SeenTypes do
@@ -1297,11 +1303,10 @@ let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
     let newClauses = TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild) |> Seq.toArray
     LowLevelModificationUtil.ReplaceChildRange(tempMatchClause, tempMatchClause, newClauses)
 
-
     lastClause |> Option.iter (moveSubsequentCommentToMatchClause matchExpr)
 
 
-let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =
+let markTopLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =
     deconstructions.Add(value.Path, Deconstruction.InnerPatterns)
 
     match value.Type with
@@ -1314,3 +1319,42 @@ let markToLevelDeconstructions (deconstructions: Deconstructions) (value: MatchV
 
     | _ ->
         ()
+
+let rec tryNavigatePatternPath (path: PatternParentTraverseStep list) (node: MatchNode) =
+    let rec tryGetListItem node index =
+        if index < 0 then None else
+        if index = 0 then Some node else
+
+        match node.Pattern with
+        | MatchTest.ListCons, [_; tail] -> tryGetListItem tail (index - 1)
+        | _ -> None
+
+    match node.Pattern, path with
+    | _, [] -> Some node
+
+    | (MatchTest.Union _, [{ Pattern = (MatchTest.UnionCase, fieldNodes) }]), PatternParentTraverseStep.ParameterOwner _ :: path ->
+        match fieldNodes, path with
+        | fieldNode :: _, [] -> Some fieldNode
+        | [node], _ -> tryNavigatePatternPath path node 
+        | _ -> None
+
+    | (MatchTest.Tuple false, nodes), PatternParentTraverseStep.Tuple(index, _) :: path
+    | (MatchTest.Or, nodes), PatternParentTraverseStep.Or(index, _) :: path
+    | (MatchTest.And, nodes), PatternParentTraverseStep.And(index, _) :: path
+    | (MatchTest.ListCons, nodes), PatternParentTraverseStep.ListCons(index, _) :: path ->
+        List.tryItem index nodes |> Option.bind (tryNavigatePatternPath path)
+
+    | (MatchTest.ListCons, _), PatternParentTraverseStep.List(index, _) :: path ->
+        tryGetListItem node index |> Option.bind (tryNavigatePatternPath path)
+
+    // | (MatchTest.Record, fieldNodes), PatternParentTraverseStep.Record _ :: PatternParentTraverseStep.Field(name, _) :: _ ->
+    //     let matchNodeOption =
+    //         fieldNodes |> List.tryFind (fun node ->
+    //             match node.Pattern with
+    //             | MatchTest.Named(Some testName), _ -> testName = name
+    //             | _ -> false
+    //         )
+    //     None
+
+    | _ -> None
+    

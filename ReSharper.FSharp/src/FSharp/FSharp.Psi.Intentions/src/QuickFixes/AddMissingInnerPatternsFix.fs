@@ -78,7 +78,7 @@ type AddMissingPatternsFix(warning: MatchIncompleteWarning) =
 
     override this.GetGenerationDeconstructions(value, _) =
         let deconstructions = OneToListMap()
-        markToLevelDeconstructions deconstructions value
+        markTopLevelDeconstructions deconstructions value
         deconstructions
 
     override this.Text = "Add missing patterns"

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open System
 open System.Linq.Expressions
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -648,3 +649,35 @@ type FSharpSelectionCompletionTest() =
     [<Test>] member x.``CE - custom operation - not available - 02 if for`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 03 use`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - not available - 04 let nested`` () = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpCompletionListTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/list"
+
+    override x.TestType = CodeCompletionTestType.List
+
+    override this.ItemSelector =
+            Func<_, _>(fun lookupItem -> lookupItem :? IAspectLookupItem<FSharpNameSuggestionInfo>)
+
+    [<Test>] member x.``Naming - Pat - As - IsInst 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - As - IsInst 02``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - List - Cons 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - List - Cons 02``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - List - Cons 03``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Naming - Pat - List - Cons 04``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Naming - Pat - List - Cons 05``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - List 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - List 02``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - Or 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - Or 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Naming - Pat - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat - Tuple 03``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Pat 02``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Type parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Naming - Type parameter 02``() = x.DoNamedTest()

@@ -1,4 +1,4 @@
-﻿# 47 ITEMS #
+﻿# 49 ITEMS #
 
 AutoOpenAttribute
 Choice1Of2    Choice<'T1,'T2>
@@ -40,11 +40,13 @@ OptimizedClosures
 Option
 OptionalArgumentAttribute
 ValueOption
++ o
 obj
+objects
 option
-+ or
+or
 outref
-+ override
+override
 ---- FULL EVALUATION ----
 IntrinsicOperators (in Microsoft.FSharp.Core.LanguagePrimitives)
 NullableOperators (in Microsoft.FSharp.Linq)
