@@ -18,7 +18,7 @@ type  ExtensionAttributeAnalyzer() =
 
     let mayHaveExtensions (typeElement: TypeElement) =
         typeElement.EnumerateParts()
-        |> Seq.exists (fun p -> p.ExtensionMethodInfos.Length > 0)
+        |> Seq.exists (fun p -> p.ExtensionMemberInfos.Length > 0)
 
     let isExtension attr =
         FSharpAttributesUtil.resolvesToType PredefinedType.EXTENSION_ATTRIBUTE_CLASS attr

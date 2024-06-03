@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -16,21 +17,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class ModulePartBase<T> : FSharpTypePart<T>, IModulePart
     where T : class, IModuleDeclaration
   {
-    private ExtensionMethodInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
+    private ExtensionMemberInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<ExtensionMemberInfo>.Instance;
     
     protected ModulePartBase([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, shortName, memberDecoration, 0, cacheBuilder)
     {
-      var extensionMemberInfos = new LocalList<ExtensionMethodInfo>();
+      var extensionMemberInfos = new LocalList<ExtensionMemberInfo>();
 
       foreach (var fsDecl in EnumerateExtensionMembers(declaration))
       {
         // todo: use candidate type
         var offset = fsDecl.GetTreeStartOffset().Offset;
         var sourceName = fsDecl.SourceName;
-        var extensionMethodInfo = new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, sourceName, this);
-        extensionMemberInfos.Add(extensionMethodInfo);
+        var extensionMemberInfo = new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, sourceName, FSharpExtensionMemberKind.FSharpExtensionMember, this);
+        extensionMemberInfos.Add(extensionMemberInfo);
       }
 
       FSharpExtensionMemberInfos = extensionMemberInfos.ToArray();
@@ -65,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       writer.WriteOftenSmallPositiveInt(FSharpExtensionMemberInfos.Length);
       foreach (var info in FSharpExtensionMemberInfos)
-        info.Write(writer);
+        info.WriteWithoutKind(writer);
     }
 
     protected ModulePartBase(IReader reader) : base(reader)
@@ -74,13 +75,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (extensionMemberCount == 0)
         return;
 
-      var methods = new ExtensionMethodInfo[extensionMemberCount];
+      var methods = new ExtensionMemberInfo[extensionMemberCount];
       for (var i = 0; i < extensionMemberCount; i++)
-        methods[i] = new ExtensionMethodInfo(reader, this);
+        methods[i] = new ExtensionMemberInfo(reader, FSharpExtensionMemberKind.FSharpExtensionMember, this);
       FSharpExtensionMemberInfos = methods;
     }
 
-    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMethodInfo info)
+    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)
     {
       if (FSharpExtensionMemberInfos.Length > 0 && GetDeclaration() is { } decl)
         foreach (var fsDecl in EnumerateExtensionMembers(decl))
@@ -103,8 +104,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.NONE;
 
-    public override ExtensionMethodInfo[] ExtensionMethodInfos =>
-      ArrayModule.Append(CSharpExtensionMethodInfos, FSharpExtensionMemberInfos);
+    public override ExtensionMemberInfo[] ExtensionMemberInfos =>
+      ArrayModule.Append(CSharpExtensionMemberInfos, FSharpExtensionMemberInfos);
 
     public override MemberDecoration Modifiers
     {

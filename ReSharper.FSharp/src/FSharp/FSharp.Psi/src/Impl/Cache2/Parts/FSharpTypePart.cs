@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   public abstract class FSharpTypePart<T> : TypePartImplBase<T>, IFSharpTypePart
     where T : class, IFSharpTypeElementDeclaration
   {
-    public ExtensionMethodInfo[] CSharpExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
+    public ExtensionMemberInfo[] CSharpExtensionMemberInfos { get; } = EmptyArray<ExtensionMemberInfo>.Instance;
     public string SourceName { get; }
 
     protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         attrNames.Add(cacheBuilder.Intern(attr.GetShortName()));
       AttributeClassNames = attrNames.ToArray();
 
-      var methods = new LocalList<ExtensionMethodInfo>();
+      var methods = new LocalList<ExtensionMemberInfo>();
       foreach (var member in declaration.MemberDeclarations)
       {
         // There are two interesting scenarios:
@@ -49,17 +49,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           continue;
 
         var offset = member.GetTreeStartOffset().Offset;
-        methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName, this));
+        
+        methods.Add(new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName, ExtensionMemberKind.ExtensionMethod, this));
       }
 
       if (methods.IsEmpty())
         return;
 
-      CSharpExtensionMethodInfos = methods.ToArray();
+      CSharpExtensionMemberInfos = methods.ToArray();
     }
 
-    public override ExtensionMethodInfo[] ExtensionMethodInfos =>
-      CSharpExtensionMethodInfos;
+    public override ExtensionMemberInfo[] ExtensionMemberInfos =>
+      CSharpExtensionMemberInfos;
 
     [NotNull]
     public TypePart GetFirstPart()
@@ -83,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return part;
     }
 
-    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMethodInfo info)
+    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)
     {
       var typeElement = TypeElement;
       if (typeElement == null)
@@ -117,10 +118,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (extensionMethodCount == 0)
         return;
 
-      var methods = new ExtensionMethodInfo[extensionMethodCount];
+      var methods = new ExtensionMemberInfo[extensionMethodCount];
       for (var i = 0; i < extensionMethodCount; i++)
-        methods[i] = new ExtensionMethodInfo(reader, this);
-      CSharpExtensionMethodInfos = methods;
+        methods[i] = new ExtensionMemberInfo(reader, this);
+      CSharpExtensionMemberInfos = methods;
     }
 
     protected override void Write(IWriter writer)
@@ -130,8 +131,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteUShort(Modifiers.ToRawValue());
       writer.WriteStringArray(AttributeClassNames);
 
-      writer.WriteOftenSmallPositiveInt(ExtensionMethodInfos.Length);
-      foreach (var info in ExtensionMethodInfos)
+      writer.WriteOftenSmallPositiveInt(ExtensionMemberInfos.Length);
+      foreach (var info in CSharpExtensionMemberInfos)
         info.Write(writer);
     }
 
