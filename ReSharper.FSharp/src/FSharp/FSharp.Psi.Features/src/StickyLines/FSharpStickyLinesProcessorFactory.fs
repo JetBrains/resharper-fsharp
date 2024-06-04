@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StickyLines
 
-open JetBrains.RdBackend.Common.Features.StickyLines.Processor
+open JetBrains.ReSharper.Feature.Services.StickyLines.Processor
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
