@@ -42,6 +42,20 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   )
   fun `csvProvider - units of measure`() = doTest("Library")
 
+  @Test(description = "RIDER-101544")
+  @TestEnvironment(
+    solution = "SwaggerProviderCSharp",
+    sdkVersion = SdkVersion.DOT_NET_6
+  )
+  fun `srtp analysis`() {
+    withOpenedEditor(project, "SwaggerProviderLibrary/SwaggerProvider.fs", "SwaggerProvider.fs") {
+      waitForDaemon()
+      executeWithGold(testGoldFile) {
+        dumpSevereHighlighters(it)
+      }
+    }
+  }
+
   private fun doTest(fileName: String) {
     withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
       waitForDaemon()
