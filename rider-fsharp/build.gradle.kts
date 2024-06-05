@@ -251,6 +251,7 @@ tasks {
   val writeDotNetSdkPathProps = create("writeDotNetSdkPathProps") {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     group = riderFSharpTargetsGroup
+    inputs.property("platformPath") { intellijPlatform.platformPath.toString() }
     outputs.file(dotNetSdkPathPropsPath)
     doLast {
       dotNetSdkPathPropsPath.writeTextIfChanged(
