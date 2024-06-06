@@ -13,8 +13,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.TextControl
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPath, sourceFile: IPsiSourceFile,
         checkerService: FcsCheckerService, symbolsCache: IFcsResolvedSymbolsCache) =

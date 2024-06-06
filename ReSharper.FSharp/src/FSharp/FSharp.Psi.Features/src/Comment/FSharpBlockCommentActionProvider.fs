@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Comment
 
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Comment
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -18,9 +19,9 @@ type FSharpBlockCommentActionProvider() =
 
         member x.GetBlockComment(token) =
             if token.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
-                TextRange(token.GetDocumentStartOffset().Offset, token.GetDocumentEndOffset().Offset)
+                token.GetDocumentRange()
             else
-                TextRange.InvalidRange
+                DocumentRange.InvalidRange
 
         member x.IsAvailable(_, _, disableAllProviders) =
             disableAllProviders <- false
@@ -31,8 +32,8 @@ type FSharpBlockCommentActionProvider() =
             if tokenType == FSharpTokenType.LINE_COMMENT then position else
 
             if tokenType == FSharpTokenType.WHITESPACE || tokenType == FSharpTokenType.NEW_LINE ||
-               tokenType == FSharpTokenType.BLOCK_COMMENT then token.GetDocumentStartOffset().Offset else
+               tokenType == FSharpTokenType.BLOCK_COMMENT then token.GetDocumentStartOffset() else
 
-            if position = token.GetDocumentStartOffset().Offset then position else
+            if position = token.GetDocumentStartOffset() then position else
 
-            token.GetDocumentEndOffset().Offset
+            token.GetDocumentEndOffset()

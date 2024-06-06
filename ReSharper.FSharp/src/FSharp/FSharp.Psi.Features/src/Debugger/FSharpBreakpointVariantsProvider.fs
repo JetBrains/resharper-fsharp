@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.Text
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -38,11 +39,11 @@ type FSharpBreakpointVariantsProvider() =
             | Some parseResults ->
 
             let document = file.ToSourceFile().Document
-            let lineStart = document.GetLineStartOffset(docLine line)
-            let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine line)
+            let lineStart = document.GetLineStartDocumentOffset(docLine line)
+            let lineEnd = document.GetLineEndDocumentOffsetWithLineBreak(docLine line)
 
             let result = Dictionary<range, IBreakpoint>()
-            for token in fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd))) do
+            for token in fsFile.FindTokensAt(fsFile.Translate(DocumentRange(&lineStart, &lineEnd))) do
                 let documentEndOffset = token.GetDocumentEndOffset()
                 let pos = getPosFromDocumentOffset documentEndOffset
                 match parseResults.ValidateBreakpointLocation(pos) with
@@ -53,8 +54,8 @@ type FSharpBreakpointVariantsProvider() =
                     let endOffset = getEndOffset document range
 
                     let text =
-                        let breakpointText = document.GetText(TextRange(startOffset, Math.Min(lineEnd, endOffset)))
-                        if endOffset > lineEnd then breakpointText + multilineSuffix else breakpointText
+                        let breakpointText = document.GetText(TextRange(startOffset, Math.Min(lineEnd.Offset, endOffset)))
+                        if endOffset > lineEnd.Offset then breakpointText + multilineSuffix else breakpointText
 
                     // Multi-method breakpoints allow us to set up multiple breakpoints across multiple methods if they
                     // all point to the same place in the source code. This is the case e.g. for async CE (since there

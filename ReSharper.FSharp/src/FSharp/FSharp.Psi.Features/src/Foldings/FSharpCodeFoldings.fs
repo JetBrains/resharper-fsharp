@@ -48,7 +48,7 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
         getOutliningRanges lines parseTree
         |> Seq.distinctBy (fun x -> x.CollapseRange.StartLine)
         |> Seq.iter (fun x ->
-            let textRange = getTextRange document x.CollapseRange
+            let textRange = getDocumentRange document x.CollapseRange
             if textRange.IsEmpty then logger.Warn(sprintf "Empty folding: %O %A" textRange x) else
 
             let placeholder =
@@ -57,15 +57,14 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
                 | _ ->
 
                 let line = (docLine x.CollapseRange.StartLine).Minus1()
-                let lineStart = document.GetLineStartOffset(line)
-                let lineEnd = document.GetLineEndOffsetNoLineBreak(line)
-                match TextRange(lineStart, lineEnd).Intersect(&textRange) with
-                | range when not range.IsEmpty -> document.GetText(range) + " ..."
+                let lineStart = document.GetLineStartDocumentOffset(line)
+                let lineEnd = document.GetLineEndDocumentOffsetNoLineBreak(line)
+                match DocumentRange(&lineStart, &lineEnd).Intersect(&textRange) with
+                | range when not range.IsEmpty -> range.GetText() + " ..."
                 | _ -> " ..."
 
             let highlightingId = getFoldingAttrId x.Scope
-            let documentRange = DocumentRange(document, textRange)
-            context.AddDefaultPriorityFolding(highlightingId, documentRange, placeholder))
+            context.AddDefaultPriorityFolding(highlightingId, textRange, placeholder))
 
     interface ICodeFoldingProcessor with
         member x.InteriorShouldBeProcessed(_,_) = false
