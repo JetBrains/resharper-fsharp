@@ -498,7 +498,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if shouldAddIndent then
             for line in lBracketLine + 1 .. lastLine do
-                document.InsertText(document.GetLineStartOffset(docLine line), " ")
+                document.InsertText(document.GetLineStartDocumentOffset(docLine line), " ")
 
         let newCaretOffset =
             if isAtLeftBracket then offset + 1 else
@@ -618,7 +618,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
-                let offset = selection.StartOffset
+                let offset = selection.StartOffset.Offset
                 offset > 0 && x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1))
 
         if not isAvailable then false else
@@ -654,7 +654,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
-                let offset = selection.StartOffset
+                let offset = selection.StartOffset.Offset
                 if offset <= 0 then false else
 
                 if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
@@ -1499,7 +1499,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
-                let offset = selection.StartOffset
+                let offset = selection.StartOffset.Offset
                 if not (offset > 0 && x.GetCachingLexer(textControl, &lexer)) then false else
 
                 if not (lexer.FindTokenAt(offset - 1)) then false else
@@ -1633,13 +1633,14 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if isNull docCommentBlockNode || not docCommentBlockNode.IsSingleLine then true else
 
-        let docCommentBlockOffset = docCommentBlockNode.GetTreeStartOffset().Offset
-        let coords = document.GetCoordsByOffset(docCommentBlockOffset)
+        let docCommentBlockOffset = docCommentBlockNode.GetDocumentStartOffset()
+        let coords = docCommentBlockOffset.ToDocumentCoords()
         let docCommentBlockLine = coords.Line
 
         let newLine = x.GetNewLineText(textControl)
-        let lineStart = document.GetLineStartOffset(docCommentBlockLine)
-        let indent = document.GetText(TextRange(lineStart, docCommentBlockOffset))
+        let lineStart = document.GetLineStartDocumentOffset(docCommentBlockLine)
+        let range = DocumentRange(&lineStart, &docCommentBlockOffset)
+        let indent = range.GetText()
         let templateLinePrefix = indent + "/// "
 
         let struct(template, caretOffset) =
@@ -1647,7 +1648,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         context.QueueCommand(fun _ ->
             use _ = this.CommandProcessor.UsingCommand("Insert XmlDoc template")
-            document.DeleteText(TextRange(lineStart, docCommentBlockNode.GetDocumentEndOffset().Offset))
+            let endOffset = docCommentBlockNode.GetDocumentEndOffset()
+            document.DeleteText(DocumentRange(&lineStart, &endOffset))
             document.InsertText(lineStart, template)
             textControl.Caret.MoveTo(lineStart + caretOffset - newLine.Length, CaretVisualPlacement.DontScrollIfVisible))
 

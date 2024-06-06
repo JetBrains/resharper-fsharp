@@ -53,8 +53,8 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
         match this.DisableNode with
         | null -> null
         | openNode ->
-        let offset = document.GetLineStartOffset(firstNode.StartLine)
-        let nodeToAddBefore = file.FindNodeAt(DocumentOffset(document, offset + 1))
+        let offset = document.GetLineStartDocumentOffset(firstNode.StartLine)
+        let nodeToAddBefore = file.FindNodeAt(offset + 1)
         let indent = if nodeToAddBefore :? Whitespace then nodeToAddBefore.GetTextLength() else 0
 
         let nodeToAddBefore = skipParentsWithSameOffset nodeToAddBefore true
@@ -67,8 +67,8 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
         match this.RestoreNode with
         | null -> null
         | closeNode ->
-        let offset = document.GetLineEndOffsetNoLineBreak(lastNode.EndLine)
-        let nodeToAddAfter = file.FindNodeAt(DocumentOffset(document, offset))
+        let offset = document.GetLineEndDocumentOffsetNoLineBreak(lastNode.EndLine)
+        let nodeToAddAfter = file.FindNodeAt(offset)
 
         let nodeToAddAfter = skipParentsWithSameOffset nodeToAddAfter false
         addNodesAfter nodeToAddAfter [

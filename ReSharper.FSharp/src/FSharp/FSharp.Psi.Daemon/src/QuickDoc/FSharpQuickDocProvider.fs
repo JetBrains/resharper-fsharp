@@ -28,7 +28,7 @@ module FSharpQuickDoc =
         let tokenNames = [token.Name]
 
         let sourceFile = token.GetSourceFile()
-        let coords = sourceFile.Document.GetCoordsByOffset(token.NameRange.EndOffset.Offset)
+        let coords = token.FSharpFile.GetDocumentOffset(token.NameRange.EndOffset).ToDocumentCoords()
         let lineText = sourceFile.Document.GetLineText(coords.Line)
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag

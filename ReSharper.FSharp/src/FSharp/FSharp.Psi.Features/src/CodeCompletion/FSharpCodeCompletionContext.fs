@@ -89,7 +89,7 @@ module FSharpCodeCompletionContext =
         nodeType == FSharpTokenType.IDENTIFIER || nodeType == FSharpTokenType.UNDERSCORE || nodeType.IsKeyword
 
     let getFcsCompletionContext (fsFile: IFSharpFile) (document: IDocument) (offset: DocumentOffset) =
-        let coords = document.GetCoordsByOffset(offset.Offset)
+        let coords = offset.ToDocumentCoords()
         let lineText = document.GetLineText(coords.Line)
         let fcsPos = getPosFromCoords coords
 

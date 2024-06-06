@@ -16,9 +16,9 @@ let getDocumentCoords (pos: Position) =
 [<Extension; CompiledName("GetDocumentOffset")>]
 let getDocumentOffset ([<NotNull>] document: IDocument) (coords: DocumentCoords) =
     if document.GetLineLength(coords.Line) >= coords.Column then
-        document.GetOffsetByCoords(coords)
+        document.GetDocumentOffsetByCoords(coords)
     else
-        document.GetLineEndOffsetNoLineBreak(coords.Line)
+        document.GetLineEndDocumentOffsetNoLineBreak(coords.Line)
 
 [<Extension; CompiledName("GetTreeOffset")>]
 let getTreeOffsetByCoords ([<NotNull>] document: IDocument) (coords: DocumentCoords) =
@@ -54,18 +54,15 @@ let getPosFromCoords (coords: DocumentCoords) =
     Position.mkPos line column
 
 [<Extension; CompiledName("GetPos")>]
-let getPosFromOffset (document: IDocument) offset =
-    let coords = document.GetCoordsByOffset(offset)
-    getPosFromCoords coords
-
-[<Extension; CompiledName("GetPos")>]
 let getPosFromDocumentOffset (offset: DocumentOffset) =
-    getPosFromOffset offset.Document offset.Offset
+    let coords = offset.ToDocumentCoords()
+    getPosFromCoords coords
 
 [<Extension; CompiledName("GetOffset")>]
 let getPosOffset ([<NotNull>] document) pos =
     let coords = getDocumentCoords pos
-    getDocumentOffset document coords
+    let offset = getDocumentOffset document coords
+    offset.Offset
 
 [<Extension; CompiledName("GetStartOffset")>]
 let getStartOffset ([<NotNull>] document) (range: range) =

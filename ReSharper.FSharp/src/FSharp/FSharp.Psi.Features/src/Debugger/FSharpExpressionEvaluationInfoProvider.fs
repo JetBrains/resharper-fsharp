@@ -55,7 +55,7 @@ type FSharpExpressionEvaluationInfoProvider() =
                 match tokenOpt with
                 | Some(token) ->
                     let document = file.GetSourceFile().Document
-                    let coords = document.GetCoordsByOffset(token.GetTreeStartOffset().Offset)
+                    let coords = token.GetDocumentStartOffset().ToDocumentCoords()
                     let lineText = document.GetLineText(coords.Line)
                     match QuickParse.GetCompleteIdentifierIsland false lineText (int coords.Column) with
                     | Some(island, _, _) -> EvaluationExpressionInfo(token, null, island, token.GetText()) // todo: compiled names?
