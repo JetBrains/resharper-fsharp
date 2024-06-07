@@ -47,7 +47,8 @@ import java.awt.event.FocusListener
 
 suspend fun getFsiRunOptions(
   project: Project,
-  configuration: FSharpScriptConfiguration? = null
+  configuration: FSharpScriptConfiguration? = null,
+  debug: Boolean = false,
 ): Pair<DotNetExecutable, DotNetRuntime> {
   val fsiHost = FsiHost.getInstance(project)
   val sessionInfo = fsiHost.rdFsiHost.requestNewFsiSessionInfo.startSuspending(Unit)
@@ -79,11 +80,17 @@ suspend fun getFsiRunOptions(
   }
 
   val args = ArrayList<String>()
+  val sessionArgs = ArrayList(sessionInfo.args)
+
   if (sessionInfo.runtime != RdFsiRuntime.NetFramework)
     args.add(sessionInfo.fsiPath)
   if (configuration != null)
     args.add("--use:${configuration.scriptFile?.path}")
-  args.addAll(sessionInfo.args)
+  if (debug) {
+    args.addAll(listOf("--optimize-", "--debug+"))
+    sessionArgs.remove("--optimize+")
+  }
+  args.addAll(sessionArgs)
 
   val parameters = DotNetExeConfigurationParameters(
     project = project,
@@ -234,12 +241,20 @@ class FsiHost(val project: Project, val coroutineScope: CoroutineScope) : Lifeti
 
   suspend fun createConsoleRunner(
     title: String,
-    scriptPath: String,
     project: Project,
     executor: Executor,
-    commandLine: GeneralCommandLine
+    commandLine: GeneralCommandLine,
+    presentableCommandLineString: String? = null
   ) =
-    getOrCreateConsoleRunner { FsiScriptProfileConsoleRunner(title, project, executor, commandLine) }
+    getOrCreateConsoleRunner {
+      FsiScriptProfileConsoleRunner(
+        title,
+        project,
+        executor,
+        commandLine,
+        presentableCommandLineString
+      )
+    }
 
   private fun notifyFsiNotFound(@NlsSafe content: String) {
     val title = FSharpBundle.message("Fsi.notifications.fsi.not.found.title")

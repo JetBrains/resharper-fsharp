@@ -8,11 +8,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.NlsSafe
 import com.jetbrains.rider.plugins.fsharp.services.fsi.CommandHistoryAction
 
-class FsiScriptProfileConsoleRunner(@NlsSafe consoleName: String,
-                                    project: Project,
-                                    private val executor: Executor,
-                                    commandLine: GeneralCommandLine) :
-  FsiConsoleRunnerBase(project, consoleName, commandLine) {
+class FsiScriptProfileConsoleRunner(
+  @NlsSafe consoleName: String,
+  project: Project,
+  private val executor: Executor,
+  commandLine: GeneralCommandLine,
+  presentableCommandLineString: String? = null
+) :
+  FsiConsoleRunnerBase(project, consoleName, commandLine, presentableCommandLineString) {
   override fun getExecutor() = executor
   override fun getToolBarActions() =
     mutableListOf(
