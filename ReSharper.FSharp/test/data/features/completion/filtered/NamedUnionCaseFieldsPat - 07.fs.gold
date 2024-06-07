@@ -10,7 +10,7 @@ NoComparisonAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
 named    int
-+ named    int
++ named =    int
 nativeint
 nativeptr
 ---- FULL EVALUATION ----

@@ -11,6 +11,6 @@ match B with
 | _ -> ()
 
 ================
-banana
-citrus
+banana| |=
+citrus| |=
 ================

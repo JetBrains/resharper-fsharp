@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -17,6 +18,8 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Resources
+open JetBrains.UI.RichText
+open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type NamedUnionCaseFieldsPatRule() =
@@ -69,7 +72,7 @@ type NamedUnionCaseFieldsPatRule() =
         let namedUnionCaseFieldsPat = if isNull parametersOwnerPat then null else parametersOwnerPat.Parameters.SingleItem.As<INamedUnionCaseFieldsPat>()
         if isNotNull namedUnionCaseFieldsPat then
             // In this scenario we are already in a named union case field pattern.
-            // Thus there is no need to show any other completions.
+            // Thus, there is no need to show any other completions.
             collector.RemoveWhere(fun item -> true)
 
         let fieldNames = getFieldsFromReference context
@@ -79,11 +82,16 @@ type NamedUnionCaseFieldsPatRule() =
 
         for fieldName, fieldType in fieldNames do
             let info = TextualInfo(fieldName, fieldName, Ranges = context.Ranges)
+            
+            let lookupText = RichText(fieldName)
+            LookupUtil.AddInformationText(lookupText, "=")
+            LookupUtil.AddEmphasize(lookupText, TextRange(0, fieldName.Length))
+
             let item =
                 LookupItemFactory
                     .CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        TextPresentation(info, fieldType, true, PsiSymbolsThemedIcons.Field.Id))
+                        TextPresentation(lookupText, PsiSymbolsThemedIcons.Field.Id, info, DisplayTypeName = fieldType))
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(info))
                     // Force the items to be on top in the list.

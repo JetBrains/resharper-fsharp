@@ -159,12 +159,12 @@ WebExtensions
 abstract
 and
 apple
-apple    int
+apple =    int
 array
 as
 assert
 banana    string
-banana    string
+banana =    string
 base
 begin
 bigint
@@ -173,7 +173,7 @@ byref
 byte
 char
 citrus    float
-citrus    float
+citrus =    float
 class
 ctx    Current file context
 decimal
