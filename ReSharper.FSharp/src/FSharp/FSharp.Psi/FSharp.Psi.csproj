@@ -36,7 +36,6 @@
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="System.Collections.Immutable" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-
     <!-- CsLex task -->
     <PackageReference Include="JetBrains.Build.Platform.DistributedCache" />
     <!-- ParserGen task -->

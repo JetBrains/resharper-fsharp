@@ -13,7 +13,6 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</AssemblyName>
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="src\ZoneMarker.fs" />
     <Compile Include="src\ErrorAttributes.fs" />
@@ -133,13 +132,11 @@
     <Compile Include="src\QuickFixes\ToObjectExprTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
     <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />
   </ItemGroup>
-  
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
@@ -150,11 +147,9 @@
     <PackageReference Include="NUnit.Console" />
     <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
-
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />

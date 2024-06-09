@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <InternalBuild Condition="'$(SolutionFileName)' != 'ReSharper.FSharp.sln'">True</InternalBuild>
@@ -6,7 +6,6 @@
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
-
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -14,7 +13,6 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests</AssemblyName>
     <JetTestProject>true</JetTestProject>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="ReadLockCookieUtil.fs" />
@@ -52,7 +50,6 @@
     <Compile Include="FSharpIconProviderTest.fs" />
     <Compile Include="RearrangeCodeTest.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
@@ -60,22 +57,19 @@
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
     <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />
   </ItemGroup>
-
   <ItemGroup>
-      <PackageReference Include="FSharp.Core" />
-      <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
-      <PackageReference Include="JetBrains.Lifetimes" />
-      <PackageReference Include="JetBrains.NuGet.Packaging" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" />
-      <PackageReference Include="NUnit" />
-      <PackageReference Include="NUnit.Console" />
-      <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.NuGet.Packaging" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit.Console" />
+    <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
-
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
