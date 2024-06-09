@@ -29,11 +29,6 @@
     <ProjectReference Include="..\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Windows.Forms" />
-    <!--needed for completion to work -->
-  </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
     <RemoveDir Directories="obj" />
   </Target>

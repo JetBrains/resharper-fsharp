@@ -86,12 +86,6 @@
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <!--needed for completion to work -->
-  </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
     <RemoveDir Directories="obj" />
   </Target>

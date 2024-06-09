@@ -37,10 +37,6 @@
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
