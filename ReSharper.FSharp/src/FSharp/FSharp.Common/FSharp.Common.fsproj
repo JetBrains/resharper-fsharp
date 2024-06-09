@@ -82,7 +82,7 @@
     </PropertyGroup>
     <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" Condition="!$(InternalBuild)" />
   </Target>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>

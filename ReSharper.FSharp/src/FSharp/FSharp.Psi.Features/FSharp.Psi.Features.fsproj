@@ -132,7 +132,7 @@
     <PackageReference Include="JetBrains.NuGet.Versioning" />
     <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
