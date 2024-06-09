@@ -87,7 +87,7 @@
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />

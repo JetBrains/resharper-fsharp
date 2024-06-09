@@ -67,7 +67,7 @@
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />

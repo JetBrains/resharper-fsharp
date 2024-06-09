@@ -19,7 +19,7 @@
     <Compile Include="src\Stubs.fs" />
     <Compile Include="src\TestWithTwoProjectsBase.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Lifetimes" />

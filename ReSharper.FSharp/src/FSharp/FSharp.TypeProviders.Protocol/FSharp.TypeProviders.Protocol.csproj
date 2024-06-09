@@ -12,7 +12,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol</AssemblyName>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
