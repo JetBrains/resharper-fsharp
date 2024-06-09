@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <InternalBuild Condition="'$(SolutionFileName)' != 'ReSharper.FSharp.sln'">True</InternalBuild>
@@ -6,14 +6,12 @@
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
-
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="src\Util\FSharpGlobalUtil.fs" />
     <Compile Include="src\Util\Util.fs" />
@@ -69,7 +67,6 @@
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Annotations" />
@@ -78,7 +75,6 @@
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
-
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
     <PropertyGroup>
       <FSharpCoreVersion Condition="'%(PackageLock.Identity)'=='FSharp.Core'">%(PackageLock.Version)</FSharpCoreVersion>
@@ -86,26 +82,21 @@
     </PropertyGroup>
     <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" Condition="!$(InternalBuild)" />
   </Target>
-
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="WindowsBase" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
+    <Reference Include="System.Windows.Forms" />
+    <!--needed for completion to work -->
   </ItemGroup>
-
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">
     <RemoveDir Directories="obj" />
   </Target>
-
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
-
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />

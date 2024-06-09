@@ -33,13 +33,12 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="WindowsBase" />
-    <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
+    <Reference Include="System.Windows.Forms" />
+    <!--needed for completion to work -->
   </ItemGroup>
-
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
-
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
