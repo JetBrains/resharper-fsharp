@@ -132,7 +132,7 @@
     <Compile Include="src\QuickFixes\ToObjectExprTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
     <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />

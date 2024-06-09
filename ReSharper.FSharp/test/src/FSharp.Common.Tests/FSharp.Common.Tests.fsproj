@@ -28,7 +28,7 @@
     <PackageReference Include="NUnit.Console" />
     <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
   <ItemGroup>

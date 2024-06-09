@@ -18,7 +18,7 @@
     <SdkTargetFrameworkOverride>.NETCoreApp,Version=v6.0</SdkTargetFrameworkOverride>
     <GenerateDependencyFile>false</GenerateDependencyFile>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
   </ItemGroup>
   <ItemGroup>

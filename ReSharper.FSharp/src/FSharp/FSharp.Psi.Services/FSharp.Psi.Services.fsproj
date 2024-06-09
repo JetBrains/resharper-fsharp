@@ -82,7 +82,7 @@
     <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
     <Compile Include="PsiServicesNamespaceZoneMarker.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />

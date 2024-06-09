@@ -50,11 +50,11 @@
     <Compile Include="FSharpIconProviderTest.fs" />
     <Compile Include="RearrangeCodeTest.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
-    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\FSharp.Tests.Common\FSharp.Tests.Common.fsproj" />
   </ItemGroup>
   <ItemGroup>

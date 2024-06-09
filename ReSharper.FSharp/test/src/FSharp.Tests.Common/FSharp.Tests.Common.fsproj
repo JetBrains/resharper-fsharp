@@ -31,11 +31,11 @@
     <PackageReference Include="NUnit.Console" />
     <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
-    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="WindowsBase" />

@@ -21,7 +21,7 @@
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
   </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">

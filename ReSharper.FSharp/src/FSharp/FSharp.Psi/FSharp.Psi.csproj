@@ -24,7 +24,7 @@
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />

@@ -137,7 +137,7 @@
       <OutputFile>src\QuickFixes\FcsErrorsQuickFixes.Generated.fs</OutputFile>
     </ErrorsGen>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
