@@ -139,13 +139,6 @@
     <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
   <Target Name="AddFantomasBundledVersion" BeforeTargets="BeforeCompile">
     <PropertyGroup>
       <GenerateAdditionalSources Condition="$(InternalBuild)">true</GenerateAdditionalSources>

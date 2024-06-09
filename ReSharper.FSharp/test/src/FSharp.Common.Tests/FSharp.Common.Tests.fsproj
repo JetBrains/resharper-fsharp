@@ -31,11 +31,6 @@
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Windows.Forms" />
-    <!--needed for completion to work -->
-  </ItemGroup>
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
