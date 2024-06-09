@@ -12,7 +12,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol</AssemblyName>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.RdFramework" />

@@ -18,7 +18,7 @@
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="SciptPsiModulesTest.fs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Lifetimes" />

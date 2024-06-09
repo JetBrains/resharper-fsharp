@@ -143,7 +143,7 @@
     <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Lifetimes" />

@@ -12,10 +12,10 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</AssemblyName>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Lifetimes" />
   </ItemGroup>
   <Target Name="DropObjFromIndependentBuild" Condition="$(InternalBuild)" BeforeTargets="Build">

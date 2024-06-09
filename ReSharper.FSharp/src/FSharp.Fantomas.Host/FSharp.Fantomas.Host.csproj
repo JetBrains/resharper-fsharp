@@ -21,19 +21,19 @@
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="Fantomas.Core" />
     <PackageReference Include="Fantomas.FCS" />
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.NuGet.Versioning" />
     <PackageReference Include="JetBrains.RdFramework" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
-    <PackageReference Include="System.Runtime.Loader" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Memory" />
     <PackageReference Include="Microsoft.NETCore.Platforms" />
     <PackageReference Include="Microsoft.NETCore.Targets" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="System.Memory" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Runtime.Loader" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Fantomas.Host.win.runtimeconfig.json">
