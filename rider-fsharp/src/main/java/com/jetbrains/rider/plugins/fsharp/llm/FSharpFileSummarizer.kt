@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.llm
 
 import com.intellij.ml.llm.privacy.PSString
-import com.intellij.ml.llm.privacy.trustedStringBuilders.privacySafe
+import com.intellij.ml.llm.privacy.trustedStringBuilders.dangerousConvert
 import com.intellij.ml.llm.smartChat.psiSummarization.LanguageSummaryProvider
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -24,7 +24,7 @@ class FSharpFileSummarizer: LanguageSummaryProvider {
       ThreadingAssertions.assertBackgroundThread()
       return runBlocking {
         return@runBlocking psiFile.project.solution.aIChatModel.getFileSummary.startSuspending(
-          GetFileSummaryParameters(ids)).summary.privacySafe
+          GetFileSummaryParameters(ids)).summary.dangerousConvert
       }
     }
     return null
