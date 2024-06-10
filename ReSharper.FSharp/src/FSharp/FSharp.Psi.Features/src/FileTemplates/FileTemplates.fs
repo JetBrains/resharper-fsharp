@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplate
 open System
 open System.Reflection
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.Diagnostics
@@ -117,7 +118,7 @@ type RiderFSharpFileTemplatesOptionPage(lifetime, optionsPageContext, settings, 
         storedTemplatesProvider, scopeCategoryManager, uiFactory, iconHost, dialogHost, FSharpProjectFileType.Name)
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpDefaultFileTemplates() =
     let xmlPath = "JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml"
 
