@@ -1,12 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 
 open JetBrains.Application.Infra
+open JetBrains.Application.Parts
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
 type AssemblyInfoShim(lifetime: Lifetime, fsSourceCache: FSharpSourceCache,
         assemblyExistsService: AssemblyExistsService, toolset: ISolutionToolset) =
     inherit DelegatingFileSystemShim(lifetime)

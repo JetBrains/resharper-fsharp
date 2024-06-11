@@ -1,12 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open FSharp.Compiler.Diagnostics
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.Util
 
-[<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type TypeCheckErrorsStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 

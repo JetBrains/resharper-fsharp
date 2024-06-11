@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
+open JetBrains.Application.Parts
 open JetBrains.ReSharper.Daemon.Xml.Highlightings
 open JetBrains.ReSharper.Daemon.Xml.Stages
 open JetBrains.ReSharper.Daemon.Xml.Stages.Analysis
@@ -14,7 +15,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Xml.Tree
 open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 
-[<ElementProblemAnalyzer([| typeof<DocComment> |], HighlightingTypes = [| typeof<InvalidXmlDocPositionWarning> |])>]
+[<ElementProblemAnalyzer(Instantiation.DemandAnyThreadSafe, [| typeof<DocComment> |], HighlightingTypes = [| typeof<InvalidXmlDocPositionWarning> |])>]
 type XmlDocAnalyzer() =
     inherit ElementProblemAnalyzer<DocComment>()
 
