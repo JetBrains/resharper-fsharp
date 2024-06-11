@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System
+open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
@@ -29,7 +30,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
     member x.Text = text
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
-and [<SolutionComponent>] TypeHintAdornmentProvider() =
+and [<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>] TypeHintAdornmentProvider() =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.UserData with
