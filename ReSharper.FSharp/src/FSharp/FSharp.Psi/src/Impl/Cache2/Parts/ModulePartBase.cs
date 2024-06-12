@@ -66,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       writer.WriteOftenSmallPositiveInt(FSharpExtensionMemberInfos.Length);
       foreach (var info in FSharpExtensionMemberInfos)
-        info.WriteWithoutKind(writer);
+        info.Write(writer);
     }
 
     protected ModulePartBase(IReader reader) : base(reader)
