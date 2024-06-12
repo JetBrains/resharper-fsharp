@@ -120,7 +120,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var methods = new ExtensionMemberInfo[extensionMethodCount];
       for (var i = 0; i < extensionMethodCount; i++)
-        methods[i] = new ExtensionMemberInfo(reader, this);
+        methods[i] = new ExtensionMemberInfo(reader, ExtensionMemberKind.ExtensionMethod, this);
       CSharpExtensionMemberInfos = methods;
     }
 
