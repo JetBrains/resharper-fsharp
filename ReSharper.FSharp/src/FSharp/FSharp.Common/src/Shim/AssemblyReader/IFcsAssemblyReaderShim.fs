@@ -34,9 +34,6 @@ type IProjectFcsModuleReader =
     /// Removes created type defs with changed type parts
     abstract InvalidateTypeDefs: shortName: string -> unit
 
-    /// Removes all created type defs due to invalidation requested externally, e.g. when references assemblies change
-    abstract InvalidateAllTypeDefs: unit -> unit
-
     /// Removes outdated type defs and updates module timestamp if needed
     abstract UpdateTimestamp: unit -> unit
 
@@ -48,8 +45,6 @@ type IFcsAssemblyReaderShim =
     abstract IsEnabled: bool
     abstract HasDirtyModules: bool
     abstract Logger: ILogger
-
-    abstract ProjectInvalidated: ISignal<FcsProjectKey>
 
     abstract TryGetModuleReader: projectKey: FcsProjectKey -> IProjectFcsModuleReader option
 

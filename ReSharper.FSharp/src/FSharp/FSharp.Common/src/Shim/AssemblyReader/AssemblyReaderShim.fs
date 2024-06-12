@@ -6,7 +6,6 @@ open System.Text
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
-open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
@@ -84,8 +83,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let dirtyProjects = HashSet()
 
     let dirtyTypesInModules = OneToSetMap<IPsiModule, string>()
-
-    let projectInvalidated = new Signal<FcsProjectKey>("AssemblyReaderShim.ModuleInvalidated")
 
     do
         // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
@@ -166,10 +163,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             projectKeyToPsiModules.TryRemove(projectKey) |> ignore
         )
 
-        // todo: better sync with project model
-        for referencingModule in getReferencingModules projectKey do
-            projectInvalidated.Fire(referencingModule)
-
     // todo: invalidate for per-referencing module
     let markDirtyDependencies () =
         let invalidatedModules = HashSet()
@@ -188,7 +181,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 let projectKey = FcsProjectKey.Create(dirtyModule)
                 if invalidatedModules.Add(projectKey) then
                     modulesToInvalidate.Push(projectKey)
-                    projectInvalidated.Fire(projectKey)
 
             | _ -> ()
 
@@ -204,7 +196,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
                 if invalidatedModules.Add(referencingProjectKey) then
                     modulesToInvalidate.Push(referencingProjectKey)
-                    projectInvalidated.Fire(referencingProjectKey)
 
         dirtyTypesInModules.Clear()
 
@@ -221,8 +212,10 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let invalidateDirty () =
         locks.AssertReadAccessAllowed()
 
+        logger.Trace("Start invalidate dirty")
         markDirtyDependencies ()
         dirtyProjects.Clear()
+        logger.Trace("Finish invalidate dirty")
 
     do
         lifetime.Bracket(
@@ -238,8 +231,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     interface IFcsAssemblyReaderShim with
         member this.IsEnabled = isEnabled ()
-
-        member this.ProjectInvalidated = projectInvalidated
 
         member this.TryGetModuleReader(projectKey: FcsProjectKey) =
             locks.AssertWriteAccessAllowed()

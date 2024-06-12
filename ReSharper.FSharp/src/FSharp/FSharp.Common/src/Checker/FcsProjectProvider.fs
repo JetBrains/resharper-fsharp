@@ -426,8 +426,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             currentProject <- project
             visitor
 
-    member x.FcsProjectInvalidated = fcsProjectInvalidated
-
     member x.ProcessChange(obj: ChangeEventArgs) =
         Assertion.Assert(dirtyProjects.Count = 0)
 
@@ -548,7 +546,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             |> Option.map (fun project -> project.GetIndex(sourceFile))
             |> Option.defaultValue -1
 
-        member x.ProjectRemoved = x.FcsProjectInvalidated :> _
+        member x.ProjectRemoved = fcsProjectInvalidated :> _
 
         member x.InvalidateReferencesToProject(project: IProject) =
             project.TargetFrameworkIds
@@ -593,14 +591,17 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             if psiModule :? FSharpScriptPsiModule then () else
             if not fcsAssemblyReaderShim.IsEnabled then () else
 
+            logger.Trace("Start processing FCS requests")
             FSharpAsyncUtil.ProcessEnqueuedReadRequests()
+            logger.Trace("Finish processing FCS requests")
 
             lock this (fun _ ->
+                logger.Trace("Start invalidating assembly reader")
                 // todo: check that dirty modules are visible to the current one
-                if not fcsAssemblyReaderShim.HasDirtyModules then () else
+                if not fcsAssemblyReaderShim.HasDirtyModules then logger.Trace("No dirty modules; exiting") else
 
                 match tryGetFcsProject psiModule with
-                | None -> ()
+                | None -> logger.Trace("Could not get fcs project; exiting")
                 | Some fcsProject ->
 
                 fcsAssemblyReaderShim.InvalidateDirty()
@@ -611,7 +612,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                     if not (isFSharpProject referencedProject) then
                         let referencedModule = psiModules.GetPrimaryPsiModule(referencedProject, targetFrameworkId)
-                        barrier.EnqueueJob(fun _ -> fcsAssemblyReaderShim.InvalidateDirty(referencedModule)))
+                        barrier.EnqueueJob(fun _ -> fcsAssemblyReaderShim.InvalidateDirty(referencedModule))
+
+                logger.Trace("Finish invalidating assembly reader")
+            )
 
 
 /// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built

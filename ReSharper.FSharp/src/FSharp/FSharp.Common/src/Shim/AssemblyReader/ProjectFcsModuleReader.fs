@@ -1387,24 +1387,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         member this.UpdateTimestamp() =
             use _ = usingWriteLock ()
-            shim.Logger.Trace("Trying to update timestamp: {0}", path)
-            if not (isUpToDate this) then
-                moduleDef <- None
-                timestamp <- DateTime.UtcNow
-                shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
+            shim.Logger.Trace("Checking up to date: {0}", path)
+            if isUpToDate this then
+                shim.Logger.Trace("Up to date: {0}", path) else
 
-        member this.InvalidateAllTypeDefs() =
-            try
-                isInvalidating <- true
-
-                use _ = usingWriteLock ()
-                shim.Logger.Trace("Invalidate all type defs: {0}", path)
-                typeDefs.Clear()
-                moduleDef <- None
-                timestamp <- DateTime.UtcNow
-                shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
-            finally
-                isInvalidating <- false
+            moduleDef <- None
+            timestamp <- DateTime.UtcNow
+            shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
         member this.MarkDirty() =
             try
@@ -1417,7 +1406,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             finally
                 isInvalidating <- false
 
-        member this.MarkDirty(typeShortName) = ()
+        member this.MarkDirty _ = ()
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =
