@@ -30,7 +30,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
     member x.Text = text
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
-and [<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>] TypeHintAdornmentProvider() =
+and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>] TypeHintAdornmentProvider() =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.UserData with
