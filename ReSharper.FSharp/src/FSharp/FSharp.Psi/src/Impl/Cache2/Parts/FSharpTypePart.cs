@@ -131,7 +131,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteUShort(Modifiers.ToRawValue());
       writer.WriteStringArray(AttributeClassNames);
 
-      writer.WriteOftenSmallPositiveInt(ExtensionMemberInfos.Length);
+      writer.WriteOftenSmallPositiveInt(CSharpExtensionMemberInfos.Length);
       foreach (var info in CSharpExtensionMemberInfos)
         info.Write(writer);
     }
