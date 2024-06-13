@@ -6,7 +6,11 @@ class FSharpLogTraceScenarios {
   object FSharpProjectModel : LogTraceScenario(
     "JetBrains.ReSharper.Plugins.FSharp.Checker.FcsCheckerService",
     "JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider",
-    "JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader.AssemblyReaderShim"
+  )
+
+  object FSharpInteropMetadata : LogTraceScenario(
+    "JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader.AssemblyReaderShim",
+    "JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader.ProjectFcsModuleReader"
   )
 
   object FSharpFileSystem : LogTraceScenario(
@@ -15,7 +19,7 @@ class FSharpLogTraceScenarios {
     "JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem.AssemblyInfoShim"
   )
 
-  object TypeProviders : LogTraceScenario(
+  object FSharpTypeProviders : LogTraceScenario(
     "JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host"
   )
 }
