@@ -19,7 +19,7 @@ class TypeProvidersFeaturesTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
   override val traceScenarios: Set<LogTraceScenario>
-    get() = super.traceScenarios + FSharpLogTraceScenarios.TypeProviders
+    get() = super.traceScenarios + FSharpLogTraceScenarios.FSharpTypeProviders
 
   @Test
   fun `signature file navigation`() = doNavigationTestWithMultipleDeclarations()
