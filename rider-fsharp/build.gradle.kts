@@ -1,6 +1,7 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.tasks.CustomTestIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -231,11 +232,17 @@ tasks {
     useJUnitPlatform()
   }
 
-  named<Test>("test") {
-    dependsOn(parserTest)
+  val testPlugin by registering(CustomTestIdeTask::class) {
+    plugins {
+      disablePlugins("com.intellij.swagger", "com.intellij.ml.llm")
+    }
     useTestNG {
       groupByInstances = true
     }
+  }
+
+  named<Test>("test") {
+    dependsOn(parserTest, testPlugin)
   }
 
   withType<Test> {
