@@ -175,6 +175,19 @@ artifacts {
 }
 
 tasks {
+  val generateDisabledPluginsTxt by registering {
+    val out = layout.buildDirectory.file("disabled_plugins.txt")
+    outputs.file(out)
+    doLast {
+      file(out).writeText(
+        """
+          com.intellij.ml.llm
+          com.intellij.swagger
+        """.trimIndent()
+      )
+    }
+  }
+
   withType<PrepareSandboxTask> {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
@@ -186,6 +199,11 @@ tasks {
       val testHostPath = "$resharperPluginPath/src/FSharp/FSharp.Tests.Host/$outputRelativePath"
       val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
       files = files + listOf("$testHostName.dll", "$testHostName.pdb")
+
+      dependsOn(generateDisabledPluginsTxt)
+      from(generateDisabledPluginsTxt.get().outputs.files.singleFile) {
+        into("../config-test")
+      }
     }
 
     fun moveToPlugin(files: List<String>, destinationFolder: String) {
