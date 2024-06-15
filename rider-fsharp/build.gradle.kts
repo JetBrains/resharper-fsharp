@@ -1,7 +1,6 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
-import org.jetbrains.intellij.platform.gradle.tasks.CustomTestIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -176,6 +175,19 @@ artifacts {
 }
 
 tasks {
+  val generateDisabledPluginsTxt by registering {
+    val out = layout.buildDirectory.file("disabled_plugins.txt")
+    outputs.file(out)
+    doLast {
+      file(out).writeText(
+        """
+          com.intellij.ml.llm
+          com.intellij.swagger
+        """.trimIndent()
+      )
+    }
+  }
+
   withType<PrepareSandboxTask> {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
@@ -187,6 +199,11 @@ tasks {
       val testHostPath = "$resharperPluginPath/src/FSharp/FSharp.Tests.Host/$outputRelativePath"
       val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
       files = files + listOf("$testHostName.dll", "$testHostName.pdb")
+
+      dependsOn(generateDisabledPluginsTxt)
+      from(generateDisabledPluginsTxt.get().outputs.files.singleFile) {
+        into("../config-test")
+      }
     }
 
     fun moveToPlugin(files: List<String>, destinationFolder: String) {
@@ -232,17 +249,11 @@ tasks {
     useJUnitPlatform()
   }
 
-  val testPlugin by registering(CustomTestIdeTask::class) {
-    plugins {
-      disablePlugins("com.intellij.swagger", "com.intellij.ml.llm")
-    }
+  named<Test>("test") {
+    dependsOn(parserTest)
     useTestNG {
       groupByInstances = true
     }
-  }
-
-  named<Test>("test") {
-    dependsOn(parserTest, testPlugin)
   }
 
   withType<Test> {
