@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickDoc
 
+open JetBrains.ReSharper.Feature.Services.QuickDoc.Render
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open JetBrains.Application.Components
@@ -50,14 +51,19 @@ type QuickDocTest() =
             this.ExecuteWithGold(projectFile, fun writer ->
                 let html = presenter.GetHtml(language).Text
                 Assert.NotNull(html)
-
-                let startIdx = html.Text.IndexOf("  <head>", StringComparison.Ordinal)
-                if startIdx >= 0 then
-                    let endIdx = html.Text.IndexOf("</head>", StringComparison.Ordinal) + "</head>".Length
-                    Assert.AreEqual(String.CompareOrdinal(html.Text, endIdx, "\n<body>", 0, "\n<body>".Length), 0)
-
-                    writer.Write(html.Text.Remove(startIdx, endIdx - startIdx + 1))
-                else writer.Write(html.Text)
+                
+                let mutable text = html.Text
+                let mutable startIdx = text.IndexOf(XmlDocHtmlUtil.START_HEAD_MARKER, StringComparison.Ordinal)
+                let mutable endIdx = text.IndexOf(XmlDocHtmlUtil.END_HEAD_MARKER, StringComparison.Ordinal) + XmlDocHtmlUtil.END_HEAD_MARKER.Length;
+                
+                while startIdx <> -1 do
+                    Assert.AreEqual(String.CompareOrdinal(text, endIdx, "\n<body>", 0, "\n<body>".Length), 0)
+                    
+                    text <- text.Remove(startIdx, endIdx - startIdx + 1)
+                    startIdx <- text.IndexOf(XmlDocHtmlUtil.START_HEAD_MARKER, StringComparison.Ordinal)
+                    endIdx <- text.IndexOf(XmlDocHtmlUtil.END_HEAD_MARKER, StringComparison.Ordinal) + XmlDocHtmlUtil.END_HEAD_MARKER.Length
+                
+                writer.Write(text);
             )
         )
 
