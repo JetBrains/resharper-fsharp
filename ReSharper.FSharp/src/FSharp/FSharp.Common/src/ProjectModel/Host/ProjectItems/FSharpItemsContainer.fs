@@ -1148,11 +1148,11 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                     let container = solution.GetComponent<IFSharpItemsContainer>()
                     if container.IsValid(viewItem) then
                         let parentFolder = viewItem.ProjectItem.ParentFolder
-                        container.TryGetParentFolderIdentity(viewItem)
-                        |> Option.iter (fun identity ->
-                            let parentItem = FSharpViewFolder(parentFolder, identity)
-                            viewHost.AddOrUpdateItem(viewItem, parentItem)
-                        )
+                        let parentItem: obj =
+                            match container.TryGetParentFolderIdentity(viewItem) with
+                            | Some identity -> FSharpViewFolder(parentFolder, identity)
+                            | None -> viewItem.ProjectItem.ParentFolder
+                        viewHost.AddOrUpdateItem(viewItem, parentItem)
             )
         )
 
