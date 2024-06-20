@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 let getAnnotationInfo<'AnnotationProvider, 'TAnnotationInfo
-when 'AnnotationProvider :> CodeAnnotationInfoProvider<IAttributesOwner, 'TAnnotationInfo>>
+when 'AnnotationProvider :> ICodeAnnotationInfoProvider<IAttributesOwner, 'TAnnotationInfo>>
     (attributesOwner: IAttributesOwner) =
     attributesOwner
         .GetPsiServices()

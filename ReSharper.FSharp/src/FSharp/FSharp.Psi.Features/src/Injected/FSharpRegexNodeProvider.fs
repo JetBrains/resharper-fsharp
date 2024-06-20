@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
+open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Features.RegExp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -111,5 +112,5 @@ type FSharpRegexNodeProvider() =
         override _.Description = "Injects .NET Regular Expression in F# strings"
         override _.Guid = "7e4d8d57-335f-4692-9ff8-6b2fa003fb51"
         override _.Words = null
-        override _.Attributes = [| RegexPatternAnnotationProvider.RegexPatternAttributeShortName
+        override _.Attributes = [| nameof RegexPatternAttribute
                                    StringSyntaxAnnotationProvider.StringSyntaxAttributeShortName |]
