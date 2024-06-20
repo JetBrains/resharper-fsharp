@@ -19,6 +19,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Transactions
@@ -80,7 +81,7 @@ type ImportRule() =
         let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
         let iconManager = solution.GetComponent<PsiIconManager>()
 
-        let symbolScope = psiServices.Symbols.GetSymbolScope(element.GetPsiModule(), true, false)
+        let symbolScope = getSymbolScope context.PsiModule false
         let typeElements = 
             symbolScope.GetAllTypeElementsGroupedByName()
             |> Seq.filter (fun typeElement -> assemblyReaderShim.IsKnownModule(typeElement.Module)) 

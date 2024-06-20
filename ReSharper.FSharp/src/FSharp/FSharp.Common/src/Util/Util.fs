@@ -259,7 +259,7 @@ module PsiUtil =
         if alternativeNames then
             symbolCache.GetAlternativeNamesSymbolScope(psiModule, withReferences)
         else
-            symbolCache.GetSymbolScope(psiModule, withReferences, true)
+            psiModule.GetCachedCaseSensitiveSymbolScopeWithReferences()
 
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) (alternativeNames: bool) =

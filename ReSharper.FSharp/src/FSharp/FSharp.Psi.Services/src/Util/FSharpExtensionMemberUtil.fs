@@ -53,7 +53,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
     let exprType = fcsType.MapType(context)
 
     use namespaceQueue = PooledQueue<INamespace>.GetInstance()
-    let symbolScope = getSymbolScope psiModule true
+    let symbolScope = getSymbolScope psiModule false
     let accessContext = ElementAccessContext(context)
     namespaceQueue.Enqueue(symbolScope.GlobalNamespace)
 
