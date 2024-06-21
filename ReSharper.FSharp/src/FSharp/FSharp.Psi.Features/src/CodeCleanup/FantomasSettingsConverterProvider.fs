@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpEditorC
 
 open System
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.Settings.Calculated.Implementation
 open JetBrains.DataFlow
@@ -29,7 +30,7 @@ type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
         member x.ReverseConvert _ = true
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FantomasSettingsConverterProvider(lifetime: Lifetime, schema: SettingsSchema) =
     let items = CollectionEvents<IEditorConfigConverter>(lifetime, $"{nameof FantomasSettingsConverterProvider}.Items")
 
