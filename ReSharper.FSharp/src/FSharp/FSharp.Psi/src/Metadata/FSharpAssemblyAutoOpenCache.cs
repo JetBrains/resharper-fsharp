@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -12,7 +13,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
-  [PsiComponent]
+  [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
   public class FSharpAssemblyAutoOpenCache : IAssemblyCache
   {
     private readonly IPsiAssemblyFileLoader myPsiAssemblyFileLoader;
