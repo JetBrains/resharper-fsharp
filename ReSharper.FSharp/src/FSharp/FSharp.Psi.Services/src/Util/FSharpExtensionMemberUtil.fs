@@ -5,14 +5,39 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.Util.DataStructures.Collections
+
+type FSharpRequest(psiModule, exprType: IType) =
+    let baseTypes: IReadOnlyList<IType> =
+        let exprDeclaredType = exprType.As<IDeclaredType>()
+        if isNull exprDeclaredType then [] else
+
+        let result = List<IType>()
+        result.Add(exprDeclaredType)
+        for superType in exprDeclaredType.GetAllSuperTypes() do
+            result.Add(superType)
+
+        result.AsReadOnly()
+
+    interface IRequest with
+        member this.Name = null
+        member this.BaseExpressionTypes = baseTypes
+        member this.ExpressionType = exprType
+        member this.ForModule = psiModule
+
+        member this.IsCaseSensitive = true
+        member this.Namespaces = []
+        member this.Types = []
+
+        member this.WithExpressionType _ = failwith "todo"
+        member this.WithModule _ = failwith "todo"
+        member this.WithName _ = failwith "todo"
+        member this.WithNamespaces _ = failwith "todo"
+        member this.WithTypes _ = failwith "todo"
 
 let getQualifierExpr (reference: IReference) =
     let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
@@ -49,18 +74,24 @@ let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
 
 let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
     let psiModule = context.GetPsiModule()
+    let solution = psiModule.GetSolution()
     use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
+
     let exprType = fcsType.MapType(context)
 
-    use namespaceQueue = PooledQueue<INamespace>.GetInstance()
-    let symbolScope = getSymbolScope psiModule false
-    let accessContext = ElementAccessContext(context)
-    namespaceQueue.Enqueue(symbolScope.GlobalNamespace)
+    let exprTypeElements =
+        let typeElements = List()
+
+        let exprTypeElement = exprType.GetTypeElement()
+        if isNotNull exprTypeElement then
+            typeElements.Add(exprTypeElement)
+            typeElements.AddRange(exprTypeElement.GetSuperTypeElements())
+
+        typeElements.AsReadOnly()
 
     let openedModulesProvider = OpenedModulesProvider(context.FSharpFile)
     let scopes = openedModulesProvider.OpenedModuleScopes
-
-    let result = List()
+    let accessContext = ElementAccessContext(context)
 
     let isInScope (typeMember: ITypeMember) =
         let isInScope name =
@@ -76,16 +107,12 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
             let ns = containingType.GetContainingNamespace()
             isInScope ns.ShortName
 
-    let matchesType (typeMember: ITypeMember) (exprType: IType) : bool =
+    let matchesType (typeMember: ITypeMember) : bool =
         let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =
             if isNull extendedTypeElement then false else
 
             // todo: arrays and other non-declared-types?
-            let exprTypeElement = exprType.GetTypeElement()
-            if isNull exprTypeElement then false else
-                
-            exprTypeElement.Equals(extendedTypeElement) ||
-            exprTypeElement.GetSuperTypeElements() |> Seq.exists extendedTypeElement.Equals
+            exprTypeElements |> Seq.exists extendedTypeElement.Equals
 
         match typeMember with
         | FSharpSourceExtensionMember mfv ->
@@ -114,33 +141,13 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
         isTypeAccessible &&
         AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
-    let addMethods (ns: INamespace) =
-        let addExtensionMethods (methodsIndex: IExtensionMembersIndex) =
-            if isNull methodsIndex then () else
+    let isApplicable (typeMember: ITypeMember) =
+        not (isInScope typeMember) &&
+        isAccessible typeMember &&
+        matchesType typeMember
 
-            for extensionMethodProxy in methodsIndex.Lookup() do
-                let members = extensionMethodProxy.FindExtensionMember()
-                for typeMember in members do
-                    // todo: use extension member info to check kind and skip namespaces
-                    if isInScope typeMember then () else
-                    if not (isAccessible typeMember) then () else
+    let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType))
 
-                    if matchesType typeMember exprType then
-                        result.Add(typeMember)
-
-        let ns = ns.As<Namespace>()
-
-        for extensionMethodsIndex in ns.SourceExtensionMethods do
-            addExtensionMethods extensionMethodsIndex
-
-        addExtensionMethods ns.CompiledExtensionMembers
-
-    while namespaceQueue.Count > 0 do
-        let ns = namespaceQueue.Dequeue()
-
-        addMethods ns
-
-        for nestedNamespace in ns.GetNestedNamespaces(symbolScope) do
-            namespaceQueue.Enqueue(nestedNamespace)
-
-    result
+    query.EnumerateMethods()
+    |> Seq.filter isApplicable
+    |> List

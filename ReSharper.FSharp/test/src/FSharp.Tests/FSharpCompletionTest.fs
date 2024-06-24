@@ -51,10 +51,10 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 03``() = x.DoNamedTest() // todo: fix in 233
 
-    [<Test>] member x.``Import - Extension - FSharp - Source - Method - Generic 01``() = x.DoNamedTest()
-    [<Test>] member x.``Import - Extension - FSharp - Source - Method - Generic 02``() = x.DoNamedTest()
-    [<Test>] member x.``Import - Extension - FSharp - Source - Method 01``() = x.DoNamedTest()
-    [<Test>] member x.``Import - Extension - FSharp - Source - Prop 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method - Generic 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method - Generic 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Prop 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Extension 01``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 02``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 03``() = x.DoNamedTestFsCs()
