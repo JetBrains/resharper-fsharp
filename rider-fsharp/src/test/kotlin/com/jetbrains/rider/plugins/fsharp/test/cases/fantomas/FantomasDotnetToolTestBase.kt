@@ -28,7 +28,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
   private val fantomasNotifications = ArrayList<String>()
-  protected val bundledVersion = "6.2.2.0"
+  protected val bundledVersion = "6.3.9.0"
   protected val globalVersion = "4.7.2.0"
   private var dotnetToolsInvalidated = false
 
