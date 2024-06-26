@@ -176,8 +176,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let nestedTypes = emptyILTypeDefs
 
         ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
-             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, false, emptyILSecurityDecls,
-             emptyILCustomAttrs)
+             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
+             emptyILSecurityDecls, emptyILCustomAttrsStored)
 
     let mkTypeAccessRights (typeElement: ITypeElement): TypeAttributes =
         let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
@@ -607,21 +607,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         [ for i in typeParameters.Count - 1 .. -1 .. 0 do
             mkGenericParameterDef typeParameters[i] ]
 
-    let mkTypeDefCustomAttrs (typeElement: ITypeElement) =
-        let hasExtensions =
-            let typeElement = typeElement.As<TypeElement>()
-            if isNull typeElement then false else
+    let hasExtensions (typeElement: ITypeElement) =
+        let typeElement = typeElement.As<TypeElement>()
+        if isNull typeElement then false else
 
-            typeElement.EnumerateParts()
-            |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
+        typeElement.EnumerateParts()
+        |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
 
+    let mkTypeDefCustomAttrs (typeElement: ITypeElement) hasExtensions =
         let customAttributes = mkCustomAttributes typeElement
-        [ yield! customAttributes
-          if hasExtensions then
-              match extensionAttribute () with
-              | Some attribute -> attribute
-              | _ -> () ]
-        |> mkILCustomAttrs
+        [| yield! customAttributes
+           if hasExtensions then
+               match extensionAttribute () with
+               | Some attribute -> attribute
+               | _ -> () |]
 
     let mkEnumInstanceValue (enum: IEnum): ILFieldDef =
         let name = "value__"
@@ -1055,8 +1054,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         actual.AsArray() = attrs.AsArray()
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
-        let actual = mkTypeDefCustomAttrs typeElement 
-        actual.AsArray() = typeDef.CustomAttrs.AsArray()
+        let hasExtensions = hasExtensions typeElement
+        let actual = mkTypeDefCustomAttrs typeElement hasExtensions
+        actual = typeDef.CustomAttrs.AsArray()
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
         mkType param.Type = paramDef.Type &&
@@ -1260,11 +1260,22 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let properties = mkILPropertiesLazy (InterruptibleLazy(fun _ -> getOrCreateProperties membersTable clrTypeName))
                 let events = mkILEventsLazy (InterruptibleLazy(fun _ -> getOrCreateEvents membersTable clrTypeName))
 
-                let customAttrs = mkTypeDefCustomAttrs typeElement
+                // TODO: avoid hasExtensions in closure?
+                let hasExtensions = hasExtensions typeElement
+                let customAttrs = mkILCustomAttrsComputed (fun _ ->
+                    let result = usingTypeElement clrTypeName [||] (fun typeElement ->
+                        mkTypeDefCustomAttrs typeElement hasExtensions
+                    )
+                    result
+                )
+
+                let additionalFlags =
+                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
+                    else ILTypeDefAdditionalFlags.None
 
                 let typeDef =
                     ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                        extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties, false,
+                        extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties, additionalFlags,
                         emptyILSecurityDecls, customAttrs)
 
                 let fcsTypeDef = 
