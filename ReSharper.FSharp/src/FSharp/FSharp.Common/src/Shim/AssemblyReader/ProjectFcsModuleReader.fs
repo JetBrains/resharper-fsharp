@@ -1263,10 +1263,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 // TODO: avoid hasExtensions in closure?
                 let hasExtensions = hasExtensions typeElement
                 let customAttrs = mkILCustomAttrsComputed (fun _ ->
-                    let result = usingTypeElement clrTypeName [||] (fun typeElement ->
+                    usingTypeElement clrTypeName [||] (fun typeElement ->
                         mkTypeDefCustomAttrs typeElement hasExtensions
                     )
-                    result
                 )
 
                 let additionalFlags =
