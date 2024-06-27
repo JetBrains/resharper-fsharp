@@ -7,7 +7,6 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.showRunContent
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.openapi.application.EDT
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.jetbrains.rider.debugger.DotNetProgramRunner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,7 +18,6 @@ class FSharpScriptFsiRunner : DotNetProgramRunner() {
   override suspend fun executeAsync(environment: ExecutionEnvironment, state: RunProfileState): RunContentDescriptor? {
     if (state !is FSharpScriptRunProfileState) return null
     val result = withContext(Dispatchers.EDT) {
-      FileDocumentManager.getInstance().saveAllDocuments()
       state.executeSuspending(environment.executor)
     }
     return showRunContent(result, environment)
