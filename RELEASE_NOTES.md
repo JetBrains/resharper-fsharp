@@ -1,5 +1,54 @@
 # Release notes
 
+## 2024.2
+
+### Import
+
+* **New**: Importing extension members is now suggested via code completion suggestions and error quick fixes. Both C#-style extension methods and F# type augmentations are supported
+
+### F# Interactive
+
+* **New**: Debugging F# scripts is now supported
+* **New**: Show line numbers in sent code fragments
+* **Fix**: 'Send to F# interactive' was unavailable for some files
+* **Fix**: Syntax highlighting was broken for some outputs
+
+### Context actions and Generate overrides
+
+* **New**: A new action to convert partial applications to lambda expressions is added
+* **New**: An action to convert F# 8 short lambdas to normal lambda expressions was added
+* **Fix**: Wrong keywords could be used for some member overrides
+
+### Code completion
+
+* **New**: Pattern names are suggested based on values types
+* **Improve**: More context-aware suggestions filtering was added
+* **Improve**: Better presentation for union case field suggestions
+* **Fix**: Some local items were missing in suggestions
+* **Fix**: Override suggestions were shown in extra cases
+
+### Code analysis and Project model
+
+* **New**: Type hints are shown for last items in pipe chains
+* **Fix**: Adding new file could put it into wrong place in solution view
+* **Fix**: Reordering files and manual fsproj changes might have no effect in code analysis
+* **Fix**: Fix performance degradation on project changes in big solutions
+* **Fix**: Fix updating script dependencies could lead to a crash
+* **Fix**: Escape sequences in string interpolations could be analysed incorrectly
+* **Fix**: Language injections are now disabled in string interpolations
+* **Fix**: Stale type providers info could be used in code analysis
+
+### Refactorings
+
+* **Fix**: Rename could not rename some type usages in type annotations
+* **Fix**: Introduce variable could fail in some cases
+
+### Misc
+
+* **Fix**: Some editor config overrides could be ignored when reformatting files
+* **Improve**: Take typing assist settings into account in more cases when typing
+* **Improve**: Disable inline breakpoints for F#
+
 ## 2024.1
 
 ### Find Usages and navigation
