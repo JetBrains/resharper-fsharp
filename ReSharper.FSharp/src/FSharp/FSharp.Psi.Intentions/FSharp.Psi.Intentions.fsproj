@@ -7,10 +7,10 @@
   <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</RootNamespace>
-    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
