@@ -122,8 +122,9 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         |> Option.bind tryGetProjectMapping
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter (itemsByName: CompactOneToListMap<_,_>) allowNonDefaultItemType =
+    let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter (itemsByName: HashSet<_>) allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
+
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
             let filter = filterProvider.CreateItemFilter(projectPart, projectDescriptor)
@@ -134,10 +135,8 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
                 // todo: allow passing additional default item types to the filter ctor
                 (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
-
-                (let (BuildAction buildAction) = item.ItemType
-                 not (buildAction.IsNone() && itemsByName[item.EvaluatedInclude].Count > 1)))
-
+                (itemsByName.Add(item.EvaluatedInclude) || item.ItemType |> (|BuildAction|) |> _.IsNone() |> not)
+            )
             |> Seq.fold (fun index item ->
                 if index < items.Count && items[index].Item.EvaluatedInclude = item.EvaluatedInclude then
                     items[index].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
@@ -231,19 +230,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
             match projectMark with
             | FSharpProjectMark ->
-                let itemsByName = CompactOneToListMap()
-                for rdProject in msBuildProject.Parts do
-                    let itemFilter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
-
-                    let isAllowedItem (item: MsBuildProjectItem) =
-                        match item.ItemType with
-                        | CompileBefore | CompileAfter -> true
-                        | itemType -> not (itemFilter.FilterByItemType(itemType, item.IsImported()))
-
-                    for rdItem in rdProject.GetAvailableItems() do
-                        if isAllowedItem rdItem then
-                            itemsByName.AddValue(rdItem.EvaluatedInclude, rdItem.ItemType)
-
+                let itemsByName = HashSet()
                 let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore itemsByName true
                 let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter itemsByName true
                 let restItems = getItems msBuildProject projectDescriptor (changesOrder >> not) itemsByName false
