@@ -9,14 +9,12 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.NetCore</AssemblyName>
+    <JetNonProductAssembly>true</JetNonProductAssembly>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
     <OutputType>Exe</OutputType>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</RootNamespace>
     <SdkTargetFrameworkOverride>.NETCoreApp,Version=v3.1</SdkTargetFrameworkOverride>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <JetNonProductAssembly>true</JetNonProductAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\FSharp.TypeProviders.Host\src\**\*.cs">

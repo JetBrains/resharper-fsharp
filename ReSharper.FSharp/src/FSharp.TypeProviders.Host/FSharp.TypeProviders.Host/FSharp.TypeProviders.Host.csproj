@@ -10,13 +10,11 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</AssemblyName>
     <DefineConstants>NETFRAMEWORK</DefineConstants>
+    <JetNonProductAssembly>true</JetNonProductAssembly>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
     <OutputType>Exe</OutputType>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host</RootNamespace>
     <TargetFramework>net472</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <JetNonProductAssembly>true</JetNonProductAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.config">
