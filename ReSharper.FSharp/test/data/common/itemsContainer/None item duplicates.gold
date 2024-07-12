@@ -1,0 +1,17 @@
+﻿
+=== Container Dump ===
+Project
+1:File1
+2:host.json (None)
+
+.NETFramework,Version=v0.0
+File1
+host.json
+
+
+=== Structure API ===
+File1 SortKey=1 ParentFolderIdentity=<null>
+host.json SortKey=2 ParentFolderIdentity=<null>
+host.json SortKey=2 ParentFolderIdentity=<null>
+
+=== Parent Folders API ===

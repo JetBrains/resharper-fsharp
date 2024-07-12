@@ -821,6 +821,12 @@ type FSharpItemsContainerTest() =
                 let (UnixSeparators path) = VirtualFileSystemPath.Parse("..\\ExternalFolder\\File1", InteractionContext.SolutionContext)
                 container.OnUpdateFile("Compile", path, "Resource", path))
 
+    [<Test>]
+    member x.``None item duplicates``() =
+        x.DoContainerInitializationTest
+            [ createItem "Compile" "File1"
+              createItem "None" "host.json"
+              createItem "None" "host.json" ]
 
     member x.DoCreateModificationContextTest(items: AnItem list) =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]
