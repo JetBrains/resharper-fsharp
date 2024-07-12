@@ -1,0 +1,63 @@
+===================
+Init
+
+-Project
+ -SolutionWithDuplicateTargets * 1 project
+  -Library
+   -Dependencies
+    -.NETStandard 2.1
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      NETStandard.Library
+   Library.fs
+   host.json
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : SolutionWithDuplicateTargets.sln)[]
+
+Project [Name:Library, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    ProjectFileImpl(Path : Library.fsproj)[]
+    ProjectFileImpl(Path : host.json)[NONE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:netstandard2.1, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : Library.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  SolutionWithDuplicateTargets.sln
+  SolutionWithDuplicateTargets/Library.fs
+  SolutionWithDuplicateTargets/Library.fsproj
+  SolutionWithDuplicateTargets/host.json
+  SolutionWithDuplicateTargets/obj/Debug/netstandard2.1/Library.AssemblyInfo.fs
+
+1:obj[1]
+  1:Debug[1]
+    1:netstandard2.1[1]
+      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
+      2:Library.AssemblyInfo.fs (CompileBefore)
+2:Library.fs
+3:host.json (None)
+
+.NETStandard,Version=v2.1
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+obj/Debug/netstandard2.1/Library.AssemblyInfo.fs
+Library.fs
+host.json
+
