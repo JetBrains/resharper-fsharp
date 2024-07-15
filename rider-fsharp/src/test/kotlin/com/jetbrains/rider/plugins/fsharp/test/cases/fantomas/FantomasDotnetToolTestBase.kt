@@ -89,7 +89,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
-          Environment.dotNetSdk(testMethod.environment.sdkVersionInstance).dotnetExecutable.toPath(),
+          Environment.dotNetSdk(testMethod.environment.sdk).dotnetExecutable.toPath(),
           listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
           env
         )
