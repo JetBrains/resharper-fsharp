@@ -343,13 +343,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let invalidateDirtyProjects () =
         locks.AssertWriteAccessAllowed()
 
-        // Create a new collection, so transitive changes could add new dirty projects,
-        // Adding dirty projects would break the enumeration below if the original collection is changed.
-        let dirtyProjects =
-            let result = HashSet(dirtyProjects)
-            dirtyProjects.Clear()
-            result
-
         let visited = HashSet<FcsProjectKey>()
         let projectsToInvalidate = Stack()
 
@@ -390,8 +383,15 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 if not (newTargetFrameworks.Contains(existingProjectKey.TargetFrameworkId)) then
                     removeProject existingProjectKey
 
-        for dirtyProject in dirtyProjects do
-            loop dirtyProject
+        // Create a new collection, so transitive changes could add new dirty projects,
+        // Adding dirty projects would break the enumeration below if the original collection is changed.
+        let mutable currentDirtyProjects = null
+        while (let result = HashSet(dirtyProjects)
+               dirtyProjects.Clear()
+               currentDirtyProjects <- result
+               result.Count <> 0) do
+            for dirtyProject in currentDirtyProjects do
+                loop dirtyProject
 
     let processInvalidatedFcsProjects () =
         if invalidatedFcsProjects.IsEmpty then () else
@@ -437,10 +437,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         use cookie = WriteLockCookie.Create()
 
-        while dirtyProjects.Count > 0 do
-            invalidateDirtyProjects ()
-
-        dirtyProjects.Clear()
+        invalidateDirtyProjects ()
 
     override x.VisitDelta(change: ProjectModelChange) =
         base.VisitDelta(change)
@@ -477,7 +474,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         if isNotNull project then
             dirtyProjects.Add(project) |> ignore
             invalidateDirtyProjects ()
-            dirtyProjects.Clear()
 
     interface IFcsProjectProvider with
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
