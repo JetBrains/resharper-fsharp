@@ -11,7 +11,7 @@ import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 
 @Suppress("unused")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK, platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK, platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
 object Net60 {
   class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net6.FSharp.classLibrary) {
     override val targetFramework: String = "net6.0"
