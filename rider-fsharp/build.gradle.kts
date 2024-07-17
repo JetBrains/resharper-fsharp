@@ -317,15 +317,12 @@ tasks {
     dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, ":lexer:generateLexer")
   }
 
-  create("buildReSharperPlugin") {
+  val buildReSharperPlugin by registering(Exec::class) {
     group = riderFSharpTargetsGroup
     dependsOn(prepare)
-    doLast {
-      exec {
-        executable = "msbuild"
-        args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
-      }
-    }
+
+    executable = "dotnet"
+    args("build", "$resharperPluginPath/ReSharper.FSharp.sln")
   }
 
   wrapper {
