@@ -3,8 +3,10 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
@@ -16,9 +18,11 @@ import org.testng.annotations.Test
 class FantomasTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
 
+  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL])
   @Test
   fun withEditorConfig() = doTest("EditorConfig.fs")
 
+  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL])
   @Test
   fun simpleFormatting() = doTest("Simple.fs")
 
