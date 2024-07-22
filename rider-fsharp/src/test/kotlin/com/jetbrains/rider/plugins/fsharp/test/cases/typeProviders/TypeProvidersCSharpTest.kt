@@ -13,7 +13,7 @@ import java.io.File
 
 @Test
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
-  override fun getSolutionDirectoryName() = "YamlProviderCSharp"
+  override val testSolution = "YamlProviderCSharp"
 
   @Test
   fun resolveTest() {

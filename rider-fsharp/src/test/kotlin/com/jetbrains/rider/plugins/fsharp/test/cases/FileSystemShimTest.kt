@@ -18,7 +18,7 @@ import java.time.Duration
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FileSystemShimTest : BaseTestWithSolution() {
-  override fun getSolutionDirectoryName() = "CoreConsoleApp"
+  override val testSolution: String = "CoreConsoleApp"
 
   @Test
   @Mute("RIDER-111885", platforms= [PlatformType.LINUX_ALL])

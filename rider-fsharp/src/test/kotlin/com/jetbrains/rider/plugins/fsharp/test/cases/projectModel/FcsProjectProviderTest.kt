@@ -25,8 +25,6 @@ import kotlin.test.assertEquals
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FcsProjectProviderTest : BaseTestWithSolution() {
-  override fun getSolutionDirectoryName() = throw Exception("Solutions are set in tests below")
-
   override val traceCategories
     get() = super.traceCategories.plus("JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider")
 

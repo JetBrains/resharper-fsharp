@@ -16,7 +16,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
-  override fun getSolutionDirectoryName() = "FormatCodeApp"
+  override val testSolution: String = "FormatCodeApp"
 
   @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @Test
