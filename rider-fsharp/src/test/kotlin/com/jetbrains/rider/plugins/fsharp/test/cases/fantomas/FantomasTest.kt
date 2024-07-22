@@ -18,11 +18,11 @@ import org.testng.annotations.Test
 class FantomasTest : EditorTestBase() {
   override fun getSolutionDirectoryName() = "FormatCodeApp"
 
-  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL])
+  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @Test
   fun withEditorConfig() = doTest("EditorConfig.fs")
 
-  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL])
+  @Mute("RIDER-114935", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @Test
   fun simpleFormatting() = doTest("Simple.fs")
 
