@@ -37,7 +37,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     private var launchCounter = 0
   }
 
-  override fun getSolutionDirectoryName() = "EmptySolution"
+  override val testSolution: String = "EmptySolution"
   override val restoreNuGetPackages = true
 
   @AfterMethod(alwaysRun = true)

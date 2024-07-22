@@ -23,7 +23,7 @@ import java.time.Duration
 import kotlin.io.path.*
 
 abstract class FantomasDotnetToolTestBase : EditorTestBase() {
-  override fun getSolutionDirectoryName() = "FormatCodeApp"
+  override val testSolution: String = "FormatCodeApp"
   override val restoreNuGetPackages = false
 
   private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")

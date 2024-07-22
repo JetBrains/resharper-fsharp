@@ -17,7 +17,7 @@ import org.testng.annotations.Test
 
 @Test
 class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
-  override fun getSolutionDirectoryName() = "CoreTypeProviderLibrary"
+  override val testSolution = "CoreTypeProviderLibrary"
 
   @Test
   @TestEnvironment(

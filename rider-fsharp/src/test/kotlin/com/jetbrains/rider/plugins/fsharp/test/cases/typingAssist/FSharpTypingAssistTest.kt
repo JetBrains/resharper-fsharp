@@ -10,7 +10,7 @@ import org.testng.annotations.Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpTypingAssistTest : TypingAssistTestBase() {
 
-  override fun getSolutionDirectoryName(): String = "CoreConsoleApp"
+  override val testSolution: String = "CoreConsoleApp"
 
   @DataProvider(name = "testTypingAssists")
   fun testTypingAssists() = arrayOf(

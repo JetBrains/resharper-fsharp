@@ -11,7 +11,7 @@ import org.testng.annotations.Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class AsyncDebuggerTest : DebuggerTestBase() {
   override val projectName = "AsyncProgram"
-  override fun getSolutionDirectoryName() = projectName
+  override val testSolution: String = projectName
 
   override val waitForCaches = true
   override val restoreNuGetPackages = true

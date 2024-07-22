@@ -21,7 +21,7 @@ import java.io.File
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
-  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val testSolution = "TypeProviderLibrary"
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 
   override val traceScenarios: Set<LogTraceScenario>
