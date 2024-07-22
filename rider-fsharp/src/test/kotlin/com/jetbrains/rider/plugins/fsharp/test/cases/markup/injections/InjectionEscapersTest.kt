@@ -23,7 +23,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class InjectionEscapersTest : BaseTestWithSolution() {
-  override fun getSolutionDirectoryName() = "CoreConsoleApp"
+  override val testSolution: String = "CoreConsoleApp"
 
   private fun doTest(action: (EditorImpl, EditorImpl) -> Unit) {
     withOpenedEditor("Program.fs", "Program.fs") {

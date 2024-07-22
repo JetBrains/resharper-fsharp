@@ -16,7 +16,7 @@ import java.io.File
 
 @Test
 class FSharpProjectModelTest : ProjectModelBaseTest() {
-  override fun getSolutionDirectoryName() = "EmptySolution"
+  override val testSolution: String = "EmptySolution"
   override val restoreNuGetPackages = true
 
   private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: RdDndOrderType? = null) {

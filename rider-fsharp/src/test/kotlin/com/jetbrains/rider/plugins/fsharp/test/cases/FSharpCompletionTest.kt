@@ -11,7 +11,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpCompletionTest : CompletionTestBase() {
-  override fun getSolutionDirectoryName() = "CoreConsoleApp"
+  override val testSolution: String = "CoreConsoleApp"
   override val restoreNuGetPackages = true
 
   @Test

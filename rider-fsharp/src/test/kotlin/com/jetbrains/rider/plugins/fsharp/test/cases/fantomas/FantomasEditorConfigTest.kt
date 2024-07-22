@@ -15,7 +15,7 @@ import java.io.File
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
-  override fun getSolutionDirectoryName() = "FormatCodeApp"
+  override val testSolution = "FormatCodeApp"
   override fun beforeDoTestWithDocuments() {
     super.beforeDoTestWithDocuments()
 

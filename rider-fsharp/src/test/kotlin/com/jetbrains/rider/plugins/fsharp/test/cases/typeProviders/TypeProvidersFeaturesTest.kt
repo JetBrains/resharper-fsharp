@@ -16,7 +16,7 @@ import java.time.Duration
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class TypeProvidersFeaturesTest : EditorTestBase() {
-  override fun getSolutionDirectoryName() = "SwaggerProviderCSharp"
+  override val testSolution = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
   override val traceScenarios: Set<LogTraceScenario>
     get() = super.traceScenarios + FSharpLogTraceScenarios.FSharpTypeProviders

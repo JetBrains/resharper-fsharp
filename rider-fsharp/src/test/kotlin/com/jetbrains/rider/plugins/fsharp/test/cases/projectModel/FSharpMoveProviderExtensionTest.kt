@@ -21,9 +21,6 @@ import org.testng.annotations.Test
 
 @Test
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
-
-  override fun getSolutionDirectoryName() = error("Specify solution per test")
-
   @Test
   @TestEnvironment(solution = "MoveProviderSolution1", sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
   fun testAllowPaste01_Mix() {

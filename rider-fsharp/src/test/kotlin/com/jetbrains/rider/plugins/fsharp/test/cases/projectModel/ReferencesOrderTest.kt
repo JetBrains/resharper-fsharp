@@ -9,7 +9,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
 class ReferencesOrder : BaseTestWithSolution() {
-  override fun getSolutionDirectoryName() = "ReferencesOrder"
+  override val testSolution = "ReferencesOrder"
 
   override val waitForCaches = true
   override val restoreNuGetPackages = true

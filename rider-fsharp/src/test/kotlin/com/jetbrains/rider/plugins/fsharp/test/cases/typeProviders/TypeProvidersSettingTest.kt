@@ -15,7 +15,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class TypeProvidersSettingTest : BaseTypeProvidersTest() {
-  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val testSolution = "TypeProviderLibrary"
 
   @Test
   fun disabledTypeProvidersSetting() {

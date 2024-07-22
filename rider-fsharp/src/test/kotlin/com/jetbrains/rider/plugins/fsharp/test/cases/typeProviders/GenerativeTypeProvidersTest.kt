@@ -20,7 +20,7 @@ import java.time.Duration
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
-  override fun getSolutionDirectoryName() = "TypeProviderLibrary"
+  override val testSolution = "TypeProviderLibrary"
 
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
