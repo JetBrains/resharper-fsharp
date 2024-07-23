@@ -140,10 +140,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       return true;
     }
 
-    public TypeProvidersExternalProcess(Lifetime processLifetime, ILogger logger, IShellLocks locks,
+    public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, DotNetCoreToolset toolset,
       bool isInternalMode, LoggerModel loggerModel)
-      : base(processLifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
+      : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myToolset = toolset;
