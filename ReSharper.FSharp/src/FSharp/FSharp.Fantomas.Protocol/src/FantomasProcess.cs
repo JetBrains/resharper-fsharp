@@ -83,10 +83,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
       return true;
     }
 
-    public FantomasProcess(Lifetime processLifetime, ILogger logger, IShellLocks locks,
+    public FantomasProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, string version,
       VirtualFileSystemPath specifiedPath = null)
-      : base(processLifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
+      : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myVersion = version;
       mySpecifiedPath = specifiedPath;
