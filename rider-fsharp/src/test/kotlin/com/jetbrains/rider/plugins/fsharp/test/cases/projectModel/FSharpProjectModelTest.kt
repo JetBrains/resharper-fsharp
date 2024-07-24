@@ -201,4 +201,15 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
       }
     }
   }
+
+  @Test(description = "RIDER-107198")
+  @TestEnvironment(
+    solution = "SolutionWithDuplicateTargets",
+    sdkVersion = SdkVersion.DOT_NET_5
+  )
+  fun doNoneItemDuplicatesTest() {
+    doTestDumpProjectsView {
+      dump2("Init", checkSlnFile = false, compareProjFile = false) { }
+    }
+  }
 }
