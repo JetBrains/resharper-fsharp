@@ -26,7 +26,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) => false;
 
+    public override bool IsParams => false;
     public override bool IsParameterArray => false;
+    public override bool IsParameterCollection => false;
     public override bool IsOptional => false;
   }
 }
