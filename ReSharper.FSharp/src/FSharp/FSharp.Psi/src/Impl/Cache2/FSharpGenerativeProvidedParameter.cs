@@ -30,9 +30,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         _ => ParameterKind.VALUE
       };
 
+    public bool IsParams => IsParameterArray;
+
     public bool IsParameterArray =>
       Info is ProxyProvidedParameterInfoWithContext x &&
       x.GetAttributeConstructorArgs(null, "System.ParamArrayAttribute") != null;
+
+    public bool IsParameterCollection => false;
 
     public bool IsValueVariable => false;
     public bool IsOptional => Info.IsOptional;

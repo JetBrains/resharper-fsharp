@@ -52,7 +52,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public ParameterKind Kind => ParameterKind.VALUE;
     public DefaultValue GetDefaultValue() => DefaultValue.BAD_VALUE;
 
+    public bool IsParams => false;
     public bool IsParameterArray => false;
+    public bool IsParameterCollection => false;
     public bool IsValueVariable => false;
     public bool IsOptional => false;
     public bool IsVarArg => false;
