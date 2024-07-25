@@ -29,7 +29,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
     public IPsiModule Module => Owner.Module;
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+    public abstract bool IsParams { get; }
     public abstract bool IsParameterArray { get; }
+    public abstract bool IsParameterCollection { get; }
     public bool IsValueVariable => false;
     public abstract bool IsOptional { get; }
     public ScopedKind Scope => ScopedKind.None;
