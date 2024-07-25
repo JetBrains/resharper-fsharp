@@ -165,6 +165,9 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Record Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 02``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 03``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 04``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 05``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 06``() = x.DoNamedTest()
 
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
@@ -543,6 +546,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field - Unfinished 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Unfinished 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field - Unfinished 05 - Another ns``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field - Unfinished 06``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 02 - Other type``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 03``() = x.DoNamedTest()

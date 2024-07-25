@@ -97,6 +97,7 @@ type RecordFieldRule() =
 
     override this.IsAvailable(context) =
         context.IsBasicOrSmartCompletion &&
+        not context.IsQualified &&
         Option.isSome (getRecordEntity context)
 
     override this.TransformItems(context, collector) =
