@@ -55,7 +55,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override ParameterKind Kind => FSharpSymbol.MapParameterKind();
+    public override bool IsParams => IsParameterArray;
     public override bool IsParameterArray => Owner is IFSharpFunction && FSharpSymbol.IsParamArrayArg;
+    public override bool IsParameterCollection => false;
 
     // todo: implement IsCliOptional in FCS
     public override bool IsOptional =>
