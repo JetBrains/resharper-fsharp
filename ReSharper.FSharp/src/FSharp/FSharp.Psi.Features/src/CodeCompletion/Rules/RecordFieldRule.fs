@@ -182,8 +182,6 @@ type RecordFieldRule() =
                    TailType.CaretTokenNodeType.Instance
                    FSharpTokenType.WHITESPACE |]
 
-            item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
-
             if emphasize then
                 item.Placement.Location <- PlacementLocation.Top
 
