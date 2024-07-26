@@ -85,7 +85,8 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   protected fun withFantomasGlobalTool(function: () -> Unit) {
     try {
-      val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString())
+      val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString(),
+                      "DOTNET_ADD_GLOBAL_TOOLS_TO_PATH" to false.toString())
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
