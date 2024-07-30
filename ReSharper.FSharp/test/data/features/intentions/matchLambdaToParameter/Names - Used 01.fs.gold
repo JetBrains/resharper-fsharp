@@ -1,0 +1,5 @@
+﻿module Module
+
+let f s s1 =
+    match s1 with{caret}
+    | "" -> ()

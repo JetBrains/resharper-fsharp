@@ -46,6 +46,7 @@
     <Compile Include="src\Intentions\DisableWarningActions.fs" />
     <Compile Include="src\Intentions\ConvertDotLambdaToLambdaExprAction.fs" />
     <Compile Include="src\Intentions\ConvertPartiallyAppliedFunctionToLambdaAction.fs" />
+    <Compile Include="src\Intentions\MatchLambdaExprToParameterAction.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />

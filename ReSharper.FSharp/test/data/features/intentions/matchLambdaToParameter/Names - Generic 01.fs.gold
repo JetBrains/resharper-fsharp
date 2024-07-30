@@ -1,0 +1,6 @@
+﻿module Module
+
+let f foo =
+    match foo with{caret}
+    | _ -> ()
+}
