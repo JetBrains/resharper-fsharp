@@ -6,6 +6,7 @@ open FSharp.Compiler.SyntaxTrivia
 open FSharp.Compiler.Text
 open FSharp.Compiler.Xml
 open JetBrains.Annotations
+open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
@@ -218,11 +219,17 @@ module rec FSharpMsBuildUtils =
         let compileBefore = BuildAction.GetOrCreate(compileBeforeItemType)
         let compileAfter = BuildAction.GetOrCreate(compileAfterItemType)
 
-    let isCompileBefore itemType =
-        equalsIgnoreCase compileBeforeItemType itemType
+    module ProjectItemMetadata =
+        let [<Literal>] compileOrder = "CompileOrder"
 
-    let isCompileAfter itemType =
-        equalsIgnoreCase compileAfterItemType itemType
+    let isCompileBefore (msbuildItem: MsBuildProjectItem) =
+        equalsIgnoreCase compileBeforeItemType msbuildItem.ItemType
+
+    let isCompileAfter (msbuildItem: MsBuildProjectItem) =
+        equalsIgnoreCase compileAfterItemType msbuildItem.ItemType
+
+    let changesOrder (msbuildItem: MsBuildProjectItem) =
+        isCompileAfter msbuildItem || isCompileAfter msbuildItem
 
     let (|CompileBefore|_|) itemType =
         if isCompileBefore itemType then someUnit else None
@@ -244,13 +251,6 @@ module rec FSharpMsBuildUtils =
 
     let (|Resource|_|) buildAction =
         if buildAction = BuildAction.RESOURCE then someUnit else None
-
-    let changesOrder = function
-        | CompileBefore | CompileAfter -> true
-        | _ -> false
-
-    type BuildAction with
-        member x.ChangesOrder = changesOrder x.Value
 
 [<Extension; AutoOpen>]
 module PsiUtil =
