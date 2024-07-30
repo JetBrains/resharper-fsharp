@@ -76,6 +76,9 @@ type FSharpImportTypeHelper() =
                     let autoOpenedModules = fsAssemblyAutoOpenCache.GetAutoOpenedModules(typeElement.Module)
                     if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else
 
+                    let fsModule = typeElement.As<IFSharpModule>()
+                    if isNotNull fsModule && isNotNull fsModule.AssociatedTypeElement then false else
+
                     let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, false, opName)
                     Option.isSome symbolUse)
                 |> Seq.cast
