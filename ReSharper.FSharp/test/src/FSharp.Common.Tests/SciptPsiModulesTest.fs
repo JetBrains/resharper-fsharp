@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common.Scripts
 open System
 open System.IO
 open System.Linq
+open System.Threading.Tasks
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
@@ -82,10 +83,10 @@ type ScriptPsiModulesTest() =
 
 [<SolutionInstanceComponent>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
-type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger) =
-    inherit DefaultSolutionToolset(lifetime, settings, logger)
+type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, solutionToolsetListeners: ILazyImmutableList<ISolutionToolsetListener>) =
+    inherit DefaultSolutionToolset(lifetime, settings, logger, solutionToolsetListeners)
 
-    let changed = new Signal<_>("MySolutionToolset::Changed")
+    let changed = new Signal<_>("MySoluAtionToolset::Changed")
 
     let cli = dotNetCoreInstallationsDetector.DetectSdkInstallations(InteractionContext.SolutionContext).FirstOrDefault().NotNull()
     let dotnetCoreToolset = DotNetCoreToolset(cli, cli.Sdks.FirstOrDefault().NotNull())
@@ -94,7 +95,11 @@ type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: 
     let buildTool = DotNetCoreMsBuildProvider().Discover(env).FirstOrDefault().NotNull()
 
     interface ISolutionToolset with
-        member x.GetBuildTool() = buildTool
+        member x.GetRuntimeAndToolset() =
+          let toolset = base.GetRuntimeAndToolset()
+          RuntimeAndToolset(toolset.MonoRuntime, toolset.DotNetCoreToolset, buildTool, toolset.NonNativeX86DotNetCoreToolset, toolset.NonNativeX64DotNetCoreToolset)
+          
+        member x.GetRuntimeAndToolsetAsync() = ValueTask<RuntimeAndToolset>(x.GetRuntimeAndToolset())
         member x.Changed = changed :> _
 
 
