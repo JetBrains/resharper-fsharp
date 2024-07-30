@@ -8,17 +8,17 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageStringLiteralExpression
-import com.jetbrains.rider.plugins.appender.lang.common.ClrLanguageConcatenationAwareInjector
+import com.jetbrains.rider.plugins.appender.database.SqlAwareClrLanguageConcatenationAwareInjector
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
 
 class FSharpConcatenationAwareInjector :
-  ClrLanguageConcatenationAwareInjector(FSharpInjectionSupport.FSHARP_SUPPORT_ID) {
+  SqlAwareClrLanguageConcatenationAwareInjector(FSharpInjectionSupport.FSHARP_SUPPORT_ID) {
   override fun getInjectionProcessor(injection: BaseInjection,
                                      host: ClrLanguageStringLiteralExpression): InjectionProcessor = FSharpInjectionProcessor(injection, host)
   override fun isInjectionHost(concatenationOperand: PsiElement) = concatenationOperand is FSharpStringLiteralExpression
 
   private class FSharpInjectionProcessor(injection: BaseInjection, host: ClrLanguageStringLiteralExpression) :
-    InjectionProcessor(
+    ClrLanguageSqlAwareInjectionProcessor(
       injection,
       mapOf(SLASH_NEWLINE to "\\\\\\n", PLACEHOLDER_IDENTIFIER to "\\{\\d+}"),
       mapOf(SLASH_NEWLINE to "\\\\\\n", PLACEHOLDER_IDENTIFIER to createInterpolatedStringFormattingPlaceholderRegex(host))
