@@ -38,6 +38,10 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
 
     loop [] declaredElement
 
+let getQualifiedName (element: IClrDeclaredElement) =
+    match toQualifiedList element with
+    | [] -> "global"
+    | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
 
 [<RequireQualifiedAccess>]
 type ModuleToImport =
@@ -377,15 +381,10 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
     // todo: use scope with references?
     let symbolScope = getSymbolScope psiModule false
 
-//    let getQualifiedName (element: IClrDeclaredElement) =
-//        match toQualifiedList element with
-//        | [] -> "global"
-//        | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
-
     let import scope (element: IClrDeclaredElement) =
-        map.Add(element.GetSourceName(), scope)
+        map.Add(getQualifiedName element, scope)
         for autoImportedModule in getNestedAutoImportedModules element symbolScope do
-            map.Add(autoImportedModule.GetSourceName(), scope)
+            map.Add(getQualifiedName autoImportedModule, scope)
 
     do
         import OpenScope.Global symbolScope.GlobalNamespace

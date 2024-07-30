@@ -94,18 +94,18 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
     let accessContext = ElementAccessContext(context)
 
     let isInScope (typeMember: ITypeMember) =
-        let isInScope name =
-            // todo: use qualified names in the map
+        let isInScope declaredElement =
+            let name = getQualifiedName declaredElement
             let scopes = scopes.GetValuesSafe(name)
             OpenScope.inAnyScope context scopes
         
         match typeMember.ContainingType with
         | :? IFSharpModule as fsModule ->
-            isInScope fsModule.SourceName
+            isInScope fsModule
 
         | containingType ->
             let ns = containingType.GetContainingNamespace()
-            isInScope ns.ShortName
+            isInScope ns
 
     let matchesType (typeMember: ITypeMember) : bool =
         let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =
