@@ -7,7 +7,6 @@ open System.Threading.Tasks
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
-open JetBrains.Application.Environment
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -15,15 +14,10 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
 open JetBrains.ProjectModel.MSBuild.BuildTools
-open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
@@ -83,8 +77,8 @@ type ScriptPsiModulesTest() =
 
 [<SolutionInstanceComponent>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
-type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, solutionToolsetListeners: ILazyImmutableList<ISolutionToolsetListener>) =
-    inherit DefaultSolutionToolset(lifetime, settings, logger, solutionToolsetListeners)
+type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, notifier: RuntimeAndToolsetChangeNotifier) =
+    inherit DefaultSolutionToolset(lifetime, settings, logger, notifier)
 
     let changed = new Signal<_>("MySoluAtionToolset::Changed")
 
