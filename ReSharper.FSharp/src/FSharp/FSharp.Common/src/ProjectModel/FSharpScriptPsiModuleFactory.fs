@@ -6,6 +6,7 @@ open System.IO
 open System.Linq
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
+open Internal.Utilities.Library
 open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
@@ -58,11 +59,14 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     let locks = solution.Locks
 
     let targetFrameworkId =
-        let platformInfos = platformManager.GetAllCompilePlatforms().AsList()
-        if platformInfos.IsEmpty() then TargetFrameworkId.Default else
+        InterruptibleLazy(fun _ ->
+            let platformInfos = platformManager.GetAllCompilePlatforms().AsList()
+            if platformInfos.IsEmpty() then TargetFrameworkId.Default else
 
-        let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
-        platformInfo.TargetFrameworkId
+            let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
+            platformInfo.TargetFrameworkId
+        )
+        
 
     let getScriptReferences (scriptPath: VirtualFileSystemPath) scriptOptions =
         let assembliesPaths = HashSet<VirtualFileSystemPath>()
@@ -278,7 +282,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         getPsiModulesForPath path
 
     member x.TargetFrameworkId =
-        targetFrameworkId
+        targetFrameworkId.Value
 
     member x.Dump(writer: TextWriter) =
         writer.WriteLine("Scripts from paths:")
