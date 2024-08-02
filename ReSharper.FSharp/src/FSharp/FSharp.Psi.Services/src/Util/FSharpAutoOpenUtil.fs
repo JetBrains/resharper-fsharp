@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.FSharpAutoOpenUtil
 
 open System.Collections.Generic
+open JetBrains.Application
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
@@ -11,7 +12,10 @@ open JetBrains.ReSharper.Psi.Impl.Reflection2
 open JetBrains.Util
 
 let rec getNestedAutoImportedModules (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope) = seq {
+    Interruption.Current.CheckAndThrow()
+
     for typeElement in getNestedTypes declaredElement symbolScope do
+        Interruption.Current.CheckAndThrow()
         if typeElement.HasAutoOpenAttribute() then
             yield typeElement
             yield! getNestedAutoImportedModules typeElement symbolScope }
