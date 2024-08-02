@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<AssertCorrectTreeStructure; DumpPsiTree>]
+[<AssertCorrectTreeStructure>]
 type MatchLambdaToParameterTest() =
     inherit FSharpContextActionExecuteTestBase<MatchLambdaExprToParameterAction>()
 
