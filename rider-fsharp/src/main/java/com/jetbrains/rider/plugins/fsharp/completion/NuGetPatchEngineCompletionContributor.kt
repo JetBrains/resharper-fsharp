@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.startOffset
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor
-import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider
+import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineOldProtocolProvider
 import com.jetbrains.rider.editors.startOffset
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
@@ -42,8 +42,8 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     }
     finally {
       // Not sure is there a better way to provide params into provider with current architecture
-      RiderPatchEngineProtocolProvider.getInstance().customPrefixThreadLocal.remove()
-      RiderPatchEngineProtocolProvider.getInstance().nuGetCustomParamThreadLocal.remove()
+      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.remove()
+      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.remove()
     }
   }
 
@@ -70,13 +70,13 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
   ): Boolean {
     if (containsExclusive(strictGroup.range, cursorPosition)) {
       val completionPrefix = content.substring(strictGroup.range.first, cursorPosition)
-      RiderPatchEngineProtocolProvider.getInstance().customPrefixThreadLocal.set(completionPrefix)
-      RiderPatchEngineProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
+      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.set(completionPrefix)
+      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
       return true
     }
     else if (containsExclusive(zoneGroup.range, cursorPosition)) {
-      RiderPatchEngineProtocolProvider.getInstance().customPrefixThreadLocal.set("")
-      RiderPatchEngineProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
+      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.set("")
+      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
       return true
     }
 
