@@ -4,6 +4,7 @@ using System.IO;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.Application.ContentModel;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
@@ -163,6 +164,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public void OnPsiChange(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
       if (elementContainingChanges == null)
+        return;
+      if (ContentModelFork.IsCurrentlyForked)
         return;
 
       var sourceFile = elementContainingChanges.GetSourceFile();
