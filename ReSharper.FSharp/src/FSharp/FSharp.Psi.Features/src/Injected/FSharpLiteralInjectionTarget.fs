@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -15,7 +16,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
 open JetBrains.Text
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpLiteralInjectionTarget() =
     let isInjectionAllowed tokenType =
         FSharpTokenType.Strings[tokenType] &&

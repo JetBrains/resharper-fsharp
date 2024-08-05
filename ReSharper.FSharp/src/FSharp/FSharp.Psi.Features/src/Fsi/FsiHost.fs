@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Text
 open System.Threading
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Lifetimes
 open JetBrains.Metadata.Utils
 open JetBrains.Platform.RdFramework.Util
@@ -23,7 +24,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,

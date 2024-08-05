@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
 open System.Text.RegularExpressions
 open JetBrains.Annotations
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Features.RegExp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -16,7 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpRegexNodeProvider() =
     let rec evalOptionsArg (expr: IFSharpExpression) =
         match expr.IgnoreInnerParens() with

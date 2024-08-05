@@ -5,6 +5,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.Parts
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -18,7 +19,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
         scriptSettings: FSharpScriptSettingsProvider, fsSourceCache: FSharpSourceCache, toolset: ISolutionToolset) =
 

@@ -1,3 +1,4 @@
+using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -7,7 +8,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.TypeProviders
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class ProvidedAbbreviationTypePartInvalidator
   {
     private readonly IProxyExtensionTypingProvider myTypeProvidersShim;
