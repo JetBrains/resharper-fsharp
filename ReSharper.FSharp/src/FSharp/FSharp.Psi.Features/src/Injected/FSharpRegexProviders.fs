@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected
 
+open JetBrains.Application.Parts
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Features.RegExp.Intellisense
@@ -15,7 +16,7 @@ open JetBrains.ReSharper.Psi.RegExp.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpRegexInjectionProvider
         (lifetime: Lifetime, solution: ISolution, persistentIndexManager: IPersistentIndexManager,
          providersViewer: InjectionNodeProvidersViewer, injectionTargetLanguage: FSharpLiteralInjectionTarget) =
@@ -31,7 +32,7 @@ type FSharpRegexInjectionProvider
     override _.SupportsInjectionIntention = false
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type RegExprPsiProvider(injectorProvider: FSharpRegexInjectionProvider) =
     inherit LiteralsInjectionPsiProvider<FSharpLanguage, ClrRegexLanguage>(injectorProvider, ClrRegexLanguage.Instance)
 

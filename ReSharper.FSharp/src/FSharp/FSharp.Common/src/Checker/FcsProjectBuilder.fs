@@ -60,7 +60,7 @@ module FcsProjectBuilder =
         splitAndTrim itemsDelimiters configuration.DefineConstants
         |> List.ofArray
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =

@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
     interface IProjectStructureProvider with

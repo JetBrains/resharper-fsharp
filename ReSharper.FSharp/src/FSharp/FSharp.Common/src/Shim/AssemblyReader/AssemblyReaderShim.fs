@@ -4,6 +4,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Text
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.Lifetimes
@@ -66,7 +67,7 @@ module AssemblyReaderShim =
 
 // todo: support script -> project references
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim,
         fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution,

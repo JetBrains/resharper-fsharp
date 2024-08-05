@@ -7,6 +7,7 @@ open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.IO
 open JetBrains.Application.Notifications
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.DotNetTools
@@ -26,7 +27,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IFSharpPluginZone>)>]
 type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer,
         fantomasHost: FantomasHost, dotnetToolsTracker: SolutionDotnetToolsTracker, notifications: UserNotifications,

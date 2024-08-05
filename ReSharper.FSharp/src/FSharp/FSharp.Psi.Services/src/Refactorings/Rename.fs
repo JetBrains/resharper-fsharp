@@ -4,6 +4,7 @@ open System
 open System.Linq
 open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -297,7 +298,7 @@ type AssociatedTypeRenameEvaluator() =
 
             | _ -> [] :> _
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpSuspiciousReferenceSearchService(searchFilter: FSharpSearchFilter) =
     inherit SuspiciousReferencesSearchService()
 

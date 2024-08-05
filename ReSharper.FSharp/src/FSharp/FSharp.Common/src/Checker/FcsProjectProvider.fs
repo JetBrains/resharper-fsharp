@@ -7,6 +7,7 @@ open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
@@ -62,7 +63,7 @@ module FcsProjectProvider =
         ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
         ProjectModelChangeType.REFERENCE_TARGET
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
@@ -616,7 +617,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
 /// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built
 /// which makes FCS cached resolve results stale
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
         typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim) =

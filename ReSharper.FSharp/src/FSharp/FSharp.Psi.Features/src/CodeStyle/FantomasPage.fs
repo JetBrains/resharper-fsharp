@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open System.Collections.Generic
 open System.Runtime.InteropServices
 open JetBrains.Application.Notifications
+open JetBrains.Application.Parts
 open JetBrains.Application.UI.Components
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
@@ -102,7 +103,7 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
         this.AddLinkButton("DotnetToolsLink", "Learn more", fun () -> uiApplication.OpenUri("https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install")) |> ignore
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifications: UserNotifications,
         optionsManager: OptionsManager, dotnetToolsTracker: SolutionDotnetToolsTracker,
         uiApplication: IUIApplication) =

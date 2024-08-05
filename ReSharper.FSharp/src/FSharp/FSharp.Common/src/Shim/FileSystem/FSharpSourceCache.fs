@@ -5,6 +5,7 @@ open System.IO
 open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
+open JetBrains.Application.Parts
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -25,7 +26,7 @@ type FSharpSource =
         | Exists(source, timestamp) -> RdFSharpSource(Encoding.UTF8.GetString(source), timestamp)
         | _ -> RdFSharpSource("NotExists", DateTime.MinValue)
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
         solutionDocumentChangeProvider: SolutionDocumentChangeProvider, fileExtensions: IProjectFileExtensions,
         logger: ILogger) =
