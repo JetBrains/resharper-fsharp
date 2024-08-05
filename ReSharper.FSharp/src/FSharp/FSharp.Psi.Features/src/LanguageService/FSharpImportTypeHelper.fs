@@ -46,7 +46,7 @@ type FSharpImportTypeHelper() =
                 let elementKey = searchFilter.TryGetKey(typeElement)
                 searchFilter.CanContainReferences(sourceFile, elementKey)
 
-            let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>()
+            let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAutoOpenCache>()
 
             let mutable candidates: ITypeElement seq =
                 names

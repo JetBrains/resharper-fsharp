@@ -2,7 +2,9 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMembe
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -89,7 +91,8 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
         typeElements.AsReadOnly()
 
-    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile)
+    let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
+    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile, autoOpenCache)
     let scopes = openedModulesProvider.OpenedModuleScopes
     let accessContext = ElementAccessContext(context)
 

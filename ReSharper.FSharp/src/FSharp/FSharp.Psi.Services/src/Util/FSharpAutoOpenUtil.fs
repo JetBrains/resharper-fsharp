@@ -1,26 +1,14 @@
-﻿[<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.FSharpAutoOpenUtil
+﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.FSharpAutoOpenUtil
 
 open System.Collections.Generic
-open JetBrains.Application
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Impl.Reflection2
 open JetBrains.Util
 
-let rec getNestedAutoImportedModules (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope) = seq {
-    Interruption.Current.CheckAndThrow()
-
-    for typeElement in getNestedTypes declaredElement symbolScope do
-        Interruption.Current.CheckAndThrow()
-        if typeElement.HasAutoOpenAttribute() then
-            yield typeElement
-            yield! getNestedAutoImportedModules typeElement symbolScope }
-
-let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly: IPsiAssembly) =
+let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (autoOpenCache: FSharpAutoOpenCache)
+        (assembly: IPsiAssembly) =
     let result = List()
 
     psiAssemblyFileLoader.GetOrLoadAssembly(assembly, true, fun psiAssembly assemblyFile metadataAssembly ->
@@ -38,6 +26,6 @@ let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly
 
             for declaredElement in symbolScope.GetElementsByQualifiedName(moduleString) do
                 result.Add(declaredElement)
-                result.AddRange(getNestedAutoImportedModules declaredElement symbolScope)) |> ignore
+                result.AddRange(autoOpenCache.GetAutoImportedElements(declaredElement, symbolScope))) |> ignore
 
     result

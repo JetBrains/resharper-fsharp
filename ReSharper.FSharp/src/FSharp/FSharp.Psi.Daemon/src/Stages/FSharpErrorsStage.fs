@@ -2,12 +2,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
 open System.Collections.Generic
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -39,11 +41,13 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(analyzerData)
 
     do
+        let solution = fsFile.GetSolution()
+        let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
+
         analyzerData.SetDaemonProcess(daemonProcess, processKind);
         analyzerData.PutData(visualElementFactoryKey, VisualElementHighlighter(fsFile.Language, settings))
-        analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
+        analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile, autoOpenCache))
 
-        let solution = fsFile.GetSolution()
         let redundantParensAnalysisEnabled =
             let isEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.RedundantParenAnalysis)
             if isEnabled then BooleanBoxes.True else BooleanBoxes.False
