@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -33,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
     public int? GetStatisticsKey() => null;
   }
 
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   internal class FSharpIdentifierTooltipProvider : IdentifierTooltipProvider<FSharpLanguage>
   {
     public FSharpIdentifierTooltipProvider(Lifetime lifetime, ISolution solution,

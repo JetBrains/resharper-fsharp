@@ -7,6 +7,7 @@ open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
+open JetBrains.Application.Parts
 open JetBrains.Core
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -26,7 +27,7 @@ type IProxyExtensionTypingProvider =
     abstract DumpTypeProvidersProcess: unit -> string
     abstract TypeProvidersManager: IProxyTypeProvidersManager
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
         scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,

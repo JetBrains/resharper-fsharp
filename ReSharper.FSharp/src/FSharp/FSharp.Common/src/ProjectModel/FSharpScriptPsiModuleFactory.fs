@@ -8,6 +8,7 @@ open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open Internal.Utilities.Library
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
@@ -36,7 +37,7 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,

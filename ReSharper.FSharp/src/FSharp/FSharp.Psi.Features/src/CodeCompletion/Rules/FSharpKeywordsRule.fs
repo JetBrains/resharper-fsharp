@@ -4,6 +4,7 @@ open System.Collections.Generic
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Tokenization
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -381,7 +382,7 @@ type FSharpKeywordsRule() =
         true
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpHashDirectiveAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
         member x.Language = FSharpLanguage.Instance :> _

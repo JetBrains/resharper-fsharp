@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Core
 open JetBrains.DocumentModel
@@ -23,7 +24,7 @@ module internal Reflection =
         if isNotNull field then field.GetValue(obj) else null
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
                   schema: SettingsSchema, settingsStore: ISettingsStore) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime

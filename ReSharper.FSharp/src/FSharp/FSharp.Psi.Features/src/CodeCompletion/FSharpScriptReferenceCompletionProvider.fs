@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
@@ -222,7 +223,7 @@ type FSharpFolderCompletionItem(path: VirtualFileSystemPath) =
         textControl.RescheduleCompletion(solution)
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpScriptReferenceAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
 
