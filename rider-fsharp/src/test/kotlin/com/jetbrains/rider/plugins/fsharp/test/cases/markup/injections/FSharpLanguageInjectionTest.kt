@@ -56,7 +56,6 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 
   @Test
-  @Mute("RIDER-102632")
   @TestEnvironment(solution = "FableApp")
   fun testInjectionByExternalAnnotation() = doTest()
 }
