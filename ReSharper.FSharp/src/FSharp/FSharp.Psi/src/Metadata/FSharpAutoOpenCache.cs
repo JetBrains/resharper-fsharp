@@ -23,7 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private readonly IPsiAssemblyFileLoader myPsiAssemblyFileLoader;
 
     private readonly Dictionary<IPsiModule, ISet<string>> myAssemblyAutoOpenModules = new();
-    private readonly OneToSetMap<string, TypePart> myModuleToNestedAutoOpenModules = new();
+    private readonly OneToSetMap<string, TypePart> mySourceModuleToNestedAutoOpenModules = new();
+    private readonly OneToSetMap<string, string> myCompiledModuleToNestedAutoOpenModules = new();
 
     public FSharpAutoOpenCache(IPsiAssemblyFileLoader psiAssemblyFileLoader, ISymbolCache symbolCache)
     {
@@ -51,14 +52,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (qualifiedName == null)
         return EmptyList<ITypeElement>.Instance;
 
-      var parts = myModuleToNestedAutoOpenModules .GetReadOnlyValues(qualifiedName);
-      if (parts.IsEmpty())
-        return EmptyList<ITypeElement>.Instance;
+      var result = new HashSet<ITypeElement>();
 
-      return parts
-        .Select(part => part.TypeElement)
-        .Where(element => element != null && element.IsValid() && symbolScope.Contains(element))
-        .ToSet();
+      foreach (var part in mySourceModuleToNestedAutoOpenModules.GetReadOnlyValues(qualifiedName))
+      {
+        var typeElement = part.TypeElement;
+        if (typeElement != null && typeElement.IsValid() && symbolScope.Contains(typeElement))
+          result.Add(typeElement);
+      }
+
+      foreach (var compiledTypeName in myCompiledModuleToNestedAutoOpenModules.GetReadOnlyValues(qualifiedName))
+        if (symbolScope.GetTypeElementByCLRName(compiledTypeName) is { } compiledTypeElement)
+          result.Add(compiledTypeElement);
+
+      return result;
     }
 
     object ICache.Load(IProgressIndicator progress, bool enablePersistence) => null;
@@ -74,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private static bool IsApplicable(TypePart typePart) =>
       typePart.CanHaveAttribute(FSharpPredefinedType.AutoOpenAttrTypeName.ShortName);
 
-    private IEnumerable<IClrDeclaredElement> GetImportingParentModules([NotNull] TypeElement typeElement)
+    private IEnumerable<IClrDeclaredElement> GetSourceImportingParentModules([NotNull] TypeElement typeElement)
     {
       var containingType = typeElement.ContainingType;
       if (containingType == null)
@@ -99,6 +106,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       }
     }
 
+    private IEnumerable<string> GetCompiledImportingParentModuleNames([NotNull] IMetadataTypeInfo typeInfo)
+    {
+      var containingType = typeInfo.DeclaringType;
+      if (containingType == null)
+      {
+        yield return typeInfo.NamespaceName;
+        yield break;
+      }
+
+      while (containingType != null)
+      {
+        yield return containingType.FullyQualifiedName;
+
+        if (containingType.HasCustomAttribute(FSharpPredefinedType.AutoOpenAttrTypeName.FullName))
+        {
+          containingType = containingType.DeclaringType;
+          if (containingType == null)
+            yield return typeInfo.NamespaceName;
+        }
+
+        else
+          break;
+      }
+    }
+
+
     private void AfterTypePartAdded(TypePart addedTypePart)
     {
       if (!IsApplicable(addedTypePart))
@@ -107,9 +140,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var typeElement = addedTypePart.TypeElement;
       Assertion.AssertNotNull(typeElement);
 
-      foreach (var parentModule in GetImportingParentModules(typeElement))
+      foreach (var parentModule in GetSourceImportingParentModules(typeElement))
         if (GetQualifiedName(parentModule) is { } qualifiedName)
-          myModuleToNestedAutoOpenModules.Add(qualifiedName, addedTypePart);
+          mySourceModuleToNestedAutoOpenModules.Add(qualifiedName, addedTypePart);
     }
 
     private void BeforeTypePartRemoved(TypePart removedTypePart)
@@ -120,16 +153,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var typeElement = removedTypePart.TypeElement;
       Assertion.AssertNotNull(typeElement);
 
-      foreach (var parentModule in GetImportingParentModules(typeElement))
+      foreach (var parentModule in GetSourceImportingParentModules(typeElement))
         if (GetQualifiedName(parentModule) is { } qualifiedName)
-          myModuleToNestedAutoOpenModules.Remove(qualifiedName, removedTypePart);
+          mySourceModuleToNestedAutoOpenModules.Remove(qualifiedName, removedTypePart);
     }
 
     private static bool IsApplicable(IMetadataAssembly metadataAssembly) =>
       metadataAssembly.ReferencedAssembliesNames.Any(assemblyName => assemblyName.IsFSharpCore()) ||
       metadataAssembly.AssemblyName.IsFSharpCore();
 
-    private static ISet<string> Build(IMetadataAssembly metadataAssembly)
+    private ISet<string> Build(IMetadataAssembly metadataAssembly)
     {
       if (!IsApplicable(metadataAssembly))
         return null;
@@ -148,7 +181,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
       foreach (var typeInfo in metadataAssembly.GetTypes())
         if (typeInfo.HasCustomAttribute(FSharpPredefinedType.AutoOpenAttrTypeName.FullName))
+        {
+          foreach (var moduleName in GetCompiledImportingParentModuleNames(typeInfo))
+            myCompiledModuleToNestedAutoOpenModules.Add(moduleName, typeInfo.FullyQualifiedName);
+
           modulesNames.Add(typeInfo.TypeName);
+        }
 
       return modulesNames;
     }
