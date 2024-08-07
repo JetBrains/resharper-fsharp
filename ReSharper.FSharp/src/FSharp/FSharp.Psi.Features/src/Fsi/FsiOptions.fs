@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -92,7 +93,7 @@ type FsiOptions =
       mutable UseLanguageVersionFromScriptOptions: bool }
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FsiOptionsProvider(lifetime, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema)
 

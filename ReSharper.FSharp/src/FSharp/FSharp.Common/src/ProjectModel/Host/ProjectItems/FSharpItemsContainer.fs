@@ -9,6 +9,7 @@ open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.DataContext
+open JetBrains.Application.Parts
 open JetBrains.Application.PersistentMap
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -47,7 +48,7 @@ open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
 
 /// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
@@ -85,7 +86,7 @@ type IItemTypeFilterProvider =
     abstract CreateItemFilter: MsBuildProjectPart * IProjectDescriptor -> MsBuildItemTypeFilter
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
     interface IItemTypeFilterProvider with
         member x.CreateItemFilter(projectPart, projectDescriptor) =
@@ -93,7 +94,7 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider, locks: IShellLocks) =
@@ -1107,7 +1108,7 @@ type IFSharpItemsContainerRefresher =
     abstract member SelectItem: IProjectMark * VirtualFileSystemPath -> unit
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
 
@@ -1273,7 +1274,7 @@ type FSharpModificationSettingsProvider() =
         member x.SmartModificationsFilter = ["fsproj"] :> _
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FSharpBuildActionsProvider() =
     inherit MsBuildDefaultBuildActionsProvider()
 
