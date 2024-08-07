@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Settings
 open System
 open System.Reflection
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions
@@ -127,7 +128,7 @@ type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundS
         settings.GetValueProperty(lifetime, entry, null) :> IProperty<'V>
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpScriptOptions>(lifetime, solution, settings, settingsSchema)
 
@@ -136,7 +137,7 @@ type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) 
     member val CustomDefines = base.GetValueProperty<string>("CustomDefines")
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpExperimentalFeatures>(lifetime, solution, settings, settingsSchema)
 
@@ -148,7 +149,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
     member val TryRecoverFcsProjects = base.GetValueProperty<bool>("TryRecoverFcsProjects")
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
@@ -159,7 +160,7 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
         this.NonFSharpProjectInMemoryReferences <-
             base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
 
