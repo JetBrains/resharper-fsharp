@@ -7,6 +7,7 @@ open System.Threading.Tasks
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
+open JetBrains.Application.Parts
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -75,7 +76,7 @@ type ScriptPsiModulesTest() =
         base.ExecuteWithGold(action) |> ignore
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
 type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, notifier: RuntimeAndToolsetChangeNotifier) =
     inherit DefaultSolutionToolset(lifetime, settings, logger, notifier)
