@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.Project
 
 open System
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Env
@@ -48,7 +49,7 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
             | _ -> null
 
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer,
         presenter: ProjectModelViewPresenter) =
