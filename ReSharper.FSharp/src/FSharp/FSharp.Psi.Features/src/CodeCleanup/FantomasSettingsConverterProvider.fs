@@ -23,7 +23,7 @@ type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
         true
 
     interface IEditorConfigConverter with
-        member val Category = EditorConfigConverter.ReSharperCategory with get, set
+        member val Category = EditorConfigConverter.ReSharperCategory with get
         member x.IsPropertySupported(property) = property.StartsWith(fSharpEditorConfigPrefix, StringComparison.Ordinal)
         member x.Convert(context) = run context null
         member x.ConvertAndCheck(context) = run context context
