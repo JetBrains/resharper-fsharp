@@ -1,20 +1,17 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
 import com.intellij.openapi.actionSystem.IdeActions
-import com.jetbrains.rdclient.patches.PATCH_ENGINE_REGISTRY_SETTING
+import com.jetbrains.rider.test.annotations.Feature
+import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.base.TypingAssistTestBase
+import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
+import com.jetbrains.rider.test.base.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.env.enums.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
-import com.jetbrains.rider.test.scriptingApi.undo
+import com.jetbrains.rider.test.reporting.SubsystemConstants
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
-class FSharpPatchEngineTypingAssists : TypingAssistTestBase() {
-  override val registrySetting: Map<String, String>
-    get() = mapOf(PATCH_ENGINE_REGISTRY_SETTING to "true")
-
+abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode) : PatchEngineEditorTestBase(mode) {
   override val checkTextControls = false
 
   override fun getSolutionDirectoryName(): String = "CoreConsoleApp"
@@ -31,16 +28,30 @@ class FSharpPatchEngineTypingAssists : TypingAssistTestBase() {
 
   @Test(dataProvider = "simpleCases")
   fun testStartNewLine(caseName: String) {
-    dumpOpenedEditor("Program.fs", "Program.fs") {
+    dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       typeOrCallAction(IdeActions.ACTION_EDITOR_START_NEW_LINE)
     }
   }
 
   @Test
   fun testStartNewLineUndo() {
-    dumpOpenedEditor("Program.fs", "Program.fs") {
+    dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       typeOrCallAction(IdeActions.ACTION_EDITOR_START_NEW_LINE)
       undo()
     }
   }
 }
+
+@Test
+@Subsystem(SubsystemConstants.TYPING_ASSIST)
+@Feature("Typing Assist")
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpTypingAssistPatchEngineSpeculativeRebaseProhibitedTest :
+  FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeRebaseProhibited)
+
+@Test
+@Subsystem(SubsystemConstants.TYPING_ASSIST)
+@Feature("Typing Assist")
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
+  FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
