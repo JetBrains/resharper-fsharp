@@ -23,7 +23,8 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
     arrayOf("indent1"),
     arrayOf("indent2"),
     arrayOf("removeSelection1"),
-    arrayOf("removeSelection2")
+    arrayOf("removeSelection2"),
+    arrayOf("trailingSpace")
   )
 
   @Test(dataProvider = "simpleCases")
