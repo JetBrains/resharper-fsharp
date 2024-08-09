@@ -781,10 +781,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
 
-        | SynType.StaticConstant(synConst, constRange) ->
-            let mark = x.Mark(range)
-            x.MarkChameleonExpression(SynExpr.Const(synConst, constRange))
-            x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
+        | SynType.StaticConstant(synConst, _) ->
+            x.MarkStaticConstType(synConst, range)
+
+        | SynType.StaticConstantNull _ ->
+            x.MarkStaticConstType(SynConst.String(null, SynStringKind.Regular, range), range)
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
@@ -803,7 +804,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeAsTypeReferenceName(rhsType)
             x.Done(range, mark, ElementType.OR_TYPE_USAGE)
 
-        | SynType.Intersection(synTypar, hashConstraints, range, _) ->
+        | SynType.Intersection(synTypar, hashConstraints, _, _) ->
             let mark = x.Mark(range)
 
             match synTypar with
@@ -817,11 +818,21 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         | SynType.FromParseError _ -> ()
 
+        | SynType.WithNull(innerType, _, _) ->
+            let mark = x.Mark(range)
+            x.ProcessType(innerType)
+            x.Done(range, mark, ElementType.WITH_NULL_TYPE_USAGE)
+
     member x.MarkTypes(synType1, synType2, range: range, elementType) =
         let mark = x.Mark(range)
         x.ProcessType(synType1)
         x.ProcessType(synType2)
         x.Done(range, mark, elementType)
+
+    member x.MarkStaticConstType(synConst, range: range) =
+        let mark = x.Mark(range)
+        x.MarkChameleonExpression(SynExpr.Const(synConst, range))
+        x.Done(range, mark, ElementType.EXPR_STATIC_CONSTANT_TYPE_USAGE)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         let range = typeConstraint.Range
@@ -843,6 +854,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | SynTypeConstraint.WhereTyparSupportsNull(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)
             x.Done(range, mark, ElementType.NULL_CONSTRAINT)
+
+        | SynTypeConstraint.WhereTyparNotSupportsNull(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.Done(range, mark, ElementType.NOT_NULL_CONSTRAINT)
 
         | SynTypeConstraint.WhereTyparIsComparable(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)

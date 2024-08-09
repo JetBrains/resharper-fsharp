@@ -1675,6 +1675,7 @@ interface typeConstraint:
   referenceTypeConstraint |
   unmanagedTypeConstraint |
   nullConstraint |
+  notNullConstraint |
   comparableConstraint |
   equatableConstraint |
   defaultsToConstraint |
@@ -1701,6 +1702,12 @@ nullConstraint:
   typeReferenceName<TYPE_REFERENCE, ReferenceNames>
   COLON
   NULL;
+
+notNullConstraint:
+  typeReferenceName<TYPE_REFERENCE, ReferenceNames>
+  COLON<FSHARP_COLON, Colon>
+  IDENTIFIER<IDENTIFIER, Identifier>
+  NULL<NULL, NullKeyword>;
 
 comparableConstraint:
   typeReferenceName<TYPE_REFERENCE, ReferenceNames>
@@ -1849,6 +1856,7 @@ interface typeUsage:
   hashTypeUsage |
   orTypeUsage |
   intersectionTypeUsage |
+  withNullTypeUsage |
   unsupportedTypeUsage;
 
 
@@ -1938,6 +1946,11 @@ intersectionTypeUsage:
     AMP<AMP, Ands>
   )?
   LIST typeUsage<HASH_CONSTRAINT, HashConstrains> SEP AMP<AMP, Ands>;
+
+withNullTypeUsage:
+  typeUsage<TYPE, TypeUsage>
+  BAR<BAR, Bar>
+  NULL<NULL, NullKeyword>;
 
 unsupportedTypeUsage:
   fakeSeparator;
