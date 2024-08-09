@@ -7,7 +7,6 @@ open JetBrains.Application.Settings
 open JetBrains.Application.Settings.Calculated.Implementation
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
-open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.EditorConfig
 
@@ -31,8 +30,8 @@ type FantomasSettingsConverter(fantomasSettingsEntry: SettingsIndexedEntry) =
 
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
-type FantomasSettingsConverterProvider(lifetime: Lifetime, schema: SettingsSchema) =
-    let items = CollectionEvents<IEditorConfigConverter>(lifetime, $"{nameof FantomasSettingsConverterProvider}.Items")
+type FantomasSettingsConverterProvider(schema: SettingsSchema) =
+    let items = CollectionEvents<IEditorConfigConverter>($"{nameof FantomasSettingsConverterProvider}.Items")
 
     do
         let fantomasSettingsEntry =
