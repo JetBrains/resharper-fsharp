@@ -727,42 +727,52 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let document = textControl.Document
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    match expr with
+        let mutable range = None
+        let processor =
+            let checkExpr (expr: IFSharpExpression) (node: ITreeNode) prevTokenEnd =
+                if isNotNull expr && expr.GetDocumentEndOffset().Offset = prevTokenEnd
+                    then Some (node.GetDocumentRange())
+                else None
+            { new IRecursiveElementProcessor with
+                member this.ProcessingIsFinished = range.IsSome
+                member this.InteriorShouldBeProcessed(element) = true
+                member this.ProcessAfterInterior(element) = ()
+                member this.ProcessBeforeInterior(element) =
+                    range <-
+                        match element with
+                        // if expr then {caret}
+                        // No info is available after error recovery, we check that range is surrounded with if ... then.
+                        | :? IFromErrorExpr as fromErrorExpr ->
+                            let expr = fromErrorExpr.Expression
+                            checkExpr expr expr prevTokenEnd
 
-                    // if expr then {caret}
-                    // No info is available after error recovery, we check that range is surrounded with if ... then.
-                    | SynExpr.FromParseError (ExprRange range, _)
+                        // while expr do {caret}
+                        | :? IWhileExpr as whileExpr ->
+                            let expr = whileExpr.ConditionExpr
+                            checkExpr expr expr prevTokenEnd
 
-                    // while expr do {caret}
-                    | SynExpr.While (_, ExprRange range, _, _) when
-                            getEndOffset document range = prevTokenEnd ->
-                        Some range
+                        // for i = ... to ... do {caret}
+                        | :? IForExpr as forExpr ->
+                            checkExpr forExpr.DoExpression forExpr.Identifier prevTokenEnd
 
-                    // for i = ... to ... do {caret}
-                    | SynExpr.For (_, _, IdentRange range, _, _, _, _, ExprRange lastRange, _)
+                        // for ... in ... do {caret}
+                        | :? IForEachExpr as foreachExpr ->
+                            checkExpr foreachExpr.InExpression foreachExpr.Pattern prevTokenEnd
 
-                    // for ... in ... do {caret}
-                    | SynExpr.ForEach (_, _, _, _, PatRange range, ExprRange lastRange, _, _) when
-                            getEndOffset document lastRange = prevTokenEnd ->
-                        Some range
+                        | _ -> None }
 
-                    | _ -> defaultTraverse expr }
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let node = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
+        if isNull node then false else
 
-        let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
+        node.ProcessThisAndDescendants(processor)
+        match range with
         | None -> false
         | Some range ->
 
         use cookie = LexerStateCookie.Create(lexer)
-        let exprStart = getStartOffset document range
+        let exprStart = range.StartOffset.Offset
         if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
