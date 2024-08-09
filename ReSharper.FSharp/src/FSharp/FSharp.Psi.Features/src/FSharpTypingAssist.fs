@@ -797,31 +797,38 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let document = textControl.Document
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitMatchClause(_, defaultTraverse, (SynMatchClause.SynMatchClause (pat, whenExpr, _, _, _, _) as mc)) =
-                    match pat, whenExpr with
-                    | _, Some (ExprRange range)
-                    | PatRange range, None when getEndOffset document range = prevTokenEnd -> Some mc
+        let mutable mc = None
+        let processor =
+            { new IRecursiveElementProcessor with
+                member this.ProcessingIsFinished = mc.IsSome
+                member this.InteriorShouldBeProcessed(element) = true
+                member this.ProcessAfterInterior(element) = ()
+                member this.ProcessBeforeInterior(element) =
+                    mc <-
+                        match element with
+                        | :? IMatchClause as matchClause ->
+                            let whenExpression = matchClause.WhenExpression
+                            let pat = matchClause.Pattern
+                            let offset =
+                                if isNull whenExpression then pat.GetDocumentEndOffset()
+                                else whenExpression.GetDocumentEndOffset()
+                            if offset.Offset = prevTokenEnd then Some matchClause else None
 
-                    | _ -> defaultTraverse mc
+                        | _ -> None }
 
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    defaultTraverse expr }
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let node = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
+        if isNull node then false else
 
-        let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
+        node.ProcessThisAndDescendants(processor)
+        match mc with
         | None -> false
-        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _, _)) ->
+        | Some mc ->
 
         use cookie = LexerStateCookie.Create(lexer)
 
-        if not (lexer.FindTokenAt(getStartOffset document range)) then false else
+        if not (lexer.FindTokenAt(mc.GetDocumentStartOffset().Offset + 1)) then false else
 
         lexer.Advance(-1)
         while isIgnored lexer.TokenType do
