@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open FSharp.Compiler.Symbols
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Feature.Services.Resources
@@ -49,7 +50,7 @@ type FsharpSpecificOccurrenceKindIconsProvider() =
 // todo: parens in `let i: (int) = 1`
 // todo: patterns in overrides and objExpr
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpItemOccurenceKindProvider() =
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =

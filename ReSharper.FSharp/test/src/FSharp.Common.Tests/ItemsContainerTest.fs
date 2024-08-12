@@ -821,6 +821,12 @@ type FSharpItemsContainerTest() =
                 let (UnixSeparators path) = VirtualFileSystemPath.Parse("..\\ExternalFolder\\File1", InteractionContext.SolutionContext)
                 container.OnUpdateFile("Compile", path, "Resource", path))
 
+    [<Test>]
+    member x.``None item duplicates``() =
+        x.DoContainerInitializationTest
+            [ createItem "Compile" "File1"
+              createItem "None" "host.json"
+              createItem "None" "host.json" ]
 
     member x.DoCreateModificationContextTest(items: AnItem list) =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]
@@ -955,8 +961,11 @@ type FSharpItemsContainerTest() =
 
                     for viewItem in createViewItems solutionItems item do
                         let name = viewItem.ProjectItem.Name
-                        let sortKey = container.TryGetSortKey(viewItem)
-                        writer.Write(sprintf "%s%s SortKey=%O" identString name (Option.get sortKey))
+                        let sortKey =
+                            match container.TryGetSortKey(viewItem) with
+                            | Some sortKey -> sortKey.ToString()
+                            | None -> "null"
+                        writer.Write $"%s{identString}%s{name} SortKey={sortKey}"
                         match viewItem with
                         | FSharpViewFolder _ ->
                             writer.WriteLine()

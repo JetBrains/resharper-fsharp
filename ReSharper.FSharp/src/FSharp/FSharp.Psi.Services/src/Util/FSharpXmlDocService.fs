@@ -5,6 +5,7 @@ open System.Xml
 open FSharp.Compiler.Symbols
 open JetBrains.Annotations
 open JetBrains.Application.Infra
+open JetBrains.Application.Parts
 open JetBrains.Application.UI.Components.Theming
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickDoc.Render
@@ -17,7 +18,7 @@ open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
         psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming,
         factory: XmlDocSectionFactory, renderer: IXmlDocHtmlRenderer) =

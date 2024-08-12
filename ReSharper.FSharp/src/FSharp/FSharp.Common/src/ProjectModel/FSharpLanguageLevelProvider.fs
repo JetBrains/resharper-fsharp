@@ -4,6 +4,7 @@ open System
 open System.Collections.Concurrent
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
@@ -41,7 +42,7 @@ type FSharpLanguageProjectSettings =
       LanguageLevel: FSharpLanguageLevel }
 
 
-[<SolutionComponent>]
+[<SolutionComponent(Instantiation.ContainerAsyncPrimaryThread (* PrimaryThread due to not thread safe ProjectSettingsStorageComponent *) )>]
 type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, projectSettings,
         persistentProjectItemProperties, settingsSchema: SettingsSchema, solutionToolset: ISolutionToolset) =
     inherit OverridableLanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(lifetime, locks,

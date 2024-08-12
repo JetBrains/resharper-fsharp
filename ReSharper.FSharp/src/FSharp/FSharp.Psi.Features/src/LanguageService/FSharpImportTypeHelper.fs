@@ -46,7 +46,7 @@ type FSharpImportTypeHelper() =
                 let elementKey = searchFilter.TryGetKey(typeElement)
                 searchFilter.CanContainReferences(sourceFile, elementKey)
 
-            let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>()
+            let fsAssemblyAutoOpenCache = psiModule.GetSolution().GetComponent<FSharpAutoOpenCache>()
 
             let mutable candidates: ITypeElement seq =
                 names
@@ -75,6 +75,9 @@ type FSharpImportTypeHelper() =
 
                     let autoOpenedModules = fsAssemblyAutoOpenCache.GetAutoOpenedModules(typeElement.Module)
                     if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else
+
+                    let fsModule = typeElement.As<IFSharpModule>()
+                    if isNotNull fsModule && isNotNull fsModule.AssociatedTypeElement then false else
 
                     let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, false, opName)
                     Option.isSome symbolUse)

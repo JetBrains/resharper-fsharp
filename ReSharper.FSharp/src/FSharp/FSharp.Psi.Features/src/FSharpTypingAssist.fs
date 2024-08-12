@@ -5,6 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application.CommandProcessing
+open JetBrains.Application.Parts
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
@@ -29,7 +30,7 @@ open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpTypingAssist(lifetime, dependencies) as this =
     inherit TypingAssistLanguageBase<FSharpLanguage>(dependencies)
 

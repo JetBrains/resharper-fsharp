@@ -57,7 +57,7 @@ let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =
 
 let [<Literal>] FSharpCore = "FSharp.Core"
 
-[<CompiledName("IsFSharpCore")>]
+[<Extension; CompiledName("IsFSharpCore")>]
 let isFSharpCore (assemblyName: AssemblyNameInfo) =
     isNotNull assemblyName && AssemblyNameInfo.SimpleNameComparer.Equals(FSharpCore, assemblyName.Name)
 
@@ -79,10 +79,3 @@ let isFSharpMetadataResource (manifestResource: IMetadataManifestResource) (comp
         compilationUnitName <- name.Substring(CompressedSignatureInfoResourceName.Length)
         true
     else false
-
-
-let getNestedTypes (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope): ITypeElement seq =
-    match declaredElement with
-    | :? INamespace as ns -> ns.GetNestedTypeElements(symbolScope) :> _
-    | :? ITypeElement as typeElement -> typeElement.NestedTypes :> _
-    | _ -> Seq.empty

@@ -218,6 +218,11 @@ module FSharpNamingService =
         loop contextPattern
         names
 
+    let getBindingPatternsUsedNames (binding: IBinding) =
+        let usedNames = HashSet()
+        usedNames.AddRange(getPatternsNames null binding.ParameterPatternsEnumerable)
+        usedNames
+
     let getUsedNames (contextExprs: IFSharpExpression list) usages containingTypeElement checkFcsSymbols: ISet<string> =
         let usedNames = getUsedNamesUsages contextExprs usages containingTypeElement checkFcsSymbols
         HashSet(usedNames.Keys) :> _
@@ -240,6 +245,12 @@ module FSharpNamingService =
 
     let addNamesForType (t: IType) (namesCollection: INamesCollection) =
         namesCollection.Add(t, getEntryOptions ())
+        namesCollection
+
+    let addNamesForFcsType (context: ITreeNode) (fcsType: FSharpType) (namesCollection: INamesCollection) =
+        let exprType = fcsType.MapType(context)
+        if isNotNull exprType then
+            addNamesForType exprType namesCollection |> ignore
         namesCollection
 
     let addNamesForExpression (overrideType: IType option) (expr: IFSharpExpression) (namesCollection: INamesCollection) =

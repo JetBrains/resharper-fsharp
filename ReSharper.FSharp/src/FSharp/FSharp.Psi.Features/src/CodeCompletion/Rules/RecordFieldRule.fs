@@ -97,6 +97,7 @@ type RecordFieldRule() =
 
     override this.IsAvailable(context) =
         context.IsBasicOrSmartCompletion &&
+        not context.IsQualified &&
         Option.isSome (getRecordEntity context)
 
     override this.TransformItems(context, collector) =
@@ -180,8 +181,6 @@ type RecordFieldRule() =
                    FSharpTokenType.WHITESPACE
                    TailType.CaretTokenNodeType.Instance
                    FSharpTokenType.WHITESPACE |]
-
-            item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
 
             if emphasize then
                 item.Placement.Location <- PlacementLocation.Top

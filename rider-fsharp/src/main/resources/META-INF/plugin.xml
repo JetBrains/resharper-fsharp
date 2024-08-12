@@ -5,8 +5,6 @@
   <description>F# language support plugin for JetBrains Rider.</description>
   <category>Languages</category>
 
-  <version>0.9999</version>
-
   <depends>com.intellij.modules.rider</depends>
   <depends>rider.intellij.plugin.appender</depends>
 
@@ -45,6 +43,7 @@
     <code.cleanup.support language="F#" implementationClass="com.jetbrains.rider.actions.impl.cleanup.BackendCodeCleanupSupportPolicy" />
     <lang.psiStructureViewFactory language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderProtocolPsiStructureViewFactory" />
     <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
+    <navbar.members.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.navbar.FSharpNavBarMembersSupport"/>
     <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
     <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
     <configurationType implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfigurationType" />

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Strategies
 
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -32,7 +33,7 @@ type FSharpAutopopupStrategyBase() =
         member this.ProcessSubsequentTyping(c, textControl) = this.ProcessSubsequentTyping(c, textControl)
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpAutocompletionStrategy() =
     inherit FSharpAutopopupStrategyBase()
 
@@ -40,7 +41,7 @@ type FSharpAutocompletionStrategy() =
     override x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpOnSpaceAutopopupStrategy() =
     inherit FSharpAutopopupStrategyBase()
 
@@ -96,7 +97,7 @@ type FSharpOnSpaceAutopopupStrategy() =
         )
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpOnParenAutopopupStrategy() =
     inherit FSharpAutopopupStrategyBase()
 

@@ -6,6 +6,7 @@ open System.IO
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
+open JetBrains.Application.Parts
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -175,7 +176,7 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
         cookie.Dispose()
         cookie <- null
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type TestModifiedFilesCache(psiFilesCache: IPsiFilesCache ) =
     member val ModifiedFileCookies = Dictionary<IPsiSourceFile, IDisposable>()
     member this.PsiFilesCache = psiFilesCache
@@ -230,7 +231,7 @@ type AssertCorrectTreeStructureAttribute() =
             modifiedFilesCache.ModifiedFileCookies.Clear()
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
     inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
@@ -241,7 +242,7 @@ type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsPro
     interface IHideImplementation<FcsResolvedSymbolsCache>
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModules) =
     inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger, psiModules)
@@ -255,7 +256,7 @@ type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModule
     interface IHideImplementation<FcsProjectBuilder>
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerService,
         fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
@@ -372,7 +373,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetAllReferencedModules() = failwith "todo"
 
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
         fsOptionsProvider, symbolCache, solution, locks, logger) =

@@ -1,6 +1,7 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -55,9 +56,11 @@ dependencies {
     bundledPlugin("org.intellij.intelliLang")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
-    bundledLibrary("lib/testFramework.jar")
     instrumentationTools()
+    testFramework(TestFrameworkType.Bundled)
   }
+
+  testImplementation("org.opentest4j:opentest4j:1.3.0")
 }
 
 val isMonorepo = rootProject.projectDir != projectDir
@@ -317,15 +320,12 @@ tasks {
     dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, ":lexer:generateLexer")
   }
 
-  create("buildReSharperPlugin") {
+  val buildReSharperPlugin by registering(Exec::class) {
     group = riderFSharpTargetsGroup
     dependsOn(prepare)
-    doLast {
-      exec {
-        executable = "msbuild"
-        args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
-      }
-    }
+
+    executable = "dotnet"
+    args("build", "$resharperPluginPath/ReSharper.FSharp.sln")
   }
 
   wrapper {

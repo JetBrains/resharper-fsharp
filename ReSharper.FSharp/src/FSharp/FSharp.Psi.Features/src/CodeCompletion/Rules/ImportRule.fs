@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -80,13 +81,14 @@ type ImportRule() =
         let solution = psiServices.Solution
         let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
         let iconManager = solution.GetComponent<PsiIconManager>()
+        let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
         let symbolScope = getSymbolScope context.PsiModule false
         let typeElements = 
             symbolScope.GetAllTypeElementsGroupedByName()
             |> Seq.filter (fun typeElement -> assemblyReaderShim.IsKnownModule(typeElement.Module)) 
 
-        let openedModulesProvider = OpenedModulesProvider(element.FSharpFile)
+        let openedModulesProvider = OpenedModulesProvider(element.FSharpFile, autoOpenCache)
         let scopes = openedModulesProvider.OpenedModuleScopes
 
         for typeElement in typeElements do

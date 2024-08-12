@@ -651,6 +651,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
+    // todo: uses different logic: names in parts for modules and resolve for other type elements
     public static bool HasAutoOpenAttribute([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
@@ -708,7 +709,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsAutoImported([NotNull] this IClrDeclaredElement declaredElement)
     {
       var psiModule = declaredElement.Module;
-      var autoOpenCache = psiModule.GetSolution().GetComponent<FSharpAssemblyAutoOpenCache>();
+      var autoOpenCache = psiModule.GetSolution().GetComponent<FSharpAutoOpenCache>();
       var autoOpenedModules = autoOpenCache.GetAutoOpenedModules(psiModule);
 
       // todo: assembly level auto open modules

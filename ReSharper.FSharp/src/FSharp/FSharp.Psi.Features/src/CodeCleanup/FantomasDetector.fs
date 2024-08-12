@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System.Collections.Generic
 open System.Reflection
+open JetBrains.Application.Parts
 open JetBrains.Collections.Viewable
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -39,7 +40,7 @@ type FantomasDiagnosticNotification =
       Location: FantomasLocation
       FallbackLocation: FantomasLocation }
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettingsProvider,
         dotnetToolsTracker: SolutionDotnetToolsTracker) =
     let [<Literal>] fantomasToolPackageId = "fantomas-tool"

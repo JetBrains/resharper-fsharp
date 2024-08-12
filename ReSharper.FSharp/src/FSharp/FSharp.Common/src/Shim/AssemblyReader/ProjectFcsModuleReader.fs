@@ -175,7 +175,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
+        ILTypeDef(name, attributes, layout, implements, None, genericParams, extends, emptyILMethods, nestedTypes,
              emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
              emptyILSecurityDecls, emptyILCustomAttrsStored)
 
@@ -1267,15 +1267,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                         mkTypeDefCustomAttrs typeElement hasExtensions
                     )
                 )
+                let implementsCustomAttrs = None // todo
 
                 let additionalFlags =
                     if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
                     else ILTypeDefAdditionalFlags.None
 
                 let typeDef =
-                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                        extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties, additionalFlags,
-                        emptyILSecurityDecls, customAttrs)
+                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, implementsCustomAttrs,
+                        genericParams, extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
+                        additionalFlags, emptyILSecurityDecls, customAttrs)
 
                 let fcsTypeDef = 
                     { TypeDef = typeDef

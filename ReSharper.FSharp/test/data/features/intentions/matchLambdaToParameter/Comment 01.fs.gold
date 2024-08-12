@@ -1,0 +1,5 @@
+﻿module Module
+
+let f i = {caret}// comment
+    match i with
+    | 1 -> ()

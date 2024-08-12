@@ -1,5 +1,111 @@
 # Release notes
 
+## 2024.2
+
+### Import
+
+* **New**: Importing extension members is now suggested via code completion suggestions and error quick fixes. Both C#-style extension methods and F# type augmentations are supported
+
+### F# Interactive
+
+* **New**: Debugging F# scripts is now supported
+* **New**: Show line numbers in sent code fragments
+* **Fix**: 'Send to F# interactive' was unavailable for some files
+* **Fix**: Syntax highlighting was broken for some outputs
+
+### Context actions and Generate overrides
+
+* **New**: A new action to convert partial applications to lambda expressions is added
+* **New**: An action to convert F# 8 short lambdas to normal lambda expressions was added
+* **Fix**: Wrong keywords could be used for some member overrides
+
+### Code completion
+
+* **New**: Pattern names are suggested based on values types
+* **Improve**: More context-aware suggestions filtering was added
+* **Improve**: Better presentation for union case field suggestions
+* **Fix**: Some local items were missing in suggestions
+* **Fix**: Override suggestions were shown in extra cases
+
+### Code analysis and Project model
+
+* **New**: Type hints are shown for last items in pipe chains
+* **Fix**: Adding new file could put it into wrong place in solution view
+* **Fix**: Reordering files and manual fsproj changes might have no effect in code analysis
+* **Fix**: Fix performance degradation on project changes in big solutions
+* **Fix**: Fix updating script dependencies could lead to a crash
+* **Fix**: Escape sequences in string interpolations could be analysed incorrectly
+* **Fix**: Language injections are now disabled in string interpolations
+* **Fix**: Stale type providers info could be used in code analysis
+
+### Refactorings
+
+* **Fix**: Rename could not rename some type usages in type annotations
+* **Fix**: Introduce variable could fail in some cases
+
+### Misc
+
+* **Fix**: Some editor config overrides could be ignored when reformatting files
+* **Improve**: Take typing assist settings into account in more cases when typing
+* **Improve**: Disable inline breakpoints for F#
+
+## 2024.1
+
+### Find Usages and navigation
+
+* **New**: Sticky lines support was implemented for F#
+* **New**: When searching for a union usages, its union cases are also searched now
+
+### Generate overrides
+
+* **New**: Generating overrides is now available in object expressions via a new quick fix for missing members, code completion, and Generate refactoring
+* **New**: A base member call is generated when possible
+* **Fix**: Generated members could be inserted to a wrong place, by [@nojaf](https://github.com/nojaf) ([#591](https://github.com/JetBrains/resharper-fsharp/pull/591))
+* **Fix**: Some required type annotations could be missing when generating overrides
+
+### Code completion
+
+* **New**: overriding members has become easier with a new rule that generates the whole member
+* **New**: New postfix templates:
+  * 'new': when invoked on record type, a new instance is created
+  * 'new': when invoked on an interface or a object construction, an object expression is created
+
+### Context actions and quick fixes
+
+* **New**: a quick fix for converting instantiation of an abstract class to an object expression
+* **New**: a context action to convert named union case field patterns to positional patterns
+* **New**: a new quick fix for disabling R# inspections is available on diagnostics
+* **New**: a context action for converting a short lambda into a normal lambda expression
+* **Improve**: when annotating a function, always add space before the last colon, to match the current guidelines
+* **Fix**: 'To literal' action was available on some extra bindings
+* **New**: 'To immutable' context action for record fields
+* **Fix**: Record field mutability stuck in caches after a change
+
+### C# interop
+
+* **Fix**: When using in-memory C# references, some F# compiler service requests would not be cancelled and would block other features until ready which could worsen performance
+* **Fix**: Record properties defined in C# could produce errors in F#
+* **Fix**: Properties defined in C# could be seen wrong in code completion
+* **Fix**: F# 8 optional `Extension` attributes were required when analyzing C# projects
+
+### Code analysis:
+
+* **Fix**: Files could be sorted wrongly after adding a new file to a project
+* **Fix**: Projects weren't updated correctly after target framework changes
+* **Fix**: Fix project file infos and related caches could leak after project unloading, which could increase memory usage and worsen performance
+* **Fix**: To interpolated string: fix suggestion could be unavailable in computation expressions
+* **Fix**: To interpolated string: fix suggestion would be shown on unsupported format handlers
+* **Fix**: To interpolated string: unsafe FSharp.Core version check could break analysis in files outside projects
+* **Fix**: Lambda analyzer: disable for quotations
+* **Fix**: Lambda analyzer: fix false positive suggestions
+* **Fix**: Fix extra errors were reported for braces in F# 8 raw strings
+
+### Misc
+
+* **Improve**: Significantly improved F# Interactive console performance
+* **Improve**: Better sorting of F# language versions in project options
+
+
 ## 2023.3
 
 ### Code analysis
@@ -608,7 +714,7 @@ The Parameter Info popup was completely rewritten to become available inside cur
 * Add missing `rec` in `let ... and` bindings
 
 
-### Find Usages & navigation
+### Find Usages and navigation
 
 * Find Usages and Go to Declaration now work for record construction and copy-and-update expressions
 * New Instance occurrence kind is shown for F# exception creation expressions

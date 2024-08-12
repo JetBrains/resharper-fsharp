@@ -2,7 +2,9 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMembe
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -89,23 +91,24 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
         typeElements.AsReadOnly()
 
-    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile)
+    let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
+    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile, autoOpenCache)
     let scopes = openedModulesProvider.OpenedModuleScopes
     let accessContext = ElementAccessContext(context)
 
     let isInScope (typeMember: ITypeMember) =
-        let isInScope name =
-            // todo: use qualified names in the map
+        let isInScope declaredElement =
+            let name = getQualifiedName declaredElement
             let scopes = scopes.GetValuesSafe(name)
             OpenScope.inAnyScope context scopes
         
         match typeMember.ContainingType with
         | :? IFSharpModule as fsModule ->
-            isInScope fsModule.SourceName
+            isInScope fsModule
 
         | containingType ->
             let ns = containingType.GetContainingNamespace()
-            isInScope ns.ShortName
+            isInScope ns
 
     let matchesType (typeMember: ITypeMember) : bool =
         let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =

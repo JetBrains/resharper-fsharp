@@ -7,11 +7,11 @@
   <Import Project="Sdk.props" Sdk="JetBrains.NET.Sdk" Version="0.0.4" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
-    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</AssemblyName>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <JetTestProject>true</JetTestProject>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</RootNamespace>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\ZoneMarker.fs" />
@@ -59,6 +59,7 @@
     <Compile Include="src\Intentions\UseNamedAccessTest.fs" />
     <Compile Include="src\Intentions\ToPositionalFieldPatternsTest.fs" />
     <Compile Include="src\Intentions\DisableWarningTest.fs" />
+    <Compile Include="src\Intentions\MatchLambdaToParameterTest.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixTestBase.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />

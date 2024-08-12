@@ -4,6 +4,8 @@ using System.IO;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.Application.ContentModel;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
@@ -24,7 +26,7 @@ using JetBrains.Util.Concurrency.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class FcsResolvedSymbolsCache : IPsiSourceFileCache, IFcsResolvedSymbolsCache
   {
     private readonly object mySyncObj = new();
@@ -163,6 +165,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public void OnPsiChange(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
       if (elementContainingChanges == null)
+        return;
+      if (ContentModelFork.IsCurrentlyForked)
         return;
 
       var sourceFile = elementContainingChanges.GetSourceFile();

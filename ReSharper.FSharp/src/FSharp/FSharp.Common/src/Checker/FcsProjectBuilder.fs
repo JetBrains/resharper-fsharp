@@ -5,6 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
@@ -21,7 +22,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
-[<SolutionInstanceComponent>]
+[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpTargetsProjectLoadModificator() =
     let fsTargets =
@@ -59,7 +60,7 @@ module FcsProjectBuilder =
         splitAndTrim itemsDelimiters configuration.DefineConstants
         |> List.ofArray
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =

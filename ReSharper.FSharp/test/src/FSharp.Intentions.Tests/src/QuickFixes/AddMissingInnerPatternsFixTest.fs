@@ -126,6 +126,7 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``List 10``() = x.DoNamedTest()
     [<Test>] member x.``List 11``() = x.DoNamedTest()
     [<Test>] member x.``List 12``() = x.DoNamedTest()
+    [<Test>] member x.``List 13``() = x.DoNamedTest()
 
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02``() = x.DoNamedTest()

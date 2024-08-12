@@ -514,7 +514,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 02 - Negate``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types - Null 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Types - Constraints - Null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Null 02``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Type 02 - No when``() = x.DoNamedTest()
     [<Test>] member x.``Types - Constraints - Reference 01``() = x.DoNamedTest()
@@ -523,6 +526,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Constraints - Equality 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Static const - Const 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Static const - Const 02 - Null``() = x.DoNamedTest()
     [<Test>] member x.``Types - Static const - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Static const - Named 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Static const - Named 02``() = x.DoNamedTest()

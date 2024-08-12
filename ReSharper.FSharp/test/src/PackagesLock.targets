@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="Fantomas.Core" Version="6.2.2" />
+    <PackageLock Include="Fantomas.Core" Version="6.3.9" />
     <PackageLock Include="FSharp.Core" Version="8.0.101" />
-    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2024.2.1" />
+    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2024.3.0" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2024.1.0" />
-    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.9.20240506.130" />
-    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.9.20240506.130" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.9.20240506.130" />
+    <PackageLock Include="JetBrains.NuGet.Frameworks" Version="6.10.20240726.136" />
+    <PackageLock Include="JetBrains.NuGet.Packaging" Version="6.10.20240726.136" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.10.20240726.136" />
     <PackageLock Include="JetBrains.RdFramework" Version="2024.1.0" />
     <PackageLock Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="1.1.1" />

@@ -3,6 +3,6 @@
 Color.FromArgb(|0b0, 0b10, 0b1111|(0)) |> ignore
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: (T) 'Color  ㅤ
+(0): ReSharper Parameter Name Hint: Color  ㅤ
 ARGB:  255, 0, 2, 15
-HEX:  FF, 0, 2, F' (E) ''
+HEX:  FF, 0, 2, F

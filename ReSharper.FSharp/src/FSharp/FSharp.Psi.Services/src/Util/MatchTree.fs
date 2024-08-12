@@ -202,6 +202,14 @@ module MatchType =
              ConstantValue.Bool(false, psiModule)]
         | _ -> failwith "todo1"
 
+    let getListNodeType context isHead value =
+        match isHead, value.Type with
+        | true, MatchType.List itemFcsType ->
+            let abbreviatedType = getAbbreviatedType itemFcsType
+            ofFcsType context abbreviatedType.GenericArguments[0]
+
+        | _ -> value.Type
+
 
 module MatchTest =
     let rec ignores (node: MatchNode) =
@@ -355,11 +363,7 @@ module MatchTest =
                     let listItemTest = MatchTest.ListConsItem isHead
                     let listItemPath = listItemTest :: listPath
 
-                    let nodeType =
-                        match isHead, value.Type with
-                        | true, MatchType.List itemFcsType -> MatchType.ofFcsType context itemFcsType.GenericArguments[0]
-                        | _ -> value.Type
-
+                    let nodeType = MatchType.getListNodeType context isHead value
                     let nodeValue = { Type = nodeType; Path = listItemPath }
                     let nodePattern = initialPattern deconstructions context isGenerating nodeValue
                     MatchNode.Create(nodeValue, nodePattern)
@@ -902,11 +906,7 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
         let nodeTest = MatchTest.ListConsItem isHead
         let nodePath = nodeTest :: path
 
-        let nodeType =
-            match isHead, value.Type with
-            | true, MatchType.List itemFcsType -> MatchType.ofFcsType pat itemFcsType.GenericArguments[0]
-            | _ -> value.Type
-
+        let nodeType = MatchType.getListNodeType pat isHead value
         let nodeValue = { Type = nodeType; Path = nodePath }
         let nodePattern = getMatchPattern deconstructions nodeValue skipOnNull pat
         MatchNode.Create(nodeValue, nodePattern)

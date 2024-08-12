@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 open System
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -18,7 +19,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Util
 open NUnit.Framework
 
-[<SolutionComponent>]
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestModulePathProvider(shim: TestAssemblyReaderShim, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
     inherit ModulePathProvider(moduleReferencesResolveStore)

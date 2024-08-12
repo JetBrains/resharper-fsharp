@@ -28,7 +28,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   private fun getDotnetCliHome() = Path(tempTestDirectory.parent, "dotnetHomeCli")
   private val fantomasNotifications = ArrayList<String>()
-  protected val bundledVersion = "6.2.2.0"
+  protected val bundledVersion = "6.3.9.0"
   protected val globalVersion = "4.7.2.0"
   private var dotnetToolsInvalidated = false
 
@@ -85,11 +85,12 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   protected fun withFantomasGlobalTool(function: () -> Unit) {
     try {
-      val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString())
+      val env = mapOf("DOTNET_CLI_HOME" to getDotnetCliHome().absolutePathString(),
+                      "DOTNET_ADD_GLOBAL_TOOLS_TO_PATH" to false.toString())
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
-          Environment.dotNetSdk(testMethod.environment.sdkVersion).dotnetExecutable.toPath(),
+          Environment.dotNetSdk(testMethod.environment.sdk).dotnetExecutable.toPath(),
           listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
           env
         )

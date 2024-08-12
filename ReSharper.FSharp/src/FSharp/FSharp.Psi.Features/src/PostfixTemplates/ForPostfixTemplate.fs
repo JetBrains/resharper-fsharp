@@ -170,13 +170,10 @@ and ForPostfixTemplateBehavior(info: ForPostfixTemplateInfo) =
             let namesCollection = FSharpNamingService.createEmptyNamesCollection forEachExpr
             match fcsType with
             | None -> ()
-            | Some fcsType ->
-                let exprType = fcsType.MapType(forEachExpr)
-                if isNotNull exprType then
-                    FSharpNamingService.addNamesForType exprType namesCollection |> ignore
+            | Some fcsType -> FSharpNamingService.addNamesForFcsType forEachExpr fcsType namesCollection |> ignore
             let namingService = LanguageManager.Instance.GetService<FSharpNamingService>(forEachExpr.Language)
             namingService.AddExtraNames(namesCollection, forEachExpr.Pattern)
-            FSharpNamingService.prepareNamesCollection EmptySet.Instance forEachExpr namesCollection
+            FSharpNamingService.prepareNamesCollection EmptySet.Instance forEachExpr namesCollection // todo: used names
 
         let names = List.ofSeq names @ ["_"]
 
