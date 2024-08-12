@@ -614,7 +614,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         typeElement.EnumerateParts()
         |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
 
-    let mkTypeDefCustomAttrs (typeElement: ITypeElement) hasExtensions =
+    let mkTypeDefCustomAttrs (typeElement: ITypeElement) =
+        let hasExtensions = hasExtensions typeElement
         let customAttributes = mkCustomAttributes typeElement
         [| yield! customAttributes
            if hasExtensions then
@@ -1058,8 +1059,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | ILAttributesStored.Reader _ -> true
         | ILAttributesStored.Given expected ->
 
-        let hasExtensions = hasExtensions typeElement
-        let actual = mkTypeDefCustomAttrs typeElement hasExtensions
+        let actual = mkTypeDefCustomAttrs typeElement
         actual = expected.AsArray()
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
@@ -1264,12 +1264,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let properties = mkILPropertiesLazy (InterruptibleLazy(fun _ -> getOrCreateProperties membersTable clrTypeName))
                 let events = mkILEventsLazy (InterruptibleLazy(fun _ -> getOrCreateEvents membersTable clrTypeName))
 
-                // TODO: avoid hasExtensions in closure?
                 let hasExtensions = hasExtensions typeElement
                 let customAttrs = mkILCustomAttrsComputed (fun _ ->
-                    usingTypeElement clrTypeName [||] (fun typeElement ->
-                        mkTypeDefCustomAttrs typeElement hasExtensions
-                    )
+                    usingTypeElement clrTypeName [||] mkTypeDefCustomAttrs
                 )
                 let implementsCustomAttrs = None // todo
 
