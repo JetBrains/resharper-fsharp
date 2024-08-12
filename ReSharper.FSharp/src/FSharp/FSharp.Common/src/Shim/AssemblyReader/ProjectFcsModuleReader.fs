@@ -607,21 +607,21 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         [ for i in typeParameters.Count - 1 .. -1 .. 0 do
             mkGenericParameterDef typeParameters[i] ]
 
+    let hasExtensions (typeElement: ITypeElement) =
+        let typeElement = typeElement.As<TypeElement>()
+        if isNull typeElement then false else
+
+        typeElement.EnumerateParts()
+        |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
+
     let mkTypeDefCustomAttrs (typeElement: ITypeElement) =
-        let hasExtensions =
-            let typeElement = typeElement.As<TypeElement>()
-            if isNull typeElement then false else
-
-            typeElement.EnumerateParts()
-            |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
-
+        let hasExtensions = hasExtensions typeElement
         let customAttributes = mkCustomAttributes typeElement
-        [ yield! customAttributes
-          if hasExtensions then
-              match extensionAttribute () with
-              | Some attribute -> attribute
-              | _ -> () ]
-        |> mkILCustomAttrs
+        [| yield! customAttributes
+           if hasExtensions then
+               match extensionAttribute () with
+               | Some attribute -> attribute
+               | _ -> () |]
 
     let mkEnumInstanceValue (enum: IEnum): ILFieldDef =
         let name = "value__"
@@ -1055,8 +1055,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         actual.AsArray() = attrs.AsArray()
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
-        let actual = mkTypeDefCustomAttrs typeElement 
-        actual.AsArray() = typeDef.CustomAttrs.AsArray()
+        match typeDef.CustomAttrsStored with
+        | ILAttributesStored.Reader _ -> true
+        | ILAttributesStored.Given expected ->
+
+        let actual = mkTypeDefCustomAttrs typeElement
+        actual = expected.AsArray()
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
         mkType param.Type = paramDef.Type &&
@@ -1260,13 +1264,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let properties = mkILPropertiesLazy (InterruptibleLazy(fun _ -> getOrCreateProperties membersTable clrTypeName))
                 let events = mkILEventsLazy (InterruptibleLazy(fun _ -> getOrCreateEvents membersTable clrTypeName))
 
-                let customAttrs = mkTypeDefCustomAttrs typeElement |> storeILCustomAttrs
+                let hasExtensions = hasExtensions typeElement
+                let customAttrs = mkILCustomAttrsComputed (fun _ ->
+                    usingTypeElement clrTypeName [||] mkTypeDefCustomAttrs
+                )
                 let implementsCustomAttrs = None // todo
+
+                let additionalFlags =
+                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
+                    else ILTypeDefAdditionalFlags.None
 
                 let typeDef =
                     ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, implementsCustomAttrs,
                         genericParams, extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
-                        ILTypeDefAdditionalFlags.None, emptyILSecurityDecls, customAttrs)
+                        additionalFlags, emptyILSecurityDecls, customAttrs)
 
                 let fcsTypeDef = 
                     { TypeDef = typeDef
