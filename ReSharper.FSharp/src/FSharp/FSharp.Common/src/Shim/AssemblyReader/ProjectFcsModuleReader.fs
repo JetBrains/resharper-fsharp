@@ -175,9 +175,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
-             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, false, emptyILSecurityDecls,
-             emptyILCustomAttrs)
+        ILTypeDef(name, attributes, layout, implements, None, genericParams, extends, emptyILMethods, nestedTypes,
+             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
+             emptyILSecurityDecls, emptyILCustomAttrsStored)
 
     let mkTypeAccessRights (typeElement: ITypeElement): TypeAttributes =
         let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
@@ -1260,12 +1260,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let properties = mkILPropertiesLazy (InterruptibleLazy(fun _ -> getOrCreateProperties membersTable clrTypeName))
                 let events = mkILEventsLazy (InterruptibleLazy(fun _ -> getOrCreateEvents membersTable clrTypeName))
 
-                let customAttrs = mkTypeDefCustomAttrs typeElement
+                let customAttrs = mkTypeDefCustomAttrs typeElement |> storeILCustomAttrs
+                let implementsCustomAttrs = None // todo
 
                 let typeDef =
-                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, genericParams,
-                        extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties, false,
-                        emptyILSecurityDecls, customAttrs)
+                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, implementsCustomAttrs,
+                        genericParams, extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
+                        ILTypeDefAdditionalFlags.None, emptyILSecurityDecls, customAttrs)
 
                 let fcsTypeDef = 
                     { TypeDef = typeDef
