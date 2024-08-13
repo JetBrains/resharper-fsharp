@@ -115,10 +115,10 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
     fantomasNotifications.clear()
 
-    project.fcsHost.fantomasNotificationFired.advise(testLifetimeDef.lifetime) {
+    project.fcsHost.fantomasNotificationFired.advise(protocolLifetimeDefinition.lifetime) {
       fantomasNotifications.add(it)
     }
-    project.fcsHost.dotnetToolInvalidated.advise(testLifetimeDef.lifetime) {
+    project.fcsHost.dotnetToolInvalidated.advise(protocolLifetimeDefinition.lifetime) {
       dotnetToolsInvalidated = true
     }
 
