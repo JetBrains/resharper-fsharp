@@ -20,7 +20,7 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
     super.beforeDoTestWithDocuments()
 
     val sourceEditorConfigFile = File(testCaseSourceDirectory, ".editorconfig")
-    val slnEditorConfigFile = File(tempTestDirectory, ".editorconfig")
+    val slnEditorConfigFile = File(testWorkDirectory, ".editorconfig")
     sourceEditorConfigFile.copyTo(slnEditorConfigFile, true)
     flushFileChanges(project)
   }
