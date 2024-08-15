@@ -518,7 +518,7 @@ type ScriptReferences =
           Files = EmptySet.Instance }
 
 
-[<SolutionFeaturePart>]
+[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
 type FSharpScriptLanguageLevelProvider(scriptSettingsProvider: FSharpScriptSettingsProvider) =
     let getLanguageLevel () =
         FSharpLanguageLevel.ofLanguageVersion scriptSettingsProvider.LanguageVersion.Value

@@ -1229,7 +1229,7 @@ type FSharpViewFolderIdentity =
     override x.ToString() = x.Identity.ToString()
 
 
-[<SolutionFeaturePart>]
+[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
     inherit OrderingContextProvider()
