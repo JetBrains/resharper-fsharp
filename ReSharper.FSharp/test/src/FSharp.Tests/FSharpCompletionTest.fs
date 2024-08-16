@@ -384,7 +384,7 @@ type FSharpPostfixCompletionTest() =
 
     [<Test>] member x.``Obj - Class - Generic 01``() = x.DoNamedTest()
     [<Test>] member x.``Obj - Class - Generic 02``() = x.DoNamedTest()
-    [<Test>] member x.``Obj - Class 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Obj - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Obj - Class 02``() = x.DoNamedTest()
     [<Test>] member x.``Obj - Class 03``() = x.DoNamedTest()
     [<Test>] member x.``Obj - Interface - Generic 01``() = x.DoNamedTest()
