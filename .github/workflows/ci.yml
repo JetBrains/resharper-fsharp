@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v1.1.0
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ runner.os }}.nuget.${{ hashFiles('ReSharper.FSharp/**/*proj') }}+${{ hashFiles('ReSharper.FSharp/**/*.props') }}
+          key: ${{ runner.os }}.nuget.${{ hashFiles('ReSharper.FSharp/**/*proj') }}+${{ hashFiles('ReSharper.FSharp/**/*.targets') }}
 
       - name: Gradlew Prepare
         working-directory: ./rider-fsharp
