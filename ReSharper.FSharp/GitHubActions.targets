@@ -5,7 +5,8 @@
         <ItemGroup>
             <FilesToExclude Include="@(ReferenceCopyLocalPaths)"
                             Condition="'%(Filename)'!='FSharp.Core' And 
-                                 '%(Filename)'!='Fantomas' And
+                                 '%(Filename)'!='Fantomas.Core' And
+								 '%(Filename)'!='Fantomas.FCS' And
                                  '%(Filename)'!='FSharp.Compiler.Service' And
                                  '%(Filename)'!='FSharp.DependencyManager.Nuget' And
                                  '%(Filename)'!='FSharp.Compiler.Interactive.Settings'"/>
