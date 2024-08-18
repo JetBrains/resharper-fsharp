@@ -3,7 +3,7 @@
     [*] DEO: Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN as Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersAbstract,ModifiersPublic)
-      text: **Enum **<font color="FF6D6D6D"> (in System)</font>
+      text: **Enum** <font color="FF6D6D6D"> (in System)</font>
       tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
