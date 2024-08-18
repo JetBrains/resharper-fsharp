@@ -14,6 +14,8 @@ import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.env.Environment
 import com.jetbrains.rider.test.env.dotNetSdk
+import com.jetbrains.rider.test.facades.RiderSolutionApiFacade
+import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.restoreNuGet
 import java.io.File
@@ -101,13 +103,17 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
     }
   }
 
-  override fun openSolution(solutionFile: File, params: OpenSolutionParams): Project {
-    application.protocolManager.protocolHosts.forEach {
-      editFSharpBackendSettings(it) {
-        dotnetCliHomeEnvVar = getDotnetCliHome().absolutePathString()
+  override val solutionApiFacade: SolutionApiFacade by lazy {
+    object : RiderSolutionApiFacade() {
+      override fun openSolution(solutionFile: File, params: OpenSolutionParams): Project {
+        application.protocolManager.protocolHosts.forEach {
+          editFSharpBackendSettings(it) {
+            dotnetCliHomeEnvVar = getDotnetCliHome().absolutePathString()
+          }
+        }
+        return super.openSolution(solutionFile, params)
       }
     }
-    return super.openSolution(solutionFile, params)
   }
 
   override fun beforeDoTestWithDocuments() {
