@@ -3,7 +3,7 @@
     [×] DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpProperty`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.AbstractMemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Interface 03 - Implement multiple.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Property,ModifiersRead,ModifiersAbstract,ModifiersPublic)
-      text: ~~Module.IA ~~<font color="FF6D6D6D"> (in Module.IA)</font>
+      text: ~~Module.IA~~ <font color="FF6D6D6D"> (in Module.IA)</font>
       tail: <font color="FF6D6D6D">TestProject</font>
       tail icon: FsharpProject
     Navigation result:

@@ -19,7 +19,7 @@
     [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
-      text: **Exception **<font color="FF6D6D6D"> (in System)</font>
+      text: **Exception** <font color="FF6D6D6D"> (in System)</font>
       tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
@@ -51,7 +51,7 @@
     [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: **IStructuralEquatable **<font color="FF6D6D6D"> (in System.Collections)</font>
+      text: **IStructuralEquatable** <font color="FF6D6D6D"> (in System.Collections)</font>
       tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
       tail icon: Assembly
     Navigation result:
