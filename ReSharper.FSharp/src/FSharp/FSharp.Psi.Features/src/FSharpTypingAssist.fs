@@ -748,11 +748,11 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             else None
 
         let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let node = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
-        if isNull node then false else
+        let expr = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
+        if isNull expr then false else
 
         let range =
-            match node with
+            match expr with
             // if expr then {caret}
             // No info is available after error recovery, we check that range is surrounded with if ... then.
             | :? IFromErrorExpr as fromErrorExpr ->
@@ -811,15 +811,12 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if isNull matchClause then false else
 
-        let matchClause =
-            let whenExpression = matchClause.WhenExpression
-            let pat = matchClause.Pattern
-            let offset =
-                if isNull whenExpression then pat.GetDocumentEndOffset()
-                else whenExpression.GetDocumentEndOffset()
-            if offset.Offset = prevTokenEnd then matchClause else null
-
-        if isNull matchClause then false else
+        let whenExpression = matchClause.WhenExpression
+        let pat = matchClause.Pattern
+        let offset =
+            if isNull whenExpression then pat.GetDocumentEndOffset()
+            else whenExpression.GetDocumentEndOffset()
+        if offset.Offset <> prevTokenEnd then false else
 
         use cookie = LexerStateCookie.Create(lexer)
 
@@ -1007,6 +1004,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let mutable outerExpr = None
 
         let check (expr: IFSharpExpression) (leftExpr: IFSharpExpression) (rightExpr: IFSharpExpression) =
+            if isNull leftExpr || isNull rightExpr then () else
+
             let startOffset = expr.GetDocumentStartOffset().Offset
             if offset >= startOffset && rightExpr.StartLine > caretLine then
                 match rightExpr with
