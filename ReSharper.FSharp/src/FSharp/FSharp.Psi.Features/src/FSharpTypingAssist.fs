@@ -552,6 +552,19 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let text = String(' ', indent) + this.GetNewLineText(textControl)
         insertText textControl lineStartOffset text "Start New Line Before" (Some (lineStartOffset + indent))
 
+    let handleStartNewLinePressed (context: IActionContext) =
+        use _ = this.CommandProcessor.UsingCommand("Start New Line")
+
+        let textControl = context.TextControl
+        textControl.Selection.Delete()
+
+        let document = textControl.Document
+        let caretLine = textControl.Caret.Position.Value.ToDocLineColumn().Line
+        let lineEndOffset = document.GetLineEndOffsetNoLineBreak(caretLine)
+        textControl.Caret.MoveTo(lineEndOffset, CaretVisualPlacement.DontScrollIfVisible)
+
+        handleEnter(context)
+
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
@@ -561,12 +574,13 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let isSmartParensHandlerAvailable = Predicate<_>(this.IsTypingSmartParenthesisHandlerAvailable2)
         let manager = dependencies.TypingAssistManager
 
-        manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
-        manager.AddActionHandler(lifetime, EditorStartNewLineBeforeAction.ACTION_ID, this, Func<_,_>(handleStartNewLineBeforePressed), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, handleEnter, isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, EditorStartNewLineBeforeAction.ACTION_ID, this, handleStartNewLineBeforePressed, isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, EditorStartNewLineAction.ACTION_ID, this, handleStartNewLinePressed, isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Backspace, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Tab, this, Func<_,_>(this.HandleTabPressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.TabLeft, this, Func<_,_>(this.HandleTabLeftPressed), isActionHandlerAvailable)
-        manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ' ', this, handleSpace, isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isSmartParensHandlerAvailable)
