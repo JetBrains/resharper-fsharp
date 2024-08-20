@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.env.Environment
 import com.jetbrains.rider.test.env.dotNetSdk
-import com.jetbrains.rider.test.facades.RiderSolutionApiFacade
+import com.jetbrains.rider.test.facades.RiderSolutionWithFoldersApiFacade
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.restoreNuGet
@@ -104,7 +104,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
   }
 
   override val solutionApiFacade: SolutionApiFacade by lazy {
-    object : RiderSolutionApiFacade() {
+    object : RiderSolutionWithFoldersApiFacade(testWorkDirectoryStorage.customWorkDirectoryName, checkSolutionLoad) {
       override fun openSolution(solutionFile: File, params: OpenSolutionParams): Project {
         application.protocolManager.protocolHosts.forEach {
           editFSharpBackendSettings(it) {
