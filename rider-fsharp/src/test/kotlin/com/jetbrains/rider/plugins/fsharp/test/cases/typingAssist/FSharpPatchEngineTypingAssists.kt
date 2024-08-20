@@ -13,8 +13,7 @@ import org.testng.annotations.Test
 
 abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode) : PatchEngineEditorTestBase(mode) {
   override val checkTextControls = false
-
-  override fun getSolutionDirectoryName(): String = "CoreConsoleApp"
+  override val testSolution = "CoreConsoleApp"
 
   @DataProvider(name = "simpleCases")
   fun simpleCases() = arrayOf(
