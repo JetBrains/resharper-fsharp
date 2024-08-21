@@ -4,6 +4,7 @@ open System
 open System.Linq
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
@@ -206,7 +207,7 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
             fsFile.GetParseAndCheckResults(true, opName) |> Option.map (fun results -> results.CheckResults)
         | _ -> None
 
-[<IntellisensePart>]
+[<IntellisensePart(Instantiation.DemandAnyThreadUnsafe)>]
 type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
     inherit CodeCompletionContextProviderBase()
 

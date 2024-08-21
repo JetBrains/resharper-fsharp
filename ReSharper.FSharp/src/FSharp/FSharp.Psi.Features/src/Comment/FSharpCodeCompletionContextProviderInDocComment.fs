@@ -1,12 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Comment
 
+open JetBrains.Application.Parts
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.CompletionInDocComments
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-[<IntellisensePart>]
+[<IntellisensePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpCodeCompletionContextProviderInDocComment() =
     inherit CodeCompletionContextProviderInDocCommentBase()
 
