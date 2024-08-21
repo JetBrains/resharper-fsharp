@@ -39,7 +39,7 @@ type FSharpScriptReferenceCompletionContext(context, token, completedPath, range
     member x.SupportsNuget = supportsNuget
 
 
-[<IntellisensePart>]
+[<IntellisensePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpScriptReferenceCompletionContextProvider() =
     inherit CodeCompletionContextProviderBase()
 
