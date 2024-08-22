@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -8,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
-    inherit FSharpScopedQuickFixBase(warning.MatchClause)
+    inherit FSharpScopedNonIncrementalQuickFixBase(warning.MatchClause)
 
     let removeMatchClause (clause : IMatchClause) =
         if isLastChild clause then
@@ -23,6 +22,10 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
 
     override x.Text = "Remove never matching rule"
     override x.ScopedText = "Remove never matching rules"
+
+    override this.IsReanalysisRequired = false
+    override this.ReanalysisDependencyRoot = null
+
     override x.IsAvailable _ = isValid warning.MatchClause
 
     override x.ExecutePsiTransaction _ =
@@ -30,6 +33,3 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         use enableFormatter = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         use writeLock = WriteLockCookie.Create(clause.IsPhysical())
         removeMatchClause clause
-
-    override x.GetScopedQuickFixExecutor(solution, fixingStrategy, highlighting, languageType) =
-        ScopedNonIncrementalQuickFixExecutor(solution, fixingStrategy, highlighting.GetType(), languageType)

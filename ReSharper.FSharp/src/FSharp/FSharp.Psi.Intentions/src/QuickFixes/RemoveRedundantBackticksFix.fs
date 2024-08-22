@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.CodeCleanup.HighlightingModule
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -24,10 +23,3 @@ type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
         replace identifier newId
 
     override x.ExecutePsiTransaction _ = x.ExecutePsiTransaction()
-
-    interface IHighlightingsCleanupItem with
-        member x.IsAvailable _ = true
-        member x.IsReanalysisRequired = false
-        member x.ReanalysisDependencyRoot = null
-        member x.IsValid() = isValid identifier
-        member x.Execute() = x.ExecutePsiTransaction()

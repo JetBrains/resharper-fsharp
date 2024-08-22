@@ -92,7 +92,7 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
 
 
 type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
-    inherit FSharpScopedQuickFixBase(pat)
+    inherit FSharpScopedNonIncrementalQuickFixBase(pat)
 
     let patOwner = ReplaceWithWildPat.getPatOwner pat
 
@@ -133,12 +133,12 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
 
         FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, $"in {scopeText}"))
 
+    override this.IsReanalysisRequired = false
+    override this.ReanalysisDependencyRoot = null
+
     override x.IsAvailable _ = ReplaceWithWildPat.isAvailable pat
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         ReplaceWithWildPat.replaceWithWildPat pat
-
-    override x.GetScopedQuickFixExecutor(solution, fixingStrategy, highlighting, languageType) =
-        ScopedNonIncrementalQuickFixExecutor(solution, fixingStrategy, highlighting.GetType(), languageType)
