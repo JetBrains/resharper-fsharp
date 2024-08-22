@@ -25,5 +25,5 @@ type Inheritred() =
     inherit Base()
 
 ---------------------------------------------------------
-(0): Interface Is Implemented: (T) 'Interface 'IInterface' is implemented (click to navigate)' (E) ''
-(1): Class Is Inherited: (T) 'Class 'Base' is inherited (click to navigate)' (E) ''
+(0): Interface Is Implemented: Interface 'IInterface' is implemented
+(1): Class Is Inherited: Class 'Base' is inherited
