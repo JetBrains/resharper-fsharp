@@ -50,7 +50,7 @@ type FSharpQuickFixBase() =
 
 [<AbstractClass>]
 type FSharpScopedQuickFixBase(contextNode: ITreeNode) =
-    inherit ScopedQuickFixBase()
+    inherit ModernScopedQuickFixBase()
 
     abstract ExecutePsiTransaction: ISolution -> unit
     default x.ExecutePsiTransaction _ = ()
@@ -62,6 +62,19 @@ type FSharpScopedQuickFixBase(contextNode: ITreeNode) =
 
     override this.TryGetContextTreeNode() = contextNode
 
+[<AbstractClass>]
+type FSharpScopedNonIncrementalQuickFixBase(contextNode: ITreeNode) =
+    inherit ModernScopedNonIncrementalQuickFixBase()
+
+    abstract ExecutePsiTransaction: ISolution -> unit
+    default x.ExecutePsiTransaction _ = ()
+
+    override x.ExecutePsiTransaction(solution, _) =
+        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
+        x.ExecutePsiTransaction(solution)
+        null
+
+    override this.TryGetContextTreeNode() = contextNode
 
 type IFSharpQuickFixUtilComponent =
     inherit IQuickFixUtilComponent
