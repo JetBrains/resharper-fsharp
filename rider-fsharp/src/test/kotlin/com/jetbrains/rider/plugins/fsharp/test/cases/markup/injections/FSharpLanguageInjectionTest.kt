@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfoType
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -22,7 +23,8 @@ private fun BaseTestWithMarkup.doTest() {
 }
 
 
-@TestEnvironment(solution = "CoreConsoleApp", sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@Solution("CoreConsoleApp")
 class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   @Test
   fun testInjectionByCommentInRegularStrings() = doTest()
@@ -56,7 +58,8 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 }
 
-@TestEnvironment(solution = "FableApp", sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@Solution("FableApp")
 class FSharpFrontendFrameworksTest : BaseTestWithMarkup() {
   @Test
   fun testInjectionByExternalAnnotation() = doTest()
