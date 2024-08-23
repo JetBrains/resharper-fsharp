@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util.DataStructures;
 
@@ -11,6 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue value, FSharpCompiledModule owner)
   : ICompiledExtensionMemberProxy
 {
+  public IPsiModule PsiModule => owner.Module;
+
   public IPsiSourceFile TryGetSourceFile() => null;
 
   public HybridCollection<ITypeMember> FindExtensionMember()
