@@ -6,6 +6,7 @@ import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.solutionName
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
@@ -22,7 +23,8 @@ import org.testng.annotations.Test
 @Test
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   @Test
-  @TestEnvironment(solution = "MoveProviderSolution1", sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @Solution("MoveProviderSolution1")
   fun testAllowPaste01_Mix() {
     doTest { provider ->
       val compileBeforeFile = findFile("Project", "CompileBeforeFile.fs")
@@ -42,7 +44,8 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(solution = "MoveProviderSolution2", sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @Solution("MoveProviderSolution2")
   fun testAllowPaste02_DifferentFiles() {
     doTest { provider ->
       val files = arrayListOf(
@@ -102,7 +105,8 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(solution = "MoveProviderSolution3", sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @Solution("MoveProviderSolution3")
   fun testAllowPaste03_DifferentFilesInFolders() {
     doTest { provider ->
       val rootFile = findFileView("TargetProject", "File3.fs")

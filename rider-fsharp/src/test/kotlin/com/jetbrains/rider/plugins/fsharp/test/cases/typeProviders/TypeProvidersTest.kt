@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rdclient.testFramework.executeWithGold
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
@@ -31,7 +32,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun providersErrors() = doTest("ProvidersErrors")
 
   @Test(description = "RIDER-60909")
-  @TestEnvironment(solution = "LegacyTypeProviderLibrary")
+  @Solution("LegacyTypeProviderLibrary")
   fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 
   @Test

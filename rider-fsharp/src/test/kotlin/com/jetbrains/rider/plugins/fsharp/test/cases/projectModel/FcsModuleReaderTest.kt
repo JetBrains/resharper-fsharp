@@ -16,13 +16,13 @@ import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
@@ -109,7 +109,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
 
   @Mute("RIDER-102738")
-  @TestEnvironment(solution = "ProjectReferencesCSharp")
+  @Solution("ProjectReferencesCSharp")
   fun testUnloadReloadCSharp() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -137,7 +137,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
   @Mute("Temporary because of RIDER-20984")
-  @TestEnvironment(solution = "ProjectReferencesCSharp")
+  @Solution("ProjectReferencesCSharp")
   fun testTypeInsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -190,7 +190,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
   @Mute
-  @TestEnvironment(solution = "ProjectReferencesCSharp")
+  @Solution("ProjectReferencesCSharp")
   fun testTypeOutsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -216,7 +216,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
 
   @Mute("RIDER-102738")
-  @TestEnvironment(solution = "ProjectReferencesCSharp2")
+  @Solution("ProjectReferencesCSharp2")
   fun testLoadReferenced() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -236,7 +236,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   override val backendLoadedTimeout: Duration
     get() = Duration.ofMinutes(20)
 
-  @TestEnvironment(solution = "ProjectReferencesCSharp2")
+  @Solution("ProjectReferencesCSharp2")
   fun testGotoUsagesFromCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
@@ -248,7 +248,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-  @TestEnvironment(solution = "ProjectReferencesCSharp3")
+  @Solution("ProjectReferencesCSharp3")
   fun testGotoUsagesFromCSharpChangeCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
@@ -261,7 +261,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-  @TestEnvironment(solution = "ProjectReferencesCSharp3")
+  @Solution("ProjectReferencesCSharp3")
   fun testGotoUsagesFromCSharpChangeCSharp2() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
