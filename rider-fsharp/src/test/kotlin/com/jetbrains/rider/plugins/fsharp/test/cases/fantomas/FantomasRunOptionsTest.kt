@@ -10,7 +10,7 @@ import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
 class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
   @Test
   fun default() {

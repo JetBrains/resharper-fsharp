@@ -10,7 +10,8 @@ import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(solution = "CoreConsoleApp", sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@Solution("CoreConsoleApp")
 class FSharpHoverDocTest : DocumentationTestBase() {
   override val checkSolutionLoad = false
 
