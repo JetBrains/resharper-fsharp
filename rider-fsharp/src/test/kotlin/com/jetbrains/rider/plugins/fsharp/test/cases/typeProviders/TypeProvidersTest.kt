@@ -38,18 +38,18 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @TestEnvironment(
-    solution = "CsvTypeProvider",
     sdkVersion = SdkVersion.DOT_NET_6,
     buildTool = BuildTool.SDK
   )
+  @Solution("CsvTypeProvider")
   fun `csvProvider - units of measure`() = doTest("Library")
 
   @Test(description = "RIDER-101544")
   @TestEnvironment(
-    solution = "SwaggerProviderCSharp",
     sdkVersion = SdkVersion.DOT_NET_6,
     buildTool = BuildTool.SDK
   )
+  @Solution("SwaggerProviderCSharp")
   fun `srtp analysis`() {
     withOpenedEditor(project, "SwaggerProviderLibrary/SwaggerProvider.fs", "SwaggerProvider.fs") {
       waitForDaemon()

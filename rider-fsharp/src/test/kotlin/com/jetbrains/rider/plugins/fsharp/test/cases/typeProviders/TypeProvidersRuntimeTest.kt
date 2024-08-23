@@ -4,6 +4,7 @@ import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -23,9 +24,9 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @TestEnvironment(
     sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
     buildTool = BuildTool.FULL,
-    platform = [PlatformType.WINDOWS_ALL],
-    solution = "TypeProviderLibrary"
+    platform = [PlatformType.WINDOWS_ALL]
   )
+  @Solution("TypeProviderLibrary")
   fun framework461() = doTest(".NET Framework 4.8")
 
   @Test
@@ -45,10 +46,8 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   fun net7() = doTest(".NET 7")
 
   @Mute("RIDER-103648")
-  @TestEnvironment(
-    sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
-    solution = "FscTypeProviderLibrary"
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @Solution("FscTypeProviderLibrary")
   fun fsc() = doTest(".NET Framework 4.8")
 
   private fun doTest(expectedRuntime: String) {
