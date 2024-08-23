@@ -2,10 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.test.annotations.Issue
-import com.jetbrains.rider.test.annotations.Issues
-import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.*
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
@@ -51,10 +48,8 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
 
   @Test
   @Mute("RIDER-110482")
-  @TestEnvironment(
-    solution = "FSharpProjectTree",
-    sdkVersion = SdkVersion.DOT_NET_5
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
       dump2("Init", false, false) {
@@ -182,10 +177,8 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(
-    solution = "FsprojWithTwoFiles",
-    sdkVersion = SdkVersion.DOT_NET_5
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
     doTestDumpProjectsView {
       dump2("Init", false, false) { }
@@ -203,10 +196,8 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test(description = "RIDER-107198")
-  @TestEnvironment(
-    solution = "SolutionWithDuplicateTargets",
-    sdkVersion = SdkVersion.DOT_NET_5
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
     doTestDumpProjectsView {
       dump2("Init", checkSlnFile = false, compareProjFile = false) { }

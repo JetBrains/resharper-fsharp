@@ -42,17 +42,13 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
   @Test
-  @TestEnvironment(
-    solution = "SwaggerProviderCSharp",
-    sdkVersion = SdkVersion.DOT_NET_6
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @Solution("SwaggerProviderCSharp")
   fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
   @Test
-  @TestEnvironment(
-    solution = "SwaggerProviderCSharp",
-    sdkVersion = SdkVersion.DOT_NET_6
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @Solution("SwaggerProviderCSharp")
   fun `provided abbreviation in csharp`() = doTestWithTypeProviders("OpenAPI Provider for")
 
   @Test

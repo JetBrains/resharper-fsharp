@@ -37,10 +37,8 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @TestEnvironment(
-    solution = "SwaggerProviderCSharp",
-    sdkVersion = SdkVersion.DOT_NET_6
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @Solution("SwaggerProviderCSharp")
   fun changeStaticArg() {
     withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()
