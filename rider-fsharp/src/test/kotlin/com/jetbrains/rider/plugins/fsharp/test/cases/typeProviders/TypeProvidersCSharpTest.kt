@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.daemon.util.hasErrors
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -90,12 +91,12 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @TestEnvironment(solution = "YamlProviderCSharp")
+  @Solution("YamlProviderCSharp")
   fun `provided type abbreviation completion`() =
     doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
   @Test
-  @TestEnvironment(solution = "YamlProviderCSharp")
+  @Solution("YamlProviderCSharp")
   fun `provided nested type completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
   @Suppress("SameParameterValue")

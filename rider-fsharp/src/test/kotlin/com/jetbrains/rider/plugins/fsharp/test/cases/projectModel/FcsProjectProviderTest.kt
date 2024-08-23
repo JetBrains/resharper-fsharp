@@ -12,6 +12,7 @@ import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -61,7 +62,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     }
   }
 
-  @TestEnvironment(solution = "ProjectReferencesFSharp")
+  @Solution("ProjectReferencesFSharp")
   fun projectReferencesFSharp() {
     assertAllProjectsWereLoaded(project)
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, emptyList())
@@ -86,7 +87,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
   }
 
   @Mute("Broken after ProjectModelMonitor refactoring")
-  @TestEnvironment(solution = "ProjectReferencesCSharp")
+  @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
@@ -119,7 +120,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     }
   }
 
-  @TestEnvironment(solution = "ProjectReferencesCSharp")
+  @Solution("ProjectReferencesCSharp")
   @Mute("RIDER-100270 Need to somehow set setting before solution load")
   fun projectReferencesCSharpNoModuleReader() {
     assertAllProjectsWereLoaded(project)

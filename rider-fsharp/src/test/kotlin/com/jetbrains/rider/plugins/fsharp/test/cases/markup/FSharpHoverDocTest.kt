@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.markup
 import com.jetbrains.rdclient.testFramework.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
@@ -36,7 +37,7 @@ class FSharpHoverDocTest : DocumentationTestBase() {
 
   @Mute("RIDER-103671")
   @Test
-  @TestEnvironment(solution = "ConsoleAppTwoTargetFrameworks")
+  @Solution("ConsoleAppTwoTargetFrameworks")
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
   @Test
