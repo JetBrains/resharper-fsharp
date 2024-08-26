@@ -15,6 +15,7 @@ import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.waitForNextDaemon
 import org.testng.annotations.Test
 import java.io.File
 
@@ -57,7 +58,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
 
       testDirectory.deleteRecursively().shouldBeTrue()
       typeWithLatency("//")
-      waitForDaemon()
+      waitForNextDaemon()
 
       executeWithGold(File(testGoldFile.path + "_before")) {
         dumpTypeProviders(it)
@@ -65,7 +66,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
 
       testDirectory.mkdir().shouldBeTrue()
       typeWithLatency(" ")
-      waitForDaemon()
+      waitForNextDaemon()
 
       executeWithGold(File(testGoldFile.path + "_after")) {
         dumpTypeProviders(it)
