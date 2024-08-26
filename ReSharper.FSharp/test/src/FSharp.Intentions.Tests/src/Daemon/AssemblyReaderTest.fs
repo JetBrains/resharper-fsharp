@@ -1,10 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
-open System
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
-open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
@@ -13,10 +11,8 @@ open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
-open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
-open JetBrains.Util
 open NUnit.Framework
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
@@ -84,6 +80,7 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Field - Const 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 02 - Wrong type``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 03 - Same name``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Const 04 - Enum of another type``() = x.DoNamedTest()
     [<Test>] member x.``Field - Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Same name 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Field 01``() = x.DoNamedTest()

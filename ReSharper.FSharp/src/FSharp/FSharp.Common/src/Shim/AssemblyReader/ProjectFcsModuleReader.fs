@@ -686,11 +686,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkFieldLiteralValue (field: IField) =
         let valueType =
-            if not field.IsEnumMember then field.Type else
-
-            match field.GetContainingType() with
-            | :? IEnum as enum -> enum.GetUnderlyingType()
-            | _ -> null
+            let underlyingType = field.Type.GetEnumUnderlying()
+            if isNotNull underlyingType then underlyingType else field.Type
 
         let value = field.ConstantValue
         getLiteralValue value valueType
