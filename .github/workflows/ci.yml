@@ -61,6 +61,11 @@ jobs:
         if: ${{ success() }} || ${{ failure() }}
         run: ./gradlew buildPlugin
 
+      - name: Test Plugin Frontend
+        working-directory: ./rider-fsharp
+        if: ${{ success() }} || ${{ failure() }}
+        run: ./gradlew test
+
       - name: Stop Gradle Daemon # to collect Gradle cache
         working-directory: ./rider-fsharp
         run: ./gradlew --stop
