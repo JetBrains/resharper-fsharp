@@ -48,7 +48,7 @@ open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
 
 /// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
@@ -1274,7 +1274,7 @@ type FSharpModificationSettingsProvider() =
         member x.SmartModificationsFilter = ["fsproj"] :> _
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpBuildActionsProvider() =
     inherit MsBuildDefaultBuildActionsProvider()
 
