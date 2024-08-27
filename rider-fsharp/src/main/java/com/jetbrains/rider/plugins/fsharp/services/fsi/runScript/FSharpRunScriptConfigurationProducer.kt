@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi.runScript
 
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.LazyRunConfigurationProducer
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
@@ -20,6 +21,7 @@ class FSharpRunScriptConfigurationProducer : LazyRunConfigurationProducer<FSharp
     context: ConfigurationContext,
     sourceElement: Ref<PsiElement>
   ): Boolean {
+    if (context.place == ActionPlaces.INTENTION_MENU) return false
     val scriptFile = getFileFromContext(context) ?: return false
     configuration.scriptFile = scriptFile.virtualFile
     configuration.setGeneratedName()
