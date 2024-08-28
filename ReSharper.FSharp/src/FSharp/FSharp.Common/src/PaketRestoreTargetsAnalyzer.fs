@@ -9,7 +9,7 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 
 let [<Literal>] paketTargets = "Paket.Restore.targets"
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type PaketTargetsProjectLoadModificator() =
     interface MsBuildLegacyLoadStrategy.IModificator with
