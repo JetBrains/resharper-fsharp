@@ -2,15 +2,12 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.base.CompletionTestBase
+import com.jetbrains.rider.test.base.PatchEngineCompletionTestBase
+import com.jetbrains.rider.test.base.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.env.enums.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.test.waitForDaemon
 import org.testng.annotations.Test
 
-@Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
-class FSharpCompletionTest : CompletionTestBase() {
+abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : PatchEngineCompletionTestBase(mode) {
   override val testSolution: String = "CoreConsoleApp"
   override val restoreNuGetPackages = true
 
@@ -37,9 +34,9 @@ class FSharpCompletionTest : CompletionTestBase() {
   fun qualified02() = doTestChooseItem("a")
 
   private fun doTestTyping(typed: String, fileName: String = "Program.fs") {
-    dumpOpenedEditor(fileName, fileName) {
+    dumpOpenedEditorFacade(fileName, fileName) {
       waitForDaemon()
-      typeWithLatency(typed)
+      type(typed)
       callBasicCompletion()
       waitForCompletion()
       completeWithTab()
@@ -47,7 +44,7 @@ class FSharpCompletionTest : CompletionTestBase() {
   }
 
   private fun doTestChooseItem(item: String, fileName: String = "Program.fs") {
-    dumpOpenedEditor(fileName, fileName) {
+    dumpOpenedEditorFacade(fileName, fileName) {
       waitForDaemon()
       callBasicCompletion()
       waitForCompletion()
@@ -57,13 +54,29 @@ class FSharpCompletionTest : CompletionTestBase() {
 
   @Test
   fun `nuget reference - simple`() = doTestTyping("nu", "Script.fsx")
+
+  @Test
   fun `nuget reference - reference`() = doTestTyping("nu", "Script.fsx")
+
+  @Test
   fun `nuget reference - triple quoted string`() = doTestTyping("nu", "Script.fsx")
+
+  @Test
   fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
+
+  @Test
   fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
+
+  @Test
   fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
+
+  @Test
   fun `nuget reference - replace whole package`() = doTestTyping("FSharp.", "Script.fsx")
+
+  @Test
   fun `nuget reference - replace path 01`() = doTestChooseItem("nuget:", "Script.fsx")
+
+  @Test
   fun `nuget reference - replace path 02`() = doTestChooseItem("nuget:", "Script.fsx")
 
   @Mute("RIDER-103666")
@@ -72,11 +85,33 @@ class FSharpCompletionTest : CompletionTestBase() {
 
   @Mute("RIDER-104549")
   fun `comments - language injections`() = doTestChooseItem("f#")
-  fun `doc comments - not available`(){
-    dumpOpenedEditor("Program.fs", "Program.fs") {
+  fun `doc comments - not available`() {
+    dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       waitForDaemon()
       callBasicCompletion()
       ensureThereIsNoLookup()
     }
+  }
+}
+
+@Test
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpCompletionTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.LegacyAsyncTyping)
+
+@Test
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Sequential)
+
+@Test
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative)
+
+@Test
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase) {
+  init {
+    addMute(Mute("RIDER-116517"), ::`nuget reference - package name`)
+    addMute(Mute("RIDER-116517"), ::`nuget reference - replace whole package`)
+    addMute(Mute("RIDER-116517"), ::`nuget reference - version`)
   }
 }
