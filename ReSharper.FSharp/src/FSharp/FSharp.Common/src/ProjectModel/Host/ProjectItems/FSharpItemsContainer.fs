@@ -249,7 +249,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
                 x.NotifyProjectLoaded(projectMark)
             | _ -> ()
 
-        member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
+        member x.OnAddFile(projectMark, itemType, path, linkedPath, properties, relativeTo, relativeToType) =
             match projectMark with
             | FSharpProjectMark ->
                 logger.Trace("On add file: {0} ({1}, link: {2}) relative to: {3} {4}",
@@ -266,7 +266,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             updateProject projectMark (fun mapping refreshFolder update ->
                 mapping.RemoveFile(path, refreshFolder, update))
 
-        member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) =
+        member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation, properties) =
             match projectMark with
             | FSharpProjectMark ->
                 logger.Trace("On update file: {0} ({1}) to {2} ({3})", oldLocation, oldItemType, newLocation, newItemType)
