@@ -14,7 +14,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
   {
     protected virtual bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>
       sourceFile != null && sourceFile.IsValid() &&
-      sourceFile.LanguageType.Is<FSharpProjectFileType>() && !sourceFile.Properties.IsNonUserFile;
+      sourceFile.Properties is { IsNonUserFile: false, ProvidesCodeModel: true } &&
+      sourceFile.LanguageType.Is<FSharpProjectFileType>();
 
     public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess daemonProcess,
       IContextBoundSettingsStore settings, DaemonProcessKind processKind)
@@ -22,13 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
       if (!IsSupported(daemonProcess.SourceFile, processKind))
         return EmptyList<IDaemonStageProcess>.InstanceList;
 
-      if (!(daemonProcess.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
+      if (daemonProcess.SourceFile.GetPrimaryPsiFile() is not IFSharpFile fsFile)
         return EmptyList<IDaemonStageProcess>.Instance;
 
       var process = CreateStageProcess(fsFile, settings, daemonProcess, processKind);
-      return process != null
-        ? new[] { process }
-        : EmptyList<IDaemonStageProcess>.InstanceList;
+      return process != null ? [process] : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
     [CanBeNull]
