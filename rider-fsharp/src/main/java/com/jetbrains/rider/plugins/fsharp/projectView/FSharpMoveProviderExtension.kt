@@ -1,10 +1,12 @@
 package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.NlsSafe
 import com.intellij.platform.backend.workspace.virtualFile
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rd.ide.model.RdDndTargetType
 import com.jetbrains.rider.model.RdProjectFileDescriptor
+import com.jetbrains.rider.model.RdProjectModelItemDescriptor
 import com.jetbrains.rider.projectView.ProjectElementView
 import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
@@ -16,15 +18,20 @@ import com.jetbrains.rider.projectView.workspace.isProjectFile
 import com.jetbrains.rider.projectView.workspace.isProjectFolder
 import com.jetbrains.rider.util.idea.application
 
+@NlsSafe
+fun getSpecialCompileType(descriptor: RdProjectModelItemDescriptor): String? {
+  if (descriptor is RdProjectFileDescriptor) {
+    return descriptor.getUserData("CompileOrder")
+  }
+
+  return null
+}
+
 class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(project) {
 
   companion object {
     const val CompileBeforeType: String = "CompileBefore"
     const val CompileAfterType: String = "CompileAfter"
-
-    fun isSpecialCompileType(descriptor: RdProjectFileDescriptor): Boolean {
-      return descriptor.buildAction in arrayOf(CompileBeforeType, CompileAfterType)
-    }
   }
 
   private fun ProjectModelEntity.prevSibling() = getSibling { index -> index - 1 }
@@ -171,9 +178,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
 
   private fun ProjectModelEntity?.isCompileBefore(orderType: RdDndOrderType): Boolean {
     this ?: return false
-    val descriptor = descriptor
-    if (descriptor is RdProjectFileDescriptor) {
-      return descriptor.buildAction == CompileBeforeType
+    val compileType = getSpecialCompileType(descriptor)
+    if (compileType != null) {
+      return compileType == CompileBeforeType
     }
     if (isProjectFolder()) {
       return when (orderType) {
@@ -187,9 +194,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
 
   private fun ProjectModelEntity?.isCompileAfter(orderType: RdDndOrderType): Boolean {
     this ?: return false
-    val descriptor = descriptor
-    if (descriptor is RdProjectFileDescriptor) {
-      return descriptor.buildAction == CompileAfterType
+    val compileType = getSpecialCompileType(descriptor)
+    if (compileType != null) {
+      return compileType == CompileAfterType
     }
     if (isProjectFolder()) {
       return when (orderType) {
