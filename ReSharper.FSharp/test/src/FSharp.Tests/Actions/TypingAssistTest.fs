@@ -152,10 +152,10 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter after error 06 - match``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 07 - multiline if with parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 08 - multiline if before then``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 09 - After then``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 09 - After then``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 10 - After while``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 11 - After while and comments``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 13 - After for in do``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 14 - After for do``() = x.DoNamedTest()
 
