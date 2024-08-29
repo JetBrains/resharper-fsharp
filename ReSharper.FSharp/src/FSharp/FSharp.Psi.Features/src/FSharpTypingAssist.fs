@@ -742,38 +742,45 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         let document = textControl.Document
 
-        let checkExpr (expr: IFSharpExpression) (node: ITreeNode) prevTokenEnd =
-            if isNotNull expr && expr.GetDocumentEndOffset().Offset = prevTokenEnd
-                then Some (node.GetDocumentRange())
-            else None
-
         let fsFile = textControl.GetFSharpFile(dependencies.Solution)
         let expr = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
         if isNull expr then false else
 
         let range =
+            let inline checkExpr (expr: IFSharpExpression) (node: ITreeNode) =
+                if isNotNull expr && isNotNull node && expr.GetDocumentEndOffset().Offset = prevTokenEnd
+                    then Some (node.GetDocumentRange())
+                else None
+
             match expr with
+            // if expr then ...
+            // elif ... {caret}
+            | :? IElifExpr as elifExpr when (elifExpr.ThenExpr :? IFromErrorExpr) ->
+                let ifExpr = IfThenElseExprNavigator.GetByElseExpr(elifExpr)
+                if isNull ifExpr then None else
+                checkExpr elifExpr.ConditionExpr ifExpr.ConditionExpr
+
             // if expr then {caret}
             // No info is available after error recovery, we check that range is surrounded with if ... then.
-            | :? IFromErrorExpr as fromErrorExpr ->
-                let expr = fromErrorExpr.Expression
-                checkExpr expr expr prevTokenEnd
+            | :? IIfThenElseExpr as ifThenElseExpr when (ifThenElseExpr.ThenExpr :? IFromErrorExpr) ->
+                checkExpr ifThenElseExpr.ConditionExpr ifThenElseExpr.ConditionExpr
 
             // while expr do {caret}
             | :? IWhileExpr as whileExpr ->
                 let expr = whileExpr.ConditionExpr
-                checkExpr expr expr prevTokenEnd
+                checkExpr expr expr
 
             // for i = ... to ... do {caret}
             | :? IForExpr as forExpr ->
-                checkExpr forExpr.DoExpression forExpr.Identifier prevTokenEnd
+                checkExpr forExpr.DoExpression forExpr.Identifier
 
             // for ... in ... do {caret}
             | :? IForEachExpr as foreachExpr ->
-                checkExpr foreachExpr.InExpression foreachExpr.Pattern prevTokenEnd
+                checkExpr foreachExpr.InExpression foreachExpr.Pattern
 
             | _ -> None
 
+        //expr.ProcessThisAndDescendants(processor)
         match range with
         | None -> false
         | Some range ->
