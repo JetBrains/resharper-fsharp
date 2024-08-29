@@ -1104,36 +1104,23 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             if tokenType == FSharpTokenType.NEW_LINE then None else
             Some lexer.TokenEnd
 
-        let mutable expr = None
-        let mutable foundError = false
-        let processor =
-            { new IRecursiveElementProcessor with
-                member this.ProcessingIsFinished = false
-                member this.InteriorShouldBeProcessed(element) = true
-                member this.ProcessAfterInterior(element) = ()
-                member this.ProcessBeforeInterior(element) =
-                    match element with
-                    | :? IFromErrorExpr -> foundError <- true
-                    | _ -> ()
-
-                    if expr.IsSome then () else
-
-                    let offset = element.GetDocumentEndOffset().Offset
-                    if offset = opEndOffset || prevEndOffset.IsSome && offset = prevEndOffset.Value then
-                        expr <- Some element
-            }
-
         let document = textControl.Document
         let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let refExpr = fsFile.GetNode<IReferenceExpr>(DocumentOffset(document, opStartOffset))
-        let binaryExpr = BinaryAppExprNavigator.GetByOperator(refExpr)
-        if isNull binaryExpr then false else
+        let opRefExpr = fsFile.GetNode<IReferenceExpr>(DocumentOffset(document, opStartOffset))
+        let binaryExpr = BinaryAppExprNavigator.GetByOperator(opRefExpr)
+        if isNull binaryExpr || not (binaryExpr.RightArgument :? IFromErrorExpr) then false else
 
-        binaryExpr.ProcessThisAndDescendants(processor)
-        if not foundError then false else
-        match expr with
-        | None -> false
-        | Some expr ->
+        let expr =
+            match prevEndOffset with
+            | None -> opRefExpr :> IFSharpExpression
+            | Some prevEndOffset ->
+
+            let expr = binaryExpr.LeftArgument
+            if isNull expr then null else
+            let offset = expr.GetDocumentEndOffset().Offset
+            if offset = prevEndOffset then expr else null
+
+        if isNull expr then false else
 
         let indent =
             let startLine = expr.StartLine
