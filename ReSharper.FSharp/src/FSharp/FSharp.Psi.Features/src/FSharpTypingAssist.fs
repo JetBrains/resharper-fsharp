@@ -1074,6 +1074,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if not (isInfixOp lexer) then false else
 
+        let opStartOffset = lexer.TokenStart
         let opEndOffset = lexer.TokenEnd
 
         let nextTokenIsKeyword =
@@ -1096,24 +1097,33 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             if tokenType == FSharpTokenType.NEW_LINE then None else
             Some lexer.TokenEnd
 
-        let document = textControl.Document
         let mutable expr = None
+        let mutable foundError = false
         let processor =
             { new IRecursiveElementProcessor with
-                member this.ProcessingIsFinished = expr.IsSome
+                member this.ProcessingIsFinished = false
                 member this.InteriorShouldBeProcessed(element) = true
                 member this.ProcessAfterInterior(element) = ()
                 member this.ProcessBeforeInterior(element) =
+                    match element with
+                    | :? IFromErrorExpr -> foundError <- true
+                    | _ -> ()
+
+                    if expr.IsSome then () else
+
                     let offset = element.GetDocumentEndOffset().Offset
                     if offset = opEndOffset || prevEndOffset.IsSome && offset = prevEndOffset.Value then
                         expr <- Some element
             }
 
+        let document = textControl.Document
         let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let node = fsFile.GetNode<IFromErrorExpr>(DocumentOffset(document, offset))
-        if isNull node then false else
+        let refExpr = fsFile.GetNode<IReferenceExpr>(DocumentOffset(document, opStartOffset))
+        let binaryExpr = BinaryAppExprNavigator.GetByOperator(refExpr)
+        if isNull binaryExpr then false else
 
-        node.ProcessThisAndDescendants(processor)
+        binaryExpr.ProcessThisAndDescendants(processor)
+        if not foundError then false else
         match expr with
         | None -> false
         | Some expr ->
