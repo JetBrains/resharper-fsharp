@@ -234,46 +234,59 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             match projectMark with
             | FSharpProjectMark ->
                 let itemsByName = HashSet()
-                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore itemsByName true
-                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter itemsByName true
-                let restItems = getItems msBuildProject projectDescriptor (changesOrder >> not) itemsByName false
+                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBeforeItem itemsByName true
+                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfterItem itemsByName true
+                let restItems = getItems msBuildProject projectDescriptor (changesOrderItem >> not) itemsByName false
+
                 let items =
                     compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
                     |> Seq.map (fun item ->
                         { item with TargetFrameworkIds = targetFrameworkIdsIntern.Intern(item.TargetFrameworkIds) })
                     |> List.ofSeq
+
                 let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
                 addProjectMapping targetFrameworkIds items projectMark
                 projectRefresher.RefreshProject(projectMark, true)
                 x.NotifyProjectLoaded(projectMark)
+
             | _ -> ()
 
         member x.OnAddFile(projectMark, itemType, path, linkedPath, properties, relativeTo, relativeToType) =
             match projectMark with
             | FSharpProjectMark ->
-                logger.Trace("On add file: {0} ({1}, link: {2}) relative to: {3} {4}",
-                    path, itemType, linkedPath, relativeTo, relativeToType)
+                let compileOrder =
+                    properties.TryGetValue(ProjectItemMetadata.compileOrder)
+                    |> snd
+                    |> FSharpCompileOrder.ofString
+
+                logger.Trace("On add file: {0} ({1} ({2}), link: {3}) relative to: {4} {5}",
+                    path, itemType, compileOrder, linkedPath, relativeTo, relativeToType)
+
                 updateProject projectMark (fun mapping refreshFolder update ->
                     let logicalPath = if isNotNull linkedPath then linkedPath else path
                     let relativeToType = Option.ofNullable relativeToType
-                    mapping.AddFile(itemType, path, logicalPath, relativeTo, relativeToType, refreshFolder, update))
+                    mapping.AddFile(itemType, compileOrder, path, logicalPath, relativeTo, relativeToType, refreshFolder, update)
+                )
+
                 projectRefresher.SelectItem(projectMark, path)
             | _ -> ()
 
         member x.OnRemoveFile(projectMark, itemType, path) =
             logger.Trace("On remove file: {0} ({1})", path, itemType)
             updateProject projectMark (fun mapping refreshFolder update ->
-                mapping.RemoveFile(path, refreshFolder, update))
+                mapping.RemoveFile(path, refreshFolder, update)
+            )
 
-        member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation, properties) =
+        member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation, _) =
             match projectMark with
             | FSharpProjectMark ->
+                // todo: update compileOrder if changed via properties
                 logger.Trace("On update file: {0} ({1}) to {2} ({3})", oldLocation, oldItemType, newLocation, newItemType)
-                // todo
-                // if not (equalsIgnoreCase oldItemType newItemType) &&
-                //         (changesOrder oldItemType || changesOrder newItemType) then
-                //     projectRefresher.ReloadProject(projectMark) else
+
+                if not (equalsIgnoreCase oldItemType newItemType) &&
+                        (changesOrder oldItemType || changesOrder newItemType) then
+                    projectRefresher.ReloadProject(projectMark) else
 
                 updateProject projectMark (fun mapping _ _ ->
                     mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
@@ -949,9 +962,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member x.TryGetFolderItems(path: VirtualFileSystemPath): IList<FSharpProjectItem> =
         folders[path]
 
-    member x.AddFile(BuildAction action, path, logicalPath, relativeToPath, relativeToType, refreshFolder, update) =
+    member x.AddFile(BuildAction action, compileOrder, path, logicalPath, relativeToPath, relativeToType, refreshFolder, update) =
         let info = createNewItemInfo path logicalPath relativeToPath relativeToType refreshFolder update
-        let item = FileItem(info, action, None, targetFrameworkIds, true) // todo
+        let item = FileItem(info, action, compileOrder, targetFrameworkIds, true) // todo
 
         files.Add(path, item)
         addChild item
