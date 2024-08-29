@@ -29,12 +29,12 @@ type StubFSharpItemsContainer() =
         member this.GetProjectItemsPaths(_, _) = [||]
         member this.Dump _ = ()
         member this.TryGetRelativeChildPath(_, _, _, _) = None
-        member this.OnAddFile(_, _, _, _, _, _) = ()
+        member this.OnAddFile(_, _, _, _, _, _, _) = ()
         member this.OnAddFolder(_, _, _, _) = ()
         member this.OnProjectLoaded(_, _, _) = ()
         member this.OnRemoveFile(_, _, _) = ()
         member this.OnRemoveFolder(_, _) = ()
-        member this.OnUpdateFile(_, _, _, _, _) = ()
+        member this.OnUpdateFile(_, _, _, _, _, _) = ()
         member this.OnUpdateFolder(_, _, _) = ()
 
         member val ProjectLoaded = new Signal<IProjectMark>("todo")

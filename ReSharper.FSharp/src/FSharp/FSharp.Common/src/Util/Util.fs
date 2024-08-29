@@ -222,20 +222,38 @@ module rec FSharpMsBuildUtils =
     module ProjectItemMetadata =
         let [<Literal>] compileOrder = "CompileOrder"
 
-    let isCompileBefore (msbuildItem: MsBuildProjectItem) =
-        equalsIgnoreCase compileBeforeItemType msbuildItem.ItemType
+    type MsBuildProjectItem with
+        member this.CompileOrderAttributeValue =
+            match this.GetMetadata(ProjectItemMetadata.compileOrder) with
+            | null -> ""
+            | metadata -> metadata.EvaluatedValue
 
-    let isCompileAfter (msbuildItem: MsBuildProjectItem) =
-        equalsIgnoreCase compileAfterItemType msbuildItem.ItemType
+    let isCompileBefore (buildAction: string) =
+        equalsIgnoreCase compileBeforeItemType buildAction
 
-    let changesOrder (msbuildItem: MsBuildProjectItem) =
-        isCompileAfter msbuildItem || isCompileAfter msbuildItem
+    let isCompileAfter (buildAction: string) =
+        equalsIgnoreCase compileAfterItemType buildAction
 
-    let (|CompileBefore|_|) itemType =
-        if isCompileBefore itemType then someUnit else None
+    let changesOrder (buildAction: string) =
+        isCompileBefore buildAction || isCompileAfter buildAction
 
-    let (|CompileAfter|_|) itemType =
-        if isCompileAfter itemType then someUnit else None
+    let isCompileBeforeItem (msbuildItem: MsBuildProjectItem) =
+        isCompileBefore msbuildItem.ItemType ||
+        isCompileBefore msbuildItem.CompileOrderAttributeValue
+
+    let isCompileAfterItem (msbuildItem: MsBuildProjectItem) =
+        isCompileAfter msbuildItem.ItemType ||
+        isCompileAfter msbuildItem.CompileOrderAttributeValue
+
+    let changesOrderItem (msbuildItem: MsBuildProjectItem) =
+        changesOrder msbuildItem.ItemType ||
+        changesOrder msbuildItem.CompileOrderAttributeValue
+
+    let (|CompileBefore|_|) item =
+        if isCompileBeforeItem item then someUnit else None
+
+    let (|CompileAfter|_|) item =
+        if isCompileAfterItem item then someUnit else None
 
     let (|Folder|_|) (itemType: string) =
         if equalsIgnoreCase folderItemType itemType then someUnit else None

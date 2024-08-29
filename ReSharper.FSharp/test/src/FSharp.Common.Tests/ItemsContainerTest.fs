@@ -1036,7 +1036,7 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
         writer.Write(sprintf "Add '%O'" location)
         writer.WriteLine(output)
         let path = projectPath location
-        container.OnAddFile(projectMark, itemType, path, path, relativeToPath, Option.toNullable relativeToType)
+        container.OnAddFile(projectMark, itemType, path, path, EmptyDictionary.Instance, relativeToPath, Option.toNullable relativeToType)
 
     member x.OnRemoveFile(itemType, location) =
         writer.WriteLine(sprintf "Remove '%O'" location)
@@ -1044,7 +1044,8 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
 
     member x.OnUpdateFile(oldItemType, oldLocation, newItemType, newLocation) =
         writer.WriteLine(sprintf "Update file: '%O' (%O) -> '%O' (%O)" oldLocation oldItemType newLocation newItemType)
-        container.OnUpdateFile(projectMark, oldItemType, projectPath oldLocation, newItemType, projectPath newLocation)
+        container.OnUpdateFile(projectMark, oldItemType, projectPath oldLocation, newItemType, projectPath newLocation,
+            EmptyDictionary.Instance)
 
     member x.OnUpdateFolder(oldLocation, newLocation) =
         writer.WriteLine(sprintf "Update folder: '%O' -> '%O'" oldLocation newLocation)
