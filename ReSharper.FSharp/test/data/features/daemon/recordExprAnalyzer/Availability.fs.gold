@@ -24,6 +24,26 @@ ignore { item with Foo |= { item.Foo with Zoo = { item.Foo.Zoo with|(7) Foo = 3 
 ignore { item with Bar = { item.Foo with Zoo |= { item.Foo.Zoo with|(8) Bar = 3 } } }
 ignore { Module.item with Foo = { item.Foo with Zoo |= { item.Foo.Zoo with|(9) Foo = 3 } } }
 ignore { item with Foo |= { item.Foo with|(10) Foo = 3 }; Bar |= { item.Bar with|(11) Foo = 3 } }
+ignore { item with
+            Foo |= {
+                item.Foo with|(12)
+                    Foo = 3
+            }
+            Bar |= {
+                item.Bar with|(13)
+                    Foo = 3
+            }
+}
+ignore { item with
+            Foo = {
+                item.Foo with
+                    Foo = 3
+            }; Bar |= {
+                item.Bar with|(14)
+                    Foo = 3
+            }
+}
+
 
 // Not available
 ignore { item with Foo = { item.Foo with Foo = } }
@@ -38,6 +58,10 @@ ignore { (id item) with Foo = { (id item).Foo with Foo = 3 } }
 ignore { item with Foo = { item2.Foo with Foo = 3 } }
 ignore { item with Foo = { item.Foo with Unresolved = 3 } }
 ignore { item with Unresolved = { item.Unresolved with Unresolved = 3 } }
+ignore { item with Foo = {
+                item.Foo with Foo = 3
+                }; Bar.Foo = 3
+}
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Nested record update can be simplified
@@ -52,3 +76,6 @@ ignore { item with Unresolved = { item.Unresolved with Unresolved = 3 } }
 (9): ReSharper Dead Code: Nested record update can be simplified
 (10): ReSharper Dead Code: Nested record update can be simplified
 (11): ReSharper Dead Code: Nested record update can be simplified
+(12): ReSharper Dead Code: Nested record update can be simplified
+(13): ReSharper Dead Code: Nested record update can be simplified
+(14): ReSharper Dead Code: Nested record update can be simplified

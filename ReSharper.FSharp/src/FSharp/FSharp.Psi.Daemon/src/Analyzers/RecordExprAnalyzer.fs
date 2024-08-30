@@ -45,14 +45,15 @@ type RecordExprAnalyzer() =
         let copyExpr = getCopyInfoReferenceExpr recordExpr
         if isNull copyExpr then produceHighlighting fieldsChainMatch previousFieldBinding consumer else
 
-        let fieldBindings = recordExpr.FieldBindingsEnumerable
+        let fieldBindings = recordExpr.FieldBindings
         let singleField = fieldBindings.SingleItem
         let hasFieldsMatch =
             isNotNull previousFieldBinding &&
             compareFieldWithNextCopyExpr previousCopyExpr previousFieldBinding.ReferenceName copyExpr
         let searchInDepthWhileMatched = hasFieldsMatch && isNotNull singleField
 
-        for currentFieldBinding in fieldBindings do
+        for i, currentFieldBinding in Seq.indexed fieldBindings do
+            let isSingleLine = currentFieldBinding.IsSingleLine
             let fieldsChainMatch =
                 if searchInDepthWhileMatched then
                     match fieldsChainMatch with
@@ -64,18 +65,26 @@ type RecordExprAnalyzer() =
                         let currentFieldNameReversed = currentFieldBinding.ReferenceName |> appendFieldNameReversed previousFieldNameReversed
                         ValueSome(rootFieldBinding, currentFieldNameReversed)
                 else
-                    produceHighlighting fieldsChainMatch previousFieldBinding consumer
+                    if isSingleLine then produceHighlighting fieldsChainMatch previousFieldBinding consumer
                     ValueNone
 
             match currentFieldBinding.Expression.IgnoreInnerParens() with
             | :? IRecordExpr as recordExpr ->
-                collectRecordExprsToSimplify recordExpr currentFieldBinding copyExpr fieldsChainMatch consumer
+                let nextFieldIdx = i + 1
+                let nextFieldOnTheSameLine =
+                    if nextFieldIdx = fieldBindings.Count then false else
+                    fieldBindings[nextFieldIdx].StartLine = currentFieldBinding.EndLine
+
+                if fieldsChainMatch.IsNone && not isSingleLine && nextFieldOnTheSameLine then
+                    collectRecordExprsToSimplify recordExpr null null ValueNone consumer
+                else
+                    collectRecordExprsToSimplify recordExpr currentFieldBinding copyExpr fieldsChainMatch consumer
             | _ ->
-                if not searchInDepthWhileMatched then () else
+                if not searchInDepthWhileMatched || not isSingleLine then () else
                 produceHighlighting fieldsChainMatch currentFieldBinding consumer
 
     override this.Run(recordExpr, data, consumer) =
-        if not data.IsFSharp80Supported || not recordExpr.IsSingleLine then () else
+        if not data.IsFSharp80Supported then () else
 
         let isInnerRecordExpr =
             recordExpr.IgnoreParentParens()
