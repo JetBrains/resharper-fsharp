@@ -9,7 +9,7 @@ import org.testng.annotations.Test
 
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
-class CodeFoldingTest : CodeFoldingTestBase() {
+class FSharpFoldingTest : CodeFoldingTestBase() {
 
   @Test
   fun codeFolding() {
