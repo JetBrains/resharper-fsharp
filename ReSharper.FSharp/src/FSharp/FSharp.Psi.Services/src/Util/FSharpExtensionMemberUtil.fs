@@ -4,16 +4,20 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
 
 type FSharpRequest(psiModule, exprType: IType, name: string option) =
+    static let memberKinds = [ExtensionMemberKind.ExtensionMethod; FSharpExtensionMemberKind.FSharpExtensionMember]
+
     let name = Option.toObj name
 
     let baseTypes: IReadOnlyList<IType> =
@@ -32,6 +36,7 @@ type FSharpRequest(psiModule, exprType: IType, name: string option) =
         member this.BaseExpressionTypes = baseTypes
         member this.ExpressionType = exprType
         member this.ForModule = psiModule
+        member this.Kinds = memberKinds
 
         member this.IsCaseSensitive = true
         member this.Namespaces = []
