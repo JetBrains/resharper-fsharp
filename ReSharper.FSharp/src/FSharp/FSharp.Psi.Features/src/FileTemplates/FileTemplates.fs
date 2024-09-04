@@ -10,6 +10,7 @@ open JetBrains.Diagnostics
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Context
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope
+open JetBrains.ReSharper.Feature.Services.LiveTemplates.Settings
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.LiveTemplates.UI
 open JetBrains.ReSharper.Plugins.FSharp
@@ -132,3 +133,5 @@ type FSharpDefaultFileTemplates() =
             let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath).NotNull()
             lifetime.OnTermination(stream) |> ignore
             stream
+            
+    interface IDefaultSettingsRootKey<LiveTemplatesSettings>
