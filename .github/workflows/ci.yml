@@ -50,6 +50,13 @@ jobs:
         working-directory: ./ReSharper.FSharp
         run: dotnet test --no-build
 
+      - name: Upload Test Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}.test-logs
+          path: C:/Users/runneradmin/AppData/Local/Temp/JetLogs/ReSharperTests
+        if: ${{ always() }}
+
       - name: Build Plugin Frontend
         working-directory: ./rider-fsharp
         if: ${{ success() }} || ${{ failure() }}
