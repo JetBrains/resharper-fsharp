@@ -18,8 +18,19 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
 
   public HybridCollection<ITypeMember> FindExtensionMember()
   {
+    bool MatchesName(string memberName) =>
+      memberName == ShortName ||
+      memberName == $"get_{ShortName}" ||
+      memberName == $"set_{ShortName}" ||
+      memberName.EndsWith($".{ShortName}") ||
+      memberName.EndsWith($".get_{ShortName}") ||
+      memberName.EndsWith($".set_{ShortName}");
+
     bool Matches(ITypeMember member)
     {
+      if (!MatchesName(member.ShortName))
+        return false;
+
       if (value.ApparentEnclosingTypeReference is not FSharpMetadataTypeReference.NonLocal typeRef)
         return false;
 
@@ -36,7 +47,7 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
       return false;
     }
 
-    return new HybridCollection<ITypeMember>(owner.EnumerateMembers(value.LogicalName, true).Where(Matches));
+    return new HybridCollection<ITypeMember>(owner.GetMembers().Where(Matches));
   }
 
   public string ShortName => value.LogicalName;

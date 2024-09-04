@@ -13,7 +13,9 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
 
-type FSharpRequest(psiModule, exprType: IType) =
+type FSharpRequest(psiModule, exprType: IType, name: string option) =
+    let name = Option.toObj name
+
     let baseTypes: IReadOnlyList<IType> =
         let exprDeclaredType = exprType.As<IDeclaredType>()
         if isNull exprDeclaredType then [] else
@@ -26,7 +28,7 @@ type FSharpRequest(psiModule, exprType: IType) =
         result.AsReadOnly()
 
     interface IRequest with
-        member this.Name = null
+        member this.Name = name
         member this.BaseExpressionTypes = baseTypes
         member this.ExpressionType = exprType
         member this.ForModule = psiModule
@@ -74,7 +76,7 @@ let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
 
     | _ -> ValueNone
 
-let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
+let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOpt: string option) =
     let psiModule = context.GetPsiModule()
     let solution = psiModule.GetSolution()
     use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -133,6 +135,24 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
 
         | _ -> false
 
+    let matchesName (typeMember: ITypeMember) =
+      match nameOpt with
+      | None -> true
+      | Some name ->
+
+      match typeMember with
+      | FSharpCompiledExtensionMember _ ->
+          let memberName = typeMember.ShortName
+          memberName = name ||
+          memberName = $"get_{name}" ||
+          memberName = $"set_{name}" ||
+
+          memberName.EndsWith($".{name}") ||
+          memberName.EndsWith($".get_{name}") ||
+          memberName.EndsWith($".set_{name}")
+
+      | _ -> typeMember.ShortName = name
+
     let isAccessible (typeMember: ITypeMember) =
         let isTypeAccessible = 
             let containingType = typeMember.ContainingType
@@ -145,11 +165,12 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) =
         AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let isApplicable (typeMember: ITypeMember) =
+        matchesName typeMember &&
         not (isInScope typeMember) &&
         isAccessible typeMember &&
         matchesType typeMember
 
-    let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType))
+    let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
 
     query.EnumerateMethods()
     |> Seq.filter isApplicable

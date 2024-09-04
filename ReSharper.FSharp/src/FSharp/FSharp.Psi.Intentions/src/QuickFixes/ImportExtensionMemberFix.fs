@@ -26,10 +26,8 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
         let fcsType = qualifierExpr.TryGetFcsType()
         if isNull fcsType then [] else
 
-        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType
-        members
-        |> Seq.filter (fun m -> m.ShortName = reference.GetName())
-        |> Seq.cast
+        let name = reference.GetName()
+        FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType (Some name) |> Seq.cast
 
     override this.Text =
         let typeMember = findExtensionMembers () |> Seq.head

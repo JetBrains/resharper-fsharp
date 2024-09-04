@@ -35,7 +35,7 @@ type ImportExtensionMemberRule() =
     override this.AddLookupItems(context, collector) =
         let qualifierExpr = getQualifierExpr context
         let fcsType = qualifierExpr.TryGetFcsType()
-        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType
+        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType None
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
