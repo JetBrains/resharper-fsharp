@@ -76,6 +76,13 @@ let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
 
     | _ -> ValueNone
 
+[<return: Struct>]
+let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
+    match typeMember with
+    | FSharpSourceExtensionMember _
+    | FSharpCompiledExtensionMember _ -> ValueSome()
+    | _ -> ValueNone
+
 let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOpt: string option) =
     let psiModule = context.GetPsiModule()
     let solution = psiModule.GetSolution()
@@ -162,7 +169,10 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
             | _ -> containingType.Module.AreInternalsVisibleTo(psiModule)
 
         isTypeAccessible &&
-        AccessUtil.IsSymbolAccessible(typeMember, accessContext)
+        
+        match typeMember with
+        | FSharpExtensionMember _ -> true
+        | _ -> AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let isApplicable (typeMember: ITypeMember) =
         matchesName typeMember &&
