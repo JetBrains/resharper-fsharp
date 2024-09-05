@@ -18,7 +18,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.METHOD;
 
-    public bool IsExtensionMethod =>
+    public bool IsExtensionMethod => IsDefinedAsExtension;
+
+    public override bool IsDefinedAsExtension =>
       Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
 
     public bool IsAsync => false;

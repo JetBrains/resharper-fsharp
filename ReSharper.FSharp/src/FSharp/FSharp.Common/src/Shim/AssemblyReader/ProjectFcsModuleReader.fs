@@ -820,7 +820,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let customAttrs =
             let isExtension = 
                 match method with
-                | :? IMethod as method -> method.IsExtensionMethod
+                | :? IMethod as method -> method.IsDefinedAsExtension
                 | _ -> false
 
             let customAttributes = mkCustomAttributes method

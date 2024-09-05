@@ -174,10 +174,28 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
             | _ -> containingType.Module.AreInternalsVisibleTo(psiModule)
 
         isTypeAccessible &&
-        
+
         match typeMember with
         | FSharpExtensionMember _ -> true
         | _ -> AccessUtil.IsSymbolAccessible(typeMember, accessContext)
+
+    let matchesName (typeMember: ITypeMember) =
+      match nameOpt with
+      | None -> true
+      | Some name ->
+
+      match typeMember with
+      | FSharpCompiledExtensionMember _ ->
+          let memberName = typeMember.ShortName
+          memberName = name ||
+          memberName = $"get_{name}" ||
+          memberName = $"set_{name}" ||
+
+          memberName.EndsWith($".{name}") ||
+          memberName.EndsWith($".get_{name}") ||
+          memberName.EndsWith($".set_{name}")
+
+      | _ -> typeMember.ShortName = name
 
     let isApplicable (typeMember: ITypeMember) =
         matchesName typeMember &&
@@ -187,6 +205,8 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
 
     let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
 
-    query.EnumerateMethods()
+    let methods = query.EnumerateMethods()
+
+    methods
     |> Seq.filter isApplicable
     |> List

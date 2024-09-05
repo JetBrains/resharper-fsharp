@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       MethodIdSubstitution.Create(this);
 
     public bool IsXamlImplicitMethod => false;
-    public bool IsExtensionMethod => false;
+    public bool IsDefinedAsExtension => false;
     public bool IsVarArg => false;
     public bool IsAsync => false;
   }
