@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 
-    public bool IsExtensionMember =>
+    public bool IsFSharpExtensionMember =>
       GetContainingType() is IFSharpModule && GetDeclaration() is IMemberSignatureOrDeclaration;
 
     protected override ITypeElement GetTypeElement(IDeclaration declaration)
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       // Workaround to hide extension methods from resolve in C#.
       // todo: calc compiled names for extension members (it'll hide needed ones properly)
       // todo: implement F# declared element presenter to hide compiled names in features/ui
-      if (IsExtensionMember && GetDeclaration() is IMemberSignatureOrDeclaration memberDeclaration)
+      if (IsFSharpExtensionMember && GetDeclaration() is IMemberSignatureOrDeclaration memberDeclaration)
         if (!(this is IMethod && memberDeclaration.Attributes.GetCompiledName(out _)))
           return AccessRights.INTERNAL;
 
