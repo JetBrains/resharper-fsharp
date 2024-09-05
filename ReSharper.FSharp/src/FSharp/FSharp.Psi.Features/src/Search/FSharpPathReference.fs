@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Searching
 
+open JetBrains.Application.Parts
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -11,7 +12,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 open System
 
-[<ReferenceProviderFactory>]
+[<ReferenceProviderFactory(Instantiation.DemandAnyThreadSafe)>]
 type FSharpPathReferenceProviderFactory() as this =
     let changed = new Signal<IReferenceProviderFactory>(this.GetType().FullName)
 
