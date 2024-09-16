@@ -42,6 +42,8 @@ type FSharpRemoveRedundantParensScopedFixingStrategy() =
     override this.GetHighlightingTypes() =
         highlightingTypes :> _
 
+    override this.GetQuickFixTypes() =
+        [| typeof<IFSharpRemoveRedundantParensFix> |]
 
 [<AbstractClass>]
 type FSharpRemoveRedundantParensFixBase(parensNode: IFSharpTreeNode, innerNode: IFSharpTreeNode) =
