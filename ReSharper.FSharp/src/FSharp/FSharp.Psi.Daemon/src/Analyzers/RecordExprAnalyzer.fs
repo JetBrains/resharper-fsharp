@@ -76,14 +76,14 @@ type RecordExprAnalyzer() =
                     fieldBindings[nextFieldIdx].StartLine = currentFieldBinding.EndLine
 
                 if fieldsChainMatch.IsNone && not isSingleLine && nextFieldOnTheSameLine then
-                    startNewAnalyze recordExpr consumer
+                    analyzeRecordExpr recordExpr consumer
                 else
                     collectRecordExprsToSimplify recordExpr currentFieldBinding copyExpr fieldsChainMatch consumer
             | _ ->
                 if not searchInDepthWhileMatched || not isSingleLine then () else
                 produceHighlighting fieldsChainMatch currentFieldBinding consumer
 
-    and startNewAnalyze recordExpr consumer =
+    and analyzeRecordExpr recordExpr consumer =
         collectRecordExprsToSimplify recordExpr null null ValueNone consumer
 
     override this.Run(recordExpr, data, consumer) =
@@ -95,4 +95,4 @@ type RecordExprAnalyzer() =
             |> isNotNull
 
         if isInnerRecordExpr then () else
-        startNewAnalyze recordExpr consumer
+        analyzeRecordExpr recordExpr consumer
