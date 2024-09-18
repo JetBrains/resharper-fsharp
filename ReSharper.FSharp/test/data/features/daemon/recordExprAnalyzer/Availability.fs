@@ -24,6 +24,26 @@ ignore { item with Foo = { item.Foo with Zoo = { item.Foo.Zoo with Foo = 3 } } }
 ignore { item with Bar = { item.Foo with Zoo = { item.Foo.Zoo with Bar = 3 } } }
 ignore { Module.item with Foo = { item.Foo with Zoo = { item.Foo.Zoo with Foo = 3 } } }
 ignore { item with Foo = { item.Foo with Foo = 3 }; Bar = { item.Bar with Foo = 3 } }
+ignore { item with
+            Foo = {
+                item.Foo with
+                    Foo = 3
+            }
+            Bar = {
+                item.Bar with
+                    Foo = 3
+            }
+}
+ignore { item with
+            Foo = {
+                item.Foo with
+                    Foo = 3
+            }; Bar = {
+                item.Bar with
+                    Foo = 3
+            }
+}
+
 
 // Not available
 ignore { item with Foo = { item.Foo with Foo = } }
@@ -38,3 +58,7 @@ ignore { (id item) with Foo = { (id item).Foo with Foo = 3 } }
 ignore { item with Foo = { item2.Foo with Foo = 3 } }
 ignore { item with Foo = { item.Foo with Unresolved = 3 } }
 ignore { item with Unresolved = { item.Unresolved with Unresolved = 3 } }
+ignore { item with Foo = {
+                item.Foo with Foo = 3
+                }; Bar.Foo = 3
+}
