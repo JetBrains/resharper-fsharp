@@ -48,7 +48,7 @@ jobs:
 
       - name: Test ReSharper.FSharp
         working-directory: ./ReSharper.FSharp
-        run: dotnet test --no-build
+        run: dotnet test --no-build -m:1 ReSharper.FSharp.sln
 
       - name: Build Plugin Frontend
         working-directory: ./rider-fsharp
