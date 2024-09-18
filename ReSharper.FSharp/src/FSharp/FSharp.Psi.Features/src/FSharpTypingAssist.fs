@@ -780,7 +780,6 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
             | _ -> None
 
-        //expr.ProcessThisAndDescendants(processor)
         match range with
         | None -> false
         | Some range ->
