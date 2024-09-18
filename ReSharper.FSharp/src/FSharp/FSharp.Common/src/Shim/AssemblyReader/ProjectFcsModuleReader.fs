@@ -170,12 +170,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkDummyTypeDef (name: string) =
         let attributes = enum 0
         let layout = ILTypeDefLayout.Auto
-        let implements = []
+        let implements = emptyILInterfaceImpls
         let genericParams = []
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(name, attributes, layout, implements, None, genericParams, extends, emptyILMethods, nestedTypes,
+        ILTypeDef(name, attributes, layout, emptyILInterfaceImpls, genericParams, extends, emptyILMethods, nestedTypes,
              emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
              emptyILSecurityDecls, emptyILCustomAttrsStored)
 
@@ -484,7 +484,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkTypeDefImplements (typeElement: ITypeElement) =
         [ for declaredType in typeElement.GetSuperTypesWithoutCircularDependent() do
             if declaredType.GetTypeElement() :? IInterface then
-                mkType declaredType ]
+                // TODO: Interface implementation can have attributes on it (not expressible in F#/C#, but in IL it is)
+                // and C# nullness metadata export makes use of it.
+                InterfaceImpl.Create(mkType declaredType) ]
 
     let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute option =
         let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, psiModule, true)
@@ -1136,14 +1138,22 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         List.forall2 isUpToDatePropertyDef properties propertyDefs
 
+    let isUpToDateInterfaceImpls (typeElement: ITypeElement) (typeDef: ILTypeDef) =
+        let expected = typeDef.Implements
+        if not expected.IsValueCreated then true else
+
+        let actual = mkTypeDefImplements typeElement
+
+        (expected.Value, actual)
+        ||> List.forall2 (fun i1 i2 -> i1.Type = i2.Type)
+
     let rec isUpToDateTypeDef (typeElement: ITypeElement) (fcsTypeDef: FcsTypeDef) =
         let typeDef = fcsTypeDef.TypeDef
 
         let extends = mkTypeDefExtends typeElement
         extends = typeDef.Extends &&
 
-        let implements = mkTypeDefImplements typeElement
-        implements = typeDef.Implements && 
+        isUpToDateInterfaceImpls typeElement typeDef &&
 
         isUpToDateTypeParamDefs typeElement.TypeParameters typeDef.GenericParams &&
         isUpToDateTypeDefCustomAttributes typeElement typeDef &&
@@ -1250,11 +1260,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let name = mkTypeDefName typeElement clrTypeName
                 let typeAttributes = mkTypeAttributes typeElement
                 let extends = mkTypeDefExtends typeElement
-                let implements = mkTypeDefImplements typeElement
                 let genericParams = mkGenericParamDefs typeElement
 
                 // todo: pass this table in nested types too?
                 let membersTable = FcsTypeDefMembers.Create()
+                let implements = InterruptibleLazy (fun _ -> usingTypeElement clrTypeName [] mkTypeDefImplements)
                 let nestedTypes = mkILTypeDefsComputed (fun _ -> getOrCreateNestedTypes membersTable this clrTypeName)
                 let methods = mkILMethodsComputed (fun _ -> getOrCreateMethods membersTable clrTypeName)
                 let fields = mkILFieldsLazy (InterruptibleLazy(fun _ -> getOrCreateFields membersTable clrTypeName))
@@ -1265,14 +1275,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let customAttrs = mkILCustomAttrsComputed (fun _ ->
                     usingTypeElement clrTypeName [||] mkTypeDefCustomAttrs
                 )
-                let implementsCustomAttrs = None // todo
 
                 let additionalFlags =
                     if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
                     else ILTypeDefAdditionalFlags.None
 
                 let typeDef =
-                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements, implementsCustomAttrs,
+                    ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements,
                         genericParams, extends, methods, nestedTypes, fields, emptyILMethodImpls, events, properties,
                         additionalFlags, emptyILSecurityDecls, customAttrs)
 
