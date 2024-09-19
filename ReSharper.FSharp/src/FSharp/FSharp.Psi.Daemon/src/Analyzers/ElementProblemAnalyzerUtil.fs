@@ -64,6 +64,9 @@ type ElementProblemAnalyzerData with
     member this.IsFSharp80Supported =
         this.LanguageLevel >= FSharpLanguageLevel.FSharp80
 
+    member this.IsFSharp90Supported =
+        this.LanguageLevel >= FSharpLanguageLevel.FSharp90
+
     member this.IsFSharpExperimentalSupported =
         this.LanguageLevel >= FSharpLanguageLevel.Preview
 
