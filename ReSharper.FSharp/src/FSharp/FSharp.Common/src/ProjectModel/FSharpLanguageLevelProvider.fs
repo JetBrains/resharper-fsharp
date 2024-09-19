@@ -81,7 +81,8 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | Version (12, minor) ->
             if minor < 4 then VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.FSharp70)
             elif minor >= 4 && minor <= 7 then VersionMapping(FSharpLanguageLevel.FSharp70, FSharpLanguageLevel.FSharp80)
-            elif minor >= 8 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.Preview)
+            elif minor = 8 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
+            elif minor >= 9 then VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.Preview)
             else null
         | _ -> null
 
@@ -115,6 +116,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
         | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
         | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
+        | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
         | FSharpLanguageVersion.Latest -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMinor
