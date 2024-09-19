@@ -286,7 +286,7 @@ type LambdaAnalyzer() =
         let rootRefExpr = getRootRefExpr expr
         if isNull rootRefExpr ||
            rootRefExpr.ShortName <> pat.SourceName ||
-           not isFSharp90Supported && not (isContextWithoutWildPats expr) then null else
+           not (isFSharp90Supported || isContextWithoutWildPats expr) then null else
 
         let patSymbol = pat.GetFcsSymbol()
         let mutable convertingUnsupported = false
@@ -306,8 +306,8 @@ type LambdaAnalyzer() =
         })
         if convertingUnsupported then null
         //TODO: workaround for https://github.com/dotnet/fsharp/issues/16305
-        elif not isFSharp90Supported && not (isLambdaArgOwnerSupported lambda false ValueNone) then null
-        else rootRefExpr
+        elif isFSharp90Supported || isLambdaArgOwnerSupported lambda false ValueNone then rootRefExpr
+        else null
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
