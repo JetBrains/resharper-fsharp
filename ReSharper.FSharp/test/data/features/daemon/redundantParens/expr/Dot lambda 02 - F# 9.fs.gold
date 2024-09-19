@@ -1,0 +1,50 @@
+﻿AllowHighPrecedenceAppParens = True
+|(|(0)_.ToString()|)|(1)
+|(|(2)_.ToString|)|(3)
+id(_.ToString())
+id |(|(4)_.ToString()|)|(5)
+M(_.ToString())
+M |(|(6)_.ToString()|)|(7)
+f 1 |(|(8)_.ToString|)|(9) 1
+f 1(_.ToString)1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+
+================
+AllowHighPrecedenceAppParens = False
+|(|(0)_.ToString()|)|(1)
+|(|(2)_.ToString|)|(3)
+id|(|(4)_.ToString()|)|(5)
+id |(|(6)_.ToString()|)|(7)
+M|(|(8)_.ToString()|)|(9)
+M |(|(10)_.ToString()|)|(11)
+f 1 |(|(12)_.ToString|)|(13) 1
+f 1|(|(14)_.ToString|)|(15)1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses
+(6): ReSharper Dead Code: Redundant parentheses
+(7):<secondary> ReSharper Dead Code: Redundant parentheses
+(8): ReSharper Dead Code: Redundant parentheses
+(9):<secondary> ReSharper Dead Code: Redundant parentheses
+(10): ReSharper Dead Code: Redundant parentheses
+(11):<secondary> ReSharper Dead Code: Redundant parentheses
+(12): ReSharper Dead Code: Redundant parentheses
+(13):<secondary> ReSharper Dead Code: Redundant parentheses
+(14): ReSharper Dead Code: Redundant parentheses
+(15):<secondary> ReSharper Dead Code: Redundant parentheses

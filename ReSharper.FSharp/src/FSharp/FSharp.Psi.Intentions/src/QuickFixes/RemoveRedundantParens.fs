@@ -58,10 +58,10 @@ type FSharpRemoveRedundantParensFixBase(parensNode: IFSharpTreeNode, innerNode: 
         FSharpRemoveRedundantParensScopedFixingStrategy.Instance
 
     abstract AddSpaceAfter: prevToken: ITokenNode -> bool
-    default _.AddSpaceAfter(prevToken: ITokenNode) = isIdentifierOrKeyword prevToken
+    default _.AddSpaceAfter(prevToken: ITokenNode) = shouldAddSpaceAfter prevToken
 
     abstract AddSpaceBefore: nextToken: ITokenNode -> bool
-    default _.AddSpaceBefore(nextToken: ITokenNode) = isIdentifierOrKeyword nextToken
+    default _.AddSpaceBefore(nextToken: ITokenNode) = shouldAddSpaceBefore nextToken
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(parensNode.IsPhysical())

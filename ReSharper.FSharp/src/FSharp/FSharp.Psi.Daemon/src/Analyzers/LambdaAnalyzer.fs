@@ -4,6 +4,7 @@ open System
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
@@ -278,13 +279,14 @@ type LambdaAnalyzer() =
         inner null expr
 
     let getRootRefExprIfCanBeConvertedToDotLambda (pat: ILocalReferencePat) (lambda: ILambdaExpr) =
+        let isFSharp90Supported = FSharpLanguageLevel.isFSharp90Supported lambda
         let expr = lambda.Expression.IgnoreInnerParens()
         if not expr.IsSingleLine then null else
 
         let rootRefExpr = getRootRefExpr expr
         if isNull rootRefExpr ||
            rootRefExpr.ShortName <> pat.SourceName ||
-           not (isContextWithoutWildPats expr) then null else
+           not isFSharp90Supported && not (isContextWithoutWildPats expr) then null else
 
         let patSymbol = pat.GetFcsSymbol()
         let mutable convertingUnsupported = false
@@ -295,7 +297,7 @@ type LambdaAnalyzer() =
             member x.ProcessBeforeInterior(treeNode) =
                 if treeNode == rootRefExpr then () else
                 match treeNode with
-                | :? IDotLambdaExpr -> convertingUnsupported <- true
+                | :? IDotLambdaExpr -> convertingUnsupported <- not isFSharp90Supported
                 | :? IReferenceExpr as ref when not ref.IsQualified ->
                     if ref.ShortName <> rootRefExpr.ShortName then () else
                     let symbol = ref.Reference.GetFcsSymbol()
@@ -304,7 +306,7 @@ type LambdaAnalyzer() =
         })
         if convertingUnsupported then null
         //TODO: workaround for https://github.com/dotnet/fsharp/issues/16305
-        elif not (isLambdaArgOwnerSupported lambda false ValueNone) then null
+        elif not isFSharp90Supported && not (isLambdaArgOwnerSupported lambda false ValueNone) then null
         else rootRefExpr
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =

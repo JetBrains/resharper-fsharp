@@ -42,5 +42,10 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Forced calculations``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
     [<Test>] member x.``Optional parameters``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test; TestReferences("System.Core")>] member x.``Dot lambda - Availability``() = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test; TestReferences("System.Core")>] member x.``Dot lambda - Availability - F# 9``() = x.DoNamedTest()
+
     [<Test>] member x.``Dot lambda - Availability - Modules``() = x.DoNamedTest()
