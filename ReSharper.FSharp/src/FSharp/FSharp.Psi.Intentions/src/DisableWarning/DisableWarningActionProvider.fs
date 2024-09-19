@@ -21,7 +21,7 @@ type DisableWarningActionProvider(settingsManager: HighlightingSettingsManager) 
             if isNull severityId then EmptyList.Instance else
 
             let hasCompilerId =
-                not (Seq.isEmpty (settingsManager.GetCompilerIds(highlighting, FSharpLanguage.Instance)))
+                not (Seq.isEmpty (settingsManager.GetCompilerIds(highlighting, FSharpLanguage.Instance, sourceFile.PsiModule)))
             //TODO: suggest #nowarn
             if hasCompilerId then EmptyList.Instance else
 
