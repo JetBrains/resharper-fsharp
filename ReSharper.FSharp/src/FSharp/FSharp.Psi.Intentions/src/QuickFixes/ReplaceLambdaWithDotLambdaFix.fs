@@ -1,11 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
@@ -14,7 +19,9 @@ type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
     let lambda = warning.Lambda
     let expr = warning.Lambda.Expression.IgnoreInnerParens()
 
-    override x.IsAvailable _ = isValid lambda && isValid expr && isContextWithoutWildPats expr
+    override x.IsAvailable _ =
+       isValid lambda && isValid expr &&
+       (FSharpLanguageLevel.isFSharp90Supported expr || isContextWithoutWildPats expr)
 
     override x.Text = "Replace with shorthand lambda"
 
@@ -30,4 +37,16 @@ type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
 
         let dotLambda = factory.CreateDotLambda()
         dotLambda.SetExpression(expr) |> ignore
-        replace lambda dotLambda
+
+        let exprToReplace = lambda.IgnoreParentParens(includingBeginEndExpr = false)
+        let hasParens = exprToReplace :? IParenExpr
+
+        let dotLambda = ModificationUtil.ReplaceChild(exprToReplace, dotLambda)
+        let replaced =
+            if hasParens then addParensIfNeeded dotLambda else dotLambda
+            |> _.IgnoreParentParens()
+
+        if replaced :? IParenExpr then () else
+
+        if shouldAddSpaceAfter (replaced.GetPreviousToken()) then addNodeBefore replaced (Whitespace())
+        if shouldAddSpaceBefore (replaced.GetNextToken()) then addNodeAfter replaced (Whitespace())

@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
 open FSharp.Compiler.Syntax
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -269,8 +270,8 @@ let literalsRequiringParens =
 let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: IFSharpExpression) (expr: IFSharpExpression) =
     if escapesTupleAppArg context expr then true else
     if expr :? IParenOrBeginEndExpr then false
-    // TODO:
-    elif expr :? IDotLambdaExpr then true else
+
+    elif expr :? IDotLambdaExpr && not (FSharpLanguageLevel.isFSharp90Supported expr) then true else
 
     let expr = expr.IgnoreInnerParens()
     if isNull expr|| contextRequiresParens expr context then true else
@@ -447,3 +448,6 @@ let addParensIfNeeded (expr: IFSharpExpression) =
     let context = expr.IgnoreParentParens(includingBeginEndExpr = false)
     if context != expr || not (needsParens context expr) then expr else
     addParens expr
+
+let shouldAddSpaceAfter (prevToken: ITokenNode) = isIdentifierOrKeyword prevToken
+let shouldAddSpaceBefore (nextToken: ITokenNode) = isIdentifierOrKeyword nextToken
