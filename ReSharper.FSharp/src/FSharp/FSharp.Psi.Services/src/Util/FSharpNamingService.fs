@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
+open JetBrains.Application.Components
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -288,7 +289,7 @@ module FSharpNamingService =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
-    inherit ClrNamingLanguageServiceBase(language, EmptyArray.Instance)
+    inherit ClrNamingLanguageServiceBase(language, EmptyImmutableEnumerableObject.Instance)
 
     let notAllowedInTypes =
         // F# 4.1 spec: 3.4 Identifiers and Keywords
