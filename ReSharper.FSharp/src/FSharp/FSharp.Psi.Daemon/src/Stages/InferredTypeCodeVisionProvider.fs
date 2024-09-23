@@ -66,7 +66,7 @@ type InferredTypeCodeVisionProvider() =
                 if isNull documentMarkup then null else
 
                 documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.providerId,
-                    fun h -> highlighting.Equals(h.UserData))
+                    fun h -> highlighting.Equals(h.GetHighlighting()))
                 |> Seq.tryHead
                 |> Option.map RiderEditorOffsetPopupWindowContext
                 |> Option.defaultValue null :> _
