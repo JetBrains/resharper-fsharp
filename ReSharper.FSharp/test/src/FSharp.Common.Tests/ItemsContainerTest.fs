@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Text.RegularExpressions
+open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
@@ -29,7 +30,7 @@ type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
 type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
 
 let projectDirectory = VirtualFileSystemPath.Parse(@"C:\Solution\Project", InteractionContext.SolutionContext)
-let solutionMark = SolutionMarkFactory([]).Create(projectDirectory.Combine("Solution.sln"))
+let solutionMark = SolutionMarkFactory(EmptyImmutableEnumerableObject<ISolutionConfigurationDefaults>.Instance).Create(projectDirectory.Combine("Solution.sln"))
 let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectDirectory.Combine("Project.fsproj"))
 
 let projectPath (relativePath: string) = projectDirectory / relativePath
