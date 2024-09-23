@@ -725,7 +725,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (if method.IsStatic then MethodAttributes.Static else enum 0) |||
         (if method.IsSealed then MethodAttributes.Final else enum 0) |||
         (if method.IsAbstract then methodAbstractAttrs else enum 0) |||
-        (if method.IsVirtual then MethodAttributes.Virtual else enum 0) ||| // todo: test
+        (if method.IsVirtual || method.IsOverride then MethodAttributes.Virtual else enum 0) ||| // todo: test
         (if not (method.GetHiddenMembers().IsEmpty()) then MethodAttributes.NewSlot else enum 0) ||| // todo: test
         (if method :? IConstructor || method :? IAccessor then MethodAttributes.SpecialName else enum 0)
 
