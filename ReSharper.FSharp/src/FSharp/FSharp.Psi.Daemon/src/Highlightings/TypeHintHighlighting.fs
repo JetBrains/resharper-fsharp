@@ -33,12 +33,12 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>] TypeHintAdornmentProvider() =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
-            match highlighter.UserData with
+            match highlighter.GetHighlighting() with
             | :? TypeHintHighlighting as dm -> dm.IsValid()
             | _ -> false
 
         member x.CreateDataModel(highlighter) =
-            match highlighter.UserData with
+            match highlighter.GetHighlighting() with
             | :? TypeHintHighlighting as thh ->
                 let data =
                     AdornmentData(thh.Text, null, AdornmentFlags.None, AdornmentPlacement.DefaultAfterPrevChar,
