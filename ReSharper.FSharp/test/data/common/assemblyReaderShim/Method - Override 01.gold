@@ -1,0 +1,16 @@
+﻿module Module
+
+type T() =
+    inherit InheritedClass()
+
+    override this.MPublic() = base.MPublic()
+    override this.MProtected() = base.MProtected()
+    override this.|MPrivate|(0)() = base.|MPrivate|(1)()
+
+    override this.|NonVirtual|(2)() = base.NonVirtual()
+    override this.NonVirtualOverriden() = base.NonVirtualOverriden()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: No abstract or interface member was found that corresponds to this override
+(1): ReSharper Error Highlighting: The type 'InheritedClass' does not define the field, constructor or member 'MPrivate'.
+(2): ReSharper Underlined Error Highlighting: No abstract or interface member was found that corresponds to this override

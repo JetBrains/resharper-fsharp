@@ -95,6 +95,7 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Method - Explicit impl 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Override 01``() = x.DoNamedTest()
 
     [<Test; Explicit "Can't reference attribute in net451">]
     member x.``Method - Param 01``() = x.DoNamedTest()
