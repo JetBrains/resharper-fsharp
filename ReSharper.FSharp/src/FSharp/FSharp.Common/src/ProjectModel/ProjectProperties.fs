@@ -199,6 +199,7 @@ module FSharpProperties =
     let [<Literal>] DotnetFscCompilerPath = "DotnetFscCompilerPath"
     let [<Literal>] FscToolPath = "FscToolPath"
     let [<Literal>] FscToolExe = "FscToolExe"
+    let [<Literal>] GeneratedAssemblyInfoFile = "GeneratedAssemblyInfoFile"
     let [<Literal>] LangVersion = "LangVersion"
     let [<Literal>] NoWarn = "NoWarn"
     let [<Literal>] OtherFlags = "OtherFlags"
@@ -213,6 +214,7 @@ type FSharpProjectPropertiesRequest() =
         [| FSharpProperties.DotnetFscCompilerPath
            FSharpProperties.FscToolPath
            FSharpProperties.FscToolExe
+           FSharpProperties.GeneratedAssemblyInfoFile
            FSharpProperties.LangVersion
            FSharpProperties.OtherFlags
            FSharpProperties.NoWarn

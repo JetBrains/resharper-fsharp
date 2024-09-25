@@ -130,11 +130,15 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
+            let assemblyInfoFile = projectPart.GetPropertyPathValue(FSharpProperties.GeneratedAssemblyInfoFile)
+
             let filter = filterProvider.CreateItemFilter(projectPart, projectDescriptor)
 
             projectPart.GetAvailableItems()
             |> Seq.filter (fun item ->
                 itemTypeFilter item &&
+
+                assemblyInfoFile <> item.EvaluatedInclude &&
 
                 // todo: allow passing additional default item types to the filter ctor
                 (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
