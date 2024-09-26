@@ -1,7 +1,9 @@
 {
     "expui": {
         "icons": {
-            "Fsharp.svg": "icons/Fsharp.svg"
+            "Fsharp.svg": "icons/Fsharp.svg",
+            "FsharpScript.svg": "icons/FsharpScript.svg",
+            "FsharpSignature.svg": "icons/FsharpSignature.svg"
         }
     }
 }
