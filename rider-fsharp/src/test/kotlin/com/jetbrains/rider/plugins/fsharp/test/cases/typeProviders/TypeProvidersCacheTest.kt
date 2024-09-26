@@ -10,6 +10,7 @@ import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.framework.waitForDaemonAndFlushSuppressors
 import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
@@ -30,7 +31,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
 
   private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
     withOpenedEditor(project, sourceFile) {
-      waitForDaemon()
+      waitForDaemonAndFlushSuppressors()
       executeWithGold(testGoldFile) {
         dumpTypeProviders(it)
       }
@@ -54,11 +55,11 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
     withOpenedEditor(project, defaultSourceFile) {
-      waitForDaemon()
+      waitForDaemonAndFlushSuppressors()
 
       testDirectory.deleteRecursively().shouldBeTrue()
       typeWithLatency("//")
-      waitForNextDaemon()
+      waitForDaemonAndFlushSuppressors()
 
       executeWithGold(File(testGoldFile.path + "_before")) {
         dumpTypeProviders(it)
@@ -66,7 +67,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
 
       testDirectory.mkdir().shouldBeTrue()
       typeWithLatency(" ")
-      waitForNextDaemon()
+      waitForDaemonAndFlushSuppressors()
 
       executeWithGold(File(testGoldFile.path + "_after")) {
         dumpTypeProviders(it)
@@ -78,7 +79,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun typing() {
     withOpenedEditor(project, defaultSourceFile) {
-      waitForDaemon()
+      waitForDaemonAndFlushSuppressors()
       typeWithLatency("//")
       checkTypeProviders(testGoldFile, defaultSourceFile)
     }
@@ -88,10 +89,10 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun projectsWithEqualProviders() {
     withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
-      waitForDaemon()
+      waitForDaemonAndFlushSuppressors()
     }
     withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
-      waitForDaemon()
+      waitForDaemonAndFlushSuppressors()
       checkTypeProviders(testGoldFile, defaultSourceFile)
     }
   }
