@@ -5,7 +5,6 @@ open System.Collections.Concurrent
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
@@ -16,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Resources.Settings
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -36,18 +34,10 @@ type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLang
     member this.Preview = preview
 
 
-[<SettingsKey(typeof<CodeInspectionSettings>, "F# language settings")>]
-type FSharpLanguageProjectSettings =
-    { [<SettingsEntry(FSharpLanguageLevel.Latest, "F# language level")>]
-      LanguageLevel: FSharpLanguageLevel }
-
-
 [<SolutionComponent(Instantiation.ContainerAsyncPrimaryThread (* PrimaryThread due to not thread safe ProjectSettingsStorageComponent *) )>]
-type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, projectSettings,
-        persistentProjectItemProperties, settingsSchema: SettingsSchema, solutionToolset: ISolutionToolset) =
-    inherit OverridableLanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(lifetime, locks,
-        projectPropertiesListener, projectSettings, persistentProjectItemProperties,
-        settingsSchema.GetKey<FSharpLanguageProjectSettings>().TryFindEntryByMemberName("LanguageLevel"))
+type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset: ISolutionToolset) =
+    inherit LanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(
+        lifetime, locks, projectPropertiesListener)
 
     let compilerPathToLanguageLevels = ConcurrentDictionary<VirtualFileSystemPath, VersionMapping>()
 
@@ -157,8 +147,6 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     override this.ConvertToLanguageVersion(languageLevel) = FSharpLanguageLevel.toLanguageVersion languageLevel
 
-    override this.GetOverriddenLanguageLevelFromSettings _ = Nullable()
-
     override this.IsAvailable(languageVersion: FSharpLanguageVersion, project: IProject,
             targetFrameworkId: TargetFrameworkId) =
         if languageVersion = FSharpLanguageVersion.Default then true else
@@ -181,12 +169,9 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     override this.ConvertToCompilationOption(version: FSharpLanguageVersion) =
         FSharpLanguageVersion.toCompilerOptionValue version
 
-    override this.SetOverridenLanguageLevelInSettings(_, _) = failwith "todo"
-
     override this.GetPresentation(version, _, _, _) =
         FSharpLanguageVersion.toString version
 
-    override this.GetLatestAvailableLanguageLevel _ = failwith "todo"
     override this.GetLatestAvailableLanguageLevelImpl(_, _) = failwith "todo"
 
     override this.LanguageLevelComparer = FSharpLanguageLevelComparer.Instance :> _
@@ -218,7 +203,6 @@ type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProp
 
         member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
         member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
-        member this.LanguageLevelOverrider = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
 
 [<ShellFeaturePart>]
@@ -242,5 +226,3 @@ type FSharpLanguageSpecificItemsProvider() =
         |> Seq.sortDescending
         |> Seq.append specialVersions
         |> Seq.toList :> _
-
-    override this.CreateLanguageLevelComboboxForInspectionTab(_, _) = null
