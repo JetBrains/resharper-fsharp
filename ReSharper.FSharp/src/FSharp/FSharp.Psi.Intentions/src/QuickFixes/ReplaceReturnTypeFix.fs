@@ -19,13 +19,9 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
         // error FS0193: Type constraint mismatch. The type ↔    'A.B'    ↔is not compatible with type↔    'Thing'
         ReplaceReturnTypeFix(error.Expr, error.MismatchedType)
 
-    (*
-        match () with
-        | _ -> ""
-    *)
     new (error: TypeEquationError) =
         // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
-        ReplaceReturnTypeFix(error.Expr, error.ActualType.Format(error.DisplayContext))
+        ReplaceReturnTypeFix(error.Expr, error.ActualType.TypeString)
 
     new (error: TypeMisMatchTuplesHaveDifferingLengthsError) =
         // Type mismatch. Expecting a
