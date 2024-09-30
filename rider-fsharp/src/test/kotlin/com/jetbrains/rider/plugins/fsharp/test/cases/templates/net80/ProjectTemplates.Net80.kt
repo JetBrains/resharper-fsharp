@@ -9,6 +9,8 @@ import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
+import org.junit.jupiter.api.Timeout
+import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK, platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
@@ -25,6 +27,7 @@ object Net80 {
     }
   }
 
+  @Timeout(value = 10, unit = TimeUnit.MINUTES)
   class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.consoleApplication) {
     override val breakpointLine: Int = 2
     override val expectedOutput: String = "Hello from F#"
