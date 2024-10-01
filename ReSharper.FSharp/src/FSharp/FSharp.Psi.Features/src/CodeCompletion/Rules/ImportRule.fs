@@ -105,7 +105,11 @@ type ImportRule() =
                     .WithPresentation(fun _ ->
                         let name = RichText(name)
                         LookupUtil.AddInformationText(name, $"(in {ns})")
-                        TextualPresentation(name, info, iconManager.GetImage(typeElement, element.Language, true)))
+
+                        // todo: allow calculating icon extensions (now disabled because of the slow unit test icons)
+                        let icon = iconManager.GetImage(typeElement, element.Language, false)
+
+                        TextualPresentation(name, info, icon))
                     .WithBehavior(fun _ -> ImportBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
                     .WithRelevance(CLRLookupItemRelevance.ImportedType)
