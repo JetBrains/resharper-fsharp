@@ -34,6 +34,7 @@
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\TypeUsageParensUtil.fs" />
+    <Compile Include="src\Util\SequentialExprUtil.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpBindUtil.fs" />
@@ -79,8 +80,7 @@
     <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\Refactorings\UseNestedRecordFieldSyntax.fs" />
-    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
-    <Compile Include="PsiServicesNamespaceZoneMarker.fs" />
+    <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
