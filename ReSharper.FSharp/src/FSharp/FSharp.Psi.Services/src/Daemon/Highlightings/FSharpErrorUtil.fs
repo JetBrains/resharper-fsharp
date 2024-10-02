@@ -1,6 +1,7 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpErrorUtil
 
+open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -10,6 +11,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
+
+type FSharpDiagnosticTypeInfo =
+    { IsTupleType: bool; TypeString: string } with
+
+    static member Create(fcsType: FSharpType, displayContext: FSharpDisplayContext) =
+        { IsTupleType = fcsType.IsTupleType
+          TypeString = fcsType.Format(displayContext) }
 
 let getDocumentRange (node: #ITreeNode) =
     node.GetHighlightingRange()
