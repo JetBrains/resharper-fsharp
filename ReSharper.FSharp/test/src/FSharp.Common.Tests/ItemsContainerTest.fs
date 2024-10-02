@@ -1024,7 +1024,7 @@ let itemFilterProvider =
 
 type LoggingFSharpItemsContainer(writer, refresher) as this =
     inherit FSharpItemsContainer(Lifetime.Eternal, DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, 
-    refresher, itemFilterProvider, null)
+    refresher, itemFilterProvider, null, null)
 
     let container = this :> IFSharpItemsContainer
 
