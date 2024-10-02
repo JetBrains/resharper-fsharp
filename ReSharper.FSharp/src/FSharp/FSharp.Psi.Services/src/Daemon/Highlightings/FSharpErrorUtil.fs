@@ -12,8 +12,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
-type DiagnosticTypeInfo =
+type FSharpDiagnosticTypeInfo =
     { IsTupleType: bool; TypeString: string } with
+
     static member Create(fcsType: FSharpType, displayContext: FSharpDisplayContext) =
         { IsTupleType = fcsType.IsTupleType
           TypeString = fcsType.Format(displayContext) }

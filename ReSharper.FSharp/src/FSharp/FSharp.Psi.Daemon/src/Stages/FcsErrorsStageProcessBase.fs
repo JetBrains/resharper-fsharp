@@ -223,7 +223,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
                 if isNull expr then null
                 elif isUnit expectedType then createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                else TypeEquationError(DiagnosticTypeInfo.Create(actualType, displayContext), expr, error.Message) :> _
+                else TypeEquationError(FSharpDiagnosticTypeInfo.Create(actualType, displayContext), expr, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
 
