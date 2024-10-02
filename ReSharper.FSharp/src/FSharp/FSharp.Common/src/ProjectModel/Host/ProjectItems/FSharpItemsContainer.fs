@@ -98,7 +98,8 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
-        projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider, locks: IShellLocks) =
+        projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider, locks: IShellLocks,
+        toolset: ISolutionToolset) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy containerLoader.GetMap()
@@ -124,9 +125,14 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         |> Option.bind tryGetProjectMapping
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let getItems (msBuildProject: MsBuildProject) projectDescriptor (itemTypeFilter: MsBuildProjectItem -> bool)
-            (itemsByName: HashSet<_>) allowNonDefaultItemType =
+    let getItems (toolsetVersion: Version2 option) (msBuildProject: MsBuildProject) projectDescriptor
+            (itemTypeFilter: MsBuildProjectItem -> bool) (itemsByName: HashSet<_>) allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
+
+        let shouldRemoveAssemblyInfo =
+            toolsetVersion
+            |> Option.map (fun v -> v.Major = 8u)
+            |> Option.defaultValue false
 
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
@@ -138,7 +144,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             |> Seq.filter (fun item ->
                 itemTypeFilter item &&
 
-                assemblyInfoFile <> item.EvaluatedInclude &&
+                not (shouldRemoveAssemblyInfo && assemblyInfoFile = item.EvaluatedInclude) &&
 
                 // todo: allow passing additional default item types to the filter ctor
                 (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
@@ -237,10 +243,16 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
             match projectMark with
             | FSharpProjectMark ->
+                let toolsetVersion =
+                    toolset
+                    |> Option.ofObj
+                    |> Option.bind (fun toolset -> toolset.GetBuildTool() |> Option.ofObj)
+                    |> Option.map _.Version
+
                 let itemsByName = HashSet()
-                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBeforeItem itemsByName true
-                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfterItem itemsByName true
-                let restItems = getItems msBuildProject projectDescriptor (changesOrderItem >> not) itemsByName false
+                let compileBeforeItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileBeforeItem itemsByName true
+                let compileAfterItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileAfterItem itemsByName true
+                let restItems = getItems toolsetVersion msBuildProject projectDescriptor (changesOrderItem >> not) itemsByName false
 
                 let items =
                     compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
