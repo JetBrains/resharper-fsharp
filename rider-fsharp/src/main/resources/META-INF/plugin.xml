@@ -52,6 +52,9 @@
     <programRunner order="first" implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptFsiRunner" />
     <rider.run.dotNetProfileConsoleViewProvider implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConsoleViewProvider"/>
 
+    <!-- Hierarchies -->
+    <callHierarchyProvider language="F#" implementationClass="com.jetbrains.rider.inspections.callHierarchy.RiderCallHierarchyProvider"/>
+
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
     <projectModelViewExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpProjectModelViewExtensions"/>
