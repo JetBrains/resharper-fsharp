@@ -7,8 +7,8 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpTodoContentsProvider() =
-    inherit DefaultTodoContentsProvider()
+type FSharpTodoLanguageService() =
+    inherit DefaultTodoLanguageService()
 
     let startsWith string range (text: string) =
         text.RangeStartsWith(range, string, StringComparison.Ordinal)
@@ -36,3 +36,6 @@ type FSharpTodoContentsProvider() =
 
         else
             Nullable()
+
+    override this.IsMultiLineComment(documentText, tokenRange, tokenType) =
+        tokenType.IsComment && startsWith "(*" tokenRange documentText
