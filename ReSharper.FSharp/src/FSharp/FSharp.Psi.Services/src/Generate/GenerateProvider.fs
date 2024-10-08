@@ -24,6 +24,11 @@ type FSharpGeneratorContextFactory() =
         member x.TryCreate(kind: string, psiDocumentRangeView: IPsiDocumentRangeView): IGeneratorContext =
             let psiView = psiDocumentRangeView.View<FSharpLanguage>()
 
+            let isInsideObjExpr (objExpr: IObjExpr) =
+                isNotNull objExpr &&
+                not (psiView.SelectionIsExactlyAtEdge(objExpr)) &&
+                not (psiView.SelectionIsExactlyAtEdge(objExpr, true))
+
             let treeNode = psiView.GetSelectedTreeNode()
             if isNull treeNode then null else
 
@@ -34,11 +39,11 @@ type FSharpGeneratorContextFactory() =
                 prevToken.GetContainingNode<IFSharpTypeDeclaration>()
 
             let typeDeclaration: IFSharpTypeElementDeclaration =
+                let objExpr = psiView.GetSelectedTreeNode<IObjExpr>()
+                if isInsideObjExpr objExpr then objExpr else
+
                 match psiView.GetSelectedTreeNode<IFSharpTypeDeclaration>() with
-                | null ->
-                    match psiView.GetSelectedTreeNode<IObjExpr>() with
-                    | null -> tryGetPreviousTypeDecl treeNode
-                    | objExpr -> objExpr
+                | null -> tryGetPreviousTypeDecl treeNode
                 | typeDeclaration -> typeDeclaration
 
             let anchor = GenerateOverrides.getAnchorNode psiView typeDeclaration
