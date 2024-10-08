@@ -1,0 +1,17 @@
+﻿Provided elements:
+ 0: ToString():System.String
+ 1: Equals(System.Object):System.Boolean
+ 2: GetHashCode():System.Int32
+ 3: Finalize():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:ToString():System.String}
+
+module Module
+
+type T() =
+    static member M() =
+        { new obj() with
+            override this.Equals() = true
+            override this.ToString() = {selstart}base.ToString(){selend}
+        }

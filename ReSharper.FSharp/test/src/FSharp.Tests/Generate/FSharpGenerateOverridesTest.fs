@@ -24,8 +24,19 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Anchor - Member 05``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Member 06``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Member 07``() = x.DoNamedTest()
+
     [<Test>] member x.``Anchor - No repr 01``() = x.DoNamedTest()
     [<Test; Explicit("Wrong spaces")>] member x.``Anchor - No repr 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Anchor - ObjExpr - Brace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr - Brace 02``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr - Brace 03``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr - Brace 04``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr 03``() = x.DoNamedTest()
+    [<Test>] member x.``Anchor - ObjExpr 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Anchor - Repr 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 02``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Repr 03``() = x.DoNamedTest()
