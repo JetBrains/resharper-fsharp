@@ -22,8 +22,27 @@ open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.Util
 
-
 module FSharpNamingService =
+    let reservedKeywords =
+        [ "break"
+          "checked"
+          "component"
+          "constraint"
+          "continue"
+          "fori"
+          "include"
+          "mixin"
+          "parallel"
+          "params"
+          "process"
+          "protected"
+          "pure"
+          "sealed"
+          "trait"
+          "tailcall"
+          "virtual" ]
+        |> HashSet
+
     let getUsedNamesUsages
             (contextExprs: IFSharpExpression list) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
             checkFcsSymbols =
@@ -282,6 +301,9 @@ module FSharpNamingService =
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
     let mangleNameIfNecessary name =
+        if reservedKeywords.Contains(name) then
+            $"``{name}``" else
+
         match name with
         | "``sig``" -> name
         | "sig" -> "``sig``"
