@@ -231,8 +231,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       myLocks.AssertReadAccessAllowed();
       SyncUpdate(false);
 
-      CheckerService.AssertFcsAccessThread();
-
       var psiModule = sourceFile.PsiModule;
       if (psiModule.IsMiscFilesProjectModule() && psiModule is not SandboxPsiModule)
         return FcsModuleResolvedSymbols.Empty;
