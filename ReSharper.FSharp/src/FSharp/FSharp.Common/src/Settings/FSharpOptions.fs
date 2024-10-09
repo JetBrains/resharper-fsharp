@@ -14,10 +14,14 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Util
+
+type Strings = JetBrains.ReSharper.Plugins.FSharp.Resources.Strings
+
 
 [<SettingsKey(typeof<Missing>, "F# settings")>]
 type FSharpSettings() = class end
@@ -173,13 +177,23 @@ module FSharpTypeHintOptions =
     let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
 
 
-[<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
+[<SettingsKey(typeof<FSharpOptions>, nameof(FSharpTypeHintOptions))>]
 type FSharpTypeHintOptions =
     { [<SettingsEntry(true, FSharpTypeHintOptions.pipeReturnTypes); DefaultValue>]
       mutable ShowPipeReturnTypes: bool
 
       [<SettingsEntry(true, FSharpTypeHintOptions.hideSameLinePipe); DefaultValue>]
-      mutable HideSameLine: bool }
+      mutable HideSameLine: bool
+
+      [<SettingsEntry(PushToHintMode.Default,
+                      DescriptionResourceType = typeof<Strings>,
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_TopLevelMembers_Description))>]
+      mutable ShowTypeHintsForTopLevelMembers: PushToHintMode
+
+      [<SettingsEntry(PushToHintMode.PushToShowHints,
+                      DescriptionResourceType = typeof<Strings>,
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_LocalBindings_Description))>]
+      mutable ShowTypeHintsForLocalBindings: PushToHintMode }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
