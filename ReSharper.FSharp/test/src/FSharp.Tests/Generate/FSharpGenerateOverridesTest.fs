@@ -105,6 +105,8 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Member - Property 02 - Setter``() = x.DoNamedTest()
     [<Test>] member x.``Member - Property 03 - Setter only``() = x.DoNamedTest()
 
+    [<Test>] member x.``Naming 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Object expr - Curried 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Curried 02``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Curried 03``() = x.DoNamedTest()

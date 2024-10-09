@@ -4,7 +4,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate.GenerateOverride
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -66,7 +65,8 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
             param.Type.Instantiate(element.Substitution)
 
         let getParamNameAndType defaultName (param: FSharpParameter) =
-            param.Name |> Option.defaultWith defaultName, getParamType param
+            let name = param.Name |> Option.defaultWith defaultName |> FSharpNamingService.mangleNameIfNecessary
+            name, getParamType param
 
         let getValueParamNameAndType (param: FSharpParameter) =
             getParamNameAndType (fun _ -> "value") param

@@ -1,7 +1,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
 
 open FSharp.Compiler.Symbols
-open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -33,7 +32,7 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
     let bind name =
         let factory = pattern.CreateElementFactory()
 
-        let name = PrettyNaming.NormalizeIdentifierBackticks name
+        let name = FSharpNamingService.normalizeBackticks name
         let newPattern = factory.CreatePattern(name, false)
         let pat = ModificationUtil.ReplaceChild(pattern, newPattern)
 
@@ -52,5 +51,5 @@ let bindFcsSymbol (pattern: IFSharpPattern) (fcsSymbol: FSharpSymbol) opName =
     
     match fcsSymbol with
     | :? FSharpUnionCase as unionCase -> bind unionCase.Name
-    | :? FSharpField as field when FSharpSymbolUtil.isEnumMember field -> bind field.Name
+    | :? FSharpField as field when isEnumMember field -> bind field.Name
     | _ -> failwith $"Unexpected symbol: {fcsSymbol}"

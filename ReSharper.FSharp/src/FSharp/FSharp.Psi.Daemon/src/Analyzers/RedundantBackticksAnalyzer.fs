@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Analyzers
 
-open FSharp.Compiler.Syntax
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -20,6 +19,6 @@ type RedundantBackticksAnalyzer() =
         if text.Length = withoutBackticks.Length || withoutBackticks = "_" ||
                 FSharpNamingService.reservedKeywords.Contains(withoutBackticks) then () else
 
-        let escaped = PrettyNaming.NormalizeIdentifierBackticks withoutBackticks
+        let escaped = FSharpNamingService.normalizeBackticks withoutBackticks
         if escaped.Length = withoutBackticks.Length then
             consumer.AddHighlighting(RedundantBackticksWarning(identifier))

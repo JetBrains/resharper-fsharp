@@ -300,6 +300,13 @@ module FSharpNamingService =
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
+    let normalizeBackticks (name: string) =
+        let withoutBackticks = name.RemoveBackticks()
+        if reservedKeywords.Contains(withoutBackticks) then
+            $"``{withoutBackticks}``"
+        else
+            PrettyNaming.NormalizeIdentifierBackticks name
+
     let mangleNameIfNecessary name =
         if reservedKeywords.Contains(name) then
             $"``{name}``" else
@@ -307,7 +314,7 @@ module FSharpNamingService =
         match name with
         | "``sig``" -> name
         | "sig" -> "``sig``"
-        | _ -> PrettyNaming.NormalizeIdentifierBackticks name
+        | _ -> normalizeBackticks name
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =

@@ -5,7 +5,6 @@ open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -82,7 +81,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         if PrettyNaming.IsLogicalOpName logicalName then
             sprintf "( %s )" name
         else
-            PrettyNaming.NormalizeIdentifierBackticks name
+            FSharpNamingService.normalizeBackticks name
 
     let createMemberDecl logicalName typeParameters parameters addSpaceBeforeParams =
         let typeParametersSource =
@@ -207,7 +206,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
 
         member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
             let printParam (name, fcsType: FSharpType) =
-                let name = PrettyNaming.NormalizeIdentifierBackticks name
+                let name = FSharpNamingService.mangleNameIfNecessary name
                 if not addTypes then name else
 
                 let fcsType = fcsType.Format(displayContext)
