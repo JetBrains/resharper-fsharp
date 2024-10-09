@@ -12,6 +12,14 @@ object FSharpFileType : RiderLanguageFileTypeBase(FSharpLanguage) {
   override fun getIcon() = FSharpIcons.FSharp
 }
 
+object FSharpSignatureFileType : RiderLanguageFileTypeBase(FSharpLanguage) {
+  override fun getName() = "F# Signature"
+  override fun getDisplayName() = "F# Signature"
+  override fun getDefaultExtension() = "fsi"
+  override fun getDescription() = FSharpBundle.message("FSharpFileType.label")
+  override fun getIcon() = FSharpIcons.FSharpSignature
+}
+
 object FSharpScriptFileType : RiderLanguageFileTypeBase(FSharpLanguage) {
   override fun getName() = "F# Script"
   override fun getDisplayName() = "F# Script"
