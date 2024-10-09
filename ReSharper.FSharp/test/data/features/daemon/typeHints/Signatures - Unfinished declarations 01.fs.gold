@@ -1,0 +1,34 @@
+﻿module Test
+
+module M1 =
+    let f1 x
+    let f2 x||(0) ||(1)=
+        let x
+        let x||(2) = 3
+        for i
+        for i||(3) in 'a' .. 'z' do ()
+        ()
+    let _ = fun x 
+    let _ = fun x||(4) -> ()
+
+module M2 =
+    type A1(obj)
+    type A2(obj||(5)) = class end
+
+module M3 =
+    type A() =
+        new (x)
+        new (x||(6), y||(7)) = A()
+        member _.P1
+        member _.P2||(8) = 3
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : 'a
+(1): ReSharper Parameter Name Hint: : unit
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : char
+(4): ReSharper Parameter Name Hint: : 'a
+(5): ReSharper Parameter Name Hint: : obj
+(6): ReSharper Parameter Name Hint: : obj
+(7): ReSharper Parameter Name Hint: : obj
+(8): ReSharper Parameter Name Hint: : int

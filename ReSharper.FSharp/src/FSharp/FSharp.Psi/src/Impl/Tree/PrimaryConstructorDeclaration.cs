@@ -13,6 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpPrimaryConstructor(this);
 
+    public ITokenNode EqualsToken => null;
+
     TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns =>
       new(new[] {ParameterPatterns});
   }

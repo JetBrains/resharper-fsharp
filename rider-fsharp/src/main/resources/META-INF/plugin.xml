@@ -66,6 +66,14 @@
 
     <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
 
+    <projectConfigurable groupId="inlay.hints" groupWeight="10" dynamic="true"
+                         id="inlay.hints.FSharpInlayHintsConfigurableGroup"
+                         instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpInlayHintsConfigurableGroup"
+                         bundle="messages.FSharpBundle"
+                         key="configurable.group.inlay.hints.FSharpInlayHintsConfigurableGroup.settings.display.name"
+    />
+
+
     <intentionAction>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
       <category>F#</category>
