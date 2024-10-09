@@ -39,9 +39,9 @@ let a, b =
 let g = fun x||(7) -> ()
 
 
-type A(x||(8)) =
+type A(x) =
     do
-        let x||(9) = 3
+        let x||(8) = 3
         ()
 
     let array = [|""|] 
@@ -49,7 +49,7 @@ type A(x||(8)) =
     new(x, y) = new A(x + y)
 
     member _.P1 =
-        let x||(10) = 1
+        let x||(9) = 1
         x
 
     member _.P2 = id
@@ -58,13 +58,13 @@ type A(x||(8)) =
 
     member x.P4
         with get index =
-            let x||(11) = array[index]
+            let x||(10) = array[index]
             x
         and set index value =
             array[index] <- value
 
     member _.M(x) (y, z) =
-        let res||(12) = x + y + z
+        let res||(11) = x + y + z
         res
 
     interface IDisposable with
@@ -126,6 +126,5 @@ type MyStruct =
 (7): ReSharper Parameter Name Hint: : 'a
 (8): ReSharper Parameter Name Hint: : int
 (9): ReSharper Parameter Name Hint: : int
-(10): ReSharper Parameter Name Hint: : int
-(11): ReSharper Parameter Name Hint: : string
-(12): ReSharper Parameter Name Hint: : int
+(10): ReSharper Parameter Name Hint: : string
+(11): ReSharper Parameter Name Hint: : int
