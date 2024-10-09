@@ -29,15 +29,15 @@ type FSharpInlayHintsPage(lifetime: Lifetime, optionsPageContext: OptionsPageCon
               NameResourceType = typeof<Strings>,
               NameResourceName = nameof(Strings.FSharpTypeHints_OptionsPage_Title))>]
 type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsPageContext,
-                                     optionsSettingsSmartContext: OptionsSettingsSmartContext) as this =
+                                optionsSettingsSmartContext: OptionsSettingsSmartContext) as this =
     inherit InlayHintsOptionPageBase(lifetime, optionsPageContext, optionsSettingsSmartContext, optionsPageContext.IsReSharper)
 
     do
         this.AddVisibilityHelpText()
 
-        this.AddHeader(Strings.FSharpSignatureHints_TopLevelMembersSettings_Header) |> ignore
+        this.AddHeader(Strings.FSharpTypeHints_TopLevelMembersSettings_Header) |> ignore
         this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForTopLevelMembers)
-        this.AddCommentText(Strings.FSharpSignatureHints_TopLevelMembersSettings_Comment)
+        this.AddCommentText(Strings.FSharpTypeHints_TopLevelMembersSettings_Comment)
 
-        this.AddHeader(Strings.FSharpSignatureHints_LocalBindingsSettings_Header) |> ignore
+        this.AddHeader(Strings.FSharpTypeHints_LocalBindingsSettings_Header) |> ignore
         this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForLocalBindings)
