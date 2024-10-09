@@ -40,7 +40,7 @@ type private MembersVisitor(settings) =
         match node with
         | :? ITopBinding
         | :? IMemberDeclaration
-        | :? ISecondaryConstructorDeclaration -> true
+        | :? IConstructorDeclaration -> true
         | _ -> false
 
     override x.VisitNode(node, context) =
