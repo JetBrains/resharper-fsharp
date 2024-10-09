@@ -147,7 +147,8 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
             not Shell.Instance.IsTestShell &&
 
             settingsStore.GetIndexedValue((fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.providerId) ||
-            settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers) <> PushToHintMode.Never
+            settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
+                         .EnsureInlayHintsDefault(settingsStore) <> PushToHintMode.Never
 
         if not isDisabled then
             fsFile.ProcessThisAndDescendants(Processor(x, consumer))
