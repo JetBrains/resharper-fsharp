@@ -17,49 +17,46 @@
     <fileType name="F#" language="F#" extensions="fs;fsi;ml;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" fieldName="INSTANCE"/>
     <fileType name="F# Script" language="F#" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" fieldName="INSTANCE"/>
 
-    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
-    <lang.syntaxHighlighter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter"/>
-    <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterMenuModelFactory" />
-    <lang.elementManipulator forClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringElementManipulator"/>
-    <lang.commenter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpCommenter"/>
-    <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
-
-    <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
+    <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
+    <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
+    <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
+    <callHierarchyProvider language="F#" implementationClass="com.jetbrains.rider.inspections.callHierarchy.RiderCallHierarchyProvider"/>
+    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
+    <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
+    <code.cleanup.support language="F#" implementationClass="com.jetbrains.rider.actions.impl.cleanup.BackendCodeCleanupSupportPolicy" />
+    <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetProtocolCompletionContributor" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetPatchEngineCompletionContributor" />
-    <frontend.completion.helper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.FSharpCompletionHelper" />
-    <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
-    <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
-    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
-    <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
-    <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
-    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rider.quickDoc.FrontendDocumentationProvider"/>
-    <rider.debuggerSupportPolicy language="F#" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
-    <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
-    <scratch.creationHelper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpScratchCreationHelper" />
-    <code.cleanup.support language="F#" implementationClass="com.jetbrains.rider.actions.impl.cleanup.BackendCodeCleanupSupportPolicy" />
-    <lang.psiStructureViewFactory language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderProtocolPsiStructureViewFactory" />
-    <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
-    <navbar.members.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.navbar.FSharpNavBarMembersSupport"/>
-    <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
-    <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
     <configurationType implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfigurationType" />
-    <runLineMarkerContributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptMarkerContributor"/>
-    <programRunner order="first" implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptFsiRunner" />
-    <rider.run.dotNetProfileConsoleViewProvider implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConsoleViewProvider"/>
-
-    <!-- Hierarchies -->
-    <callHierarchyProvider language="F#" implementationClass="com.jetbrains.rider.inspections.callHierarchy.RiderCallHierarchyProvider"/>
-
-    <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
+    <frontend.completion.helper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.FSharpCompletionHelper" />
+    <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterMenuModelFactory" />
+    <lang.commenter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpCommenter"/>
+    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rider.quickDoc.FrontendDocumentationProvider"/>
+    <lang.elementManipulator forClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringElementManipulator"/>
+    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
+    <lang.psiStructureViewFactory language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderProtocolPsiStructureViewFactory" />
+    <lang.syntaxHighlighter language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter"/>
+    <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
+    <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
+    <navbar.members.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.navbar.FSharpNavBarMembersSupport"/>
+    <programRunner order="first" implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptFsiRunner" />
     <projectModelViewExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpProjectModelViewExtensions"/>
+    <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
+    <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
+    <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
+    <rider.debuggerSupportPolicy language="F#" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
+    <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
+    <rider.run.dotNetProfileConsoleViewProvider implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConsoleViewProvider"/>
+    <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
+    <runLineMarkerContributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptMarkerContributor"/>
+    <scratch.creationHelper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpScratchCreationHelper" />
     <solutionExplorerCustomization implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpSolutionExplorerCustomization" />
-    <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
+
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
 
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" displayName="F# Interactive" />
