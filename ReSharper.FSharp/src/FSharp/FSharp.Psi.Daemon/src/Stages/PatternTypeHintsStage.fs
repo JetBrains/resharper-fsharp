@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
+open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 open JetBrains.Util.Logging
 
 type private NodesRequiringHints =
@@ -26,7 +27,9 @@ type private FSharpTypeHintSettings =
 
     static member Create(settingsStore: IContextBoundSettingsStore) =
         { TopLevelMembers = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
-          LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings) }
+                                         .EnsureInlayHintsDefault(settingsStore)
+          LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings)
+                                       .EnsureInlayHintsDefault(settingsStore) }
 
     member x.IsDisabled =
         x.TopLevelMembers = PushToHintMode.Never &&
@@ -246,6 +249,9 @@ type PatternTypeHintsStage(logger: ILogger) =
         not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settingsStore, daemonProcess, _) =
+        let isEnabled = settingsStore.GetValue(fun (key: GeneralInlayHintsOptions) -> key.EnableInlayHints)
+        if not isEnabled then null else
+
         let settings = FSharpTypeHintSettings.Create(settingsStore)
         if settings.IsDisabled then null
         else PatternsHighlightingProcess(logger, fsFile, settingsStore, daemonProcess, settings)
