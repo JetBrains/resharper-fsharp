@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.TodoItems
 open System
 open JetBrains.ReSharper.Feature.Services.TodoItems
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
@@ -37,5 +38,5 @@ type FSharpTodoLanguageService() =
         else
             Nullable()
 
-    override this.IsMultiLineComment(documentText, tokenRange, tokenType) =
-        tokenType.IsComment && startsWith "(*" tokenRange documentText
+    override this.IsMultiLineComment(_, _, tokenType) =
+        tokenType == FSharpTokenType.BLOCK_COMMENT
