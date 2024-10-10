@@ -115,6 +115,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
         let equalsToken = decl.EqualsToken
         let patterns = decl.ParameterPatterns
+
         let range =
             match decl with
             | :? IBinding as binding when patterns.Count = 0 ->
@@ -136,6 +137,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
             | _ -> Unchecked.defaultof<_>
 
         if isNull symbolUse then ValueNone else
+
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
@@ -147,8 +149,10 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         | :? IParametersOwnerPat as pattern ->
             let asPat = AsPatNavigator.GetByLeftPattern(pattern.IgnoreParentParens())
             if isNull asPat then ValueNone else
+
             let reference = pattern.Reference
             if isNull reference then ValueNone else
+
             let symbol = reference.GetFcsSymbol().As<FSharpActivePatternCase>()
             if isNull symbol then ValueNone
             else getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode
@@ -156,6 +160,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         | :? IReferencePat as refPat ->
             let symbolUse = refPat.GetFcsSymbolUse()
             if isNull symbolUse then ValueNone else
+
             let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
             if isNull symbol then ValueNone else
 
@@ -174,18 +179,6 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
         | :? IParameterOwnerMemberDeclaration as decl ->
             getReturnTypeHint decl pushToHintMode
-
-        | :? IAutoPropertyDeclaration as decl ->
-            let symbolUse = decl.GetFcsSymbolUse()
-            if isNull symbolUse then ValueNone else
-            let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
-            if isNull symbol then ValueNone else
-
-            let fcsType = symbol.ReturnParameter.Type
-            let range = decl.NameIdentifier.GetNavigationRange().EndOffsetRange()
-            let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-
-            createTypeHintHighlighting fcsType displayContext range pushToHintMode |> ValueSome
 
         | _ -> ValueNone
 
