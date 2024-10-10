@@ -48,7 +48,7 @@ let collectTypeHintAnchorsForBinding (binding: IBinding) =
 
     let acc =
         if isNotNull binding.ReturnTypeInfo then acc
-        elif binding.HasParameters then [(binding: ITreeNode)]
+        elif binding.HasParameters then [binding :> ITreeNode]
         else  visitPattern acc binding.HeadPattern
 
     collectPatternsRequiringAnnotations acc binding
@@ -65,25 +65,15 @@ let collectTypeHintsAnchorsForMember (m: IMemberDeclaration) =
     let accessorDeclarations = m.AccessorDeclarations
     if isNull m || isNull m.EqualsToken && accessorDeclarations.IsEmpty then [] else
 
-    let acc = if isNull m.ReturnTypeInfo then [(m: ITreeNode)] else []
+    let acc = if isNull m.ReturnTypeInfo then [m :> ITreeNode] else []
     let acc = collectPatternsRequiringAnnotations acc m
 
     accessorDeclarations
     |> Seq.fold collectPatternsRequiringAnnotations acc
 
 let collectTypeHintAnchorsForConstructor (ctor: IConstructorDeclaration) =
-    let isApplicable =
-        if isNull ctor then false else
-        match ctor with
-        | :? IPrimaryConstructorDeclaration as ctor ->
-            let owner = FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(ctor)
-            isNotNull owner && isNotNull owner.EqualsToken
-        | _ ->
-            isNotNull ctor.EqualsToken
-
-    if not isApplicable then [] else
-
-    collectPatternsRequiringAnnotations [] ctor
+    if isNull ctor.EqualsToken then []
+    else collectPatternsRequiringAnnotations [] ctor
 
 let collectTypeHintAnchorsForEachExpr (forEachExpr: IForEachExpr) =
     if isNull forEachExpr.InExpression then []

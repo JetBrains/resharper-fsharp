@@ -1457,7 +1457,6 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
   memberKeyword{MEMBER, MemberKeyword}
   VAL<VAL, ValKeyword>
   IDENTIFIER<IDENTIFIER, Identifier>
-  typeUsage<TYPE, TypeUsage>?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
   accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
