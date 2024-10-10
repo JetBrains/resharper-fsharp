@@ -25,4 +25,19 @@
     <data name="InferredTypeCodeVisionProvider_TypeCopied_TooltipText" xml:space="preserve">
         <value>Inferred type copied to clipboard</value>
     </data>
+    <data name="FSharpTypeHints_TopLevelMembersSettings_Header" xml:space="preserve">
+        <value>Top-level bindings and type members </value>
+    </data>
+    <data name="FSharpOptionPageTitle" xml:space="preserve">
+        <value>F#</value>
+    </data>
+    <data name="FSharpTypeHints_OptionsPage_Title" xml:space="preserve">
+        <value>Signatures</value>
+    </data>
+    <data name="FSharpTypeHints_LocalBindingsSettings_Header" xml:space="preserve">
+        <value>Local bindings</value>
+    </data>
+    <data name="FSharpTypeHints_TopLevelMembersSettings_Comment" xml:space="preserve">
+        <value>if the 'Never Show' option is selected, Code Vision inferred types will be shown</value>
+    </data>
 </root>

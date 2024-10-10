@@ -10,7 +10,7 @@ using Range = FSharp.Compiler.Text.Range;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class AccessorDeclaration: IParameterOwnerMemberDeclaration
+  internal partial class AccessorDeclaration
   {
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
