@@ -38,6 +38,7 @@ object Net80 {
 
     init {
       addMute(Mute("RIDER-79065: No SWEA for F#"), ::swea)
+      addMute(Mute("RIDER-117187"), ::debugProgram)
     }
   }
 
