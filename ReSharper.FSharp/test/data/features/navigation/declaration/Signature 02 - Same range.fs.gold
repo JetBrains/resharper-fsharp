@@ -18,7 +18,7 @@
 
     TO: [O] val |x|: int RANGE: (19,20) @ Signature 02 - Same range.fsi
     Menu item (enabled) :
-      icon: Fsharp
+      icon: FsharpSignature
       text: Signature 02 - Same range.fsi<font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: val **x**: int

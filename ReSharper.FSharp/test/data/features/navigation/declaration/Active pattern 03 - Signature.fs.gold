@@ -18,7 +18,7 @@
 
     TO: [O] val (||A||): int -> int RANGE: (21,22) @ Active pattern 03 - Signature.fsi
     Menu item (enabled) :
-      icon: Fsharp
+      icon: FsharpSignature
       text: Active pattern 03 - Signature.fsi<font color="06C"> (3)</font>
       tail: <font color="FF6D6D6D">in <TestProject></font>
       tooltip: val (|**A**|): int -> int
