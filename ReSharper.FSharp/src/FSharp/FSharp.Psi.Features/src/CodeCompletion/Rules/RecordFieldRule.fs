@@ -172,21 +172,11 @@ type RecordFieldRule() =
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
 
-            let item =
-                if emphasize then item.WithRelevance(matchedFieldRelevance) else item
+            let item: ILookupItem =
+                if not emphasize then item else
 
-            let tailNodeTypes =
-                [| FSharpTokenType.WHITESPACE
-                   FSharpTokenType.EQUALS
-                   FSharpTokenType.WHITESPACE
-                   TailType.CaretTokenNodeType.Instance
-                   FSharpTokenType.WHITESPACE |]
-
-            if emphasize then
+                let item = item.WithRelevance(matchedFieldRelevance)
                 item.Placement.Location <- PlacementLocation.Top
-
-            let solution = context.BasicContext.Solution
-            LookupItemUtil.SubscribeAfterComplete(item, fun textControl _ _ _ _ _ ->
-                textControl.RescheduleCompletion(solution))
+                item
 
             collector.Add(item)
