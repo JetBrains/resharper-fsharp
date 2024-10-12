@@ -116,7 +116,7 @@ and FSharpBuildSettings() =
         | _ -> false
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpProjectApplicableProvider() =
     interface ProjectConfigurationValidator.IApplicableProvider with
