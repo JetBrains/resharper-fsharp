@@ -9,6 +9,8 @@ import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.framework.disableTimedMarkupSuppression
+import com.jetbrains.rider.test.framework.enableTimedMarkupSuppression
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
@@ -16,6 +18,7 @@ import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.waitForDaemon
 import com.jetbrains.rider.test.waitForNextDaemon
+import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.File
 
@@ -54,6 +57,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
     withOpenedEditor(project, defaultSourceFile) {
+      disableTimedMarkupSuppression()
       waitForDaemon()
 
       testDirectory.deleteRecursively().shouldBeTrue()
@@ -71,6 +75,8 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
       executeWithGold(File(testGoldFile.path + "_after")) {
         dumpTypeProviders(it)
       }
+
+      enableTimedMarkupSuppression()
     }
   }
 
