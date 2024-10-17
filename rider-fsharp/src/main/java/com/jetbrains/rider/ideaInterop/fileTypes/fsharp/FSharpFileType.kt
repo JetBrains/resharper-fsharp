@@ -16,7 +16,7 @@ object FSharpSignatureFileType : RiderLanguageFileTypeBase(FSharpLanguage) {
   override fun getName() = "F# Signature"
   override fun getDisplayName() = "F# Signature"
   override fun getDefaultExtension() = "fsi"
-  override fun getDescription() = FSharpBundle.message("FSharpFileType.label")
+  override fun getDescription() = FSharpBundle.message("FSharpSignatureFileType.label")
   override fun getIcon() = FSharpIcons.FSharpSignature
 }
 
