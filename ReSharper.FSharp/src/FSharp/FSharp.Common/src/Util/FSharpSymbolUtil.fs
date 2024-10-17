@@ -92,6 +92,8 @@ let rec getIconId (symbol: FSharpSymbol) =
         let isProperty = mfv.IsProperty
         let isCtor = mfv.IsConstructor
 
+        if mfv.LiteralValue.IsSome then PsiSymbolsThemedIcons.Const.Id else
+
         if isModuleValueOrMember && not isMember && accessibility.IsPublic then
             if isValCompiledAsMethod mfv then staticMethod else staticProperty
         else
