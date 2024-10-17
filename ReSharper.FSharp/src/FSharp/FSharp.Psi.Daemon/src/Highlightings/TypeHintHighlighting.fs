@@ -6,6 +6,8 @@ open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Feature.Services.InlayHints
+open JetBrains.ReSharper.Feature.Services.TypeNameHints
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
@@ -15,8 +17,10 @@ open JetBrains.UI.RichText
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
+type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode) =
     let text = RichText(": " + typeNameString)
+    new (typeNameString: string, range: DocumentRange) =
+        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default)
 
     interface IHighlighting with
         member x.ToolTip = null
@@ -24,10 +28,13 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange) =
         member x.IsValid() = x.IsValid()
         member x.CalculateRange() = range
 
+    interface IInlayHintHighlighting
+
     interface IHighlightingWithTestOutput with
         member x.TestOutput = text.Text
 
     member x.Text = text
+    member x.PushToHintMode = pushToHintMode
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>] TypeHintAdornmentProvider() =
@@ -42,8 +49,8 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>] TypeHintAdornmentPr
             | :? TypeHintHighlighting as thh ->
                 let data =
                     AdornmentData(thh.Text, null, AdornmentFlags.None, AdornmentPlacement.DefaultAfterPrevChar,
-                        PushToHintMode.Default)
-                
+                                  thh.PushToHintMode)
+
                 { new IAdornmentDataModel with
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems = null
