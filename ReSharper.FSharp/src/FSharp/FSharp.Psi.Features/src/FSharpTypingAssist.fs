@@ -2,12 +2,10 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.Syntax
 open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application.CommandProcessing
 open JetBrains.Application.Parts
 open JetBrains.Application.UI.ActionSystem.Text
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -742,42 +740,52 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let document = textControl.Document
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    match expr with
 
-                    // if expr then {caret}
-                    // No info is available after error recovery, we check that range is surrounded with if ... then.
-                    | SynExpr.FromParseError (ExprRange range, _)
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let expr = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
+        if isNull expr then false else
 
-                    // while expr do {caret}
-                    | SynExpr.While (_, ExprRange range, _, _) when
-                            getEndOffset document range = prevTokenEnd ->
-                        Some range
+        let range =
+            let inline checkExpr (expr: IFSharpExpression) (node: ITreeNode) =
+                if isNotNull expr && isNotNull node && expr.GetDocumentEndOffset().Offset = prevTokenEnd
+                    then Some (node.GetDocumentRange())
+                else None
 
-                    // for i = ... to ... do {caret}
-                    | SynExpr.For (_, _, IdentRange range, _, _, _, _, ExprRange lastRange, _)
+            match expr with
+            // if expr then ...
+            // elif ... {caret}
+            | :? IElifExpr as elifExpr when (elifExpr.ThenExpr :? IFromErrorExpr) ->
+                let ifExpr = IfThenElseExprNavigator.GetByElseExpr(elifExpr)
+                if isNull ifExpr then None else
+                checkExpr elifExpr.ConditionExpr ifExpr.ConditionExpr
 
-                    // for ... in ... do {caret}
-                    | SynExpr.ForEach (_, _, _, _, PatRange range, ExprRange lastRange, _, _) when
-                            getEndOffset document lastRange = prevTokenEnd ->
-                        Some range
+            // if expr then {caret}
+            // No info is available after error recovery, we check that range is surrounded with if ... then.
+            | :? IIfThenElseExpr as ifThenElseExpr when (ifThenElseExpr.ThenExpr :? IFromErrorExpr) ->
+                checkExpr ifThenElseExpr.ConditionExpr ifThenElseExpr.ConditionExpr
 
-                    | _ -> defaultTraverse expr }
+            // while expr do {caret}
+            | :? IWhileExpr as whileExpr ->
+                let expr = whileExpr.ConditionExpr
+                checkExpr expr expr
 
-        let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
+            // for i = ... to ... do {caret}
+            | :? IForExpr as forExpr ->
+                checkExpr forExpr.DoExpression forExpr.Identifier
+
+            // for ... in ... do {caret}
+            | :? IForEachExpr as foreachExpr ->
+                checkExpr foreachExpr.InExpression foreachExpr.Pattern
+
+            | _ -> None
+
+        match range with
         | None -> false
         | Some range ->
 
         use cookie = LexerStateCookie.Create(lexer)
-        let exprStart = getStartOffset document range
+        let exprStart = range.StartOffset.Offset
         if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -802,36 +810,23 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let document = textControl.Document
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitMatchClause(_, defaultTraverse, (SynMatchClause.SynMatchClause (pat, whenExpr, _, _, _, _) as mc)) =
-                    match pat, whenExpr with
-                    | _, Some (ExprRange range)
-                    | PatRange range, None when getEndOffset document range = prevTokenEnd -> Some mc
 
-                    | _ -> defaultTraverse mc
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let matchClause = fsFile.GetNode<IMatchClause>(DocumentOffset(document, lexer.TokenStart))
 
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    defaultTraverse expr }
+        if isNull matchClause then false else
 
-        let documentCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match SyntaxTraversal.Traverse(getPosFromCoords documentCoords, parseTree, visitor) with
-        | None -> false
-        | Some (SynMatchClause.SynMatchClause (_, _, _, range, _, _)) ->
+        let whenExpression = matchClause.WhenExpression
+        let pat = matchClause.Pattern
+        let offset =
+            if isNull whenExpression then pat.GetDocumentEndOffset()
+            else whenExpression.GetDocumentEndOffset()
+        if offset.Offset <> prevTokenEnd then false else
 
         use cookie = LexerStateCookie.Create(lexer)
 
-        if not (lexer.FindTokenAt(getStartOffset document range)) then false else
-
-        lexer.Advance(-1)
-        while isIgnored lexer.TokenType do
-            lexer.Advance(-1)
-
+        if not (lexer.FindTokenAt(matchClause.GetDocumentStartOffset().Offset)) then false else
         if lexer.TokenType != FSharpTokenType.BAR then false else
 
         let indent =
@@ -1004,21 +999,6 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 let tokenType = lexer.TokenType
                 (isNotNull tokenType && tokenType.IsWhitespace || tokenType == FSharpTokenType.LPAREN)) then false else
 
-        lexer.FindTokenAt(offset - 1) |> ignore
-
-        let isAfterInfixOp =
-            use cookie = LexerStateCookie.Create(lexer)
-            while lexer.TokenType == FSharpTokenType.WHITESPACE do
-                lexer.Advance(-1)
-            isInfixOp lexer
-
-        let isBeforeInfixOp =
-            use cookie = LexerStateCookie.Create(lexer)
-            lexer.FindTokenAt(offset) |> ignore
-            while lexer.TokenType == FSharpTokenType.WHITESPACE do
-                lexer.Advance()
-            isInfixOp lexer
-
         let document = textControl.Document
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
@@ -1026,61 +1006,62 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let lineStart = document.GetLineStartOffset(caretLine)
         if document.GetText(TextRange(lineStart, offset)).IsWhitespace() then false else
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let mutable appExpr = None
         let mutable outerExpr = None
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    match expr with
-                    | SynExpr.App (_, false, leftExpr, rightExpr, range)
-                    | SynExpr.App (_, true,  rightExpr, leftExpr, range) ->
 
-                        if offset >= getStartOffset document range && rightExpr.Range.GetStartLine() > caretLine then
-                            match leftExpr, expr with
-                            | _, SynExpr.App(_, true,  rightExpr, leftExpr, _)
-                            | SynExpr.App (_, true, rightExpr, leftExpr, _), _ when
-                                    leftExpr.Range.EndLine = rightExpr.Range.StartLine -> ()
-                            | _ -> outerExpr <- Some (expr, rightExpr)
+        let check (expr: IFSharpExpression) (leftExpr: IFSharpExpression) (rightExpr: IFSharpExpression) =
+            if isNull leftExpr || isNull rightExpr then () else
 
-                        if offset >= getEndOffset document leftExpr.Range &&
-                                offset <= getStartOffset document rightExpr.Range then
-                            appExpr <- Some expr
+            let startOffset = expr.GetDocumentStartOffset().Offset
+            if offset >= startOffset && rightExpr.StartLine > caretLine then
+                match rightExpr with
+                | :? IReferenceExpr as operator when
+                    leftExpr.EndLine = operator.StartLine -> ()
+                | _ -> outerExpr <- Some (expr, rightExpr)
 
-                            outerExpr <-
-                                match outerExpr with
-                                | Some (expr, _) when range.Start = expr.Range.Start -> outerExpr
-                                | _ -> None
+            if offset >= leftExpr.GetDocumentEndOffset().Offset &&
+                    offset <= rightExpr.GetDocumentStartOffset().Offset then
+                appExpr <- Some expr
 
-                        defaultTraverse expr
+                outerExpr <-
+                    match outerExpr with
+                    | Some (expr, _) when startOffset = expr.GetDocumentStartOffset().Offset -> outerExpr
+                    | _ -> None
 
-                    | _ -> defaultTraverse expr }
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let node = fsFile.GetNode<IAppExpr>(DocumentOffset(document, offset))
+        if isNull node then false else
 
-        SyntaxTraversal.Traverse(getPosFromCoords caretCoords, parseTree, visitor) |> ignore
+        match node with
+        | :? IPrefixAppExpr as prefixAppExpr ->
+            check prefixAppExpr prefixAppExpr.FunctionExpression prefixAppExpr.ArgumentExpression
+        | :? IBinaryAppExpr as binaryAppExpr ->
+            check binaryAppExpr binaryAppExpr.LeftArgument binaryAppExpr.Operator
+            check binaryAppExpr binaryAppExpr.Operator binaryAppExpr.RightArgument
+        | _ -> ()
+
         match appExpr, outerExpr with
         | None, _ -> false
         | Some expr, None
         | _, Some (_, expr) ->
 
+        let exprStartOffset = expr.GetDocumentStartOffset().Offset
+
         let indent =
             match expr with
-            | SynExpr.App (_, (true  as isInfix), _, argExpr, _)
-            | SynExpr.App (_, (false as isInfix), argExpr, _, _) when
-                isInfix && isBeforeInfixOp || not isInfix && isAfterInfixOp ->
-                let argExprLine = argExpr.Range.GetStartLine()
-                getOffsetInLine document argExprLine (getStartOffset document expr.Range)
+            | :? IBinaryAppExpr as binaryAppExpr ->
+                let argExpr = binaryAppExpr.LeftArgument
+                let argExprLine = argExpr.StartLine
+                getOffsetInLine document argExprLine exprStartOffset
 
             | _ ->
 
-            let exprStartLine = expr.Range.GetStartLine()
+            let exprStartLine = expr.StartLine
 
             if exprStartLine < caretLine then
                 getLineWhitespaceIndent textControl caretLine else
 
-            let offsetInLine = getOffsetInLine document exprStartLine (getStartOffset document expr.Range)
+            let offsetInLine = getOffsetInLine document exprStartLine exprStartOffset
             if exprStartLine > caretLine then offsetInLine else
 
             let additionalIndent = getIndentSize textControl
@@ -1099,6 +1080,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if not (isInfixOp lexer) then false else
 
+        let opStartOffset = lexer.TokenStart
         let opEndOffset = lexer.TokenEnd
 
         let nextTokenIsKeyword =
@@ -1122,38 +1104,30 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             Some lexer.TokenEnd
 
         let document = textControl.Document
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let opRefExpr = fsFile.GetNode<IReferenceExpr>(DocumentOffset(document, opStartOffset))
+        let binaryExpr = BinaryAppExprNavigator.GetByOperator(opRefExpr)
+        if isNull binaryExpr || not (binaryExpr.RightArgument :? IFromErrorExpr) then false else
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
+        let expr =
+            match prevEndOffset with
+            | None -> opRefExpr :> IFSharpExpression
+            | Some prevEndOffset ->
 
-        let mutable foundError = false
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitExpr(path, _, defaultTraverse, expr) =
-                    match expr with
-                    | SynExpr.FromParseError _ -> foundError <- true
-                    | _ -> ()
+            let expr = binaryExpr.LeftArgument
+            if isNull expr then null else
+            let offset = expr.GetDocumentEndOffset().Offset
+            if offset = prevEndOffset then expr else null
 
-                    match getEndOffset document expr.Range with
-                    | offset when offset = opEndOffset ||
-                                  prevEndOffset.IsSome && offset = prevEndOffset.Value -> Some expr
-                    | _ -> defaultTraverse expr }
-
-        let tokenCoords = document.GetCoordsByOffset(lexer.TokenStart)
-        match SyntaxTraversal.Traverse(getPosFromCoords tokenCoords, parseTree, visitor) with
-        | None -> false
-        | _ when not foundError -> false
-
-        | Some expr ->
+        if isNull expr then false else
 
         let indent =
-            let startLine = expr.Range.GetStartLine()
-            let endLine = expr.Range.GetEndLine()
+            let startLine = expr.StartLine
+            let endLine = expr.EndLine
 
             if startLine <> endLine then getLineWhitespaceIndent textControl endLine else
 
-            let offset = getStartOffset document expr.Range
+            let offset = expr.GetDocumentStartOffset().Offset
             getOffsetInLine document startLine offset
 
         use command = x.CommandProcessor.UsingCommand("New Line")
@@ -1180,41 +1154,23 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if lexer.TokenType != FSharpTokenType.DOT then false else
         let dotOffset = lexer.TokenStart
 
-        match x.GetFSharpTree(textControl) with
-        | None -> false
-        | Some parseTree ->
-
         let document = textControl.Document
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
 
-        let visitor =
-            { new SyntaxVisitorBase<_>() with
-                member x.VisitExpr(_, _, defaultTraverse, expr) =
-                    if expr.Range.GetStartLine() <> caretLine then defaultTraverse expr else
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        let qualifiedExpr = fsFile.GetNode<IQualifiedExpr>(DocumentOffset(document, offset))
+        if isNull qualifiedExpr then false else
 
-                    match expr with
-                    | SynExpr.DotGet (expr, rangeOfDot, _, _)
-                    | SynExpr.DotIndexedGet (expr, _, rangeOfDot, _)
-                    | SynExpr.DotIndexedSet (expr, _, _, _, rangeOfDot, _) when
-                            dotOffset = getStartOffset document rangeOfDot ->
-                        Some expr.Range
+        if qualifiedExpr.StartLine <> caretLine then false else
 
-                    | SynExpr.DotSet (_, LongIdentWithDots (_, dots), _, _)
-                    | SynExpr.LongIdent (_, LongIdentWithDots (_, dots), _, _)
-                    | SynExpr.NamedIndexedPropertySet (LongIdentWithDots (_, dots), _, _, _)
-                    | SynExpr.DotNamedIndexedPropertySet (_, LongIdentWithDots (_, dots), _, _, _) when
-                            dots |> List.exists (fun dot -> dotOffset = getStartOffset document dot) ->
-                        Some expr.Range
+        let delimiter = qualifiedExpr.Delimiter
+        if isNull delimiter || delimiter.GetDocumentStartOffset().Offset <> dotOffset then false else
 
-                    | _ -> defaultTraverse expr }
-
-        match SyntaxTraversal.Traverse(getPosFromCoords caretCoords, parseTree, visitor) with
-        | None -> false
-        | Some range ->
+        let exprOffset = qualifiedExpr.GetDocumentStartOffset().Offset
 
         let indent =
-            getOffsetInLine document caretLine (getStartOffset document range) +
+            getOffsetInLine document caretLine exprOffset +
             getIndentSize textControl
 
         insertNewLineAt textControl indent TrimTrailingSpaces.Yes
