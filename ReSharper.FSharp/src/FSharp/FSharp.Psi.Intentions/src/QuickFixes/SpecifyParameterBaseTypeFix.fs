@@ -149,7 +149,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
 
                 let richText = RichText(fcsType.Format(displayContext))
                 if isImmediateSuperType then
-                    richText.SetStyle(JetFontStyles.Bold, 0, richText.Length)
+                    richText.SetStyle(JetFontStyles.Bold, 0, richText.Length) |> ignore
                 WorkflowPopupMenuOccurrence(richText, RichText.Empty, (fcsType, displayContext), icon))
             |> List.toArray
 
