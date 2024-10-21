@@ -38,7 +38,7 @@ type LocalValuesRule() =
         isNotNull node &&
 
         let refExpr = node.Parent.As<IReferenceExpr>()
-        isNotNull refExpr && isNull refExpr.Qualifier && refExpr.Identifier == node
+        isNotNull refExpr && not refExpr.IsQualified && refExpr.Identifier == node
 
     override this.AddLookupItems(context, collector) =
         let values = Dictionary<string, FSharpSymbolUse>()

@@ -76,7 +76,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     ITypeArgumentList ITypeArgumentOwner.TypeArgumentList => TypeArgumentList;
 
-    public bool IsQualified => Qualifier != null;
+    public bool IsQualified => 
+      Qualifier != null ||
+      DotLambdaExprNavigator.GetByExpression(this) != null;
 
     public FSharpSymbolReference QualifierReference =>
       Qualifier is IReferenceExpr refExpr ? refExpr.Reference : null;

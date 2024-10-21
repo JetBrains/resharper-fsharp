@@ -128,7 +128,9 @@ let getExprPresentableName (expr: IFSharpExpression) =
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
 let rec isSimpleQualifiedName (expr: IReferenceExpr) =
-    if isNotNull expr.TypeArgumentList then false else
+    isNull expr.TypeArgumentList &&
+    isNull (DotLambdaExprNavigator.GetByExpression(expr)) &&
+
     match expr.Qualifier with
     | :? IReferenceExpr as expr -> isSimpleQualifiedName expr
     | null -> true

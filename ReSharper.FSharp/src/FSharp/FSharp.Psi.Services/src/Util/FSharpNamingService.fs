@@ -103,7 +103,7 @@ module FSharpNamingService =
                             addUsedNames scopedNames.Keys
                             scopedNames.Clear() else
 
-                        if isNotNull refExpr.Qualifier then () else
+                        if refExpr.IsQualified then () else
 
                         let name = refExpr.ShortName
                         if name = SharedImplUtil.MISSING_DECLARATION_NAME ||

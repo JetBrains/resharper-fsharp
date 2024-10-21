@@ -40,7 +40,7 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
     override x.Text = $"Make '{referenceExpr.ShortName}' recursive"
 
     override x.IsAvailable _ =
-        if not (isValid referenceExpr && isNull referenceExpr.Qualifier) then false else
+        if not (isValid referenceExpr && not referenceExpr.IsQualified) then false else
 
         getContainingBindings referenceExpr
         |> List.filter isSuitable
