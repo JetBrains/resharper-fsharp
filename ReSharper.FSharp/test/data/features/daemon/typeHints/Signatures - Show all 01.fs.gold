@@ -115,6 +115,15 @@ type MyStruct =
     val mutable myInt : int
     val mutable myString : string
 
+
+let (|Active|) arg||(51) valueToMatch||(52) ||(53)=
+    Active(if arg && valueToMatch = 2 then "" else "")
+
+let (|Active1|Active2|) valueToMatch||(54) ||(55)=
+    if valueToMatch then Choice1Of2(1) else Choice2Of2("")
+
+let (|ActiveOption|_|) _ ||(56)= None
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
 (1): ReSharper Parameter Name Hint: : 'c
@@ -167,3 +176,9 @@ type MyStruct =
 (48): ReSharper Parameter Name Hint: : string
 (49): ReSharper Parameter Name Hint: : IFormatProvider
 (50): ReSharper Parameter Name Hint: : string
+(51): ReSharper Parameter Name Hint: : bool
+(52): ReSharper Parameter Name Hint: : int
+(53): ReSharper Parameter Name Hint: : string
+(54): ReSharper Parameter Name Hint: : bool
+(55): ReSharper Parameter Name Hint: : Choice<int,string>
+(56): ReSharper Parameter Name Hint: : 'b option

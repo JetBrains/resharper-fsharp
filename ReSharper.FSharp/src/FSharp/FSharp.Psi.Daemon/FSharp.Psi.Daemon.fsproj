@@ -13,6 +13,8 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
+    <Compile Include="PsiNamespaceZoneMarker.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -22,8 +24,6 @@
       <DependentUpon>Strings.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
-    <Compile Include="PsiNamespaceZoneMarker.fs" />
     <Compile Include="src\Options\FSharpTypeHintOptionsPage.fs" />
     <Compile Include="src\Options\FSharpTypeHintsOptionsRegistrator.fs" />
     <Compile Include="src\ReadLockCookieUtil.fs" />

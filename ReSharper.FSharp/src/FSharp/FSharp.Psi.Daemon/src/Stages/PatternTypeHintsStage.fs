@@ -102,9 +102,9 @@ type private MembersVisitor(settings) =
 type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore: IContextBoundSettingsStore,
                                            daemonProcess: IDaemonProcess, settings) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
+    static let defaultDisplayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
     let createTypeHintHighlighting (fcsType: FSharpType) (displayContext: FSharpDisplayContext) range pushToHintMode =
-        let displayContext = displayContext.WithShortTypeNames(true)
         TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode)
 
     let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode =
@@ -114,14 +114,12 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         | _ ->
 
         let equalsToken = decl.EqualsToken
-        let patterns = decl.ParameterPatterns
-
         let range =
             match decl with
-            | :? IBinding as binding when patterns.Count = 0 ->
+            | :? IBinding as binding when not binding.HasParameters ->
                 binding.HeadPattern.GetDocumentRange().EndOffsetRange()
 
-            | :? IMemberDeclaration as memberDeclaration when patterns.Count = 0 ->
+            | :? IMemberDeclaration as memberDeclaration when memberDeclaration.ParameterPatternsEnumerable.IsEmpty() ->
                 memberDeclaration.NameIdentifier.GetDocumentRange().EndOffsetRange()
 
             | _ -> equalsToken.GetDocumentRange().StartOffsetRange()
@@ -129,11 +127,10 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         let symbolUse =
             match decl with
             | :? IBinding as binding ->
-                let refPat = binding.HeadPattern.As<IReferencePat>()
-                if isNull refPat then Unchecked.defaultof<_> else
-                refPat.GetFcsSymbolUse()
-            | :? IMemberDeclaration as memberDeclaration ->
-                memberDeclaration.GetFcsSymbolUse()
+                match binding.HeadPattern with
+                | :? IReferencePat as refPat -> refPat.GetFcsSymbolUse()
+                | _ -> Unchecked.defaultof<_>
+            | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.GetFcsSymbolUse()
             | _ -> Unchecked.defaultof<_>
 
         if isNull symbolUse then ValueNone else
@@ -141,8 +138,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
-        let displayContext = symbolUse.DisplayContext
-        createTypeHintHighlighting symbol.ReturnParameter.Type displayContext range pushToHintMode |> ValueSome
+        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode |> ValueSome
 
     let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode =
         match pattern with
@@ -153,9 +149,10 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
             let reference = pattern.Reference
             if isNull reference then ValueNone else
 
-            let symbol = reference.GetFcsSymbol().As<FSharpActivePatternCase>()
-            if isNull symbol then ValueNone
-            else getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode
+            match reference.GetFcsSymbol() with
+            | :? FSharpActivePatternCase ->
+                getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode
+            | _ -> ValueNone
 
         | :? IReferencePat as refPat ->
             let symbolUse = refPat.GetFcsSymbolUse()
@@ -166,9 +163,8 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
             let fcsType = symbol.FullType
             let range = pattern.GetNavigationRange().EndOffsetRange()
-            let displayContext = symbolUse.DisplayContext
 
-            createTypeHintHighlighting fcsType displayContext range pushToHintMode |> ValueSome
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode |> ValueSome
 
         | _ -> ValueNone
 
@@ -186,7 +182,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         use _swc = logger.StopwatchCookie($"Adorning %s{logKey} nodes", $"topLevelNodesCount=%d{topLevelNodes.Length} localNodesCount=%d{localNodes.Length} sourceFile=%s{daemonProcess.SourceFile.Name}")
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
-        let adornNodes nodes pushToHintMode =
+        let inline adornNodes nodes pushToHintMode =
             for node in nodes do
                 if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
