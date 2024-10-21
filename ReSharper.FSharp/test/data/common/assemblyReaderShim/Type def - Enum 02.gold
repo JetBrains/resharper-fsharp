@@ -44,7 +44,7 @@ match |EnumSameFields.A|(13) with
 
 
 type InheritEnum() =
-    |inherit Enum()|(15)
+    inherit |Enum|(15)()
 
 type InheritClass() =
     inherit Class()

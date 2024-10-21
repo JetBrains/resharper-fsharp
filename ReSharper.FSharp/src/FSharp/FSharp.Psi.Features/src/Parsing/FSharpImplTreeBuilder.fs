@@ -224,7 +224,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 | _ -> ()
                 ElementType.INTERFACE_IMPLEMENTATION
 
-            | SynMemberDefn.Inherit(baseType, _, _) ->
+            | SynMemberDefn.Inherit(baseType, _, _, _) ->
                 try x.ProcessTypeAsTypeReferenceName(baseType)
                 with _ -> () // Getting type range throws an exception if base type lid is empty.
                 ElementType.INTERFACE_INHERIT
@@ -1175,7 +1175,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
 
         | SynExpr.ImplicitZero _ -> ()
 
-        | SynExpr.YieldOrReturn(_, expr, _) ->
+        | SynExpr.YieldOrReturn(_, expr, _, _) ->
             x.AdvanceToStart(range)
             if x.TokenType == FSharpTokenType.RARROW then
                 // Remove fake yield expressions in list comprehensions
@@ -1184,7 +1184,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
             else
                 x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
-        | SynExpr.YieldOrReturnFrom(_, expr, _) ->
+        | SynExpr.YieldOrReturnFrom(_, expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range, _) ->
@@ -1199,7 +1199,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         | SynExpr.MatchBang(_, expr, clauses, _, _) ->
             x.MarkMatchExpr(range, expr, clauses)
 
-        | SynExpr.DoBang(expr, _) ->
+        | SynExpr.DoBang(expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.DO_EXPR)
 
         | SynExpr.LibraryOnlyILAssembly _
