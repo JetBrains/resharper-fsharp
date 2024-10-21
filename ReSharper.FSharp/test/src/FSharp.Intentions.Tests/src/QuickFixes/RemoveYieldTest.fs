@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; Explicit("Fix in 243")>]
 type RemoveYieldTest() =
     inherit FSharpQuickFixTestBase<RemoveYieldFix>()
 

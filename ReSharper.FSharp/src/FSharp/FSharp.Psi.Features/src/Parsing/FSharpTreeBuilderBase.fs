@@ -818,7 +818,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
         | SynType.FromParseError _ -> ()
 
-        | SynType.WithNull(innerType, _, _) ->
+        | SynType.WithNull(innerType, _, _, _) ->
             let mark = x.Mark(range)
             x.ProcessType(innerType)
             x.Done(range, mark, ElementType.WITH_NULL_TYPE_USAGE)
@@ -855,7 +855,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
             x.ProcessTypeParameter(typeParameter)
             x.Done(range, mark, ElementType.NULL_CONSTRAINT)
 
-        | SynTypeConstraint.WhereTyparNotSupportsNull(typeParameter, _) ->
+        | SynTypeConstraint.WhereTyparNotSupportsNull(typeParameter, _, _) ->
             x.ProcessTypeParameter(typeParameter)
             x.Done(range, mark, ElementType.NOT_NULL_CONSTRAINT)
 

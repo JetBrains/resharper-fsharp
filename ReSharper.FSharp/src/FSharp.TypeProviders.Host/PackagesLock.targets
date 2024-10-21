@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <PackageLock Include="FSharp.Core" Version="8.0.101" />
+    <PackageLock Include="FSharp.Core" Version="9.0.100-beta.24466.6" />
     <PackageLock Include="JetBrains.Annotations" Version="2024.2.0" />
-    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2024.3.0" />
+    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2024.3.1" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2024.3.0" />
     <PackageLock Include="JetBrains.RdFramework" Version="2024.3.0" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="1.1.1" />
