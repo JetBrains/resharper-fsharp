@@ -51,14 +51,14 @@ public class Program
 (0): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
 (1): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
 (2): ReSharper Underlined Error Highlighting: The type 'int' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
-(3): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
-(4): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(3): ReSharper Underlined Error Highlighting: The type 'int?' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
+(4): ReSharper Underlined Error Highlighting: The type 'int?' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
 (5): ReSharper Underlined Error Highlighting: The type 'System.IDisposable' must be convertible to 'System.Exception' in order to use it as parameter 'T' in the generic class 'BaseClassConstraint2<T>'
 (6): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
 (7): ReSharper Underlined Error Highlighting: The type 'string' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
 (8): ReSharper Underlined Error Highlighting: The type 'int' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
-(9): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
-(10): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(9): ReSharper Underlined Error Highlighting: The type 'int?' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
+(10): ReSharper Underlined Error Highlighting: The type 'int?' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
 (11): ReSharper Underlined Error Highlighting: The type 'System.Exception' must be convertible to 'System.IDisposable' in order to use it as parameter 'T' in the generic class 'InterfaceConstraint<T>'
 M:BaseClassConstraint1`1.#ctor
 M:BaseClassConstraint1`1.#ctor
