@@ -4,11 +4,14 @@ open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.TestFramework
+open JetBrains.TextControl.DocumentMarkup.Adornments
 open NUnit.Framework
 
 [<HighlightOnly(typeof<TypeHintHighlighting>)>]
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Never)>]
 type PipeChainTypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 

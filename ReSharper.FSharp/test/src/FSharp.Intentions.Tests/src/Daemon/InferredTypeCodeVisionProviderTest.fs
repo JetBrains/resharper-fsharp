@@ -1,8 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.TestFramework
+open JetBrains.TextControl.DocumentMarkup.Adornments
 open NUnit.Framework
 
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
 type InferredTypeCodeVisionProviderTest() =
     inherit FSharpHighlightingTestBase()
 

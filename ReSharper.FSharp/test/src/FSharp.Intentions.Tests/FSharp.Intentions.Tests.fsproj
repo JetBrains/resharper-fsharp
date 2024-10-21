@@ -24,6 +24,7 @@
     <Compile Include="src\Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="src\Daemon\InferredTypeCodeVisionProviderTest.fs" />
     <Compile Include="src\Daemon\PipeChainTypeHintStageTest.fs" />
+    <Compile Include="src\Daemon\TypeHintStageTest.fs" />
     <Compile Include="src\Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="src\Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="src\Daemon\RedundantParenExprTest.fs" />

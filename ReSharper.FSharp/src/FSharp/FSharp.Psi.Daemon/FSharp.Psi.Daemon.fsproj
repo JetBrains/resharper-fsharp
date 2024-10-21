@@ -24,6 +24,8 @@
       <DependentUpon>Strings.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="src\Options\FSharpTypeHintOptionsPage.fs" />
+    <Compile Include="src\Options\FSharpTypeHintsOptionsRegistrator.fs" />
     <Compile Include="src\ReadLockCookieUtil.fs" />
     <Compile Include="src\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
@@ -41,6 +43,7 @@
     <Compile Include="src\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Stages\FSharpErrorsStage.fs" />
     <Compile Include="src\Stages\PipeChainTypeHintStage.fs" />
+    <Compile Include="src\Stages\PatternTypeHintsStage.fs" />
     <Compile Include="src\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Stages\ZoneMarker.fs" />
