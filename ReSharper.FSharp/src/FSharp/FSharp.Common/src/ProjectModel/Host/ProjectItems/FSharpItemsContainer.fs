@@ -47,6 +47,7 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
+open NuGet.Versioning
 
 /// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
 [<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
@@ -125,14 +126,14 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         |> Option.bind tryGetProjectMapping
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let getItems (toolsetVersion: Version2 option) (msBuildProject: MsBuildProject) projectDescriptor
+    let getItems (toolsetVersion: NuGetVersion) (msBuildProject: MsBuildProject) projectDescriptor
             (itemTypeFilter: MsBuildProjectItem -> bool) (itemsByName: HashSet<_>) allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
 
         let shouldRemoveAssemblyInfo =
-            toolsetVersion
-            |> Option.map (fun v -> v.Major = 8u)
-            |> Option.defaultValue false
+            match toolsetVersion with
+            | null -> false
+            | version -> version.Major = 8
 
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
@@ -245,9 +246,11 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             | FSharpProjectMark ->
                 let toolsetVersion =
                     toolset
-                    |> Option.ofObj
-                    |> Option.bind (fun toolset -> toolset.GetBuildTool() |> Option.ofObj)
-                    |> Option.map _.Version
+                    |> ValueOption.ofObj
+                    |> ValueOption.bind (fun toolset -> toolset.GetDotNetCoreToolset() |> ValueOption.ofObj)
+                    |> ValueOption.bind (_.Sdk >> ValueOption.ofObj)
+                    |> ValueOption.map _.Version
+                    |> ValueOption.defaultValue null
 
                 let itemsByName = HashSet()
                 let compileBeforeItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileBeforeItem itemsByName true
