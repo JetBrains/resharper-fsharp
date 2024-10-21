@@ -14,7 +14,7 @@ public class Program
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: The type 'string' must be a non-nullable value type in order to use it as parameter 'T'
 (1): ReSharper Underlined Error Highlighting: The type 'string' must be a non-nullable value type in order to use it as parameter 'T'
-(2): ReSharper Underlined Error Highlighting: The type 'System.Nullable<int>' must be a non-nullable value type in order to use it as parameter 'T'
+(2): ReSharper Underlined Error Highlighting: The type 'int?' must be a non-nullable value type in order to use it as parameter 'T'
 M:StructConstraint`1.#ctor
 M:StructConstraint`1.#ctor
 M:StructConstraint`1.#ctor
