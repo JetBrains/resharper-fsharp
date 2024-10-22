@@ -3,7 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open System.Collections.Generic
 open JetBrains.DocumentModel
 
-type VisibilityConsumer<'a>(visibleRange: DocumentRange, [<InlineIfLambda>] getRange: 'a -> DocumentRange) =
+type VisibilityConsumer<'a>(visibleRange: DocumentRange, getRange: 'a -> DocumentRange) =
     let visibleRangeIsValid = visibleRange.IsValid()
     let visible = List()
     let notVisible = List()
@@ -15,7 +15,7 @@ type VisibilityConsumer<'a>(visibleRange: DocumentRange, [<InlineIfLambda>] getR
         let listToAdd = getContainer item
         listToAdd.Add(item)
 
-    //TODO: optiomize
+    //TODO: optimize
     member x.AddRange(items) =
         for item in items do x.Add(item)
 
