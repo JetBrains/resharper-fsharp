@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.UI.RichText
@@ -30,7 +32,14 @@ type ImportExtensionMemberRule() =
         isNotNull qualifierExpr &&
 
         let fcsType = qualifierExpr.TryGetFcsType()
-        isNotNull fcsType
+        isNotNull fcsType &&
+
+        match qualifierExpr with
+        | :? IReferenceExpr as refExpr ->
+            match refExpr.Reference.GetFcsSymbol() with
+            | :? FSharpMemberOrFunctionOrValue as mfv -> not mfv.IsConstructor
+            | _ -> true
+        | _ -> true
 
     override this.AddLookupItems(context, collector) =
         let qualifierExpr = getQualifierExpr context
@@ -50,7 +59,7 @@ type ImportExtensionMemberRule() =
 
                     | containingType ->
                         containingType.GetContainingNamespace().QualifiedName
-                
+
                 ns, name
             )
 
