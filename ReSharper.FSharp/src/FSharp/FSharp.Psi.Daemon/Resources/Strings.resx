@@ -47,6 +47,6 @@
         <value>Hide when |&gt; is on same line as argument</value>
     </data>
     <data name="FSharpTypeHints_PipesSettings_Header" xml:space="preserve">
-        <value>Pipes</value>
+        <value>Pipe operators</value>
     </data>
 </root>
