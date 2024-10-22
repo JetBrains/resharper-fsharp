@@ -8,6 +8,7 @@ open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Highlightings.FSharpTypeHintsBulbActionsProvider
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -104,10 +105,15 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
     static let defaultDisplayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
-    let createTypeHintHighlighting (fcsType: FSharpType) (displayContext: FSharpDisplayContext) range pushToHintMode =
-        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode)
+    let createTypeHintHighlighting
+        (fcsType: FSharpType)
+        (displayContext: FSharpDisplayContext)
+        range
+        pushToHintMode
+        actionsProvider =
+        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, actionsProvider)
 
-    let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode =
+    let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode actionsProvider =
         match decl with
         | :? IConstructorDeclaration
         | :? IAccessorDeclaration -> ValueNone
@@ -138,9 +144,10 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
-        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode |> ValueSome
+        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode actionsProvider
+        |> ValueSome
 
-    let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode =
+    let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode actionsProvider =
         match pattern with
         | :? IParametersOwnerPat as pattern ->
             let asPat = AsPatNavigator.GetByLeftPattern(pattern.IgnoreParentParens())
@@ -151,7 +158,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
             match reference.GetFcsSymbol() with
             | :? FSharpActivePatternCase ->
-                getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode
+                getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode actionsProvider
             | _ -> ValueNone
 
         | :? IReferencePat as refPat ->
@@ -164,17 +171,18 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
             let fcsType = symbol.FullType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
-            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode |> ValueSome
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider
+            |> ValueSome
 
         | _ -> ValueNone
 
-    let rec getHighlighting (node: ITreeNode) pushToHintMode =
+    let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =
         match node with
         | :? IFSharpPattern as pattern ->
-            getHintForPattern pattern pushToHintMode
+            getHintForPattern pattern pushToHintMode actionsProvider
 
         | :? IParameterOwnerMemberDeclaration as decl ->
-            getReturnTypeHint decl pushToHintMode
+            getReturnTypeHint decl pushToHintMode actionsProvider
 
         | _ -> ValueNone
 
@@ -182,16 +190,16 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         use _swc = logger.StopwatchCookie($"Adorning %s{logKey} nodes", $"topLevelNodesCount=%d{topLevelNodes.Length} localNodesCount=%d{localNodes.Length} sourceFile=%s{daemonProcess.SourceFile.Name}")
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
-        let inline adornNodes nodes pushToHintMode =
+        let inline adornNodes nodes pushToHintMode actionsProvider =
             for node in nodes do
                 if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-                match getHighlighting node pushToHintMode with
+                match getHighlighting node pushToHintMode actionsProvider with
                 | ValueSome highlighting -> highlightingConsumer.AddHighlighting(highlighting)
                 | _ -> ()
 
-        adornNodes topLevelNodes settings.TopLevelMembers
-        adornNodes localNodes settings.LocalBindings
+        adornNodes topLevelNodes settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
+        adornNodes localNodes settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
 
         highlightingConsumer.CollectHighlightings()
 
