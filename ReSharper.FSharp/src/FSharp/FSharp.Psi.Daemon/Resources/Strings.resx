@@ -40,4 +40,13 @@
     <data name="FSharpTypeHints_TopLevelMembersSettings_Comment" xml:space="preserve">
         <value>if the 'Never Show' option is selected, Code Vision inferred types will be shown</value>
     </data>
+    <data name="FSharpTypeHints_ShowPipeReturnTypes_Description" xml:space="preserve">
+        <value>Show return type hints in |&gt; chains</value>
+    </data>
+    <data name="FSharpTypeHints_HideSameLinePipe_Description" xml:space="preserve">
+        <value>Hide when |&gt; is on same line as argument</value>
+    </data>
+    <data name="FSharpTypeHints_PipesSettings_Header" xml:space="preserve">
+        <value>Pipes</value>
+    </data>
 </root>

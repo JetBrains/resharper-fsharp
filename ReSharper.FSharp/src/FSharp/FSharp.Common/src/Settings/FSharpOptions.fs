@@ -171,18 +171,18 @@ type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema
     member val Location = base.GetValueProperty<FantomasLocationSettings>("Location")
 
 
-module FSharpTypeHintOptions =
-    let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
-
-    let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
-
-
 [<SettingsKey(typeof<FSharpOptions>, nameof(FSharpTypeHintOptions))>]
 type FSharpTypeHintOptions =
-    { [<SettingsEntry(true, FSharpTypeHintOptions.pipeReturnTypes); DefaultValue>]
+    { [<SettingsEntry(true,
+                      DescriptionResourceType = typeof<Strings>,
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_ShowPipeReturnTypes_Description));
+        DefaultValue>]
       mutable ShowPipeReturnTypes: bool
 
-      [<SettingsEntry(true, FSharpTypeHintOptions.hideSameLinePipe); DefaultValue>]
+      [<SettingsEntry(true,
+                      DescriptionResourceType = typeof<Strings>,
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_ShowPipeReturnTypes_Description));
+        DefaultValue>]
       mutable HideSameLine: bool
 
       [<SettingsEntry(PushToHintMode.Default,
@@ -211,15 +211,6 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         if PlatformUtil.IsRunningUnderWindows then
             this.AddBoolOption((fun key -> key.TargetNetFramework), RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
         this.AddBoolOptionWithComment((fun key -> key.FsiInteractiveEditor), FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
-
-        this.AddHeader("Type hints")
-        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
-
-        do
-            use indent = this.Indent()
-            [ this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) ]
-            |> Seq.iter (fun checkbox ->
-                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj))
 
         this.AddHeader("F# Compiler Service")
         this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore

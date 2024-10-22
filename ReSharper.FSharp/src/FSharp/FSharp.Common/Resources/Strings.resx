@@ -22,4 +22,10 @@
     <data name="FSharpTypeHints_LocalBindings_Description" xml:space="preserve">
         <value>Type hints for local bindings</value>
     </data>
+    <data name="FSharpTypeHints_ShowPipeReturnTypes_Description" xml:space="preserve">
+        <value>Show return type hints in |&gt; chains</value>
+    </data>
+    <data name="FSharpTypeHints_HideSameLinePipe_Description" xml:space="preserve">
+        <value>Hide when |&gt; is on same line as argument</value>
+    </data>
 </root>

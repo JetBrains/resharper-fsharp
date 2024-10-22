@@ -46,3 +46,6 @@ type public Strings() =
     static member FSharpTypeHints_OptionsPage_Title = Strings.ResourceManager.GetString("FSharpTypeHints_OptionsPage_Title")
     static member FSharpTypeHints_LocalBindingsSettings_Header = Strings.ResourceManager.GetString("FSharpTypeHints_LocalBindingsSettings_Header")
     static member FSharpTypeHints_TopLevelMembersSettings_Comment = Strings.ResourceManager.GetString("FSharpTypeHints_TopLevelMembersSettings_Comment")
+    static member FSharpTypeHints_ShowPipeReturnTypes_Description = Strings.ResourceManager.GetString("FSharpTypeHints_ShowPipeReturnTypes_Description")
+    static member FSharpTypeHints_HideSameLinePipe_Description = Strings.ResourceManager.GetString("FSharpTypeHints_HideSameLinePipe_Description")
+    static member FSharpTypeHints_PipesSettings_Header = Strings.ResourceManager.GetString("FSharpTypeHints_PipesSettings_Header")

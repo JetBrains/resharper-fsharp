@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
 open System.Runtime.InteropServices
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
+open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions
 open JetBrains.IDE.UI.Options
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Feature.Services.InlayHints
@@ -41,3 +42,15 @@ type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsP
 
         this.AddHeader(Strings.FSharpTypeHints_LocalBindingsSettings_Header) |> ignore
         this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForLocalBindings)
+
+
+        this.AddHeader(Strings.FSharpTypeHints_PipesSettings_Header) |> ignore
+        this.AddBoolOption((fun (s: FSharpTypeHintOptions) -> s.ShowPipeReturnTypes),
+                           Strings.FSharpTypeHints_ShowPipeReturnTypes_Description) |> ignore
+
+        do
+            use indent = this.Indent()
+            let checkbox =
+                this.AddBoolOption((fun (s: FSharpTypeHintOptions) -> s.HideSameLine),
+                                   Strings.FSharpTypeHints_HideSameLinePipe_Description)
+            this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj)

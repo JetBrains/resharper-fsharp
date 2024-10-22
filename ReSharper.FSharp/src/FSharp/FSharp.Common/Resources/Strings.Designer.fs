@@ -40,3 +40,5 @@ type public Strings() =
 
     static member FSharpTypeHints_TopLevelMembers_Description = Strings.ResourceManager.GetString("FSharpTypeHints_TopLevelMembers_Description")
     static member FSharpTypeHints_LocalBindings_Description = Strings.ResourceManager.GetString("FSharpTypeHints_LocalBindings_Description")
+    static member FSharpTypeHints_ShowPipeReturnTypes_Description = Strings.ResourceManager.GetString("FSharpTypeHints_ShowPipeReturnTypes_Description")
+    static member FSharpTypeHints_HideSameLinePipe_Description = Strings.ResourceManager.GetString("FSharpTypeHints_HideSameLinePipe_Description")
