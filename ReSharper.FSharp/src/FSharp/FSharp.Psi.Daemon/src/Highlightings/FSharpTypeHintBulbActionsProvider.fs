@@ -31,9 +31,9 @@ type FSharpTypeHintBulbActionsProvider(setting: Expression<Func<FSharpTypeHintOp
         member _.GetOptionsPageId() = nameof(FSharpTypeHintsOptionsPage)
 
 type FSharpTopLevelMembersTypeHintBulbActionsProvider private () =
-    inherit FSharpTypeHintBulbActionsProvider(_.ShowTypeHintsForTopLevelMembers, Strings.FSharpTypeHints_TopLevelMembersSettings_Header)
+    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowTypeHintsForTopLevelMembers), Strings.FSharpTypeHints_TopLevelMembersSettings_Header)
     static member val Instance = FSharpTopLevelMembersTypeHintBulbActionsProvider()
 
 type FSharpLocalBindingTypeHintBulbActionsProvider private () =
-    inherit FSharpTypeHintBulbActionsProvider(_.ShowTypeHintsForLocalBindings, Strings.FSharpTypeHints_LocalBindingsSettings_Header)
+    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowTypeHintsForLocalBindings), Strings.FSharpTypeHints_LocalBindingsSettings_Header)
     static member val Instance = FSharpLocalBindingTypeHintBulbActionsProvider()
