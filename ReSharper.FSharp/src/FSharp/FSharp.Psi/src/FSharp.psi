@@ -199,7 +199,6 @@ private bindingHeader:
   REC<REC, RecKeyword>?
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>?
-  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpPattern<HEAD_PATTERN, HeadPattern>
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
   parametersPatternDeclaration<PARAMETERS_DECL, ParametersDeclarations>*
@@ -266,11 +265,13 @@ interface typedLikePat:
 localReferencePat options { stubBase="LocalPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
 
 topReferencePat options { stubBase="TopPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<topReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   expressionReferenceName<REFERENCE_NAME, ReferenceName>;
 
 parametersOwnerPat options { stubBase="FSharpPatternBase"; } extras {

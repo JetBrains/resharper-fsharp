@@ -155,11 +155,11 @@ let addAttributeListToLetBinding newLine (binding: IBinding) =
         if isNotNull mutableKeyword then
             addAttributeList false mutableKeyword else
 
-        let accessModifier = binding.AccessModifier
-        if isNotNull accessModifier then
-            addAttributeList false accessModifier else
-
         let headPattern = binding.HeadPattern
+        let refPat = headPattern.As<IReferencePat>()
+        if isNotNull refPat && isNotNull refPat.AccessModifier then
+            addAttributeList false refPat.AccessModifier else
+
         if isNotNull headPattern then
             addAttributeList false headPattern else
 
