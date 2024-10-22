@@ -9,6 +9,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -28,7 +29,7 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode * bool>>()
+    inherit TreeNodeVisitor<VisibilityConsumer<IReferenceExpr * ITreeNode * bool>>()
 
     let showSameLineHints =
         match sameLinePipeHints with
@@ -38,7 +39,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
     let isApplicable binaryAppExpr =
         isPredefinedInfixOpApp "|>" binaryAppExpr
 
-    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode * bool>) =
+    let visitBinaryAppExpr binaryAppExpr (context: VisibilityConsumer<IReferenceExpr * ITreeNode * bool>) =
         if not (isApplicable binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
@@ -120,8 +121,8 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
             |> not
         | None -> false
 
-    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
-        use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
+    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode * bool) ICollection) =
+        use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Count daemonProcess.SourceFile.Name)
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
         for refExpr, exprToAdorn, isLeft in exprs do
@@ -147,23 +148,20 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
             else
                 SameLinePipeHints.Show
 
-        let consumer = List()
-        fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
-        let allHighlightings = Array.ofSeq consumer
-
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
+        let consumer =
+            VisibilityConsumer(visibleRange, fun (_, exprToAdorn: ITreeNode, _) -> exprToAdorn.GetNavigationRange())
+
+        fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
 
         let remainingHighlightings =
             if visibleRange.IsValid() then
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
-                let visible, notVisible =
-                    allHighlightings
-                    |> Array.partition (fun (_, exprToAdorn, _) ->
-                        exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
-                    )
+                let visible = consumer.VisibleItems
+                let notVisible = consumer.NotVisibleItems
 
                 // Adorn visible expressions first
                 let visibleHighlightings = adornExprs "visible" visible
@@ -172,7 +170,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 // Finally adorn expressions that aren't visible in the viewport
                 adornExprs "not visible" notVisible
             else
-                adornExprs "all" allHighlightings
+                adornExprs "all" consumer.NotVisibleItems
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 

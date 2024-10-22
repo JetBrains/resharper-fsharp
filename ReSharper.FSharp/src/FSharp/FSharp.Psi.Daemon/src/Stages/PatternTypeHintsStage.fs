@@ -8,6 +8,7 @@ open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -20,7 +21,7 @@ open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 open JetBrains.Util.Logging
 
 type private NodesRequiringHints =
-    { TopLevelNodes: List<ITreeNode>; LocalNodes: List<ITreeNode> }
+    { TopLevelNodes: VisibilityConsumer<ITreeNode>; LocalNodes: VisibilityConsumer<ITreeNode> }
 
 type private FSharpTypeHintSettings =
     { TopLevelMembers: PushToHintMode; LocalBindings: PushToHintMode } with
@@ -178,8 +179,8 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
         | _ -> ValueNone
 
-    let adornNodes logKey (topLevelNodes : ITreeNode array) (localNodes : ITreeNode array) =
-        use _swc = logger.StopwatchCookie($"Adorning %s{logKey} nodes", $"topLevelNodesCount=%d{topLevelNodes.Length} localNodesCount=%d{localNodes.Length} sourceFile=%s{daemonProcess.SourceFile.Name}")
+    let adornNodes logKey (topLevelNodes : ITreeNode ICollection) (localNodes : ITreeNode ICollection) =
+        use _swc = logger.StopwatchCookie($"Adorning %s{logKey} nodes", $"topLevelNodesCount=%d{topLevelNodes.Count} localNodesCount=%d{localNodes.Count} sourceFile=%s{daemonProcess.SourceFile.Name}")
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
         let inline adornNodes nodes pushToHintMode =
@@ -196,26 +197,22 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         highlightingConsumer.CollectHighlightings()
 
     override x.Execute(committer) =
-        let consumer = { TopLevelNodes = List(); LocalNodes = List() }
-        fsFile.Accept(MembersVisitor(settings), consumer)
-
-        let topLevelNodes = consumer.TopLevelNodes |> Array.ofSeq
-        let localNodes = consumer.LocalNodes |> Array.ofSeq
-
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
+        let consumer = { TopLevelNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+                         LocalNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
+        fsFile.Accept(MembersVisitor(settings), consumer)
 
-        let partition (nodes: ITreeNode array) visibleRange =
-            nodes
-            |> Array.partition _.GetNavigationRange().IntersectsOrContacts(&visibleRange)
+        let topLevelNodes = consumer.TopLevelNodes
+        let localNodes = consumer.LocalNodes
 
         let remainingHighlightings =
             if visibleRange.IsValid() then
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
-                let topLevelVisible, topLevelNotVisible = partition topLevelNodes visibleRange
-                let localNodesVisible, localNodesNotVisible = partition localNodes visibleRange
+                let topLevelVisible, topLevelNotVisible = topLevelNodes.VisibleItems, topLevelNodes.NotVisibleItems
+                let localNodesVisible, localNodesNotVisible = localNodes.VisibleItems, localNodes.NotVisibleItems
 
                 // Adorn visible expressions first
                 let visibleHighlightings = adornNodes "visible" topLevelVisible localNodesVisible
@@ -224,7 +221,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
                 // Finally adorn expressions that aren't visible in the viewport
                 adornNodes "not visible" topLevelNotVisible localNodesNotVisible
             else
-                adornNodes "all" topLevelNodes localNodes
+                adornNodes "all" topLevelNodes.NotVisibleItems localNodes.NotVisibleItems
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
