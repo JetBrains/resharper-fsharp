@@ -27,6 +27,7 @@
     <Compile Include="src\Options\FSharpTypeHintOptionsPage.fs" />
     <Compile Include="src\Options\FSharpTypeHintsOptionsRegistrator.fs" />
     <Compile Include="src\ReadLockCookieUtil.fs" />
+    <Compile Include="src\Highlightings\FSharpTypeHintBulbActionsProvider.fs" />
     <Compile Include="src\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\QuickDoc\FSharpQuickDocProvider.fs" />
