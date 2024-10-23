@@ -15,10 +15,11 @@ type VisibilityConsumer<'a>(visibleRange: DocumentRange, getRange: 'a -> Documen
         let listToAdd = getContainer item
         listToAdd.Add(item)
 
-    //TODO: optimize
     member x.AddRange(items) =
-        if items |> Seq.forall (fun x -> getContainer x = notVisible) then notVisible.AddRange(items)
-        else for item in items do x.Add(item)
+        if not visibleRangeIsValid || items |> Seq.forall (fun x -> getContainer x = notVisible) then
+            notVisible.AddRange(items)
+        else
+            for item in items do x.Add(item)
 
     member x.VisibleItems = visible
     member x.NotVisibleItems = notVisible
