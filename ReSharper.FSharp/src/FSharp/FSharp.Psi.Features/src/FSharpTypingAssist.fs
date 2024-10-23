@@ -748,8 +748,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         let range =
             let inline checkExpr (expr: IFSharpExpression) (node: ITreeNode) =
-                if isNotNull expr && isNotNull node && expr.GetDocumentEndOffset().Offset = prevTokenEnd
-                    then Some (node.GetDocumentRange())
+                if isNotNull expr && isNotNull node && expr.GetDocumentEndOffset().Offset = prevTokenEnd then
+                    Some (node.GetDocumentRange())
                 else None
 
             match expr with
@@ -763,7 +763,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             // if expr then {caret}
             // No info is available after error recovery, we check that range is surrounded with if ... then.
             | :? IIfThenElseExpr as ifThenElseExpr when (ifThenElseExpr.ThenExpr :? IFromErrorExpr) ->
-                checkExpr ifThenElseExpr.ConditionExpr ifThenElseExpr.ConditionExpr
+                let conditionExpr = ifThenElseExpr.ConditionExpr
+                checkExpr conditionExpr conditionExpr
 
             // while expr do {caret}
             | :? IWhileExpr as whileExpr ->
