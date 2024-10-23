@@ -31,7 +31,7 @@ type FSharpInlayHintsPage(lifetime: Lifetime, optionsPageContext: OptionsPageCon
               NameResourceName = nameof(Strings.FSharpTypeHints_OptionsPage_Title))>]
 type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsPageContext,
                                 optionsSettingsSmartContext: OptionsSettingsSmartContext) as this =
-    inherit InlayHintsOptionPageBase(lifetime, optionsPageContext, optionsSettingsSmartContext, optionsPageContext.IsReSharper)
+    inherit InlayHintsOptionPageBase(lifetime, optionsPageContext, optionsSettingsSmartContext)
 
     do
         this.AddVisibilityHelpText()
