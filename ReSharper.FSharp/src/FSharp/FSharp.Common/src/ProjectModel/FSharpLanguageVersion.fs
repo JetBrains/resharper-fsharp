@@ -34,7 +34,7 @@ type FSharpLanguageLevel =
     /// Nullness
     | FSharp90 = 90
 
-    | Latest = 80 //TODO
+    | Latest = 90
 
     | Preview = 2147483646 // Int32.MaxValue - 1
 
