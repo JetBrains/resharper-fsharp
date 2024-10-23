@@ -13,8 +13,6 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
-    <Compile Include="PsiNamespaceZoneMarker.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -75,6 +73,8 @@
     <Compile Include="src\Analyzers\IndexerExprAnalyzer.fs" />
     <Compile Include="src\Analyzers\XmlDocAnalyzer.fs" />
     <Compile Include="src\Analyzers\RecordExprAnalyzer.fs" />
+    <Compile Include="PsiFeaturesNamespaceZoneMarker.fs" />
+    <Compile Include="PsiNamespaceZoneMarker.fs" />
     <Compile Include="ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
