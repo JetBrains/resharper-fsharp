@@ -35,6 +35,10 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
         unionCaseFieldsPat.FieldPatternsEnumerable
         |> Seq.fold visitPattern acc
 
+    | :? IAndsPat as andPat ->
+        andPat.PatternsEnumerable
+        |> Seq.fold visitPattern acc
+
     | _ -> acc
 
 let private collectPatternsRequiringAnnotations acc (parametersOwner: IParameterOwnerMemberDeclaration) =

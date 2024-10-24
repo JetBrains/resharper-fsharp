@@ -123,3 +123,9 @@ let (|Active1|Active2|) valueToMatch =
     if valueToMatch then Choice1Of2(1) else Choice2Of2("")
 
 let (|ActiveOption|_|) _ = None
+
+
+let (|Int|) (x: MyStruct) : int = Int(x.myInt)
+let (|String|) (x: MyStruct) : string = String(x.myString)
+
+let f1 (x & Int(name) & String(surname)) = ()
