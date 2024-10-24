@@ -45,6 +45,10 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
   fun net7() = doTest(".NET 7")
 
+  @Test
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_9)
+  fun net9() = doTest(".NET 9")
+
   @Mute("RIDER-103648")
   @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
   @Solution("FscTypeProviderLibrary")
