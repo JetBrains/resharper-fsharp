@@ -128,7 +128,7 @@ let (|ActiveOption|_|) _ ||(42)= None
 let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
-let f1 (x||(43) & Int(name||(44)) & String(surname||(45))) ||(46)= ()
+let f1 (x||(43) & Int(i||(44)) & String(s||(45))) ||(46)= ()
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
