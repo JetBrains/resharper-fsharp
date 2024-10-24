@@ -1,8 +1,18 @@
 ﻿module Module
 
-[<CustomClass; CustomStruct; |CustomMethod|(0)>]
-type C() =
+[<CustomClass; |CustomStruct|(0); |CustomMethod|(1)>]
+type C1() =
+    [<CustomMethod>]
+    member x.M() = ()
+
+[<CustomClass>]
+type C2() =
     class end
+
+[<CustomStruct>]
+type C3 =
+    struct end
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
+(1): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
