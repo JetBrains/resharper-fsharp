@@ -8,6 +8,11 @@ class FSharpLogTraceScenarios {
     "JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider",
   )
 
+  object FSharpFcsRequests : LogTraceScenario(
+    "JetBrains.ReSharper.Plugins.FSharp.FSharpAsyncUtil",
+    "JetBrains.ReSharper.Plugins.FSharp.FSharpReadLockRequestsQueue",
+  )
+
   object FSharpInteropMetadata : LogTraceScenario(
     "JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader.AssemblyReaderShim",
     "JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader.ProjectFcsModuleReader"
