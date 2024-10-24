@@ -1,11 +1,40 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
+let rec visitConsTailPat (acc: ITreeNode list) (pattern: IFSharpPattern) =
+    match pattern.IgnoreInnerParens() with
+    | :? IReferencePat -> acc
+    | :? IListConsPat as listConsPat ->
+        let acc = visitConsTailPat acc listConsPat.HeadPattern
+        visitConsTailPat acc listConsPat.TailPattern
+    | _ -> visitPattern acc pattern
+
+and visitArrayOrListTailPat (acc: ITreeNode list) (pattern: IFSharpPattern) =
+    match pattern.IgnoreInnerParens() with
+    | :? IReferencePat -> acc
+    | _ -> visitPattern acc pattern
+
+and visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     match pattern with
-    | null
+    | null -> acc
+    | :? IListConsPat as listConsPat ->
+        let acc = visitPattern acc listConsPat.HeadPattern
+        visitConsTailPat acc listConsPat.TailPattern
+    | :? IArrayOrListPat as seq ->
+        let nestedPatterns = seq.NestedPatterns
+        if Seq.isEmpty nestedPatterns then acc else
+
+        match nestedPatterns |> Seq.tryHead with
+        | Some head ->
+            let acc = visitPattern acc head
+            nestedPatterns
+            |> Seq.tail
+            |> Seq.fold visitArrayOrListTailPat acc
+        | None -> acc
+
     | :? IUnitPat
     | :? IWildPat
     | :? ITypedPat -> acc
@@ -78,3 +107,7 @@ let collectTypeHintAnchorsForConstructor (ctor: IConstructorDeclaration) =
 let collectTypeHintAnchorsForEachExpr (forEachExpr: IForEachExpr) =
     if isNull forEachExpr.InExpression then []
     else visitPattern [] forEachExpr.Pattern
+
+let collectTypeHintAnchorsForMatchClause (matchClause: IMatchClause) =
+    if isNull matchClause.RArrow then []
+    else visitPattern [] matchClause.Pattern

@@ -99,6 +99,12 @@ type private MembersVisitor(settings) =
 
         x.VisitNode(forEachExpr, context)
 
+    override x.VisitMatchClause(matchClause, context) =
+        let result = collectTypeHintAnchorsForMatchClause matchClause
+        context.LocalNodes.AddRange(result)
+
+        x.VisitNode(matchClause, context)
+
 type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore: IContextBoundSettingsStore,
                                            daemonProcess: IDaemonProcess, settings) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
