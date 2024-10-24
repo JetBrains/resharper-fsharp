@@ -128,4 +128,4 @@ let (|ActiveOption|_|) _ = None
 let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
-let f1 (x & Int(name) & String(surname)) = ()
+let f1 (x & Int(i) & String(s)) = ()
