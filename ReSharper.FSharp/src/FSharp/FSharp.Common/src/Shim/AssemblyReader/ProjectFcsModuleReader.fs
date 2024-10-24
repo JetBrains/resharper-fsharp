@@ -32,6 +32,7 @@ open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+open JetBrains.Util.Logging
 
 module ProjectFcsModuleReader =
     module DummyValues =
@@ -129,20 +130,33 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let readData f =
+        let logger = Logger.GetLogger<ProjectFcsModuleReader>()
+
+        logger.Trace("readData: before UsingReadLockInsideFcs");
         FSharpAsyncUtil.UsingReadLockInsideFcs(locks,
             (fun _ ->
+                logger.Trace("readData: action: inside lambda");
+
                 use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
                 if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
+                    logger.Trace("readData: action: marking as dirty");
                     shim.MarkDirty(psiModule)
 
+                logger.Trace("readData: action: before f");
                 f ()
+                logger.Trace("readData: action: after f");
             ),
-            fun _ -> not isInvalidating
+            fun _ ->
+                logger.Trace($"readData: upToDateCheck: isInvalidating: {isInvalidating}");
+                not isInvalidating
         )
+        logger.Trace("readData: after UsingReadLockInsideFcs");
+
         // The whole FCS request could've been cancelled and the call above silently exited.
         // We need to throw the exception to make FCS handle it properly.
         Cancellable.CheckAndThrow()
+        logger.Trace("readData: after CheckAndThrow");
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         let projectProperties = project.ProjectProperties
