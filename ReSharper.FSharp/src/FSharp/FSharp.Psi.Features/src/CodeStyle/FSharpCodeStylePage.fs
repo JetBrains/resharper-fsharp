@@ -20,9 +20,9 @@ type FSharpCodePreviewPreparator() =
 
 
 [<FormattingSettingsPresentationComponent>]
-type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide) =
+type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide, calculatedSettingsSchema) =
     inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,
-        itemViewModelFactory, container, settingsToHide)
+        itemViewModelFactory, container, settingsToHide, calculatedSettingsSchema)
 
     override x.Language = FSharpLanguage.Instance :> _
     override x.PageName = "Formatting Style"
