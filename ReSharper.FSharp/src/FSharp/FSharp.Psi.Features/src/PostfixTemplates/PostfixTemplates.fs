@@ -264,7 +264,7 @@ type FSharpPostfixTemplateContextFactory() =
             null
 
 
-[<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadUnsafe)>]
+[<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadSafe)>]
 type FSharpPostfixTemplatesProvider(templatesManager, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, usageStatistics)
