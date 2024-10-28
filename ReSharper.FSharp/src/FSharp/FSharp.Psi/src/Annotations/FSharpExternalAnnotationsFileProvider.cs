@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Application;
+using JetBrains.Application.Parts;
 using JetBrains.Metadata.Utils;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.ExternalAnnotations;
 using JetBrains.Util;
@@ -9,7 +10,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 {
   // TODO: fix for application packages detection in the platform
-  [ShellComponent]
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
   public class FSharpExternalAnnotationsFileProvider : IExternalAnnotationsFileProvider
   {
     private readonly OneToSetMap<string, VirtualFileSystemPath> myAnnotations;
