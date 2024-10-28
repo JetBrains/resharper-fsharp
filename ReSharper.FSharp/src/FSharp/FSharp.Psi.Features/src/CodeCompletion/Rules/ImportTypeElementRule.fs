@@ -24,6 +24,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Transactions
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 
@@ -31,21 +32,22 @@ module ImportInfo =
     let [<Literal>] Id = "Import rule"
 
 
-type ImportInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text) =
+type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text) =
     inherit TextualInfo(text, text)
 
     new (declaredElement: IClrDeclaredElement, text) =
         let elementPointer = declaredElement.CreateElementPointer()
-        ImportInfo(elementPointer, text)
+        ImportDeclaredElementInfo(elementPointer, text)
 
-    member this.DeclaredElement = declaredElementPointer.FindDeclaredElement()
+    member this.DeclaredElement =
+        declaredElementPointer.FindDeclaredElement()
 
     override this.MakeSafe(text) =
         FSharpNamingService.mangleNameIfNecessary text
 
 
-type ImportBehavior(info: ImportInfo) =
-    inherit TextualBehavior<ImportInfo>(info)
+type ImportDeclaredElementBehavior(info: ImportDeclaredElementInfo) =
+    inherit TextualBehavior<ImportDeclaredElementInfo>(info)
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
@@ -63,6 +65,17 @@ type ImportBehavior(info: ImportInfo) =
             FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference declaredElement ImportInfo.Id
 
 
+module ImportRule =
+    let createItem info (name: string) ns icon =
+        LookupItemFactory.CreateLookupItem(info)
+            .WithPresentation(fun _ ->
+                let name = RichText(name)
+                LookupUtil.AddInformationText(name, $"(in {ns})")
+
+                TextualPresentation(name, info, icon))
+            .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
+
+
 [<Language(typeof<FSharpLanguage>)>]
 type ImportRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
@@ -76,6 +89,9 @@ type ImportRule() =
     override this.AddLookupItems(context, collector) =
         let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
 
+        let referenceOwner = reference.GetElement()
+        if not referenceOwner.ReferenceContext.HasValue then false else
+
         let element = reference.GetElement()
         let psiServices = element.GetPsiServices()
         let solution = psiServices.Solution
@@ -84,9 +100,13 @@ type ImportRule() =
         let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
         let symbolScope = getSymbolScope context.PsiModule false
-        let typeElements = 
+        let typeElements =
             symbolScope.GetAllTypeElementsGroupedByName()
             |> Seq.filter (fun typeElement -> assemblyReaderShim.IsKnownModule(typeElement.Module)) 
+
+        // todo: try to use nodes from sandbox for better parser recovery
+        let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
+        if isNull fsFile then false else
 
         let openedModulesProvider = OpenedModulesProvider(element.FSharpFile, autoOpenCache)
         let scopes = openedModulesProvider.OpenedModuleScopes
@@ -99,20 +119,15 @@ type ImportRule() =
             if scopes.ContainsKey(ns) then () else
 
             let name = typeElement.ShortName
-            let info = ImportInfo(typeElement, name, Ranges = context.Ranges)
+            let info = ImportDeclaredElementInfo(typeElement, name, Ranges = context.Ranges)
             let item =
-                LookupItemFactory.CreateLookupItem(info)
-                    .WithPresentation(fun _ ->
-                        let name = RichText(name)
-                        LookupUtil.AddInformationText(name, $"(in {ns})")
-
-                        // todo: allow calculating icon extensions (now disabled because of the slow unit test icons)
-                        let icon = iconManager.GetImage(typeElement, element.Language, false)
-
-                        TextualPresentation(name, info, icon))
-                    .WithBehavior(fun _ -> ImportBehavior(info))
-                    .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
-                    .WithRelevance(CLRLookupItemRelevance.ImportedType)
+                // todo: allow calculating icon extensions (now disabled because of the slow unit test icons)
+                let icon = iconManager.GetImage(typeElement, context.Language, false)
+                let item = ImportRule.createItem info name ns icon
+                item
+                    .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
+                    .WithRelevance(CLRLookupItemRelevance.NotImportedType)
+            collector.Add(item)
 
             collector.Add(item)
 

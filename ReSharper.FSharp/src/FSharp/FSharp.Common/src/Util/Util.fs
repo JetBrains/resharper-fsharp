@@ -182,11 +182,21 @@ module rec FcsUtil =
         | SynIdent(id, _) -> id.idRange
 
     let inline (|PatRange|) (pat: SynPat) =
+        let range =
+            match pat with
+            | SynPat.Named(SynIdent(_, Some(IdentTrivia.HasParenthesis(lparen, rparen))), _, _, _)
+            | SynPat.LongIdent(SynLongIdent(_, _, [Some(IdentTrivia.HasParenthesis(lparen, rparen))]), _, _, _, _, _) ->
+                Range.unionRanges lparen rparen
+            | _ -> pat.Range
+        
+        // todo: fix range in FCS
         match pat with
-        | SynPat.Named(SynIdent(_, Some(IdentTrivia.HasParenthesis(lparen, rparen))), _, _, _)
-        | SynPat.LongIdent(SynLongIdent(_, _, [Some(IdentTrivia.HasParenthesis(lparen, rparen))]), _, _, _, _, _) ->
-            Range.unionRanges lparen rparen
-        | _ -> pat.Range
+        | SynPat.Named(accessibility = Some access)
+        | SynPat.LongIdent(accessibility = Some access)
+        | SynPat.InstanceMember(accessibility = Some access) ->
+            Range.unionRanges range access.Range
+
+        | _ -> range
 
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range

@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util
 
 #nowarn "57"
 
@@ -53,6 +52,7 @@ module FSharpErrors =
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] ErrorFromAddingConstraint = 43
+    let [<Literal>] UpperCaseIdentifierInPattern = 49
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
     let [<Literal>] IndeterminateType = 72
@@ -274,6 +274,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | ErrorFromAddingConstraint ->
             createHighlightingFromNodeWithMessage AddingConstraintError range error
+
+        | UpperCaseIdentifierInPattern ->
+            let identifier = fsFile.GetNode(range)
+            let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
+            if isNull referenceOwner then null else
+
+            UpperCaseIdentifierInPatternWarning(referenceOwner.Reference, error.Message) :> _
 
         | UpcastUnnecessary ->
             createHighlightingFromNode UpcastUnnecessaryWarning range

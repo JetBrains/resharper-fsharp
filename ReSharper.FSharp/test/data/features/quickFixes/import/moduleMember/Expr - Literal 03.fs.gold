@@ -1,0 +1,14 @@
+﻿namespace Ns1
+
+[<AutoOpen>]
+module Top =
+    [<RequireQualifiedAccess>]
+    module Nested =
+        let [<Literal>] Literal1 = 1
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    let i = Nested.Literal1{caret}

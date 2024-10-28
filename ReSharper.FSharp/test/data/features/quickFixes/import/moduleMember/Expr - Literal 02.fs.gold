@@ -1,0 +1,13 @@
+﻿namespace Ns1
+
+module Top =
+    [<AutoOpen>]
+    module Nested =
+        let [<Literal>] Literal1 = 1
+
+namespace Ns2
+
+open Ns1.Top
+
+module M =
+    let i = Literal1{caret}

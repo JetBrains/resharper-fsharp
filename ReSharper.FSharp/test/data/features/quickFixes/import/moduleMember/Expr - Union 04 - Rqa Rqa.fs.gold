@@ -1,0 +1,14 @@
+﻿namespace Ns1
+
+[<RequireQualifiedAccess>]
+module Top =
+    [<RequireQualifiedAccess>]
+    type Union =
+        | Case
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    let u = Top.Union.Case{caret}

@@ -479,9 +479,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var constValue = ReadOption(reader => reader.ReadConst());
       var xmlDoc = ReadPossibleXmlDoc();
 
+      var isPublic = accessibility.Length == 0;
+      var isLiteral = constValue != null;
+      var isFunction = type?.IsFunction ?? false;
       var isExtensionMember = (flags & ValueFlags.IsExtensionMember) != 0;
+
       var apparentEnclosingEntity = memberInfo?.Value.ApparentEnclosingEntity;
-      return new FSharpMetadataValue(logicalName, compiledName, isExtensionMember, apparentEnclosingEntity);
+      return new FSharpMetadataValue(logicalName, compiledName, isExtensionMember, apparentEnclosingEntity, isPublic,
+        isLiteral, isFunction);
     }
 
     private object ReadValueRepresentationInfo()
@@ -761,6 +766,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       {
         ReadType();
         ReadType();
+        return FSharpMetadataType.Function;
       }
 
       else if (tag == 4)
@@ -1510,7 +1516,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return path;
     }
 
-    private object ReadAccessibility()
+    private Tuple<string, EntityKind>[][] ReadAccessibility()
     {
       return ReadArray(reader => reader.ReadCompilationPath());
     }

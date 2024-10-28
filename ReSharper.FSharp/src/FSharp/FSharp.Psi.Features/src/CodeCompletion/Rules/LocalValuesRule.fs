@@ -25,22 +25,10 @@ type FcsSymbolInfo(text, symbolUse: FSharpSymbolUse) =
         member this.FcsSymbolUse = symbolUse
         member this.NamespaceToOpen = [||]
 
-[<Language(typeof<FSharpLanguage>)>]
-type LocalValuesRule() =
-    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+module rec LocalValuesRule =
+    let valuesKey = Key<IDictionary<string, FSharpSymbolUse>>(nameof LocalValuesRule)
 
-    let valuesKey = Key<Dictionary<string, FSharpSymbolUse>>(nameof LocalValuesRule)
-
-    override this.IsAvailable(context) =
-        context.IsBasicOrSmartCompletion &&
-
-        let node = context.ReparsedContext.TreeNode
-        isNotNull node &&
-
-        let refExpr = node.Parent.As<IReferenceExpr>()
-        isNotNull refExpr && not refExpr.IsQualified && refExpr.Identifier == node
-
-    override this.AddLookupItems(context, collector) =
+    let getLocalValues (context: ITreeNode) : IDictionary<_, _> =
         let values = Dictionary<string, FSharpSymbolUse>()
 
         let addValue (decl: IFSharpDeclaration) =
@@ -75,7 +63,7 @@ type LocalValuesRule() =
 
                 | _ -> ()
 
-        for parentNode in context.ReparsedContext.TreeNode.ContainingNodes() do
+        for parentNode in context.ContainingNodes() do
             match parentNode with
             | :? IMatchClause as matchClause ->
                 addPatternValues matchClause.Pattern
@@ -143,12 +131,29 @@ type LocalValuesRule() =
 
             | _ -> ()
 
-        if values.Count > 0 then
-            context.PutData(valuesKey, values)
+        values
+
+[<Language(typeof<FSharpLanguage>)>]
+type LocalValuesRule() =
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    override this.IsAvailable(context) =
+        context.IsBasicOrSmartCompletion &&
+
+        let node = context.ReparsedContext.TreeNode
+        isNotNull node &&
+
+        let refExpr = node.Parent.As<IReferenceExpr>()
+        isNotNull refExpr && not refExpr.IsQualified && refExpr.Identifier == node
+
+    override this.AddLookupItems(context, collector) =
+        let values =
+            let treeNode = context.ReparsedContext.TreeNode
+            context.GetOrCreateDataUnderLock(LocalValuesRule.valuesKey, treeNode, LocalValuesRule.getLocalValues)
 
         for KeyValue(name, fcsSymbolUse) in values do
             let icon = if isNull fcsSymbolUse then null else getIconId fcsSymbolUse.Symbol
-            
+
             let info = FcsSymbolInfo(name, fcsSymbolUse, Ranges = context.Ranges)
             let item =
                 LookupItemFactory.CreateLookupItem(info)
@@ -168,7 +173,7 @@ type LocalValuesRule() =
         false
 
     override this.TransformItems(context, collector) =
-        let values = context.GetData(valuesKey)
+        let values = context.GetData(LocalValuesRule.valuesKey)
         if isNull values then () else
 
         collector.RemoveWhere(fun item ->

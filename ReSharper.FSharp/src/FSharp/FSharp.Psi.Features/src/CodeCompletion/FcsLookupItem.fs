@@ -162,10 +162,10 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
                 | _ -> null
 
             if isNotNull clrDeclaredElement then
-                FSharpReferenceBindingUtil.SetRequiredQualifiers(referenceOwner.Reference, clrDeclaredElement, referenceOwner)
+                referenceOwner.Reference.SetRequiredQualifiers(clrDeclaredElement, referenceOwner)
 
         if ns.IsEmpty() then () else
-        addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore moduleToImport
+        addOpen offset fsFile moduleToImport
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(items.Name, x.TextColor)

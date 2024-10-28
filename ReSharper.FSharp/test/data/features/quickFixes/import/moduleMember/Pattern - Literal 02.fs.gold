@@ -1,0 +1,12 @@
+﻿namespace Ns1
+
+module Top =
+    let [<Literal>] Literal1 = 1
+
+namespace Ns2
+
+open Ns1.Top
+
+module M =
+    match 1 with
+    | Literal1{caret} -> ()

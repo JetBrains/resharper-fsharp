@@ -74,6 +74,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
 
+    public FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Expression;
+
     ITypeArgumentList ITypeArgumentOwner.TypeArgumentList => TypeArgumentList;
 
     public bool IsQualified => 

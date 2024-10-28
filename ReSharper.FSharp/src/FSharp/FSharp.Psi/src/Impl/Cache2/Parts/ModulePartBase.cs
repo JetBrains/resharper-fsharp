@@ -18,7 +18,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     where T : class, IModuleDeclaration
   {
     private ExtensionMemberInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<ExtensionMemberInfo>.Instance;
-    
+
+    public string[] ValueNames { get; }
+    public string[] FunctionNames { get; }
+    public string[] LiteralNames { get; }
+    public string[] ActivePatternNames { get; }
+    public string[] ActivePatternCaseNames { get; }
+
     protected ModulePartBase([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, shortName, memberDecoration, 0, cacheBuilder)
@@ -35,6 +41,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       }
 
       FSharpExtensionMemberInfos = extensionMemberInfos.ToArray();
+
+      var valueNames = new LocalList<string>();
+      var functionNames = new LocalList<string>();
+      var literalNames = new LocalList<string>();
+      var activePatternNames = new LocalList<string>();
+      var activePatternCaseNames = new LocalList<string>();
+      
+      foreach (var moduleMember in declaration.MembersEnumerable)
+      {
+        if (moduleMember is not ILetBindingsDeclaration letBindings) continue;
+
+        foreach (var binding in letBindings.BindingsEnumerable)
+        {
+          if (binding.HeadPattern is not { } headPattern) continue;
+
+          foreach (var pat in headPattern.NestedPatterns)
+          {
+            // todo: complex patterns
+            if (pat is not IReferencePat refPat || refPat.GetAccessRights() != AccessRights.PUBLIC) continue;
+
+            var name = refPat.SourceName;
+            if (refPat.NameIdentifier is IActivePatternId activePatternId)
+            {
+              activePatternNames.Add(name);
+              foreach (var activePatternCase in activePatternId.CasesEnumerable)
+              {
+                if (activePatternCase is IActivePatternCaseName {Identifier.Name: var caseName })
+                  activePatternCaseNames.Add(caseName);
+              }
+            }
+            else
+            {
+              if (binding.ParametersDeclarationsEnumerable.IsEmpty())
+              {
+                valueNames.Add(name);
+                if (binding.IsLiteral)
+                  literalNames.Add(name);
+              }
+              else
+              {
+                functionNames.Add(name);
+              }
+            }
+          }
+        }
+      }
+
+      ValueNames = valueNames.ToArray();
+      FunctionNames = functionNames.ToArray();
+      LiteralNames = literalNames.ToArray();
+      ActivePatternNames = activePatternNames.ToArray();
+      ActivePatternCaseNames = activePatternCaseNames.ToArray();
     }
 
     private static IEnumerable<IFSharpDeclaration> EnumerateExtensionMembers(T declaration)
@@ -67,18 +125,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteOftenSmallPositiveInt(FSharpExtensionMemberInfos.Length);
       foreach (var info in FSharpExtensionMemberInfos)
         info.Write(writer);
+
+      writer.WriteStringArray(ValueNames);
+      writer.WriteStringArray(FunctionNames);
+      writer.WriteStringArray(LiteralNames);
+      writer.WriteStringArray(ActivePatternNames);
+      writer.WriteStringArray(ActivePatternCaseNames);
     }
 
     protected ModulePartBase(IReader reader) : base(reader)
     {
       var extensionMemberCount = reader.ReadOftenSmallPositiveInt();
-      if (extensionMemberCount == 0)
-        return;
+      if (extensionMemberCount != 0)
+      {
+        var methods = new ExtensionMemberInfo[extensionMemberCount];
+        for (var i = 0; i < extensionMemberCount; i++)
+          methods[i] = new ExtensionMemberInfo(reader, FSharpExtensionMemberKind.FSharpExtensionMember, this);
+        FSharpExtensionMemberInfos = methods;
+      }
 
-      var methods = new ExtensionMemberInfo[extensionMemberCount];
-      for (var i = 0; i < extensionMemberCount; i++)
-        methods[i] = new ExtensionMemberInfo(reader, FSharpExtensionMemberKind.FSharpExtensionMember, this);
-      FSharpExtensionMemberInfos = methods;
+      ValueNames = reader.ReadStringArray();
+      FunctionNames = reader.ReadStringArray();
+      LiteralNames = reader.ReadStringArray();
+      ActivePatternNames = reader.ReadStringArray();
+      ActivePatternCaseNames = reader.ReadStringArray();
     }
 
     public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)

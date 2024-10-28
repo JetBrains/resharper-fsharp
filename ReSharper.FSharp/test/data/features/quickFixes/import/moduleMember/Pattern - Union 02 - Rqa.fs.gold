@@ -1,0 +1,13 @@
+﻿namespace Ns1
+
+[<RequireQualifiedAccess>]
+type Union =
+    | Case
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    match Unchecked.defaultof<Ns1.Union> with
+    | Union.Case{caret} -> ()

@@ -20,6 +20,7 @@ type FSharpMetadataTypeReference =
 type FSharpMetadataType =
     | TypeRef of typeRef: FSharpMetadataTypeReference
     | App of typeRef: FSharpMetadataTypeReference * inst: FSharpMetadataType[]
+    | Function
     | Other
 
 type FSharpMetadataMemberInfo =
@@ -29,7 +30,11 @@ type FSharpMetadataValue =
     { LogicalName: string
       CompiledName: string option
       IsExtensionMember: bool
-      ApparentEnclosingTypeReference: FSharpMetadataTypeReference }
+      ApparentEnclosingTypeReference: FSharpMetadataTypeReference
+      IsPublic: bool // todo: replace with the accessibility
+      IsLiteral: bool // todo: replace with the literal value
+      IsFunction: bool // todo: replace with the type }
+    }
 
 [<RequireQualifiedAccess>]
 type FSharpMetadataModuleNameKind =

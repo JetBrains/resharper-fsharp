@@ -36,9 +36,9 @@ IFSharpImplFile
                   FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
               FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+PublicTokenElement(type:PUBLIC, text:public)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopReferencePat
+              FSharpTokenType+PublicTokenElement(type:PUBLIC, text:public)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:x)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -59,9 +59,9 @@ IFSharpImplFile
                   FSharpIdentifierToken(type:IDENTIFIER, text:Baz)
               FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITopReferencePat
+              FSharpTokenType+InternalTokenElement(type:INTERNAL, text:internal)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:y)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

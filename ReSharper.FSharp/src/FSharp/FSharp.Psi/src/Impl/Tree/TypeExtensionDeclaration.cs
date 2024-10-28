@@ -59,6 +59,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
 
+    public FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Type;
+
     public bool IsQualified => QualifierReferenceName != null;
     public FSharpSymbolReference QualifierReference => QualifierReferenceName?.Reference;
 

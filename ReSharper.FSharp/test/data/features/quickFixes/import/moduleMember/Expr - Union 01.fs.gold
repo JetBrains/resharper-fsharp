@@ -1,0 +1,11 @@
+﻿namespace Ns1
+
+type Union =
+    | Case
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    let u = Case{caret}

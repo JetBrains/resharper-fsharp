@@ -11,6 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override string DeclaredElementName => CalcImplicitName();
     public override string SourceName => CompiledName;
+    public string ClrName => CompiledName;
 
     public override IFSharpIdentifier NameIdentifier => null;
 

@@ -1,0 +1,9 @@
+﻿namespace Ns1
+
+module Top =
+    module Nested =
+        let [<Literal>] Literal1 = 1
+
+    open Nested
+    
+    Literal1{caret}

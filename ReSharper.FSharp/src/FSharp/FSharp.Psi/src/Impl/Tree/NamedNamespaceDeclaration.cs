@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override string DeclaredName => QualifiedName;
     public string QualifiedName => FSharpImplUtil.GetQualifiedName(QualifierReferenceName, Identifier);
     public override string CompiledName => Identifier.GetCompiledName();
+    public string ClrName => QualifiedName;
 
     public override IFSharpIdentifier NameIdentifier => Identifier;
 
@@ -64,6 +65,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       ModuleOrNamespaceKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
-
   }
 }

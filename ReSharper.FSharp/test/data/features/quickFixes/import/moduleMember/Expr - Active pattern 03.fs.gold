@@ -1,0 +1,11 @@
+﻿namespace Ns1
+
+module Top =
+    let (|Aaa|_|) x = if x then Some() else None
+
+namespace Ns2
+
+open Ns1.Top
+
+module M =
+    let i = (| Aaa | _ |){caret}

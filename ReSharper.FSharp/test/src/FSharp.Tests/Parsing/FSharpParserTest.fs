@@ -662,6 +662,13 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Open - Type - App 02``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open - Type - App 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Accessibility 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Accessibility 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Accessibility 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Accessibility 04``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Accessibility 05``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Accessibility 06``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Array 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Array 03 - Empty``() = x.DoNamedTest()

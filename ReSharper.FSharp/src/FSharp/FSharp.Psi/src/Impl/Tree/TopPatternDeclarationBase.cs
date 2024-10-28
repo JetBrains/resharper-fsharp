@@ -100,15 +100,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     [CanBeNull]
-    private IDeclaredElement TryCreateLiteral([NotNull] IBinding binding, [NotNull] IChameleonExpression chameleonExpr)
-    {
-      if (!binding.Attributes.HasAttribute("Literal"))
-        return null;
-
-      return chameleonExpr.IsLiteralExpression()
+    private IDeclaredElement TryCreateLiteral([NotNull] IBinding binding, [NotNull] IChameleonExpression chameleonExpr) =>
+      binding.IsLiteral && chameleonExpr.IsLiteralExpression()
         ? new FSharpLiteral(this)
         : null;
-    }
 
     [NotNull]
     private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>

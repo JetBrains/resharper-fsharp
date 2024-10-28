@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 let [<Literal>] OpName = "RedundantQualifierAnalyzer"
 
@@ -40,8 +41,8 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     let qualifiedName =
         let resolveResult = qualifierExprReference.Resolve()
         let declaredElement = resolveResult.DeclaredElement.As<IClrDeclaredElement>()
-        if isNotNull declaredElement then getQualifiedName declaredElement else 
-        if isGlobal qualifierExprReference then "global" else ""
+        if isNotNull declaredElement then getClrName declaredElement else 
+        if isGlobal qualifierExprReference then "" else SharedImplUtil.MISSING_DECLARATION_NAME
 
     let opens = data.GetData(openedModulesProvider).OpenedModuleScopes
     let scopes = opens.GetValuesSafe(qualifiedName)
@@ -64,7 +65,7 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     if isNull fcsSymbol then false else
 
     match fcsSymbol with
-    | :? FSharpEntity as fcsEntity when fcsEntity.IsNamespace && qualifiedName <> "global" ->
+    | :? FSharpEntity as fcsEntity when fcsEntity.IsNamespace && qualifiedName <> "" ->
         // Don't make namespace usages unqualified, e.g. don't remove `System` leaving `Collections.Generic.List`.
         false
     | _ ->

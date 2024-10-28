@@ -1,6 +1,8 @@
 ﻿using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -19,5 +21,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ModuleOrNamespaceKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
 
+    public string ClrName
+    {
+      get
+      {
+        var ns = NamespaceName;
+        if (!ns.IsEmpty() && ns != SharedImplUtil.MISSING_DECLARATION_NAME)
+          return ns + "." + CompiledName;
+
+        return CompiledName;
+      }
+    }
+
+    public string NamespaceName =>
+      QualifierReferenceName?.QualifiedName ?? 
+      SharedImplUtil.MISSING_DECLARATION_NAME;
   }
 }

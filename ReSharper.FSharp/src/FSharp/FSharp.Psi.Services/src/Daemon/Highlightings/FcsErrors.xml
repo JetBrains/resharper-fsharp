@@ -40,6 +40,18 @@
     <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
   </Error>
 
+  <Warning staticGroup="FSharpErrors" name="UpperCaseIdentifierInPattern" ID="FS0049: Upper case identifier in pattern">
+    <Parameter type="FSharpSymbolReference" name="reference"/>
+    <!-- todo: change to IReference? -->
+    <Parameter type="string" name="fcsMessage"/>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <!--todo: identifier null check-->
+    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix arguments="h.Reference">FSharpImportModuleMemberFix</QuickFix>
+  </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="UseBindingsIllegalInModules" ID="FS0524: 'use' bindings illegal in modules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
@@ -254,6 +266,7 @@
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpImportExtensionMemberFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpImportModuleMemberFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">

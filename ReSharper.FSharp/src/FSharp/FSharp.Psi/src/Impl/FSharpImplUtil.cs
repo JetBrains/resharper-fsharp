@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -331,6 +332,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [NotNull]
     public static IList<IUnionCase> GetSourceUnionCases([CanBeNull] this ITypeElement type) =>
       GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
+
+    public static string[] GetUnionCaseNames(this ITypeElement typeElement) =>
+      typeElement is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union repr }
+        ? repr.cases
+        : typeElement.GetSourceUnionCases().Select(unionCase => unionCase.SourceName).ToArray();
 
     [CanBeNull]
     public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>

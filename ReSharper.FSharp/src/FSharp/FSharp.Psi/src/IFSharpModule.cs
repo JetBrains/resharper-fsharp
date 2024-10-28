@@ -22,5 +22,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     [CanBeNull] ITypeElement AssociatedTypeElement { get; }
 
     string QualifiedSourceName { get; }
+    
+    string[] ValueNames { get; }
+    string[] FunctionNames { get; }
+    string[] LiteralNames { get; }
+    string[] ActivePatternNames { get; }
+    string[] ActivePatternCaseNames { get; }
   }
 }

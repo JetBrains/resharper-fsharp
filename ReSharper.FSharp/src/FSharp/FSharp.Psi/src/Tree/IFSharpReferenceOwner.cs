@@ -10,6 +10,13 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
+  public enum FSharpReferenceContext
+  {
+    Expression,
+    Pattern,
+    Type
+  }
+
   public interface IFSharpReferenceOwner : IFSharpTreeNode
   {
     [NotNull] FSharpSymbolReference Reference { get; }
@@ -18,6 +25,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull]
     IFSharpReferenceOwner SetName([NotNull] string name);
+    
+    FSharpReferenceContext? ReferenceContext { get; }
   }
 
   public interface IFSharpQualifiableReferenceOwner : IFSharpReferenceOwner
@@ -40,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       var name = FSharpReferenceBindingUtil.SuggestShortReferenceName(declaredElement, referenceOwner.Language);
       var delimiter = ModificationUtil.AddChildBefore(identifier, FSharpTokenType.DOT.CreateLeafElement());
       var qualifier = ModificationUtil.AddChildBefore(delimiter, factory(name));
-      FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifier.Reference, declaredElement, referenceOwner);
+      qualifier.Reference.SetRequiredQualifiers(declaredElement, referenceOwner);
     }
   }
 }

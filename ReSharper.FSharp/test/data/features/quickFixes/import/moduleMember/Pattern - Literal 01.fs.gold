@@ -1,0 +1,13 @@
+﻿namespace Ns1
+
+[<RequireQualifiedAccess>]
+module Top =
+    let [<Literal>] Literal1 = 1
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    match 1 with
+    | Top.Literal1{caret} -> ()

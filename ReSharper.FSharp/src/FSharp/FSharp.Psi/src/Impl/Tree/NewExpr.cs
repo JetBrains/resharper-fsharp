@@ -18,6 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       new CtorReference(this);
 
     public override IFSharpReferenceOwner SetName(string name) => this;
+    public override FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Type;
 
     public IList<IArgument> ParameterArguments =>
       myParameterArguments.GetValue(this, expr => expr.CalculateParameterArguments(new[] { expr.ArgumentExpression }));

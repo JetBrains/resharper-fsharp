@@ -1,22 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches.SymbolCache;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  internal class FSharpModule : FSharpClass, IFSharpModule, IAlternativeNameCacheTrieNodeOwner
+  internal class FSharpModule([NotNull] IModulePart part)
+    : FSharpClass(part), IFSharpModule, IAlternativeNameCacheTrieNodeOwner
   {
     public CacheTrieNode AlternativeNameTrieNode { get; set; }
-
-    public FSharpModule([NotNull] IModulePart part) : base(part)
-    {
-    }
 
     protected override LocalList<IDeclaredType> CalcSuperTypes() =>
       new(new[] { Module.GetPredefinedType().Object });
@@ -43,6 +43,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     /// Qualified source name
     public string QualifiedSourceName => this.GetQualifiedName();
 
+    private string[] GetNames(Func<IModulePart, string[]> getter)
+    {
+      var definedLabels =
+        EnumerateParts()
+          .SelectNotNull(part => part is IModulePart modulePart ? getter(modulePart) : null);
+
+      var result = new LocalList<string>();
+      foreach (var definedLabel in definedLabels)
+        result.AddRange(definedLabel);
+
+      return result.ToArray();
+    }
+
+    public string[] ValueNames => GetNames(part => part.ValueNames);
+    public string[] FunctionNames => GetNames(part => part.FunctionNames);
+    public string[] LiteralNames => GetNames(part => part.LiteralNames);
+    public string[] ActivePatternNames => GetNames(part => part.ActivePatternNames);
+    public string[] ActivePatternCaseNames => GetNames(part => part.ActivePatternCaseNames);
+
     string IAlternativeNameOwner.AlternativeName => SourceName != ShortName ? SourceName : null;
   }
 
@@ -60,8 +79,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         containingType = containingType.GetContainingType();
       }
 
-      builder.Prepend(".");
-      builder.Prepend(fsModule.GetContainingNamespace().QualifiedName);
+      var ns = fsModule.GetContainingNamespace();
+      if (!ns.IsRootNamespace)
+      {
+        builder.Prepend(".");
+        builder.Prepend(ns.QualifiedName);  
+      }
 
       return builder.ToString();
     }

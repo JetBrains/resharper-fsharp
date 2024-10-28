@@ -1,0 +1,11 @@
+﻿namespace Ns1
+
+module Top =
+    let f x = 1
+
+namespace Ns2
+
+open Ns1.Top
+
+module M =
+    let i = f{caret}

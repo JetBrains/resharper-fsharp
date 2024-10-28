@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     /// Doesn't take opened modules into account, only checks if qualifiers are required by containing type or syntax.
-    public static void SetRequiredQualifiers([NotNull] FSharpSymbolReference reference,
+    public static void SetRequiredQualifiers([NotNull] this FSharpSymbolReference reference,
       [NotNull] IClrDeclaredElement declaredElement, [NotNull] ITreeNode context)
     {
       var containingType = declaredElement.GetContainingType();
@@ -73,6 +73,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return;
       }
 
+      SetRequiredQualifiersForContainingType(reference, containingType, context);
+    }
+
+    public static void SetRequiredQualifiersForContainingType([NotNull] this FSharpSymbolReference reference, 
+      [NotNull] ITypeElement containingType, [NotNull] ITreeNode context)
+    {
       if (containingType.IsModule() && !containingType.RequiresQualifiedAccess())
       {
         SetNamespaceQualifierIfNeeded(reference, containingType);

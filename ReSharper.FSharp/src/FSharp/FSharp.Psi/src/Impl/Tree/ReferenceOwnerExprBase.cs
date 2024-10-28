@@ -34,5 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
+
+    public abstract FSharpReferenceContext? ReferenceContext { get; }
   }
 }

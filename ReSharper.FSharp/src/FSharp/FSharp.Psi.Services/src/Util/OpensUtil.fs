@@ -39,10 +39,15 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
 
     loop [] declaredElement
 
+let toSourceNameList (element: IClrDeclaredElement) =
+    toQualifiedList element
+    |> List.map _.GetSourceName()
+
 let getQualifiedName (element: IClrDeclaredElement) =
-    match toQualifiedList element with
-    | [] -> "global"
-    | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
+    element
+    |> toSourceNameList
+    |> String.concat "."
+
 
 [<RequireQualifiedAccess>]
 type ModuleToImport =
@@ -103,10 +108,13 @@ let rec getModuleToOpen (declaredElement: IClrDeclaredElement): IClrDeclaredElem
         declaredElement.GetNamespace()
 
     | containingType ->
-        if containingType.IsModule() && containingType.GetAccessType() = ModuleMembersAccessKind.Normal then
-            containingType :> _
-        else
-            getModuleToOpen containingType
+        getModuleToOpenFromContainingType containingType
+
+and getModuleToOpenFromContainingType (containingType: ITypeElement): IClrDeclaredElement =
+    if containingType.IsModule() && containingType.GetAccessType() = ModuleMembersAccessKind.Normal then
+        containingType :> _
+    else
+        getModuleToOpen containingType
 
 let tryGetCommonParentModuleDecl (context: ITreeNode) (moduleToImport: ModuleToImport) =
     match moduleToImport with
@@ -196,7 +204,7 @@ let canInsertBefore (openStatement: IOpenStatement) ns =
         not openStatement.IsSystem &&
         ns < openStatement.ReferenceName.QualifiedName
 
-let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (moduleToImport: ModuleToImport) =
+let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (moduleToImport: ModuleToImport) =
     let elementFactory = fsFile.CreateElementFactory()
     let lineEnding = fsFile.GetLineEnding()
 
@@ -323,6 +331,10 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
 
     insertAfterAnchor ns anchor indent
 
+let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (moduleToImport: ModuleToImport) =
+    let settings = fsFile.GetSettingsStoreWithEditorConfig()
+    addOpenWithSettings offset fsFile settings moduleToImport
+
 let addOpens (reference: FSharpSymbolReference) (declaredElement: IClrDeclaredElement) =
     let containingType = declaredElement.GetContainingType()
     if isNotNull containingType && containingType.IsAutoImported() then reference else
@@ -337,8 +349,7 @@ let addOpens (reference: FSharpSymbolReference) (declaredElement: IClrDeclaredEl
     if qualifiedModuleToOpen.IsEmpty then reference else
 
     let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)
-    let settings = fsFile.GetSettingsStoreWithEditorConfig()
-    addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings moduleToImport
+    addOpen (referenceOwner.GetDocumentStartOffset()) fsFile moduleToImport
     reference
 
 let getContainingModules (treeNode: ITreeNode) =
@@ -352,6 +363,11 @@ let isInOpen (referenceName: IReferenceName) =
     | null -> false
     | node -> node.Parent :? IOpenStatement
 
+let getClrName (element: IClrDeclaredElement) =
+    match element with
+    | :? INamespace as ns -> ns.QualifiedName
+    | :? ITypeElement as typeElement -> typeElement.GetClrName().FullName
+    | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
 [<RequireQualifiedAccess>]
 type OpenScope =
@@ -382,23 +398,39 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
     // todo: use scope with references?
     let symbolScope = getSymbolScope psiModule false
 
-    let import scope (element: IClrDeclaredElement) =
-        map.Add(getQualifiedName element, scope)
-        for autoImportedModule in autoOpenCache.GetAutoImportedElements(element, symbolScope) do
-            map.Add(getQualifiedName autoImportedModule, scope)
+    let importQualifiedName scope (qualifiedName: string) =
+        if qualifiedName = SharedImplUtil.MISSING_DECLARATION_NAME then () else
+
+        map.Add(qualifiedName, scope)
+        for autoImportedModule in autoOpenCache.GetAutoImportedElements(qualifiedName, symbolScope) do
+            let clrName = getClrName autoImportedModule
+            map.Add(clrName, scope)
+
+    let importElement scope (element: IClrDeclaredElement) =
+        let clrName = getClrName element
+        clrName |> importQualifiedName scope
+
+    let rec importDecl containingScope (moduleDecl: IModuleLikeDeclaration) =
+        if isNull moduleDecl then () else
+
+        let scope = OpenScope.Range(moduleDecl.GetTreeTextRange())
+        importQualifiedName scope moduleDecl.ClrName
+
+        let namedModuleDecl = moduleDecl.As<INamedModuleDeclaration>()
+        if isNotNull namedModuleDecl then
+            importQualifiedName scope namedModuleDecl.NamespaceName
+
+        for moduleMember in moduleDecl.MembersEnumerable do
+            let nestedModuleDecl = moduleMember.As<INestedModuleDeclaration>()
+            importDecl containingScope nestedModuleDecl
 
     do
-        import OpenScope.Global symbolScope.GlobalNamespace
-
+        importElement OpenScope.Global symbolScope.GlobalNamespace
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelDecl then
-                // todo: use inner range only
                 let scope = OpenScope.Range(topLevelDecl.GetTreeTextRange())
-                match topLevelDecl.DeclaredElement with
-                | :? INamespace as ns -> import scope ns
-                | :? IFSharpModule as fsModule -> import scope (fsModule.GetContainingNamespace())
-                | _ -> ()
+                importDecl scope topLevelDecl
 
         match fsFile.GetParseAndCheckResults(true, "OpenedModulesProvider") with
         | None -> ()
@@ -410,8 +442,26 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
             for fcsEntity in fcsOpenDecl.Modules do
                 let declaredElement = fcsEntity.GetDeclaredElement(psiModule).As<IClrDeclaredElement>()
                 if isNotNull declaredElement then
-                    import scope declaredElement
+                    importElement scope declaredElement
 
     member x.OpenedModuleScopes = map
+
+    member this.Contains(declaredElement: IClrDeclaredElement, context: ITreeNode) =
+        let qualifiedName =
+            match declaredElement with
+            | :? INamespace as ns -> ValueSome ns.QualifiedName
+            | :? IFSharpModule as fsModule -> ValueSome fsModule.QualifiedSourceName
+            | _ ->
+
+            match declaredElement.GetContainingType() with
+            | :? IFSharpModule as fsModule -> ValueSome (fsModule.QualifiedSourceName + "." + declaredElement.GetSourceName())
+            | _ -> ValueNone
+
+        match qualifiedName with
+        | ValueNone -> false
+        | ValueSome qualifiedName ->
+
+        map.GetValuesSafe(qualifiedName)
+        |> OpenScope.inAnyScope context
 
 let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")

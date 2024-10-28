@@ -1,0 +1,12 @@
+﻿namespace Ns1
+
+type Union =
+    | Case
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    match Unchecked.defaultof<Ns1.Union> with
+    | Case{caret} -> ()

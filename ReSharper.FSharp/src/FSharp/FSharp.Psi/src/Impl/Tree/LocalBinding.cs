@@ -37,6 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
+    public bool IsLiteral => false;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement => HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
   }

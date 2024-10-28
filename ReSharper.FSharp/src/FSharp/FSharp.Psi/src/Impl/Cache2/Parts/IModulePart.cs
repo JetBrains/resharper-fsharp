@@ -10,5 +10,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     ModuleMembersAccessKind AccessKind { get; }
 
     [CanBeNull] ITypeElement AssociatedTypeElement { get; }
+    
+    string[] ValueNames { get; }
+    string[] FunctionNames { get; }
+    string[] LiteralNames { get; }
+    string[] ActivePatternNames { get; }
+    string[] ActivePatternCaseNames { get; }
   }
 }

@@ -7,5 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     protected override FSharpSymbolReference CreateReference() => new(this);
     public override IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
+
+    public override FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Type;
   }
 }

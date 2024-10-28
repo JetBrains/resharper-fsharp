@@ -67,3 +67,58 @@ type ImportExtensionMemberTest() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
+
+
+[<FSharpTest>]
+type FSharpImportModuleMemberTest() =
+    inherit FSharpQuickFixTestBase<FSharpImportModuleMemberFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/moduleMember"
+
+    [<Test>] member x.``Expr - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Active pattern 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Active pattern 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Literal 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 04``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Expr - Literal 05``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Union 02 - Rqa``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Union 03 - AutoOpen Rqa``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Union 04 - Rqa Rqa``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Expr - Union 05 - Rqa AutoOpen Rqa``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Value 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Function 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Function 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Active pattern 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Literal 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 02``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 03``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 04``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 05``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Pattern - Literal 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union 02 - Rqa``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union 03 - AutoOpen Rqa``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Union 04 - Rqa Rqa``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Pattern - Union 05 - Rqa AutoOpen Rqa``() = x.DoNamedTest()
+
+    [<Test; Explicit>] member x.``Not available - Internal 01 - Literal``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Not available - Internal 02 - Value``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Not available - Internal 03 - Function``() = x.DoNamedTest()
+
+    [<Test; Explicit>] member x.``Not available - Unreachable 01``() = x.DoNamedTest()

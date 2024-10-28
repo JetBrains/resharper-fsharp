@@ -16,6 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifier FSharpIdentifier => null;
 
     public override IFSharpReferenceOwner SetName(string name) => this;
+    public override FSharpReferenceContext? ReferenceContext => null;
 
     protected override FSharpSymbolReference CreateReference() =>
       new RecordCtorReference(this);

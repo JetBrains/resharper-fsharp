@@ -2,6 +2,7 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -52,6 +53,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         throw new System.NotImplementedException();
 
       ModuleOrNamespaceKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
+    }
+
+    public string ClrName
+    {
+      get
+      {
+        var containingDecl = GetContainingNode<IModuleLikeDeclaration>();
+        if (containingDecl is { ClrName: var qualifierName})
+          if (!qualifierName.IsEmpty() && qualifierName != SharedImplUtil.MISSING_DECLARATION_NAME)
+          {
+            var separator = containingDecl is IModuleDeclaration ? "+" : ".";
+            return qualifierName + separator + SourceName;
+          }
+
+        return SourceName;
+      }
     }
   }
 }

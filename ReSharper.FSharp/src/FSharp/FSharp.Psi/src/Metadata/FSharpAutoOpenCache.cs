@@ -45,10 +45,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         _ => null
       };
 
-    public IEnumerable<ITypeElement> GetAutoImportedElements([NotNull] IClrDeclaredElement declaredElement,
+    public IEnumerable<ITypeElement> GetAutoImportedElements([CanBeNull] string qualifiedName,
       ISymbolScope symbolScope)
     {
-      var qualifiedName = GetQualifiedName(declaredElement);
       if (qualifiedName == null)
         return EmptyList<ITypeElement>.Instance;
 
@@ -67,6 +66,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
       return result;
     }
+
+    public IEnumerable<ITypeElement> GetAutoImportedElements([NotNull] IClrDeclaredElement declaredElement,
+      ISymbolScope symbolScope)
+    {
+      var qualifiedName = GetQualifiedName(declaredElement);
+      return GetAutoImportedElements(qualifiedName, symbolScope);
+    }
+
 
     object ICache.Load(IProgressIndicator progress, bool enablePersistence) => null;
 
