@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.editor
 
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CodeFoldingTestBase

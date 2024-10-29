@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
 import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment

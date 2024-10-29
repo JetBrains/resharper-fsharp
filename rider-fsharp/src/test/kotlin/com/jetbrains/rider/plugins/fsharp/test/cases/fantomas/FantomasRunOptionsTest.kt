@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
