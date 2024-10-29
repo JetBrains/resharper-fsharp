@@ -21,6 +21,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -317,7 +318,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let isInSeqExpr =
             let seqExpr = SequentialExprNavigator.GetByExpression(sourceExpr)
-            isNotNull seqExpr && sourceExpr != seqExpr.Expressions.Last()
+            isNotNull seqExpr && not (SequentialExprUtil.isLastExprInSeqExpr seqExpr sourceExpr)
 
         let replaceSourceExprNode = contextIsSourceExpr && not isInSeqExpr
 

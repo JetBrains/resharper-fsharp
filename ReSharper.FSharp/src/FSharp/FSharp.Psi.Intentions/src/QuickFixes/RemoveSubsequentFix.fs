@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -20,13 +21,10 @@ type RemoveSubsequentFix(expr: IFSharpExpression) =
     override x.Text = "Remove subsequent expressions"
 
     override x.IsAvailable _ =
-        if not (isValid expr) then false else
+        isValid expr &&
 
         let seqExpr = SequentialExprNavigator.GetByExpression(expr)
-        if not (isValid seqExpr) then false else
-
-        let lastExpr = seqExpr.Expressions.LastOrDefault()
-        isNotNull lastExpr && expr != lastExpr
+        isNotNull seqExpr && not (SequentialExprUtil.isLastExprInSeqExpr seqExpr expr)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())

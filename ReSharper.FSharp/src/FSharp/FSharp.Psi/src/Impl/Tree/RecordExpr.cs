@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       // todo: cover other contexts
       var sequentialExpr = SequentialExprNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
-      if (sequentialExpr != null && sequentialExpr.Expressions.Last() != RecordExpr)
+      if (sequentialExpr != null && sequentialExpr.ExpressionsEnumerable.LastOrDefault() != RecordExpr)
         return null;
       var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
 

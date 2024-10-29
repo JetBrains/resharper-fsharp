@@ -13,6 +13,7 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\Util\SequentialExprUtil.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -34,6 +35,7 @@
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\TypeUsageParensUtil.fs" />
+    <Compile Include="src\Util\SequentialExprUtil.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />

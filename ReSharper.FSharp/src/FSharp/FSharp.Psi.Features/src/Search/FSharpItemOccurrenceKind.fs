@@ -15,24 +15,31 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<RequireQualifiedAccess>]
 module FSharpOccurrenceKinds =
     let copyAndUpdate = OccurrenceKind.CreateSemantic("Copy and update")
     let import = OccurrenceKind.CreateSemantic("Module or namespace import")
+    let nonTailRecursiveInvocation = OccurrenceKind.CreateSemantic("Non-tail recursive application")
     let partialApplication = OccurrenceKind.CreateSemantic("Partial application")
+    let partialRecursiveApplication = OccurrenceKind.CreateSemantic("Partial recursive application")
     let pattern = OccurrenceKind.CreateSemantic("Pattern")
-    let typeAbbreviation = OccurrenceKind.CreateSemantic("Type abbreviation")
+    let recursiveInvocation = OccurrenceKind.CreateSemantic("Recursive invocation")
+    let typeAbbreviation = OccurrenceKind.CreateSemantic("Type abbreviation") // todo: add icon
     let typeExtension = OccurrenceKind.CreateSemantic("Type extension")
     let typeSpecification = OccurrenceKind.CreateSemantic("Type specification")
 
     let icons =
         [| copyAndUpdate, ServicesNavigationThemedIcons.UsageInstanceCreation.Id
            import, ServicesNavigationThemedIcons.UsageInUsings.Id
+           nonTailRecursiveInvocation, ServicesNavigationThemedIcons.UsageRecursionProblematic.Id
+           partialApplication, FSharpIcons.UsagePartialApplication.Id
+           partialRecursiveApplication, ServicesNavigationThemedIcons.UsageRecursionPartialCall.Id
            pattern, ServicesNavigationThemedIcons.UsagePatternChecking.Id
-           typeExtension, ServicesNavigationThemedIcons.UsageExtensionMethod.Id
-           partialApplication, FSharpIcons.UsagePartialApplication.Id |]
+           recursiveInvocation, ServicesNavigationThemedIcons.UsageRecursion.Id
+           typeExtension, ServicesNavigationThemedIcons.UsageExtensionMethod.Id |]
         |> dict
 
 
@@ -161,23 +168,32 @@ type FSharpItemOccurenceKindProvider() =
                     EmptyList.Instance :> _
 
                 | :? FSharpMemberOrFunctionOrValue as mfv ->
-                    let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(refExpr.IgnoreParentParens())
-                    if isNull appExpr then EmptyList.Instance :> _ else
+                    let isRecursive =
+                        let decl = refExpr.GetContainingNode<IDeclaration>()
+                        isNotNull decl && element = decl.DeclaredElement
 
-                    let argsCount = getPrefixAppExprArgs refExpr |> Seq.length
-                    let fcsType = getAbbreviatedType mfv.FullType
-                    let mfvTypeParamCount = FcsTypeUtil.getFunctionTypeArgs false fcsType |> Seq.length
-                    if mfvTypeParamCount = 0 then EmptyList.Instance :> _ else
+                    let isPartial =
+                        let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(refExpr.IgnoreParentParens())
+                        if isNull appExpr then true else
 
-                    if argsCount < mfvTypeParamCount then
-                        [| FSharpOccurrenceKinds.partialApplication |] :> _ else
+                        let argsCount = getPrefixAppExprArgs refExpr |> Seq.length
+                        let fcsType = getAbbreviatedType mfv.FullType
+                        let mfvTypeParamCount = FcsTypeUtil.getFunctionTypeArgs false fcsType |> Seq.length
+                        argsCount < mfvTypeParamCount
 
-                    [| OccurrenceKind.Invocation |] :> _
+                    match isPartial, isRecursive with
+                    | true, true -> [| FSharpOccurrenceKinds.partialRecursiveApplication |] :> _
+                    | true, false -> [| FSharpOccurrenceKinds.partialApplication |] :> _
+                    | false, false -> [| OccurrenceKind.Invocation |] :> _
+
+                    | false, true ->
+                        let appExpr = getOutermostPrefixAppExpr refExpr
+                        if FSharpResolveUtil.isInTailRecursivePosition appExpr then
+                            [| FSharpOccurrenceKinds.recursiveInvocation |] :> _
+                        else
+                            [| FSharpOccurrenceKinds.nonTailRecursiveInvocation |] :> _
 
                 | _ -> EmptyList.Instance :> _
-
-//            | :? IAttribute when (element :? IConstructor) ->
-//                [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | _ -> EmptyList.Instance :> _
 
@@ -186,10 +202,13 @@ type FSharpItemOccurenceKindProvider() =
                OccurrenceKind.ExtendedType
                OccurrenceKind.Invocation
                OccurrenceKind.NewInstanceCreation
-               FSharpOccurrenceKinds.import
-               FSharpOccurrenceKinds.pattern
-               FSharpOccurrenceKinds.partialApplication
                FSharpOccurrenceKinds.copyAndUpdate
+               FSharpOccurrenceKinds.import
+               FSharpOccurrenceKinds.nonTailRecursiveInvocation
+               FSharpOccurrenceKinds.partialApplication
+               FSharpOccurrenceKinds.partialRecursiveApplication
+               FSharpOccurrenceKinds.pattern
+               FSharpOccurrenceKinds.recursiveInvocation
                FSharpOccurrenceKinds.typeExtension
                FSharpOccurrenceKinds.typeAbbreviation
                FSharpOccurrenceKinds.typeSpecification

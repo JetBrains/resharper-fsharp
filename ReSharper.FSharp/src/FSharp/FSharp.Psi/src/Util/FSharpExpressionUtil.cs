@@ -54,21 +54,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           currentExpr = matchExpr as IFSharpExpression;
           continue;
         }
-        
-        if (SequentialExprNavigator.GetByExpression(currentExpr) is { } seqExpr &&
-            seqExpr.ExpressionsEnumerable.Last() == currentExpr)
+
+        if (SequentialExprNavigator.GetByLastExpression(currentExpr) is { } seqExpr)
         {
           currentExpr = seqExpr;
           continue;
         }
 
-        if ((IfThenElseExprNavigator.GetByBranchExpression(currentExpr)) is {ElseExpr: { }} ifExpr)
+        if (IfThenElseExprNavigator.GetByBranchExpression(currentExpr) is { ElseExpr: not null } ifExpr)
         {
           currentExpr = ifExpr;
           continue;
         }
 
-        if (ElifExprNavigator.GetByBranchExpression(currentExpr) is {ElseExpr: { }} elifExpr)
+        if (ElifExprNavigator.GetByBranchExpression(currentExpr) is { ElseExpr: not null } elifExpr)
         {
           currentExpr = elifExpr;
           continue;

@@ -231,8 +231,7 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
         match MatchExprUtil.isLastClause matchClause, matchClause.Expression, missingIndent matchClause, direction with
         | true, NotNull expr, _, Direction.Down ->
             let seqExpr = SequentialExprNavigator.GetByExpression(matchExpr)
-            let seqExprs = if isNotNull seqExpr then seqExpr.Expressions else TreeNodeCollection.Empty
-            if not seqExprs.IsEmpty && matchExpr != seqExprs.LastOrDefault() then false else
+            if isNotNull seqExpr && not (SequentialExprUtil.isLastExprInSeqExpr seqExpr matchExpr) then false else
 
             let matchExprStmt = ExpressionStatementNavigator.GetByExpression(matchExpr)
             let moduleDecl = ModuleDeclarationNavigator.GetByMember(matchExprStmt)
