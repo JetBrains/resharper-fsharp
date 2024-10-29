@@ -16,8 +16,8 @@ import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import com.jetbrains.rider.test.waitForDaemon
-import com.jetbrains.rider.test.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.File

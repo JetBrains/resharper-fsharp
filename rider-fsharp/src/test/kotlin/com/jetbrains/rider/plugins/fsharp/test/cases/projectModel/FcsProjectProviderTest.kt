@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.testFramework.ProjectViewTestUtil
-import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost

@@ -12,8 +12,8 @@ import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.test.waitForDaemon
-import com.jetbrains.rider.test.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.Test
 import java.time.Duration
 

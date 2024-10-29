@@ -17,7 +17,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.getHighlighters
 import com.jetbrains.rider.test.scriptingApi.typeFromOffset
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import com.jetbrains.rider.test.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
