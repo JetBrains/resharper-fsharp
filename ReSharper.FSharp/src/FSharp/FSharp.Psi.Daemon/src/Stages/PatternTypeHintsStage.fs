@@ -5,9 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -230,12 +228,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type PatternTypeHintsStage(logger: ILogger) =
-    inherit FSharpDaemonStageBase()
-
-    override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT &&
-        base.IsSupported(sourceFile, processKind) &&
-        not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+    inherit FSharpDaemonStageBase(true, false)
 
     override x.CreateStageProcess(fsFile, settingsStore, daemonProcess, _) =
         let isEnabled = settingsStore.GetValue(fun (key: GeneralInlayHintsOptions) -> key.EnableInlayHints)

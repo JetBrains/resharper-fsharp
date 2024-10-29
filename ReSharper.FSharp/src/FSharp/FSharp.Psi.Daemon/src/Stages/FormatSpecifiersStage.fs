@@ -28,10 +28,7 @@ type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<UnusedOpensStage> |])>]
 type FormatSpecifiersStage() =
-    inherit FSharpDaemonStageBase()
-
-    override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
+    inherit FSharpDaemonStageBase(true)
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess, _) =
         FormatSpecifiersStageProcess(fsFile, daemonProcess) :> _

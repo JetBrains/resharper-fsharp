@@ -80,11 +80,7 @@ type InferredTypeCodeVisionProvider() =
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
-    inherit FSharpDaemonStageBase()
-
-    override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind) &&
-        not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+    inherit FSharpDaemonStageBase(true, false)
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess, _) =
         InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider) :> _

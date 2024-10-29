@@ -178,12 +178,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type PipeChainTypeHintStage(logger: ILogger) =
-    inherit FSharpDaemonStageBase()
-
-    override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT &&
-        base.IsSupported(sourceFile, processKind) &&
-        not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+    inherit FSharpDaemonStageBase(true, false)
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess, _) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else

@@ -10,12 +10,14 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
-  public abstract class FSharpDaemonStageBase : IDaemonStage
+  public abstract class FSharpDaemonStageBase(bool visibleDocumentsOnly = false, bool enableInSignatures = true) : IDaemonStage
   {
     protected virtual bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>
+      (!visibleDocumentsOnly || processKind == DaemonProcessKind.VISIBLE_DOCUMENT) &&
       sourceFile != null && sourceFile.IsValid() &&
       sourceFile.Properties is { IsNonUserFile: false, ProvidesCodeModel: true } &&
-      sourceFile.LanguageType.Is<FSharpProjectFileType>();
+      sourceFile.LanguageType.Is<FSharpProjectFileType>() &&
+      (enableInSignatures || !sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>());
 
     public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess daemonProcess,
       IContextBoundSettingsStore settings, DaemonProcessKind processKind)

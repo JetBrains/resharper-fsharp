@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System.Collections.Generic
 open JetBrains.Application
-open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
@@ -14,13 +13,10 @@ open JetBrains.Util
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type ScriptLoadPathsStage() =
-    inherit FSharpDaemonStageBase()
+    inherit FSharpDaemonStageBase(true) // todo: should report for closed files
 
-        override x.IsSupported(sourceFile, processKind) =
-            processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
-
-        override x.CreateStageProcess(fsFile, _, daemonProcess, _) =
-            ScriptLoadPathsStageProcess(fsFile, daemonProcess) :> _
+    override x.CreateStageProcess(fsFile, _, daemonProcess, _) =
+        ScriptLoadPathsStageProcess(fsFile, daemonProcess) :> _
 
 
 type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =

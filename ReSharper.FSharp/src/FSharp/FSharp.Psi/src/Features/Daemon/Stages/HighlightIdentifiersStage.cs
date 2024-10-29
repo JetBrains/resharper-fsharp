@@ -12,28 +12,22 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
   [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesAfter = new[] {typeof(CollectUsagesStage)})]
-  public class HighlightIdentifiersStage : FSharpDaemonStageBase
+  public class HighlightIdentifiersStage() : FSharpDaemonStageBase(true)
   {
-    protected override bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>
-      processKind == DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind);
-
     protected override IDaemonStageProcess CreateStageProcess(IFSharpFile psiFile, IContextBoundSettingsStore settings,
       IDaemonProcess process, DaemonProcessKind _) =>
       new HighlightIdentifiersStageProcess(psiFile, process);
   }
 
-  public class HighlightIdentifiersStageProcess : FSharpDaemonStageProcessBase
+  public class HighlightIdentifiersStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
+    : FSharpDaemonStageProcessBase(fsFile, process)
   {
-    private readonly IDocument myDocument;
-
-    public HighlightIdentifiersStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
-      : base(fsFile, process) => myDocument = process.Document;
+    private readonly IDocument myDocument = process.Document;
 
     private void AddHighlightings(IEnumerable<FcsResolvedSymbolUse> symbolsUses,
       ICollection<HighlightingInfo> highlightings)
