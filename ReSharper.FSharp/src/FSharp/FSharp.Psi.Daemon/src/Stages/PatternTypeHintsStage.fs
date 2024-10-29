@@ -108,8 +108,10 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         (displayContext: FSharpDisplayContext)
         range
         pushToHintMode
-        actionsProvider =
-        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, actionsProvider)
+        actionsProvider
+        isFromReturnType =
+        let suffix = if isFromReturnType then " " else ""
+        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, suffix, actionsProvider)
 
     let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode actionsProvider =
         match decl with
@@ -142,7 +144,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
-        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode actionsProvider
+        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode actionsProvider true
         |> ValueSome
 
     let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode actionsProvider =
@@ -169,8 +171,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
             let fcsType = symbol.FullType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
-            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider
-            |> ValueSome
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false |> ValueSome
 
         | _ -> ValueNone
 
