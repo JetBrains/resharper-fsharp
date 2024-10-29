@@ -21,7 +21,6 @@ open JetBrains.UI.RichText
 type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode, suffix,
                           bulbActionsProvider: IInlayHintBulbActionsProvider) =
     let text = RichText(": " + typeNameString + suffix)
-    let text = RichText(": " + typeNameString)
     new (typeNameString: string, range: DocumentRange) =
         TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null)
 
