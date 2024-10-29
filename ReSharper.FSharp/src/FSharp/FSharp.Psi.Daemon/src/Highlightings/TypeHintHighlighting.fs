@@ -18,11 +18,11 @@ open JetBrains.UI.RichText
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode,
+type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode, suffix,
                           bulbActionsProvider: IInlayHintBulbActionsProvider) =
-    let text = RichText(": " + typeNameString)
+    let text = RichText(": " + typeNameString + suffix)
     new (typeNameString: string, range: DocumentRange) =
-        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, null)
+        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null)
 
     interface IHighlighting with
         member x.ToolTip = null
