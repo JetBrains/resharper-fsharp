@@ -341,7 +341,7 @@ type LambdaAnalyzer() =
                     let expr = lambda.IgnoreParentParens()
                     let mutable funExpr = Unchecked.defaultof<_>
                     let mutable arg = Unchecked.defaultof<_>
-                    if isFunctionInApp expr &funExpr &arg then
+                    if isFunctionInAppExpr expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
                         tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFSharp60Supported :> _
