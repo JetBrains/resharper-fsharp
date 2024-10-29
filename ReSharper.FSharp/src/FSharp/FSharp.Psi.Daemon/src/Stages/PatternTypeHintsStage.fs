@@ -171,7 +171,8 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
             let fcsType = symbol.FullType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
-            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false |> ValueSome
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
+            |> ValueSome
 
         | _ -> ValueNone
 
