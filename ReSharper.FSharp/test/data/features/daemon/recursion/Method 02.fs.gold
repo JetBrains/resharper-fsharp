@@ -1,0 +1,31 @@
+﻿module Module
+
+type T() =
+    member this.M1(x) =
+        |this.M1|(0)(x + 1)
+
+    member this.M2(x) =
+        |this.M2|(1)(x + 1)
+        ()
+
+    member this.M3(x) =
+        |this.M3|(2)
+        ()
+
+    member this.M4(a, b) =
+        |this.M4|(3) a
+        ()
+
+    member this.M5(a, b) =
+        |this.M5|(4) a
+
+    member this.M6(a, b) =
+        |this.M6|(5)
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Non-tail recursion: Recursion in non-tail position
+(2): Partial recursion: Recursive name usage
+(3): Non-tail recursion: Recursion in non-tail position
+(4): Recursion: Recursion in tail position
+(5): Partial recursion: Recursive name usage

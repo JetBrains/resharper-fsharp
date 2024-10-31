@@ -1,0 +1,21 @@
+﻿Other
+---
+UsageOther TO: [O] let rec |f| a b = RANGE: (23,24) @ Recursion 06.fs
+UsageOther TO: [O] let rec f |a| b = RANGE: (25,26) @ Recursion 06.fs
+UsageOther TO: [O] let rec f a |b| = RANGE: (27,28) @ Recursion 06.fs
+UsageOther TO: [O] |f| 1 |> ignore RANGE: (35,36) @ Recursion 06.fs
+UsageOther TO: [O] f 1 ||>| ignore RANGE: (39,41) @ Recursion 06.fs
+UsageOther TO: [O] f 1 |> |ignore| RANGE: (42,48) @ Recursion 06.fs
+
+
+Partial recursive application
+---
+UsageRecursionPartialCall TO: [O] |f| 1 |> ignore RANGE: (35,36) @ Recursion 06.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] f 1 ||>| ignore RANGE: (39,41) @ Recursion 06.fs
+UsageInvocation TO: [O] f 1 |> |ignore| RANGE: (42,48) @ Recursion 06.fs
+
+

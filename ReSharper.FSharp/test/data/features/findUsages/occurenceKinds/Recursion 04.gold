@@ -1,0 +1,12 @@
+﻿Other
+---
+UsageOther TO: [O] let rec |f| x = RANGE: (23,24) @ Recursion 04.fs
+UsageOther TO: [O] let rec f |x| = RANGE: (25,26) @ Recursion 04.fs
+UsageOther TO: [O] |f| RANGE: (33,34) @ Recursion 04.fs
+
+
+Partial recursive application
+---
+UsageRecursionPartialCall TO: [O] |f| RANGE: (33,34) @ Recursion 04.fs
+
+

@@ -3,9 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Text
 open JetBrains.Annotations
-open JetBrains.Application.Settings
 open JetBrains.DocumentModel
-open type JetBrains.ProjectModel.ProjectFileTypeEx
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -88,7 +87,7 @@ type ITreeNode with
     member x.Indent =
         match x.GetSourceFile() with
         | null -> FormatterHelper.CalcNodeIndent(x, x.GetCodeFormatter()).Length
-        | sourceFile -> x.GetIndent()
+        | _ -> x.GetIndent()
 
     member x.GetStartLine() =
         x.GetDocumentStartOffset().ToDocumentCoords().Line
@@ -531,16 +530,6 @@ let rec getOutermostPrefixAppExpr ([<CanBeNull>] expr: IFSharpExpression) =
 
     getOutermostPrefixAppExpr prefixAppExpr
 
-let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
-    let mutable currentExpr = expr
-    seq {
-        while isNotNull currentExpr do
-            let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(currentExpr.IgnoreParentParens())
-            if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
-                currentExpr <- prefixApp
-                yield prefixApp.ArgumentExpression
-            else currentExpr <- null
-    }
 
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with

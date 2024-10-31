@@ -226,3 +226,27 @@ let isOperatorReferenceExpr (expr: IFSharpExpression) =
     let name = refExpr.ShortName
     name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
     PrettyNaming.IsOperatorDisplayName name
+
+let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
+    let mutable currentExpr = expr
+    seq {
+        while isNotNull currentExpr do
+            let expr = currentExpr.IgnoreParentParens()
+
+            let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr)
+            if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+                currentExpr <- prefixApp
+                yield prefixApp.ArgumentExpression else
+
+            let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
+            if isNotNull binaryAppExpr && isPredefinedInfixOpApp "|>" binaryAppExpr then
+                currentExpr <- binaryAppExpr
+                yield binaryAppExpr.LeftArgument else
+
+            let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
+            if isNotNull binaryAppExpr && isPredefinedInfixOpApp "<|" binaryAppExpr then
+                currentExpr <- binaryAppExpr
+                yield binaryAppExpr.RightArgument else
+
+            currentExpr <- null
+    }

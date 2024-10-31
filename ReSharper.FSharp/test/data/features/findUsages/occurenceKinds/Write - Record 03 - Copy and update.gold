@@ -11,7 +11,6 @@ UsageOther TO: [O] let r2 = { |r1| with F = r1.F + 1 } RANGE: (73,75) @ Write - 
 UsageOther TO: [O] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (88,89) @ Write - Record 03 - Copy and update.fs
 UsageOther TO: [O] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (85,87) @ Write - Record 03 - Copy and update.fs
 UsageOther TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (90,91) @ Write - Record 03 - Copy and update.fs
-UsageOther TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (90,91) @ Write - Record 03 - Copy and update.fs
 
 
 New instance creation
@@ -35,5 +34,10 @@ Read access
 UsageRead TO: [R] let r2 = { |r1| with F = r1.F + 1 } RANGE: (73,75) @ Write - Record 03 - Copy and update.fs
 UsageRead TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (88,89) @ Write - Record 03 - Copy and update.fs
 UsageRead TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (85,87) @ Write - Record 03 - Copy and update.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] let r2 = { r1 with F = r1.F |+| 1 } RANGE: (90,91) @ Write - Record 03 - Copy and update.fs
 
 

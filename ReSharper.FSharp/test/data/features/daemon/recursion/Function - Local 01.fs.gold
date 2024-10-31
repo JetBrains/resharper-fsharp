@@ -1,0 +1,34 @@
+﻿module Module
+
+do
+    let rec f1 x =
+        |f1|(0) (x + 1)
+
+    let rec f2 x =
+        |f2|(1) (x + 1)
+        ()
+
+    let rec f3 x =
+        |f3|(2)
+        ()
+
+    let rec f4 a b =
+        |f4|(3) a
+        ()
+
+    let rec f5 a b =
+        |f5|(4) a
+
+    let rec f6 a b =
+        |f6|(5)
+
+
+    ()
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Non-tail recursion: Recursion in non-tail position
+(2): Partial recursion: Recursive name usage
+(3): Partial recursion: Recursive partial application
+(4): Partial recursion: Recursive partial application
+(5): Partial recursion: Recursive name usage

@@ -414,6 +414,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
       declaredElement switch
       {
+        IConstructor ctor => ctor.ContainingType?.GetSourceName() ?? ctor.ShortName,
         INamespace ns => ns.IsRootNamespace ? "global" : ns.ShortName,
         IFSharpDeclaredElement fsElement => fsElement.SourceName,
         CompiledTypeElement compiledTypeElement => GetSourceName(compiledTypeElement),

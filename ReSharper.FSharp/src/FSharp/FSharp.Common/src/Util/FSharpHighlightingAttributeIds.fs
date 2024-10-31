@@ -1,8 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System.Drawing
+open JetBrains.Application.UI.Controls.BulbMenu.Anchors
+open JetBrains.Application.UI.Controls.BulbMenu.Items
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
+open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.TextControl.DocumentMarkup
+open JetBrains.Util
 
 [<RequireQualifiedAccess>]
 module FSharpHighlightingAttributeIds =
@@ -66,8 +70,29 @@ module FSharpHighlightingAttributeIds =
     let [<Literal>] ComputationExpression = "ReSharper F# Computation Expression Identifier"
     let [<Literal>] UnitOfMeasure = "ReSharper F# Unit Of Measure Identifier"
 
+    let [<Literal>] NonTailRecursion = "Non-tail recursion"
+    let [<Literal>] PartialRecursion = "Partial recursion"
+    let [<Literal>] Recursion = "Recursion"
+
+
 type FSharpSettingsNamesProvider() =
     inherit PrefixBasedSettingsNamesProvider("ReSharper F#", "FSHARP")
+
+
+type FSharpRecursionGutterMarkTypeBase(icon) =
+    inherit IconGutterMarkType(icon)
+
+    override this.Priority = BulbMenuAnchors.PermanentBackgroundItems
+    override this.GetBulbMenuItems _ = EmptyList<BulbMenuItem>.Instance
+
+type FSharpRecursionGutterMarkType() =
+    inherit FSharpRecursionGutterMarkTypeBase(DaemonThemedIcons.Recursion.Id)
+
+type FSharpPartialRecursionGutterMarkType() =
+    inherit FSharpRecursionGutterMarkTypeBase(DaemonThemedIcons.RecursionInPartialCall.Id)
+
+type FSharpNonTailRecursionGutterMarkType() =
+    inherit FSharpRecursionGutterMarkTypeBase(DaemonThemedIcons.RecursionProblematic.Id)
 
 
 // todo: replace explicit styles with fallback ids when highlighting registration refactoring is finished.
@@ -365,8 +390,25 @@ type FSharpSettingsNamesProvider() =
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Members//Extension property",
       Layer = HighlighterLayer.SYNTAX,
-      EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet")>]
+      EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
+  
+  RegisterHighlighter(
+    FSharpHighlightingAttributeIds.Recursion,
+    Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
+    EffectType = EffectType.GUTTER_MARK,
+    GutterMarkType = typeof<FSharpRecursionGutterMarkType>);
 
+  RegisterHighlighter(
+    FSharpHighlightingAttributeIds.NonTailRecursion,
+    Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
+    EffectType = EffectType.GUTTER_MARK,
+    GutterMarkType = typeof<FSharpNonTailRecursionGutterMarkType>);
+  
+  RegisterHighlighter(
+    FSharpHighlightingAttributeIds.PartialRecursion,
+    Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
+    EffectType = EffectType.GUTTER_MARK,
+    GutterMarkType = typeof<FSharpPartialRecursionGutterMarkType>)>]
 type FSharpHighlightingAttributeIds() = class end
 
 module MissingAssemblyReferenceWorkaround =

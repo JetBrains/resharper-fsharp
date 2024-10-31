@@ -141,15 +141,19 @@ let findRequiredQualifierForRecordField (fieldBinding: IRecordFieldBinding) =
     let field = fieldBinding.ReferenceName.Reference.GetFcsSymbol().As<FSharpField>()
     findRequiredQualifier fieldBinding field.DeclaringEntity field [field.DisplayName]
 
+let isInvocation (mfv: FSharpMemberOrFunctionOrValue) (refExpr: IReferenceExpr) =
+    isNotNull (BinaryAppExprNavigator.GetByOperator(refExpr)) ||
+
+    let argsCount = getPrefixAppExprArgs refExpr |> Seq.length
+    let fcsType = getAbbreviatedType mfv.FullType
+    let mfvTypeParamCount = FcsTypeUtil.getFunctionTypeArgs false fcsType |> Seq.length
+    argsCount >= mfvTypeParamCount
+
 let isRecursiveApplication (declaredElement: IDeclaredElement) (refExpr: IReferenceExpr) =
-    let decl = refExpr.GetContainingNode<IDeclaration>()
+    let decl = refExpr.GetContainingNode<IParameterOwnerMemberDeclaration>()
     isNotNull decl && declaredElement = decl.DeclaredElement
 
 let isInTailRecursivePosition (expr: IFSharpExpression) =
-    let parentExpr = expr.GetOutermostParentExpressionFromItsReturn()
-
-    let binding = BindingNavigator.GetByExpression(parentExpr)
-    isNotNull (LetBindingsNavigator.GetByBinding(binding)) ||
-
-    let memberDecl = MemberDeclarationNavigator.GetByExpression(parentExpr)
-    isNotNull memberDecl
+    expr.GetOutermostParentExpressionFromItsReturn()
+    |> ParameterOwnerMemberDeclarationNavigator.GetByExpression
+    |> isNotNull

@@ -4,7 +4,6 @@ UsageOther TO: [O] let mutable |aaa| = 123 RANGE: (27,30) @ Write - Expr 02 - Pa
 UsageOther TO: [O] (|aaa|) <- aaa + 1 RANGE: (38,41) @ Write - Expr 02 - Paren.fs
 UsageOther TO: [O] (aaa) <- |aaa| + 1 RANGE: (46,49) @ Write - Expr 02 - Paren.fs
 UsageOther TO: [O] (aaa) <- aaa |+| 1 RANGE: (50,51) @ Write - Expr 02 - Paren.fs
-UsageOther TO: [O] (aaa) <- aaa |+| 1 RANGE: (50,51) @ Write - Expr 02 - Paren.fs
 
 
 Write access
@@ -15,5 +14,10 @@ UsageWrite TO: [W] (|aaa|) <- aaa + 1 RANGE: (38,41) @ Write - Expr 02 - Paren.f
 Read access
 ---
 UsageRead TO: [R] (aaa) <- |aaa| + 1 RANGE: (46,49) @ Write - Expr 02 - Paren.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] (aaa) <- aaa |+| 1 RANGE: (50,51) @ Write - Expr 02 - Paren.fs
 
 

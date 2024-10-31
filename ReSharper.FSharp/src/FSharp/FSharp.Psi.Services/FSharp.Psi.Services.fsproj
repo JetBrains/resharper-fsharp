@@ -36,6 +36,7 @@
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\TypeUsageParensUtil.fs" />
     <Compile Include="src\Util\SequentialExprUtil.fs" />
+    <Compile Include="src\Util\FcsTypeUtil.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />
@@ -43,7 +44,6 @@
     <Compile Include="src\Util\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Util\UnusedOpensUtil.fs" />
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
-    <Compile Include="src\Util\FcsTypeUtil.fs" />
     <Compile Include="src\Util\Deconstruction.fs" />
     <Compile Include="src\Util\MatchExprUtil.fs" />
     <Compile Include="src\Util\MatchTree.fs" />

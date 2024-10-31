@@ -12,7 +12,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpSecondaryConstructor(this);
 
-    TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns =>
-      new(new[] {ParameterPatterns});
+    TreeNodeEnumerable<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
+      ParametersDeclarationsEnumerable => new([ParametersDeclaration]);
+
+    TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns => new([ParameterPatterns]);
   }
 }

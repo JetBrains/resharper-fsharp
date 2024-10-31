@@ -9,11 +9,9 @@ open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -151,8 +149,6 @@ type FSharpItemOccurenceKindProvider() =
                 [| OccurrenceKind.ExtendedType |] :> _
 
             | :? IReferenceExpr as refExpr ->
-                let refExpr = refExpr.IgnoreInnerParens()
-
                 if element :? IConstructor then
                     [| OccurrenceKind.NewInstanceCreation |] :> _ else
 
@@ -167,26 +163,16 @@ type FSharpItemOccurenceKindProvider() =
 
                     EmptyList.Instance :> _
 
-                | :? FSharpMemberOrFunctionOrValue as mfv ->
-                    let isRecursive =
-                        let decl = refExpr.GetContainingNode<IDeclaration>()
-                        isNotNull decl && element = decl.DeclaredElement
+                | :? FSharpMemberOrFunctionOrValue as mfv when mfv.FullType.IsFunctionType ->
+                    let isRecursive = FSharpResolveUtil.isRecursiveApplication element refExpr
+                    let isInvocation = FSharpResolveUtil.isInvocation mfv refExpr
 
-                    let isPartial =
-                        let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(refExpr.IgnoreParentParens())
-                        if isNull appExpr then true else
+                    match isInvocation, isRecursive with
+                    | false, false -> [| FSharpOccurrenceKinds.partialApplication |] :> _
+                    | true, false -> [| OccurrenceKind.Invocation |] :> _
+                    | false, true -> [| FSharpOccurrenceKinds.partialRecursiveApplication |] :> _
 
-                        let argsCount = getPrefixAppExprArgs refExpr |> Seq.length
-                        let fcsType = getAbbreviatedType mfv.FullType
-                        let mfvTypeParamCount = FcsTypeUtil.getFunctionTypeArgs false fcsType |> Seq.length
-                        argsCount < mfvTypeParamCount
-
-                    match isPartial, isRecursive with
-                    | true, true -> [| FSharpOccurrenceKinds.partialRecursiveApplication |] :> _
-                    | true, false -> [| FSharpOccurrenceKinds.partialApplication |] :> _
-                    | false, false -> [| OccurrenceKind.Invocation |] :> _
-
-                    | false, true ->
+                    | true, true ->
                         let appExpr = getOutermostPrefixAppExpr refExpr
                         if FSharpResolveUtil.isInTailRecursivePosition appExpr then
                             [| FSharpOccurrenceKinds.recursiveInvocation |] :> _

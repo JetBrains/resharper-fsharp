@@ -1,12 +1,14 @@
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public interface IParameterOwnerMemberDeclaration : IFSharpTreeNode
   {
     /// Returns associated '=' token, possibly from containing type declaration
-    JetBrains.ReSharper.Psi.Tree.ITokenNode EqualsToken { get; }
-    JetBrains.ReSharper.Psi.Tree.TreeNodeCollection<IFSharpPattern> ParameterPatterns { get; }
+    ITokenNode EqualsToken { get; }
     IDeclaredElement DeclaredElement { get; }
+    TreeNodeEnumerable<IParametersPatternDeclaration> ParametersDeclarationsEnumerable { get; }
+    TreeNodeCollection<IFSharpPattern> ParameterPatterns { get; }
   }
 }

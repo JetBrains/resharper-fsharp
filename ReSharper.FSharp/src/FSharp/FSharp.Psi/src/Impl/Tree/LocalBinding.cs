@@ -1,3 +1,4 @@
+using System;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -13,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetIsMutable(bool value)
     {
       if (!value)
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
 
       var headPat = HeadPattern;
       if (headPat != null)
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetIsInline(bool value)
     {
       if (value)
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
 
       using var _ = WriteLockCookie.Create(IsPhysical());
       var inlineKeyword = InlineKeyword;
@@ -39,6 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => false;
 
-    IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement => HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
+    IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
+      HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
   }
 }

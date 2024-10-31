@@ -6,12 +6,13 @@
     JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Resources
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Resources;
   </Usings>
 
   <StaticSeverityGroups>

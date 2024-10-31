@@ -1,15 +1,23 @@
+using JetBrains.Annotations;
+
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public static class ParameterOwnerMemberDeclarationNavigator
   {
-    [JetBrains.Annotations.Pure]
-    [JetBrains.Annotations.CanBeNull]
-    [JetBrains.Annotations.ContractAnnotation("null => null")]
-    public static IParameterOwnerMemberDeclaration GetByParameterPattern(IFSharpPattern? param)
-    {
-      return (IParameterOwnerMemberDeclaration) BindingNavigator.GetByParameterPattern(param)
-             ?? (IParameterOwnerMemberDeclaration) MemberDeclarationNavigator.GetByParameterPattern(param)
-             ?? (IParameterOwnerMemberDeclaration) ConstructorDeclarationNavigator.GetByParameterPatterns(param);
-    }
+    [Pure]
+    [CanBeNull]
+    [ContractAnnotation("null => null")]
+    public static IParameterOwnerMemberDeclaration GetByParameterPattern([CanBeNull] IFSharpPattern param) =>
+      (IParameterOwnerMemberDeclaration)BindingNavigator.GetByParameterPattern(param) ??
+      (IParameterOwnerMemberDeclaration)MemberDeclarationNavigator.GetByParameterPattern(param) ??
+      (IParameterOwnerMemberDeclaration)ConstructorDeclarationNavigator.GetByParameterPatterns(param);
+
+    [Pure]
+    [CanBeNull]
+    [ContractAnnotation("null => null")]
+    public static IParameterOwnerMemberDeclaration GetByExpression(IFSharpExpression expr) =>
+      (IParameterOwnerMemberDeclaration)BindingNavigator.GetByExpression(expr) ??
+      (IParameterOwnerMemberDeclaration)MemberDeclarationNavigator.GetByExpression(expr) ??
+      SecondaryConstructorDeclarationNavigator.GetByExpression(expr);
   }
 }

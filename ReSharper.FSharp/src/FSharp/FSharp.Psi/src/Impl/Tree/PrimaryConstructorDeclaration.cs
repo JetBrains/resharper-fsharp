@@ -13,10 +13,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpPrimaryConstructor(this);
 
+    TreeNodeEnumerable<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
+      ParametersDeclarationsEnumerable => new([ParametersDeclaration]);
+
     public ITokenNode EqualsToken =>
       FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(this)?.EqualsToken;
 
-    TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns =>
-      new(new[] {ParameterPatterns});
+    TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns => new([ParameterPatterns]);
   }
 }

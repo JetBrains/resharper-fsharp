@@ -3,8 +3,6 @@
 UsageOther TO: [O] let |p| = 1 RANGE: (34,35) @ Write - Return 01.fs
 UsageOther TO: [O] do |p| |> ignore RANGE: (47,48) @ Write - Return 01.fs
 UsageOther TO: [O] do p ||>| ignore RANGE: (49,51) @ Write - Return 01.fs
-UsageOther TO: [O] do p ||>| ignore RANGE: (49,51) @ Write - Return 01.fs
-UsageOther TO: [O] do p |> |ignore| RANGE: (52,58) @ Write - Return 01.fs
 UsageOther TO: [O] do p |> |ignore| RANGE: (52,58) @ Write - Return 01.fs
 UsageOther TO: [O] T.|M|(P = 1) RANGE: (126,127) @ Write - Return 01.fs
 UsageOther TO: [O] |T|.M(P = 1) RANGE: (124,125) @ Write - Return 01.fs
@@ -19,15 +17,17 @@ Read access
 UsageRead TO: [R] do |p| |> ignore RANGE: (47,48) @ Write - Return 01.fs
 
 
+Invocation
+---
+UsageInvocation TO: [O] do p ||>| ignore RANGE: (49,51) @ Write - Return 01.fs
+UsageInvocation TO: [O] do p |> |ignore| RANGE: (52,58) @ Write - Return 01.fs
+UsageInvocation TO: [O] T.|M|(P = 1) RANGE: (126,127) @ Write - Return 01.fs
+
+
 New instance creation
 ---
 UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (119,120) @ Write - Return 01.fs
 UsageInstanceCreation TO: [O] static member M() = |T|() RANGE: (119,120) @ Write - Return 01.fs
-
-
-Invocation
----
-UsageInvocation TO: [O] T.|M|(P = 1) RANGE: (126,127) @ Write - Return 01.fs
 
 
 Write access

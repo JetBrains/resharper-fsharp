@@ -1,0 +1,25 @@
+﻿Other
+---
+UsageOther TO: [O] static member M(|x|) = RANGE: (46,47) @ Recursion 10.fs
+UsageOther TO: [O] T.|M|(x + 1) RANGE: (61,62) @ Recursion 10.fs
+UsageOther TO: [O] |T|.M(x + 1) RANGE: (59,60) @ Recursion 10.fs
+UsageOther TO: [O] |T|.M(x + 1) RANGE: (59,60) @ Recursion 10.fs
+UsageOther TO: [O] T.M(|x| + 1) RANGE: (63,64) @ Recursion 10.fs
+UsageOther TO: [O] T.M(x |+| 1) RANGE: (65,66) @ Recursion 10.fs
+
+
+Recursive invocation
+---
+UsageRecursion TO: [O] T.|M|(x + 1) RANGE: (61,62) @ Recursion 10.fs
+
+
+Read access
+---
+UsageRead TO: [R] T.M(|x| + 1) RANGE: (63,64) @ Recursion 10.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] T.M(x |+| 1) RANGE: (65,66) @ Recursion 10.fs
+
+
