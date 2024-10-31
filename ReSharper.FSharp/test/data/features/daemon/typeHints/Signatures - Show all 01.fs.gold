@@ -191,4 +191,4 @@ let f1 (x||(57) & Int(i||(58)) & String(s||(59))) ||(60)= ()
 (57): ReSharper Parameter Name Hint: : MyStruct
 (58): ReSharper Parameter Name Hint: : int
 (59): ReSharper Parameter Name Hint: : string
-(60): ReSharper Parameter Name Hint: : unit
+(60): ReSharper Parameter Name Hint: : unit 
