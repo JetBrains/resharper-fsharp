@@ -3,7 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let rec tryVisitCompositePattern acc (pattern: IFSharpPattern) =
+let rec private tryVisitCompositePattern acc (pattern: IFSharpPattern) =
     match pattern with
     | :? IReferencePat -> acc
     | _ -> visitPattern acc pattern
