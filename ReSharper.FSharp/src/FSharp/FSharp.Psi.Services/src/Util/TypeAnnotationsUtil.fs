@@ -3,7 +3,12 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
+let rec tryVisitCompositePattern acc (pattern: IFSharpPattern) =
+    match pattern with
+    | :? IReferencePat -> acc
+    | _ -> visitPattern acc pattern
+
+and private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     match pattern with
     | null
     | :? IUnitPat
@@ -38,6 +43,17 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     | :? IAndsPat as andPat ->
         andPat.PatternsEnumerable
         |> Seq.fold visitPattern acc
+
+    | :? IOrPat as orPat ->
+        visitPattern acc orPat.Pattern1
+
+    | :? IListConsPat as listConsPat ->
+        let acc = tryVisitCompositePattern acc listConsPat.HeadPattern
+        visitPattern acc listConsPat.TailPattern
+
+    | :? IArrayOrListPat as arrayOrListPat ->
+        arrayOrListPat.PatternsEnumerable
+        |> Seq.fold tryVisitCompositePattern acc
 
     | _ -> acc
 
@@ -82,3 +98,7 @@ let collectTypeHintAnchorsForConstructor (ctor: IConstructorDeclaration) =
 let collectTypeHintAnchorsForEachExpr (forEachExpr: IForEachExpr) =
     if isNull forEachExpr.InExpression then []
     else visitPattern [] forEachExpr.Pattern
+
+let collectTypeHintAnchorsForMatchClause (matchClause: IMatchClause) =
+    if isNull matchClause.RArrow then []
+    else visitPattern [] matchClause.Pattern

@@ -130,6 +130,21 @@ let (|String|) (x: MyStruct) : string = String(x.myString)
 
 let f1 (x & Int(i) & String(s)) = ()
 
+
+function x||(12) -> ()
+
+match [Some 5] with
+| [] -> ()
+| [x] -> ()
+| x :: y :: [] -> ()
+| Some(x||(13)) :: tail||(14) -> () 
+| [Some(x||(15))]
+| [_; Some(x)] when let x||(16) = 5 in true ->
+    let y||(17) = 5 in ()
+
+exception MyException of string
+try () with | MyException(x||(18)) -> ()
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
 (1): ReSharper Parameter Name Hint: : int
@@ -143,3 +158,10 @@ let f1 (x & Int(i) & String(s)) = ()
 (9): ReSharper Parameter Name Hint: : int
 (10): ReSharper Parameter Name Hint: : string
 (11): ReSharper Parameter Name Hint: : int
+(12): ReSharper Parameter Name Hint: : 'a
+(13): ReSharper Parameter Name Hint: : int
+(14): ReSharper Parameter Name Hint: : int option list
+(15): ReSharper Parameter Name Hint: : int
+(16): ReSharper Parameter Name Hint: : int
+(17): ReSharper Parameter Name Hint: : int
+(18): ReSharper Parameter Name Hint: : string
