@@ -1,5 +1,5 @@
 ﻿module Module
 
-let f s =
-    match s with{caret}
+let f x{caret} =
+    match x with
     | "" -> ()

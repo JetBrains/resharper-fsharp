@@ -1,5 +1,5 @@
 ﻿module Module
 
-let f i = {caret}// comment
-    match i with
+let f x{caret} = // comment
+    match x with
     | 1 -> ()

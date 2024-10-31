@@ -1,6 +1,6 @@
 ﻿module Module
 
-let f foo =
-    match foo with{caret}
+let f x{caret} =
+    match x with
     | _ -> ()
 }
