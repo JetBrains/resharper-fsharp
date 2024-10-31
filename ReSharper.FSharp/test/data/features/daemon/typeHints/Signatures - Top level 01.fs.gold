@@ -124,6 +124,12 @@ let (|Active1|Active2|) valueToMatch||(40) ||(41)=
 
 let (|ActiveOption|_|) _ ||(42)= None
 
+
+let (|Int|) (x: MyStruct) : int = Int(x.myInt)
+let (|String|) (x: MyStruct) : string = String(x.myString)
+
+let f1 (x||(43) & Int(i||(44)) & String(s||(45))) ||(46)= ()
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
 (1): ReSharper Parameter Name Hint: : 'c
@@ -168,3 +174,7 @@ let (|ActiveOption|_|) _ ||(42)= None
 (40): ReSharper Parameter Name Hint: : bool
 (41): ReSharper Parameter Name Hint: : Choice<int,string> 
 (42): ReSharper Parameter Name Hint: : 'b option 
+(43): ReSharper Parameter Name Hint: : MyStruct
+(44): ReSharper Parameter Name Hint: : int
+(45): ReSharper Parameter Name Hint: : string
+(46): ReSharper Parameter Name Hint: : unit 
