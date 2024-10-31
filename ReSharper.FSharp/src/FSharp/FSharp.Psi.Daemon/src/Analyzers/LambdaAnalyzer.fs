@@ -12,29 +12,32 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [| typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
+                         HighlightingTypes = [| typeof<DotLambdaCanBeUsedWarning>
+                                                typeof<LambdaCanBeReplacedWithBuiltinFunctionWarning>
                                                 typeof<LambdaCanBeReplacedWithInnerExpressionWarning>
                                                 typeof<LambdaCanBeSimplifiedWarning>
-                                                typeof<RedundantApplicationWarning>
-                                                typeof<DotLambdaCanBeUsedWarning> |])>]
+                                                typeof<RedundantApplicationWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
     let rec patIsUsed (nameUsages: OneToListMap<string, ITreeNode>) (excludedUseExpr: ITreeNode) (pat: IFSharpPattern) =
         match pat.IgnoreInnerParens() with
-        | :? ITuplePat as tuplePat -> Seq.exists (patIsUsed nameUsages excludedUseExpr) tuplePat.PatternsEnumerable
+        | :? ITuplePat as tuplePat ->
+            Seq.exists (patIsUsed nameUsages excludedUseExpr) tuplePat.PatternsEnumerable
+
         | :? ILocalReferencePat as refPat ->
             nameUsages.GetValuesSafe(refPat.SourceName)
             |> Seq.exists (fun u -> isNotNull u && not (excludedUseExpr.Contains(u)))
+
         | _ -> false
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
@@ -122,7 +125,8 @@ type LambdaAnalyzer() =
 
         exprType <> lambdaReturnType
 
-    let isLambdaArgOwnerSupported (lambda: IFSharpExpression) delegatesConversionSupported (replacementExprSymbol: FSharpSymbol voption) =
+    let isLambdaArgOwnerSupported (lambda: IFSharpExpression) delegatesConversionSupported
+            (replacementExprSymbol: FSharpSymbol voption) =
         isNull (QuoteExprNavigator.GetByQuotedExpression(lambda.IgnoreParentParens())) &&
 
         let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
@@ -152,6 +156,7 @@ type LambdaAnalyzer() =
                 parameterType.HasTypeDefinition &&
                 let abbreviatedType = getAbbreviatedEntity parameterType.TypeDefinition
                 abbreviatedType.IsDelegate ||
+
                 abbreviatedType.LogicalName = "Expression`1" &&
                 match abbreviatedType.TryFullName with
                 | Some "System.Linq.Expressions.Expression`1" -> true
@@ -182,8 +187,9 @@ type LambdaAnalyzer() =
             | _ -> true
         | _ -> true
 
-    let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg) isFSharp6Supported =
-        if isFSharp6Supported && hasExplicitConversion(lambda) then null else
+    let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg)
+            isFSharp6Supported =
+        if isFSharp6Supported && hasExplicitConversion lambda then null else
 
         let lambda = lambda.IgnoreParentParens()
 
@@ -206,6 +212,7 @@ type LambdaAnalyzer() =
                 |> Seq.concat
                 |> Seq.exists (fun x -> x.IsOptionalArg)
             if hasOptionalArg then null else ctor arg
+
         | _ -> ctor arg
 
     let tryCreateWarningForBuiltInFun ctor (lambda: ILambdaExpr, funName: string as arg) isFSharp6Supported =
@@ -220,41 +227,50 @@ type LambdaAnalyzer() =
             let fcsType = expr.TryGetFcsType()
             isNotNull fcsType && isReadOnly fcsType
 
-        let processor = { new IRecursiveElementProcessor with
-            member x.ProcessingIsFinished = containsForcedCalculations
-            member x.InteriorShouldBeProcessed(treeNode) = not (treeNode :? ILambdaExpr)
-            member x.ProcessAfterInterior(treeNode) = ()
-            member x.ProcessBeforeInterior(treeNode) =
-                match treeNode with
-                | :? INewExpr
-                | :? IForLikeExpr
-                | :? ISetExpr
-                | :? IWhileExpr
-                | :? IBinaryAppExpr ->
-                    containsForcedCalculations <- true
-                | :? IIndexerExpr as indexer when not (typeIsReadOnly indexer.Qualifier) ->
-                    containsForcedCalculations <- true
-                | :? IPrefixAppExpr as prefixAppExpr ->
-                    if prefixAppExpr.IsIndexerLike && not (typeIsReadOnly prefixAppExpr.FunctionExpression) then
+        let processor =
+            { new IRecursiveElementProcessor with
+                member x.ProcessingIsFinished = containsForcedCalculations
+                member x.InteriorShouldBeProcessed(treeNode) = not (treeNode :? ILambdaExpr)
+                member x.ProcessAfterInterior(treeNode) = ()
+
+                member x.ProcessBeforeInterior(treeNode) =
+                    match treeNode with
+                    | :? INewExpr
+                    | :? IForLikeExpr
+                    | :? ISetExpr
+                    | :? IWhileExpr
+
+                    | :? IBinaryAppExpr ->
                         containsForcedCalculations <- true
-                    elif isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
-                        prefixAppExprContext <- prefixAppExpr
-                | :? IReferenceExpr as referenceExpr ->
-                    containsForcedCalculations <-
-                        let fcsSymbol = referenceExpr.Reference.GetFcsSymbol()
-                        isNull fcsSymbol ||
-                        match fcsSymbol with
-                        | :? FSharpMemberOrFunctionOrValue as m ->
-                            (m.IsProperty|| m.IsTypeFunction) && (isNull prefixAppExprContext || not prefixAppExprContext.IsIndexerLike) ||
-                            m.IsMutable ||
-                            isNotNull prefixAppExprContext && (m.IsConstructor ||
-                            (m.IsFunction || m.IsMethod) &&
-                             m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count)
-                        | :? FSharpUnionCase when isNotNull prefixAppExprContext -> true
-                        | :? FSharpEntity as e when e.IsDelegate -> true
-                        | _ -> false
-                    prefixAppExprContext <- null
-                | _ -> ()
+
+                    | :? IIndexerExpr as indexer when not (typeIsReadOnly indexer.Qualifier) ->
+                        containsForcedCalculations <- true
+
+                    | :? IPrefixAppExpr as prefixAppExpr ->
+                        if prefixAppExpr.IsIndexerLike && not (typeIsReadOnly prefixAppExpr.FunctionExpression) then
+                            containsForcedCalculations <- true
+                        elif isNull (PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr)) then
+                            prefixAppExprContext <- prefixAppExpr
+
+                    | :? IReferenceExpr as referenceExpr ->
+                        containsForcedCalculations <-
+                            let fcsSymbol = referenceExpr.Reference.GetFcsSymbol()
+                            isNull fcsSymbol ||
+
+                            match fcsSymbol with
+                            | :? FSharpMemberOrFunctionOrValue as m ->
+                                (m.IsProperty|| m.IsTypeFunction) && (isNull prefixAppExprContext || not prefixAppExprContext.IsIndexerLike) ||
+                                m.IsMutable ||
+                                isNotNull prefixAppExprContext && (m.IsConstructor ||
+                                (m.IsFunction || m.IsMethod) &&
+                                 m.CurriedParameterGroups.Count <= prefixAppExprContext.Arguments.Count)
+                            | :? FSharpUnionCase when isNotNull prefixAppExprContext -> true
+                            | :? FSharpEntity as e when e.IsDelegate -> true
+                            | _ -> false
+
+                        prefixAppExprContext <- null
+
+                    | _ -> ()
             }
 
         expression.ProcessThisAndDescendants(processor)
@@ -273,6 +289,7 @@ type LambdaAnalyzer() =
                 // '...App x y' not supported
                 if prefixApp.IsIndexerLike && prefixApp.FunctionExpression.IgnoreInnerParens() :? IPrefixAppExpr then null
                 else inner prefixApp prefixApp.InvokedExpression
+
             | :? IQualifiedExpr as expr -> inner expr expr.Qualifier
             | _ -> null
 
@@ -294,6 +311,7 @@ type LambdaAnalyzer() =
             member x.ProcessingIsFinished = convertingUnsupported
             member x.InteriorShouldBeProcessed(treeNode) = true
             member x.ProcessAfterInterior(treeNode) = ()
+
             member x.ProcessBeforeInterior(treeNode) =
                 if treeNode == rootRefExpr then () else
                 match treeNode with
@@ -330,9 +348,13 @@ type LambdaAnalyzer() =
             match compareArgs pats expr with
             | true, true, replaceCandidate ->
                 if containsForcedCalculations replaceCandidate then null else
-                tryCreateWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate) isFSharp60Supported :> _
+
+                tryCreateWarning LambdaCanBeReplacedWithInnerExpressionWarning (lambda, replaceCandidate)
+                    isFSharp60Supported :> _
+
             | true, false, replaceCandidate ->
                 tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFSharp60Supported :> _
+
             | _ ->
 
             if pats.Count = 1 then
@@ -344,22 +366,30 @@ type LambdaAnalyzer() =
                     if isFunctionInAppExpr expr &funExpr &arg then
                         RedundantApplicationWarning(funExpr, arg) :> _
                     else
-                        tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id") isFSharp60Supported :> _
+                        tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda,  "id")
+                            isFSharp60Supported :> _
                 else
                     match pat with
                     | :? ITuplePat as pat when not pat.IsStruct && pat.PatternsEnumerable.CountIs(2) ->
                         let tuplePats = pat.Patterns
                         if compareArg tuplePats[0] expr then
-                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst") isFSharp60Supported :> _
+                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "fst")
+                                isFSharp60Supported :> _
                         elif compareArg tuplePats[1] expr then
-                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd") isFSharp60Supported :> _
-                        else null
+                            tryCreateWarningForBuiltInFun LambdaCanBeReplacedWithBuiltinFunctionWarning (lambda, "snd")
+                                isFSharp60Supported :> _
+                        else
+                            null
+
                     | :? ILocalReferencePat as pat when isFSharp80Supported ->
-                        let referenceExpr = getRootRefExprIfCanBeConvertedToDotLambda pat lambda
-                        if isNull referenceExpr then null
-                        else DotLambdaCanBeUsedWarning(lambda, referenceExpr)
+                        match getRootRefExprIfCanBeConvertedToDotLambda pat lambda with
+                        | null -> null
+                        | referenceExpr -> DotLambdaCanBeUsedWarning(lambda, referenceExpr)
+
                     | _ -> null
 
-            else null
+            else
+                null
 
-        if isNotNull warning then consumer.AddHighlighting(warning)
+        if isNotNull warning then
+            consumer.AddHighlighting(warning)
