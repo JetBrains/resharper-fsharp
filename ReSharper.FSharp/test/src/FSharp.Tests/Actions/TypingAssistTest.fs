@@ -329,6 +329,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Arrays 07 - Type bar in multiline list wrong formatting``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Angle 01 - Replace``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Angle 02``() = x.DoNamedTest()
 
     [<Test>] member x.``At 01 - Make quotation after left angle``() = x.DoNamedTest()
     [<Test>] member x.``At 02 - Inside empty typed quotations``() = x.DoNamedTest()

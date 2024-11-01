@@ -1354,7 +1354,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
-        if x.SkipCharInOperator(context, lexer, offset) then true else
+        if context.Char = ')' && x.SkipCharInOperator(context, lexer, offset) then true else
 
         this.HandleRightBracketTyped
             (context,
