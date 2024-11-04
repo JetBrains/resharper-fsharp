@@ -87,6 +87,7 @@ module FSharpErrors =
     let [<Literal>] InvalidUseOfTypeName = 800
     let [<Literal>] PropertyIsStatic = 809
     let [<Literal>] PropertyCannotBeSet = 810
+    let [<Literal>] AttributeIsNotValidOnThisElement = 842
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
     let [<Literal>] UnusedValue = 1182
@@ -462,6 +463,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | PropertyCannotBeSet ->
             createHighlightingFromNode PropertyCannotBeSetError range
+
+        | AttributeIsNotValidOnThisElement ->
+            match fsFile.GetNode<IAttribute>(range) with
+            | null -> null
+            | attribute -> AttributeIsNotValidOnThisElementError(attribute, error.Message)
 
         | LocalClassBindingsCannotBeInline ->
             createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
