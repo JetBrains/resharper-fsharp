@@ -16,7 +16,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
-open JetBrains.Util.Logging
 
 type private NodesRequiringHints =
     { TopLevelNodes: List<ITreeNode>; LocalNodes: List<ITreeNode> }
@@ -98,8 +97,7 @@ type private MembersVisitor(settings) =
 
         x.VisitNode(forEachExpr, context)
 
-type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore: IContextBoundSettingsStore,
-                                           daemonProcess: IDaemonProcess, settings) =
+type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSettingsStore, daemonProcess: IDaemonProcess, settings) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
     static let defaultDisplayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
@@ -186,8 +184,7 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
 
         | _ -> ValueNone
 
-    let adornNodes logKey (topLevelNodes : ITreeNode array) (localNodes : ITreeNode array) =
-        use _swc = logger.StopwatchCookie($"Adorning %s{logKey} nodes", $"topLevelNodesCount=%d{topLevelNodes.Length} localNodesCount=%d{localNodes.Length} sourceFile=%s{daemonProcess.SourceFile.Name}")
+    let adornNodes (topLevelNodes : ITreeNode array) (localNodes : ITreeNode array) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
         let inline adornNodes nodes pushToHintMode actionsProvider =
@@ -226,18 +223,18 @@ type private PatternsHighlightingProcess(logger: ILogger, fsFile, settingsStore:
                 let localNodesVisible, localNodesNotVisible = partition localNodes visibleRange
 
                 // Adorn visible expressions first
-                let visibleHighlightings = adornNodes "visible" topLevelVisible localNodesVisible
+                let visibleHighlightings = adornNodes topLevelVisible localNodesVisible
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
                 // Finally adorn expressions that aren't visible in the viewport
-                adornNodes "not visible" topLevelNotVisible localNodesNotVisible
+                adornNodes topLevelNotVisible localNodesNotVisible
             else
-                adornNodes "all" topLevelNodes localNodes
+                adornNodes topLevelNodes localNodes
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type PatternTypeHintsStage(logger: ILogger) =
+type PatternTypeHintsStage() =
     inherit FSharpDaemonStageBase(true, false)
 
     override x.CreateStageProcess(fsFile, settingsStore, daemonProcess, _) =
@@ -246,4 +243,4 @@ type PatternTypeHintsStage(logger: ILogger) =
 
         let settings = FSharpTypeHintSettings.Create(settingsStore)
         if settings.IsDisabled then null
-        else PatternsHighlightingProcess(logger, fsFile, settingsStore, daemonProcess, settings)
+        else PatternsHighlightingProcess(fsFile, settingsStore, daemonProcess, settings)

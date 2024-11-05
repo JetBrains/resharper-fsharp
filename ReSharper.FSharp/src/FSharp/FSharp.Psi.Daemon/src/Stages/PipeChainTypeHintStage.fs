@@ -5,9 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
@@ -19,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util.Logging
 
 [<RequireQualifiedAccess>]
 [<Struct>]
@@ -83,7 +80,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
         visitBinaryAppExpr binaryAppExpr context
         x.VisitNode(binaryAppExpr, context)
 
-type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let isRightPipeArgApplicable (expr: ITreeNode) (pipeResultType: FSharpType) =
@@ -120,8 +117,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
             |> not
         | None -> false
 
-    let adornExprs logKey (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
-        use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
+    let adornExprs (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
         for refExpr, exprToAdorn, isLeft in exprs do
@@ -166,20 +162,20 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                     )
 
                 // Adorn visible expressions first
-                let visibleHighlightings = adornExprs "visible" visible
+                let visibleHighlightings = adornExprs visible
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
                 // Finally adorn expressions that aren't visible in the viewport
-                adornExprs "not visible" notVisible
+                adornExprs notVisible
             else
-                adornExprs "all" allHighlightings
+                adornExprs allHighlightings
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type PipeChainTypeHintStage(logger: ILogger) =
+type PipeChainTypeHintStage() =
     inherit FSharpDaemonStageBase(true, false)
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess, _) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
-        PipeChainHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _
+        PipeChainHighlightingProcess(fsFile, settings, daemonProcess) :> _
