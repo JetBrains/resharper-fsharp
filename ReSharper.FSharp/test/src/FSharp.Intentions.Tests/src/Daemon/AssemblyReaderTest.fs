@@ -62,10 +62,13 @@ type AssemblyReaderCSharpTest() =
     override this.RelativeTestDataPath = "common/assemblyReaderShim"
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
-    [<Test>] member x.``Attribute - Attribute usage 01 - Before F# 9``() = x.DoNamedTest()
-
     [<Test>] member x.``Attribute - Attribute usage 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Attribute - Attribute usage 02``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Attribute - Attribute usage 03 - F# 9``() = x.DoNamedTest()
+
     [<Test>] member x.``Attribute - Obsolete 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
