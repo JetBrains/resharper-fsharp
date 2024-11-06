@@ -13,8 +13,8 @@ type RemoveRedundantAttributeFix(attr: IAttribute) =
     new(warning: RedundantRequireQualifiedAccessAttributeWarning) =
         RemoveRedundantAttributeFix(warning.Attr)
 
-    new(warning: AttributeIsNotValidOnThisElementError) =
-        RemoveRedundantAttributeFix(warning.Attribute)
+    new(error: AttributeIsNotValidOnThisElementError) =
+        RemoveRedundantAttributeFix(error.Attribute)
 
     override x.Text = "Remove attribute"
 
