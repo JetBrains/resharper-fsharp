@@ -16,7 +16,7 @@ type RemoveRedundantAttributeFix(attr: IAttribute) =
     new(warning: AttributeIsNotValidOnThisElementError) =
         RemoveRedundantAttributeFix(warning.Attribute)
 
-    override x.Text = "Remove redundant attribute"
+    override x.Text = "Remove attribute"
 
     override x.IsAvailable _ =
         isValid attr && isNotNull (AttributeListNavigator.GetByAttribute(attr))
