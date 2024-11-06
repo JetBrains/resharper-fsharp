@@ -1,6 +1,6 @@
 ﻿module Module
 
-[<CustomClass; CustomStruct; |CustomMethod|(0)>]
+[<CustomClass; |CustomStruct|(0); |CustomMethod|(1)>]
 type C1() =
     [<CustomMethod>]
     member x.M() = ()
@@ -15,3 +15,4 @@ type C3 =
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
+(1): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element

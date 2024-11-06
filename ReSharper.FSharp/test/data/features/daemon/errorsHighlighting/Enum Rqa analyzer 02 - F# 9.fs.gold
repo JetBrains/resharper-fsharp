@@ -1,0 +1,9 @@
+﻿module Module
+
+[<||RequireQualifiedAccess|(0)|(1)>]
+type E =
+    | A = 1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant RequireQualifiedAccess attribute
+(1): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element

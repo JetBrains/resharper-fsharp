@@ -15,7 +15,12 @@ type ErrorsHighlightingTest() =
 
     override x.RelativeTestDataPath = "features/daemon/errorsHighlighting"
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Enum Rqa analyzer 01``() = x.DoNamedTest()
+
+    // Note: error produced only for FSharp.Core < 8.0.401
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Enum Rqa analyzer 02 - F# 9``() = x.DoNamedTest()
 
     [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>] member x.``Extension analyzer 01``() = x.DoNamedTest()
     [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>] member x.``Extension analyzer 02``() = x.DoNamedTest()
