@@ -1,0 +1,7 @@
+﻿module M
+
+[<|RequireQualifiedAccess|(0)>]
+()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
