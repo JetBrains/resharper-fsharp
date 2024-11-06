@@ -7,12 +7,16 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type RemoveRedundantAttributeFix(warning: RedundantRequireQualifiedAccessAttributeWarning) =
+type RemoveRedundantAttributeFix(attr: IAttribute) =
     inherit FSharpQuickFixBase()
 
-    let attr = warning.Attr
+    new(warning: RedundantRequireQualifiedAccessAttributeWarning) =
+        RemoveRedundantAttributeFix(warning.Attr)
 
-    override x.Text = "Remove redundant attribute"
+    new(error: AttributeIsNotValidOnThisElementError) =
+        RemoveRedundantAttributeFix(error.Attribute)
+
+    override x.Text = "Remove attribute"
 
     override x.IsAvailable _ =
         isValid attr && isNotNull (AttributeListNavigator.GetByAttribute(attr))

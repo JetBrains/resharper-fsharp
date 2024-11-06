@@ -747,4 +747,15 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemovePatternArgumentFix</QuickFix>
   </Error>
+
+  <Error staticGroup="FSharpErrors" name="AttributeIsNotValidOnThisElement" ID="FS0842: This attribute is not valid for use on this language element">
+    <Parameter type="IAttribute" name="attribute"/>
+      <Parameter type="string" name="fcsMessage"/>
+      <Message resourceName="Message" resourceType="Strings">
+          <Argument>fcsMessage</Argument>
+      </Message>
+    <Range>attribute.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveRedundantAttributeFix</QuickFix>
+  </Error>
 </Errors>

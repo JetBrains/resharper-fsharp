@@ -97,3 +97,5 @@ type FcsErrorsHighlightingTest() =
     [<Test>] member x.``XmlDoc - Primary constructor 02``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Syntax 01``() = x.DoNamedTest()
     [<Test>] member x.``XmlDoc - Syntax 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Attributes - Invalid use 01``() = x.DoNamedTest()
