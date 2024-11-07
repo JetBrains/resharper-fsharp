@@ -5,8 +5,7 @@ open JetBrains.DocumentModel
 open JetBrains.Util
 
 type VisibilityConsumer<'a>(visibleRange: DocumentRange, getRange: 'a -> DocumentRange) =
-    let visibleRangeIsValid = visibleRange.IsValid()
-    let visible: ICollection<'a> = if visibleRangeIsValid then List() else EmptyList.Instance
+    let visible: ICollection<'a> = if visibleRange.IsValid() then List() else EmptyList.Instance
     let notVisible: ICollection<'a> = List()
     let getContainer item =
         let itemRange = getRange item
