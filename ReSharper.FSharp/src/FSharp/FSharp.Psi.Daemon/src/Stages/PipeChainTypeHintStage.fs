@@ -153,12 +153,11 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
 
         fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
 
-        let visibleItems = consumer.VisibleItems
         let remainingHighlightings =
-            if visibleItems.Count > 0 then
+            if consumer.HasVisibleItems then
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
                 // Adorn visible expressions first
-                let visibleHighlightings = adornExprs visibleItems
+                let visibleHighlightings = adornExprs consumer.VisibleItems
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
             // Finally adorn expressions that aren't visible in the viewport
