@@ -7,6 +7,7 @@ open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -25,7 +26,7 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<List<IReferenceExpr * ITreeNode * bool>>()
+    inherit TreeNodeVisitor<VisibilityConsumer<IReferenceExpr * ITreeNode * bool>>()
 
     let showSameLineHints =
         match sameLinePipeHints with
@@ -35,7 +36,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
     let isApplicable binaryAppExpr =
         isPredefinedInfixOpApp "|>" binaryAppExpr
 
-    let visitBinaryAppExpr binaryAppExpr (context: List<IReferenceExpr * ITreeNode * bool>) =
+    let visitBinaryAppExpr binaryAppExpr (context: VisibilityConsumer<IReferenceExpr * ITreeNode * bool>) =
         if not (isApplicable binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
@@ -117,7 +118,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
             |> not
         | None -> false
 
-    let adornExprs (exprs : (IReferenceExpr * ITreeNode * bool)[]) =
+    let adornExprs (exprs : (IReferenceExpr * ITreeNode * bool) ICollection) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
 
         for refExpr, exprToAdorn, isLeft in exprs do
@@ -143,32 +144,25 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
             else
                 SameLinePipeHints.Show
 
-        let consumer = List()
-        fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
-        let allHighlightings = Array.ofSeq consumer
-
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
+        let consumer =
+            VisibilityConsumer(visibleRange, fun (_, exprToAdorn: ITreeNode, _) -> exprToAdorn.GetNavigationRange())
 
+        fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
+
+        let visibleItems = consumer.VisibleItems
         let remainingHighlightings =
-            if visibleRange.IsValid() then
+            if visibleItems.Count > 0 then
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
-                let visible, notVisible =
-                    allHighlightings
-                    |> Array.partition (fun (_, exprToAdorn, _) ->
-                        exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
-                    )
-
                 // Adorn visible expressions first
-                let visibleHighlightings = adornExprs visible
+                let visibleHighlightings = adornExprs visibleItems
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
-                // Finally adorn expressions that aren't visible in the viewport
-                adornExprs notVisible
-            else
-                adornExprs allHighlightings
+            // Finally adorn expressions that aren't visible in the viewport
+            adornExprs consumer.NonVisibleItems
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
