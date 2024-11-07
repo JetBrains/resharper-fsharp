@@ -1,6 +1,6 @@
-namespace Ns1
+namespace Ns
 
-module M =
+module Module =
     f{caret} ()
 
     let f x = ()

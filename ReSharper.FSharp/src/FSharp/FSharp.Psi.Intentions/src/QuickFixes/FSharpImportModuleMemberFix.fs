@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -105,7 +106,9 @@ type FSharpImportModuleMemberFix(reference: IReference) =
                 | _ -> Seq.empty
 
             if names |> Seq.exists (fun names -> SharedImplUtil.HasMemberWithName(names, name, false)) then
-                if not (openedScopes.Contains(typeElement, referenceOwner)) then
+                if openedScopes.Contains(typeElement, referenceOwner) then () else
+
+                if FSharpResolveUtil.canReference fsReference typeElement then
                     result.Add(typeElement) |> ignore
 
         result

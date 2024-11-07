@@ -1,10 +1,12 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -157,3 +159,17 @@ let isInTailRecursivePosition (expr: IFSharpExpression) =
     expr.GetOutermostParentExpressionFromItsReturn()
     |> ParameterOwnerMemberDeclarationNavigator.GetByExpression
     |> isNotNull
+
+let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
+    let sourceFile = context.GetSourceFile().NotNull()
+    declaredElement.GetDeclarationsIn(sourceFile)
+    |> Seq.exists (fun decl -> decl.GetDocumentStartOffset().Offset < context.GetDocumentStartOffset().Offset)
+
+let canReference (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
+    let referenceOwner = reference.GetElement()
+    referenceOwner.GetPsiModule() <> typeElement.Module ||
+
+    let sourceFile = referenceOwner.GetSourceFile()
+    isNotNull sourceFile &&
+    FSharpSearchFilter.CanContainReference(typeElement, sourceFile, referenceOwner.CheckerService.FcsProjectProvider) &&
+    (not (typeElement.GetSourceFiles().Contains(sourceFile)) || isPreceding referenceOwner typeElement)

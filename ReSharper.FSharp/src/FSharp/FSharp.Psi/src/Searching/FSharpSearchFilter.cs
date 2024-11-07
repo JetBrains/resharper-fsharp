@@ -1,3 +1,4 @@
+using System.Linq;
 using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
@@ -10,15 +11,8 @@ using JetBrains.Util.DataStructures;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
-  public sealed class FSharpSearchFilter : ISearchFilter
+  public sealed class FSharpSearchFilter(IFcsProjectProvider fsProjectProvider) : ISearchFilter
   {
-    private readonly IFcsProjectProvider myFsProjectProvider;
-
-    public FSharpSearchFilter(IFcsProjectProvider fsProjectProvider)
-    {
-      myFsProjectProvider = fsProjectProvider;
-    }
-
     private record FSharpSearchFilterKey(
       bool IsTypePrivateMember,
       IPsiModule PsiModule,
@@ -29,7 +23,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public bool IsAvailable(SearchPattern pattern) => true;
 
-    public object TryGetKey(IDeclaredElement declaredElement)
+    public static bool CanContainReference(IDeclaredElement declaredElement, IPsiSourceFile sourceFile, IFcsProjectProvider fsProjectProvider)
+    {
+      if (!sourceFile.LanguageType.Is<FSharpProjectFileType>()) return true;
+
+      var key = TryGetKey(declaredElement, fsProjectProvider);
+
+      if (key.SourceFiles.Contains(sourceFile)) return true;
+      if (key.IsTypePrivateMember) return false;
+      if (!sourceFile.PsiModule.Equals(key.PsiModule)) return true;
+
+      var sourceFileIndex = fsProjectProvider.GetFileIndex(sourceFile);
+      return sourceFileIndex >= key.FileIndex;
+    }
+
+    private static FSharpSearchFilterKey TryGetKey(IDeclaredElement declaredElement, IFcsProjectProvider fsProjectProvider)
     {
       if (declaredElement is not IFSharpDeclaredElement fsDeclaredElement) return null;
 
@@ -44,18 +52,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (declaredElement is ITypePrivateMember)
         return new FSharpSearchFilterKey(IsTypePrivateMember: true, fsDeclaredElement.Module, sourceFiles, FileIndex: -1);
 
-      var fileIndex = 0;
-      foreach (var psiSourceFile in sourceFiles)
-      {
-        var currentIndex = myFsProjectProvider.GetFileIndex(psiSourceFile);
-        if (currentIndex < fileIndex)
-          fileIndex = currentIndex;
-      }
-
-      if (fileIndex < 0) return null;
+      var fileIndex = sourceFiles.Select(fsProjectProvider.GetFileIndex).Min();
 
       return new FSharpSearchFilterKey(IsTypePrivateMember: false, fsDeclaredElement.Module, sourceFiles, fileIndex);
     }
+
+    public object TryGetKey(IDeclaredElement declaredElement) =>
+      TryGetKey(declaredElement, fsProjectProvider);
 
     public bool CanContainReferences(IPsiSourceFile sourceFile, object key)
     {
@@ -67,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (fsSearchFilterKey.IsTypePrivateMember) return false;
       if (!sourceFile.PsiModule.Equals(fsSearchFilterKey.PsiModule)) return true;
 
-      var sourceFileIndex = myFsProjectProvider.GetFileIndex(sourceFile);
+      var sourceFileIndex = fsProjectProvider.GetFileIndex(sourceFile);
       return sourceFileIndex >= fsSearchFilterKey.FileIndex;
     }
   }

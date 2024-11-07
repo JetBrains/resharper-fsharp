@@ -5,6 +5,7 @@ using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -311,14 +312,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return ParameterKind.VALUE;
     }
 
-    public static bool TryGetFcsRange(this ITreeNode treeNode, out Range range)
+    public static bool TryGetFcsRange([NotNull] this ITreeNode treeNode, out Range range) =>
+      TryGetFcsRange(treeNode, treeNode.GetDocumentRange(), out range);
+
+    public static bool TryGetFcsRange([NotNull] this ITreeNode treeNode, DocumentRange documentRange, out Range range)
     {
       range = default;
 
       var sourceFile = treeNode.GetSourceFile();
       if (sourceFile == null) return false;
 
-      range = treeNode.GetDocumentRange().ToFcsRange(sourceFile.GetLocation());
+      range = documentRange.ToFcsRange(sourceFile.GetLocation());
       return true;
     }
 
@@ -326,14 +330,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       fsTreeNode.FSharpFile.GetParseAndCheckResults(true, opName)?.Value?.CheckResults;
 
     [CanBeNull]
-    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode)
-    {
-      var checkResults = treeNode.GetCheckResults(nameof(TryGetFcsType));
-      if (checkResults == null) return null;
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode) =>
+      TryGetFcsType(treeNode, treeNode.GetDocumentRange());
 
-      return treeNode.TryGetFcsRange(out var range)
-        ? checkResults.GetTypeOfExpression(range)?.Value
-        : null;
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode, DocumentRange documentRange)
+    {
+      if (!treeNode.TryGetFcsRange(documentRange, out var range)) return null;
+
+      if (treeNode.GetCheckResults(nameof(TryGetFcsType)) is var checkResults)
+        return checkResults?.GetTypeOfExpression(range)?.Value;
+
+      return null;
     }
 
     [CanBeNull]
