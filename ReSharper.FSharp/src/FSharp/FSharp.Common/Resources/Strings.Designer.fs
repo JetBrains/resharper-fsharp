@@ -42,3 +42,5 @@ type public Strings() =
     static member FSharpTypeHints_LocalBindings_Description = Strings.ResourceManager.GetString("FSharpTypeHints_LocalBindings_Description")
     static member FSharpTypeHints_ShowPipeReturnTypes_Description = Strings.ResourceManager.GetString("FSharpTypeHints_ShowPipeReturnTypes_Description")
     static member FSharpTypeHints_HideSameLinePipe_Description = Strings.ResourceManager.GetString("FSharpTypeHints_HideSameLinePipe_Description")
+    static member FSharpTypeHints_MatchClauses_Description = Strings.ResourceManager.GetString("FSharpTypeHints_MatchClauses_Description")
+    static member FSharpTypeHints_MatchClausesSettings_Header = Strings.ResourceManager.GetString("FSharpTypeHints_MatchClausesSettings_Header")
