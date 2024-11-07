@@ -30,6 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override AccessRights GetAccessRights() =>
       ContainingType.GetRepresentationAccessRights();
 
+    public override string SourceName => ShortName;
+
     public override bool IsValid() =>
       OriginElement.IsValid();
 

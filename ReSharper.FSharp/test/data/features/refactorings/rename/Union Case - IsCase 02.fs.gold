@@ -1,0 +1,10 @@
+﻿//${NEW_NAME:Zzz}
+module Module
+
+type U =
+    | Zzz
+    | B
+
+let a: U = Zzz
+
+a.IsZzz

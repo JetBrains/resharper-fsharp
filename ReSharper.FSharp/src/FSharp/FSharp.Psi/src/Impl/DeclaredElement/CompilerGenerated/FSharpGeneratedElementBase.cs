@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     [NotNull] protected abstract IClrDeclaredElement ContainingElement { get; }
 
-    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
+    public virtual string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool IsValid() => ContainingElement.IsValid();
     public override IPsiServices GetPsiServices() => ContainingElement.GetPsiServices();
