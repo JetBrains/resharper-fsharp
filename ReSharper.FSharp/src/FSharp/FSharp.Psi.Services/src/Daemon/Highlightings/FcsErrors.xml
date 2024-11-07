@@ -398,7 +398,7 @@
   <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression" ID="FS0747: 'yield' is not allowed">
     <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
     <Message resourceName="YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage" resourceType="Strings"/>
-    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Range>yieldExpr.YieldKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>

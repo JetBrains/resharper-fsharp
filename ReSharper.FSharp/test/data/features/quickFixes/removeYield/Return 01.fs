@@ -1,1 +1,1 @@
-return 123{caret}
+return{caret} 123

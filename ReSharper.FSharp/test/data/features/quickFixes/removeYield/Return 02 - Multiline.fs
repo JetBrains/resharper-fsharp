@@ -1,2 +1,2 @@
-return ignore
-           (){caret}
+{caret}return ignore
+           ()

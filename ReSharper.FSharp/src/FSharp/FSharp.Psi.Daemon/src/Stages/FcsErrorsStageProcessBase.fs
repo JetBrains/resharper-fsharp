@@ -530,10 +530,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
 
         | ConstructRequiresListArrayOrSequence ->
-            createHighlightingFromNode YieldRequiresSeqExpressionError range
+            createHighlightingFromParentNode YieldRequiresSeqExpressionError range
 
         | ConstructRequiresComputationExpression ->
-            createHighlightingFromNode ReturnRequiresComputationExpressionError range
+            createHighlightingFromParentNode ReturnRequiresComputationExpressionError range
 
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
