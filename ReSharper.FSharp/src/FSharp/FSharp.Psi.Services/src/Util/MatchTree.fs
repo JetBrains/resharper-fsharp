@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil.ParentTraversal
@@ -838,19 +839,30 @@ module MatchNode =
         increment deconstructions context false node
 
 
-let getMatchExprMatchType (matchExpr: IMatchExpr) : MatchType =
-    let expr = matchExpr.Expression
-    if isNull expr then MatchType.Error else
+let getMatchExprMatchType (matchExpr: IMatchLikeExpr) : MatchType =
+    match matchExpr with
+    | :? IMatchExpr as matchExpr ->
+        let expr = matchExpr.Expression
+        if isNull expr then MatchType.Error else
 
-    match expr with
-    | :? ITupleExpr as tupleExpr ->
-        let types =
-            [| for expr in tupleExpr.Expressions -> expr.TryGetFcsType() |]
-            |> Array.map (MatchType.ofFcsType matchExpr)
-        MatchType.Tuple(tupleExpr.IsStruct, types)
-    | _ ->
-        let fcsType = expr.TryGetFcsType()
+        match expr with
+        | :? ITupleExpr as tupleExpr ->
+            let types =
+                [| for expr in tupleExpr.Expressions -> expr.TryGetFcsType() |]
+                |> Array.map (MatchType.ofFcsType matchExpr)
+            MatchType.Tuple(tupleExpr.IsStruct, types)
+        | _ ->
+            let fcsType = expr.TryGetFcsType()
+            MatchType.ofFcsType matchExpr fcsType
+
+    | :? IMatchLambdaExpr as matchLambdaExpr ->
+        // todo: fix substitution in FCS
+        let startOffset = matchLambdaExpr.GetDocumentStartOffset()
+        let fcsType = matchLambdaExpr.TryGetFcsType(DocumentRange(&startOffset))
         MatchType.ofFcsType matchExpr fcsType
+
+    | _ ->
+        MatchType.Error
 
 let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) skipOnNull (pat: IFSharpPattern) =
     let addDeconstruction path deconstruction =
@@ -1183,11 +1195,11 @@ let ofMatchClause (value: MatchValue) (matchClause: IMatchClause) =
     let deconstructions = OneToListMap()
     getMatchPattern deconstructions value false matchClause.Pattern
 
-let getMatchValue (matchExpr: IMatchExpr) =
+let getMatchValue (matchExpr: IMatchLikeExpr) =
     let matchType = getMatchExprMatchType matchExpr
     { Type = matchType; Path = [] }
 
-let ofMatchExpr (matchExpr: IMatchExpr) =
+let ofMatchExpr (matchExpr: IMatchLikeExpr) =
     let matchValue = getMatchValue matchExpr
 
     let matchNodes = List()
@@ -1213,11 +1225,11 @@ let moveSubsequentCommentToMatchClause (matchExpr: IMatchLikeExpr) (matchClause:
     ModificationUtil.AddChildRangeAfter(matchClause, range) |> ignore
     ModificationUtil.DeleteChildRange(range)
 
-let generateClauses (matchExpr: IMatchExpr) value nodes deconstructions =
+let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
     let factory = matchExpr.CreateElementFactory()
 
     let lineEnding = matchExpr.GetLineEnding()
-    let indent = matchExpr.Indent
+    let indent = matchExpr.ClausesEnumerable.FirstOrDefault().Indent
 
     let unitExpr = factory.CreateExpr("()")
     let sandBoxMatchExpr = factory.CreateMatchExpr(unitExpr).Copy()

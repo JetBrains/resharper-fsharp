@@ -1,0 +1,5 @@
+﻿module Say
+
+let f = function
+    | None -> ()
+    | Some value -> {selstart}failwith "todo"{selend}

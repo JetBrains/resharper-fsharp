@@ -20,7 +20,7 @@ open JetBrains.Util
 type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
     inherit FSharpQuickFixBase()
 
-    let matchExpr = warning.Expr.As<IMatchExpr>()
+    let matchExpr = warning.Expr.As<IMatchLikeExpr>()
 
     abstract MarkAdditionalUsedNodes: value: MatchValue * Deconstructions * usedNodes: List<MatchNode> -> unit
     default this.MarkAdditionalUsedNodes(_, _, _) = ()
@@ -36,7 +36,7 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
 
         isNotNull firstClause &&
         isNotNull firstClause.Bar &&
-        firstClause.Indent = matchExpr.Indent
+        (matchExpr :? IMatchLambdaExpr || firstClause.Indent = matchExpr.Indent)
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
@@ -67,7 +67,7 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
 type AddMissingPatternsFix(warning: MatchIncompleteWarning) =
     inherit AddMissingMatchClausesFixBase(warning)
 
-    let matchExpr = warning.Expr.As<IMatchExpr>()
+    let matchExpr = warning.Expr.As<IMatchLikeExpr>()
 
     override this.MarkAdditionalUsedNodes(value, deconstructions, usedNodes) =
         let matchPattern = MatchTest.initialPattern deconstructions matchExpr false value

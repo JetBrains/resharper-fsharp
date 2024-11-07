@@ -114,6 +114,9 @@ type AddMissingPatternsFixTest() =
 
     [<Test>] member x.``Bool 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function 02``() = x.DoNamedTest()
+
     [<Test>] member x.``List 01``() = x.DoNamedTest()
     [<Test>] member x.``List 02``() = x.DoNamedTest()
     [<Test>] member x.``List 03``() = x.DoNamedTest()
