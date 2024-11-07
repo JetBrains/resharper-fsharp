@@ -139,8 +139,8 @@ match [Some 5] with
 | x :: y :: [] -> ()
 | Some(x) :: tail -> () 
 | [Some(x)]
-| [_; Some(x)] when let x = 5 in true ->
-    let y = 5 in ()
+| [_; Some(x)] when let x||(12) = 5 in true ->
+    let y||(13) = 5 in ()
 
 exception MyException of string
 try () with | MyException(x) -> ()
@@ -158,3 +158,5 @@ try () with | MyException(x) -> ()
 (9): ReSharper Parameter Name Hint: : int
 (10): ReSharper Parameter Name Hint: : string
 (11): ReSharper Parameter Name Hint: : int
+(12): ReSharper Parameter Name Hint: : int
+(13): ReSharper Parameter Name Hint: : int
