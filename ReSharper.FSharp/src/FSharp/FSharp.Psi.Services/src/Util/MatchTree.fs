@@ -1229,7 +1229,12 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
     let factory = matchExpr.CreateElementFactory()
 
     let lineEnding = matchExpr.GetLineEnding()
-    let indent = matchExpr.ClausesEnumerable.FirstOrDefault().Indent
+    let indent =
+        matchExpr.ClausesEnumerable
+        |> Seq.cast<ITreeNode>
+        |> Seq.tryHead
+        |> Option.defaultValue matchExpr
+        |> _.Indent
 
     let unitExpr = factory.CreateExpr("()")
     let sandBoxMatchExpr = factory.CreateMatchExpr(unitExpr).Copy()
