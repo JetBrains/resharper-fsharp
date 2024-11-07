@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
-open JetBrains.Util.Logging
 
 type private NodesRequiringHints =
     { TopLevelNodes: VisibilityConsumer<ITreeNode>; LocalNodes: VisibilityConsumer<ITreeNode> } with
