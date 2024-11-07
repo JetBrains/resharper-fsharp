@@ -62,8 +62,7 @@ type private MembersVisitor(settings) =
         | _ -> false
 
     override x.VisitNode(node, context) =
-        if disabledForMatchClauses &&
-           (disabledForLocalBindings && isTopLevelMember node || node :? IMatchClauseListOwnerExpr) then () else
+        if disabledForLocalBindings && disabledForMatchClauses && isTopLevelMember node then () else
 
         for child in node.Children() do
             if disabledForTopBindings && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
@@ -116,8 +115,9 @@ type private MembersVisitor(settings) =
         x.VisitNode(forEachExpr, context)
 
     override x.VisitMatchClause(matchClause, context) =
-        let result = collectTypeHintAnchorsForMatchClause matchClause
-        context.MatchClauses.AddRange(result)
+        if not disabledForMatchClauses then
+            let result = collectTypeHintAnchorsForMatchClause matchClause
+            context.MatchClauses.AddRange(result)
 
         x.VisitNode(matchClause, context)
 
