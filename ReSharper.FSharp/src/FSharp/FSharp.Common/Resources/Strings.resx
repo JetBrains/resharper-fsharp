@@ -28,4 +28,10 @@
     <data name="FSharpTypeHints_HideSameLinePipe_Description" xml:space="preserve">
         <value>Hide when |&gt; is on same line as argument</value>
     </data>
+    <data name="FSharpTypeHints_MatchClauses_Description" xml:space="preserve">
+        <value>Type hints for match clauses</value>
+    </data>
+    <data name="FSharpTypeHints_MatchClausesSettings_Header" xml:space="preserve">
+        <value />
+    </data>
 </root>

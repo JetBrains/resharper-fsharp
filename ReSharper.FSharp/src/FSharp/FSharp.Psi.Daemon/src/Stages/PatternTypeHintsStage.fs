@@ -18,24 +18,34 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 
 type private NodesRequiringHints =
-    { TopLevelNodes: List<ITreeNode>; LocalNodes: List<ITreeNode> }
+    { TopLevelNodes: List<ITreeNode>
+      LocalNodes: List<ITreeNode>
+      MatchClauses: List<ITreeNode> }
 
 type private FSharpTypeHintSettings =
-    { TopLevelMembers: PushToHintMode; LocalBindings: PushToHintMode } with
+    { TopLevelMembers: PushToHintMode
+      LocalBindings: PushToHintMode
+      MatchClauses: PushToHintMode } with
 
     static member Create(settingsStore: IContextBoundSettingsStore) =
         { TopLevelMembers = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
                                          .EnsureInlayHintsDefault(settingsStore)
           LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings)
-                                       .EnsureInlayHintsDefault(settingsStore) }
+                                       .EnsureInlayHintsDefault(settingsStore)
+          MatchClauses = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForMatchClauses)
+                                      .EnsureInlayHintsDefault(settingsStore)}
 
     member x.IsDisabled =
         x.TopLevelMembers = PushToHintMode.Never &&
-        x.LocalBindings = PushToHintMode.Never
+        x.LocalBindings = PushToHintMode.Never &&
+        x.MatchClauses = PushToHintMode.Never
 
 
 type private MembersVisitor(settings) =
     inherit TreeNodeVisitor<NodesRequiringHints>()
+    let disabledForTopBindings = settings.TopLevelMembers = PushToHintMode.Never
+    let disabledForLocalBindings = settings.LocalBindings = PushToHintMode.Never
+    let disabledForMatchClauses = settings.MatchClauses = PushToHintMode.Never
 
     let isTopLevelMember (node: ITreeNode) =
         match node with
@@ -44,13 +54,20 @@ type private MembersVisitor(settings) =
         | :? IConstructorDeclaration -> true
         | _ -> false
 
+    let isLocalBinding (node: ITreeNode) =
+        match node with
+        | :? ILocalBinding
+        | :? ILambdaExpr
+        | :? IForEachExpr -> true
+        | _ -> false
+
     override x.VisitNode(node, context) =
-        if settings.LocalBindings = PushToHintMode.Never &&
-           (isTopLevelMember node || node :? IMatchClauseListOwnerExpr) then () else
+        if disabledForMatchClauses &&
+           (disabledForLocalBindings && isTopLevelMember node || node :? IMatchClauseListOwnerExpr) then () else
 
         for child in node.Children() do
-            if settings.TopLevelMembers = PushToHintMode.Never &&
-               isTopLevelMember child then x.VisitNode(child, context) else
+            if disabledForTopBindings && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
+                then x.VisitNode(child, context) else
 
             match child with
             | :? IFSharpTreeNode as treeNode -> treeNode.Accept(x, context)
@@ -100,7 +117,7 @@ type private MembersVisitor(settings) =
 
     override x.VisitMatchClause(matchClause, context) =
         let result = collectTypeHintAnchorsForMatchClause matchClause
-        context.LocalNodes.AddRange(result)
+        context.MatchClauses.AddRange(result)
 
         x.VisitNode(matchClause, context)
 
@@ -192,7 +209,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
         | _ -> ValueNone
 
-    let adornNodes (topLevelNodes : ITreeNode array) (localNodes : ITreeNode array) =
+    let adornNodes
+        (topLevelNodes: ITreeNode array)
+        (localNodes: ITreeNode array)
+        (matchClauses: ITreeNode array) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
         let inline adornNodes nodes pushToHintMode actionsProvider =
@@ -205,15 +225,17 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
         adornNodes topLevelNodes settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
         adornNodes localNodes settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
+        adornNodes matchClauses settings.MatchClauses FSharpMatchClauseTypeHintBulbActionsProvider.Instance
 
         highlightingConsumer.CollectHighlightings()
 
     override x.Execute(committer) =
-        let consumer = { TopLevelNodes = List(); LocalNodes = List() }
+        let consumer = { TopLevelNodes = List(); LocalNodes = List(); MatchClauses = List() }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
         let topLevelNodes = consumer.TopLevelNodes |> Array.ofSeq
         let localNodes = consumer.LocalNodes |> Array.ofSeq
+        let matchClauses = consumer.MatchClauses |> Array.ofSeq
 
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
@@ -229,15 +251,16 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
                 let topLevelVisible, topLevelNotVisible = partition topLevelNodes visibleRange
                 let localNodesVisible, localNodesNotVisible = partition localNodes visibleRange
+                let matchClausesVisible, matchClausesNotVisible = partition matchClauses visibleRange
 
                 // Adorn visible expressions first
-                let visibleHighlightings = adornNodes topLevelVisible localNodesVisible
+                let visibleHighlightings = adornNodes topLevelVisible localNodesVisible matchClausesVisible
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
                 // Finally adorn expressions that aren't visible in the viewport
-                adornNodes topLevelNotVisible localNodesNotVisible
+                adornNodes topLevelNotVisible localNodesNotVisible matchClausesNotVisible
             else
-                adornNodes topLevelNodes localNodes
+                adornNodes topLevelNodes localNodes matchClauses
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 

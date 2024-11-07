@@ -131,7 +131,7 @@ let (|String|) (x: MyStruct) : string = String(x.myString)
 let f1 (x||(57) & Int(i||(58)) & String(s||(59))) ||(60)= ()
 
 
-function x||(61) -> ()
+let _ = function x||(61) -> ()
 
 match [Some 5] with
 | [] -> ()
