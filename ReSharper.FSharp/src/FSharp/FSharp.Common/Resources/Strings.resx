@@ -32,6 +32,6 @@
         <value>Type hints for match clauses</value>
     </data>
     <data name="FSharpTypeHints_MatchClausesSettings_Header" xml:space="preserve">
-        <value />
+        <value>Match clauses</value>
     </data>
 </root>
