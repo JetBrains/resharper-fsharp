@@ -20,32 +20,32 @@ open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 type private NodesRequiringHints =
     { TopLevelNodes: List<ITreeNode>
       LocalNodes: List<ITreeNode>
-      MatchClauses: List<ITreeNode> }
+      MatchNodes: List<ITreeNode> }
 
 type private FSharpTypeHintSettings =
     { TopLevelMembers: PushToHintMode
       LocalBindings: PushToHintMode
-      MatchClauses: PushToHintMode } with
+      MatchPatterns: PushToHintMode } with
 
     static member Create(settingsStore: IContextBoundSettingsStore) =
         { TopLevelMembers = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
                                          .EnsureInlayHintsDefault(settingsStore)
           LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings)
                                        .EnsureInlayHintsDefault(settingsStore)
-          MatchClauses = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForMatchClauses)
-                                      .EnsureInlayHintsDefault(settingsStore)}
+          MatchPatterns = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForMatchPatterns)
+                                       .EnsureInlayHintsDefault(settingsStore)}
 
     member x.IsDisabled =
         x.TopLevelMembers = PushToHintMode.Never &&
         x.LocalBindings = PushToHintMode.Never &&
-        x.MatchClauses = PushToHintMode.Never
+        x.MatchPatterns = PushToHintMode.Never
 
 
 type private MembersVisitor(settings) =
     inherit TreeNodeVisitor<NodesRequiringHints>()
     let disabledForTopBindings = settings.TopLevelMembers = PushToHintMode.Never
     let disabledForLocalBindings = settings.LocalBindings = PushToHintMode.Never
-    let disabledForMatchClauses = settings.MatchClauses = PushToHintMode.Never
+    let disabledForMatchPatterns = settings.MatchPatterns = PushToHintMode.Never
 
     let isTopLevelMember (node: ITreeNode) =
         match node with
@@ -62,7 +62,7 @@ type private MembersVisitor(settings) =
         | _ -> false
 
     override x.VisitNode(node, context) =
-        if disabledForLocalBindings && disabledForMatchClauses && isTopLevelMember node then () else
+        if disabledForLocalBindings && disabledForMatchPatterns && isTopLevelMember node then () else
 
         for child in node.Children() do
             if disabledForTopBindings && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
@@ -115,9 +115,9 @@ type private MembersVisitor(settings) =
         x.VisitNode(forEachExpr, context)
 
     override x.VisitMatchClause(matchClause, context) =
-        if not disabledForMatchClauses then
+        if not disabledForMatchPatterns then
             let result = collectTypeHintAnchorsForMatchClause matchClause
-            context.MatchClauses.AddRange(result)
+            context.MatchNodes.AddRange(result)
 
         x.VisitNode(matchClause, context)
 
@@ -225,17 +225,17 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
         adornNodes topLevelNodes settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
         adornNodes localNodes settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
-        adornNodes matchClauses settings.MatchClauses FSharpMatchClauseTypeHintBulbActionsProvider.Instance
+        adornNodes matchClauses settings.MatchPatterns FSharpMatchClauseTypeHintBulbActionsProvider.Instance
 
         highlightingConsumer.CollectHighlightings()
 
     override x.Execute(committer) =
-        let consumer = { TopLevelNodes = List(); LocalNodes = List(); MatchClauses = List() }
+        let consumer = { TopLevelNodes = List(); LocalNodes = List(); MatchNodes = List() }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
         let topLevelNodes = consumer.TopLevelNodes |> Array.ofSeq
         let localNodes = consumer.LocalNodes |> Array.ofSeq
-        let matchClauses = consumer.MatchClauses |> Array.ofSeq
+        let matchClauses = consumer.MatchNodes |> Array.ofSeq
 
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw

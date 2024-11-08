@@ -197,8 +197,8 @@ type FSharpTypeHintOptions =
 
       [<SettingsEntry(PushToHintMode.PushToShowHints,
                       DescriptionResourceType = typeof<Strings>,
-                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_MatchClauses_Description))>]
-      mutable ShowTypeHintsForMatchClauses: PushToHintMode }
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_MatchPatterns_Description))>]
+      mutable ShowTypeHintsForMatchPatterns: PushToHintMode }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]

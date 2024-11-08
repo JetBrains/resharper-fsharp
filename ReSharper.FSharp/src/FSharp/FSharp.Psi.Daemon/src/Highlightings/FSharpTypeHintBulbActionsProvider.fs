@@ -39,5 +39,5 @@ type FSharpLocalBindingTypeHintBulbActionsProvider private () =
     static member val Instance = FSharpLocalBindingTypeHintBulbActionsProvider()
 
 type FSharpMatchClauseTypeHintBulbActionsProvider private () =
-    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowTypeHintsForMatchClauses), Strings.FSharpTypeHints_MatchClausesSettings_Header)
+    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowTypeHintsForMatchPatterns), Strings.FSharpTypeHints_MatchPatternsSettings_Header)
     static member val Instance = FSharpMatchClauseTypeHintBulbActionsProvider()
