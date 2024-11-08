@@ -6,7 +6,7 @@ using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Feature.Services.TypingAssist;
+using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
