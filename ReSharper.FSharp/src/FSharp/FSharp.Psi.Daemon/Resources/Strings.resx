@@ -49,7 +49,7 @@
     <data name="FSharpTypeHints_PipesSettings_Header" xml:space="preserve">
         <value>Pipe operators</value>
     </data>
-    <data name="FSharpTypeHints_MatchClausesSettings_Header" xml:space="preserve">
-        <value>Match clauses</value>
+    <data name="FSharpTypeHints_MatchPatternsSettings_Header" xml:space="preserve">
+        <value>Match patterns</value>
     </data>
 </root>

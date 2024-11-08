@@ -12,7 +12,7 @@ open NUnit.Framework
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Always)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Always)>]
-[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchClauses", PushToHintMode.Always)>]
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchPatterns", PushToHintMode.Always)>]
 type TypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -22,11 +22,11 @@ type TypeHintStageTest() =
     [<Test>] member x.``Signatures - Show all 01``() = x.DoPatternsCommonTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Never)>]
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchClauses", PushToHintMode.Never)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchPatterns", PushToHintMode.Never)>]
     [<Test>] member x.``Signatures - Top level 01``() = x.DoPatternsCommonTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchClauses", PushToHintMode.Never)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchPatterns", PushToHintMode.Never)>]
     [<Test>] member x.``Signatures - Locals 01``() = x.DoPatternsCommonTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
@@ -39,7 +39,7 @@ type TypeHintStageTest() =
     [<TestSetting(typeof<GeneralInlayHintsOptions>, "DefaultMode", PushToHintMode.Never)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Default)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Default)>]
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchClauses", PushToHintMode.Default)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForMatchPatterns", PushToHintMode.Default)>]
     [<Test>] member x.``Disabled 02 - By mode``() = x.DoPatternsCommonTest()
 
     [<Test>] member x.``Signatures - Unfinished declarations 01``() = x.DoNamedTest()

@@ -43,8 +43,8 @@ type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsP
         this.AddHeader(Strings.FSharpTypeHints_LocalBindingsSettings_Header) |> ignore
         this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForLocalBindings)
 
-        this.AddHeader(Strings.FSharpTypeHints_MatchClausesSettings_Header) |> ignore
-        this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForMatchClauses)
+        this.AddHeader(Strings.FSharpTypeHints_MatchPatternsSettings_Header) |> ignore
+        this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForMatchPatterns)
 
 
         this.AddHeader(Strings.FSharpTypeHints_PipesSettings_Header) |> ignore
