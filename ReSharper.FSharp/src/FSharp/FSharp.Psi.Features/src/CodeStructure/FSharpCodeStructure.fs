@@ -128,6 +128,8 @@ type FSharpCodeStructureProvider() =
             processNode root null file
             root
 
+        member this.SupportsBackgroundUpdate = false
+
 
 type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, parentBlock: ICodeStructureBlockStart) =
     inherit CodeStructureElement(parent)
