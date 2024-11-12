@@ -1,4 +1,4 @@
 ﻿module Module
 
-let f{caret} ((a, b): int * int) : int =
+let f{caret} (a: int, b: int) : int =
     a + b

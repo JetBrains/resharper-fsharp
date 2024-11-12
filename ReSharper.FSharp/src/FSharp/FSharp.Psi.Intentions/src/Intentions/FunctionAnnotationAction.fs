@@ -84,20 +84,41 @@ module SpecifyTypes =
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
+    let rec (|TupleLikePattern|_|) (pattern: IFSharpPattern) =
+        match pattern with
+        | :? ITuplePat as pat -> Some(pat)
+        | :? IAsPat as pat ->
+            match pat.LeftPattern.IgnoreInnerParens() with
+            | TupleLikePattern pat -> Some(pat)
+            | _ -> None
+        | _ -> None
+
     let specifyParameterTypes displayContext (binding: IBinding) (mfv: FSharpMemberOrFunctionOrValue) =
         let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
-        let parameters = binding.ParametersDeclarations
+        let parameters = binding.ParametersDeclarations |> Seq.map _.Pattern
 
-        for fcsType, parameter in (types, parameters) ||> Seq.zip do
-            match parameter.Pattern.IgnoreInnerParens() with
-            | :? IConstPat | :? ITypedPat -> ()
-            | pattern -> SpecifyTypes.specifyParameterType displayContext fcsType pattern
+        let rec specifyParameterTypes (types: FSharpType seq) (parameters: IFSharpPattern seq) isTopLevel =
+            for fcsType, parameter in Seq.zip types parameters do
+                match parameter.IgnoreInnerParens() with
+                | :? IConstPat | :? ITypedPat -> ()
+                | TupleLikePattern pat when isTopLevel ->
+                    specifyParameterTypes fcsType.GenericArguments pat.Patterns false
+                | pattern ->
+                    SpecifyTypes.specifyParameterType displayContext fcsType pattern
+
+        specifyParameterTypes types parameters true
+
 
     let isAnnotated (binding: IBinding) =
+        let rec isAnnotated isTopLevel (pattern: IFSharpPattern) =
+            let pattern = pattern.IgnoreInnerParens()
+            match pattern with
+            | :? ITypedPat | :? IUnitPat -> true
+            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.forall (isAnnotated false)
+            | _ -> false
+
         isNotNull binding.ReturnTypeInfo &&
-        binding.ParametersDeclarations |> Seq.forall (fun p ->
-            let pattern = p.Pattern.IgnoreInnerParens()
-            pattern :? ITypedPat || pattern :? IUnitPat)
+        binding.ParametersDeclarations |> Seq.forall (fun p -> isAnnotated true p.Pattern)
 
     let hasBangInBindingKeyword (binding: IBinding) =
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
