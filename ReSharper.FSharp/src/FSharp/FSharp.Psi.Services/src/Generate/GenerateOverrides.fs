@@ -434,7 +434,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
 
-let getOverridableMembers (typeDeclaration: IFSharpTypeElementDeclaration) missingMembersOnly : FSharpGeneratorElement seq =
+let getOverridableMembers missingMembersOnly (typeDeclaration: IFSharpTypeElementDeclaration) : FSharpGeneratorElement seq =
     if isNull typeDeclaration then [] else
 
     let typeElement = typeDeclaration.DeclaredElement

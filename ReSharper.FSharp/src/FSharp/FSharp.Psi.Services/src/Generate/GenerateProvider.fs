@@ -72,7 +72,7 @@ type FSharpOverridableMembersProvider() =
 
     override x.Populate(context: FSharpGeneratorContext) =
         let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
-        GenerateOverrides.getOverridableMembers context.TypeDeclaration missingMembersOnly
+        GenerateOverrides.getOverridableMembers missingMembersOnly context.TypeDeclaration
         |> Seq.iter context.ProvidedElements.Add
 
 
@@ -334,3 +334,17 @@ type FSharpOverridingMembersBuilder() =
         let nodes = anchor.RightSiblings()
         let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
         context.SetSelectedRange(selectedRange)
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpInheritanceAnalyzer() =
+    interface InheritanceAnalyzer.IInheritanceAnalyzer with
+        member this.IInheritanceAnalyzer_GetMissingMembers(typeDeclaration) =
+            typeDeclaration.As()
+            |> GenerateOverrides.getOverridableMembers true
+            |> Seq.map (_.Member >> OverridableMemberInstance)
+
+        member this.IInheritanceAnalyzer_GetOverridableMembers(typeDeclaration) =
+            typeDeclaration.As()
+            |> GenerateOverrides.getOverridableMembers false
+            |> Seq.map (_.Member >> OverridableMemberInstance)

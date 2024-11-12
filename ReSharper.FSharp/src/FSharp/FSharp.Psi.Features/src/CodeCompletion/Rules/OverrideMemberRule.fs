@@ -116,7 +116,7 @@ type OverrideMemberRule() =
         let mayHaveBaseCalls = GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
 
         let generatorElements =
-            GenerateOverrides.getOverridableMembers generatorContext.TypeDeclaration false
+            GenerateOverrides.getOverridableMembers false generatorContext.TypeDeclaration
             |> GenerateOverrides.sanitizeMembers
 
         for generatorElement in generatorElements do
