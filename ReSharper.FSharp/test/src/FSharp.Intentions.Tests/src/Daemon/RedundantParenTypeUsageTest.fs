@@ -26,6 +26,8 @@ type RedundantParenTypeUsageTest() =
     [<Test>] member x.``Function 05 - Case field``() = x.DoNamedTest()
     [<Test>] member x.``Function 06 - Val field``() = x.DoNamedTest()
 
+    [<Test>] member x.``Nullable 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Parameters 01``() = x.DoNamedTest()
     [<Test>] member x.``Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()

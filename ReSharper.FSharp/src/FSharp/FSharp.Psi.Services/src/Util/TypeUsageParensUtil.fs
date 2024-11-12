@@ -88,4 +88,7 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         let referenceName = namedTypeUsage.ReferenceName
         isNotNull referenceName && referenceName.TypeArgumentList :? IPostfixAppTypeArgumentList
 
+    | :? IWithNullTypeUsage ->
+        isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context))
+
     | _ -> false

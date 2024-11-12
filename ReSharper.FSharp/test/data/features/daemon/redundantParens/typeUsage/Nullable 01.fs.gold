@@ -1,0 +1,12 @@
+﻿module Module
+
+type TArray1 = (string | null)[]
+
+type TFunction01 = |(|(0)string | null|)|(1) -> int
+type TTuple01 = |(|(2)string | null|)|(3) * int
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
