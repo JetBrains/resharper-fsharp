@@ -1,5 +1,51 @@
 # Release notes
 
+## 2024.3
+
+This release adds full support F# 9 and .NET 9. Various features were updated to take the languages changes into account
+
+### Code analysis
+
+* **New**: F# support now shows inferred type hints for patterns and members. It’s easy to see the local value types with the new Push-to-Hint implementation.
+* **New**: Recursive symbol usages are shown on the gutter, highlighting usages in non-tail-recursive positions
+
+### Code completion
+
+* **New**: Importing module members, union cases, active patterns, and literals is now possible via code completion and the new quick fixes
+* **Fix**: Numerous fixes for record field suggestions, type import, and extension members
+* **Improve**: 'Import type' suggestions were optimized to check `AutoImport` and `RequireQualifiedAccess` in a faster way
+
+### Context actions and quick fixes
+
+* **New**: New action to convert `function` in `let` bindings to a parameter + match expr (link)
+* **Improve** 'Convert to nested record update' action is enabled in more cases
+* **Improve**: 'Replace with short lambda' is enabled more cases
+* **Fix**: Generate missing patterns: fixes for abbreviated types
+* **Fix**: Generate overrides: the placement of new members is fixed inside object expressions
+* **Fix**: Generate overrides: reserved F# keywords are taken into account when generating parameter names
+
+### Project model
+
+* **Fix**: Some changes to fsproj files could be ignored in code analysis
+* **New**: Support the new `CompileBefore`/`CompileAfter` implementation in .NET 9
+* **Fix** Better implicit items filtering, fixing duplicates and non-project files appearing in Solution view
+
+### C# interop
+
+* **Fix**: Fix false positive errors for const fields
+* **Fix**: Fix false positive errors for overridden methods
+* **Fix**: Faster analysis of referenced C# projects, due to lazy extensions analysis
+
+### Misc
+
+* **New**: 'Find usages' results show recursive usages of symbols
+* **New**: New icons for scripts and signature files
+* **New**: Added support for code style options in .editorconfig files
+* **Improve**: Bundled Fantomas is updated to 6.3.15
+* **Improve**: Improve typing and implement 'Start new line' action for Remote development
+* **Fix**: Several exceptions were fixed in 'Analyze Code' actions and Qodana integration
+* **Fix**: A memory leak in code analysis results was fixed
+
 ## 2024.2
 
 ### Import
