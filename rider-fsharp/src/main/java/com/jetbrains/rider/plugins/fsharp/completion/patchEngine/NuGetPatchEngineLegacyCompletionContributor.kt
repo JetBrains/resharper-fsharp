@@ -1,4 +1,4 @@
-package com.jetbrains.rider.plugins.fsharp.completion
+package com.jetbrains.rider.plugins.fsharp.completion.patchEngine
 
 import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -9,16 +9,20 @@ import com.intellij.psi.util.startOffset
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineOldProtocolProvider
+import com.jetbrains.rider.completion.patchEngine.isPreemptiveCompletionEnabled
 import com.jetbrains.rider.editors.startOffset
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
+import com.jetbrains.rider.plugins.fsharp.completion.PACKAGE_REFERENCE_REGEX
+import com.jetbrains.rider.plugins.fsharp.completion.insideReferenceDirective
+import kotlin.text.get
 
-class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContributor() {
+class NuGetPatchEngineLegacyCompletionContributor : RiderPatchEngineCompletionContributor() {
 
   override fun isAvailable(file: PsiFile, offset: Int): Boolean = file is FSharpFile && insideReferenceDirective(file, offset)
 
   override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-    if (!isPatchEngineEnabled) {
+    if (!isPatchEngineEnabled || isPreemptiveCompletionEnabled) {
       super.fillCompletionVariants(parameters, result)
       return
     }
@@ -42,13 +46,13 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     }
     finally {
       // Not sure is there a better way to provide params into provider with current architecture
-      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.remove()
-      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.remove()
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().customPrefixThreadLocal.remove()
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().nuGetCustomParamThreadLocal.remove()
     }
   }
 
   override fun beforeCompletion(context: CompletionInitializationContext) {
-    if (!isPatchEngineEnabled)
+    if (!isPatchEngineEnabled || isPreemptiveCompletionEnabled)
       return
 
     val psiElement = context.file.findElementAt(context.startOffset)?.parent ?: return
@@ -70,13 +74,13 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
   ): Boolean {
     if (containsExclusive(strictGroup.range, cursorPosition)) {
       val completionPrefix = content.substring(strictGroup.range.first, cursorPosition)
-      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.set(completionPrefix)
-      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().customPrefixThreadLocal.set(completionPrefix)
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().nuGetCustomParamThreadLocal.set(host)
       return true
     }
     else if (containsExclusive(zoneGroup.range, cursorPosition)) {
-      RiderPatchEngineOldProtocolProvider.getInstance().customPrefixThreadLocal.set("")
-      RiderPatchEngineOldProtocolProvider.getInstance().nuGetCustomParamThreadLocal.set(host)
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().customPrefixThreadLocal.set("")
+      RiderPatchEngineOldProtocolProvider.Companion.getInstance().nuGetCustomParamThreadLocal.set(host)
       return true
     }
 
