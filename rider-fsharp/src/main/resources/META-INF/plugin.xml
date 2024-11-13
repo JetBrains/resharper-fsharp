@@ -31,7 +31,8 @@
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetProtocolCompletionContributor" />
-    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.NuGetPatchEngineCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.patchEngine.NuGetPatchEngineCompletionContributor" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.patchEngine.NuGetPatchEngineLegacyCompletionContributor" />
     <configurationType implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfigurationType" />
     <frontend.completion.helper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.completion.FSharpCompletionHelper" />
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterMenuModelFactory" />
