@@ -48,9 +48,9 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
     TypeHintAdornmentProvider(settingsStore: ISettingsStore) =
 
-    let createCopyToClipboardBulbItem (highlighting: TypeHintHighlighting) highlighterKey =
+    let createCopyToClipboardBulbItem (highlighting: TypeHintHighlighting) highlighter =
         let text = highlighting.TypeText
-        BulbMenuItem(ExecutableItem(fun () -> copyToClipboard text highlighting highlighterKey),
+        BulbMenuItem(ExecutableItem(fun () -> copyToClipboard text highlighter),
                      Strings.FSharpInferredTypeHighlighting_TooltipText, null, BulbMenuAnchors.FirstClassContextItems)
 
     interface IHighlighterAdornmentProvider with
@@ -71,7 +71,7 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems =
                         [|
-                            yield createCopyToClipboardBulbItem thh highlighter.Key
+                            yield createCopyToClipboardBulbItem thh highlighter
 
                             if isNotNull actionsProvider then
                                 yield! actionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)

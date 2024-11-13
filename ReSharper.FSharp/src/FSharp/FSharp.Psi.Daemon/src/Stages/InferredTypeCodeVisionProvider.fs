@@ -53,7 +53,7 @@ type InferredTypeCodeVisionProvider() =
             let entry = codeInsightsHighlighting.Entry.As<TextCodeVisionEntry>()
             if isNull entry then () else
 
-            copyToClipboard entry.Text codeInsightsHighlighting highlighting.Highlighter.Key
+            copyToClipboard entry.Text highlighting.Highlighter
 
         member x.OnExtraActionClick(_, _, _) = ()
 
