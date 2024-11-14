@@ -1158,6 +1158,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         if not expected.IsValueCreated then true else
 
         let actual = mkTypeDefImplements typeElement
+        expected.Value.Length = actual.Length &&
 
         (expected.Value, actual)
         ||> List.forall2 (fun i1 i2 -> i1.Type = i2.Type)
