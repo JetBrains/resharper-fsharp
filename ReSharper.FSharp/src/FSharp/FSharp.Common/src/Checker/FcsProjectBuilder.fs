@@ -3,7 +3,6 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
-open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Diagnostics
@@ -12,7 +11,6 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
-open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -52,13 +50,16 @@ module FcsProjectBuilder =
 
     let getProjectConfiguration (targetFramework: TargetFrameworkId) (project: IProject) =
         let projectProperties = project.ProjectProperties
-        projectProperties.ActiveConfigurations.TryGetConfiguration(targetFramework).As<IManagedProjectConfiguration>()
+        projectProperties.ActiveConfigurations.TryGetConfiguration(targetFramework).As<IFSharpProjectConfiguration>()
 
-    let getDefines (configuration: IManagedProjectConfiguration) =
+    let getDefines (configuration: IFSharpProjectConfiguration) =
         if isNull configuration then [] else
 
-        splitAndTrim itemsDelimiters configuration.DefineConstants
-        |> List.ofArray
+        let defines = splitAndTrim itemsDelimiters configuration.DefineConstants |> List.ofArray
+
+        match configuration.Nullable with
+        | Some true -> "NULLABLE" :: defines
+        | _ -> defines
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
@@ -140,7 +141,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         otherOptions.AddRange(xmlDocsNoWarns)
 
         match projectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
-        | :? IManagedProjectConfiguration as cfg ->
+        | :? IFSharpProjectConfiguration as cfg ->
             let definedConstants = FcsProjectBuilder.getDefines cfg
             otherOptions.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
 
@@ -186,6 +187,11 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             | true, otherFlags when not (otherFlags.IsNullOrWhitespace()) -> FcsProjectBuilder.splitAndTrim [| ' ' |] otherFlags
             | _ -> EmptyArray.Instance
             |> otherOptions.AddRange
+
+            cfg.Nullable
+            |> Option.map (fun nullable -> if nullable then "--checknulls+" else "--checknulls-")
+            |> Option.iter otherOptions.Add
+
         | _ -> ()
 
         let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)

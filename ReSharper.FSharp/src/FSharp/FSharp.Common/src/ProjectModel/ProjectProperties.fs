@@ -24,6 +24,7 @@ type IFSharpProjectConfiguration =
     inherit IManagedProjectConfiguration
 
     abstract LanguageVersion: FSharpLanguageVersion with get, set
+    abstract Nullable: bool option with get, set
 
 type FSharpProjectConfiguration() as this =
     inherit ManagedProjectConfigurationBase()
@@ -32,20 +33,32 @@ type FSharpProjectConfiguration() as this =
 
     interface IFSharpProjectConfiguration with
         member val LanguageVersion = FSharpLanguageVersion.Default with get, set
+        member val Nullable = None with get, set
 
     override this.WriteConfiguration(writer, stringIntern) =
         base.WriteConfiguration(writer, stringIntern)
         writer.WriteEnum(configuration.LanguageVersion)
 
+        match configuration.Nullable with
+        | None -> writer.WriteBool(false)
+        | Some nullable ->
+            writer.WriteBool(true)
+            writer.WriteBool(nullable)
+
     override this.ReadConfiguration(reader, stringIntern) =
         base.ReadConfiguration(reader, stringIntern)
         configuration.LanguageVersion <- reader.ReadEnum(FSharpLanguageVersion.Default)
+
+        if reader.ReadBool() then
+            configuration.Nullable <- Some(reader.ReadBool())
 
     override this.UpdateFrom(otherConfiguration) =
         let fsConfiguration = otherConfiguration.As<IFSharpProjectConfiguration>()
         if isNull fsConfiguration then false else
 
         configuration.LanguageVersion <- fsConfiguration.LanguageVersion
+        configuration.Nullable <- fsConfiguration.Nullable
+
         base.UpdateFrom(otherConfiguration)
 
 

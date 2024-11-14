@@ -35,11 +35,18 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
     override this.BuildProjectConfiguration(rdProjectDescriptor, project, configuration) =
         base.BuildProjectConfiguration(rdProjectDescriptor, project, configuration)
 
-        let languageVersion = project.GetPropertyValue(MSBuildProjectUtil.LanguageVersionProperty, true)
-        let languageVersion = FSharpLanguageVersion.parseCompilationOption languageVersion
+        let languageVersion =
+            let languageVersion = project.GetPropertyValue(MSBuildProjectUtil.LanguageVersionProperty, true)
+            FSharpLanguageVersion.parseCompilationOption languageVersion
+
+        let nullable =
+            project.GetPropertyValueOrNull(MSBuildProjectUtil.NullableProperty)
+            |> Option.ofObj
+            |> Option.map ((=) "enable")
 
         let configuration = configuration.As<IFSharpProjectConfiguration>()
         configuration.LanguageVersion <- languageVersion
+        configuration.Nullable <- nullable
 
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
