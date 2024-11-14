@@ -62,6 +62,7 @@
     <Compile Include="src\Intentions\ToPositionalFieldPatternsTest.fs" />
     <Compile Include="src\Intentions\DisableWarningTest.fs" />
     <Compile Include="src\Intentions\MatchLambdaToParameterTest.fs" />
+    <Compile Include="src\Intentions\PartialAppToLambdaTest.fs" />
     <Compile Include="src\QuickFixes\FSharpQuickFixTestBase.fs" />
     <Compile Include="src\QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />

@@ -1,0 +1,3 @@
+﻿module Module
+
+fun i -> {caret}1 + i

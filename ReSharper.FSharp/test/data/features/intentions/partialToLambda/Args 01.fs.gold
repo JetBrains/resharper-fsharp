@@ -1,0 +1,5 @@
+﻿module Module
+
+let f a b = a + b
+
+fun o -> {caret}f a o
