@@ -76,10 +76,10 @@ type ScriptPsiModulesTest() =
         base.ExecuteWithGold(action) |> ignore
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
-type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, notifier: RuntimeAndToolsetChangeNotifier) =
-    inherit DefaultSolutionToolset(lifetime, settings, logger, notifier)
+type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: DotNetCoreInstallationsDetector, settings, logger: ILogger, shellLocks, notifier: RuntimeAndToolsetChangeNotifier) =
+    inherit DefaultSolutionToolset(lifetime, settings, logger, shellLocks, notifier)
 
     let changed = new Signal<_>("MySoluAtionToolset::Changed")
 
