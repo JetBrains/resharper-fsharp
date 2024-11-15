@@ -183,7 +183,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
       object[] staticArgs)
     {
-      var key = string.Join(".", fullTypePathAfterArguments);
+      var key = string.Join(".", fullTypePathAfterArguments) + (IsErased ? "" : "+" + string.Join(",", staticArgs));
       var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
 
       var result = TypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), TypeProvider,
