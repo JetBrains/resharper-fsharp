@@ -176,28 +176,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) => myStaticParameters.Value;
 
-    public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
-      object[] staticArgs) => IsErased
-      ? ApplyStaticArguments(fullTypePathAfterArguments, staticArgs)
-      : ApplyStaticArgumentsGenerative(fullTypePathAfterArguments, staticArgs);
-
-    private ProvidedType ApplyStaticArguments(string[] fullTypePathAfterArguments, object[] staticArgs)
-    {
-      var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
-      return TypeProvidersContext.ProvidedTypesCache.GetOrCreate(
-        TypeProvidersContext.Connection.ExecuteWithCatch(
-          () => RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
-            new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions),
-            RpcTimeouts.Maximal)),
-        TypeProvider);
-    }
-
+    // Note for generative types:
     // Since we distinguish different generative types by assembly name
     // and, at the same time, even for the same types, the generated assembly names will be different,
     // we will cache such types on the ReSharper side to avoid leaks.
-    private ProvidedType ApplyStaticArgumentsGenerative(string[] fullTypePathAfterArguments, object[] staticArgs)
+    public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
+      object[] staticArgs)
     {
-      var key = string.Join(".", fullTypePathAfterArguments) + "+" + string.Join(",", staticArgs);
+      var key = string.Join(".", fullTypePathAfterArguments);
       var staticArgDescriptions = staticArgs.Select(PrimitiveTypesBoxer.BoxToServerStaticArg).ToArray();
 
       var result = TypeProvidersContext.AppliedProvidedTypesCache.GetOrCreate((EntityId, key), TypeProvider,
