@@ -5,6 +5,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Psi.Resolve.Managed;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
@@ -34,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract bool IsParameterCollection { get; }
     public bool IsValueVariable => false;
     public abstract bool IsOptional { get; }
-    public ScopedKind Scope => ScopedKind.None;
+    public ScopedKind GetScope(IResolveContext context = null) => ScopedKind.None;
     public IParametersOwner ContainingParametersOwner => Owner;
 
     public IPsiServices GetPsiServices() => Owner.GetPsiServices();
