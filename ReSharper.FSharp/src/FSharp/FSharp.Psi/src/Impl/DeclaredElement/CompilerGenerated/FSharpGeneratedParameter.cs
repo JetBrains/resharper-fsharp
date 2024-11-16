@@ -3,6 +3,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Pointers;
+using JetBrains.ReSharper.Psi.Resolve.Managed;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
@@ -43,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PARAMETER;
 
-    public ScopedKind Scope => ScopedKind.None;
+    public ScopedKind GetScope(IResolveContext context = null) => ScopedKind.None;
     public IParametersOwner ContainingParametersOwner => Owner;
     protected override IClrDeclaredElement ContainingElement => Owner;
     public override ITypeMember GetContainingTypeMember() => Owner as ITypeMember;

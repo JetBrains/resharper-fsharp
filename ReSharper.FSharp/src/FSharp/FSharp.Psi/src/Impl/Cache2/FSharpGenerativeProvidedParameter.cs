@@ -1,6 +1,7 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Resolve.Managed;
 using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
@@ -41,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public bool IsValueVariable => false;
     public bool IsOptional => Info.IsOptional;
     public bool IsVarArg => false;
-    public ScopedKind Scope => ScopedKind.None;
+    public ScopedKind GetScope(IResolveContext context = null) => ScopedKind.None;
     public IParametersOwner ContainingParametersOwner { get; }
   }
 }
