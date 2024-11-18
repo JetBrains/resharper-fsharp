@@ -174,6 +174,13 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             let fcsType = symbol.FullType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
+            let isOptional = isNotNull (OptionalValPatNavigator.GetByPattern(refPat))
+            let fcsType =
+                if isOptional then
+                    let genericParameters = fcsType.GenericArguments
+                    if genericParameters.Count = 0 then fcsType else fcsType.GenericArguments[0]
+                else fcsType
+
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
             |> ValueSome
 

@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Psi.Tree
 let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     match pattern with
     | null
-    | :? IUnitPat
+    | :? IConstPat
     | :? IWildPat
     | :? ITypedPat -> acc
 
@@ -30,6 +30,8 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
         let acc = (parametersOwnerPat : ITreeNode) :: acc
         parametersOwnerPat.ParametersEnumerable
         |> Seq.fold visitPattern acc
+
+    | :? IOptionalValPat as optionalPat -> visitPattern acc optionalPat.Pattern
 
     | :? INamedUnionCaseFieldsPat as unionCaseFieldsPat ->
         unionCaseFieldsPat.FieldPatternsEnumerable

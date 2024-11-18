@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Generic
+open System.Runtime.InteropServices
 
 type SingleCaseDU<'a, 'b> = SingleCaseDU of x: 'a
 type Record = { Foo: int; Bar: string }
@@ -67,8 +68,10 @@ type A(x||(16)) =
         let res = x + y + z
         res
 
+    member _.M1([<Optional>] ?x||(31)) ||(32)= x.Value + 1
+
     interface IDisposable with
-        member _.Dispose() ||(31)= ()
+        member _.Dispose() ||(33)= ()
 
 
 type Typed(x: int) =
@@ -88,7 +91,7 @@ type Typed(x: int) =
 
     member val P3: int = 3 with get, set
 
-    member x.P4||(32)
+    member x.P4||(34)
         with get (index: int) =
             let x: string = array[index]
             x
@@ -99,10 +102,12 @@ type Typed(x: int) =
         let res: int = x + y + z
         res
 
+    member _.M1([<Optional>] ?x: int) : int = x.Value + 1
+
     interface IDisposable with
         member _.Dispose(): unit = ()
 
-let delimiter (delim1||(33), delim2||(34), value||(35)) ||(36)=
+let delimiter (delim1||(35), delim2||(36), value||(37)) ||(38)=
     { new IFormattable with
         member x.ToString(format, provider) =
             if format = "D" then
@@ -116,19 +121,19 @@ type MyStruct =
     val mutable myString : string
 
 
-let (|Active|) arg||(37) valueToMatch||(38) ||(39)=
+let (|Active|) arg||(39) valueToMatch||(40) ||(41)=
     Active(if arg && valueToMatch = 2 then "" else "")
 
-let (|Active1|Active2|) valueToMatch||(40) ||(41)=
+let (|Active1|Active2|) valueToMatch||(42) ||(43)=
     if valueToMatch then Choice1Of2(1) else Choice2Of2("")
 
-let (|ActiveOption|_|) _ ||(42)= None
+let (|ActiveOption|_|) _ ||(44)= None
 
 
 let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
-let f1 (x||(43) & Int(i||(44)) & String(s||(45))) ||(46)= ()
+let f1 (x||(45) & Int(i||(46)) & String(s||(47))) ||(48)= ()
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
@@ -162,19 +167,21 @@ let f1 (x||(43) & Int(i||(44)) & String(s||(45))) ||(46)= ()
 (28): ReSharper Parameter Name Hint: : int
 (29): ReSharper Parameter Name Hint: : int
 (30): ReSharper Parameter Name Hint: : int 
-(31): ReSharper Parameter Name Hint: : unit 
-(32): ReSharper Parameter Name Hint: : string 
-(33): ReSharper Parameter Name Hint: : string
-(34): ReSharper Parameter Name Hint: : string
+(31): ReSharper Parameter Name Hint: : int
+(32): ReSharper Parameter Name Hint: : int 
+(33): ReSharper Parameter Name Hint: : unit 
+(34): ReSharper Parameter Name Hint: : string 
 (35): ReSharper Parameter Name Hint: : string
-(36): ReSharper Parameter Name Hint: : IFormattable 
-(37): ReSharper Parameter Name Hint: : bool
-(38): ReSharper Parameter Name Hint: : int
-(39): ReSharper Parameter Name Hint: : string 
-(40): ReSharper Parameter Name Hint: : bool
-(41): ReSharper Parameter Name Hint: : Choice<int,string> 
-(42): ReSharper Parameter Name Hint: : 'b option 
-(43): ReSharper Parameter Name Hint: : MyStruct
-(44): ReSharper Parameter Name Hint: : int
-(45): ReSharper Parameter Name Hint: : string
-(46): ReSharper Parameter Name Hint: : unit 
+(36): ReSharper Parameter Name Hint: : string
+(37): ReSharper Parameter Name Hint: : string
+(38): ReSharper Parameter Name Hint: : IFormattable 
+(39): ReSharper Parameter Name Hint: : bool
+(40): ReSharper Parameter Name Hint: : int
+(41): ReSharper Parameter Name Hint: : string 
+(42): ReSharper Parameter Name Hint: : bool
+(43): ReSharper Parameter Name Hint: : Choice<int,string> 
+(44): ReSharper Parameter Name Hint: : 'b option 
+(45): ReSharper Parameter Name Hint: : MyStruct
+(46): ReSharper Parameter Name Hint: : int
+(47): ReSharper Parameter Name Hint: : string
+(48): ReSharper Parameter Name Hint: : unit 
