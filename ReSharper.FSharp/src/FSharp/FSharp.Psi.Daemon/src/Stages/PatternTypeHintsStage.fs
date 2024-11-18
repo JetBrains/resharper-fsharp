@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
@@ -175,11 +176,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
             let isOptional = isNotNull (OptionalValPatNavigator.GetByPattern(refPat))
-            let fcsType =
-                if isOptional then
-                    let genericParameters = fcsType.GenericArguments
-                    if genericParameters.Count = 0 then fcsType else fcsType.GenericArguments[0]
-                else fcsType
+            let fcsType = if isOptional && isOption fcsType then fcsType.GenericArguments[0] else fcsType
 
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
             |> ValueSome
