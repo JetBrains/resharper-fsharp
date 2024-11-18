@@ -31,13 +31,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       var extensionMemberInfos = new LocalList<ExtensionMemberInfo>();
 
-      foreach (var fsDecl in EnumerateExtensionMembers(declaration))
+      if (declaration.GetContainingTypeDeclaration() == null)
       {
-        // todo: use candidate type
-        var offset = fsDecl.GetTreeStartOffset().Offset;
-        var sourceName = fsDecl.SourceName;
-        var extensionMemberInfo = new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, sourceName, FSharpExtensionMemberKind.FSharpExtensionMember, this);
-        extensionMemberInfos.Add(extensionMemberInfo);
+        foreach (var fsDecl in EnumerateExtensionMembers(declaration))
+        {
+          // todo: use candidate type
+          var offset = fsDecl.GetTreeStartOffset().Offset;
+          var sourceName = fsDecl.SourceName;
+          var extensionMemberInfo = new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, sourceName, FSharpExtensionMemberKind.FSharpExtensionMember, this);
+          extensionMemberInfos.Add(extensionMemberInfo);
+        }
       }
 
       FSharpExtensionMemberInfos = extensionMemberInfos.ToArray();
@@ -95,10 +98,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       ActivePatternCaseNames = activePatternCaseNames.ToArray();
     }
 
-    private static IEnumerable<IFSharpDeclaration> EnumerateExtensionMembers(T declaration)
+    private static IEnumerable<IFSharpDeclaration> EnumerateExtensionMembers([NotNull] IModuleDeclaration declaration)
     {
       foreach (var moduleMember in declaration.MembersEnumerable)
       {
+        if (moduleMember is INestedModuleDeclaration nestedModuleDecl)
+        {
+          foreach (var memberDecl in EnumerateExtensionMembers(nestedModuleDecl))
+            yield return memberDecl;
+
+          continue;
+        }
+
         if (moduleMember is not ITypeDeclarationGroup typeDeclGroup)
           continue;
 

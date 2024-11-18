@@ -67,6 +67,9 @@ type ImportExtensionMemberTest() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
+    
+    [<Test>] member x.``Extension - FSharp - Source 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extension - FSharp - Source 02``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
