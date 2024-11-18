@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
             activePatternNames.Add(name);
             foreach (var activePatternCaseName in name.Split('|'))
             {
-              if (activePatternCaseName != "_")
+              if (!activePatternCaseName.IsEmpty() && activePatternCaseName != "_")
                 activePatternCaseNames.Add(activePatternCaseName);
             }
           }
