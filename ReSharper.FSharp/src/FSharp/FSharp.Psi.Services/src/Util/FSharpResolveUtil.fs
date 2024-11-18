@@ -172,7 +172,7 @@ let isInTailRecursivePosition (expr: IFSharpExpression) =
 let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
     let sourceFile = context.GetSourceFile().NotNull()
     declaredElement.GetDeclarationsIn(sourceFile)
-    |> Seq.exists (fun decl -> decl.GetDocumentStartOffset().Offset < context.GetDocumentStartOffset().Offset)
+    |> Seq.exists (fun decl -> decl.GetDocumentEndOffset().Offset < context.GetDocumentStartOffset().Offset)
 
 let canReference (reference: FSharpSymbolReference) (typeElement: ITypeElement) =
     let referenceOwner = reference.GetElement()

@@ -124,3 +124,4 @@ type FSharpImportModuleMemberTest() =
     [<Test; NotAvailable>] member x.``Not available - Unreachable 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
