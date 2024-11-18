@@ -156,9 +156,18 @@ let isRecursiveApplication (declaredElement: IDeclaredElement) (refExpr: IRefere
     isNotNull decl && declaredElement = decl.DeclaredElement
 
 let isInTailRecursivePosition (expr: IFSharpExpression) =
-    expr.GetOutermostParentExpressionFromItsReturn()
-    |> ParameterOwnerMemberDeclarationNavigator.GetByExpression
-    |> isNotNull
+    let outermostExpr =
+        let rec loop (expr: IFSharpExpression) =
+            let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
+            if isNotNull ifExpr then
+                loop ifExpr else
+
+            expr
+
+        let expr = expr.GetOutermostParentExpressionFromItsReturn()
+        loop expr
+
+    isNotNull (ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens()))
 
 let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
     let sourceFile = context.GetSourceFile().NotNull()

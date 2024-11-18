@@ -1,0 +1,61 @@
+﻿module Module
+
+let rec f1 () =
+    if true then
+        |f1|(0) ()
+
+let rec f2 () =
+    if true then
+        |f2|(1) ()
+
+    ()
+
+
+
+let rec f3 () =
+    if true then
+        |f3|(2) ()
+    elif true then
+        |f3|(3) ()
+
+
+let rec f4 () =
+    if true then
+        |f4|(4) ()
+    elif true then
+        |f4|(5) ()
+
+    ()
+
+
+let rec f5 () =
+    if true then
+        |f5|(6) ()
+    elif true then
+        |f5|(7) ()
+    elif true then
+        |f5|(8) ()
+
+let rec f6 () =
+    if true then
+        |f6|(9) ()
+    elif true then
+        |f6|(10) ()
+    elif true then
+        |f6|(11) ()
+
+    ()
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Non-tail recursion: Recursion in non-tail position
+(2): Recursion: Recursion in tail position
+(3): Recursion: Recursion in tail position
+(4): Non-tail recursion: Recursion in non-tail position
+(5): Non-tail recursion: Recursion in non-tail position
+(6): Recursion: Recursion in tail position
+(7): Recursion: Recursion in tail position
+(8): Recursion: Recursion in tail position
+(9): Non-tail recursion: Recursion in non-tail position
+(10): Non-tail recursion: Recursion in non-tail position
+(11): Non-tail recursion: Recursion in non-tail position
