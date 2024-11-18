@@ -45,6 +45,8 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
 
     prepareCustomParams(stringText, context.startOffset, "NuGet:name", `package`, packageZone, context)
     || prepareCustomParams(stringText, context.startOffset, "NuGet:version|${`package`.value}", version!!, versionZone!!, context)
+
+    RiderPatchEngineProtocolProvider.getInstance().isSuppress = true
   }
 
   private fun prepareCustomParams(
