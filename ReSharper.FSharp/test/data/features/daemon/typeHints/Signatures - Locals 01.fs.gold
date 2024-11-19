@@ -68,7 +68,7 @@ type A(x) =
         let res||(11) = x + y + z
         res
 
-    member _.M1([<Optional>] ?x) = x.Value + 1
+    member _.M1([<Optional>] ?x, ?y) = x.Value + y.Value + 1
 
     interface IDisposable with
         member _.Dispose() = ()
@@ -102,7 +102,7 @@ type Typed(x: int) =
         let res: int = x + y + z
         res
 
-    member _.M1([<Optional>] ?x: int) : int = x.Value + 1
+    member _.M1([<Optional>] ?x: int, ?y: int) : int = x.Value + y.Value + 1
 
     interface IDisposable with
         member _.Dispose(): unit = ()

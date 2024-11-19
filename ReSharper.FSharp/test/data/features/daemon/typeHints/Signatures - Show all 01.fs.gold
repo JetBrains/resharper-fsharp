@@ -68,10 +68,10 @@ type A(x||(24)) =
         let res||(41) = x + y + z
         res
 
-    member _.M1([<Optional>] ?x||(42)) ||(43)= x.Value + 1
+    member _.M1([<Optional>] ?x||(42), ?y||(43)) ||(44)= x.Value + y.Value + 1
 
     interface IDisposable with
-        member _.Dispose() ||(44)= ()
+        member _.Dispose() ||(45)= ()
 
 
 type Typed(x: int) =
@@ -91,7 +91,7 @@ type Typed(x: int) =
 
     member val P3: int = 3 with get, set
 
-    member x.P4||(45)
+    member x.P4||(46)
         with get (index: int) =
             let x: string = array[index]
             x
@@ -102,14 +102,14 @@ type Typed(x: int) =
         let res: int = x + y + z
         res
 
-    member _.M1([<Optional>] ?x: int) : int = x.Value + 1
+    member _.M1([<Optional>] ?x: int, ?y: int) : int = x.Value + y.Value + 1
 
     interface IDisposable with
         member _.Dispose(): unit = ()
 
-let delimiter (delim1||(46), delim2||(47), value||(48)) ||(49)=
+let delimiter (delim1||(47), delim2||(48), value||(49)) ||(50)=
     { new IFormattable with
-        member x.ToString(format||(50), provider||(51)) ||(52)=
+        member x.ToString(format||(51), provider||(52)) ||(53)=
             if format = "D" then
                 delim1 + value + delim2
             else
@@ -121,19 +121,19 @@ type MyStruct =
     val mutable myString : string
 
 
-let (|Active|) arg||(53) valueToMatch||(54) ||(55)=
+let (|Active|) arg||(54) valueToMatch||(55) ||(56)=
     Active(if arg && valueToMatch = 2 then "" else "")
 
-let (|Active1|Active2|) valueToMatch||(56) ||(57)=
+let (|Active1|Active2|) valueToMatch||(57) ||(58)=
     if valueToMatch then Choice1Of2(1) else Choice2Of2("")
 
-let (|ActiveOption|_|) _ ||(58)= None
+let (|ActiveOption|_|) _ ||(59)= None
 
 
 let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
-let f1 (x||(59) & Int(i||(60)) & String(s||(61))) ||(62)= ()
+let f1 (x||(60) & Int(i||(61)) & String(s||(62))) ||(63)= ()
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
@@ -179,23 +179,24 @@ let f1 (x||(59) & Int(i||(60)) & String(s||(61))) ||(62)= ()
 (40): ReSharper Parameter Name Hint: : int 
 (41): ReSharper Parameter Name Hint: : int
 (42): ReSharper Parameter Name Hint: : int
-(43): ReSharper Parameter Name Hint: : int 
-(44): ReSharper Parameter Name Hint: : unit 
-(45): ReSharper Parameter Name Hint: : string 
-(46): ReSharper Parameter Name Hint: : string
+(43): ReSharper Parameter Name Hint: : int
+(44): ReSharper Parameter Name Hint: : int 
+(45): ReSharper Parameter Name Hint: : unit 
+(46): ReSharper Parameter Name Hint: : string 
 (47): ReSharper Parameter Name Hint: : string
 (48): ReSharper Parameter Name Hint: : string
-(49): ReSharper Parameter Name Hint: : IFormattable 
-(50): ReSharper Parameter Name Hint: : string
-(51): ReSharper Parameter Name Hint: : IFormatProvider
-(52): ReSharper Parameter Name Hint: : string 
-(53): ReSharper Parameter Name Hint: : bool
-(54): ReSharper Parameter Name Hint: : int
-(55): ReSharper Parameter Name Hint: : string 
-(56): ReSharper Parameter Name Hint: : bool
-(57): ReSharper Parameter Name Hint: : Choice<int,string> 
-(58): ReSharper Parameter Name Hint: : 'b option 
-(59): ReSharper Parameter Name Hint: : MyStruct
-(60): ReSharper Parameter Name Hint: : int
-(61): ReSharper Parameter Name Hint: : string
-(62): ReSharper Parameter Name Hint: : unit 
+(49): ReSharper Parameter Name Hint: : string
+(50): ReSharper Parameter Name Hint: : IFormattable 
+(51): ReSharper Parameter Name Hint: : string
+(52): ReSharper Parameter Name Hint: : IFormatProvider
+(53): ReSharper Parameter Name Hint: : string 
+(54): ReSharper Parameter Name Hint: : bool
+(55): ReSharper Parameter Name Hint: : int
+(56): ReSharper Parameter Name Hint: : string 
+(57): ReSharper Parameter Name Hint: : bool
+(58): ReSharper Parameter Name Hint: : Choice<int,string> 
+(59): ReSharper Parameter Name Hint: : 'b option 
+(60): ReSharper Parameter Name Hint: : MyStruct
+(61): ReSharper Parameter Name Hint: : int
+(62): ReSharper Parameter Name Hint: : string
+(63): ReSharper Parameter Name Hint: : unit 
