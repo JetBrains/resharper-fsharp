@@ -4,12 +4,9 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpEnum : Enum, IFSharpTypeElement
+  public class FSharpEnum(IFSharpEnumPart part) : Enum(part), IFSharpTypeElement
   {
-    public int MeasureTypeParametersCount { get; }
-
-    public FSharpEnum(IFSharpEnumPart part) : base(part) =>
-      MeasureTypeParametersCount = part.MeasureTypeParametersCount;
+    public int MeasureTypeParametersCount { get; } = part.MeasureTypeParametersCount;
 
     protected override bool AcceptsPart(TypePart part) =>
       part.ShortName == ShortName &&
@@ -18,5 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public string SourceName => this.GetSourceName();
 
     public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
+    
+    public ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.RequiresQualifiedAccess;
   }
 }

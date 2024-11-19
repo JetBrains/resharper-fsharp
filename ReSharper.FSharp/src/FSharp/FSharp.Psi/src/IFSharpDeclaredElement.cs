@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
   public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement
   {
+    ModuleMembersAccessKind AccessKind { get; }
   }
 
   public interface IFSharpCompiledTypeElement : ICompiledTypeElement, IFSharpDeclaredElement,

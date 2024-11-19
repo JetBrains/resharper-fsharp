@@ -8,5 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     [NotNull] string SourceName { get; }
     int MeasureTypeParametersCount { get; }
     TypePart GetFirstPart();
+
+    ModuleMembersAccessKind AccessKind { get; }
   }
 }

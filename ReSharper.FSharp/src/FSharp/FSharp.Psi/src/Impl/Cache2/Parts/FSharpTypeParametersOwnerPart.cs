@@ -17,13 +17,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     private readonly string[] myTypeParameterNames;
     public override int MeasureTypeParametersCount { get; }
+    public override ModuleMembersAccessKind AccessKind { get; }
 
     protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
       IList<ITypeParameterDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count,
         cacheBuilder)
     {
-
       if (declaration is IFSharpTypeOrExtensionDeclaration { TypeParameterDeclarationList: { } typeParamDeclList })
         MeasureTypeParametersCount = typeParamDeclList.TypeParametersEnumerable.Count(typeParamDecl =>
           typeParamDecl.Attributes.HasAttribute("Measure"));
@@ -31,12 +31,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (typeParameters.Count == 0)
       {
         myTypeParameterNames = EmptyArray<string>.Instance;
-        return;
+      }
+      else
+      {
+        myTypeParameterNames = new string[typeParameters.Count];
+        for (var i = 0; i < typeParameters.Count; i++)
+          myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].CompiledName);  
       }
 
-      myTypeParameterNames = new string[typeParameters.Count];
-      for (var i = 0; i < typeParameters.Count; i++)
-        myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].CompiledName);
+      AccessKind = declaration.AttributesEnumerable.GetAccessType();
     }
 
     protected FSharpTypeParametersOwnerPart(IReader reader) : base(reader)

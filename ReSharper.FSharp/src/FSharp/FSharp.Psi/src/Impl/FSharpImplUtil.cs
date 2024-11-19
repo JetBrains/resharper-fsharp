@@ -696,11 +696,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
     {
-      if (typeElement is IFSharpModule fsModule)
-        return fsModule.AccessKind;
-
       if (typeElement is IEnum)
         return ModuleMembersAccessKind.RequiresQualifiedAccess;
+
+      if (typeElement is IFSharpTypeElement fsTypeElement)
+        return fsTypeElement.AccessKind;
 
       return MayHaveRequireQualifiedAccessAttribute(typeElement) && typeElement.HasRequireQualifiedAccessAttribute()
         ? ModuleMembersAccessKind.RequiresQualifiedAccess
@@ -876,12 +876,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result;
     }
 
+    public static ModuleMembersAccessKind GetAccessKind(this IEnumerable<TypePart> parts) =>
+      parts.Any(part => part is IFSharpTypePart { AccessKind: ModuleMembersAccessKind.RequiresQualifiedAccess })
+        ? ModuleMembersAccessKind.RequiresQualifiedAccess
+        : ModuleMembersAccessKind.Normal;
 
-    public static ModuleMembersAccessKind GetAccessType([NotNull] this IDeclaredModuleDeclaration moduleDeclaration)
+    public static ModuleMembersAccessKind GetAccessType(this TreeNodeEnumerable<IAttribute> attributes)
     {
       var autoOpen = false;
 
-      foreach (var attr in moduleDeclaration.AttributesEnumerable)
+      foreach (var attr in attributes)
         switch (attr.ReferenceName?.ShortName.DropAttributeSuffix())
         {
           case "AutoOpen":

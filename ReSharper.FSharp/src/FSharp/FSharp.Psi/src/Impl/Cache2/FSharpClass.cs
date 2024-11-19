@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -27,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
     public string SourceName => this.GetSourceName();
+
+    public virtual ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
 
     public override IClass GetSuperClass()
     {

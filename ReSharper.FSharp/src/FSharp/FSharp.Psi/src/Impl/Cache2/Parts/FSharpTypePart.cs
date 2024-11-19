@@ -53,10 +53,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         methods.Add(new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName, ExtensionMemberKind.ExtensionMethod, this));
       }
 
-      if (methods.IsEmpty())
-        return;
-
-      CSharpExtensionMemberInfos = methods.ToArray();
+      if (!methods.IsEmpty())
+        CSharpExtensionMemberInfos = methods.ToArray();
     }
 
     public override ExtensionMemberInfo[] ExtensionMemberInfos =>
@@ -83,6 +81,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       return part;
     }
+
+    public virtual ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.Normal;
 
     public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)
     {

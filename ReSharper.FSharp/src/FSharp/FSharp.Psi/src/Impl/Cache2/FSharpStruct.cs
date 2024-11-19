@@ -8,12 +8,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpStruct : Struct, IFSharpTypeElement, IFSharpTypeParametersOwner
+  public class FSharpStruct([NotNull] IFSharpStructPart part)
+    : Struct(part), IFSharpTypeElement, IFSharpTypeParametersOwner
   {
-    public int MeasureTypeParametersCount { get; }
-
-    public FSharpStruct([NotNull] IFSharpStructPart part) : base(part) =>
-      MeasureTypeParametersCount = part.MeasureTypeParametersCount;
+    public int MeasureTypeParametersCount { get; } = part.MeasureTypeParametersCount;
 
     protected override bool AcceptsPart(TypePart part) =>
       part.ShortName == ShortName &&
@@ -35,5 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       this.GetAllTypeParametersReversed();
 
     public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
+
+    public ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
   }
 }

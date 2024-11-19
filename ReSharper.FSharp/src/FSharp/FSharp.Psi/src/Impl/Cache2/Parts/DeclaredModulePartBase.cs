@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected DeclaredModulePartBase([NotNull] T declaration, [NotNull] string shortName,
       MemberDecoration memberDecoration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, shortName, memberDecoration, cacheBuilder) =>
-      AccessKind = declaration.GetAccessType();
+      AccessKind = declaration.AttributesEnumerable.GetAccessType();
 
     protected DeclaredModulePartBase(IReader reader) : base(reader) =>
       AccessKind = (ModuleMembersAccessKind) reader.ReadByte();
