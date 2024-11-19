@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
@@ -25,7 +26,10 @@ type ImportExtensionMemberRule() =
     let getQualifierExpr (context: FSharpCodeCompletionContext) =
         FSharpExtensionMemberUtil.getQualifierExpr context.ReparsedContext.Reference
 
+    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+
     override this.IsAvailable(context) =
+        context.EnableImportCompletion &&
         context.IsQualified &&
 
         let qualifierExpr = getQualifierExpr context

@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -84,7 +85,11 @@ type ImportModuleMemberRule() =
         ns.StartsWith("Microsoft.FSharp.", StringComparison.Ordinal) &&
         typeElement.Module.Name = "FSharp.Core"
 
+    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+
     override this.IsAvailable(context) =
+        context.EnableImportCompletion &&
+
         not context.IsQualified &&
         context.ReparsedContext.Reference :? FSharpSymbolReference &&
 

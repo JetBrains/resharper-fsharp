@@ -184,6 +184,12 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
         | :? ITypeReferenceName as name -> isNotNull (AttributeNavigator.GetByReferenceName(name))
         | _ -> false
 
+    member this.EnableImportCompletion =
+        let parameters = context.Parameters
+        (parameters.Multiplier <> 1 || parameters.EvaluationMode = EvaluationMode.Full) &&
+
+        not (FSharpCodeCompletionContext.isFullEvaluationDisabled context)
+
     override this.ContextId = "FSharpCodeCompletionContext"
 
     member this.FcsCompletionContext = fcsCompletionContext

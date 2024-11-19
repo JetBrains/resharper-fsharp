@@ -106,3 +106,5 @@ type NamedUnionCaseFieldsPatRule() =
             item.SetTailType(SimpleTailType(" = ", tailNodeTypes, SkipTypings = [|" = "; "= "|]))
 
             collector.Add(item)
+
+        FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext
