@@ -184,13 +184,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkDummyTypeDef (name: string) =
         let attributes = enum 0
         let layout = ILTypeDefLayout.Auto
-        let implements = emptyILInterfaceImpls
         let genericParams = []
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(name, attributes, layout, emptyILInterfaceImpls, genericParams, extends, emptyILMethods, nestedTypes,
-             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
+        ILTypeDef(name, attributes, layout, [], genericParams, None, emptyILMethods, nestedTypes,
+             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
              emptyILSecurityDecls, emptyILCustomAttrsStored)
 
     let mkTypeAccessRights (typeElement: ITypeElement): TypeAttributes =
@@ -1166,7 +1165,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let typeDef = fcsTypeDef.TypeDef
 
         let extends = mkTypeDefExtends typeElement
-        extends = typeDef.Extends &&
+        typeDef.Extends.IsValueCreated &&
+        extends = typeDef.Extends.Value &&
 
         isUpToDateInterfaceImpls typeElement typeDef &&
 
@@ -1274,7 +1274,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | typeElement ->
                 let name = mkTypeDefName typeElement clrTypeName
                 let typeAttributes = mkTypeAttributes typeElement
-                let extends = mkTypeDefExtends typeElement
+                let extends = InterruptibleLazy (fun _ -> usingTypeElement clrTypeName None mkTypeDefExtends)
                 let genericParams = mkGenericParamDefs typeElement
 
                 // todo: pass this table in nested types too?
@@ -1291,9 +1291,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     usingTypeElement clrTypeName [||] mkTypeDefCustomAttrs
                 )
 
+                let typeKind =
+                    match typeElement with
+                    | :? IEnum -> ILTypeDefAdditionalFlags.Enum
+                    | :? IStruct -> ILTypeDefAdditionalFlags.ValueType
+                    | :? IDelegate -> ILTypeDefAdditionalFlags.Delegate
+                    | :? IInterface -> ILTypeDefAdditionalFlags.Interface
+                    | _ -> ILTypeDefAdditionalFlags.Class
+
                 let additionalFlags =
-                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
-                    else ILTypeDefAdditionalFlags.None
+                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods ||| typeKind
+                    else typeKind
 
                 let typeDef =
                     ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements,
