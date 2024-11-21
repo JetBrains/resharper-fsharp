@@ -37,7 +37,8 @@ class FSharpConcatenationAwareInjector :
 
     override fun getInterpolatedStringPartTextRange(
       literal: ClrLanguageInterpolatedStringLiteralExpression,
-      part: ClrLanguageInterpolatedStringLiteralExpressionPart
+      part: ClrLanguageInterpolatedStringLiteralExpressionPart,
+      previousPart: ClrLanguageInterpolatedStringLiteralExpressionPart?
     ): TextRange {
       val wholeLiteralRange = ElementManipulators.getValueTextRange(literal)
       val fsharpLiteral = literal as FSharpInterpolatedStringLiteralExpression
