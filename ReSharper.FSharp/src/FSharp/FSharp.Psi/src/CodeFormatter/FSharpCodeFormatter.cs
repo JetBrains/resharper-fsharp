@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using JetBrains.Application.Parts;
+using JetBrains.Application.Components;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
   [Language(typeof(FSharpLanguage))]
   public class FSharpCodeFormatter : CodeFormatterBase<FSharpFormatSettingsKey>
   {
-    private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;
+    private readonly ILazy<FSharpFormatterInfoProvider> myFormatterInfoProvider;
 
     private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache = new();
 
@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     private static readonly NodeTypeSet RightBraceEndNodes = new(FSharpTokenType.RBRACE, FSharpTokenType.BAR_RBRACE);
 
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
-      FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
+      ILazy<FSharpFormatterInfoProvider> formatterInfoProvider) : base(language, requirements)
     {
       myFormatterInfoProvider = formatterInfoProvider;
     }
@@ -91,9 +91,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       if (!firstElement.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.Formatter))
         return new TreeRange(firstElement, lastElement);
 
-      var formatterSettings = GetFormattingSettings(task.FirstElement, parameters, myFormatterInfoProvider);
+      var formatterSettings = GetFormattingSettings(task.FirstElement, parameters, myFormatterInfoProvider.Value);
 
-      DoDeclarativeFormat(formatterSettings, myFormatterInfoProvider, null, new[] {task},
+      DoDeclarativeFormat(formatterSettings, myFormatterInfoProvider.Value, null, new[] {task},
         parameters, null, null, false);
 
       return new TreeRange(firstElement, lastElement);
