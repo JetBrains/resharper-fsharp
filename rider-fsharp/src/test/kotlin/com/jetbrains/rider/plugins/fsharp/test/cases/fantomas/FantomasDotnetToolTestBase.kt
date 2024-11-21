@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.env.Environment
 import com.jetbrains.rider.test.env.dotNetSdk
-import com.jetbrains.rider.test.facades.RiderSolutionWithFoldersApiFacade
+import com.jetbrains.rider.test.facades.solution.RiderSolutionWithFoldersApiFacade
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.restoreNuGet

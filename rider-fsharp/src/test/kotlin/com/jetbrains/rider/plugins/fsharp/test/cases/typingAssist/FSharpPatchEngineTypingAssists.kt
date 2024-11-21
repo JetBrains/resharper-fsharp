@@ -5,9 +5,9 @@ import com.jetbrains.rider.test.annotations.Feature
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
-import com.jetbrains.rider.test.base.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.reporting.SubsystemConstants
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
