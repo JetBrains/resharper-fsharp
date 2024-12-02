@@ -26,7 +26,7 @@ type FSharpSource =
         | Exists(source, timestamp) -> RdFSharpSource(Encoding.UTF8.GetString(source), timestamp)
         | _ -> RdFSharpSource("NotExists", DateTime.MinValue)
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpSourceCache(lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
         solutionDocumentChangeProvider: SolutionDocumentChangeProvider, fileExtensions: IProjectFileExtensions,
         logger: ILogger) =

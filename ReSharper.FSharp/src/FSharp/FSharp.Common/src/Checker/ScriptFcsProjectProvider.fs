@@ -19,7 +19,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.Util
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
         scriptSettings: FSharpScriptSettingsProvider, fsSourceCache: FSharpSourceCache, toolset: ISolutionToolset) =
 

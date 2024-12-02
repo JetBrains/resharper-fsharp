@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
+open JetBrains.Application.Threading
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
@@ -94,12 +95,12 @@ type FsiOptions =
 
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-type FsiOptionsProvider(lifetime, settings, settingsSchema) =
-    inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema)
+type FsiOptionsProvider(lifetime, settings, settingsSchema, shellLocks: IShellLocks) =
+    inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema, shellLocks)
 
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FsiOptionsProvider(lifetime, settings, settingsSchema)
+        FsiOptionsProvider(lifetime, settings, settingsSchema, solution.Locks)
 
     member val AutoDetect               = base.GetValueProperty<bool>("AutoDetect")
     member val IsCustomTool             = base.GetValueProperty<bool>("IsCustomTool")
