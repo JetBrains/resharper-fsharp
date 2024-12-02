@@ -37,7 +37,7 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         documentManager: DocumentManager, scriptOptionsProvider: IScriptFcsProjectProvider,
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
@@ -192,8 +192,6 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         )
 
     do
-        changeManager.RegisterChangeProvider(lifetime, this)
-
         if not scriptOptionsProvider.SyncUpdate then
             scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
                 queueUpdateReferences path options
@@ -305,8 +303,9 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     interface IPsiModuleFactory with
         member x.Modules = psiModulesCollection
 
-    interface IChangeProvider with
+    interface ISolutionChangeProvider with
         member x.Execute _ = null
+        member x.Lifetime = lifetime
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc).

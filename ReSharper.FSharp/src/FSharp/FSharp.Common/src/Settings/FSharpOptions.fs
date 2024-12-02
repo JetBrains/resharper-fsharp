@@ -5,6 +5,7 @@ open System.Reflection
 open JetBrains.Application
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
+open JetBrains.Application.Threading
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions
 open JetBrains.DataFlow
@@ -119,21 +120,21 @@ type FSharpExperimentalFeatures =
 
 [<AllowNullLiteral>]
 type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive,
-        settingsSchema: SettingsSchema) =
+        settingsSchema: SettingsSchema, shellLocks: IShellLocks) =
 
     let settingsKey = settingsSchema.GetKey<'T>()
 
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FSharpSettingsProviderBase(lifetime, settings, settingsSchema)
+        FSharpSettingsProviderBase(lifetime, settings, settingsSchema, solution.Locks)
 
     member x.GetValueProperty<'V>(name: string) =
         let entry = settingsKey.TryFindEntryByMemberName(name) :?> SettingsScalarEntry
-        settings.GetValueProperty(lifetime, entry, null) :> IProperty<'V>
+        settings.GetValueProperty2(lifetime, entry, null, ApartmentForNotifications.Primary(shellLocks)) :> IProperty<'V>
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) =
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
+type FSharpScriptSettingsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpScriptOptions>(lifetime, solution, settings, settingsSchema)
 
     member val LanguageVersion = base.GetValueProperty<FSharpLanguageVersion>("LanguageVersion")
@@ -142,7 +143,7 @@ type FSharpScriptSettingsProvider(lifetime, solution, settings, settingsSchema) 
 
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSchema) =
+type FSharpExperimentalFeaturesProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpExperimentalFeatures>(lifetime, solution, settings, settingsSchema)
 
     member val EnablePostfixTemplates = base.GetValueProperty<bool>("PostfixTemplates")
@@ -154,7 +155,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution, settings, settingsSc
 
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
+type FSharpOptionsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
     member val NonFSharpProjectInMemoryReferences =
@@ -165,7 +166,7 @@ type FSharpOptionsProvider(lifetime, solution, settings, settingsSchema) =
             base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-type FSharpFantomasSettingsProvider(lifetime, solution, settings, settingsSchema) =
+type FSharpFantomasSettingsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
 
     member val Location = base.GetValueProperty<FantomasLocationSettings>("Location")
