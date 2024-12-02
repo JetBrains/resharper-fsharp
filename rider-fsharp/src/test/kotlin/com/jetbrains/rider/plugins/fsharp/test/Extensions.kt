@@ -10,7 +10,7 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.protocol.IProtocolHost
 import com.jetbrains.rider.protocol.protocolHost
 import com.jetbrains.rider.settings.RiderSettingMaintenanceController
-import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.BackendSettingsEditorBase
@@ -39,7 +39,8 @@ fun withSetting(project: Project, setting: String, enterValue: String, exitValue
   }
 }
 
-fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> Unit) {
+context(SolutionApiFacade)
+fun withDisabledOutOfProcessTypeProviders(function: () -> Unit) {
   withSetting(
     project,
     "FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue",
@@ -50,7 +51,8 @@ fun BaseTestWithSolution.withDisabledOutOfProcessTypeProviders(function: () -> U
   }
 }
 
-fun BaseTestWithSolution.withNonFSharpProjectReferences(function: () -> Unit) {
+context(SolutionApiFacade)
+fun withNonFSharpProjectReferences(function: () -> Unit) {
   withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", "true", "false") {
     project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
     function()
