@@ -28,6 +28,13 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Parameters - Pattern 03 - List``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 04 - As``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 05 - Param owner``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 06 - Tuple with as 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 07 - Tuple with as 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 08 - Tuple with as 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 09 - Nested tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 10 - Nested tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 11 - Active pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 12 - Active pattern 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Function - Return - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return - Function 02``() = x.DoNamedTest()
@@ -58,6 +65,7 @@ type SpecifyTypesActionAvailabilityTest() =
 
     [<Test>] member x.``Let bindings - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Let bindings - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let bindings - Tuples 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
     [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
