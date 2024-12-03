@@ -32,6 +32,7 @@
     <Compile Include="src\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\QuickDoc\FSharpQuickDocProvider.fs" />
     <Compile Include="src\Syntax\XmlDocSummaryHighlightingVisitor.fs" />
+    <Compile Include="src\Utils\VisibilityConsumer.fs" />
     <Compile Include="src\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Stages\FSharpCompilerWarningProcessor.fs" />
     <Compile Include="src\Stages\FSharpDaemonBehaviour.fs" />
