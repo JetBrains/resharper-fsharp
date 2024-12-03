@@ -69,12 +69,12 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
 
     if (containsExclusive(strictGroup.range, cursorPosition)) {
       val completionPrefix = content.substring(strictGroup.range.first, cursorPosition)
-      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, textControlId, textControlModel,
+      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, initContext.editor,
                                                                              initContext.completionType, 1, completionPrefix, host)
       return true
     }
     else if (containsExclusive(zoneGroup.range, cursorPosition)) {
-      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, textControlId, textControlModel,
+      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, initContext.editor,
                                                                              initContext.completionType, 1, "", host)
       return true
     }
