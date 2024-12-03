@@ -2,11 +2,13 @@ module Test
 
 open System
 open System.Collections.Generic
+open System.Runtime.InteropServices
 
 type SingleCaseDU<'a, 'b> = SingleCaseDU of x: 'a
 type Record = { Foo: int; Bar: string }
 
 let f _
+      1
       ()
       x
       (y, z as b)
@@ -67,6 +69,8 @@ type A(x) =
         let res = x + y + z
         res
 
+    member _.M1([<Optional>] ?x, ?y) = x.Value + y.Value + 1
+
     interface IDisposable with
         member _.Dispose() = ()
 
@@ -98,6 +102,8 @@ type Typed(x: int) =
     member _.M(x: int) (y: int, z: int) : int =
         let res: int = x + y + z
         res
+
+    member _.M1([<Optional>] ?x: int, ?y: int) : int = x.Value + y.Value + 1
 
     interface IDisposable with
         member _.Dispose(): unit = ()
