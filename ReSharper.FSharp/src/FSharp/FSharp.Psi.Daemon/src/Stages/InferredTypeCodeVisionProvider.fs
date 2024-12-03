@@ -8,13 +8,10 @@ open JetBrains.Application.Settings
 open JetBrains.Application.UI.Components
 open JetBrains.Application.UI.PopupLayout
 open JetBrains.Application.UI.Tooltips
-open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Platform.CodeInsights
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.RdBackend.Common.Features.Services
-open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -27,6 +24,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.TextControl.DocumentMarkup.Adornments
+open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
@@ -143,6 +141,8 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
             not Shell.Instance.IsTestShell &&
 
             settingsStore.GetIndexedValue((fun (key: CodeInsightsSettings) -> key.DisabledProviders), FSharpInferredTypeHighlighting.providerId) ||
+
+            settingsStore.GetValue(fun (key: GeneralInlayHintsOptions) -> key.EnableInlayHints) &&
             settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
                          .EnsureInlayHintsDefault(settingsStore) <> PushToHintMode.Never
 

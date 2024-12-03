@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TextControl.DocumentMarkup.Adornments
+open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 open NUnit.Framework
 
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
@@ -25,3 +26,7 @@ type InferredTypeCodeVisionProviderTest() =
     [<Test>] member x.``Binding - As 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding - As 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Paren 01``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<GeneralInlayHintsOptions>, "EnableInlayHints", false)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Always)>]
+    [<Test>] member x.``Availability - Disabled inlay hints 01``() = x.DoNamedTest()
