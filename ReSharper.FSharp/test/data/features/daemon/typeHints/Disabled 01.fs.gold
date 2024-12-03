@@ -8,6 +8,7 @@ type SingleCaseDU<'a, 'b> = SingleCaseDU of x: 'a
 type Record = { Foo: int; Bar: string }
 
 let f _
+      1
       ()
       x
       (y, z as b)
