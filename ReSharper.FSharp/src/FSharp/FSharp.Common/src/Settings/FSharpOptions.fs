@@ -193,7 +193,12 @@ type FSharpTypeHintOptions =
       [<SettingsEntry(PushToHintMode.PushToShowHints,
                       DescriptionResourceType = typeof<Strings>,
                       DescriptionResourceName = nameof(Strings.FSharpTypeHints_LocalBindings_Description))>]
-      mutable ShowTypeHintsForLocalBindings: PushToHintMode }
+      mutable ShowTypeHintsForLocalBindings: PushToHintMode
+
+      [<SettingsEntry(PushToHintMode.PushToShowHints,
+                      DescriptionResourceType = typeof<Strings>,
+                      DescriptionResourceName = nameof(Strings.FSharpTypeHints_MatchPatterns_Description))>]
+      mutable ShowTypeHintsForMatchPatterns: PushToHintMode }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]

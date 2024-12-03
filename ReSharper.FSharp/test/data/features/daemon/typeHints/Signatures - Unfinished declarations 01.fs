@@ -10,6 +10,8 @@ module M1 =
         ()
     let _ = fun x 
     let _ = fun x -> ()
+    function | x
+    function | x -> ()
 
 module M2 =
     type A1(obj)

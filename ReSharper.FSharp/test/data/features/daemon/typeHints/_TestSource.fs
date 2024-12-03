@@ -129,3 +129,18 @@ let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
 let f1 (x & Int(i) & String(s)) = ()
+
+
+let _ = function x -> ()
+
+match [Some 5] with
+| [] -> ()
+| [x] -> ()
+| x :: y :: [] -> ()
+| Some(x) :: tail -> () 
+| [Some(x)]
+| [_; Some(x)] when let x = 5 in true ->
+    let y = 5 in ()
+
+exception MyException of string
+try () with | MyException(x) -> ()
