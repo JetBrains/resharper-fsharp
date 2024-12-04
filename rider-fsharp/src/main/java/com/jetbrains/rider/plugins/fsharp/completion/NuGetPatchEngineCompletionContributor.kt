@@ -1,22 +1,16 @@
-package com.jetbrains.rider.plugins.fsharp.completion.patchEngine
+package com.jetbrains.rider.plugins.fsharp.completion
 
 import com.intellij.codeInsight.completion.CompletionInitializationContext
-import com.intellij.openapi.diagnostic.trace
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.startOffset
-import com.jetbrains.rdclient.document.textControlId
-import com.jetbrains.rdclient.document.textControlModel
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider
-import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider.Companion.logger
 import com.jetbrains.rider.completion.patchEngine.isPreemptiveCompletionEnabled
 import com.jetbrains.rider.editors.startOffset
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
-import com.jetbrains.rider.plugins.fsharp.completion.PACKAGE_REFERENCE_REGEX
-import com.jetbrains.rider.plugins.fsharp.completion.insideReferenceDirective
 
 class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContributor() {
 
@@ -38,15 +32,13 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     val stringText = ElementManipulators.getValueText(psiElement)
     val match = PACKAGE_REFERENCE_REGEX.find(stringText) ?: return
 
-    val `package` = match.groups["package"]!!
-    val packageZone = match.groups["packageZone"]!!
-    val version = match.groups["version"]
-    val versionZone = match.groups["versionZone"]
+    val `package` = match.groups[GROUP_PACKAGE]!!
+    val packageZone = match.groups[GROUP_PACKAGE_ZONE]!!
+    val version = match.groups[GROUP_VERSION]
+    val versionZone = match.groups[GROUP_VERSION_ZONE]
 
-    prepareCustomParams(stringText, context.startOffset, "NuGet:name", `package`, packageZone, context)
-    || prepareCustomParams(stringText, context.startOffset, "NuGet:version|${`package`.value}", version!!, versionZone!!, context)
-
-    RiderPatchEngineProtocolProvider.getInstance().isSuppress = true
+    prepareCustomParams(stringText, context.startOffset, KEY_NAME, `package`, packageZone, context)
+    || prepareCustomParams(stringText, context.startOffset, "$KEY_VERSION|${`package`.value}", version!!, versionZone!!, context)
   }
 
   private fun prepareCustomParams(
@@ -57,25 +49,15 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     zoneGroup: MatchGroup,
     initContext: CompletionInitializationContext,
   ): Boolean {
-    val textControlModel = initContext.editor.textControlModel ?: run {
-      logger.trace { "TextControlModel is null during starting completion :: editor=${initContext.editor}" }
-      return false
-    }
-
-    val textControlId = initContext.editor.textControlId ?: run {
-      logger.trace { "TextControlId is null during starting completion :: editor=${initContext.editor}" }
-      return false
-    }
-
     if (containsExclusive(strictGroup.range, cursorPosition)) {
       val completionPrefix = content.substring(strictGroup.range.first, cursorPosition)
-      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, initContext.editor,
-                                                                             initContext.completionType, 1, completionPrefix, host)
+      RiderPatchEngineProtocolProvider.Companion.getInstance().triggerCompletion(
+        initContext.project, initContext.editor, initContext.completionType, 1, completionPrefix, host)
       return true
     }
     else if (containsExclusive(zoneGroup.range, cursorPosition)) {
-      RiderPatchEngineProtocolProvider.getInstance().triggerCustomCompletion(initContext.project, initContext.editor,
-                                                                             initContext.completionType, 1, "", host)
+      RiderPatchEngineProtocolProvider.Companion.getInstance().triggerCompletion(
+        initContext.project, initContext.editor, initContext.completionType, 1, "", host)
       return true
     }
 

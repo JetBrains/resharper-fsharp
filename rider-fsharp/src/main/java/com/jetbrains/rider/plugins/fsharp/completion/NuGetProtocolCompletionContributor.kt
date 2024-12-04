@@ -13,7 +13,15 @@ import com.jetbrains.rider.completion.currentOffsetSafe
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
 
-val PACKAGE_REFERENCE_REGEX =
+internal const val KEY_NAME = "NuGet:name"
+internal const val KEY_VERSION = "NuGet:version"
+
+internal const val GROUP_PACKAGE = "package"
+internal const val GROUP_PACKAGE_ZONE = "packageZone"
+internal const val GROUP_VERSION = "version"
+internal const val GROUP_VERSION_ZONE = "versionZone"
+
+internal val PACKAGE_REFERENCE_REGEX =
   Regex("""^nuget:(?<packageZone>\s*(?<package>[a-zA-Z_0-9\-\\.]*)\s*)(,(?<versionZone>\s*(?<version>[a-zA-Z_0-9\-\\.]*)\s*))?""")
 
 class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
@@ -62,15 +70,15 @@ class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
 
     val cursorPosition = textControlModel.currentOffsetSafe - stringContentRange
 
-    val `package` = match.groups["package"]!!
-    val packageZone = match.groups["packageZone"]!!
-    val version = match.groups["version"]
-    val versionZone = match.groups["versionZone"]
+    val `package` = match.groups[GROUP_PACKAGE]!!
+    val packageZone = match.groups[GROUP_PACKAGE_ZONE]!!
+    val version = match.groups[GROUP_VERSION]
+    val versionZone = match.groups[GROUP_VERSION_ZONE]
 
     context.replacementOffset = psiElement.startOffset + stringRange.endOffset
 
-    ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:name", `package`, packageZone) ||
+    ensureCompletionIsRunning(helper, context, stringText, cursorPosition, KEY_NAME, `package`, packageZone) ||
     versionZone != null && `package`.value.isNotEmpty() &&
-      ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "NuGet:version|${`package`.value}", version!!, versionZone)
+      ensureCompletionIsRunning(helper, context, stringText, cursorPosition, "$KEY_VERSION|${`package`.value}", version!!, versionZone)
   }
 }
