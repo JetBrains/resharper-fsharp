@@ -78,12 +78,14 @@
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+      <skipBeforeAfter>true</skipBeforeAfter>
     </intentionAction>
 
     <intentionAction>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendSelectionToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+      <skipBeforeAfter>true</skipBeforeAfter>
     </intentionAction>
 
     <registryKey key="rider.fsharp.fcsBusyDelay.ms" description="Number of milliseconds that the FCS reactor must be busy for before showing a background task" defaultValue="5000" restartRequired="false"/>
