@@ -21,11 +21,12 @@ open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 type private NodesRequiringHints =
     { TopLevelNodes: VisibilityConsumer<ITreeNode>
       LocalNodes: VisibilityConsumer<ITreeNode>
-      MatchNodes: List<ITreeNode> } with
+      MatchNodes: VisibilityConsumer<ITreeNode> } with
 
     member x.HasVisibleItems =
         x.TopLevelNodes.HasVisibleItems ||
-        x.LocalNodes.HasVisibleItems
+        x.LocalNodes.HasVisibleItems ||
+        x.MatchNodes.HasVisibleItems
 
 type private FSharpTypeHintSettings =
     { TopLevelMembers: PushToHintMode
@@ -217,7 +218,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
     let adornNodes
         (topLevelNodes: ITreeNode ICollection)
         (localNodes: ITreeNode ICollection)
-        (matchClauses: ITreeNode array) =
+        (matchClauses: ITreeNode ICollection) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
         let inline adornNodes nodes pushToHintMode actionsProvider =
@@ -235,38 +236,30 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         highlightingConsumer.CollectHighlightings()
 
     override x.Execute(committer) =
-        let consumer = { TopLevelNodes = List(); LocalNodes = List(); MatchClauses = List() }
-        fsFile.Accept(MembersVisitor(settings), consumer)
-
-        let topLevelNodes = consumer.TopLevelNodes |> Array.ofSeq
-        let localNodes = consumer.LocalNodes |> Array.ofSeq
-        let matchClauses = consumer.MatchClauses |> Array.ofSeq
-
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
-        let consumer = { TopLevelNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
-                         LocalNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
+        let consumer = {
+                         TopLevelNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+                         LocalNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+                         MatchNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
         let topLevelNodes = consumer.TopLevelNodes
         let localNodes = consumer.LocalNodes
+        let matchNodes = consumer.MatchNodes
 
+        // Partition the expressions to adorn by whether they're visible in the viewport or not
         let remainingHighlightings =
-            if visibleRange.IsValid() then
-                // Partition the expressions to adorn by whether they're visible in the viewport or not
-                let topLevelVisible, topLevelNotVisible = partition topLevelNodes visibleRange
-                let localNodesVisible, localNodesNotVisible = partition localNodes visibleRange
-
+            if consumer.HasVisibleItems then
                 // Adorn visible expressions first
-                let visibleHighlightings = adornNodes topLevelVisible localNodesVisible
+                let visibleHighlightings =
+                    adornNodes topLevelNodes.VisibleItems localNodes.VisibleItems matchNodes.VisibleItems
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
-                // Finally adorn expressions that aren't visible in the viewport
-                adornNodes topLevelNotVisible localNodesNotVisible
-            else
-                adornNodes topLevelNodes localNodes
+            // Finally adorn expressions that aren't visible in the viewport
+            adornNodes topLevelNodes.NonVisibleItems localNodes.NonVisibleItems matchNodes.NonVisibleItems
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
