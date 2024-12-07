@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
@@ -178,18 +179,6 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
     let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode actionsProvider =
         match pattern with
-        | :? IParametersOwnerPat as pattern ->
-            let asPat = AsPatNavigator.GetByLeftPattern(pattern.IgnoreParentParens())
-            if isNull asPat then ValueNone else
-
-            let reference = pattern.Reference
-            if isNull reference then ValueNone else
-
-            match reference.GetFcsSymbol() with
-            | :? FSharpActivePatternCase ->
-                getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode actionsProvider
-            | _ -> ValueNone
-
         | :? IReferencePat as refPat ->
             let symbolUse = refPat.GetFcsSymbolUse()
             if isNull symbolUse then ValueNone else
@@ -203,7 +192,25 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
             |> ValueSome
 
-        | _ -> ValueNone
+        | :? IParametersOwnerPat as pattern ->
+            let asPat = AsPatNavigator.GetByLeftPattern(pattern.IgnoreParentParens())
+            if isNull asPat then ValueNone else
+
+            let reference = pattern.Reference
+            if isNull reference then ValueNone else
+
+            match reference.GetFcsSymbol() with
+            | :? FSharpActivePatternCase ->
+                getHintForPattern (asPat.RightPattern.IgnoreInnerParens()) pushToHintMode actionsProvider
+            | _ -> ValueNone
+
+        | pattern ->
+            let fcsType = pattern.TryGetFcsType()
+            if isNull fcsType then ValueNone else
+
+            let range = pattern.GetDocumentRange().EndOffsetRange()
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
+            |> ValueSome
 
     let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =
         match node with

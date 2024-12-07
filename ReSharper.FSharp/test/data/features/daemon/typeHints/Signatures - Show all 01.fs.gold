@@ -134,16 +134,45 @@ let f1 (x||(57) & Int(i||(58)) & String(s||(59))) ||(60)= ()
 let _ = function x||(61) -> ()
 
 match [Some 5] with
-| [] -> ()
-| [x] -> ()
-| x :: y :: [] -> ()
-| Some(x||(62)) :: tail||(63) -> () 
-| [Some(x||(64))]
-| [_; Some(x)] when let x||(65) = 5 in true ->
-    let y||(66) = 5 in ()
+| []||(62) -> ()
+| [x||(63)] -> ()
+| [x: int option] -> ()
+| [x; y]||(64) -> ()
+| [x||(65); y: int option] -> ()
+| [_; x||(66)] -> ()
+| [_; _] -> ()
+| [x||(67); _; _] -> ()
+| [x||(68); _; Some 5] -> ()
+| x :: tail||(69) -> ()
+| _ :: (tail: int option list) -> ()
+| x: int option :: tail||(70) -> ()
+| x||(71) :: (tail: int option list) -> ()
+| ((x :: tail): int option list) -> ()
+| _ :: _ -> ()
+| x||(72) :: _  -> ()
+| _ :: x||(73) :: _ -> ()
+| x||(74) :: _ :: _  -> ()
+| x||(75) :: Some y||(76) :: _  -> ()
+| x :: (y :: _||(77))  -> ()
+| x :: y :: []||(78) -> ()
+| x||(79) :: [y||(80)] -> ()
+| Some(x||(81)) :: tail||(82) -> () 
+| [Some(x||(83))]
+| [_; Some(x)] when let x||(84) = 5 in true ->
+    let y||(85) = 5 in ()
+
+match [[5]] with
+| [[]||(86)] -> ()
+| [[]; x]||(87) -> ()
+
+match [|5|] with
+| [||]||(88) -> ()
+| [|x||(89)|] -> ()
+| [|x; y|]||(90) -> ()
+| [|x||(91); y: int|] -> ()
 
 exception MyException of string
-try () with | MyException(x||(67)) -> ()
+try () with | MyException(x||(92)) -> ()
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
@@ -208,9 +237,34 @@ try () with | MyException(x||(67)) -> ()
 (59): ReSharper Parameter Name Hint: : string
 (60): ReSharper Parameter Name Hint: : unit 
 (61): ReSharper Parameter Name Hint: : 'a
-(62): ReSharper Parameter Name Hint: : int
-(63): ReSharper Parameter Name Hint: : int option list
-(64): ReSharper Parameter Name Hint: : int
-(65): ReSharper Parameter Name Hint: : int
-(66): ReSharper Parameter Name Hint: : int
-(67): ReSharper Parameter Name Hint: : string
+(62): ReSharper Parameter Name Hint: : int option list
+(63): ReSharper Parameter Name Hint: : int option
+(64): ReSharper Parameter Name Hint: : int option list
+(65): ReSharper Parameter Name Hint: : int option
+(66): ReSharper Parameter Name Hint: : int option
+(67): ReSharper Parameter Name Hint: : int option
+(68): ReSharper Parameter Name Hint: : int option
+(69): ReSharper Parameter Name Hint: : int option list
+(70): ReSharper Parameter Name Hint: : int option list
+(71): ReSharper Parameter Name Hint: : int option
+(72): ReSharper Parameter Name Hint: : int option
+(73): ReSharper Parameter Name Hint: : int option
+(74): ReSharper Parameter Name Hint: : int option
+(75): ReSharper Parameter Name Hint: : int option
+(76): ReSharper Parameter Name Hint: : int
+(77): ReSharper Parameter Name Hint: : int option list
+(78): ReSharper Parameter Name Hint: : int option list
+(79): ReSharper Parameter Name Hint: : int option
+(80): ReSharper Parameter Name Hint: : int option
+(81): ReSharper Parameter Name Hint: : int
+(82): ReSharper Parameter Name Hint: : int option list
+(83): ReSharper Parameter Name Hint: : int
+(84): ReSharper Parameter Name Hint: : int
+(85): ReSharper Parameter Name Hint: : int
+(86): ReSharper Parameter Name Hint: : int list
+(87): ReSharper Parameter Name Hint: : int list list
+(88): ReSharper Parameter Name Hint: : int array
+(89): ReSharper Parameter Name Hint: : int
+(90): ReSharper Parameter Name Hint: : int array
+(91): ReSharper Parameter Name Hint: : int
+(92): ReSharper Parameter Name Hint: : string

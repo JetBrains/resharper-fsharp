@@ -1,12 +1,32 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let rec private tryVisitCompositePattern acc (pattern: IFSharpPattern) =
+let private isRequiresAnnotation (pattern: IFSharpPattern) =
     match pattern with
-    | :? IReferencePat -> acc
-    | _ -> visitPattern acc pattern
+    | :? IReferencePat -> true
+    | :? IArrayOrListPat as pat when pat.PatternsEnumerable.IsEmpty() -> true
+    | _ -> false
+
+let rec private tryVisitCompositePattern acc (pattern: IFSharpPattern) =
+    if isRequiresAnnotation pattern then acc
+    else visitPattern acc pattern
+
+and private collectHintsForCollectionPattern innerPatterns acc defaultPatternToAnnotate=
+    let acc =
+        match List.filter isRequiresAnnotation innerPatterns with
+        | [] -> acc
+        | [pattern] -> visitPattern acc pattern
+        | _ ->
+
+        match defaultPatternToAnnotate with
+        | ValueNone -> acc
+        | ValueSome pat -> pat :: acc
+
+    innerPatterns
+    |> Seq.fold tryVisitCompositePattern acc
 
 and private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     match pattern with
@@ -48,12 +68,28 @@ and private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
         visitPattern acc orPat.Pattern1
 
     | :? IListConsPat as listConsPat ->
-        let acc = tryVisitCompositePattern acc listConsPat.HeadPattern
-        visitPattern acc listConsPat.TailPattern
+        let rec flat (pat: IFSharpPattern) acc =
+            match pat.IgnoreInnerParens() with
+            | :? IListConsPat as pat -> flat pat.TailPattern (pat.HeadPattern :: acc)
+            | _ -> pat :: acc
+
+        let patterns = flat listConsPat []
+
+        let defaultPatternToAnnotate: ITreeNode voption =
+            match patterns with
+            | :? IWildPat as tailPat :: _ -> ValueSome(tailPat)
+            | tailPat :: _ when isRequiresAnnotation tailPat -> ValueSome(tailPat)
+            | _ -> ValueNone
+
+        collectHintsForCollectionPattern patterns acc defaultPatternToAnnotate
 
     | :? IArrayOrListPat as arrayOrListPat ->
-        arrayOrListPat.PatternsEnumerable
-        |> Seq.fold tryVisitCompositePattern acc
+        let patterns = arrayOrListPat.PatternsEnumerable
+        if patterns.IsEmpty() then arrayOrListPat :: acc else
+
+        let patterns = List.ofSeq patterns
+        let defaultPatternToAnnotate = ValueSome(arrayOrListPat : ITreeNode)
+        collectHintsForCollectionPattern patterns acc defaultPatternToAnnotate
 
     | _ -> acc
 
