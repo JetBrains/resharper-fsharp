@@ -17,7 +17,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
-  [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
+  [PsiComponent(Instantiation.DemandAnyThreadSafe)]
   public class FSharpAutoOpenCache : IAssemblyCache
   {
     private readonly IPsiAssemblyFileLoader myPsiAssemblyFileLoader;
