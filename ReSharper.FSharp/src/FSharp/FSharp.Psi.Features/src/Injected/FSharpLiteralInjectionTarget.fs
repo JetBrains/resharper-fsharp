@@ -16,7 +16,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Impl.Shared.InjectedPsi
 open JetBrains.Text
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLiteralInjectionTarget() =
     let isInjectionAllowed tokenType =
         FSharpTokenType.Strings[tokenType] &&
