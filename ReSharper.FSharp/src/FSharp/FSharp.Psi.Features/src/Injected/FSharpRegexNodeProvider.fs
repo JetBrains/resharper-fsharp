@@ -17,7 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpRegexNodeProvider() =
     let rec evalOptionsArg (expr: IFSharpExpression) =
         match expr.IgnoreInnerParens() with
