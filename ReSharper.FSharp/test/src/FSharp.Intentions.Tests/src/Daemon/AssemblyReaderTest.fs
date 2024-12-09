@@ -70,6 +70,9 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Attribute - Attribute usage 03 - F# 9``() = x.DoNamedTest()
 
     [<Test>] member x.``Attribute - Obsolete 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Param 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Param 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Param 03``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 03``() = x.DoNamedTest()
@@ -94,7 +97,6 @@ type AssemblyReaderCSharpTest() =
 
     [<Test>] member x.``Method - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
-    [<Test>] member x.``Method - Ctor 03 - Optional param``() = x.DoNamedTest()
     [<Test>] member x.``Method - Duplicate 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Duplicate 02 - Visibility``() = x.DoNamedTest()
     [<Test>] member x.``Method - Explicit impl 01``() = x.DoNamedTest()
@@ -102,6 +104,9 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extern 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Override 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Optional 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Optional 02``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Optional 03``() = x.DoNamedTest()
 
     [<Test; Explicit "Can't reference attribute in net451">]
     member x.``Method - Param 01``() = x.DoNamedTest()

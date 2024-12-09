@@ -555,7 +555,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let constantValue = attrValue.ConstantValue
 
             // todo: use default value for type from parameter/property?
-            if constantValue.IsBadValue() then ILAttribElem.Null else
+            if constantValue.IsBadValue() || constantValue.IsNull() then ILAttribElem.Null else
 
             if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
 

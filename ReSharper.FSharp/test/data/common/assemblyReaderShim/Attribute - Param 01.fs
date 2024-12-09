@@ -1,0 +1,12 @@
+module Module
+
+let c = Class()
+
+[<Attr>]
+let i1 = 1
+
+[<Attr "">]
+let i2 = 1
+
+[<Attr null>]
+let i3 = 1
