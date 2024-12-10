@@ -295,6 +295,10 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
     static let leftBracketsToAddIndent: HashSet<TokenNodeType> =
         bracketsToAddIndent |> Seq.map fst |> HashSet
 
+    let getNode (textControl: ITextControl) offset =
+        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+        fsFile.GetNode<_>(DocumentOffset(textControl.Document, offset))
+
     let findRightBracket (lexer: CachingLexer) =
         leftBracketsToAddIndent.Contains(lexer.TokenType) &&
         FSharpBracketMatcher().FindMatchingBracket(lexer)
@@ -735,60 +739,57 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let mutable allowedTokens = null
         if not (tryDeindentTokens.TryGetValue(lexer.TokenType, &allowedTokens)) then false else
 
-        let prevTokenEnd =
+        let tokenBeforeKeywordEnd =
             use cookie = LexerStateCookie.Create(lexer)
             lexer.Advance(-1)
             while isIgnored lexer.TokenType do
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        let document = textControl.Document
-
-        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let expr = fsFile.GetNode<IFSharpExpression>(DocumentOffset(document, lexer.TokenStart))
+        let expr: IFSharpExpression = getNode textControl lexer.TokenStart
         if isNull expr then false else
 
-        let range =
-            let inline checkExpr (expr: IFSharpExpression) (node: ITreeNode) =
-                if isNotNull expr && isNotNull node && expr.GetDocumentEndOffset().Offset = prevTokenEnd then
-                    Some (node.GetDocumentRange())
+        let indentOffset =
+            let inline tryGetIndentOffset (exprBeforeKeyword: IFSharpExpression) (indentAnchor: ITreeNode) =
+                if isNotNull exprBeforeKeyword && isNotNull indentAnchor &&
+                   exprBeforeKeyword.GetDocumentEndOffset().Offset = tokenBeforeKeywordEnd then
+                   Some (indentAnchor.GetDocumentStartOffset().Offset)
                 else None
 
             match expr with
             // if expr then ...
-            // elif ... {caret}
+            // elif ... then {caret}
             | :? IElifExpr as elifExpr when (elifExpr.ThenExpr :? IFromErrorExpr) ->
                 let ifExpr = IfThenElseExprNavigator.GetByElseExpr(elifExpr)
                 if isNull ifExpr then None else
-                checkExpr elifExpr.ConditionExpr ifExpr.ConditionExpr
+                tryGetIndentOffset elifExpr.ConditionExpr ifExpr.ConditionExpr
 
             // if expr then {caret}
             // No info is available after error recovery, we check that range is surrounded with if ... then.
             | :? IIfThenElseExpr as ifThenElseExpr when (ifThenElseExpr.ThenExpr :? IFromErrorExpr) ->
                 let conditionExpr = ifThenElseExpr.ConditionExpr
-                checkExpr conditionExpr conditionExpr
+                tryGetIndentOffset conditionExpr conditionExpr
 
             // while expr do {caret}
             | :? IWhileExpr as whileExpr ->
                 let expr = whileExpr.ConditionExpr
-                checkExpr expr expr
+                tryGetIndentOffset expr expr
 
             // for i = ... to ... do {caret}
             | :? IForExpr as forExpr ->
-                checkExpr forExpr.DoExpression forExpr.Identifier
+                tryGetIndentOffset forExpr.ToExpression forExpr.Identifier
 
             // for ... in ... do {caret}
             | :? IForEachExpr as foreachExpr ->
-                checkExpr foreachExpr.InExpression foreachExpr.Pattern
+                tryGetIndentOffset foreachExpr.InExpression foreachExpr.Pattern
 
             | _ -> None
 
-        match range with
+        match indentOffset with
         | None -> false
-        | Some range ->
+        | Some exprStart ->
 
         use cookie = LexerStateCookie.Create(lexer)
-        let exprStart = range.StartOffset.Offset
         if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -797,6 +798,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if not (Array.contains lexer.TokenType allowedTokens) then false else
 
         let indent =
+            let document = textControl.Document
             let tokenLine = document.GetCoordsByOffset(lexer.TokenStart).Line
             let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
             offsetInLine + getIndentSize textControl
@@ -813,17 +815,12 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
                 lexer.Advance(-1)
             lexer.TokenEnd
 
-        let document = textControl.Document
-
-        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let matchClause = fsFile.GetNode<IMatchClause>(DocumentOffset(document, lexer.TokenStart))
-
+        let matchClause: IMatchClause = getNode textControl lexer.TokenStart
         if isNull matchClause then false else
 
         let whenExpression = matchClause.WhenExpression
-        let pat = matchClause.Pattern
         let offset =
-            if isNull whenExpression then pat.GetDocumentEndOffset()
+            if isNull whenExpression then matchClause.Pattern.GetDocumentEndOffset()
             else whenExpression.GetDocumentEndOffset()
         if offset.Offset <> prevTokenEnd then false else
 
@@ -833,6 +830,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if lexer.TokenType != FSharpTokenType.BAR then false else
 
         let indent =
+            let document = textControl.Document
             let tokenLine = document.GetCoordsByOffset(lexer.TokenStart).Line
             let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
             offsetInLine + getIndentSize textControl
@@ -1120,9 +1118,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             if tokenType == FSharpTokenType.NEW_LINE then None else
             Some lexer.TokenEnd
 
-        let document = textControl.Document
-        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let opRefExpr = fsFile.GetNode<IReferenceExpr>(DocumentOffset(document, opStartOffset))
+        let opRefExpr: IReferenceExpr = getNode textControl opStartOffset
         let binaryExpr = BinaryAppExprNavigator.GetByOperator(opRefExpr)
         if isNull binaryExpr || not (binaryExpr.RightArgument :? IFromErrorExpr) then false else
 
@@ -1145,13 +1141,13 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             if startLine <> endLine then getLineWhitespaceIndent textControl endLine else
 
             let offset = expr.GetDocumentStartOffset().Offset
-            getOffsetInLine document startLine offset
+            getOffsetInLine textControl.Document startLine offset
 
         use command = x.CommandProcessor.UsingCommand("New Line")
         if not (insertNewLineAt textControl indent TrimTrailingSpaces.Yes) then false else
 
         if nextTokenIsKeyword then
-            document.InsertText(textControl.Caret.Offset(), " ")
+            textControl.Document.InsertText(textControl.Caret.Offset(), " ")
             textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
@@ -1175,8 +1171,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
 
-        let fsFile = textControl.GetFSharpFile(dependencies.Solution)
-        let qualifiedExpr = fsFile.GetNode<IQualifiedExpr>(DocumentOffset(document, offset))
+        let qualifiedExpr: IQualifiedExpr = getNode textControl offset
         if isNull qualifiedExpr then false else
 
         if qualifiedExpr.StartLine <> caretLine then false else
