@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IType Type =>
       FcsField is { } field
-        ? field.FieldType.MapType(Reference.GetElement())
+        ? @field.FieldType.MapType(Reference.GetElement())
         : TypeFactory.CreateUnknownType(Module);
 
     public IFSharpAnonRecordFieldProperty SetName(string newName)
