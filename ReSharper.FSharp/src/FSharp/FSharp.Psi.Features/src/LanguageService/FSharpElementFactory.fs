@@ -83,15 +83,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         else
             FSharpNamingService.normalizeBackticks name
 
-    let createMemberDecl logicalName typeParameters parameters addSpaceBeforeParams =
+    let createMemberDecl isStatic logicalName typeParameters parameters addSpaceBeforeParams =
         let typeParametersSource =
             match typeParameters with
             | [] -> ""
             | parameters -> parameters |> List.map ((+) "'") |> String.concat ", " |> sprintf "<%s>"
 
+        let header = if isStatic then "static member " else "member this."
         let name = toSourceName logicalName
         let space = if addSpaceBeforeParams then " " else ""
-        let memberSource = sprintf "member this.%s%s%s%s = failwith \"todo\"" name typeParametersSource space parameters
+        let memberSource = $"{header}{name}{typeParametersSource}{space}{parameters} = failwith \"todo\""
         let typeDecl = getTypeDecl memberSource
         typeDecl.TypeMembers[0] :?> IMemberDeclaration
 
@@ -223,12 +224,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
                 )
                 |> String.concat " "
 
-            let memberBinding = createMemberDecl "P" List.empty parametersSource true
+            let memberBinding = createMemberDecl false "P" List.empty parametersSource true
             memberBinding.ParametersDeclarations |> Seq.toList
 
-        member x.CreateMemberBindingExpr(name, typeParameters, parameters) =
+        member x.CreateMemberBindingExpr(isStatic, name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
-            let memberDecl = createMemberDecl name typeParameters parsedParams false
+            let memberDecl = createMemberDecl isStatic name typeParameters parsedParams false
             
             // Force chameleon opening before the change
             memberDecl.Expression |> ignore
@@ -236,10 +237,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             setParamDecls false memberDecl.ParametersDeclarations parameters
             memberDecl
 
-        member x.CreatePropertyWithAccessor(name, accessorName, parameters) =
+        member x.CreatePropertyWithAccessor(isStatic, name, accessorName, parameters) =
             let name = toSourceName name
             let parametersString = parameters |> Seq.map (fun _ -> "()") |> String.concat " "
-            let memberSource = $"member this.{name} with {accessorName} {parametersString} = failwith \"todo\""
+            let header = if isStatic then "static member " else "member this."
+            let memberSource = $"{header}{name} with {accessorName} {parametersString} = failwith \"todo\""
             let typeDecl = getTypeDecl memberSource
             let memberDecl = typeDecl.TypeMembers[0] :?> IMemberDeclaration
             let accessorDecl = memberDecl.AccessorDeclarations[0]

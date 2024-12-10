@@ -67,6 +67,9 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``ObjExpr 03``() = x.DoNamedTest()
     [<Test>] member x.``ObjExpr 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``Static 01``() = x.DoNamedTest()
+    [<Test>] member x.``Static 02``() = x.DoNamedTest()
+
 
 [<FSharpTest; AssertCorrectTreeStructure>]
 type GenerateMissingMembersFixTest() =

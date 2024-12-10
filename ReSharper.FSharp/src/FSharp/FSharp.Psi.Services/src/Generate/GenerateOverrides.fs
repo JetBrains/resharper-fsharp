@@ -112,12 +112,14 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
         if not generateParameters then [] else
         factory.CreateMemberParamDeclarations(argNameGroups, spaceAfterComma, addTypes, displayContext)
 
+    let isStatic = not mfv.IsInstanceMember
+
     let memberDeclaration =
         if isPropertyAccessor && generateParameters then
             let accessorName = if isPropertyGetterMethod then "get" else "set"
-            factory.CreatePropertyWithAccessor(memberName, accessorName, paramGroups)
+            factory.CreatePropertyWithAccessor(isStatic, memberName, accessorName, paramGroups)
         else
-            factory.CreateMemberBindingExpr(memberName, typeParams, paramGroups)
+            factory.CreateMemberBindingExpr(isStatic, memberName, typeParams, paramGroups)
 
     let shouldCallBase (element: IFSharpGeneratorElement) =
         let fsGeneratorElement = element.As<FSharpGeneratorElement>()
