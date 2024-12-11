@@ -129,6 +129,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 76 - After equals``() = x.DoNamedTest()
     [<Test>] member x.``Enter 77 - After equals``() = x.DoNamedTest() // todo: use indent from below
     [<Test>] member x.``Enter 78 - After equals``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 79 - Before if body``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 80 - Before elif body``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter - After comment - Indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Indent 02``() = x.DoNamedTest()

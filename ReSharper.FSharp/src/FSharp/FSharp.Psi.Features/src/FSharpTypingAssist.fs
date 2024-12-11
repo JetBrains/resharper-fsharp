@@ -759,14 +759,14 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             match expr with
             // if expr then ...
             // elif ... then {caret}
-            | :? IElifExpr as elifExpr when (elifExpr.ThenExpr :? IFromErrorExpr) ->
+            | :? IElifExpr as elifExpr ->
                 let ifExpr = IfThenElseExprNavigator.GetByElseExpr(elifExpr)
                 if isNull ifExpr then None else
                 tryGetIndentOffset elifExpr.ConditionExpr ifExpr.ConditionExpr
 
             // if expr then {caret}
             // No info is available after error recovery, we check that range is surrounded with if ... then.
-            | :? IIfThenElseExpr as ifThenElseExpr when (ifThenElseExpr.ThenExpr :? IFromErrorExpr) ->
+            | :? IIfThenElseExpr as ifThenElseExpr ->
                 let conditionExpr = ifThenElseExpr.ConditionExpr
                 tryGetIndentOffset conditionExpr conditionExpr
 
