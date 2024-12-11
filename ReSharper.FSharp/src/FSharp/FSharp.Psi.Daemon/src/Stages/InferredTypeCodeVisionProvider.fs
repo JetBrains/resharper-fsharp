@@ -4,6 +4,7 @@ open System.Text
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Components
 open JetBrains.Application.UI.PopupLayout
@@ -42,7 +43,7 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
         member x.TestOutput = text
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type InferredTypeCodeVisionProvider() =
     let typeCopiedTooltipText = Strings.InferredTypeCodeVisionProvider_TypeCopied_TooltipText
 

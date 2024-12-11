@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Globalization
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Platform
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
@@ -77,7 +78,7 @@ let customTool: FsiTool =
       ShadowCopyAllowed = true }
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FsiDetector() =
     let providers: IFsiDirectoryProvider[] =
         [| CoreFsiProvider()

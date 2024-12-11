@@ -72,7 +72,7 @@ type FSharpScopeProviderBase() as this =
     abstract TryCreate: string -> ITemplateScopePoint
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpProjectScopeProvider() =
     inherit FSharpScopeProviderBase()
 
@@ -86,7 +86,7 @@ type FSharpProjectScopeProvider() =
         | _ -> EmptyList.Instance :> _
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpFileScopeProvider() =
     inherit FSharpScopeProviderBase()
 
