@@ -1,0 +1,6 @@
+// ${CHAR:Enter} 
+
+do
+    id """
+
+"""{caret}

@@ -403,14 +403,27 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let rec tryFindContinuedLine line lineStartOffset hasLeadingLeftBracket =
             if isNull lexer.TokenType then line else
 
-            if lexer.TokenStart <= lineStartOffset && not hasLeadingLeftBracket then line else
+            if lexer.TokenEnd <= lineStartOffset && not hasLeadingLeftBracket then line else
+
+            let interpolatedStringExpr =
+                if not (isInterpolatedStringEndToken lexer.TokenType) then null else
+
+                let fsFile = textControl.GetFSharpFile(dependencies.Solution)
+                fsFile.GetNode<IInterpolatedStringExpr>(DocumentOffset(document, lexer.TokenEnd - 1))
+
+            if isNotNull interpolatedStringExpr then
+                let interpolatedStringExprStartOffset = interpolatedStringExpr.GetTreeStartOffset().Offset
+                while lexer.TokenStart > interpolatedStringExprStartOffset do
+                    lexer.Advance(-1)
 
             let continuedLine =
                 if deindentingTokens.Contains(lexer.TokenType) then
                     if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then line else
                     document.GetCoordsByOffset(lexer.TokenStart).Line
                 else
-                    if lexer.TokenStart >= lineStartOffset then line else line.Previous
+                    if lexer.TokenStart >= lineStartOffset then line else
+
+                    document.GetCoordsByOffset(lexer.TokenStart).Line
 
             let lineStartOffset =
                 if line = continuedLine then lineStartOffset else
@@ -425,7 +438,6 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             tryFindContinuedLine continuedLine lineStartOffset hasLeadingLeftParen
 
         let lineStartOffset = document.GetLineStartOffset(line)
-
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
     let insertNewLineAt textControl indent trimAfterCaret =

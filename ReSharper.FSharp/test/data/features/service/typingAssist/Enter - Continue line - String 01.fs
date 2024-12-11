@@ -1,0 +1,6 @@
+// ${CHAR:Enter} 
+
+do
+    """
+
+"""{caret}

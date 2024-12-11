@@ -142,6 +142,17 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - After comment - Line start 06``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Line start 07``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter - Continue line - String 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 08``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 09``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Continue line - String 10``() = x.DoNamedTest()
+
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
