@@ -46,7 +46,7 @@ dependencies {
       local(dir)
     } else {
       logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-      rider("$riderBaseVersion-SNAPSHOT")
+      rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
     bundledPlugin("JavaScript")
@@ -245,6 +245,7 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
+    compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
 
@@ -325,7 +326,7 @@ tasks {
     dependsOn(prepare)
 
     executable = "dotnet"
-    args("build", "$resharperPluginPath/ReSharper.FSharp.sln")
+    args("build", "-consoleloggerparameters:ErrorsOnly", "$resharperPluginPath/ReSharper.FSharp.sln")
   }
 
   wrapper {

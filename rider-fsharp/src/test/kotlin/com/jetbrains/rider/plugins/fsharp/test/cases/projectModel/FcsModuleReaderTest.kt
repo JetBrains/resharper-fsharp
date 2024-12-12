@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rdclient.testFramework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
@@ -110,6 +109,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
   @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
+  @Test
   fun testUnloadReloadCSharp() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -138,6 +138,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
   @Mute("Temporary because of RIDER-20984")
   @Solution("ProjectReferencesCSharp")
+  @Test
   fun testTypeInsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -191,6 +192,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
   @Mute
   @Solution("ProjectReferencesCSharp")
+  @Test
   fun testTypeOutsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -217,6 +219,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
   @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp2")
+  @Test
   fun testLoadReferenced() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
@@ -237,6 +240,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     get() = Duration.ofMinutes(20)
 
   @Solution("ProjectReferencesCSharp2")
+  @Test
   fun testGotoUsagesFromCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
@@ -249,6 +253,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
   @Solution("ProjectReferencesCSharp3")
+  @Test
   fun testGotoUsagesFromCSharpChangeCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
@@ -262,6 +267,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   }
 
   @Solution("ProjectReferencesCSharp3")
+  @Test
   fun testGotoUsagesFromCSharpChangeCSharp2() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
