@@ -129,6 +129,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 76 - After equals``() = x.DoNamedTest()
     [<Test>] member x.``Enter 77 - After equals``() = x.DoNamedTest() // todo: use indent from below
     [<Test>] member x.``Enter 78 - After equals``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 79 - Before if body``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 80 - Before elif body``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter - After comment - Indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Indent 02``() = x.DoNamedTest()
@@ -155,20 +157,21 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
 
-    [<Test; Explicit>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 02 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 02 - If``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 03 - If``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 04 - While``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 04 - While``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 05 - multiline if``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 06 - match``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 07 - multiline if with parens``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 08 - multiline if before then``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 09 - After then``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 06 - match``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 07 - multiline if with parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 08 - multiline if before then``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 09 - After then``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 10 - After while``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 11 - After while and comments``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 13 - After for in do``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 14 - After for do``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 15 - After for to do``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 02``() = x.DoNamedTest()

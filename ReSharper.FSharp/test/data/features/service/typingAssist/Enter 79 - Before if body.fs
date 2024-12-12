@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+if true &&
+        true then {caret}5
