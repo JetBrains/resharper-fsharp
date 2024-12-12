@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net80
 
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.RiderTestTimeout
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
@@ -27,7 +28,6 @@ object Net80 {
     }
   }
 
-  @Timeout(value = 10, unit = TimeUnit.MINUTES)
   class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.consoleApplication) {
     override val breakpointLine: Int = 2
     override val expectedOutput: String = "Hello from F#"
