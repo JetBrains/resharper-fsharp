@@ -750,7 +750,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if isNull expr then false else
 
         let indentOffset =
-            let inline tryGetIndentOffset (exprBeforeKeyword: IFSharpExpression) (indentAnchor: ITreeNode) =
+            let tryGetIndentOffset (exprBeforeKeyword: IFSharpExpression) (indentAnchor: ITreeNode) =
                 if isNotNull exprBeforeKeyword && isNotNull indentAnchor &&
                    exprBeforeKeyword.GetDocumentEndOffset().Offset = tokenBeforeKeywordEnd then
                    Some (indentAnchor.GetDocumentStartOffset().Offset)
