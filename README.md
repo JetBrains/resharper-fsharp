@@ -77,7 +77,7 @@ You can find some tips and tricks about the ReSharper.Host plugin (the *backend*
 
 ## Development notes
 
-The main development branch is changed on each release (i.e. `net212` correspond to 2021.2 development cycle), and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/).
+The `main` branch is used for development, and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/).
 
 By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle.kts) if necessary.
 
