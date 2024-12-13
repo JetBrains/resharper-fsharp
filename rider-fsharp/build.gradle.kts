@@ -178,6 +178,10 @@ artifacts {
 }
 
 tasks {
+  instrumentCode {
+    enabled = false
+  }
+
   val generateDisabledPluginsTxt by registering {
     val out = layout.buildDirectory.file("disabled_plugins.txt")
     outputs.file(out)
