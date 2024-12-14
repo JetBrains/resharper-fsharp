@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net80
 
 import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.RiderTestTimeout
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
@@ -10,8 +9,6 @@ import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.BuildTool
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
-import org.junit.jupiter.api.Timeout
-import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK, platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
