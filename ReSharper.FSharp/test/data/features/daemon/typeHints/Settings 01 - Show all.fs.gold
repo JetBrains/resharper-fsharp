@@ -6,37 +6,43 @@ let f x||(0) ||(1)=
     let g x||(2) ||(3)= ()
     let x||(4) = fun y||(5) -> ()
     for x||(6) in [""] do ()
+    match 5 with x||(7) -> () 
     { new IFormattable with
-        member x.ToString(format||(7), provider||(8)) ||(9)= "" }
+        member x.ToString(format||(8), provider||(9)) ||(10)= "" }
 
-fun x||(10) -> ()
+fun x||(11) -> ()
 
-type A(x||(11)) =
+match 5 with
+| x||(12) when let y||(13) = 5 in true ->
+    let z||(14) = 3
+    ()
+
+type A(x||(15)) =
     do
-        let x||(12) = 3
+        let x||(16) = 3
         ()
 
-    let array||(13) = [|""|]
+    let array||(17) = [|""|]
 
-    new(x||(14), y||(15)) = A(x + y)
+    new(x||(18), y||(19)) = A(x + y)
 
-    member _.P1||(16) =
-        let x||(17) = 1
+    member _.P1||(20) =
+        let x||(21) = 1
         x
 
-    member _.P2||(18) = id
+    member _.P2||(22) = id
 
     member val P3 = 3 with get, set
 
-    member x.P4||(19)
-        with get index||(20) =
-            let x||(21) = array[index]
+    member x.P4||(23)
+        with get index||(24) =
+            let x||(25) = array[index]
             x
-        and set index||(22) value||(23) =
+        and set index||(26) value||(27) =
             array[index] <- value
 
-    member _.M(x||(24)) (y||(25), z||(26)) ||(27)=
-        let res||(28) = x + y + z
+    member _.M(x||(28)) (y||(29), z||(30)) ||(31)=
+        let res||(32) = x + y + z
         res
 
 ---------------------------------------------------------
@@ -47,25 +53,29 @@ type A(x||(11)) =
 (4): ReSharper Parameter Name Hint: : 'b -> unit
 (5): ReSharper Parameter Name Hint: : 'b
 (6): ReSharper Parameter Name Hint: : string
-(7): ReSharper Parameter Name Hint: : string
-(8): ReSharper Parameter Name Hint: : IFormatProvider
-(9): ReSharper Parameter Name Hint: : string 
-(10): ReSharper Parameter Name Hint: : 'a
-(11): ReSharper Parameter Name Hint: : int
+(7): ReSharper Parameter Name Hint: : int
+(8): ReSharper Parameter Name Hint: : string
+(9): ReSharper Parameter Name Hint: : IFormatProvider
+(10): ReSharper Parameter Name Hint: : string 
+(11): ReSharper Parameter Name Hint: : 'a
 (12): ReSharper Parameter Name Hint: : int
-(13): ReSharper Parameter Name Hint: : string array
+(13): ReSharper Parameter Name Hint: : int
 (14): ReSharper Parameter Name Hint: : int
 (15): ReSharper Parameter Name Hint: : int
-(16): ReSharper Parameter Name Hint: : int 
-(17): ReSharper Parameter Name Hint: : int
-(18): ReSharper Parameter Name Hint: : obj -> obj 
-(19): ReSharper Parameter Name Hint: : string 
-(20): ReSharper Parameter Name Hint: : int
-(21): ReSharper Parameter Name Hint: : string
-(22): ReSharper Parameter Name Hint: : int
-(23): ReSharper Parameter Name Hint: : string
+(16): ReSharper Parameter Name Hint: : int
+(17): ReSharper Parameter Name Hint: : string array
+(18): ReSharper Parameter Name Hint: : int
+(19): ReSharper Parameter Name Hint: : int
+(20): ReSharper Parameter Name Hint: : int 
+(21): ReSharper Parameter Name Hint: : int
+(22): ReSharper Parameter Name Hint: : obj -> obj 
+(23): ReSharper Parameter Name Hint: : string 
 (24): ReSharper Parameter Name Hint: : int
-(25): ReSharper Parameter Name Hint: : int
+(25): ReSharper Parameter Name Hint: : string
 (26): ReSharper Parameter Name Hint: : int
-(27): ReSharper Parameter Name Hint: : int 
+(27): ReSharper Parameter Name Hint: : string
 (28): ReSharper Parameter Name Hint: : int
+(29): ReSharper Parameter Name Hint: : int
+(30): ReSharper Parameter Name Hint: : int
+(31): ReSharper Parameter Name Hint: : int 
+(32): ReSharper Parameter Name Hint: : int
