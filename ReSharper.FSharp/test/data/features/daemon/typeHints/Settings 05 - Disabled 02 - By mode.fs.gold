@@ -6,10 +6,16 @@ let f x =
     let g x = ()
     let x = fun y -> ()
     for x in [""] do ()
+    match 5 with x -> () 
     { new IFormattable with
         member x.ToString(format, provider) = "" }
 
 fun x -> ()
+
+match 5 with
+| x when let y = 5 in true ->
+    let z = 3
+    ()
 
 type A(x) =
     do
