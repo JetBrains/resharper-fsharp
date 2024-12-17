@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -51,6 +52,12 @@ module SpecifyTypes =
         parenPat :> IFSharpPattern
 
     let specifyPattern displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
+        let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
+
+        let (pattern: IFSharpPattern), fcsType =
+            if isNotNull optionalValPat && isOption fcsType then optionalValPat, fcsType.GenericArguments[0]
+            else pattern, fcsType
+
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
 
@@ -172,7 +179,6 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use disableFormatter = new DisableCodeFormatter()
 
         let symbolUse = pattern.GetFcsSymbolUse()
-        let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
 
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let displayContext = symbolUse.DisplayContext
