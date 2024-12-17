@@ -52,7 +52,6 @@ dependencies {
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
-    bundledPlugin("com.intellij.ml.llm")
     bundledPlugin("org.intellij.intelliLang")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")

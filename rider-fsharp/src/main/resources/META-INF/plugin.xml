@@ -9,7 +9,6 @@
   <depends>rider.intellij.plugin.appender</depends>
 
   <content>
-    <module name="intellij.rider.plugins.fsharp/llm" />
     <module name="intellij.rider.plugins.fsharp/injections" />
   </content>
 
