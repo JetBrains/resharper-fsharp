@@ -1,0 +1,3 @@
+﻿module Module
+
+let a, (b: int){caret} = 1, 1
