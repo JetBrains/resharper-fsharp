@@ -5,11 +5,9 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -55,7 +53,7 @@ module SpecifyTypes =
     let specifyPattern displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let pattern, fcsType =
             match pattern with
-            | :? IReferencePat as pattern -> fixIfOptionalParameter pattern fcsType
+            | :? IReferencePat as pattern -> FcsTypeUtil.fixIfOptionalParameter pattern fcsType
             | _ -> pattern, fcsType
 
         let pattern = pattern.IgnoreParentParens()
