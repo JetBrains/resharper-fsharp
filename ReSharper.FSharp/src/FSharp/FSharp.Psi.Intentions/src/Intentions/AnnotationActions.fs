@@ -5,6 +5,7 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -52,11 +53,10 @@ module SpecifyTypes =
         parenPat :> IFSharpPattern
 
     let specifyPattern displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
-
-        let (pattern: IFSharpPattern), fcsType =
-            if isNotNull optionalValPat && isOption fcsType then optionalValPat, fcsType.GenericArguments[0]
-            else pattern, fcsType
+        let pattern, fcsType =
+            match pattern with
+            | :? IReferencePat as pattern -> fixIfOptionalParameter pattern fcsType
+            | _ -> pattern, fcsType
 
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()

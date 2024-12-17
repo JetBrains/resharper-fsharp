@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Highlightings.FSharpTypeHints
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -201,10 +202,8 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull symbol then ValueNone else
 
             let fcsType = symbol.FullType
+            let pattern, fcsType = fixIfOptionalParameter refPat fcsType
             let range = pattern.GetNavigationRange().EndOffsetRange()
-
-            let isOptional = isNotNull (OptionalValPatNavigator.GetByPattern(refPat))
-            let fcsType = if isOptional && isOption fcsType then fcsType.GenericArguments[0] else fcsType
 
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
             |> ValueSome
