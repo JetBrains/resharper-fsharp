@@ -221,21 +221,26 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
 
             let nextSibling = nameNode.NextSibling
             if isInlineSpace nextSibling && nextSibling.NextSibling == pattern && nextSibling.GetTextLength() = 1 then
-                let settingsStore = pattern.GetSettingsStoreWithEditorConfig()
-                let spaceBeforeUppercase =
-                    settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)
+                ModificationUtil.DeleteChild(nextSibling)
 
-                if not spaceBeforeUppercase then
-                    ModificationUtil.DeleteChild(nextSibling)
+        let settingsStore = parenPattern.GetSettingsStoreWithEditorConfig()
 
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
-        if isNotNull parametersOwnerPat then
+        if isNotNull parametersOwnerPat &&
+           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)) then
             removeSpace parametersOwnerPat.ReferenceName parenPattern
 
         let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
         let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
-        if isNotNull memberDeclaration then
+        if isNotNull memberDeclaration &&
+           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)) then
             removeSpace memberDeclaration.Identifier patternDeclaration
+
+        let ctorDeclaration = PrimaryConstructorDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
+        let typeDeclaration = FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(ctorDeclaration)
+        if isNotNull typeDeclaration &&
+           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeClassConstructor)) then
+            removeSpace typeDeclaration.Identifier ctorDeclaration
 
         pattern
     else
