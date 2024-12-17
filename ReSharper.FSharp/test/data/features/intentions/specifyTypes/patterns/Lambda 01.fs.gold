@@ -1,0 +1,3 @@
+﻿module Module
+
+fun (x: int){caret} -> x + 1
