@@ -77,9 +77,7 @@ You can find some tips and tricks about the ReSharper.Host plugin (the *backend*
 
 ## Development notes
 
-The `main` branch is used for development, and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/).
-
-By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle.kts) if necessary.
+The `main` branch is used for development. By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle.kts) if necessary.
 
 Gradle downloads a newer SDK from time to time. To force an update, run the `prepare --refresh-dependencies` Gradle task.
 
