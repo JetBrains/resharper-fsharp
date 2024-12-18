@@ -108,10 +108,5 @@ class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEdit
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
-class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase) {
-  init {
-    addMute(Mute("RIDER-116517"), ::`nuget reference - package name`)
-    addMute(Mute("RIDER-116517"), ::`nuget reference - replace whole package`)
-    addMute(Mute("RIDER-116517"), ::`nuget reference - version`)
-  }
-}
+@Mute("RIDER-116517")
+class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
