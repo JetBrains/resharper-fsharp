@@ -49,6 +49,7 @@ dependencies {
       rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
+    bundledModule("intellij.rider")
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
