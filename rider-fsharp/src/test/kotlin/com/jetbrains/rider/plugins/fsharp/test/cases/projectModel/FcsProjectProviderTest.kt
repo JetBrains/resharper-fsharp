@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.testFramework.ProjectViewTestUtil
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
@@ -14,7 +13,7 @@ import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.scriptingApi.*
@@ -23,9 +22,8 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
-@Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
-class FcsProjectProviderTest : BaseTestWithSolution() {
+class FcsProjectProviderTest : PerTestSolutionTestBase() {
   override val traceCategories
     get() = super.traceCategories.plus("JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider")
 
@@ -54,7 +52,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     hasErrors: Boolean,
     expectedReferencedProjects: List<String>
   ) {
-    withOpenedEditor(project, fileName) {
+    withOpenedEditor(fileName) {
       waitForDaemon()
       project!!.fcsHost.dumpFcsModuleReader.sync(Unit)
       assertEquals(hasErrors, markupAdapter.hasErrors)
@@ -63,6 +61,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
   }
 
   @Solution("ProjectReferencesFSharp")
+  @Test
   fun projectReferencesFSharp() {
     assertAllProjectsWereLoaded(project)
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, emptyList())
@@ -87,6 +86,7 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
   }
 
   @Mute("Broken after ProjectModelMonitor refactoring")
+  @Test
   @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharp() {
     withNonFSharpProjectReferences {
@@ -120,8 +120,9 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     }
   }
 
-  @Solution("ProjectReferencesCSharp")
   @Mute("RIDER-100270 Need to somehow set setting before solution load")
+  @Test
+  @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharpNoModuleReader() {
     assertAllProjectsWereLoaded(project)
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
