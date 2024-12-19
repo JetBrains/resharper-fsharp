@@ -12,11 +12,9 @@ import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
-@Test
+@Solution("TypeProviderLibrary")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class TypeProvidersTest : BaseTypeProvidersTest() {
-  override val testSolution = "TypeProviderLibrary"
-
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun swaggerProvider() = doTest("SwaggerProvider")
@@ -51,7 +49,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   )
   @Solution("SwaggerProviderCSharp")
   fun `srtp analysis`() {
-    withOpenedEditor(project, "SwaggerProviderLibrary/SwaggerProvider.fs", "SwaggerProvider.fs") {
+    withOpenedEditor("SwaggerProviderLibrary/SwaggerProvider.fs", "SwaggerProvider.fs") {
       waitForDaemon()
       executeWithGold(testGoldFile) {
         dumpSevereHighlighters(it)
@@ -60,7 +58,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   }
 
   private fun doTest(fileName: String) {
-    withOpenedEditor(project, "TypeProviderLibrary/$fileName.fs") {
+    withOpenedEditor("TypeProviderLibrary/$fileName.fs") {
       waitForDaemon()
       executeWithGold(testGoldFile) {
         dumpSevereHighlighters(it)

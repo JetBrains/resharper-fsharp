@@ -4,6 +4,7 @@ import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.PlatformType
@@ -21,17 +22,16 @@ import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.Test
 import java.io.File
 
-@Test
+@Solution("TypeProviderLibrary")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
-  override val testSolution = "TypeProviderLibrary"
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 
   override val traceScenarios: Set<LogTraceScenario>
     get() = super.traceScenarios + RdLogTraceScenarios.Daemon
 
   private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
-    withOpenedEditor(project, sourceFile) {
+    withOpenedEditor(sourceFile) {
       waitForDaemon()
       executeWithGold(testGoldFile) {
         dumpTypeProviders(it)
@@ -55,7 +55,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   fun invalidation() {
     val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
-    withOpenedEditor(project, defaultSourceFile) {
+    withOpenedEditor(defaultSourceFile) {
       disableTimedMarkupSuppression()
       waitForDaemon()
 
@@ -82,7 +82,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun typing() {
-    withOpenedEditor(project, defaultSourceFile) {
+    withOpenedEditor(defaultSourceFile) {
       waitForDaemon()
       typeWithLatency("//")
       checkTypeProviders(testGoldFile, defaultSourceFile)
@@ -92,10 +92,10 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun projectsWithEqualProviders() {
-    withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+    withOpenedEditor("TypeProviderLibrary/Library.fs") {
       waitForDaemon()
     }
-    withOpenedEditor(project, "TypeProviderLibrary2/Library.fs") {
+    withOpenedEditor("TypeProviderLibrary2/Library.fs") {
       waitForDaemon()
       checkTypeProviders(testGoldFile, defaultSourceFile)
     }

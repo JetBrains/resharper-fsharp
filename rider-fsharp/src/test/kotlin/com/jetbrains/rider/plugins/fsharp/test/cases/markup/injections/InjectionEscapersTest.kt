@@ -9,22 +9,22 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.jetbrains.rider.editors.getPsiFile
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.getHighlighters
 import com.jetbrains.rider.test.scriptingApi.typeFromOffset
-import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Test
+@Solution("CoreConsoleApp")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
-class InjectionEscapersTest : BaseTestWithSolution() {
-  override val testSolution: String = "CoreConsoleApp"
-
+class InjectionEscapersTest : PerTestSolutionTestBase() {
   private fun doTest(action: (EditorImpl, EditorImpl) -> Unit) {
     withOpenedEditor("Program.fs", "Program.fs") {
       waitForDaemon()

@@ -39,8 +39,7 @@ fun withSetting(project: Project, setting: String, enterValue: String, exitValue
   }
 }
 
-context(SolutionApiFacade)
-fun withDisabledOutOfProcessTypeProviders(function: () -> Unit) {
+fun SolutionApiFacade.withDisabledOutOfProcessTypeProviders(function: () -> Unit) {
   withSetting(
     project,
     "FSharp/FSharpOptions/FSharpExperimentalFeatures/OutOfProcessTypeProviders/@EntryValue",
@@ -51,8 +50,7 @@ fun withDisabledOutOfProcessTypeProviders(function: () -> Unit) {
   }
 }
 
-context(SolutionApiFacade)
-fun withNonFSharpProjectReferences(function: () -> Unit) {
+fun SolutionApiFacade.withNonFSharpProjectReferences(function: () -> Unit) {
   withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", "true", "false") {
     project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
     function()

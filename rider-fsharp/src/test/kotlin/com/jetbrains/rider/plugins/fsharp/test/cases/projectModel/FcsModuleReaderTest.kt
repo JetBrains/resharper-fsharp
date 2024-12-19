@@ -70,7 +70,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     expectedReferencedProjects: List<String>
   ) {
     val project = project
-    withOpenedEditor(project, "FSharpProject/Library.fs") {
+    withOpenedEditor("FSharpProject/Library.fs") {
       waitForNextDaemon()
       assert(markupAdapter.hasErrors == hasErrors)
       assertFcsStampAndReferencedProjectNames(this, expectedReferencedProjects)
@@ -150,7 +150,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
         openFsFileDumpModuleReader(it, "2. Open F# file", false, listOf("CSharpProject"))
 
-        withOpenedEditor(project, "CSharpProject/Class1.cs") {
+        withOpenedEditor("CSharpProject/Class1.cs") {
           typeFromOffset(" ", 75)
           waitForNextDaemon()
         }
@@ -170,7 +170,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
         openFsFileDumpModuleReader(it, "8. Open F# file", false, listOf("CSharpProject"))
 
-        withOpenedEditor(project, "CSharpProject/Class1.cs") {
+        withOpenedEditor("CSharpProject/Class1.cs") {
           typeFromOffset(" ", 75)
         }
 
@@ -204,7 +204,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
 
         openFsFileDumpModuleReader(it, "2. Open F# file", false, listOf("CSharpProject"))
 
-        withOpenedEditor(project, "CSharpProject/Class1.cs") {
+        withOpenedEditor("CSharpProject/Class1.cs") {
           typeFromOffset(" ", 129)
         }
 
@@ -244,7 +244,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testGotoUsagesFromCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
-      withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+      withOpenedEditor("CSharpProject/Class1.cs", "Class1.cs") {
         waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)
         waitForEditorSwitch("Library.fs")
@@ -257,7 +257,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testGotoUsagesFromCSharpChangeCSharp() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
-      withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+      withOpenedEditor("CSharpProject/Class1.cs", "Class1.cs") {
         typeWithLatency("1")
         waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)
@@ -272,13 +272,13 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     withNonFSharpProjectReferences {
       assertAllProjectsWereLoaded(project)
 
-      withOpenedEditor(project, "FSharpProject/Library.fs") {
+      withOpenedEditor("FSharpProject/Library.fs") {
         waitForNextDaemon()
       }
 
       waitForDaemonCloseAllOpenEditors(project)
 
-      withOpenedEditor(project, "CSharpProject/Class1.cs", "Class1.cs") {
+      withOpenedEditor("CSharpProject/Class1.cs", "Class1.cs") {
         typeWithLatency("1")
         waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)

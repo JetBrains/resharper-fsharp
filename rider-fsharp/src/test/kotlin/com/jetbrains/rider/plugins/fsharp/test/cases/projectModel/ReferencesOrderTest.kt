@@ -1,20 +1,22 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.base.BaseTestWithSolution
+import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@Test
+@Solution("ReferencesOrder")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
-class ReferencesOrder : BaseTestWithSolution() {
-  override val testSolution = "ReferencesOrder"
+class ReferencesOrder : PerTestSolutionTestBase() {
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    params.waitForCaches = true
+    params.restoreNuGetPackages = true
+  }
 
-  override val waitForCaches = true
-  override val restoreNuGetPackages = true
-
-  @Test()
+  @Test
   fun testReferencesOrder() {
     val references = project.fcsHost.dumpSingleProjectLocalReferences.sync(Unit)
     assert(references == listOf("Library1.dll", "Library2.dll"))
