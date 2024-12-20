@@ -18,7 +18,6 @@ import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
-import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.File
 

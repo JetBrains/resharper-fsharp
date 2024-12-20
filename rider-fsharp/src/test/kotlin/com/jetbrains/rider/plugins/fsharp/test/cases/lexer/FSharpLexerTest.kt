@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.lexer
 
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
-import com.jetbrains.rider.test.cases.psi.lexer.RiderFrontendLexerTest
+import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
 import org.testng.annotations.Test
 
 @Test

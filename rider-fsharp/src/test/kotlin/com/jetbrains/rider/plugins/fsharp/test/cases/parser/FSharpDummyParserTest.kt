@@ -10,7 +10,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
-import com.jetbrains.rider.test.cases.psi.parsing.RiderFrontendParserTest
+import com.jetbrains.rider.test.base.psi.parsing.RiderFrontendParserTest
 import org.junit.Assert
 
 abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) :

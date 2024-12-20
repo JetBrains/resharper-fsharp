@@ -28,22 +28,22 @@ let typed (x: int)
           (KeyValue(a, b) as kvp: KeyValuePair<int, int>) : unit = ()
 
 let a, b =
-    let f x||(0) y||(1) ||(2)=
-        let result||(3) = x + y
+    let f x y =
+        let result = x + y
         result
 
     for i = 0 to 10 do ()
-    for i||(4) in Seq.empty do ()
+    for i in Seq.empty do ()
 
-    let a||(5), b||(6) = 3, 3
+    let a, b = 3, 3
     a, b
 
-let g = fun x||(7) -> ()
+let g = fun x -> ()
 
 
 type A(x) =
     do
-        let x||(8) = 3
+        let x = 3
         ()
 
     let array = [|""|] 
@@ -51,7 +51,7 @@ type A(x) =
     new(x, y) = new A(x + y)
 
     member _.P1 =
-        let x||(9) = 1
+        let x = 1
         x
 
     member _.P2 = id
@@ -60,13 +60,13 @@ type A(x) =
 
     member x.P4
         with get index =
-            let x||(10) = array[index]
+            let x = array[index]
             x
         and set index value =
             array[index] <- value
 
     member _.M(x) (y, z) =
-        let res||(11) = x + y + z
+        let res = x + y + z
         res
 
     member _.M1([<Optional>] ?x, ?y) = x.Value + y.Value + 1
@@ -135,17 +135,3 @@ let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
 let f1 (x & Int(i) & String(s)) = ()
-
----------------------------------------------------------
-(0): ReSharper Parameter Name Hint: : int
-(1): ReSharper Parameter Name Hint: : int
-(2): ReSharper Parameter Name Hint: : int 
-(3): ReSharper Parameter Name Hint: : int
-(4): ReSharper Parameter Name Hint: : obj
-(5): ReSharper Parameter Name Hint: : int
-(6): ReSharper Parameter Name Hint: : int
-(7): ReSharper Parameter Name Hint: : 'a
-(8): ReSharper Parameter Name Hint: : int
-(9): ReSharper Parameter Name Hint: : int
-(10): ReSharper Parameter Name Hint: : string
-(11): ReSharper Parameter Name Hint: : int

@@ -15,28 +15,30 @@ open NUnit.Framework
 type TypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
-    let [<Literal>] PatternsCommonTestFile = "_TestSource.fs"
+    let [<Literal>] PatternsCommonTestFile = "_SettingsTestSource.fs"
     override x.RelativeTestDataPath = "features/daemon/typeHints"
 
-    [<Test>] member x.``Signatures - Show all 01``() = x.DoPatternsCommonTest()
+    [<Test>] member x.``Settings 01 - Show all``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Never)>]
-    [<Test>] member x.``Signatures - Top level 01``() = x.DoPatternsCommonTest()
+    [<Test>] member x.``Settings 02 - Top level``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
-    [<Test>] member x.``Signatures - Locals 01``() = x.DoPatternsCommonTest()
+    [<Test>] member x.``Settings 03 - Locals``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<GeneralInlayHintsOptions>, "EnableInlayHints", false)>]
-    [<Test>] member x.``Disabled 01``() = x.DoPatternsCommonTest()
+    [<Test>] member x.``Settings 04 - Disabled 01``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<GeneralInlayHintsOptions>, "DefaultMode", PushToHintMode.Never)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Default)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Default)>]
-    [<Test>] member x.``Disabled 02 - By mode``() = x.DoPatternsCommonTest()
+    [<Test>] member x.``Settings 05 - Disabled 02 - By mode``() = x.DoSettingsTest()
 
-    [<Test>] member x.``Signatures - Unfinished declarations 01``() = x.DoNamedTest()
+    [<Test>] member x.``Patterns 01``() = x.DoNamedTest()
 
-    member x.DoPatternsCommonTest() = x.DoTestSolution(PatternsCommonTestFile)
+    [<Test>] member x.``Unfinished declarations and expressions 01``() = x.DoNamedTest()
+
+    member x.DoSettingsTest() = x.DoTestSolution(PatternsCommonTestFile)
 
     override x.GetGoldTestDataPath(fileName) =
         if fileName = PatternsCommonTestFile then

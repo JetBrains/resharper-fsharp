@@ -46,13 +46,13 @@ dependencies {
       local(dir)
     } else {
       logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-      rider("$riderBaseVersion-SNAPSHOT")
+      rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
+    bundledModule("intellij.rider")
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
-    bundledPlugin("com.intellij.ml.llm")
     bundledPlugin("org.intellij.intelliLang")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
@@ -178,6 +178,10 @@ artifacts {
 }
 
 tasks {
+  instrumentCode {
+    enabled = false
+  }
+
   val generateDisabledPluginsTxt by registering {
     val out = layout.buildDirectory.file("disabled_plugins.txt")
     outputs.file(out)
@@ -245,6 +249,7 @@ tasks {
 
   withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
+    compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
 
@@ -325,7 +330,7 @@ tasks {
     dependsOn(prepare)
 
     executable = "dotnet"
-    args("build", "$resharperPluginPath/ReSharper.FSharp.sln")
+    args("build", "-consoleloggerparameters:ErrorsOnly", "$resharperPluginPath/ReSharper.FSharp.sln")
   }
 
   wrapper {
