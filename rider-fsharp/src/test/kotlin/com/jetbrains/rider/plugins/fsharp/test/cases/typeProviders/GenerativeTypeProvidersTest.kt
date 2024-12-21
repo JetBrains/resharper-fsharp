@@ -4,6 +4,7 @@ import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
@@ -17,18 +18,16 @@ import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.Test
 import java.time.Duration
 
-@Test
+@Solution("TypeProviderLibrary")
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
-  override val testSolution = "TypeProviderLibrary"
-
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun `generative type providers cross-project analysis`() {
     val generativeProviderProjectPath =
       "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
 
-    withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+    withOpenedEditor("GenerativeTypeLibrary/Library.fs") {
       waitForDaemon()
       markupAdapter.hasErrors.shouldBeTrue()
 
@@ -41,7 +40,7 @@ class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
     unloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
     reloadProject(arrayOf("TypeProviderLibrary", "GenerativeTypeProvider"))
 
-    withOpenedEditor(project, "GenerativeTypeLibrary/Library.fs") {
+    withOpenedEditor("GenerativeTypeLibrary/Library.fs") {
       waitForDaemon()
       markupAdapter.hasErrors.shouldBeFalse()
     }
@@ -51,7 +50,7 @@ class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun `change abbreviation`() {
     executeWithGold(testGoldFile) {
-      withOpenedEditor(project, "GenerativeTypeProvider/Library.fs") {
+      withOpenedEditor("GenerativeTypeProvider/Library.fs") {
         waitForDaemon()
 
         it.println("Before:\n")

@@ -12,13 +12,11 @@ import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.Test
 import java.io.File
 
-@Test
+@Solution("YamlProviderCSharp")
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
-  override val testSolution = "YamlProviderCSharp"
-
   @Test
   fun resolveTest() {
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+    withOpenedEditor("CSharpLibrary/CSharpLibrary.cs") {
       waitForDaemon()
       executeWithGold(testGoldFile) {
         dumpSevereHighlighters(it)
@@ -28,7 +26,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     unloadAllProjects()
     reloadAllProjects(project)
 
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs") {
+    withOpenedEditor("CSharpLibrary/CSharpLibrary.cs") {
       waitForDaemon()
       executeWithGold(testGoldFile) {
         dumpSevereHighlighters(it)
@@ -40,18 +38,18 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
   @Solution("SwaggerProviderCSharp")
   fun changeStaticArg() {
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+    withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForDaemon()
       markupAdapter.hasErrors.shouldBeFalse()
     }
 
-    withOpenedEditor(project, "SwaggerProviderLibrary/Literals.fs") {
+    withOpenedEditor("SwaggerProviderLibrary/Literals.fs") {
       waitForDaemon()
       // change schema path from "specification.json" to "specification1.json"
       typeFromOffset("1", 86)
     }
 
-    withOpenedEditor(project, "CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
+    withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForNextDaemon()
       executeWithGold(File(testGoldFile.path + "_before")) {
         dumpSevereHighlighters(it)

@@ -1,9 +1,11 @@
 package com.jetbrains.rider.plugins.fsharp.completion
 
 import com.intellij.codeInsight.completion.CompletionInitializationContext
+import com.intellij.openapi.editor.Editor
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.startOffset
+import com.jetbrains.rdclient.document.editorSynchronizer
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider
@@ -37,8 +39,8 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     val version = match.groups[GROUP_VERSION]
     val versionZone = match.groups[GROUP_VERSION_ZONE]
 
-    prepareCustomParams(stringText, context.startOffset, KEY_NAME, `package`, packageZone, context)
-    || prepareCustomParams(stringText, context.startOffset, "$KEY_VERSION|${`package`.value}", version!!, versionZone!!, context)
+    prepareCustomParams(stringText, context.startOffset, KEY_NAME, `package`, packageZone, context.editor)
+    || prepareCustomParams(stringText, context.startOffset, "$KEY_VERSION|${`package`.value}", version!!, versionZone!!, context.editor)
   }
 
   private fun prepareCustomParams(
@@ -47,17 +49,19 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     host: String,
     strictGroup: MatchGroup,
     zoneGroup: MatchGroup,
-    initContext: CompletionInitializationContext,
+    editor: Editor
   ): Boolean {
     if (containsExclusive(strictGroup.range, cursorPosition)) {
       val completionPrefix = content.substring(strictGroup.range.first, cursorPosition)
-      RiderPatchEngineProtocolProvider.Companion.getInstance().triggerCompletion(
-        initContext.project, initContext.editor, initContext.completionType, 1, completionPrefix, host)
+      RiderPatchEngineProtocolProvider.getInstance().customHostDocumentVersion = editor.editorSynchronizer?.version
+      RiderPatchEngineProtocolProvider.getInstance().customHost = host
+      RiderPatchEngineProtocolProvider.getInstance().customPrefix = completionPrefix
       return true
     }
     else if (containsExclusive(zoneGroup.range, cursorPosition)) {
-      RiderPatchEngineProtocolProvider.Companion.getInstance().triggerCompletion(
-        initContext.project, initContext.editor, initContext.completionType, 1, "", host)
+      RiderPatchEngineProtocolProvider.getInstance().customHostDocumentVersion = editor.editorSynchronizer?.version
+      RiderPatchEngineProtocolProvider.getInstance().customHost = host
+      RiderPatchEngineProtocolProvider.getInstance().customPrefix = ""
       return true
     }
 

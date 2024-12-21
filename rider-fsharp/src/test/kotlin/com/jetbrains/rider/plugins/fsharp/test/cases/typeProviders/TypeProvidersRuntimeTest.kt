@@ -16,10 +16,8 @@ import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
-@Test
+@Solution("CoreTypeProviderLibrary")
 class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
-  override val testSolution = "CoreTypeProviderLibrary"
-
   @Test
   @TestEnvironment(
     sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
@@ -55,7 +53,7 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   fun fsc() = doTest(".NET Framework 4.8")
 
   private fun doTest(expectedRuntime: String) {
-    withOpenedEditor(project, "TypeProviderLibrary/Library.fs") {
+    withOpenedEditor("TypeProviderLibrary/Library.fs") {
       waitForDaemon()
       val typeProvidersRuntimeVersion = this.project!!.fcsHost.typeProvidersRuntimeVersion.sync(Unit)
       typeProvidersRuntimeVersion
