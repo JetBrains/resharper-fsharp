@@ -98,6 +98,8 @@ module FSharpErrors =
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] XmlDocSignatureCheckFailed = 3390
     let [<Literal>] InvalidXmlDocPosition = 3520
+    let [<Literal>] ConstructDeprecatedSequenceExpressionsInvalidForm = 3873
+    let [<Literal>] InvalidRecordSequenceOrComputationExpression = 740
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -525,6 +527,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnionCaseDoesNotTakeArguments ->
             createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
+
+        | InvalidRecordSequenceOrComputationExpression ->
+            createHighlightingFromNode InvalidRecordSequenceOrComputationExpressionError range
+
+        | ConstructDeprecatedSequenceExpressionsInvalidForm ->
+            createHighlightingFromNode ConstructDeprecatedSequenceExpressionsInvalidFormError range
 
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error

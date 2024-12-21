@@ -748,6 +748,22 @@
     <QuickFix>RemovePatternArgumentFix</QuickFix>
   </Error>
 
+    <Error staticGroup="FSharpErrors" name="ConstructDeprecatedSequenceExpressionsInvalidForm" ID="FS3873: This construct is deprecated. Sequence expressions should be of the form 'seq {{ ... }}'">
+        <Parameter type="IComputationExpr" name="computationExpr"/>
+        <Message resourceName="ConstructDeprecatedSequenceExpressionInvalidFormMessage" resourceType="Strings"/>
+        <Range>computationExpr.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="NONE"/>
+        <QuickFix>AddMissingSeqFix</QuickFix>
+    </Error>
+    
+    <Error staticGroup="FSharpErrors" name="InvalidRecordSequenceOrComputationExpression" ID="FS740: Invalid record, sequence or computation expression. Sequence expressions should be of the form 'seq { ... }'">
+        <Parameter type="IComputationExpr" name="computationExpr"/>
+        <Message resourceName="InvalidRecordSequenceOrComputationExpressionMessage" resourceType="Strings"/>
+        <Range>computationExpr.GetHighlightingRange()</Range>
+        <Behavour overlapResolvePolicy="NONE"/>
+        <QuickFix>AddMissingSeqFix</QuickFix>
+    </Error>
+
   <Error staticGroup="FSharpErrors" name="AttributeIsNotValidOnThisElement" ID="FS0842: This attribute is not valid for use on this language element">
     <Parameter type="IAttribute" name="attribute"/>
       <Parameter type="string" name="fcsMessage"/>

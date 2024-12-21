@@ -271,6 +271,12 @@
     <data name="ThisUnionCaseDoesNotTakeArgumentsMessage" xml:space="preserve">
         <value>This union case does not take arguments</value>
     </data>
+    <data name="InvalidRecordSequenceOrComputationExpressionMessage" xml:space="preserve">
+        <value>Invalid record, sequence or computation expression. Sequence expressions should be of the form 'seq { ... }'</value>
+    </data>    
+    <data name="ConstructDeprecatedSequenceExpressionInvalidFormMessage" xml:space="preserve">
+        <value>This construct is deprecated. Sequence expressions should be of the form 'seq { ... }'</value>
+    </data>
     <data name="TypeAbbreviationsCannotHaveAugmentationsMessage" xml:space="preserve">
         <value>Type abbreviations cannot have augmentations</value>
     </data>
