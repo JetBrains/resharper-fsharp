@@ -77,7 +77,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | _ -> null
 
     let getCompilerVersion (fscPath: VirtualFileSystemPath) =
-        let assemblyNameInfo = AssemblyNameReader.GetAssemblyNameRaw(fscPath)
+        let assemblyNameInfo = AssemblyNameReader.TryReadAssemblyNameFromFile(fscPath)
         assemblyNameInfo.Version
 
     let getLanguageLevelByCompilerNoCache (fscPath: VirtualFileSystemPath): VersionMapping =
