@@ -155,6 +155,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         tryGetValue psiModule assemblyReadersByModule
 
     let rec removeModule (psiModule: IPsiModule) =
+        // locks.AssertWriteAccessAllowed()
+
         let projectKey = FcsProjectKey.Create(psiModule)
 
         tryGetReaderFromModule psiModule

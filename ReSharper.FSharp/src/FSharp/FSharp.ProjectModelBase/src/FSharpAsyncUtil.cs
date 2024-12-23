@@ -26,23 +26,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
 
     /// <summary>
-    /// Try to execute <paramref name="action"/> using read lock on the current thread.
-    /// If not possible, queue a request to a thread calling FCS, possibly after a change on the main thread.
-    /// When processing the request, the relevant psi module or declared element may already be removed and invalid.
+    /// Try to execute <paramref name="action"/> using a read lock on the current thread.
+    /// If not possible, queue a request to a thread waiting for FCS (which has a read lock).
     /// </summary>
     public static void UsingReadLockInsideFcs(IShellLocks locks, Action action, Func<bool> upToDateCheck = null)
     {
       var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
 
-      // Capture FCS cancellation token so we can propagate cancellation in cases like F#->C#->F#,
+      // The current thread has a read lock when it's a R# thread (e.g. reading C# metadata for code completion),
+      // and not an FCS background thread (i.e. computing a "node" in the project graph analysis).
+      var hasReadLock = locks.IsReadAccessAllowed();
+
+      // FCS asserts that this is only called within a cancellable "node" computation, so we have to guard it.
+      if (!hasReadLock)
+        Cancellable.CheckAndThrow();
+
+      // Capture the FCS cancellation token, so we can propagate the cancellation in cases like F#->C#->F#,
       // where the last FCS request is initiated from inside reading the C# metadata,
       // and the initial request may get cancelled
-      var fcsToken = Cancellable.Token;
+      var fcsToken = !hasReadLock ? Cancellable.Token : CancellationToken.None;
       using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
 
       // Try to acquire read lock on the current thread.
       // It should be possible, unless there's a write lock request that prevents it.
-
       try
       {
         if (locks.TryExecuteWithReadLock(action))
@@ -55,10 +61,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       {
         logger.Trace("UsingReadLockInsideFcs: exception: the operation cancelled on the initial thread");
 
-        // The FCS request has originated from a R# thread, but was cancelled. We don't want to requeue this request.
-        if (locks.IsReadAccessAllowed())
+        // If the FCS request has originated from a R# thread, we don't want to queue it to another thread.
+        // FCS requests are queued below.
+        if (hasReadLock)
         {
-          logger.Trace("UsingReadLockInsideFcs: read lock was acquired before the request, rethrowing");
+          logger.Trace("UsingReadLockInsideFcs: read lock was acquired outside the request, rethrowing");
           throw;
         }
       }
@@ -69,20 +76,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         throw;
       }
 
-      // Could not finish task under a read lock. Queue a request to be processed by a thread calling FCS.
+      // Could not finish the task using a read lock. Queue a request to be processed by a thread waiting for FCS.
+      //
+      // To ensure the metadata consistency, we retry cancelled requests in this loop.
+      // If two threads are waiting for FCS, but one of them gets cancelled (e.g. a cancelled tooltip calculation),
+      // the other one should try it again.
+      // The FCS request cancellation is checked separately via its cancellation token.
       logger.Trace("UsingReadLockInsideFcs: before the loop");
       while (true)
       {
-        // To ensure FCS metadata consistency, we retry cancelled requests in this loop.
-        // This may happen when R# read lock is cancelled, but the corresponding FCS request in not (yet).
-        // We should check the FCS request cancellation separately via its cancellation token.
-        if (Cancellable.Token.IsCancellationRequested)
+        if (fcsToken.IsCancellationRequested)
         {
           logger.Trace("UsingReadLockInsideFcs: FCS token is cancelled");
           break;
         }
 
-        logger.Trace("UsingReadLockInsideFcs: enqueueing request");
+        logger.Trace("UsingReadLockInsideFcs: enqueueing the request");
         var tcs = new TaskCompletionSource<Unit>();
         ReadRequests.Enqueue(() =>
         {

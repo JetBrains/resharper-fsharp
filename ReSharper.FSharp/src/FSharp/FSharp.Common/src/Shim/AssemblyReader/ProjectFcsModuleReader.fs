@@ -95,6 +95,7 @@ type FcsTypeDef =
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path,
         shim: IFcsAssemblyReaderShim, realReader: ILModuleReader option) =
     let locks = psiModule.GetPsiServices().Locks
+    let logger = Logger.GetLogger<ProjectFcsModuleReader>()
 
     let getSymbolScope () =
         // todo: make it safe to cache symbol scope in R#
@@ -130,8 +131,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let readData f =
-        let logger = Logger.GetLogger<ProjectFcsModuleReader>()
-
         logger.Trace("readData: before UsingReadLockInsideFcs");
         FSharpAsyncUtil.UsingReadLockInsideFcs(locks,
             (fun _ ->
@@ -1185,6 +1184,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             isNull typeDef ||
 
             let symbolScope = getSymbolScope ()
+            // todo: consider the nested type was removed
             let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName).NotNull("IsUpToDate: nested type")
             isUpToDateTypeDef typeElement typeDef)
 
@@ -1219,6 +1219,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         if isNull upToDateChecked then
             upToDateChecked <- HashSet()
 
+        // todo: non-interruptible! AAAA
         use cookie = ReadLockCookie.Create()
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 

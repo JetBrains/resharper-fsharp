@@ -2,11 +2,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open System
 open FSharp.Compiler.AbstractIL.ILBinaryReader
-open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
+[<Struct>]
 type FcsProjectKey =
     { Project: IProject
       TargetFrameworkId: TargetFrameworkId }
