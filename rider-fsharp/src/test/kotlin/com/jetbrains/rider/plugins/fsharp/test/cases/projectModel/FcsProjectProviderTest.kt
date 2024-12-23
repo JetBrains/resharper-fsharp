@@ -6,11 +6,10 @@ import com.intellij.testFramework.ProjectViewTestUtil
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
+import com.jetbrains.rider.plugins.fsharp.test.withoutNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
@@ -85,55 +84,18 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, emptyList())
   }
 
-  @Mute("Broken after ProjectModelMonitor refactoring")
   @Test
   @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharp() {
-    withNonFSharpProjectReferences {
-      assertAllProjectsWereLoaded(project)
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
-
-      waitForDaemonCloseAllOpenEditors(project)
-      addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
-
-      buildSolutionWithReSharperBuild()
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
-
-      waitForDaemonCloseAllOpenEditors(project)
-      deleteElement(
-        project,
-        arrayOf(
-          "ProjectReferencesCSharp",
-          "FSharpProject",
-          "Dependencies",
-          ".NETStandard 2.0",
-          "Projects",
-          "CSharpProject/1.0.0"
-        )
-      )
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
-
-      waitForDaemonCloseAllOpenEditors(project)
-      addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
-    }
-  }
-
-  @Mute("RIDER-100270 Need to somehow set setting before solution load")
-  @Test
-  @Solution("ProjectReferencesCSharp")
-  fun projectReferencesCSharpNoModuleReader() {
     assertAllProjectsWereLoaded(project)
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
 
     waitForDaemonCloseAllOpenEditors(project)
     addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
+    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
 
-    waitForDaemonCloseAllOpenEditors(project)
     buildSolutionWithReSharperBuild()
-    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, emptyList())
+    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
 
     waitForDaemonCloseAllOpenEditors(project)
     deleteElement(
@@ -144,14 +106,49 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
         "Dependencies",
         ".NETStandard 2.0",
         "Projects",
-        "CSharpProject/1.0.0"
+        "CSharpProject"
       )
     )
-
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
 
     waitForDaemonCloseAllOpenEditors(project)
     addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
-    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, emptyList())
+    assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
+  }
+
+  @Test
+  @Solution("ProjectReferencesCSharp")
+  fun projectReferencesCSharpNoModuleReader() {
+    withoutNonFSharpProjectReferences {
+      assertAllProjectsWereLoaded(project)
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
+
+      waitForDaemonCloseAllOpenEditors(project)
+      addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
+
+      waitForDaemonCloseAllOpenEditors(project)
+      buildSolutionWithReSharperBuild()
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, emptyList())
+
+      waitForDaemonCloseAllOpenEditors(project)
+      deleteElement(
+        project,
+        arrayOf(
+          "ProjectReferencesCSharp",
+          "FSharpProject",
+          "Dependencies",
+          ".NETStandard 2.0",
+          "Projects",
+          "CSharpProject"
+        )
+      )
+
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
+
+      waitForDaemonCloseAllOpenEditors(project)
+      addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+      assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, emptyList())
+    }
   }
 }

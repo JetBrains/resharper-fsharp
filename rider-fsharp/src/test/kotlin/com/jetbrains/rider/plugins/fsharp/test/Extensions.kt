@@ -50,13 +50,24 @@ fun SolutionApiFacade.withDisabledOutOfProcessTypeProviders(function: () -> Unit
   }
 }
 
-fun SolutionApiFacade.withNonFSharpProjectReferences(function: () -> Unit) {
-  withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", "true", "false") {
+
+private fun SolutionApiFacade.withNonFSharpProjectReferencesSetting(enable: Boolean, function: () -> Unit) {
+  val (enterValue, exitValue) = if (enable) Pair("true", "false") else Pair("false", "true");
+  withSetting(project, "FSharp/FSharpOptions/NonFSharpProjectInMemoryReferences/@EntryValue", enterValue, exitValue) {
     project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
     function()
   }
   project.fcsHost.updateAssemblyReaderSettings.sync(Unit)
 }
+
+fun SolutionApiFacade.withNonFSharpProjectReferences(function: () -> Unit) {
+  withNonFSharpProjectReferencesSetting(true, function)
+}
+
+fun SolutionApiFacade.withoutNonFSharpProjectReferences(function: () -> Unit) {
+  withNonFSharpProjectReferencesSetting(false, function)
+}
+
 
 fun withEditorConfig(project: Project, function: () -> Unit) {
   withSetting(project, "CodeStyle/EditorConfig/EnableEditorConfigSupport", "true", "false", function)

@@ -47,7 +47,6 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @Mute("RIDER-110482")
   @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
@@ -149,14 +148,12 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @Mute("RIDER-110482")
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
-  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_9)
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
-        // currently ProjectTemplates.Sdk.Net6 should be used in LATEST_STABLE tests
-        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net6.FSharp.classLibrary, targetFramework = "netstandard2.1")
+        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net9.FSharp.classLibrary, targetFramework = "netstandard2.1")
       }
       dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
