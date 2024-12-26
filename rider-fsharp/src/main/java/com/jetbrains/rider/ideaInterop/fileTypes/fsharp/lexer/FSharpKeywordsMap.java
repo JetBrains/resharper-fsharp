@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-class FSharpKeywordsMap {
+final class FSharpKeywordsMap {
   private static final Map<CharSequence, IElementType> ourKeywordMap = CollectionFactory.createCharSequenceMap(true);
 
   static {
