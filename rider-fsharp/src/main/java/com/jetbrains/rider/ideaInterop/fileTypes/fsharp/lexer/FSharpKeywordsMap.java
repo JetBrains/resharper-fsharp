@@ -17,8 +17,7 @@ class FSharpKeywordsMap {
     }
   }
 
-  @Nullable
-  static IElementType findKeyword(@NotNull CharSequence buffer, int start, int end) {
+  static @Nullable IElementType findKeyword(@NotNull CharSequence buffer, int start, int end) {
     CharSequence sequence = buffer.subSequence(start, end);
     return ourKeywordMap.get(sequence);
   }

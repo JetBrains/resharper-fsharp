@@ -450,18 +450,15 @@ public interface FSharpTokenType {
     DECIMAL
   );
 
-  @NotNull
-  static FSharpTokenNodeType createToken(@NotNull String value) {
+  static @NotNull FSharpTokenNodeType createToken(@NotNull String value) {
     return new FSharpTokenNodeType(value);
   }
 
-  @NotNull
-  static FSharpTokenNodeType createToken(@NotNull String value, @NotNull String representation) {
+  static @NotNull FSharpTokenNodeType createToken(@NotNull String value, @NotNull String representation) {
     return new FSharpTokenNodeType(value, representation);
   }
 
-  @NotNull
-  static FSharpKeywordTokenNodeType createKeywordToken(String value, @NotNull String representation) {
+  static @NotNull FSharpKeywordTokenNodeType createKeywordToken(String value, @NotNull String representation) {
     return new FSharpKeywordTokenNodeType(value, representation, false);
   }
 }
