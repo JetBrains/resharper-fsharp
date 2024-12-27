@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.*
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -12,9 +13,12 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
+@Solution("EmptySolution")
 class FSharpProjectModelTest : ProjectModelBaseTest() {
-  override val testSolution: String = "EmptySolution"
-  override val restoreNuGetPackages = true
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    super.modifyOpenSolutionParams(params)
+    params.restoreNuGetPackages = true
+  }
 
   private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: RdDndOrderType? = null) {
     // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.

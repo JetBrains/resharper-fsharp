@@ -14,6 +14,7 @@ import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
@@ -31,13 +32,17 @@ import java.time.Duration
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@Solution("EmptySolution")
 class FcsModuleReaderTest : ProjectModelBaseTest() {
   companion object {
     private var launchCounter = 0
   }
 
-  override val testSolution: String = "EmptySolution"
-  override val restoreNuGetPackages = true
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    super.modifyOpenSolutionParams(params)
+    params.restoreNuGetPackages = true
+    params.backendLoadedTimeout = Duration.ofMinutes(20)
+  }
 
   @AfterMethod(alwaysRun = true)
   fun tearDownTestCase() {
@@ -235,9 +240,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
       }
     }
   }
-
-  override val backendLoadedTimeout: Duration
-    get() = Duration.ofMinutes(20)
 
   @Solution("ProjectReferencesCSharp2")
   @Test

@@ -1,5 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
+import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.DebuggerTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
@@ -9,12 +11,15 @@ import org.testng.annotations.Test
 
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@Solution("AsyncProgram")
 class AsyncDebuggerTest : DebuggerTestBase() {
   override val projectName = "AsyncProgram"
-  override val testSolution: String = projectName
 
-  override val waitForCaches = true
-  override val restoreNuGetPackages = true
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    super.modifyOpenSolutionParams(params)
+    params.waitForCaches = true
+    params.restoreNuGetPackages = true
+  }
 
   @Test(description = "RIDER-27263")
   fun testAsyncBreakpoint() {
