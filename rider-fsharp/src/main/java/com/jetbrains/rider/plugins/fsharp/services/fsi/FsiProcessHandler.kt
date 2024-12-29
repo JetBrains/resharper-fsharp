@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.trySendBlocking
 
-class FsiProcessHandler(
+internal class FsiProcessHandler(
   parentLifetime: Lifetime,
   private val fsiInputOutputProcessor: FsiInputOutputProcessor,
   process: Process,
