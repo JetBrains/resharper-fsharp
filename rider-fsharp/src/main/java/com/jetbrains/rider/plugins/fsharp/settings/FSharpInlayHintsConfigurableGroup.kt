@@ -4,7 +4,7 @@ import com.intellij.openapi.options.ex.SortedConfigurableGroup
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.settings.simple.SimpleOptionsPage
 
-class FSharpInlayHintsConfigurableGroup : SortedConfigurableGroup("inlay.hints.RiderInlayHintsFSharpConfigurableGroup",
+private class FSharpInlayHintsConfigurableGroup : SortedConfigurableGroup("inlay.hints.RiderInlayHintsFSharpConfigurableGroup",
   FSharpBundle.message("configurable.group.inlay.hints.FSharpInlayHintsConfigurableGroup.settings.display.name"),
   "", null, 10) {
 
