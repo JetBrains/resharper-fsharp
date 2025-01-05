@@ -484,7 +484,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
 let shiftNode shift (expr: #ITreeNode) =
     if shift = 0 || isNull expr then () else
 
-    for child in List.ofSeq (expr.Tokens()) do
+    for child in List.ofSeq (expr.EnumerateAllTokensFromFirstIn()) do
         if not (child :? NewLine) then () else
 
         let nextSibling = child.NextSibling
