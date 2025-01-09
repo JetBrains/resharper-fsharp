@@ -106,7 +106,7 @@ suspend fun getFsiRunOptions(
     runtimeArguments = ""
   )
 
-  val dotNetExecutable = parameters.toDotNetExecutable()
+  val dotNetExecutable = parameters.toDotNetExecutableSuspending()
   val dotNetRuntime = DotNetRuntime.detectRuntimeForExeOrThrow(
     project,
     runtimeHost,
