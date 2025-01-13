@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsCont
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type FSharpFileServiceStub() =
 
