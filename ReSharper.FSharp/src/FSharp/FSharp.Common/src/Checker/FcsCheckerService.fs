@@ -9,6 +9,7 @@ open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -82,7 +83,7 @@ type FcsProjectInvalidationType =
     | Remove
 
 
-[<ShellComponent; AllowNullLiteral>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
         settingsStore: ISettingsStore, locks: IShellLocks) =
 
@@ -93,7 +94,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
 
         let getSettingProperty name =
             let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty(lifetime, setting, null)
+            settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
 
         let skipImpl = getSettingProperty "SkipImplementationAnalysis"
         let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
