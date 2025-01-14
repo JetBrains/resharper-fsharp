@@ -212,7 +212,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         let memberType =
             match typeMember with
-            | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
+            | SynMemberDefn.ImplicitInherit(baseType, args, _, _, _) ->
                 x.ProcessTypeAsTypeReferenceName(baseType)
                 x.MarkChameleonExpression(args)
                 ElementType.TYPE_INHERIT
@@ -225,8 +225,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 ElementType.INTERFACE_IMPLEMENTATION
 
             | SynMemberDefn.Inherit(baseType, _, _, _) ->
-                try x.ProcessTypeAsTypeReferenceName(baseType)
-                with _ -> () // Getting type range throws an exception if base type lid is empty.
+                match baseType with
+                | Some baseType -> x.ProcessTypeAsTypeReferenceName(baseType)
+                | None -> ()
                 ElementType.INTERFACE_INHERIT
 
             | SynMemberDefn.GetSetMember(getBinding, setBinding, range, trivia) ->

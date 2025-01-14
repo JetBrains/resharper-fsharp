@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       // Capture FCS cancellation token so we can propagate cancellation in cases like F#->C#->F#,
       // where the last FCS request is initiated from inside reading the C# metadata,
       // and the initial request may get cancelled
-      var fcsToken = Cancellable.Token;
+      var fcsToken = Cancellable.HasCancellationToken ? Cancellable.Token : CancellationToken.None;
       using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
 
       // Try to acquire read lock on the current thread.
@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         // To ensure FCS metadata consistency, we retry cancelled requests in this loop.
         // This may happen when R# read lock is cancelled, but the corresponding FCS request in not (yet).
         // We should check the FCS request cancellation separately via its cancellation token.
-        if (Cancellable.Token.IsCancellationRequested)
+        if (Cancellable.HasCancellationToken && Cancellable.Token.IsCancellationRequested)
         {
           logger.Trace("UsingReadLockInsideFcs: FCS token is cancelled");
           break;

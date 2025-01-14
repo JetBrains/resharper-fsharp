@@ -117,7 +117,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mutable isInvalidating = false
 
     let mutable isDirty = false
-    let mutable upToDateChecked = null
+
+    /// The types that have already been checked in isUpToDate check 
+    let mutable upToDateCheckedTypes = null
+
+    /// Set together with `upToDateChecked` set.
+    /// It's placed outside `isUpToDate` to keep its state if an interruption happens during checking. 
+    let mutable seenOutdatedTypes = false
 
     let mutable moduleDef: (ILModuleDef * ILPreTypeDef[]) option = None
     let mutable realModuleReader: ILModuleReader option = realReader
@@ -155,7 +161,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         // The whole FCS request could've been cancelled and the call above silently exited.
         // We need to throw the exception to make FCS handle it properly.
-        Cancellable.CheckAndThrow()
+        Cancellable.TryCheckAndThrow()
         logger.Trace("readData: after CheckAndThrow");
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
@@ -184,13 +190,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkDummyTypeDef (name: string) =
         let attributes = enum 0
         let layout = ILTypeDefLayout.Auto
-        let implements = emptyILInterfaceImpls
+        let implements = []
         let genericParams = []
         let extends = None
         let nestedTypes = emptyILTypeDefs
 
-        ILTypeDef(name, attributes, layout, emptyILInterfaceImpls, genericParams, extends, emptyILMethods, nestedTypes,
-             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties, ILTypeDefAdditionalFlags.None,
+        ILTypeDef(name, attributes, layout, implements, genericParams, extends, emptyILMethods, nestedTypes,
+             emptyILFields, emptyILMethodImpls, emptyILEvents, emptyILProperties,
              emptyILSecurityDecls, emptyILCustomAttrsStored)
 
     let mkTypeAccessRights (typeElement: ITypeElement): TypeAttributes =
@@ -1163,17 +1169,20 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (expected.Value, actual)
         ||> List.forall2 (fun i1 i2 -> i1.Type = i2.Type)
 
+    let isUpToDateBaseType (typeDef: ILTypeDef) typeElement =
+        not typeDef.Extends.IsValueCreated ||
+
+        let actualBaseType = mkTypeDefExtends typeElement
+        actualBaseType = typeDef.Extends.Value
+
     let rec isUpToDateTypeDef (typeElement: ITypeElement) (fcsTypeDef: FcsTypeDef) =
         let typeDef = fcsTypeDef.TypeDef
 
-        let extends = mkTypeDefExtends typeElement
-        extends = typeDef.Extends &&
-
+        isUpToDateBaseType typeDef typeElement &&
         isUpToDateInterfaceImpls typeElement typeDef &&
-
         isUpToDateTypeParamDefs typeElement.TypeParameters typeDef.GenericParams &&
         isUpToDateTypeDefCustomAttributes typeElement typeDef &&
-        isUpToDateNestedMembers typeElement fcsTypeDef.Members
+        isUpToDateNestedTypesAndMembers typeElement fcsTypeDef.Members
 
     and isUpToDateNestedTypeDefs  (preTypeDefs: ILPreTypeDef[]) =
         isNull preTypeDefs ||
@@ -1188,7 +1197,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName).NotNull("IsUpToDate: nested type")
             isUpToDateTypeDef typeElement typeDef)
 
-    and isUpToDateNestedMembers (typeElement: ITypeElement) (members: FcsTypeDefMembers) =
+    and isUpToDateNestedTypesAndMembers (typeElement: ITypeElement) (members: FcsTypeDefMembers) =
         isNull members ||
 
         isUpToDateNestedTypeDefs members.NestedTypes &&
@@ -1216,13 +1225,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         if not isDirty then true else
 
-        if isNull upToDateChecked then
-            upToDateChecked <- HashSet()
+        if isNull upToDateCheckedTypes then
+            upToDateCheckedTypes <- HashSet()
+            seenOutdatedTypes <- false
 
         use cookie = ReadLockCookie.Create()
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
-
-        let mutable isUpToDate = true
 
         match moduleDef with
         | None -> ()
@@ -1231,27 +1239,29 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             let preTypeDefsUpToDate =
                 oldPreTypeDefs.Length = newPreTypeDefs.Length &&
 
+                // todo: can the order change? Do we want to support it, if yes? 
                 (oldPreTypeDefs, newPreTypeDefs) ||> Array.forall2 (fun oldPreTypeDef newPreTypeDef ->
                     oldPreTypeDef.Name = newPreTypeDef.Name &&
                     oldPreTypeDef.Namespace = newPreTypeDef.Namespace
                 )
 
             if not preTypeDefsUpToDate then
-                isUpToDate <- false
+                seenOutdatedTypes <- true
 
         for KeyValue(clrTypeName, fcsTypeDef) in List.ofSeq typeDefs do
             Interruption.Current.CheckAndThrow()
 
-            if upToDateChecked.Contains(clrTypeName) then () else
+            if upToDateCheckedTypes.Contains(clrTypeName) then () else
 
             if not (isUpToDateTypeDef clrTypeName fcsTypeDef) then
                 typeDefs.TryRemove(clrTypeName) |> ignore
-                isUpToDate <- false
+                seenOutdatedTypes <- true
 
-            upToDateChecked.Add(clrTypeName) |> ignore
+            upToDateCheckedTypes.Add(clrTypeName) |> ignore
 
         isDirty <- false
-        isUpToDate
+        upToDateCheckedTypes <- null
+        seenOutdatedTypes
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
         use lock = usingWriteLock ()
@@ -1275,7 +1285,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | typeElement ->
                 let name = mkTypeDefName typeElement clrTypeName
                 let typeAttributes = mkTypeAttributes typeElement
-                let extends = mkTypeDefExtends typeElement
+                let extends = InterruptibleLazy(fun _ -> usingTypeElement clrTypeName None mkTypeDefExtends)
                 let genericParams = mkGenericParamDefs typeElement
 
                 // todo: pass this table in nested types too?
@@ -1292,9 +1302,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     usingTypeElement clrTypeName [||] mkTypeDefCustomAttrs
                 )
 
+                let typeKind =
+                    match typeElement with
+                    | :? IEnum -> ILTypeDefAdditionalFlags.Enum
+                    | :? IStruct -> ILTypeDefAdditionalFlags.ValueType
+                    | :? IDelegate -> ILTypeDefAdditionalFlags.Delegate
+                    | :? IInterface -> ILTypeDefAdditionalFlags.Interface
+                    | _ -> ILTypeDefAdditionalFlags.Class
+
                 let additionalFlags =
-                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods
-                    else ILTypeDefAdditionalFlags.None
+                    if hasExtensions then ILTypeDefAdditionalFlags.CanContainExtensionMethods ||| typeKind
+                    else typeKind
 
                 let typeDef =
                     ILTypeDef(name, typeAttributes, ILTypeDefLayout.Auto, implements,
@@ -1415,7 +1433,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 for clrTypeName in clrNamesByShortNames.GetValuesSafe(shortName) do
                     this.InvalidateTypeDef(clrTypeName)
                 isDirty <- true
-                upToDateChecked <- null
+                upToDateCheckedTypes <- null
+                seenOutdatedTypes <- false
             finally
                 isInvalidating <- false
 
@@ -1425,6 +1444,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             if isUpToDate this then
                 shim.Logger.Trace("Up to date: {0}", path) else
 
+            upToDateCheckedTypes <- null
+            seenOutdatedTypes <- false
             moduleDef <- None
             timestamp <- DateTime.UtcNow
             shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
@@ -1436,7 +1457,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 use _ = usingWriteLock ()
                 shim.Logger.Trace("Mark dirty: {0}", path)
                 isDirty <- true
-                upToDateChecked <- null
+                upToDateCheckedTypes <- null
+                seenOutdatedTypes <- false
             finally
                 isInvalidating <- false
 
