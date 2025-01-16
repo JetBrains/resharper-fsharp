@@ -2,7 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.env.enums.SdkVersion

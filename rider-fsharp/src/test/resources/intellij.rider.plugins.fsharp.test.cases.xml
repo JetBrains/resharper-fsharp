@@ -1,0 +1,22 @@
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.intellij.css"/>
+        <plugin id="com.intellij.database"/>
+        <plugin id="com.jetbrains.dotTrace.dotMemory"/>
+        <plugin id="com.jetbrains.dpa"/>
+        <plugin id="com.jetbrains.restClient"/>
+        <plugin id="com.jetbrains.rider.fsharp"/>
+        <plugin id="com.jetbrains.rider.livePlusPlus"/>
+        <plugin id="com.jetbrains.xaml.previewer"/>
+        <module name="intellij.database.connectivity.tests._test"/>
+        <module name="intellij.database.connectivity.tests.core._test"/>
+        <module name="intellij.qodana.testFramework"/>
+        <module name="intellij.rider.plugins.appender/database"/>
+        <module name="intellij.rider.plugins.appender/docker"/>
+        <module name="intellij.rider.plugins.appender/qodanaDotnet"/>
+        <module name="intellij.rider.plugins.appender/settingsSync"/>
+        <module name="intellij.rider.test.framework"/>
+        <module name="intellij.rider.test.framework._test"/>
+        <module name="intellij.rider.test.framework.core"/>
+    </dependencies>
+</idea-plugin>

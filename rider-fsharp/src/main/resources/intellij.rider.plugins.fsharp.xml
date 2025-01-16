@@ -1,0 +1,8 @@
+<idea-plugin>
+
+    <dependencies>
+        <plugin id="com.intellij.ml.llm"/>
+        <plugin id="org.intellij.intelliLang"/>
+    </dependencies>
+
+</idea-plugin>
