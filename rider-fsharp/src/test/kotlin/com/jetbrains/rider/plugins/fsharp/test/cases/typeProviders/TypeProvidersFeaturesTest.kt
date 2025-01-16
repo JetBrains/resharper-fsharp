@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.IdeActions
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
-import com.jetbrains.rdclient.testFramework.executeWithGold
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.test.annotations.TestEnvironment
