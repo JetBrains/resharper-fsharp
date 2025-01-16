@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -233,7 +234,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type PatternTypeHintsStage() =
     inherit FSharpDaemonStageBase(true, false)
 
