@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rdclient.testFramework.executeWithGold
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
 import com.jetbrains.rider.test.annotations.Mute
