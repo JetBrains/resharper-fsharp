@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
 open System.Collections.Generic
+open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -23,7 +24,7 @@ module FSharpErrorsStage =
     let parseAndCheckResultsKey = Key<FSharpParseAndCheckResults option>("ParseAndCheckResultsKey")
 
 
-[<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
 type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 

@@ -3,6 +3,7 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -165,7 +166,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type PipeChainTypeHintStage() =
     inherit FSharpDaemonStageBase(true, false)
 
