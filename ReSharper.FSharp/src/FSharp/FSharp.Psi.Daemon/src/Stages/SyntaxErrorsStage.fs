@@ -1,10 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
+open JetBrains.Application.Parts
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |],
+[<DaemonStage(Instantiation.DemandAnyThreadSafe,
+              StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |],
               StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type SyntaxErrorsStage() =
     inherit FSharpDaemonStageBase()
