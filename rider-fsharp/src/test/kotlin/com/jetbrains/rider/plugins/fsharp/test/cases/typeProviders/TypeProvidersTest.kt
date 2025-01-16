@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
-import com.jetbrains.rdclient.testFramework.executeWithGold
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
