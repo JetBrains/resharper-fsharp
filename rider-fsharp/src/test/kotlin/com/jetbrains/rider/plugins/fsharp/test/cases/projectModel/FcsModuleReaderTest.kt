@@ -9,8 +9,8 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
