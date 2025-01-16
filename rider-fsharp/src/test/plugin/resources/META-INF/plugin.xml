@@ -1,0 +1,33 @@
+<idea-plugin>
+    <!--
+    NOTE: This is used as an internal structure to run tests as a Rider plugin,
+    which uses real Rider product layout. Does not affect gradle configuration.
+    -->
+    <id>intellij.rider.plugins.fsharp.test.cases.plugin</id>
+    <name>Rider Tests Plugin for intellij.rider.plugins.fsharp.test.cases module</name>
+    <vendor>JetBrains</vendor>
+
+    <content>
+        <module name="intellij.angular._test"/>
+        <module name="intellij.clouds.kubernetes._test"/>
+        <module name="intellij.database.connectivity.tests._test"/>
+        <module name="intellij.database.connectivity.tests.core._test"/>
+        <module name="intellij.java.rt"/>
+        <module name="intellij.js.liveEdit._test"/>
+        <module name="intellij.libraries.junit4"/>
+        <module name="intellij.libraries.junit5"/>
+        <module name="intellij.libraries.testng"/>
+        <module name="intellij.platform.navbar.testFramework"/>
+        <module name="intellij.platform.testFramework"/>
+        <module name="intellij.platform.testFramework.common"/>
+        <module name="intellij.platform.testFramework.core"/>
+        <module name="intellij.platform.testFramework.impl"/>
+        <module name="intellij.qodana.testFramework"/>
+        <module name="intellij.rd.client.testFramework"/>
+        <module name="intellij.rider.plugins.fsharp.test.cases"/>
+        <module name="intellij.rider.test.framework"/>
+        <module name="intellij.rider.test.framework._test"/>
+        <module name="intellij.rider.test.framework.core"/>
+        <module name="intellij.swagger.core._test"/>
+    </content>
+</idea-plugin>

@@ -2,7 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
-import com.jetbrains.rider.plugins.fsharp.test.dumpTypeProviders
+import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
