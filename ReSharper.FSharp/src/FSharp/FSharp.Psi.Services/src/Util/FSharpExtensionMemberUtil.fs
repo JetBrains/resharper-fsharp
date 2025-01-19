@@ -33,7 +33,7 @@ type FSharpRequest(psiModule, exprType: IType, name: string option) =
 
     interface IRequest with
         member this.Name = name
-        member this.BaseExpressionTypes = baseTypes
+        member this.EligibleExtensionArgumentTypes = baseTypes
         member this.ExpressionType = exprType
         member this.ForModule = psiModule
         member this.Kinds = memberKinds
