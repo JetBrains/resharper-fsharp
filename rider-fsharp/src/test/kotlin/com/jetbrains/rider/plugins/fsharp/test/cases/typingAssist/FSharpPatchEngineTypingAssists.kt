@@ -46,12 +46,5 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
-class FSharpTypingAssistPatchEngineSpeculativeRebaseProhibitedTest :
-  FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeRebaseProhibited)
-
-@Test
-@Subsystem(SubsystemConstants.TYPING_ASSIST)
-@Feature("Typing Assist")
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
   FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
