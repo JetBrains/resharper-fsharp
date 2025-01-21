@@ -1,12 +1,12 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.pathString
 
 plugins {
   // Version is configured in gradle.properties
@@ -57,7 +57,10 @@ dependencies {
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
     instrumentationTools()
-    testFramework(TestFrameworkType.Bundled)
+    // TODO: Temporary I hope hope hope
+    bundledLibrary(provider {
+      project.intellijPlatform.platformPath.resolve("lib/testFramework.jar").pathString
+    })
   }
 
   testImplementation("org.opentest4j:opentest4j:1.3.0")
