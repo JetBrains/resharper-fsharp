@@ -291,7 +291,7 @@ tasks {
     }
 
     buildSearchableOptions {
-      enabled = false // TODO: buildConfiguration == "Release"
+      enabled = buildConfiguration == "Release"
     }
   }
 
