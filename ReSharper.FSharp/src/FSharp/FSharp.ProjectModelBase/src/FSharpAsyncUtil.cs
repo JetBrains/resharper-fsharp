@@ -179,8 +179,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
       interruptChecker ??= DefaultInterruptCheck;
 
-      using var lifetimeDefinition = new LifetimeDefinition();
-      var cancellationToken = lifetimeDefinition.Lifetime.ToCancellationToken();
+      using var cancellationSource = new CancellationSource();
 
       logger.Trace("RunAsTask: before StartAsTask");
       var task = FSharpAsync.StartAsTask(async, null, cancellationToken);
