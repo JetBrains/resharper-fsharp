@@ -96,12 +96,15 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         FcsLookupCandidate.getOverloads items.Description
         |> List.map (fun overload -> FcsLookupCandidate(overload, context.XmlDocService, context.PsiModule) :> ICandidate)
 
+    member x.DisplayName =
+        x.FcsSymbol.DisplayNameCore
+
     override x.Image =
         try getIconId x.FcsSymbol
         with _ -> null
 
     override x.Text =
-        let name = x.FcsSymbol.DisplayNameCore
+        let name = x.DisplayName
         let name = if context.IsInAttributeContext then name.DropAttributeSuffix() else name
         FSharpNamingService.normalizeBackticks name
 

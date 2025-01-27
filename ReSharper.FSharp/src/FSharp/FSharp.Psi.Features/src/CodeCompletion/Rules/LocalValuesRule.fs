@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -19,6 +20,9 @@ open JetBrains.Util
 
 type FcsSymbolInfo(text, symbolUse: FSharpSymbolUse) =
     inherit TextualInfo(text, text)
+
+    override this.MakeSafe(text) =
+        FSharpNamingService.mangleNameIfNecessary text
 
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = if isNotNull symbolUse then symbolUse.Symbol else Unchecked.defaultof<_>
@@ -180,5 +184,5 @@ type LocalValuesRule() =
             let fcsLookupItem = item.As<FcsLookupItem>()
             isNotNull fcsLookupItem &&
 
-            values.ContainsKey(fcsLookupItem.Text)
+            values.ContainsKey(fcsLookupItem.DisplayName)
         )
