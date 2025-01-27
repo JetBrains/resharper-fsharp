@@ -182,7 +182,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       using var cancellationSource = new CancellationSource();
 
       logger.Trace("RunAsTask: before StartAsTask");
-      var task = FSharpAsync.StartAsTask(async, null, cancellationToken);
+      var task = FSharpAsync.StartAsTask(async, null, cancellationSource.Token);
       logger.Trace("RunAsTask: after StartAsTask");
 
       task.ContinueWith(_ =>
@@ -218,6 +218,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       logger.Trace("RunAsTask: after loop");
 
       return task.Result;
+    }
+
+    private class CancellationSource : IDisposable
+    {
+      [CanBeNull] private readonly LifetimeDefinition myLifetimeDefinition;
+      public CancellationToken Token { get; }
+
+      public CancellationSource()
+      {
+        if (Cancellable.HasCancellationToken)
+        {
+          Token = Cancellable.Token;
+          return;
+        }
+
+        myLifetimeDefinition = new LifetimeDefinition();
+        Token = myLifetimeDefinition.Lifetime.ToCancellationToken();
+      }
+
+      public void Dispose() =>
+        myLifetimeDefinition?.Dispose();
     }
   }
 }
