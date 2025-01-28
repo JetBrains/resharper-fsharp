@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System
+open FSharp.Compiler.EditorServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -96,8 +97,13 @@ type ImportModuleMemberRule() =
         context.BasicContext.Solution.GetComponent<IFcsAssemblyReaderShim>().IsEnabled
 
     override this.AddLookupItems(context, collector) =
-        let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
+        let reparsedContext = context.ReparsedContext
+        let reference = reparsedContext.Reference :?> FSharpSymbolReference
         let referenceOwner = reference.GetElement()
+
+        match reparsedContext.GetFcsContext().CompletionContext with
+        | Some(CompletionContext.Invalid) -> false
+        | _ ->
 
         let referenceContext = referenceOwner.ReferenceContext
         if not referenceContext.HasValue then false else
@@ -112,7 +118,7 @@ type ImportModuleMemberRule() =
         let values =
             match referenceContext.Value with
             | FSharpReferenceContext.Expression ->
-                let treeNode = context.ReparsedContext.TreeNode
+                let treeNode = reparsedContext.TreeNode
                 context.GetOrCreateDataUnderLock(LocalValuesRule.valuesKey, treeNode, LocalValuesRule.getLocalValues)
 
             | _ -> EmptyDictionary.Instance

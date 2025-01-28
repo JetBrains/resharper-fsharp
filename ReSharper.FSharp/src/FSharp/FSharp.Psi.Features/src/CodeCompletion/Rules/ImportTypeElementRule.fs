@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open FSharp.Compiler.EditorServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -92,10 +93,15 @@ type ImportRule() =
         context.BasicContext.Solution.GetComponent<IFcsAssemblyReaderShim>().IsEnabled
 
     override this.AddLookupItems(context, collector) =
-        let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
+        let reparsedContext = context.ReparsedContext
+        let reference = reparsedContext.Reference :?> FSharpSymbolReference
 
         let referenceOwner = reference.GetElement()
         if not referenceOwner.ReferenceContext.HasValue then false else
+
+        match reparsedContext.GetFcsContext().CompletionContext with
+        | Some(CompletionContext.Invalid) -> false
+        | _ ->
 
         let element = reference.GetElement()
         let psiServices = element.GetPsiServices()
