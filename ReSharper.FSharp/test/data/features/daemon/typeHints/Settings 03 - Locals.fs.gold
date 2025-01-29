@@ -6,14 +6,20 @@ let f x =
     let g x||(0) ||(1)= ()
     let x||(2) = fun y||(3) -> ()
     for x||(4) in [""] do ()
+    match 5 with x -> () 
     { new IFormattable with
         member x.ToString(format, provider) = "" }
 
 fun x||(5) -> ()
 
+match 5 with
+| x when let y||(6) = 5 in true ->
+    let z||(7) = 3
+    ()
+
 type A(x) =
     do
-        let x||(6) = 3
+        let x||(8) = 3
         ()
 
     let array = [|""|]
@@ -21,7 +27,7 @@ type A(x) =
     new(x, y) = A(x + y)
 
     member _.P1 =
-        let x||(7) = 1
+        let x||(9) = 1
         x
 
     member _.P2 = id
@@ -30,13 +36,13 @@ type A(x) =
 
     member x.P4
         with get index =
-            let x||(8) = array[index]
+            let x||(10) = array[index]
             x
         and set index value =
             array[index] <- value
 
     member _.M(x) (y, z) =
-        let res||(9) = x + y + z
+        let res||(11) = x + y + z
         res
 
 ---------------------------------------------------------
@@ -48,5 +54,7 @@ type A(x) =
 (5): ReSharper Parameter Name Hint: : 'a
 (6): ReSharper Parameter Name Hint: : int
 (7): ReSharper Parameter Name Hint: : int
-(8): ReSharper Parameter Name Hint: : string
+(8): ReSharper Parameter Name Hint: : int
 (9): ReSharper Parameter Name Hint: : int
+(10): ReSharper Parameter Name Hint: : string
+(11): ReSharper Parameter Name Hint: : int
