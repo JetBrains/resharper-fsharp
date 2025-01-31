@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
-open System.IO
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
@@ -29,48 +28,6 @@ open JetBrains.Util
 module FcsCheckerService =
     let getSourceText (document: IDocument) =
         SourceText.ofString(document.GetText())
-
-
-type FcsProject =
-    { OutputPath: VirtualFileSystemPath
-      ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      FileIndices: IDictionary<VirtualFileSystemPath, int>
-      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
-      ReferencedModules: ISet<FcsProjectKey> }
-
-    member x.IsKnownFile(sourceFile: IPsiSourceFile) =
-        let path = sourceFile.GetLocation()
-        x.FileIndices.ContainsKey(path)
-
-    member x.GetIndex(sourceFile: IPsiSourceFile) =
-        let path = sourceFile.GetLocation()
-        tryGetValue path x.FileIndices |> Option.defaultValue -1
-
-    member x.TestDump(writer: TextWriter) =
-        let projectOptions = x.ProjectOptions
-
-        writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
-        writer.WriteLine($"Stamp: {projectOptions.Stamp}")
-        writer.WriteLine($"Load time: {projectOptions.LoadTime}")
-
-        writer.WriteLine("Source files:")
-        for sourceFile in projectOptions.SourceFiles do
-            writer.WriteLine($"  {sourceFile}")
-
-        writer.WriteLine("Other options:")
-        for option in projectOptions.OtherOptions do
-            writer.WriteLine($"  {option}")
-
-        writer.WriteLine("Referenced projects:")
-        for referencedProject in projectOptions.ReferencedProjects do
-            let stamp =
-                match referencedProject with
-                | FSharpReferencedProject.FSharpReference(_, options) -> $"{options.Stamp}: "
-                | _ -> ""
-            writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
-
-        writer.WriteLine()
 
 
 [<RequireQualifiedAccess>]

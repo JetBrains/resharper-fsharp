@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     /// If not possible, queue a request to a thread calling FCS, possibly after a change on the main thread.
     /// When processing the request, the relevant psi module or declared element may already be removed and invalid.
     /// </summary>
-    public static void UsingReadLockInsideFcs(IShellLocks locks, Action action, Func<bool> upToDateCheck = null)
+    public static void UsingReadLockInsideFcs(IShellLocks locks, Action action)
     {
       var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
 
@@ -107,16 +107,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp
           using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
           try
           {
-            if (upToDateCheck == null || !upToDateCheck())
-            {
-              logger.Trace("UsingReadLockInsideFcs: before action");
-              action();
-              logger.Trace("UsingReadLockInsideFcs: after action");
-            }
-            else
-            {
-              logger.Trace("UsingReadLockInsideFcs: action not performed due to upToDateCheck");
-            }
+            logger.Trace("UsingReadLockInsideFcs: before action");
+            action();
+            logger.Trace("UsingReadLockInsideFcs: after action");
 
             logger.Trace("UsingReadLockInsideFcs: setting result");
             tcs.SetResult(Unit.Instance);

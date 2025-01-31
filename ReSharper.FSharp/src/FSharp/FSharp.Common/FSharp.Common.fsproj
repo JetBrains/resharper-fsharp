@@ -52,6 +52,7 @@
     <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
     <Compile Include="src\Util\FcsTaggedText.fs" />
     <Compile Include="src\Util\XmlDocUtil.fs" />
+    <Compile Include="src\Checker\FcsProject.fs" />
     <Compile Include="src\Shim\AssemblyReader\IFcsAssemblyReaderShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
     <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />

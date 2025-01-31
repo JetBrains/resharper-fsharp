@@ -81,24 +81,25 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     /// Modules invalidated by symbol cache or are known to read incomplete contents.
     /// Readers need to check up to date before new FCS requests.
-    let dirtyProjects = HashSet()
+    let dirtyModules = HashSet<IPsiModule>()
 
-    let dirtyTypesInModules = OneToSetMap<IPsiModule, string>()
+    let mutable lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp
 
     do
         // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
         assemblyInfoShim |> ignore
-    
+
         changeManager.RegisterChangeProvider(lifetime, this)
         changeManager.AddDependency(lifetime, this, psiModules)
-    
+
     let isEnabled () =
         fsOptionsProvider.NonFSharpProjectInMemoryReferences ||
         FSharpExperimentalFeatureCookie.IsEnabled(ExperimentalFeature.AssemblyReaderShim)
 
     let getFcsProjectProvider () = solution.GetComponent<IFcsProjectProvider>()
 
-    let getReferencingModules (projectKey: FcsProjectKey) =
+    let getReferencingModules (psiModule: IPsiModule) =
+        let projectKey = FcsProjectKey.Create(psiModule)
         let fcsProjectProvider = getFcsProjectProvider ()
         match fcsProjectProvider.GetReferencedModule(projectKey) with
         | None -> Seq.empty
@@ -107,10 +108,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let isKnownModule (psiModule: IPsiModule) =
         if not (psiModule.ContainingProjectModule :? IProject) then false else
 
-        let fcsProjectProvider = getFcsProjectProvider ()
-
         assemblyReadersByModule.ContainsKey(psiModule) ||
 
+        let fcsProjectProvider = getFcsProjectProvider ()
         let projectKey = FcsProjectKey.Create(psiModule)
         fcsProjectProvider.GetReferencedModule(projectKey).IsSome
 
@@ -118,7 +118,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     let readRealAssembly (path: VirtualFileSystemPath) =
         if not (this.DebugReadRealAssemblies && path.ExistsFile) then None else
 
-        let readerOptions: ILReaderOptions = 
+        let readerOptions: ILReaderOptions =
             { pdbDirPath = None
               reduceMemoryUsage = ReduceMemoryFlag.Yes
               metadataOnly = MetadataOnlyFlag.Yes
@@ -164,59 +164,30 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             projectKeyToPsiModules.TryRemove(projectKey) |> ignore
         )
 
-    // todo: invalidate for per-referencing module
-    let markDirtyDependencies () =
-        let invalidatedModules = HashSet()
-
-        let modulesToInvalidate = Stack<FcsProjectKey>(dirtyProjects)
-
-        for dirtyModule in dirtyTypesInModules.Keys do
-            match dirtyModule.ContainingProjectModule with
-            | :? IProject ->
-                match tryGetReaderFromModule dirtyModule with
-                | None -> ()
-                | Some reader ->
-                    for typeName in dirtyTypesInModules.GetValuesSafe(dirtyModule) do
-                        reader.InvalidateTypeDefs(typeName)
-
-                let projectKey = FcsProjectKey.Create(dirtyModule)
-                if invalidatedModules.Add(projectKey) then
-                    modulesToInvalidate.Push(projectKey)
-
-            | _ -> ()
+    let markDirtyReaders () =
+        let invalidatedModules = HashSet<IPsiModule>()
+        let modulesToInvalidate = Stack<IPsiModule>(dirtyModules)
 
         while modulesToInvalidate.Count > 0 do
-            let projectKey = modulesToInvalidate.Pop()
+            let psiModule = modulesToInvalidate.Pop()
 
-            for referencingProjectKey in getReferencingModules projectKey do
+            if not (psiModule.ContainingProjectModule :? IProject) then () else
+            if not (invalidatedModules.Add(psiModule)) then () else
+
+            match tryGetReaderFromModule psiModule with
+            | None -> ()
+            | Some reader -> reader.MarkDirty()
+
+            for referencingProjectKey in getReferencingModules psiModule do
                 let referencingModule = projectKeyToPsiModules.TryGetValue(referencingProjectKey)
-                if isNull referencingModule then () else
+                if not (isNull referencingModule) then
+                    modulesToInvalidate.Push(referencingModule)
 
-                tryGetReaderFromModule referencingModule
-                |> Option.iter (fun reader -> reader.MarkDirty())
-
-                if invalidatedModules.Add(referencingProjectKey) then
-                    modulesToInvalidate.Push(referencingProjectKey)
-
-        dirtyTypesInModules.Clear()
+        dirtyModules.Clear()
 
     let markTypePartDirty (typePart: TypePart) =
-        if not (isEnabled ()) then () else
-        if assemblyReadersByModule.Count = 0 then () else
-
-        let typeElement = typePart.TypeElement
-        let psiModule = typeElement.Module
-
-        // todo: filter modules to only listen to C#/VB or referenced F# projects
-        dirtyTypesInModules.Add(psiModule, typeElement.ShortName) |> ignore
-
-    let invalidateDirty () =
-        locks.AssertReadAccessAllowed()
-
-        logger.Trace("Start invalidate dirty")
-        markDirtyDependencies ()
-        dirtyProjects.Clear()
-        logger.Trace("Finish invalidate dirty")
+        if isEnabled () && assemblyReadersByModule.Count <> 0 then
+            dirtyModules.Add(typePart.TypeElement.Module) |> ignore
 
     do
         lifetime.Bracket(
@@ -237,16 +208,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             locks.AssertWriteAccessAllowed()
 
             getOrCreateReaderFromModule projectKey
-
-        member this.InvalidateDirty() =
-            locks.AssertReadAccessAllowed()
-
-            invalidateDirty ()
-
-        member this.InvalidateDirty(psiModule) =
-            tryGetReaderFromModule psiModule
-            |> Option.iter (fun reader -> reader.UpdateTimestamp())
-            
 
         member this.TestDump =
             use cookie = ReadLockCookie.Create()
@@ -273,22 +234,10 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     for referencing in referencingModules |> Seq.sortBy (fun projectKey -> projectKey.Project.Name) do
                         builder.AppendLine($"    {referencing.Project.Name}") |> ignore
 
-            if dirtyProjects.Count > 0 then
-                builder.AppendLine($"Dirty projects: {dirtyProjects.Count}") |> ignore
-                for projectKey in dirtyProjects do
-                    builder.AppendLine($"    {projectKey.Project.Name}, IsValid: {projectKey.Project.IsValid()}") |> ignore
-
-            if dirtyTypesInModules.Count > 0 then
+            if dirtyModules.Count > 0 then
                 builder.AppendLine("Dirty types in readers:") |> ignore
-                for psiModule in dirtyTypesInModules.Keys do
+                for psiModule in dirtyModules do
                     builder.AppendLine($"  {psiModule.DisplayName}, IsValid: {psiModule.IsValid()}") |> ignore
-                    for typeName in dirtyTypesInModules.GetValuesSafe(psiModule) do
-                        builder.AppendLine($"    {typeName}") |> ignore
-
-            // if invalidationsSinceLastTestDump.Count > 0 then
-            //     builder.AppendLine("Invalidations since last dump:") |> ignore
-            //     while invalidationsSinceLastTestDump.Count > 0 do
-            //         builder.AppendLine($"  {invalidationsSinceLastTestDump.Dequeue()}") |> ignore
 
             builder.ToString()
 
@@ -298,17 +247,35 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         member this.IsKnownModule(path: VirtualFileSystemPath) =
             assemblyReadersByPath.ContainsKey(path)
 
-        member this.HasDirtyModules =
-            locks.AssertReadAccessAllowed()
-
-            not (dirtyProjects.IsEmpty() && dirtyTypesInModules.IsEmpty())
-
         member this.Logger = logger
 
         member this.MarkDirty(psiModule) =
+            // todo: do we need this check? Should we just check that the module comes from a project?
             if isKnownModule psiModule then
-                let projectKey = FcsProjectKey.Create(psiModule)
-                dirtyProjects.Add(projectKey) |> ignore
+                dirtyModules.Add(psiModule) |> ignore
+
+        member this.PrepareForFcsRequest(fcsProject) =
+            locks.AssertReadAccessAllowed()
+
+            if not (isEnabled ()) then () else
+            if lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp then () else
+
+            lock this (fun _ ->
+                if lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp then () else
+
+                markDirtyReaders ()
+                lastSyncedWriteLockTimestamp <- locks.ContentModelLocks.WriteLockTimestamp
+            )
+
+            use barrier = locks.Tasks.CreateBarrier(lifetime)
+            for referencedProjectKey in fcsProject.ReferencedModules do
+                let referencedModule = projectKeyToPsiModules.TryGetValue(referencedProjectKey)
+                if isNotNull referencedModule && assemblyReadersByModule.ContainsKey(referencedModule) then
+                    barrier.EnqueueJob(fun _ ->
+                        tryGetReaderFromModule referencedModule |> Option.iter _.UpdateTimestamp()
+                    )
+
+            logger.Trace("Finish invalidating assembly reader")
 
     interface IChangeProvider with
         member this.Execute(map) =
@@ -323,8 +290,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 match change.Type with
                 | PsiModuleChange.ChangeType.Modified
                 | PsiModuleChange.ChangeType.Invalidated ->
-                    let projectKey = FcsProjectKey.Create(change.Item)
-                    dirtyProjects.Add(projectKey) |> ignore
+                    dirtyModules.Add(change.Item) |> ignore
 
                 | PsiModuleChange.ChangeType.Removed ->
                     removeModule change.Item
