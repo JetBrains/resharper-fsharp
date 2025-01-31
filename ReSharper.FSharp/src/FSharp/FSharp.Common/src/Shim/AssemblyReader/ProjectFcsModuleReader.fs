@@ -136,11 +136,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let readData f =
+        FSharpAsyncUtil.CheckAndThrow()
         let logger = Logger.GetLogger<ProjectFcsModuleReader>()
 
         logger.Trace("readData: before UsingReadLockInsideFcs");
         FSharpAsyncUtil.UsingReadLockInsideFcs(locks,
             (fun _ ->
+                FSharpAsyncUtil.CheckAndThrow()
+                locks.AssertReadAccessAllowed()
+
                 logger.Trace("readData: action: inside lambda");
 
                 use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -161,7 +165,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         // The whole FCS request could've been cancelled and the call above silently exited.
         // We need to throw the exception to make FCS handle it properly.
-        Cancellable.TryCheckAndThrow()
+        FSharpAsyncUtil.CheckAndThrow()
         logger.Trace("readData: after CheckAndThrow");
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
@@ -1264,6 +1268,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         seenOutdatedTypes
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
+        FSharpAsyncUtil.CheckAndThrow()
         use lock = usingWriteLock ()
 
         match typeDefs.TryGetValue(clrTypeName) with
@@ -1349,6 +1354,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =
+            FSharpAsyncUtil.CheckAndThrow()
             use lock = usingWriteLock ()
 
             match moduleDef with
@@ -1416,7 +1422,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member this.ILAssemblyRefs = []
 
         member this.Timestamp =
+            FSharpAsyncUtil.CheckAndThrow()
             use lock = locker.UsingReadLock()
+
             timestamp
 
         member this.Path = path

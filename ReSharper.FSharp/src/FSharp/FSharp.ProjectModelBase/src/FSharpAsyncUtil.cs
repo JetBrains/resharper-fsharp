@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using FSharp.Compiler;
@@ -24,6 +25,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       () => Interruption.Current.CheckAndThrow();
 
     private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
+
+    [Conditional("JET_MODE_ASSERT")]
+    public static void CheckAndThrow()
+    {
+      // If the FCS cancellation token is set, then this is FCS background analysis thread.
+      // Otherwise, it's a R# background thread doing something under read lock.
+      var isFcsThread = Cancellable.HasCancellationToken;
+      Assertion.Assert(isFcsThread || Shell.Instance.Locks.IsReadAccessAllowed());
+      if (isFcsThread)
+        Cancellable.CheckAndThrow();
+      else
+        Interruption.Current.CheckAndThrow();
+    }
 
     /// <summary>
     /// Try to execute <paramref name="action"/> using read lock on the current thread.
