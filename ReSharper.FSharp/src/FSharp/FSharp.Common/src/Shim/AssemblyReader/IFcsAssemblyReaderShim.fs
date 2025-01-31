@@ -46,7 +46,7 @@ type IFcsAssemblyReaderShim =
     abstract HasDirtyModules: bool
     abstract Logger: ILogger
 
-    abstract TryGetModuleReader: projectKey: FcsProjectKey -> IProjectFcsModuleReader option
+    abstract TryGetOrCreateModuleReader: projectKey: FcsProjectKey -> IProjectFcsModuleReader option
 
     abstract IsKnownModule: IPsiModule -> bool
     abstract IsKnownModule: VirtualFileSystemPath -> bool
@@ -54,8 +54,7 @@ type IFcsAssemblyReaderShim =
     /// Marks module as dirty, so it could be invalidated before the next FCS request
     abstract MarkDirty: IPsiModule -> unit
 
-    /// Clears dirty type defs, updating reader timestamps if needed
-    abstract InvalidateDirty: unit -> unit
+    abstract MarkDirtyDependencies: unit -> unit
 
     /// Clears dirty type defs, updating reader timestamps if needed
     /// todo: remove psi module, replace with project key

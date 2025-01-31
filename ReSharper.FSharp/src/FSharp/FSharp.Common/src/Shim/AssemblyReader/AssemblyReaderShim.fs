@@ -74,6 +74,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         locks: IShellLocks, logger: ILogger) as this =
     inherit AssemblyReaderShimBase(lifetime, changeManager)
 
+    let mutable lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp
+
     let assemblyReadersByModule = ConcurrentDictionary<IPsiModule, IProjectFcsModuleReader>()
     let assemblyReadersByPath = ConcurrentDictionary<VirtualFileSystemPath, IProjectFcsModuleReader>()
 
@@ -166,6 +168,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
     // todo: invalidate for per-referencing module
     let markDirtyDependencies () =
+        logger.Trace("markDirtyDependencies: start")
         let invalidatedModules = HashSet()
 
         let modulesToInvalidate = Stack<FcsProjectKey>(dirtyProjects)
@@ -199,6 +202,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     modulesToInvalidate.Push(referencingProjectKey)
 
         dirtyTypesInModules.Clear()
+        dirtyProjects.Clear()
+        logger.Trace("markDirtyDependencies: finish")
 
     let markTypePartDirty (typePart: TypePart) =
         if not (isEnabled ()) then () else
@@ -209,14 +214,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
 
         // todo: filter modules to only listen to C#/VB or referenced F# projects
         dirtyTypesInModules.Add(psiModule, typeElement.ShortName) |> ignore
-
-    let invalidateDirty () =
-        locks.AssertReadAccessAllowed()
-
-        logger.Trace("Start invalidate dirty")
-        markDirtyDependencies ()
-        dirtyProjects.Clear()
-        logger.Trace("Finish invalidate dirty")
 
     do
         lifetime.Bracket(
@@ -233,20 +230,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     interface IFcsAssemblyReaderShim with
         member this.IsEnabled = isEnabled ()
 
-        member this.TryGetModuleReader(projectKey: FcsProjectKey) =
+        member this.TryGetOrCreateModuleReader(projectKey: FcsProjectKey) =
             locks.AssertWriteAccessAllowed()
 
             getOrCreateReaderFromModule projectKey
 
-        member this.InvalidateDirty() =
+        member this.InvalidateDirty(psiModule) =
             locks.AssertReadAccessAllowed()
 
-            invalidateDirty ()
-
-        member this.InvalidateDirty(psiModule) =
             tryGetReaderFromModule psiModule
             |> Option.iter (fun reader -> reader.UpdateTimestamp())
-            
 
         member this.TestDump =
             use cookie = ReadLockCookie.Create()
@@ -293,9 +286,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             builder.ToString()
 
         member this.IsKnownModule(psiModule: IPsiModule) =
+            locks.AssertReadAccessAllowed()
             assemblyReadersByModule.ContainsKey(psiModule)
 
         member this.IsKnownModule(path: VirtualFileSystemPath) =
+            locks.AssertReadAccessAllowed()
             assemblyReadersByPath.ContainsKey(path)
 
         member this.HasDirtyModules =
@@ -309,6 +304,16 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             if isKnownModule psiModule then
                 let projectKey = FcsProjectKey.Create(psiModule)
                 dirtyProjects.Add(projectKey) |> ignore
+
+        member this.MarkDirtyDependencies() =
+            locks.AssertReadAccessAllowed()
+
+            if lastSyncedWriteLockTimestamp <> locks.ContentModelLocks.WriteLockTimestamp then () else
+
+            lock this (fun _ ->
+                markDirtyDependencies ()
+                lastSyncedWriteLockTimestamp <- locks.ContentModelLocks.WriteLockTimestamp
+            )
 
     interface IChangeProvider with
         member this.Execute(map) =

@@ -96,27 +96,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         shim: IFcsAssemblyReaderShim, realReader: ILModuleReader option) =
     let locks = psiModule.GetPsiServices().Locks
 
-    let getSymbolScope () =
-        // todo: make it safe to cache symbol scope in R#
-        let symbolCache = psiModule.GetPsiServices().Symbols
-        symbolCache.GetSymbolScope(psiModule, false, true)
+    let mutable isDirty = false
 
     let locker = JetFastSemiReenterableRWLock()
 
-    let usingWriteLock () =
-        let mutable cookie = ValueNone
-
-        while cookie.IsNone do
-            if locker.TryAcquireWrite() then
-                cookie <- ValueSome(new ProjectFcsModuleReader.LocalReadWriteLockCookie(locker))
-            elif locks.IsReadAccessAllowed() then
-                FSharpAsyncUtil.ProcessEnqueuedReadRequests()
-
-        cookie.Value
-
     let mutable isInvalidating = false
-
-    let mutable isDirty = false
 
     /// The types that have already been checked in isUpToDate check 
     let mutable upToDateCheckedTypes = null
@@ -135,7 +119,25 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let typeDefs = ConcurrentDictionary<IClrTypeName, FcsTypeDef>() // todo: use non-concurrent, add locks
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
+    let getSymbolScope () =
+        // todo: make it safe to cache symbol scope in R#
+        let symbolCache = psiModule.GetPsiServices().Symbols
+        symbolCache.GetSymbolScope(psiModule, false, true)
+
+    let usingWriteLock () =
+        let mutable cookie = ValueNone
+
+        while cookie.IsNone do
+            if locker.TryAcquireWrite() then
+                cookie <- ValueSome(new ProjectFcsModuleReader.LocalReadWriteLockCookie(locker))
+            elif locks.IsReadAccessAllowed() then
+                FSharpAsyncUtil.ProcessEnqueuedReadRequests()
+
+        cookie.Value
+
     let readData f =
+        FSharpAsyncUtil.CheckAndThrow(locks)
+
         let logger = Logger.GetLogger<ProjectFcsModuleReader>()
 
         logger.Trace("readData: before UsingReadLockInsideFcs");
@@ -161,7 +163,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         // The whole FCS request could've been cancelled and the call above silently exited.
         // We need to throw the exception to make FCS handle it properly.
-        Cancellable.TryCheckAndThrow()
+        FSharpAsyncUtil.CheckAndThrow(locks)
         logger.Trace("readData: after CheckAndThrow");
 
     let isDll (project: IProject) (targetFrameworkId: TargetFrameworkId) =
@@ -1249,7 +1251,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 seenOutdatedTypes <- true
 
         for KeyValue(clrTypeName, fcsTypeDef) in List.ofSeq typeDefs do
-            Interruption.Current.CheckAndThrow()
+            FSharpAsyncUtil.CheckAndThrow(locks)
 
             if upToDateCheckedTypes.Contains(clrTypeName) then () else
 
@@ -1264,6 +1266,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         seenOutdatedTypes
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
+        FSharpAsyncUtil.CheckAndThrow(locks)
+
+        // Assertion.Assert(not isDirty)
+
         use lock = usingWriteLock ()
 
         match typeDefs.TryGetValue(clrTypeName) with
@@ -1349,6 +1355,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =
+            FSharpAsyncUtil.CheckAndThrow(locks)
+
             use lock = usingWriteLock ()
 
             match moduleDef with
@@ -1416,6 +1424,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member this.ILAssemblyRefs = []
 
         member this.Timestamp =
+            FSharpAsyncUtil.CheckAndThrow(locks)
+
             use lock = locker.UsingReadLock()
             timestamp
 

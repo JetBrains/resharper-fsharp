@@ -25,11 +25,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
 
-    /// <summary>
+    public static void CheckAndThrow(IShellLocks locks)
+    {
+      // If the FCS cancellation token is set, then this is FCS background analysis thread.
+      // Otherwise, it's a R# background thread doing something under read lock.
+      var isFcsThread = Cancellable.HasCancellationToken;
+      Assertion.Assert(isFcsThread || locks.IsReadAccessAllowed());
+
+      if (isFcsThread)
+        Cancellable.CheckAndThrow();
+      else
+        Interruption.Current.CheckAndThrow();
+    }
+
     /// Try to execute <paramref name="action"/> using read lock on the current thread.
     /// If not possible, queue a request to a thread calling FCS, possibly after a change on the main thread.
     /// When processing the request, the relevant psi module or declared element may already be removed and invalid.
-    /// </summary>
     public static void UsingReadLockInsideFcs(IShellLocks locks, Action action, Func<bool> upToDateCheck = null)
     {
       var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
