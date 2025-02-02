@@ -6,14 +6,14 @@ let f x =
     let g x = ()
     let x = fun y -> ()
     for x in [""] do ()
-    match 5 with x -> () 
+    match 5 with x||(0) -> () 
     { new IFormattable with
         member x.ToString(format, provider) = "" }
 
 fun x -> ()
 
 match 5 with
-| x when let y = 5 in true ->
+| x||(1) when let y = 5 in true ->
     let z = 3
     ()
 
@@ -46,3 +46,5 @@ type A(x) =
         res
 
 ---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int

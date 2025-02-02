@@ -10,6 +10,10 @@ module M1 =
         ()
     let _ = fun x 
     let _ = fun x -> ()
+    function | x
+    function | x -> ()
+    match 5 with x
+    match 5 with x -> () 
 
 module M2 =
     type A1(obj)

@@ -10,17 +10,21 @@ module M1 =
         ()
     let _ = fun x 
     let _ = fun x||(4) -> ()
+    function | x
+    function | x||(5) -> ()
+    match 5 with x
+    match 5 with x||(6) -> () 
 
 module M2 =
     type A1(obj)
-    type A2(obj||(5)) = class end
+    type A2(obj||(7)) = class end
 
 module M3 =
     type A() =
         new (x)
-        new (x||(6), y||(7)) = A()
+        new (x||(8), y||(9)) = A()
         member _.P1
-        member _.P2||(8) = 3
+        member _.P2||(10) = 3
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'a
@@ -28,7 +32,9 @@ module M3 =
 (2): ReSharper Parameter Name Hint: : int
 (3): ReSharper Parameter Name Hint: : char
 (4): ReSharper Parameter Name Hint: : 'a
-(5): ReSharper Parameter Name Hint: : obj
-(6): ReSharper Parameter Name Hint: : obj
+(5): ReSharper Parameter Name Hint: : 'a
+(6): ReSharper Parameter Name Hint: : int
 (7): ReSharper Parameter Name Hint: : obj
-(8): ReSharper Parameter Name Hint: : int 
+(8): ReSharper Parameter Name Hint: : obj
+(9): ReSharper Parameter Name Hint: : obj
+(10): ReSharper Parameter Name Hint: : int 
