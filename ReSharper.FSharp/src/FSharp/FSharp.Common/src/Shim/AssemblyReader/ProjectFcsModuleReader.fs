@@ -1261,7 +1261,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         isDirty <- false
         upToDateCheckedTypes <- null
-        seenOutdatedTypes
+        not seenOutdatedTypes
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
         FSharpAsyncUtil.CheckAndThrow()
