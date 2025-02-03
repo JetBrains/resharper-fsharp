@@ -1,6 +1,5 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.UnusedOpensUtil
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler.EditorServices
 open JetBrains.ReSharper.Plugins.FSharp
@@ -12,7 +11,7 @@ open JetBrains.Util
 
 let [<Literal>] opName = "UnusedOpensStageProcess"
 
-let getUnusedOpens (fsFile: IFSharpFile) (interruptChecker: Action): IOpenStatement[] =
+let getUnusedOpens (fsFile: IFSharpFile): IOpenStatement[] =
     let document = fsFile.GetSourceFile().Document
 
     let lines = Dictionary<int, string>()
@@ -28,7 +27,7 @@ let getUnusedOpens (fsFile: IFSharpFile) (interruptChecker: Action): IOpenStatem
     | Some results ->
 
     let checkResults = results.CheckResults
-    for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask(interruptChecker) do
+    for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask() do
         match fsFile.GetNode<IOpenStatement>(document, range) with
         | null -> ()
         | openDirective ->
