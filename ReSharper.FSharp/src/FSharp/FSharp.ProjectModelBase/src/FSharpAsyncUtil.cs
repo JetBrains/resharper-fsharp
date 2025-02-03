@@ -21,9 +21,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   {
     private const int InterruptCheckTimeout = 30;
 
-    private static readonly Action DefaultInterruptCheck =
-      () => Interruption.Current.CheckAndThrow();
-
     private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
 
     [Conditional("JET_MODE_ASSERT")]
@@ -34,9 +31,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       var isFcsThread = Cancellable.HasCancellationToken;
       Assertion.Assert(isFcsThread || Shell.Instance.Locks.IsReadAccessAllowed());
       if (isFcsThread)
-        Cancellable.CheckAndThrow();
+      {
+        try
+        {
+          Cancellable.CheckAndThrow();
+        }
+        catch (Exception e) when (e.IsOperationCanceled())
+        {
+          var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
+          var fcsTokenCancelled = Cancellable.Token.IsCancellationRequested;
+          logger.Trace($"Cancelled via Cancellable.CheckAndThrow, fcsToken.IsCancelled: {fcsTokenCancelled}");
+          throw;
+        }
+      }
       else
-        Interruption.Current.CheckAndThrow();
+      {
+        {
+          try
+          {
+            Interruption.Current.CheckAndThrow();
+          }
+          catch (Exception e) when (e.IsOperationCanceled())
+          {
+            var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
+            logger.Trace("Cancelled via Interruption.Current.CheckAndThrow()");
+            throw;
+          }
+        }
+
+      }
     }
 
     /// <summary>
@@ -52,13 +75,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       // where the last FCS request is initiated from inside reading the C# metadata,
       // and the initial request may get cancelled
       var fcsToken = Cancellable.HasCancellationToken ? Cancellable.Token : CancellationToken.None;
-      using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
 
       // Try to acquire read lock on the current thread.
       // It should be possible, unless there's a write lock request that prevents it.
-
       try
       {
+        // FCS token is the source for the cancellation
+        using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
         if (locks.TryExecuteWithReadLock(action))
         {
           logger.Trace("UsingReadLockInsideFcs: executed on the initial thread, returning");
@@ -69,9 +92,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       {
         logger.Trace("UsingReadLockInsideFcs: exception: the operation cancelled on the initial thread");
 
-        // The FCS request has originated from a R# thread, but was cancelled. We don't want to requeue this request.
+        // todo: what if this happens in F#->C#->F#?
         if (locks.IsReadAccessAllowed())
         {
+          // The FCS request has originated from a R# thread and was cancelled. We don't want to requeue this request.
+          // If the request is coming from FCS, it's cancelled below in the loop.
           logger.Trace("UsingReadLockInsideFcs: read lock was acquired before the request, rethrowing");
           throw;
         }
@@ -84,66 +109,55 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       }
 
       // Could not finish task under a read lock. Queue a request to be processed by a thread calling FCS.
+      // To ensure FCS metadata consistency, we retry cancelled requests in this loop.
+      // This may happen when R# read lock is cancelled, but the corresponding FCS request has not seen it yet.
+      // We check the FCS request cancellation separately via its cancellation token.
       logger.Trace("UsingReadLockInsideFcs: before the loop");
       while (true)
       {
-        // To ensure FCS metadata consistency, we retry cancelled requests in this loop.
-        // This may happen when R# read lock is cancelled, but the corresponding FCS request in not (yet).
-        // We should check the FCS request cancellation separately via its cancellation token.
-        if (Cancellable.HasCancellationToken && Cancellable.Token.IsCancellationRequested)
-        {
-          logger.Trace("UsingReadLockInsideFcs: FCS token is cancelled");
-          break;
-        }
+        CheckAndThrow();
 
-        logger.Trace("UsingReadLockInsideFcs: enqueueing request");
+        logger.Trace("UsingReadLockInsideFcs: enqueueing a new request");
         var tcs = new TaskCompletionSource<Unit>();
         ReadRequests.Enqueue(() =>
         {
-          logger.Trace("UsingReadLockInsideFcs: inside request lambda");
-          // Add interruption source from the captured token on the thread executing the task. 
-
-          // ReSharper disable once VariableHidesOuterVariable
-          using var _ = Interruption.Current.Add(new LifetimeInterruptionSource(fcsToken));
           try
           {
             logger.Trace("UsingReadLockInsideFcs: before action");
             action();
             logger.Trace("UsingReadLockInsideFcs: after action");
 
-            logger.Trace("UsingReadLockInsideFcs: setting result");
             tcs.SetResult(Unit.Instance);
           }
           catch (Exception e) when (e.IsOperationCanceled())
           {
-            logger.Trace("UsingReadLockInsideFcs: exception: cancelled, before tcs.SetCanceled");
             tcs.SetCanceled();
-            logger.Trace("UsingReadLockInsideFcs: exception: after tcs.SetCanceled, rethrowing");
-            throw;
+            logger.Trace("UsingReadLockInsideFcs: exception: cancelled");
           }
           catch (Exception e)
           {
-            logger.Trace("UsingReadLockInsideFcs: exception: before tcs.SetException");
             tcs.SetException(e);
+            logger.Trace("UsingReadLockInsideFcs: exception");
+            Logger.LogException(e);
           }
         });
-        logger.Trace("UsingReadLockInsideFcs: enqueued request");
 
         try
         {
           logger.Trace("UsingReadLockInsideFcs: before tcs.Task.Wait");
           tcs.Task.Wait();
-          logger.Trace("UsingReadLockInsideFcs: after tcs.Task.Wait");
+          logger.Trace("UsingReadLockInsideFcs: after tcs.Task.Wait, breaking");
           break;
         }
         catch (Exception e) when (e.IsOperationCanceled())
         {
-          logger.Trace("UsingReadLockInsideFcs: exception: cancelled");
+          logger.Trace("UsingReadLockInsideFcs: exception: cancelled, checking FCS token");
+          CheckAndThrow();
         }
-        catch (Exception e)
+        catch (Exception)
         {
           logger.Trace("UsingReadLockInsideFcs: exception");
-          Logger.LogException(e);
+          throw;
         }
       }
     }
@@ -179,14 +193,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     }
 
     [CanBeNull]
-    public static TResult RunAsTask<TResult>([NotNull] this FSharpAsync<TResult> async,
-      [CanBeNull] Action interruptChecker = null)
+    public static TResult RunAsTask<TResult>([NotNull] this FSharpAsync<TResult> async)
     {
       var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
 
-      interruptChecker ??= DefaultInterruptCheck;
-
-      using var cancellationSource = new CancellationSource();
+      using var cancellationSource = new FcsCancellationTokenSource();
 
       logger.Trace("RunAsTask: before StartAsTask");
       var task = FSharpAsync.StartAsTask(async, null, cancellationSource.Token);
@@ -209,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       logger.Trace("RunAsTask: before loop");
       while (!task.IsCompleted)
       {
-        interruptChecker();
+        CheckAndThrow();
 
         var action = ReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
         if (action != null)
@@ -227,12 +238,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       return task.Result;
     }
 
-    private class CancellationSource : IDisposable
+    /// Provides the token, depending on the request thread.
+    /// When the request is coming from an FCS thread, then its cancellation token is propagated to the new request.
+    /// Otherwise, and new lifetime definition (with a new token) is created. 
+    private class FcsCancellationTokenSource : IDisposable
     {
       [CanBeNull] private readonly LifetimeDefinition myLifetimeDefinition;
       public CancellationToken Token { get; }
 
-      public CancellationSource()
+      public FcsCancellationTokenSource()
       {
         if (Cancellable.HasCancellationToken)
         {

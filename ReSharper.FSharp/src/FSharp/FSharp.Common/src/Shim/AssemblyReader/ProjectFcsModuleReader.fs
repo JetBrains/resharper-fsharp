@@ -138,13 +138,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         logger.Trace("readData: before UsingReadLockInsideFcs");
         FSharpAsyncUtil.UsingReadLockInsideFcs(locks, (fun _ ->
-                FSharpAsyncUtil.CheckAndThrow()
                 locks.AssertReadAccessAllowed()
 
+                FSharpAsyncUtil.CheckAndThrow()
                 logger.Trace("readData: action: inside lambda");
 
                 use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
+                // Reading data on incomplete caches, e.g. when an assembly metadata is being imported.
+                // Resolve results may be incorrect.
+                // Mark this module dirty, so the data is invalidated before next FCS request. 
                 if not (psiModule.GetPsiServices().CachesState.IsIdle.Value) then
                     logger.Trace("readData: action: marking as dirty");
                     shim.MarkDirty(psiModule)
