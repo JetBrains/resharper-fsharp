@@ -46,19 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       }
       else
       {
-        {
-          try
-          {
-            Interruption.Current.CheckAndThrow();
-          }
-          catch (Exception e) when (e.IsOperationCanceled())
-          {
-            var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
-            logger.Trace("Cancelled via Interruption.Current.CheckAndThrow()");
-            throw;
-          }
-        }
-
+        Interruption.Current.CheckAndThrow();
       }
     }
 
@@ -92,11 +80,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       {
         logger.Trace("UsingReadLockInsideFcs: exception: the operation cancelled on the initial thread");
 
-        // todo: what if this happens in F#->C#->F#?
         if (locks.IsReadAccessAllowed())
         {
           // The FCS request has originated from a R# thread and was cancelled. We don't want to requeue this request.
           // If the request is coming from FCS, it's cancelled below in the loop.
+          // We could also check `Cancellable.HasCancellationToken` instead.
           logger.Trace("UsingReadLockInsideFcs: read lock was acquired before the request, rethrowing");
           throw;
         }
