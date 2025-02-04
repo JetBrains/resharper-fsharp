@@ -980,13 +980,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         // todo: make inner types computed on demand, needs an Fcs patch
         let result = List<ILPreTypeDef>()
 
-        let rec addTypes (ns: INamespace) =
-            for typeElement in ns.GetNestedTypeElements(symbolScope) do
-                result.Add(PreTypeDef(typeElement, reader))
-            for nestedNs in ns.GetNestedNamespaces(symbolScope) do
-                addTypes nestedNs
-
-        addTypes symbolScope.GlobalNamespace
+        for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
+            result.Add(PreTypeDef(typeElement, reader))
 
         result.ToArray()
 
