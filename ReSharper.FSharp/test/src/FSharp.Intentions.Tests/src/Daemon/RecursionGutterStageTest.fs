@@ -12,6 +12,7 @@ type RecursionGutterStageTest() =
         highlighting :? FSharpRecursionGutterHighlighting
 
     [<Test>] member x.``Expr - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Let 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Function - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Top 01``() = x.DoNamedTest()

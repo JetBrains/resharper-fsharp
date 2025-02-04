@@ -155,7 +155,7 @@ let isRecursiveApplication (declaredElement: IDeclaredElement) (refExpr: IRefere
     let decl = refExpr.GetContainingNode<IParameterOwnerMemberDeclaration>()
     isNotNull decl && declaredElement = decl.DeclaredElement
 
-let isInTailRecursivePosition (expr: IFSharpExpression) =
+let isInTailRecursivePosition (declaredElement: IDeclaredElement) (expr: IFSharpExpression) =
     let outermostExpr =
         let rec loop (expr: IFSharpExpression) =
             let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
@@ -167,7 +167,8 @@ let isInTailRecursivePosition (expr: IFSharpExpression) =
         let expr = expr.GetOutermostParentExpressionFromItsReturn()
         loop expr
 
-    isNotNull (ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens()))
+    let decl = ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens())
+    isNotNull decl && decl.DeclaredElement = declaredElement
 
 let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
     let sourceFile = context.GetSourceFile().NotNull()

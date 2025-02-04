@@ -103,7 +103,7 @@ type RecursiveInvocationAnalyzer() =
                             FSharpRecursionGutterHighlighting.CreatePartialRecursion(refExpr)
                     else
                         let appExpr = getOutermostPrefixAppExpr refExpr
-                        if FSharpResolveUtil.isInTailRecursivePosition appExpr then
+                        if FSharpResolveUtil.isInTailRecursivePosition context.DeclaredElement appExpr then
                             FSharpRecursionGutterHighlighting.CreateRecursion(refExpr) else
 
                         FSharpRecursionGutterHighlighting.CreateNonTailRecursion(refExpr)
@@ -125,5 +125,5 @@ type RecursiveInvocationAnalyzer() =
         decl.ProcessDescendants(processor, context)
 
     interface IConditionalElementProblemAnalyzer with
-        member this.ShouldRun(file, data) =
+        member this.ShouldRun(_, data) =
             data.GetDaemonProcessKind() = DaemonProcessKind.VISIBLE_DOCUMENT

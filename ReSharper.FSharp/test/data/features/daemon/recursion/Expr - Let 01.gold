@@ -1,0 +1,8 @@
+﻿module Module
+
+let f () =
+    let _ = |f|(0) ()
+    ()
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
