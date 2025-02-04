@@ -4,7 +4,6 @@ open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -95,7 +94,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let line = int fcsContext.Coords.Line + 1
 
             let isAttributeReferenceContext = context.IsInAttributeContext
-            let getAllSymbols () = getAllSymbols (checkResults, context.BasicContext.Solution)
+            let getAllSymbols () = getAllSymbols checkResults
 
             try
                 let itemLists =
@@ -125,11 +124,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
-    inherit FSharpLookupItemsProviderBase(logger, false, fun (checkResults, _) ->
+    inherit FSharpLookupItemsProviderBase(logger, false, (fun checkResults ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
             return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature }
-        getSymbolsAsync.RunAsTask())
+        getSymbolsAsync.RunAsTask()))
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)

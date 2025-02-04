@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.Util
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -106,14 +107,13 @@ type ImportRule() =
         let element = reference.GetElement()
         let psiServices = element.GetPsiServices()
         let solution = psiServices.Solution
-        let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
         let iconManager = solution.GetComponent<PsiIconManager>()
         let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
         let symbolScope = getSymbolScope context.PsiModule false
         let typeElements =
             symbolScope.GetAllTypeElementsGroupedByName()
-            |> Seq.filter (fun typeElement -> assemblyReaderShim.IsKnownModule(typeElement.Module)) 
+            |> Seq.filter (fun typeElement -> not (isFSharpProjectOrAssemblyModule typeElement.Module)) 
 
         // todo: try to use nodes from sandbox for better parser recovery
         let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
@@ -138,7 +138,6 @@ type ImportRule() =
                 item
                     .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
                     .WithRelevance(CLRLookupItemRelevance.NotImportedType)
-            collector.Add(item)
 
             collector.Add(item)
 
