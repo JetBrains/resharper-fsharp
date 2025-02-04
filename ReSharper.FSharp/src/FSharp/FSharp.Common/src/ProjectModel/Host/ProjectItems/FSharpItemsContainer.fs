@@ -133,7 +133,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         let shouldRemoveAssemblyInfo =
             match toolsetVersion with
             | null -> false
-            | version -> version.Major = 8
+            | version -> version.Major = 8 && version.Minor = 0 && version.Patch < 403
 
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
