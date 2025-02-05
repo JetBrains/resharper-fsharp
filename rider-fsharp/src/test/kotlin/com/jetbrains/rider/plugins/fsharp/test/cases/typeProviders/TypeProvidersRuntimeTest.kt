@@ -20,7 +20,7 @@ import org.testng.annotations.Test
 class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @Test
   @TestEnvironment(
-    sdkVersion = SdkVersion.DOT_NET_CORE_3_1,
+    sdkVersion = SdkVersion.LATEST_STABLE,
     buildTool = BuildTool.FULL,
     platform = [PlatformType.WINDOWS_ALL]
   )
@@ -48,7 +48,7 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   fun net9() = doTest(".NET 9")
 
   @Mute("RIDER-103648")
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("FscTypeProviderLibrary")
   fun fsc() = doTest(".NET Framework 4.8")
 

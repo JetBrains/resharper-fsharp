@@ -24,7 +24,7 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Solution("TypeProviderLibrary")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 

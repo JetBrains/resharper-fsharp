@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Solution("TypeProviderLibrary")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
 class TypeProvidersSettingTest : BaseTypeProvidersTest() {
   @Test
   fun disabledTypeProvidersSetting() {
