@@ -19,7 +19,7 @@ import org.testng.annotations.Test
 import java.time.Duration
 
 @Solution("TypeProviderLibrary")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.FULL)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
