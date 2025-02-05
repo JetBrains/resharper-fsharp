@@ -1,5 +1,5 @@
 module Module
 
-let f () =
+let rec f () =
     let _ = f ()
     ()
