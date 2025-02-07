@@ -9,11 +9,11 @@
     Navigation result:
       opened file: Enum.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public abstract class |CARET|Enum : ValueType, IComparable, IFormattable, IConvertible
-        {
-          private static readonly char[] enumSeperatorCharArray = new char[1]
+      [__DynamicallyInvokable]
+      [Serializable]
+      public abstract class |CARET|Enum : ValueType, IComparable, IFormattable, IConvertible
+      {
+        private static readonly char[] enumSeperatorCharArray = new char[1]
       ------------------
 
     DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -25,11 +25,11 @@
     Navigation result:
       opened file: IComparable.cs
       ------------------
-        [ComVisible(true)]
+      [ComVisible(true)]
+      [__DynamicallyInvokable]
+      public interface |CARET|IComparable
+      {
         [__DynamicallyInvokable]
-        public interface |CARET|IComparable
-        {
-          [__DynamicallyInvokable]
       ------------------
 
     DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -41,11 +41,11 @@
     Navigation result:
       opened file: IConvertible.cs
       ------------------
-        [CLSCompliant(false)]
+      [CLSCompliant(false)]
+      [__DynamicallyInvokable]
+      public interface |CARET|IConvertible
+      {
         [__DynamicallyInvokable]
-        public interface |CARET|IConvertible
-        {
-          [__DynamicallyInvokable]
       ------------------
 
     DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -57,11 +57,11 @@
     Navigation result:
       opened file: IFormattable.cs
       ------------------
-        [ComVisible(true)]
+      [ComVisible(true)]
+      [__DynamicallyInvokable]
+      public interface |CARET|IFormattable
+      {
         [__DynamicallyInvokable]
-        public interface |CARET|IFormattable
-        {
-          [__DynamicallyInvokable]
       ------------------
 
     DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -73,11 +73,11 @@
     Navigation result:
       opened file: ValueType.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public abstract class |CARET|ValueType
-        {
-          [SecuritySafeCritical]
+      [__DynamicallyInvokable]
+      [Serializable]
+      public abstract class |CARET|ValueType
+      {
+        [SecuritySafeCritical]
       ------------------
 
 

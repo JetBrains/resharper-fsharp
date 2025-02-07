@@ -4,11 +4,11 @@
     Navigation result:
       opened file: Int32.cs
       ------------------
+      [__DynamicallyInvokable]
+      [Serializable]
+      public struct |CARET|Int32 : IComparable, IFormattable, IConvertible, IComparable<int>, IEquatable<int>
+      {
         [__DynamicallyInvokable]
-        [Serializable]
-        public struct |CARET|Int32 : IComparable, IFormattable, IConvertible, IComparable<int>, IEquatable<int>
-        {
-          [__DynamicallyInvokable]
       ------------------
 
 
