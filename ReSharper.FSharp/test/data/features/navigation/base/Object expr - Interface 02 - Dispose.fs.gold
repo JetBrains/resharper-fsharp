@@ -4,11 +4,11 @@
     Navigation result:
       opened file: IDisposable.cs
       ------------------
-        {
-          [__DynamicallyInvokable]
-          void |CARET|Dispose();
-        }
+      {
+        [__DynamicallyInvokable]
+        void |CARET|Dispose();
       }
+
       ------------------
 
 

@@ -4,11 +4,11 @@
     Navigation result:
       opened file: IDisposable.cs
       ------------------
-        [ComVisible(true)]
+      [ComVisible(true)]
+      [__DynamicallyInvokable]
+      public interface |CARET|IDisposable
+      {
         [__DynamicallyInvokable]
-        public interface |CARET|IDisposable
-        {
-          [__DynamicallyInvokable]
       ------------------
 
 

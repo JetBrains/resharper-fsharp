@@ -9,11 +9,11 @@
     Navigation result:
       opened file: _Exception.cs
       ------------------
-        [InterfaceType(ComInterfaceType.InterfaceIsDual)]
-        [CLSCompliant(false)]
-        public interface |CARET|_Exception
-        {
-          string ToString();
+      [InterfaceType(ComInterfaceType.InterfaceIsDual)]
+      [CLSCompliant(false)]
+      public interface |CARET|_Exception
+      {
+        string ToString();
       ------------------
 
     [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -25,11 +25,11 @@
     Navigation result:
       opened file: Exception.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public class |CARET|Exception : ISerializable, _Exception
-        {
-          [OptionalField]
+      [__DynamicallyInvokable]
+      [Serializable]
+      public class |CARET|Exception : ISerializable, _Exception
+      {
+        [OptionalField]
       ------------------
 
     DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -41,11 +41,11 @@
     Navigation result:
       opened file: ISerializable.cs
       ------------------
+
+      [ComVisible(true)]
+      public interface |CARET|ISerializable
       {
-        [ComVisible(true)]
-        public interface |CARET|ISerializable
-        {
-          [SecurityCritical]
+        [SecurityCritical]
       ------------------
 
     [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
@@ -57,11 +57,11 @@
     Navigation result:
       opened file: IStructuralEquatable.cs
       ------------------
+
+      [__DynamicallyInvokable]
+      public interface |CARET|IStructuralEquatable
       {
         [__DynamicallyInvokable]
-        public interface |CARET|IStructuralEquatable
-        {
-          [__DynamicallyInvokable]
       ------------------
 
 

@@ -10,10 +10,10 @@
       opened file: Object.cs
       ------------------
 
-          [__DynamicallyInvokable]
-          public virtual string |CARET|ToString() => this.GetType().ToString();
+        [__DynamicallyInvokable]
+        public virtual string |CARET|ToString() => this.GetType().ToString();
 
-          [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
+        [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
       ------------------
 
     DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IMemberSignatureOrDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
