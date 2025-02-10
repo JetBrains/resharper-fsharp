@@ -48,9 +48,6 @@ type FSharpOptions =
       [<SettingsEntry(true, nonFSharpProjectInMemoryReferences); DefaultValue>]
       mutable NonFSharpProjectInMemoryReferences: bool
 
-      [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
-      mutable EnableOutOfScopeCompletion: bool
-
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
       mutable TopLevelOpenCompletion: bool }
 
@@ -204,7 +201,6 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
     do
         this.AddHeader("Imports")
-        this.AddBoolOption((fun key -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null) |> ignore
         this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
 
         this.AddHeader("Script editing")

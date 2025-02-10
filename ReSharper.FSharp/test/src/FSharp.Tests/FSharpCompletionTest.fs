@@ -220,7 +220,7 @@ type FSharpCompletionTest() =
 
     [<Test; Explicit("243")>] member x.``Import - Same project 01``() = x.DoNamedTest()
 
-    [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
+    [<Explicit "Reuse the common setting">]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Same ns 01``() = x.DoTestFiles("File1.fs", "File2.fs")

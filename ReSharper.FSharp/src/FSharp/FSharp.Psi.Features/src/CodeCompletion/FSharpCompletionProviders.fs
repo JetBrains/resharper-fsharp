@@ -4,7 +4,6 @@ open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -79,7 +78,6 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         match context.BasicContext.File, context.GetCheckResults(opName) with
         | :? IFSharpFile as fsFile, Some checkResults ->
             let settings = basicContext.ContextBoundSettingsStore
-            let addImportItems = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
 
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes
@@ -95,7 +93,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let line = int fcsContext.Coords.Line + 1
 
             let isAttributeReferenceContext = context.IsInAttributeContext
-            let getAllSymbols () = getAllSymbols (checkResults, context.BasicContext.Solution)
+            let getAllSymbols () = getAllSymbols checkResults
 
             try
                 let itemLists =
@@ -104,8 +102,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
                 for list in itemLists do
                     if list.Name = ".. .." then () else
-                    let resolved = list.NamespaceToOpen.IsEmpty()
-                    if (not addImportItems) && not resolved || filterResolved && resolved then () else
+                    if filterResolved && list.NamespaceToOpen.IsEmpty() then () else
                     if skipFsiModules && isFsiModuleToSkip list then () else
 
                     let lookupItem = FcsLookupItem(list, context)
@@ -125,11 +122,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
-    inherit FSharpLookupItemsProviderBase(logger, false, fun (checkResults, _) ->
+    inherit FSharpLookupItemsProviderBase(logger, false, (fun checkResults ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
             return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature }
-        getSymbolsAsync.RunAsTask())
+        getSymbolsAsync.RunAsTask()))
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)
@@ -163,12 +160,7 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
     inherit FSharpLookupItemsProviderBase(logger, true, assemblyContentProvider.GetLibrariesEntities)
 
     interface ICodeCompletionItemsProvider with
-        member x.IsAvailable(context) =
-            let settings = context.BasicContext.ContextBoundSettingsStore
-            let enabled = settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion)
-
-            if enabled then base.IsAvailable(context) else null
-
+        member x.IsAvailable(context) = base.IsAvailable(context)
         member x.GetDefaultRanges(context) = base.GetDefaultRanges(context)
         member x.AddLookupItems(context, collector, _) =
             let basicContext = context.BasicContext

@@ -28,6 +28,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
@@ -51,6 +52,10 @@ module FcsProjectProvider =
 
     let isFSharpProjectModule (psiModule: IPsiModule) =
         isFSharpProject psiModule.ContainingProjectModule
+
+    let isFSharpProjectOrAssemblyModule psiModule =
+        isFSharpProjectModule psiModule ||
+        isFSharpAssembly psiModule
 
     let [<Literal>] invalidateProjectChangeType =
         ProjectModelChangeType.PROPERTIES |||
