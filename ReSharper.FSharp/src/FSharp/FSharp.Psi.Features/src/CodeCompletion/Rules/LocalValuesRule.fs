@@ -169,7 +169,7 @@ type LocalValuesRule() =
                 if isNull fcsSymbolUse then null else
 
                 match getReturnType fcsSymbolUse.Symbol with
-                | Some t -> RichText(t.Format(fcsSymbolUse.DisplayContext))
+                | Some t -> RichText(t.Format(fcsSymbolUse.DisplayContext.WithShortTypeNames(true)))
                 | _ -> null
 
             collector.Add(item)

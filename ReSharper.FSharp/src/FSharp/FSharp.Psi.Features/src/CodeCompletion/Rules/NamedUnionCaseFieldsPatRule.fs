@@ -35,7 +35,7 @@ type NamedUnionCaseFieldsPatRule() =
         let fcsUnionCase = referenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase then None else
 
-        let displayContext = referenceName.Reference.GetSymbolUse().DisplayContext
+        let displayContext = referenceName.Reference.GetSymbolUse().DisplayContext.WithShortTypeNames(true)
         let fieldNames =
             fcsUnionCase.Fields
             |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format(displayContext)))

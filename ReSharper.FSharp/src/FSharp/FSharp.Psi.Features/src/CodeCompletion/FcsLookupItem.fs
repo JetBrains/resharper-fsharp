@@ -111,7 +111,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisplayTypeName =
         try
             match getReturnType x.FcsSymbol with
-            | Some t -> RichText(t.Format(x.FcsSymbolUse.DisplayContext))
+            | Some t -> RichText(t.Format(x.FcsSymbolUse.DisplayContext.WithShortTypeNames(true)))
             | _ -> null
         with _ -> null
 

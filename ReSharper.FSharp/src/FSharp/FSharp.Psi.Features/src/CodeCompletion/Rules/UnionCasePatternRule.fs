@@ -255,7 +255,7 @@ type UnionCasePatternRule() =
                 if not (matchesType returnType || isFSharpList returnType) then
                     let text = fcsUnionCase.Name
                     let fcsEntityInstance = FcsEntityInstance.create returnType
-                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext
+                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext.WithShortTypeNames(true)
                     let item = createUnionCaseItem fcsEntityInstance returnType displayContext text fcsUnionCase false
                     unionCaseItems.Add(item)
 
@@ -285,6 +285,7 @@ type UnionCasePatternRule() =
             let typeName = expectedTypeElement.GetSourceName()
 
             if fcsEntity.IsFSharpUnion then
+                let displayContext = displayContext.WithShortTypeNames(true)
                 let requiresQualifiedName = expectedTypeElement.RequiresQualifiedAccess()
                 for fcsUnionCase in fcsEntity.UnionCases do
                     let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
