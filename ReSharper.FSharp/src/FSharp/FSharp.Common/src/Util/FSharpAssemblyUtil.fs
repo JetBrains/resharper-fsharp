@@ -1,13 +1,12 @@
 [<Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
+open JetBrains.Application.Threading
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.dataStructures
 
@@ -39,16 +38,17 @@ let isFSharpAssembly (psiModule: IPsiModule) =
     | :? IProject -> false
     | _ ->
 
-    match psiModule.GetData(isFSharpAssemblyKey) with
-    | null ->
-        use cookie = ReadLockCookie.Create()
-        let attrs = psiModule.GetPsiServices().Symbols.GetModuleAttributes(psiModule)
-        let isFSharpAssembly = attrs.HasAttributeInstance(interfaceDataVersionAttrTypeName, false)
+    let value =
+        psiModule.GetOrCreateDataUnderLock(isFSharpAssemblyKey, fun _ ->
+            let psiServices = psiModule.GetPsiServices()
 
-        psiModule.PutData(isFSharpAssemblyKey, if isFSharpAssembly then BooleanBoxes.True else BooleanBoxes.False)
-        isFSharpAssembly
+            psiServices.Locks.AssertReadAccessAllowed()
+            let attrs = psiServices.Symbols.GetModuleAttributes(psiModule)
+            let isFSharpAssembly = attrs.HasAttributeInstance(interfaceDataVersionAttrTypeName, false)
+            if isFSharpAssembly then BooleanBoxes.True else BooleanBoxes.False
+        )
 
-    | value -> value == BooleanBoxes.True
+    value == BooleanBoxes.True
 
 [<Extension; CompiledName("IsFromFSharpAssembly")>]
 let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =

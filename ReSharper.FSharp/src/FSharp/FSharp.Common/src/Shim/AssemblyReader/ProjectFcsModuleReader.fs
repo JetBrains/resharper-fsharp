@@ -26,7 +26,6 @@ open JetBrains.ReSharper.Psi.Impl.Types
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.DataStructures
@@ -1216,6 +1215,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     /// Checks if any external change has lead to a metadata change,
     /// e.g. a super type resolves to a different thing.
     let isUpToDate reader =
+        locks.AssertReadAccessAllowed()
         use lock = usingWriteLock ()
 
         if not isDirty then true else
@@ -1224,7 +1224,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             upToDateCheckedTypes <- HashSet()
             seenOutdatedTypes <- false
 
-        use cookie = ReadLockCookie.Create()
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
         match moduleDef with

@@ -92,11 +92,6 @@ module IgnoreAll =
     let ignoreAll = IgnoreAllBuilder()
 
 
-namespace JetBrains.ReSharper.Resources.Shell
-
-type ReadLockCookie = NonCSharpInteropReadLockCookie
-
-
 namespace JetBrains.ReSharper.Plugins.FSharp
 
 open JetBrains.Annotations

@@ -207,7 +207,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
             getOrCreateReaderFromModule projectKey
 
         member this.TestDump =
-            use cookie = ReadLockCookie.Create()
+            use cookie = NonCSharpInteropReadLockCookie.Create()
 
             if not (isEnabled ()) then "Shim is disabled" else
 
