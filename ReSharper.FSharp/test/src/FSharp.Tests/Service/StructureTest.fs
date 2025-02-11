@@ -24,6 +24,8 @@ type FSharpStructureTest() =
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Record 01``() = x.DoNamedTest()
 

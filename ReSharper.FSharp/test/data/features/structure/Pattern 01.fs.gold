@@ -1,0 +1,7 @@
+﻿File: Pattern 01.fs
+ Module
+  a : int
+  b : int
+  c : int
+  d : object
+  e() : void
