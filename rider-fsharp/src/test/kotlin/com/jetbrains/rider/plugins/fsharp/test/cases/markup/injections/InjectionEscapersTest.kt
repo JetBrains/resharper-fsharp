@@ -23,7 +23,7 @@ import org.testng.annotations.Test
 
 @Test
 @Solution("CoreConsoleApp")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class InjectionEscapersTest : PerTestSolutionTestBase() {
   private fun doTest(action: (EditorImpl, EditorImpl) -> Unit) {
     withOpenedEditor("Program.fs", "Program.fs") {

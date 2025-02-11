@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
 @Solution("ReferencesOrder")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class ReferencesOrder : PerTestSolutionTestBase() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
     params.waitForCaches = true

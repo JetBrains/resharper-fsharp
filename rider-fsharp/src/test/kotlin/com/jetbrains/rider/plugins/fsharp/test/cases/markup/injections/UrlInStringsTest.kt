@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class UrlInStringsTest : BaseTestWithMarkup() {
   private fun doTest() {

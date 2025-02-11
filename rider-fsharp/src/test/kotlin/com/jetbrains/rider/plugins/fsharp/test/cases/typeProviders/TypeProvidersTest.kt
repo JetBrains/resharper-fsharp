@@ -36,7 +36,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   @TestEnvironment(
-    sdkVersion = SdkVersion.DOT_NET_6,
+    sdkVersion = SdkVersion.LATEST_STABLE,
     buildTool = BuildTool.SDK
   )
   @Solution("CsvTypeProvider")
@@ -44,7 +44,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
 
   @Test(description = "RIDER-101544")
   @TestEnvironment(
-    sdkVersion = SdkVersion.DOT_NET_6,
+    sdkVersion = SdkVersion.LATEST_STABLE,
     buildTool = BuildTool.SDK
   )
   @Solution("SwaggerProviderCSharp")

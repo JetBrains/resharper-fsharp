@@ -14,7 +14,7 @@ import org.testng.annotations.Test
 import java.time.Duration
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class TypeProvidersFeaturesTest : EditorTestBase() {
   override val testSolution = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
