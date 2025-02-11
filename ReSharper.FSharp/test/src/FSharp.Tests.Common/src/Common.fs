@@ -373,7 +373,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetAllReferencedModules() = failwith "todo"
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
         fsOptionsProvider, symbolCache, solution, locks, logger) =
