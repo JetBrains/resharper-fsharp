@@ -32,22 +32,52 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util.Extension
 
+[<RequireQualifiedAccess>]
 module ImportInfo =
     let [<Literal>] Id = "Import rule"
 
+    let getDescription (context: FSharpCodeCompletionContext) typeElement memberName useExprRules =
+        let typeNames = toSourceNameList typeElement
+        let names = typeNames @ Option.toList memberName
+        let treeNode = context.NodeInFile.As<IFSharpTreeNode>()
+        if isNull treeNode then null else
 
-type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text) =
+        let sourceFile = treeNode.GetSourceFile()
+        let offset = context.BasicContext.CaretDocumentOffset
+        let coords = offset.ToDocumentCoords()
+        match treeNode.CheckerService.ResolveNameAtLocation(sourceFile, names, coords, useExprRules, "ImportModuleMemberInfo.GetDescription") with
+        | None -> null
+        | Some fcsSymbolUse ->
+
+        match treeNode.FSharpFile.GetParseAndCheckResults(true, "ImportModuleMemberInfo.GetDescription") with
+        | None -> null
+        | Some { CheckResults = checkResults } ->
+
+        let _, range = treeNode.TryGetFcsRange()
+        let description = checkResults.GetDescription(fcsSymbolUse.Symbol, [], false, range)
+        description
+        |> FcsLookupCandidate.getOverloads
+        |> List.tryHead
+        |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule)
+        |> Option.defaultValue null
+
+
+type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text, context: FSharpCodeCompletionContext) =
     inherit TextualInfo(text, text)
 
-    new (declaredElement: IClrDeclaredElement, text) =
+    new (declaredElement: IClrDeclaredElement, text, context: FSharpCodeCompletionContext) =
         let elementPointer = declaredElement.CreateElementPointer()
-        ImportDeclaredElementInfo(elementPointer, text)
+        ImportDeclaredElementInfo(elementPointer, text, context)
 
     member this.DeclaredElement =
         declaredElementPointer.FindDeclaredElement()
 
     override this.MakeSafe(text) =
         FSharpNamingService.mangleNameIfNecessary text
+
+    interface IDescriptionProvidingLookupItem with
+        member this.GetDescription() =
+            ImportInfo.getDescription context this.DeclaredElement None false
 
 
 type ImportDeclaredElementBehavior(info: ImportDeclaredElementInfo) =
@@ -145,7 +175,7 @@ type ImportRule() =
 
             if name = prevTypeName then prevTypeName else
 
-            let info = ImportDeclaredElementInfo(typeElement, name, Ranges = context.Ranges)
+            let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
             let item =
                 // todo: allow calculating icon extensions (now disabled because of the slow unit test icons)
                 let icon = iconManager.GetImage(typeElement, context.Language, false)

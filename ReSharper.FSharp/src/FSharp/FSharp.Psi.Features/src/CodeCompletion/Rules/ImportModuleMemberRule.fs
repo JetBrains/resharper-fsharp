@@ -38,26 +38,7 @@ type ImportModuleMemberInfo(typeElement: ITypeElement, name: string, context: FS
 
     interface IDescriptionProvidingLookupItem with
         member this.GetDescription() =
-            let typeNames = toSourceNameList typeElement
-            let names = typeNames @ [name]
-            let treeNode = context.NodeInFile.As<IFSharpTreeNode>()
-            if isNull treeNode then null else
-
-            match treeNode.CheckerService.ResolveNameAtLocation(treeNode, names, true, "ImportModuleMemberInfo.GetDescription") with
-            | None -> null
-            | Some fcsSymbolUse ->
-
-            match treeNode.FSharpFile.GetParseAndCheckResults(true, "ImportModuleMemberInfo.GetDescription") with
-            | None -> null
-            | Some { CheckResults = checkResults } ->
-
-            let _, range = treeNode.TryGetFcsRange()
-            let description = checkResults.GetDescription(fcsSymbolUse.Symbol, [], false, range)
-            description
-            |> FcsLookupCandidate.getOverloads
-            |> List.tryHead
-            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule)
-            |> Option.defaultValue null
+            ImportInfo.getDescription context typeElement (Some name) true
 
 type ImportModuleMemberBehavior(info: ImportModuleMemberInfo) =
     inherit TextualBehavior<ImportModuleMemberInfo>(info)

@@ -71,7 +71,7 @@ type ImportExtensionMemberRule() =
             // todo: use all candidates for signatures
             let typeMember = typeMembers |> Seq.head
 
-            let info = ImportDeclaredElementInfo(typeMember, name, Ranges = context.Ranges)
+            let info = ImportDeclaredElementInfo(typeMember, name, context, Ranges = context.Ranges)
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
