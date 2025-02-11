@@ -18,7 +18,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -45,18 +44,18 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         settingsStore: ISettingsStore, locks: IShellLocks) =
 
     let checker =
-        Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-
-        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-
-        let getSettingProperty name =
-            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
-
-        let skipImpl = getSettingProperty "SkipImplementationAnalysis"
-        let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
-
         lazy
+            Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
+
+            let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
+            let getSettingProperty name =
+                let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+                settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
+
+            let skipImpl = getSettingProperty "SkipImplementationAnalysis"
+            let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
+
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
@@ -72,7 +71,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 checker.Value.InvalidateAll())
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
-    member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
 

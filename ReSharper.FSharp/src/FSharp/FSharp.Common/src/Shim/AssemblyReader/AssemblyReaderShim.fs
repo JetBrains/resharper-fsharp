@@ -67,7 +67,7 @@ module AssemblyReaderShim =
 
 // todo: support script -> project references
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiModules: IPsiModules,
         cache: FcsModuleReaderCommonCache, assemblyInfoShim: AssemblyInfoShim,
         fsOptionsProvider: FSharpOptionsProvider, symbolCache: ISymbolCache, solution: ISolution,
@@ -88,9 +88,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     do
         // The shim is injected to get the expected shim shadowing chain, it's expected to be unused.
         assemblyInfoShim |> ignore
-
-        changeManager.RegisterChangeProvider(lifetime, this)
-        changeManager.AddDependency(lifetime, this, psiModules)
 
     let isEnabled () =
         fsOptionsProvider.NonFSharpProjectInMemoryReferences ||
@@ -298,3 +295,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 | _ -> ()
 
             null
+
+    interface ISolutionChangeProvider<IPsiModules> with
+        member this.Lifetime = lifetime

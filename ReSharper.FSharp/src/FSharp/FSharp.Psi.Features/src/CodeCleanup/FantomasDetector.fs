@@ -40,7 +40,7 @@ type FantomasDiagnosticNotification =
       Location: FantomasLocation
       FallbackLocation: FantomasLocation }
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadUnsafe)>]
 type FantomasDetector(lifetime, fantomasSettingsProvider: FSharpFantomasSettingsProvider,
         dotnetToolsTracker: SolutionDotnetToolsTracker) =
     let [<Literal>] fantomasToolPackageId = "fantomas-tool"

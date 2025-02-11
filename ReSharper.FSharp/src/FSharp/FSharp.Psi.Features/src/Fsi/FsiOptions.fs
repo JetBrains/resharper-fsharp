@@ -94,7 +94,7 @@ type FsiOptions =
       mutable UseLanguageVersionFromScriptOptions: bool }
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FsiOptionsProvider(lifetime, settings, settingsSchema, shellLocks: IShellLocks) =
     inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema, shellLocks)
 

@@ -12,19 +12,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpMsBuildUtils
 open JetBrains.ReSharper.Psi
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FcsCheckerService,
-        fsFileService: IFSharpFileService) =
+type FSharpProjectFileLanguageService(projectFileType, fsFileService: IFSharpFileService) =
     inherit ProjectFileLanguageService(projectFileType)
 
     override x.Icon = ProjectModelThemedIcons.Fsharp.Id
     override x.PsiLanguageType = FSharpLanguage.Instance :> _
 
-    override x.GetMixedLexerFactory(_, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
+    override x.GetMixedLexerFactory(solution, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
         match sourceFile with
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
         | _ ->
 
-        let defines = fsCheckerService.FcsProjectProvider.GetParsingOptions(sourceFile).ConditionalDefines
+        let defines = solution.GetComponent<IFcsProjectProvider>().GetParsingOptions(sourceFile).ConditionalDefines
         FSharpPreprocessedLexerFactory(defines) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
@@ -39,14 +38,14 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FcsChec
 
 
 [<ProjectFileType(typeof<FSharpSignatureProjectFileType>)>]
-type FSharpSignatureProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService) =
-    inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
+type FSharpSignatureProjectFileLanguageService(projectFileType, fsFileService) =
+    inherit FSharpProjectFileLanguageService(projectFileType, fsFileService)
 
     override this.Icon = ProjectModelThemedIcons.FsharpSignature.Id
 
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
-type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService) =
-    inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
+type FSharpScriptProjectFileLanguageService(projectFileType, fsFileService) =
+    inherit FSharpProjectFileLanguageService(projectFileType, fsFileService)
 
     override this.Icon = ProjectModelThemedIcons.FsharpScript.Id

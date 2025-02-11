@@ -151,7 +151,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution: ISolution, settings,
     member val TryRecoverFcsProjects = base.GetValueProperty<bool>("TryRecoverFcsProjects")
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpOptionsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpOptions>(lifetime, solution, settings, settingsSchema)
 
@@ -162,7 +162,7 @@ type FSharpOptionsProvider(lifetime, solution: ISolution, settings, settingsSche
         this.NonFSharpProjectInMemoryReferences <-
             base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpFantomasSettingsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
 

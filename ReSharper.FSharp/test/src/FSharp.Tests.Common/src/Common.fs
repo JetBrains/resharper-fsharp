@@ -233,8 +233,8 @@ type AssertCorrectTreeStructureAttribute() =
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
-    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
+type TestFSharpResolvedSymbolsCache(lifetime, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
+    inherit FcsResolvedSymbolsCache(lifetime, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
         x.ProjectSymbolsCaches.Clear()

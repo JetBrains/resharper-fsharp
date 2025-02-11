@@ -3,10 +3,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.IO
+open System.Threading.Tasks
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Components
 open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
@@ -73,7 +75,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider,
         fsFileService: IFSharpFileService, fsItemsContainer: IFSharpItemsContainer,
-        locks: IShellLocks, logger: ILogger, fcsAssemblyReaderShim: IFcsAssemblyReaderShim, psiModules: IPsiModules,
+        locks: IShellLocks, logger: ILogger, fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>, psiModules: IPsiModules,
         moduleReferencesResolveStore: IModuleReferencesResolveStore) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
@@ -261,8 +263,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                             let path = referencedFcsProject.OutputPath.FullPath
                             Some(FSharpReferencedProject.FSharpReference(path, referencedFcsProject.ProjectOptions))
 
-                        elif fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
-                            fcsAssemblyReaderShim.TryGetModuleReader(referencedProjectKey)
+                        elif fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
+                            fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey)
                             |> Option.map (fun reader ->
                                 let getTimestamp () = reader.Timestamp
                                 let getReader () = reader :> ILModuleReader
@@ -600,17 +602,18 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             FSharpAsyncUtil.ProcessEnqueuedReadRequests()
             logger.Trace("Finish processing FCS requests")
 
-            fcsAssemblyReaderShim.PrepareForFcsRequest(fcsProject)
+            fcsAssemblyReaderShim.Value.PrepareForFcsRequest(fcsProject)
 
 
 /// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built
 /// which makes FCS cached resolve results stale
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
-        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler,
-        typeProvidersShim: IProxyExtensionTypingProvider, fcsAssemblyReaderShim: IFcsAssemblyReaderShim) =
-    do
-        scheduler.EnqueueTask(SolutionLoadTask(typeof<OutputAssemblyChangeInvalidator>, "FcsProjectProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
+        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, typeProvidersShim: IProxyExtensionTypingProvider,
+        fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>) =
+
+    interface ISolutionLoadTasksStartPsiListener with
+        member this.OnSolutionLoadStartPsiAsync(_, _) =
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
                 // No FCS caches to invalidate.
@@ -620,7 +623,7 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
                 if project.IsFSharp && not (typeProvidersShim.HasGenerativeTypeProviders(project)) then () else
 
                 // The project change is visible to FCS without build.
-                if fcsAssemblyReaderShim.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
+                if fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject project then () else
 
                 if fcsProjectProvider.InvalidateReferencesToProject(project) then
                     // Drop cached values.
@@ -629,4 +632,5 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
                     // Request files re-highlighting.
                     daemon.Invalidate($"Project {project.Name} contains F# generative type providers")
             )
-        ))
+
+            Task.CompletedTask

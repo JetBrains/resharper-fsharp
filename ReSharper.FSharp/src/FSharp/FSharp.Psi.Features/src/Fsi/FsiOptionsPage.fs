@@ -4,6 +4,8 @@ open System
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Components
+open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.Application.UI.Controls.FileSystem
 open JetBrains.Application.UI.Options
@@ -26,7 +28,7 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
-type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: FsiDetector,
+type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSchema, fsiDetector: ILazy<FsiDetector>,
         [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution, dialogs: ICommonFileDialogs,
         iconHost: IconHostBase, shellLocks: IShellLocks) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
@@ -37,23 +39,23 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
     let fsiOptions = FsiOptionsProvider(lifetime, settings, settingsSchema, shellLocks)
 
-    let tools = fsiDetector.GetFsiTools(solution)
+    let tools = fsiDetector.Value.GetFsiTools(solution)
     let autoDetectAllowed = tools.Length > 1
 
     let autoDetect =
         if autoDetectAllowed then fsiOptions.AutoDetect else
-        new Property<bool>(lifetime, "FsiNoAutoDetect", false) :> _
+        new Property<bool>("FsiNoAutoDetect", false) :> _
 
     let getActiveTool () =
         if fsiOptions.IsCustomTool.Value || not autoDetectAllowed then customTool else
-        fsiDetector.GetActiveTool(solution, fsiOptions)
+        fsiDetector.Value.GetActiveTool(solution, fsiOptions)
 
     let parsedPath = fsiOptions.FsiPathAsPath
     let fsiTool = if autoDetect.Value then tools[0] else getActiveTool ()
 
     let initialPath = if fsiTool.IsCustom then parsedPath else fsiTool.GetFsiPath(fsiOptions.UseAnyCpu.Value)
-    let fsiPath = new Property<_>(lifetime, "FsiExePath", initialPath)
-    let fsiTool = new Property<obj>(lifetime, "CurrentFsiTool", fsiTool)
+    let fsiPath = new Property<_>("FsiExePath", initialPath)
+    let fsiTool = new Property<obj>("CurrentFsiTool", fsiTool)
 
     do
         if not autoDetectAllowed then fsiOptions.IsCustomTool.Value <- true
@@ -127,7 +129,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
     member x.AddUseAnyCpu() =
         let initialValue = not fsiOptions.IsCustomTool.Value && fsiOptions.UseAnyCpu.Value
-        let useAnyCpu = new Property<bool>(lifetime, useAnyCpuText, initialValue)
+        let useAnyCpu = new Property<bool>(useAnyCpuText, initialValue)
         let checkBox = this.AddBoolOption(useAnyCpu, RichText(useAnyCpuText), useAnyCpuText)
         fsiOptions.IsCustomTool.FlowIntoRd(lifetime, checkBox.Enabled, Not)
 
@@ -145,7 +147,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
                 fsiPath.Value <- fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value))
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"

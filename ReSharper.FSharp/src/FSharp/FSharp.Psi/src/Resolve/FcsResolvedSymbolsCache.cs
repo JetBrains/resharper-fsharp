@@ -14,7 +14,6 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts;
-using JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Files.SandboxFiles;
@@ -32,7 +31,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly object mySyncObj = new();
     private readonly IShellLocks myLocks;
     public IPsiModules PsiModules { get; }
-    public FcsCheckerService CheckerService { get; }
     public IFcsProjectProvider FcsProjectProvider { get; }
 
     protected readonly Dictionary<FcsProjectKey, FcsModuleResolvedSymbols> ProjectSymbolsCaches = new();
@@ -41,13 +39,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly OneToSetMap<FcsProjectKey, FcsProjectKey> myReferencingModules = new();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
-    public FcsResolvedSymbolsCache(Lifetime lifetime, FcsCheckerService checkerService, IPsiModules psiModules,
+    public FcsResolvedSymbolsCache(Lifetime lifetime, IPsiModules psiModules,
       IFcsProjectProvider fcsProjectProvider, FSharpScriptPsiModulesProvider scriptPsiModulesProvider,
       IShellLocks locks)
     {
       myLocks = locks;
       PsiModules = psiModules;
-      CheckerService = checkerService;
       FcsProjectProvider = fcsProjectProvider;
 
       fcsProjectProvider.ProjectRemoved.Advise(lifetime, RemoveProject);
