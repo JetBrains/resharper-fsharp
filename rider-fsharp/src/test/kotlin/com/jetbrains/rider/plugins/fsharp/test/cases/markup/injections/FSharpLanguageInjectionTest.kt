@@ -23,7 +23,7 @@ private fun BaseTestWithMarkup.doTest() {
 }
 
 
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   @Test
@@ -58,7 +58,7 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 }
 
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("FableApp")
 class FSharpFrontendFrameworksTest : BaseTestWithMarkup() {
   @Test

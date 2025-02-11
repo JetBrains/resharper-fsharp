@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.base.RiderSqlInjectionTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class FSharpSqlAutomaticInjectionTest : RiderSqlInjectionTestBase() {
   @Test

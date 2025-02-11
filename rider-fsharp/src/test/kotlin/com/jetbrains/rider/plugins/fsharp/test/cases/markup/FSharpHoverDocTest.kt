@@ -10,7 +10,7 @@ import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class FSharpHoverDocTest : DocumentationTestBase() {
   override val checkSolutionLoad = false
@@ -42,12 +42,12 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("SwaggerProviderCSharp")
   fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("SwaggerProviderCSharp")
   fun `provided abbreviation in csharp`() = doTestWithTypeProviders("OpenAPI Provider for")
 
