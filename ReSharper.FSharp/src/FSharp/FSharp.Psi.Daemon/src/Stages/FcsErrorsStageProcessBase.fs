@@ -217,14 +217,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                        TypeMisMatchTuplesHaveDifferingLengthsError
                            (expectedType.Format(displayContext))
                            (actualType.Format(displayContext))
-
                 else
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                let expr = getResultExpr expr
+                    let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+                    let expr = getResultExpr expr
 
-                if isNull expr then null
-                elif isUnit expectedType then createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                else TypeEquationError(FSharpDiagnosticTypeInfo.Create(actualType, displayContext), expr, error.Message) :> _
+                    if isNull expr then
+                        null
+                    elif isUnit expectedType then
+                        createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+                    else
+                        let actualTypeInfo = FSharpDiagnosticTypeInfo.Create(actualType, displayContext)
+                        TypeEquationError(actualTypeInfo, expr, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
 

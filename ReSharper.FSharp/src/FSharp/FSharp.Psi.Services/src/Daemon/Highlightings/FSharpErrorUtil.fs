@@ -75,7 +75,7 @@ let rec getResultExpr (expr: IFSharpExpression) =
         let lastExpr = seqExpr.Expressions.LastOrDefault()
         if isNotNull lastExpr then getResultExpr lastExpr else expr
 
-    | :? IParenExpr as parenExpr ->
+    | :? IParenOrBeginEndExpr as parenExpr ->
         let innerExpr = parenExpr.InnerExpression
         if isNotNull innerExpr && not parenExpr.IsSingleLine then getResultExpr innerExpr else expr
 
