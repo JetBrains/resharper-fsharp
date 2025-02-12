@@ -83,6 +83,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
 
+    member this.AllFcsSymbolUses = items.SymbolUses
     member this.FcsSymbolUse = items.SymbolUses.Head
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
     member this.NamespaceToOpen = items.NamespaceToOpen

@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
@@ -77,8 +76,6 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         let basicContext = context.BasicContext
         match context.BasicContext.File, context.GetCheckResults(opName) with
         | :? IFSharpFile as fsFile, Some checkResults ->
-            let settings = basicContext.ContextBoundSettingsStore
-
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes
                 fsFile.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() &&
