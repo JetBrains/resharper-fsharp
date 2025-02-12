@@ -1,5 +1,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
@@ -40,6 +41,16 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     | :? IAndsPat as andPat ->
         andPat.PatternsEnumerable
         |> Seq.fold visitPattern acc
+
+    | :? IOrPat as orPat ->
+        visitPattern acc orPat.Pattern1
+
+    | :? IListConsPat as pat ->
+        let tailPat = getLastTailPattern pat
+        if isNull tailPat || tailPat :? ITypedPat then acc else tailPat :: acc
+
+    | :? IArrayOrListPat as pat ->
+        pat :: acc
 
     | _ -> acc
 
@@ -84,3 +95,7 @@ let collectTypeHintAnchorsForConstructor (ctor: IConstructorDeclaration) =
 let collectTypeHintAnchorsForEachExpr (forEachExpr: IForEachExpr) =
     if isNull forEachExpr.InExpression then []
     else visitPattern [] forEachExpr.Pattern
+
+let collectTypeHintAnchorsForMatchClause (matchClause: IMatchClause) =
+    if isNull matchClause.RArrow then []
+    else visitPattern [] matchClause.Pattern

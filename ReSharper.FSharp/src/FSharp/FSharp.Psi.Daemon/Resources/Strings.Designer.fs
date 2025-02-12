@@ -49,3 +49,4 @@ type public Strings() =
     static member FSharpTypeHints_ShowPipeReturnTypes_Description = Strings.ResourceManager.GetString("FSharpTypeHints_ShowPipeReturnTypes_Description")
     static member FSharpTypeHints_HideSameLinePipe_Description = Strings.ResourceManager.GetString("FSharpTypeHints_HideSameLinePipe_Description")
     static member FSharpTypeHints_PipesSettings_Header = Strings.ResourceManager.GetString("FSharpTypeHints_PipesSettings_Header")
+    static member FSharpTypeHints_OtherPatternsSettings_Header = Strings.ResourceManager.GetString("FSharpTypeHints_OtherPatternsSettings_Header")

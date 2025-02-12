@@ -6,55 +6,59 @@ let f x||(0) ||(1)=
     let g x = ()
     let x = fun y -> ()
     for x in [""] do ()
+    match 5 with x -> () 
     { new IFormattable with
         member x.ToString(format, provider) = "" }
 
-fun x||(2) -> ()
+fun x -> ()
 
-type A(x||(3)) =
+match 5 with
+| x when let y = 5 in true ->
+    let z = 3
+    ()
+
+type A(x||(2)) =
     do
-        let x||(4) = 3
+        let x = 3
         ()
 
-    let array||(5) = [|""|]
+    let array||(3) = [|""|]
 
-    new(x||(6), y||(7)) = A(x + y)
+    new(x||(4), y||(5)) = A(x + y)
 
-    member _.P1||(8) =
+    member _.P1||(6) =
         let x = 1
         x
 
-    member _.P2||(9) = id
+    member _.P2||(7) = id
 
     member val P3 = 3 with get, set
 
-    member x.P4||(10)
-        with get index||(11) =
+    member x.P4||(8)
+        with get index||(9) =
             let x = array[index]
             x
-        and set index||(12) value||(13) =
+        and set index||(10) value||(11) =
             array[index] <- value
 
-    member _.M(x||(14)) (y||(15), z||(16)) ||(17)=
+    member _.M(x||(12)) (y||(13), z||(14)) ||(15)=
         let res = x + y + z
         res
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'a
 (1): ReSharper Parameter Name Hint: : IFormattable 
-(2): ReSharper Parameter Name Hint: : 'a
-(3): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : string array
 (4): ReSharper Parameter Name Hint: : int
-(5): ReSharper Parameter Name Hint: : string array
-(6): ReSharper Parameter Name Hint: : int
-(7): ReSharper Parameter Name Hint: : int
-(8): ReSharper Parameter Name Hint: : int 
-(9): ReSharper Parameter Name Hint: : obj -> obj 
-(10): ReSharper Parameter Name Hint: : string 
-(11): ReSharper Parameter Name Hint: : int
+(5): ReSharper Parameter Name Hint: : int
+(6): ReSharper Parameter Name Hint: : int 
+(7): ReSharper Parameter Name Hint: : obj -> obj 
+(8): ReSharper Parameter Name Hint: : string 
+(9): ReSharper Parameter Name Hint: : int
+(10): ReSharper Parameter Name Hint: : int
+(11): ReSharper Parameter Name Hint: : string
 (12): ReSharper Parameter Name Hint: : int
-(13): ReSharper Parameter Name Hint: : string
+(13): ReSharper Parameter Name Hint: : int
 (14): ReSharper Parameter Name Hint: : int
-(15): ReSharper Parameter Name Hint: : int
-(16): ReSharper Parameter Name Hint: : int
-(17): ReSharper Parameter Name Hint: : int 
+(15): ReSharper Parameter Name Hint: : int 

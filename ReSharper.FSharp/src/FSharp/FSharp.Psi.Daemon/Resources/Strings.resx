@@ -49,4 +49,7 @@
     <data name="FSharpTypeHints_PipesSettings_Header" xml:space="preserve">
         <value>Pipe operators</value>
     </data>
+    <data name="FSharpTypeHints_OtherPatternsSettings_Header" xml:space="preserve">
+        <value>Other patterns</value>
+    </data>
 </root>

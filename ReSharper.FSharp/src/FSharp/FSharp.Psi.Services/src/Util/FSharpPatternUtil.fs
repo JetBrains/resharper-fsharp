@@ -38,6 +38,11 @@ let rec ignoreParentAsPatsFromRight (pat: IFSharpPattern) =
     | null -> pat
     | pat -> ignoreParentAsPatsFromRight pat
 
+let rec getLastTailPattern (pat: IListConsPat) =
+    match pat.TailPattern.IgnoreInnerParens() with
+    | :? IListConsPat as pat -> getLastTailPattern pat
+    | pat -> pat
+
 let rec ignoreInnerAsPatsToRight (pat: IFSharpPattern) =
     match pat with
     | :? IAsPat as asPat -> ignoreInnerAsPatsToRight asPat.RightPattern
