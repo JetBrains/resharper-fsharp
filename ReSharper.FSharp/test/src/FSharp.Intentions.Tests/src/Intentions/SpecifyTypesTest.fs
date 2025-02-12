@@ -72,9 +72,11 @@ type SpecifyPatternTypeActionTest() =
     [<Test>] member x.``Tuple 02 - Top level``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 03 - As``() = x.DoNamedTest()
 
+    //TODO: remove parens
     [<Test>] member x.``Record field 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    //TODO: remove parens
     [<Test>] member x.``Union case 02 - Named``() = x.DoNamedTest()
     [<Test>] member x.``Union case 03 - Parens``() = x.DoNamedTest()
 
