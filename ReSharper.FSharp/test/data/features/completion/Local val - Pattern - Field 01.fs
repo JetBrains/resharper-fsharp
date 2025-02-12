@@ -1,0 +1,6 @@
+// ${COMPLETE_ITEM:i}
+module Module
+
+let f s =
+    match s with
+    | Some(Value = i) -> ignore {caret}
