@@ -21,7 +21,7 @@ let _ = |not |b|(12) :?> A|(11)
 ------------------------------------------------
 0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to type test
+Add parens to the type test
 1: This expression was expected to have type
     'bool'    
 but here has type
@@ -35,7 +35,7 @@ is not compatible with type
     'B'    
 
 QUICKFIXES:
-Add parens to type cast
+Add parens to the type cast
 4: This expression was expected to have type
     'bool'    
 but here has type
@@ -43,7 +43,7 @@ but here has type
 NO QUICKFIXES
 5: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to type cast
+Add parens to the type cast
 6: This expression was expected to have type
     'bool'    
 but here has type
@@ -51,7 +51,7 @@ but here has type
 NO QUICKFIXES
 7: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to type test
+Add parens to the type test
 8: This expression was expected to have type
     'bool'    
 but here has type
@@ -63,7 +63,7 @@ is not compatible with type
     'A'    
 
 QUICKFIXES:
-Add parens to type cast
+Add parens to the type cast
 10: This expression was expected to have type
     'bool'    
 but here has type
@@ -71,7 +71,7 @@ but here has type
 NO QUICKFIXES
 11: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to type cast
+Add parens to the type cast
 12: This expression was expected to have type
     'bool'    
 but here has type
