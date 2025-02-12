@@ -51,6 +51,7 @@ type FSharpIntroduceVariableData(sourceExpr, usages) =
 
     member val FirstUsageExpr: IFSharpExpression = null with get, set
     member val ContextExpr: IFSharpExpression = null with get, set
+    member val ContextDecl: IModuleMember = null with get, set
 
     member val Keywords = [FSharpTokenType.LET] with get, set
     member val BindComputation = false with get, set
@@ -144,6 +145,16 @@ module FSharpIntroduceVariable =
             getOutermostLambda parent
         | _ -> parent
 
+    let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
+        let binding = BindingNavigator.GetByExpression(contextExpr)
+        if isNotNull binding && binding.HasParameters then null else
+
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
+        if isNotNull letBindings then letBindings :> _ else
+
+        let exprStmt = ExpressionStatementNavigator.GetByExpression(contextExpr)
+        if isNotNull exprStmt then exprStmt :> _ else null
+
     let getOccurrenceText (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (text: string) =
         let richText = RichText("Bind '")
         richText.Append(fcsType.Format(displayContext), TextStyle(JetFontStyles.Bold)) |> ignore
@@ -217,16 +228,6 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         else
             let range = TreeRange(contextExpr)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
-
-    let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
-        let binding = BindingNavigator.GetByExpression(contextExpr)
-        if isNotNull binding && binding.HasParameters then null else
-
-        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
-        if isNotNull letBindings then letBindings :> _ else
-
-        let exprStmt = ExpressionStatementNavigator.GetByExpression(contextExpr)
-        if isNotNull exprStmt then exprStmt :> _ else null
 
     let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
         let elementFactory = context.CreateElementFactory()
@@ -308,9 +309,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let data = data :?> FSharpIntroduceVariableData
         let sourceExpr = data.FirstUsageExpr
         let contextExpr = data.ContextExpr
-
-        // `contextDecl` is not null when expression is bound to a module/type let binding.
-        let contextDecl = getContextDeclaration contextExpr
+        let contextDecl = data.ContextDecl
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
         let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoLikeStatement
@@ -681,7 +680,7 @@ type FSharpIntroduceVarHelper() =
     override this.AdditionalInitialization(workflow, expression, context) =
         let data = workflow.DataModel :?> FSharpIntroduceVariableData
 
-        // Replace the actual source expression with the outer-most expression among usages,
+        // Replace the actual source expression with the outermost expression among usages,
         // since it's needed for calculating a common node to replace.
         let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
 
@@ -689,8 +688,12 @@ type FSharpIntroduceVarHelper() =
         let safeParentToInsertBefore = FSharpIntroduceVariable.getSafeParentExprToInsertBefore workflow commonParent
         let contextExpr = FSharpIntroduceVariable.getExprToInsertBefore safeParentToInsertBefore
 
+        // `contextDecl` is not null when expression is bound to a module/type let binding.
+        let contextDecl = FSharpIntroduceVariable.getContextDeclaration contextExpr
+
         data.FirstUsageExpr <- sourceExpr
         data.ContextExpr <- contextExpr
+        data.ContextDecl <- contextDecl
 
         let fcsType = sourceExpr.TryGetFcsType()
         let displayContext = sourceExpr.TryGetFcsDisplayContext()
@@ -752,6 +755,8 @@ type FSharpIntroduceVarHelper() =
         let isDisposable = mappedBoundType.IsSubtypeOf(disposableType)
 
         let supportsUse =
+            isNull contextDecl &&
+
             match isDisposable, computationType with
             | false, _ -> false
             | _, None -> true
