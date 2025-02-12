@@ -159,13 +159,18 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
 
 [<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
-                Description = "Annotate named pattern")>]
+                Description = "Annotate named parameter/pattern with it is type")>]
 type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
     override x.Text = "Add type annotation"
 
     override x.IsAvailable _ =
         let pattern = dataProvider.GetSelectedElement<IReferencePat>().IgnoreParentParens()
+        let pattern =
+            match OptionalValPatNavigator.GetByPattern(pattern) with
+            | null -> pattern
+            | x -> x
+
         isNotNull pattern &&
         isNull (TypedPatNavigator.GetByPattern(pattern)) &&
         isNull (BindingNavigator.GetByHeadPattern(pattern))
