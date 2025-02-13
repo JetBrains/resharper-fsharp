@@ -43,6 +43,9 @@ type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsP
         this.AddHeader(Strings.FSharpTypeHints_LocalBindingsSettings_Header) |> ignore
         this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowTypeHintsForLocalBindings)
 
+        this.AddHeader(Strings.FSharpTypeHints_OtherPatternsSettings_Header) |> ignore
+        this.AddVisibilityOption(fun (s: FSharpTypeHintOptions) -> s.ShowForOtherPatterns)
+
 
         this.AddHeader(Strings.FSharpTypeHints_PipesSettings_Header) |> ignore
         this.AddBoolOption((fun (s: FSharpTypeHintOptions) -> s.ShowPipeReturnTypes),

@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
@@ -21,28 +22,39 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 
 type private NodesRequiringHints =
-    { TopLevelNodes: VisibilityConsumer<ITreeNode>; LocalNodes: VisibilityConsumer<ITreeNode> } with
+    { TopLevelMembers: VisibilityConsumer<ITreeNode>
+      LocalBindings: VisibilityConsumer<ITreeNode>
+      OtherPatterns: VisibilityConsumer<ITreeNode> }
 
     member x.HasVisibleItems =
-        x.TopLevelNodes.HasVisibleItems ||
-        x.LocalNodes.HasVisibleItems
+        x.TopLevelMembers.HasVisibleItems ||
+        x.LocalBindings.HasVisibleItems ||
+        x.OtherPatterns.HasVisibleItems
 
 type private FSharpTypeHintSettings =
-    { TopLevelMembers: PushToHintMode; LocalBindings: PushToHintMode } with
+    { TopLevelMembers: PushToHintMode
+      LocalBindings: PushToHintMode
+      OtherPatterns: PushToHintMode }
 
     static member Create(settingsStore: IContextBoundSettingsStore) =
         { TopLevelMembers = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
                                          .EnsureInlayHintsDefault(settingsStore)
           LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings)
-                                       .EnsureInlayHintsDefault(settingsStore) }
+                                       .EnsureInlayHintsDefault(settingsStore)
+          OtherPatterns = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowForOtherPatterns)
+                                       .EnsureInlayHintsDefault(settingsStore)}
 
     member x.IsDisabled =
         x.TopLevelMembers = PushToHintMode.Never &&
-        x.LocalBindings = PushToHintMode.Never
+        x.LocalBindings = PushToHintMode.Never &&
+        x.OtherPatterns = PushToHintMode.Never
 
 
 type private MembersVisitor(settings) =
     inherit TreeNodeVisitor<NodesRequiringHints>()
+    let disabledForTopMembers = settings.TopLevelMembers = PushToHintMode.Never
+    let disabledForLocalBindings = settings.LocalBindings = PushToHintMode.Never
+    let disabledForOtherPatterns = settings.OtherPatterns = PushToHintMode.Never
 
     let isTopLevelMember (node: ITreeNode) =
         match node with
@@ -51,12 +63,18 @@ type private MembersVisitor(settings) =
         | :? IConstructorDeclaration -> true
         | _ -> false
 
+    let isLocalBinding (node: ITreeNode) =
+        match node with
+        | :? ILocalBinding
+        | :? ILambdaExpr -> true
+        | _ -> false
+
     override x.VisitNode(node, context) =
-        if settings.LocalBindings = PushToHintMode.Never && isTopLevelMember node then () else
+        if disabledForLocalBindings && disabledForOtherPatterns && isTopLevelMember node then () else
 
         for child in node.Children() do
-            if settings.TopLevelMembers = PushToHintMode.Never &&
-               isTopLevelMember child then x.VisitNode(child, context) else
+            if disabledForTopMembers && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
+                then x.VisitNode(child, context) else
 
             match child with
             | :? IFSharpTreeNode as treeNode -> treeNode.Accept(x, context)
@@ -64,45 +82,54 @@ type private MembersVisitor(settings) =
 
     override x.VisitLambdaExpr(lambda, context) =
         let result = collectTypeHintAnchorsForLambda lambda
-        context.LocalNodes.AddRange(result)
+        context.LocalBindings.AddRange(result)
 
         x.VisitNode(lambda, context)
 
     override x.VisitLocalBinding(binding, context) =
         let result = collectTypeHintAnchorsForBinding binding
-        context.LocalNodes.AddRange(result)
+        context.LocalBindings.AddRange(result)
 
         x.VisitNode(binding, context)
 
     override x.VisitTopBinding(binding, context) =
         let result = collectTypeHintAnchorsForBinding binding
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(binding, context)
 
     override x.VisitMemberDeclaration(memberDecl, context) =
         let result = collectTypeHintsAnchorsForMember memberDecl
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(memberDecl, context)
 
     override x.VisitPrimaryConstructorDeclaration(constructor, context) =
         let result = collectTypeHintAnchorsForConstructor constructor
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(constructor, context)
 
     override x.VisitSecondaryConstructorDeclaration(constructor, context) =
         let result = collectTypeHintAnchorsForConstructor constructor
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(constructor, context)
 
     override x.VisitForEachExpr(forEachExpr, context) =
-        let result = collectTypeHintAnchorsForEachExpr forEachExpr
-        context.LocalNodes.AddRange(result)
+        if not disabledForOtherPatterns then
+            let result = collectTypeHintAnchorsForEachExpr forEachExpr
+            context.OtherPatterns.AddRange(result)
 
         x.VisitNode(forEachExpr, context)
+
+    override x.VisitMatchClause(matchClause, context) =
+        if not disabledForOtherPatterns then
+            let result = collectTypeHintAnchorsForMatchClause matchClause
+            context.OtherPatterns.AddRange(result)
+
+        x.VisitNode(matchClause, context)
+
 
 type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSettingsStore, daemonProcess: IDaemonProcess, settings) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
@@ -182,7 +209,13 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
             |> ValueSome
 
-        | _ -> ValueNone
+        | pattern ->
+            let fcsType = pattern.TryGetFcsType()
+            if isNull fcsType then ValueNone else
+
+            let range = pattern.GetDocumentRange().EndOffsetRange()
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
+            |> ValueSome
 
     let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =
         match node with
@@ -194,7 +227,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
         | _ -> ValueNone
 
-    let adornNodes (topLevelNodes : ITreeNode ICollection) (localNodes : ITreeNode ICollection) =
+    let adornNodes
+        (topLevelMembers: ITreeNode ICollection)
+        (localBindings: ITreeNode ICollection)
+        (otherPatterns: ITreeNode ICollection) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
         let inline adornNodes nodes pushToHintMode actionsProvider =
@@ -205,8 +241,9 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
                 | ValueSome highlighting -> highlightingConsumer.AddHighlighting(highlighting)
                 | _ -> ()
 
-        adornNodes topLevelNodes settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
-        adornNodes localNodes settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
+        adornNodes topLevelMembers settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
+        adornNodes localBindings settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
+        adornNodes otherPatterns settings.OtherPatterns FSharpOtherPatternsTypeHintBulbActionsProvider.Instance
 
         highlightingConsumer.CollectHighlightings()
 
@@ -215,22 +252,26 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
-        let consumer = { TopLevelNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
-                         LocalNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
+        let consumer: NodesRequiringHints =
+            { TopLevelMembers = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+              LocalBindings = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+              OtherPatterns = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
-        let topLevelNodes = consumer.TopLevelNodes
-        let localNodes = consumer.LocalNodes
+        let topLevelNodes = consumer.TopLevelMembers
+        let localNodes = consumer.LocalBindings
+        let matchNodes = consumer.OtherPatterns
 
         // Partition the expressions to adorn by whether they're visible in the viewport or not
         let remainingHighlightings =
             if consumer.HasVisibleItems then
                 // Adorn visible expressions first
-                let visibleHighlightings = adornNodes topLevelNodes.VisibleItems localNodes.VisibleItems
+                let visibleHighlightings =
+                    adornNodes topLevelNodes.VisibleItems localNodes.VisibleItems matchNodes.VisibleItems
                 committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
 
             // Finally adorn expressions that aren't visible in the viewport
-            adornNodes topLevelNodes.NonVisibleItems localNodes.NonVisibleItems
+            adornNodes topLevelNodes.NonVisibleItems localNodes.NonVisibleItems matchNodes.NonVisibleItems
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
