@@ -147,24 +147,6 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
 
         | _ -> false
 
-    let matchesName (typeMember: ITypeMember) =
-      match nameOpt with
-      | None -> true
-      | Some name ->
-
-      match typeMember with
-      | FSharpCompiledExtensionMember _ ->
-          let memberName = typeMember.ShortName
-          memberName = name ||
-          memberName = $"get_{name}" ||
-          memberName = $"set_{name}" ||
-
-          memberName.EndsWith($".{name}") ||
-          memberName.EndsWith($".get_{name}") ||
-          memberName.EndsWith($".set_{name}")
-
-      | _ -> typeMember.ShortName = name
-
     let isAccessible (typeMember: ITypeMember) =
         let isTypeAccessible = 
             let containingType = typeMember.ContainingType
@@ -180,24 +162,30 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         | _ -> AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let matchesName (typeMember: ITypeMember) =
-      match nameOpt with
-      | None -> true
-      | Some name ->
+        match nameOpt with
+        | None -> true
+        | Some name ->
 
-      match typeMember with
-      | FSharpCompiledExtensionMember _ ->
-          let memberName = typeMember.ShortName
-          memberName = name ||
-          memberName = $"get_{name}" ||
-          memberName = $"set_{name}" ||
+        match typeMember with
+        | FSharpCompiledExtensionMember _ ->
+            let memberName = typeMember.ShortName
+            memberName = name ||
+            memberName = $"get_{name}" ||
+            memberName = $"set_{name}" ||
+  
+            memberName.EndsWith($".{name}") ||
+            memberName.EndsWith($".get_{name}") ||
+            memberName.EndsWith($".set_{name}")
 
-          memberName.EndsWith($".{name}") ||
-          memberName.EndsWith($".get_{name}") ||
-          memberName.EndsWith($".set_{name}")
+        | _ -> typeMember.ShortName = name
 
-      | _ -> typeMember.ShortName = name
+    let resolvesAsExtensionMember (typeMember: ITypeMember) =
+        match typeMember with
+        | :? IFSharpDeclaredElement -> typeMember :? IFSharpMethod
+        | _ -> true
 
     let isApplicable (typeMember: ITypeMember) =
+        resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
         not (isInScope typeMember) &&
         isAccessible typeMember &&
