@@ -202,7 +202,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull symbol then ValueNone else
 
             let fcsType = symbol.FullType
-            let pattern, fcsType = fixIfOptionalParameter refPat fcsType
+            let pattern, fcsType = tryGetOuterOptionalParameterAndItsType refPat fcsType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
             createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
