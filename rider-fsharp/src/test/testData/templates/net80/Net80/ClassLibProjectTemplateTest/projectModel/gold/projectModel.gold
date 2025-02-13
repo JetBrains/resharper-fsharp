@@ -10,7 +10,7 @@ Opened
       -Implicit
        ...
      -Packages
-      FSharp.Core/8.0.300
+      FSharp.Core/8.0.403
      -Frameworks
       Microsoft.NETCore.App
    Library.fs
@@ -30,7 +30,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:net8.0, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
