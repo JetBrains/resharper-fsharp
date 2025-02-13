@@ -39,5 +39,5 @@ type FSharpLocalBindingTypeHintBulbActionsProvider private () =
     static member val Instance = FSharpLocalBindingTypeHintBulbActionsProvider()
 
 type FSharpOtherPatternsTypeHintBulbActionsProvider private () =
-    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowTypeHintsForOtherPatterns), Strings.FSharpTypeHints_OtherPatternsSettings_Header)
+    inherit FSharpTypeHintBulbActionsProvider((fun x -> x.ShowForOtherPatterns), Strings.FSharpTypeHints_OtherPatternsSettings_Header)
     static member val Instance = FSharpOtherPatternsTypeHintBulbActionsProvider()

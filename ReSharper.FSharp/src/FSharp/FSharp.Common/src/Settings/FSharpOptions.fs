@@ -196,7 +196,7 @@ type FSharpTypeHintOptions =
       [<SettingsEntry(PushToHintMode.PushToShowHints,
                       DescriptionResourceType = typeof<Strings>,
                       DescriptionResourceName = nameof(Strings.FSharpTypeHints_OtherPatterns_Description))>]
-      mutable ShowTypeHintsForOtherPatterns: PushToHintMode }
+      mutable ShowForOtherPatterns: PushToHintMode }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]

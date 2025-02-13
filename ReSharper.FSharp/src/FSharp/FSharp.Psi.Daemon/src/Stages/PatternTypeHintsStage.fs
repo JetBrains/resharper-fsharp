@@ -22,26 +22,26 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 
 type private NodesRequiringHints =
-    { TopLevelNodes: VisibilityConsumer<ITreeNode>
-      LocalNodes: VisibilityConsumer<ITreeNode>
-      OtherPatterns: VisibilityConsumer<ITreeNode> } with
+    { TopLevelMembers: VisibilityConsumer<ITreeNode>
+      LocalBindings: VisibilityConsumer<ITreeNode>
+      OtherPatterns: VisibilityConsumer<ITreeNode> }
 
     member x.HasVisibleItems =
-        x.TopLevelNodes.HasVisibleItems ||
-        x.LocalNodes.HasVisibleItems ||
+        x.TopLevelMembers.HasVisibleItems ||
+        x.LocalBindings.HasVisibleItems ||
         x.OtherPatterns.HasVisibleItems
 
 type private FSharpTypeHintSettings =
     { TopLevelMembers: PushToHintMode
       LocalBindings: PushToHintMode
-      OtherPatterns: PushToHintMode } with
+      OtherPatterns: PushToHintMode }
 
     static member Create(settingsStore: IContextBoundSettingsStore) =
         { TopLevelMembers = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForTopLevelMembers)
                                          .EnsureInlayHintsDefault(settingsStore)
           LocalBindings = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForLocalBindings)
                                        .EnsureInlayHintsDefault(settingsStore)
-          OtherPatterns = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowTypeHintsForOtherPatterns)
+          OtherPatterns = settingsStore.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowForOtherPatterns)
                                        .EnsureInlayHintsDefault(settingsStore)}
 
     member x.IsDisabled =
@@ -52,7 +52,7 @@ type private FSharpTypeHintSettings =
 
 type private MembersVisitor(settings) =
     inherit TreeNodeVisitor<NodesRequiringHints>()
-    let disabledForTopBindings = settings.TopLevelMembers = PushToHintMode.Never
+    let disabledForTopMembers = settings.TopLevelMembers = PushToHintMode.Never
     let disabledForLocalBindings = settings.LocalBindings = PushToHintMode.Never
     let disabledForOtherPatterns = settings.OtherPatterns = PushToHintMode.Never
 
@@ -73,7 +73,7 @@ type private MembersVisitor(settings) =
         if disabledForLocalBindings && disabledForOtherPatterns && isTopLevelMember node then () else
 
         for child in node.Children() do
-            if disabledForTopBindings && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
+            if disabledForTopMembers && isTopLevelMember child || disabledForLocalBindings && isLocalBinding child
                 then x.VisitNode(child, context) else
 
             match child with
@@ -82,37 +82,37 @@ type private MembersVisitor(settings) =
 
     override x.VisitLambdaExpr(lambda, context) =
         let result = collectTypeHintAnchorsForLambda lambda
-        context.LocalNodes.AddRange(result)
+        context.LocalBindings.AddRange(result)
 
         x.VisitNode(lambda, context)
 
     override x.VisitLocalBinding(binding, context) =
         let result = collectTypeHintAnchorsForBinding binding
-        context.LocalNodes.AddRange(result)
+        context.LocalBindings.AddRange(result)
 
         x.VisitNode(binding, context)
 
     override x.VisitTopBinding(binding, context) =
         let result = collectTypeHintAnchorsForBinding binding
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(binding, context)
 
     override x.VisitMemberDeclaration(memberDecl, context) =
         let result = collectTypeHintsAnchorsForMember memberDecl
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(memberDecl, context)
 
     override x.VisitPrimaryConstructorDeclaration(constructor, context) =
         let result = collectTypeHintAnchorsForConstructor constructor
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(constructor, context)
 
     override x.VisitSecondaryConstructorDeclaration(constructor, context) =
         let result = collectTypeHintAnchorsForConstructor constructor
-        context.TopLevelNodes.AddRange(result)
+        context.TopLevelMembers.AddRange(result)
 
         x.VisitNode(constructor, context)
 
@@ -228,8 +228,8 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         | _ -> ValueNone
 
     let adornNodes
-        (topLevelNodes: ITreeNode ICollection)
-        (localNodes: ITreeNode ICollection)
+        (topLevelMembers: ITreeNode ICollection)
+        (localBindings: ITreeNode ICollection)
         (otherPatterns: ITreeNode ICollection) =
         let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settingsStore)
 
@@ -241,8 +241,8 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
                 | ValueSome highlighting -> highlightingConsumer.AddHighlighting(highlighting)
                 | _ -> ()
 
-        adornNodes topLevelNodes settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
-        adornNodes localNodes settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
+        adornNodes topLevelMembers settings.TopLevelMembers FSharpTopLevelMembersTypeHintBulbActionsProvider.Instance
+        adornNodes localBindings settings.LocalBindings FSharpLocalBindingTypeHintBulbActionsProvider.Instance
         adornNodes otherPatterns settings.OtherPatterns FSharpOtherPatternsTypeHintBulbActionsProvider.Instance
 
         highlightingConsumer.CollectHighlightings()
@@ -252,13 +252,13 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
-        let consumer = { TopLevelNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
-                         LocalNodes = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+        let consumer = { TopLevelMembers = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+                         LocalBindings = VisibilityConsumer(visibleRange, _.GetNavigationRange())
                          OtherPatterns = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
-        let topLevelNodes = consumer.TopLevelNodes
-        let localNodes = consumer.LocalNodes
+        let topLevelNodes = consumer.TopLevelMembers
+        let localNodes = consumer.LocalBindings
         let matchNodes = consumer.OtherPatterns
 
         // Partition the expressions to adorn by whether they're visible in the viewport or not
