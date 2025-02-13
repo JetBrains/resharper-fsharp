@@ -252,9 +252,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
         let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
-        let consumer = { TopLevelMembers = VisibilityConsumer(visibleRange, _.GetNavigationRange())
-                         LocalBindings = VisibilityConsumer(visibleRange, _.GetNavigationRange())
-                         OtherPatterns = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
+        let consumer: NodesRequiringHints =
+            { TopLevelMembers = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+              LocalBindings = VisibilityConsumer(visibleRange, _.GetNavigationRange())
+              OtherPatterns = VisibilityConsumer(visibleRange, _.GetNavigationRange()) }
         fsFile.Accept(MembersVisitor(settings), consumer)
 
         let topLevelNodes = consumer.TopLevelMembers
