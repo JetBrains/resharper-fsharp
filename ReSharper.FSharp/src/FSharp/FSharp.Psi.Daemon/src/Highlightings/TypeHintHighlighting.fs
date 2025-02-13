@@ -3,12 +3,17 @@
 open System
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
+open JetBrains.Application.UI.Controls.BulbMenu.Anchors
+open JetBrains.Application.UI.Controls.BulbMenu.Items
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.InlayHints
+open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
+open JetBrains.TextControl
+open JetBrains.TextControl.CodeWithMe
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
@@ -41,7 +46,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
-    TypeHintAdornmentProvider(settingsStore: ISettingsStore) =
+    TypeHintAdornmentProvider(solution: ISolution, settingsStore: ISettingsStore, actionsProvider: ISpecifyTypeActionsProvider) =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.GetHighlighting() with
@@ -54,15 +59,22 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                 let data =
                     AdornmentData(thh.Text, null, AdornmentFlags.None, AdornmentPlacement.DefaultAfterPrevChar,
                                   thh.PushToHintMode)
-                let actionsProvider = thh.BulbActionsProvider
+                let visibilityActionsProvider = thh.BulbActionsProvider
 
                 { new IAdornmentDataModel with
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems =
                         [|
-                            if isNotNull actionsProvider then
-                                yield! actionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)
+                            // First-class context items
+                            let textControl = solution.GetComponent<ITextControlManager>().LastFocusedTextControlPerClient.ForCurrentClient()
+                            yield! actionsProvider.GetAvailableActions(textControl)
+                                   |> Seq.map _.ToBulbMenuItem(solution, textControl)
+                                   |> Seq.map (fun x -> BulbMenuItem(x.ExecutableItem, x.RichText, x.IconId, BulbMenuAnchors.FirstClassContextItems))
 
+                            if isNotNull visibilityActionsProvider then
+                                yield! visibilityActionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)
+
+                            // Second-class context items
                             yield IntraTextAdornmentDataModelHelper.CreateTurnOffAllInlayHintsBulbMenuItem(settingsStore)
                             yield IntraTextAdornmentDataModelHelper.CreateConfigureBulbMenuItem(nameof(FSharpTypeHintsOptionsPage))
                         |]

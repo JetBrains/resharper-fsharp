@@ -1,17 +1,25 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Parts
 open JetBrains.Diagnostics
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
+open JetBrains.TextControl.CodeWithMe
+open JetBrains.Util
 
 module SpecifyTypes =
     let specifyBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
@@ -187,3 +195,26 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let displayContext = symbolUse.DisplayContext
 
         SpecifyTypes.specifyPattern displayContext mfv.FullType pattern
+
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
+type SpecifyTypeActionsProvider(solution: ISolution, caTable: IContextActionTable) =
+    let caTypes = [
+        typeof<FunctionAnnotationAction>
+        typeof<PatternAnnotationAction>
+    ]
+
+    interface ISpecifyTypeActionsProvider with
+        member this.GetAvailableActions(textControl) =
+            if isNull textControl then [||] else
+            let userDataHolder = UserDataHolder()
+
+            use _ = ReadLockCookie.Create()
+
+            let context = textControl.GetFSharpFile(solution).GetPsiModule().GetContextFromModule()
+            use _ = CompilationContextCookie.GetOrCreate(context)
+            caTypes
+            |> Seq.map (fun caType -> caTable.TryInstantiateConcreteAction(solution, textControl, caType))
+            |> Seq.filter _.IsAvailable(solution, userDataHolder)
+            |> Seq.map _.CreateBulbItemsNoScoped(solution)
+            |> Seq.concat
+            |> Seq.toArray
