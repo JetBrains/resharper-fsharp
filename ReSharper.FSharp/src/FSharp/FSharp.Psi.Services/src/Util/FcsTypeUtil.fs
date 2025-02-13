@@ -22,7 +22,7 @@ let getFunctionTypeArgs includeReturnType fcsType =
 
     loop fcsType [] |> List.rev
 
-let fixIfOptionalParameter (pattern: IReferencePat) fcsType =
+let tryGetOuterOptionalParameterAndItsType (pattern: IReferencePat) fcsType =
     let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
     if isNotNull optionalValPat && isOption fcsType then (optionalValPat : IFSharpPattern), fcsType.GenericArguments[0]
     else pattern, fcsType

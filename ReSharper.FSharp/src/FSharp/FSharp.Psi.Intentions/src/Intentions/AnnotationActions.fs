@@ -50,10 +50,10 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let specifyPattern displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
+    let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let pattern, fcsType =
             match pattern with
-            | :? IReferencePat as pattern -> FcsTypeUtil.fixIfOptionalParameter pattern fcsType
+            | :? IReferencePat as pattern -> FcsTypeUtil.tryGetOuterOptionalParameterAndItsType pattern fcsType
             | _ -> pattern, fcsType
 
         let pattern = pattern.IgnoreParentParens()
@@ -107,7 +107,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 | TupleLikePattern pat when isTopLevel ->
                     specifyParameterTypes fcsType.GenericArguments pat.Patterns false
                 | pattern ->
-                    SpecifyTypes.specifyPattern displayContext fcsType pattern
+                    SpecifyTypes.specifyPatternType displayContext fcsType pattern
 
         specifyParameterTypes types parameters true
 
@@ -186,4 +186,4 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
         let displayContext = symbolUse.DisplayContext
 
-        SpecifyTypes.specifyPattern displayContext mfv.FullType pattern
+        SpecifyTypes.specifyPatternType displayContext mfv.FullType pattern
