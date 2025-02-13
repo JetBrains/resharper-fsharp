@@ -66,6 +66,8 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                     override x.ContextMenuItems =
                         [|
                             // First-class context items
+
+                            //TODO: unify logic with FSharpReformatCode
                             let textControl = solution.GetComponent<ITextControlManager>().LastFocusedTextControlPerClient.ForCurrentClient()
                             yield! actionsProvider.GetAvailableActions(textControl)
                                    |> Seq.map _.ToBulbMenuItem(solution, textControl)
