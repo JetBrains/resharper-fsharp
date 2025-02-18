@@ -81,7 +81,7 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.SpecifyType(decl, mfv, d) =
         let decl = decl :?> ILocalReferencePat
-        SpecifyTypes.specifyParameterType d mfv.FullType decl
+        SpecifyTypes.specifyPatternType d mfv.FullType decl
 
 
 type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
@@ -101,9 +101,7 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.IsApplicable(decl: IDeclaration) =
         match decl with
-        | :? IMemberDeclaration as decl ->
-            isNull decl.ReturnTypeInfo &&
-            Seq.isEmpty decl.AccessorDeclarationsEnumerable
+        | :? IMemberDeclaration as decl -> SpecifyTypes.getAvailability decl |> _.ReturnType
         | _ -> false
 
     override this.SpecifyType(decl, mfv, displayContext) =

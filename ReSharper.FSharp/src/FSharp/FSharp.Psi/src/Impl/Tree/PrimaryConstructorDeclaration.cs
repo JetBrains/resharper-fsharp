@@ -16,6 +16,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     TreeNodeEnumerable<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
       ParametersDeclarationsEnumerable => new([ParametersDeclaration]);
 
+    TreeNodeCollection<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
+      ParametersDeclarations => new([ParametersDeclaration]);
+
     public ITokenNode EqualsToken =>
       FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(this)?.EqualsToken;
 

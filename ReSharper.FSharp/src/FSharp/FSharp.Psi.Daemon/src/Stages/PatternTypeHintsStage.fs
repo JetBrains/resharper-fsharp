@@ -11,11 +11,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Highlightings.FSharpTypeHints
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationsUtil
@@ -141,9 +141,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         range
         pushToHintMode
         actionsProvider
+        owner
         isFromReturnType =
         let suffix = if isFromReturnType then " " else ""
-        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, suffix, actionsProvider)
+        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, suffix, actionsProvider, owner)
 
     let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode actionsProvider =
         match decl with
@@ -176,7 +177,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
-        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode actionsProvider true
+        createTypeHintHighlighting symbol.ReturnParameter.Type defaultDisplayContext range pushToHintMode actionsProvider decl true
         |> ValueSome
 
     let rec getHintForPattern (pattern: IFSharpPattern) pushToHintMode actionsProvider =
@@ -201,12 +202,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull symbol then ValueNone else
 
             let fcsType = symbol.FullType
+            let pattern, fcsType = tryGetOuterOptionalParameterAndItsType refPat fcsType
             let range = pattern.GetNavigationRange().EndOffsetRange()
 
-            let isOptional = isNotNull (OptionalValPatNavigator.GetByPattern(refPat))
-            let fcsType = if isOptional && isOption fcsType then fcsType.GenericArguments[0] else fcsType
-
-            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider pattern false
             |> ValueSome
 
         | pattern ->
@@ -214,7 +213,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull fcsType then ValueNone else
 
             let range = pattern.GetDocumentRange().EndOffsetRange()
-            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider false
+            createTypeHintHighlighting fcsType defaultDisplayContext range pushToHintMode actionsProvider pattern false
             |> ValueSome
 
     let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =
