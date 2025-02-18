@@ -3,11 +3,10 @@
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Parts
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
-open JetBrains.Application.UI.Controls.BulbMenu.Items
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Feature.Services.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -18,9 +17,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Feature.Services.Util
 
 module SpecifyTypes =
     type Availability = {
@@ -276,17 +275,24 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         SpecifyTypes.specifyTypes pattern availability
 
 
+type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Availability) =
+    inherit BulbActionBase()
+    override this.Text = "Add type annotation"
+
+    override this.ExecutePsiTransaction(solution, progress) =
+        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+        SpecifyTypes.specifyTypes node availability
+        null
+
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
-type SpecifyTypeActionsProvider() =
+type SpecifyTypeActionsProvider(solution) =
     interface ISpecifyTypeActionProvider with
-        member this.TryCreateSpecifyTypeAction(node) =
+        member this.TryCreateSpecifyTypeAction(node: ITreeNode) =
             use _ = ReadLockCookie.Create()
             let availability = { SpecifyTypes.getAvailability node with ParameterTypes = false }
             if not availability.IsAvailable then null else
 
-            BulbMenuItem(ExecutableItem(fun _ ->
-                use _ = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(node.GetPsiServices(), "Add type annotation")
-                use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-                use disableFormatter = new DisableCodeFormatter()
-                SpecifyTypes.specifyTypes node availability
-                ), "Add type annotation", BulbThemedIcons.ContextAction.Id, BulbMenuAnchors.FirstClassContextItems)
+            SpecifyTypeAction(node, availability)
+                .ToContextActionIntention(BulbMenuAnchors.FirstClassContextItems)
+                .ToBulbMenuItem(solution, TextControlUtils.GetTextControl(node))

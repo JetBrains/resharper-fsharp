@@ -141,10 +141,10 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         range
         pushToHintMode
         actionsProvider
-        semanticNode
+        owner
         isFromReturnType =
         let suffix = if isFromReturnType then " " else ""
-        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, suffix, actionsProvider, semanticNode)
+        TypeHintHighlighting(fcsType.Format(displayContext), range, pushToHintMode, suffix, actionsProvider, owner)
 
     let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode actionsProvider =
         match decl with

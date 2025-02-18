@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.InlayHints
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
@@ -21,7 +21,7 @@ open JetBrains.UI.RichText
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
 type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode, suffix,
-                          bulbActionsProvider: IInlayHintBulbActionsProvider, semanticNode: IFSharpTreeNode) =
+                          bulbActionsProvider: IInlayHintBulbActionsProvider, owner: ITreeNode) =
     let text = RichText(": " + typeNameString + suffix)
     new (typeNameString: string, range: DocumentRange) =
         TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null, null)
@@ -40,7 +40,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
     member x.Text = text
     member x.PushToHintMode = pushToHintMode
     member x.BulbActionsProvider = bulbActionsProvider
-    member x.SemanticNode = semanticNode
+    member x.Owner = owner
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
@@ -64,7 +64,7 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                     override x.ContextMenuItems =
                         [|
                             // First-class context items
-                            let specifyTypeAction = specifyTypeActionProvider.TryCreateSpecifyTypeAction(thh.SemanticNode)
+                            let specifyTypeAction = specifyTypeActionProvider.TryCreateSpecifyTypeAction(thh.Owner)
                             if isNotNull specifyTypeAction then
                                 yield specifyTypeAction
 

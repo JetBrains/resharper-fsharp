@@ -47,7 +47,7 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
 
     | :? IListConsPat as pat ->
         let tailPat = getLastTailPattern pat
-        if isNull tailPat || tailPat :? ITypedPat then acc else tailPat :: acc
+        if isNull tailPat || tailPat :? ITypedPat then acc else pat :: acc
 
     | :? IArrayOrListPat as pat ->
         pat :: acc
