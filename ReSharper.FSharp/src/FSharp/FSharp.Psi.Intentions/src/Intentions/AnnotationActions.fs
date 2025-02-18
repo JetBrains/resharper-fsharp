@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree.MatchNode
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -49,15 +50,26 @@ module SpecifyTypes =
 
         binding.ParametersDeclarations |> Seq.forall (fun p -> isAnnotated true p.Pattern)
 
-    let getAvailability (node: ITreeNode) =
+    let private hasBangInBindingKeyword (binding: IBinding) =
+        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
+        if isNull letExpr then false else
+        letExpr.IsComputed
+
+    let rec getAvailability (node: ITreeNode) =
         if not (isValid node) then Availability.Unavailable else
 
         match node with
         | :? IBinding as binding ->
+            //TODO: support
+            if hasBangInBindingKeyword binding then Availability.Unavailable else
+
             { ParameterTypes = not (isParametersAnnotated binding)
               ReturnType = isNull binding.ReturnTypeInfo }
 
         | :? IFSharpPattern as pattern ->
+            let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
+            if isNotNull binding then getAvailability binding else
+
             let pattern =
                 match OptionalValPatNavigator.GetByPattern(pattern) with
                 | null -> pattern
@@ -169,27 +181,32 @@ module SpecifyTypes =
         (node: ITreeNode)
         (availability: Availability) =
         match node with
-        | :? IReferencePat as pattern ->
-            let binding = BindingNavigator.GetByHeadPattern(pattern)
+        | :? IFSharpPattern as pattern ->
+            let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
             if isNotNull binding then specifyTypes binding availability else
 
-            let symbolUse = pattern.GetFcsSymbolUse()
+            match pattern with
+            | :? IReferencePat as pattern ->
+                let binding = BindingNavigator.GetByHeadPattern(pattern)
+                if isNotNull binding then specifyTypes binding availability else
 
-            let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-            let fcsType = mfv.FullType
-            let pattern, fcsType = tryGetOuterOptionalParameterAndItsType pattern fcsType
-            let displayContext = symbolUse.DisplayContext
+                let symbolUse = pattern.GetFcsSymbolUse()
 
-            specifyPatternType displayContext fcsType pattern
+                let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+                let fcsType = mfv.FullType
+                let pattern, fcsType = tryGetOuterOptionalParameterAndItsType pattern fcsType
+                let displayContext = symbolUse.DisplayContext
 
-        | :? IOptionalValPat as optionalPat ->
-            specifyTypes optionalPat.Pattern availability
+                specifyPatternType displayContext fcsType pattern
 
-        | :? IFSharpPattern as pattern ->
-            let patType = pattern.TryGetFcsType()
-            let displayContext = pattern.TryGetFcsDisplayContext()
+            | :? IOptionalValPat as optionalPat ->
+                specifyTypes optionalPat.Pattern availability
 
-            specifyPatternType displayContext patType pattern
+            | pattern ->
+                let patType = pattern.TryGetFcsType()
+                let displayContext = pattern.TryGetFcsDisplayContext()
+
+                specifyPatternType displayContext patType pattern
 
         | :? IBinding as binding ->
             let refPat = binding.HeadPattern.As<IReferencePat>()
@@ -230,17 +247,11 @@ module SpecifyTypes =
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    let hasBangInBindingKeyword (binding: IBinding) =
-        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        if isNull letExpr then false else
-        letExpr.IsComputed
-
     override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
-        if hasBangInBindingKeyword binding then false else
         if not (isAtBindingKeywordOrReferencePattern dataProvider binding) then false else
         SpecifyTypes.getAvailability binding |> _.IsAvailable
 
