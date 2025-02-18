@@ -530,6 +530,13 @@ let rec getOutermostPrefixAppExpr ([<CanBeNull>] expr: IFSharpExpression) =
 
     getOutermostPrefixAppExpr prefixAppExpr
 
+[<CanBeNull>]
+let rec getOutermostListConstPat ([<CanBeNull>] pattern: IFSharpPattern) =
+    let listConsPat = ListConsPatNavigator.GetByTailPattern(pattern)
+    if isNull listConsPat then pattern else
+
+    getOutermostListConstPat listConsPat
+
 
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with
