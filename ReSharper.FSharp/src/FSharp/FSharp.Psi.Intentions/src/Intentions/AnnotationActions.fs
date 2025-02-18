@@ -50,7 +50,12 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let specifyParameterType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
+    let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
+        let pattern, fcsType =
+            match pattern with
+            | :? IReferencePat as pattern -> FcsTypeUtil.tryGetOuterOptionalParameterAndItsType pattern fcsType
+            | _ -> pattern, fcsType
+
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
 
@@ -61,13 +66,11 @@ module SpecifyTypes =
 
         let typedPat =
             let typeUsage = factory.CreateTypeUsage(fcsType.Format(displayContext), TypeUsageContext.TopLevel)
-            let typedPat = factory.CreateTypedPat(newPattern, typeUsage)
-            if isNull (TuplePatNavigator.GetByPattern(pattern)) then
-                addParens factory typedPat
-            else
-                typedPat :> _
+            factory.CreateTypedPat(newPattern, typeUsage)
 
-        ModificationUtil.ReplaceChild(pattern, typedPat) |> ignore
+        ModificationUtil.ReplaceChild(pattern, typedPat)
+        |> ParenPatUtil.addParensIfNeeded
+        |> ignore
 
     let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
@@ -104,7 +107,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 | TupleLikePattern pat when isTopLevel ->
                     specifyParameterTypes fcsType.GenericArguments pat.Patterns false
                 | pattern ->
-                    SpecifyTypes.specifyParameterType displayContext fcsType pattern
+                    SpecifyTypes.specifyPatternType displayContext fcsType pattern
 
         specifyParameterTypes types parameters true
 
@@ -153,3 +156,34 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
         if isNull binding.ReturnTypeInfo then
             SpecifyTypes.specifyBindingReturnType displayContext mfv binding
+
+
+[<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
+                Description = "Annotate named parameter/pattern with it is type")>]
+type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit FSharpContextActionBase(dataProvider)
+    override x.Text = "Add type annotation"
+
+    override x.IsAvailable _ =
+        let pattern = dataProvider.GetSelectedElement<IReferencePat>().IgnoreParentParens()
+        let pattern =
+            match OptionalValPatNavigator.GetByPattern(pattern) with
+            | null -> pattern
+            | x -> x
+
+        isNotNull pattern &&
+        isNull (TypedPatNavigator.GetByPattern(pattern)) &&
+        isNull (BindingNavigator.GetByHeadPattern(pattern))
+
+    override x.ExecutePsiTransaction _ =
+        let pattern = dataProvider.GetSelectedElement<IReferencePat>()
+
+        use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
+        let symbolUse = pattern.GetFcsSymbolUse()
+
+        let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
+        let displayContext = symbolUse.DisplayContext
+
+        SpecifyTypes.specifyPatternType displayContext mfv.FullType pattern

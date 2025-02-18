@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-type SpecifyTypesActionTest() =
+type SpecifyFunctionTypesActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
@@ -58,6 +58,33 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Recursive - Function 04`` () = x.DoNamedTest()
 
 
+type SpecifyPatternTypeActionTest() =
+    inherit FSharpContextActionExecuteTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes/patterns"
+
+    [<Test>] member x.``Parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter 02 - Optional``() = x.DoNamedTest()
+
+    [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 02 - Top level``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple 03 - As``() = x.DoNamedTest()
+
+    //TODO: remove parens
+    [<Test>] member x.``Record field 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    //TODO: remove parens
+    [<Test>] member x.``Union case 02 - Named``() = x.DoNamedTest()
+    [<Test>] member x.``Union case 03 - Parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``As pat 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Ands pat 01``() = x.DoNamedTest()
+
+
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 
@@ -71,3 +98,11 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()
+
+
+type SpecifyPatternTypeActionAvailabilityTest() =
+    inherit FSharpContextActionAvailabilityTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes"
+
+    [<Test>] member x.``Patterns 01``() = x.DoNamedTest()
