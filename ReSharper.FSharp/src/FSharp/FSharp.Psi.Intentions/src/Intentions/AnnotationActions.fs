@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree.MatchNode
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -213,6 +212,7 @@ module SpecifyTypes =
 
                 specifyPatternType displayContext patType pattern
 
+        //TODO: unify
         | :? IBinding as binding ->
             let refPat = binding.HeadPattern.As<IReferencePat>()
             if isNull refPat then () else
