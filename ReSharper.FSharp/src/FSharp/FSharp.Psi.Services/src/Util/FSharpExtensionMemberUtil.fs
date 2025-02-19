@@ -181,7 +181,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
 
     let resolvesAsExtensionMember (typeMember: ITypeMember) =
         match typeMember with
-        | :? IFSharpDeclaredElement -> typeMember :? IFSharpMethod
+        | :? IFSharpDeclaredElement -> typeMember :? IFSharpMethod || typeMember :? IFSharpProperty
         | _ -> true
 
     let isApplicable (typeMember: ITypeMember) =
