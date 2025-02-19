@@ -86,7 +86,28 @@ module SpecifyTypes =
 
         | _ -> Availability.Unavailable
 
-    let private specifyParametersOwnerReturnType typeString (declaration: IParameterOwnerMemberDeclaration) =
+    let private specifyParametersOwnerReturnType
+        (declaration: IParameterOwnerMemberDeclaration)
+        (mfv: FSharpMemberOrFunctionOrValue)
+        displayContext=
+
+        let typeString =
+            let fullType = mfv.FullType
+            if declaration :? IBinding && fullType.IsFunctionType then
+                let specifiedTypesCount = declaration.ParametersDeclarations.Count
+
+                let types = getFunctionTypeArgs true fullType
+                if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
+
+                let remainingTypes = types |> List.skip specifiedTypesCount
+                remainingTypes
+                |> List.map (fun fcsType ->
+                    let typeString = fcsType.Format(displayContext)
+                    if fcsType.IsFunctionType then sprintf "(%s)" typeString else typeString)
+                |> String.concat " -> "
+            else
+                mfv.ReturnParameter.Type.Format(displayContext)
+
         let factory = declaration.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel)
 
@@ -104,31 +125,11 @@ module SpecifyTypes =
         if parameters.Count > 0 && declaration :? IBinding then
             ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
 
-    let private specifyMemberReturnType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
+    let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
-        specifyParametersOwnerReturnType (fcsType.Format(displayContext)) decl
-
-    let specifyBindingReturnType displayContext (mfv: FSharpMemberOrFunctionOrValue) (binding: IBinding) =
-        let typeString =
-            let fullType = mfv.FullType
-            if fullType.IsFunctionType then
-                let specifiedTypesCount = binding.ParametersDeclarations.Count
-
-                let types = FcsTypeUtil.getFunctionTypeArgs true fullType
-                if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
-
-                let remainingTypes = types |> List.skip specifiedTypesCount
-                remainingTypes
-                |> List.map (fun fcsType ->
-                    let typeString = fcsType.Format(displayContext)
-                    if fcsType.IsFunctionType then sprintf "(%s)" typeString else typeString)
-                |> String.concat " -> "
-            else
-                mfv.ReturnParameter.Type.Format(displayContext)
-
-        specifyParametersOwnerReturnType typeString binding
+        specifyParametersOwnerReturnType decl mfv displayContext
 
     let private addParens (factory: IFSharpElementFactory) (pattern: IFSharpPattern) =
         let parenPat = factory.CreateParenPat()
@@ -138,7 +139,7 @@ module SpecifyTypes =
     let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let pattern, fcsType =
             match pattern with
-            | :? IReferencePat as pattern -> FcsTypeUtil.tryGetOuterOptionalParameterAndItsType pattern fcsType
+            | :? IReferencePat as pattern -> tryGetOuterOptionalParameterAndItsType pattern fcsType
             | _ -> pattern, fcsType
 
         let pattern = pattern.IgnoreParentParens()
@@ -164,9 +165,9 @@ module SpecifyTypes =
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
             ParenPatUtil.addParens listConsParenPat |> ignore
 
-    let private specifyMemberParameterTypes displayContext (binding: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
-        let types = FcsTypeUtil.getFunctionTypeArgs true mfv.FullType
-        let parameters = binding.ParametersDeclarations |> Seq.map _.Pattern
+    let private specifyMemberParameterTypes displayContext (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
+        let types = getFunctionTypeArgs true mfv.FullType
+        let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
 
         let rec specifyParameterTypes (types: FSharpType seq) (parameters: IFSharpPattern seq) isTopLevel =
             for fcsType, parameter in Seq.zip types parameters do
@@ -178,10 +179,6 @@ module SpecifyTypes =
                     specifyPatternType displayContext fcsType pattern
 
         specifyParameterTypes types parameters true
-
-    let specifyPropertyType displayContext (fcsType: FSharpType) (decl: IMemberDeclaration) =
-        Assertion.Assert(decl.ParametersDeclarationsEnumerable.IsEmpty(), "decl.ParametersDeclarationsEnumerable.IsEmpty()")
-        specifyMemberReturnType displayContext fcsType decl
 
     let rec specifyTypes
         (node: ITreeNode)
@@ -214,37 +211,18 @@ module SpecifyTypes =
 
                 specifyPatternType displayContext patType pattern
 
-        //TODO: unify
-        | :? IBinding as binding ->
-            let refPat = binding.HeadPattern.As<IReferencePat>()
-            if isNull refPat then () else
-
-            let symbolUse = refPat.GetFcsSymbolUse()
+        | :? IParameterOwnerMemberDeclaration as declaration ->
+            let symbolUse = declaration.GetFcsSymbolUse()
             if isNull symbolUse then () else
 
             let symbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
             let displayContext = symbolUse.DisplayContext
 
             if availability.ParameterTypes then
-                specifyMemberParameterTypes displayContext binding symbol
+                specifyMemberParameterTypes displayContext declaration symbol
 
             if availability.ReturnType then
-                specifyBindingReturnType displayContext symbol binding
-
-        | :? IMemberDeclaration as memberDeclaration ->
-            let symbolUse = memberDeclaration.GetFcsSymbolUse()
-            if isNull symbolUse then () else
-
-            let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
-            if isNull symbol then () else
-
-            let displayContext = symbolUse.DisplayContext
-
-            if availability.ParameterTypes then
-                specifyMemberParameterTypes displayContext memberDeclaration symbol
-
-            if availability.ReturnType then
-                specifyMemberReturnType displayContext symbol.ReturnParameter.Type memberDeclaration
+                specifyParametersOwnerReturnType declaration symbol displayContext
 
         | _ -> ()
 
@@ -276,7 +254,7 @@ type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Avail
     inherit BulbActionBase()
     override this.Text = "Add type annotation"
 
-    override this.ExecutePsiTransaction(solution, progress) =
+    override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
         SpecifyTypes.specifyTypes node availability

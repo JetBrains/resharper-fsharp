@@ -163,15 +163,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
 
             | _ -> equalsToken.GetDocumentRange().StartOffsetRange()
 
-        let symbolUse =
-            match decl with
-            | :? IBinding as binding ->
-                match binding.HeadPattern with
-                | :? IReferencePat as refPat -> refPat.GetFcsSymbolUse()
-                | _ -> Unchecked.defaultof<_>
-            | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.GetFcsSymbolUse()
-            | _ -> Unchecked.defaultof<_>
-
+        let symbolUse = decl.GetFcsSymbolUse()
         if isNull symbolUse then ValueNone else
 
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
