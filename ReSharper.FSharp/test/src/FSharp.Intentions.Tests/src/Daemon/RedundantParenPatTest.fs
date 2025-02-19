@@ -56,6 +56,10 @@ type RedundantParenPatTest() =
     [<Test>] member x.``Typed 05 - Members param decl``() = x.DoNamedTest()
     [<Test>] member x.``Typed 06 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Typed 07 - Match clause``() = x.DoNamedTest()
+    //TODO: remove parens
+    [<Test>] member x.``Typed 08 - As``() = x.DoNamedTest()
+    //TODO: remove parens
+    [<Test>] member x.``Typed 09 - Named field``() = x.DoNamedTest()
 
     [<Test>] member x.``Wild - Function param 01``() = x.DoNamedTest()
     [<Test>] member x.``Wild - Pattern param 01``() = x.DoNamedTest()

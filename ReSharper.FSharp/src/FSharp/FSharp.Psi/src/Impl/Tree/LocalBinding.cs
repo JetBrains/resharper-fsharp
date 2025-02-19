@@ -1,4 +1,5 @@
 using System;
+using FSharp.Compiler.CodeAnalysis;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -42,5 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
       HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
+
+    public FSharpSymbolUse GetFcsSymbolUse() => (HeadPattern as IReferencePat)?.GetFcsSymbolUse();
   }
 }
