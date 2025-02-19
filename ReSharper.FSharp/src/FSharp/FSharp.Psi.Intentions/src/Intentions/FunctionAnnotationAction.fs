@@ -165,7 +165,7 @@ module SpecifyTypes =
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
             ParenPatUtil.addParens listConsParenPat |> ignore
 
-    let private specifyMemberParameterTypes displayContext (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
+    let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
         let types = getFunctionTypeArgs true mfv.FullType
         let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
 
@@ -219,7 +219,7 @@ module SpecifyTypes =
             let displayContext = symbolUse.DisplayContext
 
             if availability.ParameterTypes then
-                specifyMemberParameterTypes displayContext declaration symbol
+                specifyParameterTypes declaration symbol displayContext
 
             if availability.ReturnType then
                 specifyParametersOwnerReturnType declaration symbol displayContext
