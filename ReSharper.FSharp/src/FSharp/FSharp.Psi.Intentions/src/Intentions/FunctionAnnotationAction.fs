@@ -159,6 +159,8 @@ module SpecifyTypes =
         |> ParenPatUtil.addParensIfNeeded
         |> ignore
 
+        // In the case `x :: _: Type` add parens to the whole listConsPat
+        //TODO: improve parens analyzer
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
             ParenPatUtil.addParens listConsParenPat |> ignore
 
