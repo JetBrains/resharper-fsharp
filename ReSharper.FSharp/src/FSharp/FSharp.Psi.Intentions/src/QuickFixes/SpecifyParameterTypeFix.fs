@@ -106,4 +106,4 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.SpecifyType(decl, mfv, displayContext) =
         let memberDecl = decl :?> IMemberDeclaration
-        SpecifyTypes.specifyPropertyType displayContext mfv.FullType memberDecl
+        SpecifyTypes.specifyMemberReturnType memberDecl mfv displayContext
