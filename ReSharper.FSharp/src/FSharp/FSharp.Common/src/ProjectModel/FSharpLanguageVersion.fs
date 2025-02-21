@@ -31,8 +31,8 @@ type FSharpLanguageLevel =
     /// Nested record field copy and update/shorthand lambda
     | FSharp80 = 80
 
-    /// Includes fixes for shorthand lambda
-    | FSharp8Patched = 81
+    /// Shorthand lambda fixes
+    | FSharp81 = 81
 
     /// Nullness
     | FSharp90 = 90
@@ -66,7 +66,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp60 -> FSharpLanguageVersion.FSharp60
         | FSharpLanguageLevel.FSharp70 -> FSharpLanguageVersion.FSharp70
         | FSharpLanguageLevel.FSharp80
-        | FSharpLanguageLevel.FSharp8Patched -> FSharpLanguageVersion.FSharp80
+        | FSharpLanguageLevel.FSharp81 -> FSharpLanguageVersion.FSharp80
         | FSharpLanguageLevel.FSharp90 -> FSharpLanguageVersion.FSharp90
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
@@ -121,7 +121,7 @@ module FSharpLanguageLevel =
 
     [<Extension; CompiledName("IsFSharp8PatchedSupported")>]
     let isFSharp8PatchedSupported (treeNode: ITreeNode) =
-        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp8Patched
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp81
 
     [<Extension; CompiledName("IsFSharp90Supported")>]
     let isFSharp90Supported (treeNode: ITreeNode) =
