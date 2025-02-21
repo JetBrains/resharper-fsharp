@@ -296,14 +296,14 @@ type LambdaAnalyzer() =
         inner null expr
 
     let getRootRefExprIfCanBeConvertedToDotLambda (pat: ILocalReferencePat) (lambda: ILambdaExpr) =
-        let isFSharp90Supported = FSharpLanguageLevel.isFSharp90Supported lambda
+        let isFSharp8PatchedSupported = FSharpLanguageLevel.isFSharp8PatchedSupported lambda
         let expr = lambda.Expression.IgnoreInnerParens()
         if not expr.IsSingleLine then null else
 
         let rootRefExpr = getRootRefExpr expr
         if isNull rootRefExpr ||
            rootRefExpr.ShortName <> pat.SourceName ||
-           not (isFSharp90Supported || isContextWithoutWildPats expr) then null else
+           not (isFSharp8PatchedSupported || isContextWithoutWildPats expr) then null else
 
         let patSymbol = pat.GetFcsSymbol()
         let mutable convertingUnsupported = false
@@ -315,7 +315,7 @@ type LambdaAnalyzer() =
             member x.ProcessBeforeInterior(treeNode) =
                 if treeNode == rootRefExpr then () else
                 match treeNode with
-                | :? IDotLambdaExpr -> convertingUnsupported <- not isFSharp90Supported
+                | :? IDotLambdaExpr -> convertingUnsupported <- not isFSharp8PatchedSupported
                 | :? IReferenceExpr as ref when not ref.IsQualified ->
                     if ref.ShortName <> rootRefExpr.ShortName then () else
                     let symbol = ref.Reference.GetFcsSymbol()
@@ -324,7 +324,7 @@ type LambdaAnalyzer() =
         })
         if convertingUnsupported then null
         //TODO: workaround for https://github.com/dotnet/fsharp/issues/16305
-        elif isFSharp90Supported || isLambdaArgOwnerSupported lambda false ValueNone then rootRefExpr
+        elif isFSharp8PatchedSupported || isLambdaArgOwnerSupported lambda false ValueNone then rootRefExpr
         else null
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
