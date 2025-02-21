@@ -72,6 +72,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
             if minor < 4 then VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.FSharp70)
             elif minor >= 4 && minor <= 7 then VersionMapping(FSharpLanguageLevel.FSharp70, FSharpLanguageLevel.FSharp80)
             elif minor = 8 && build < 200 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
+            // .NET 8.0.200
             elif minor = 8 then VersionMapping(FSharpLanguageLevel.FSharp8Patched, FSharpLanguageLevel.FSharp90)
             elif minor >= 9 then VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.Preview)
             else null
