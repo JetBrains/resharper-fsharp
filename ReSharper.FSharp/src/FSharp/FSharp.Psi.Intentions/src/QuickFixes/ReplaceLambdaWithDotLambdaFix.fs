@@ -21,7 +21,7 @@ type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
 
     override x.IsAvailable _ =
        isValid lambda && isValid expr &&
-       (FSharpLanguageLevel.isFSharp90Supported expr || isContextWithoutWildPats expr)
+       (FSharpLanguageLevel.isFSharp8PatchedSupported expr || isContextWithoutWildPats expr)
 
     override x.Text = "Replace with shorthand lambda"
 
