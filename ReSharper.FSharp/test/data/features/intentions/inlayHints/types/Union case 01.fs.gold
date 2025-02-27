@@ -1,0 +1,5 @@
+﻿// ${BULB_TEXT:Add type annotation}
+
+module Module
+
+let f (Some(x: int{caret})) = x + 1
