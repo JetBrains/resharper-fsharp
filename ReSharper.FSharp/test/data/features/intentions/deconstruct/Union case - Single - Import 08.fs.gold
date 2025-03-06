@@ -8,6 +8,6 @@ module Nested1 =
                 | A of int
 
     open Nested21.Nested3
-    
+
     module Module22 =
         let (A i{caret}) = Nested21.Nested3.A 1

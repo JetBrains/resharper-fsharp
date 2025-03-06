@@ -1,9 +1,13 @@
+using JetBrains.Application;
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Implementation;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.EditorConfig;
 using JetBrains.ReSharper.Psi.Format;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 {
@@ -167,8 +171,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     [EditorConfigEntryAlias("multi_line_lambda_closing_newline", EditorConfigAliasType.LanguageSpecificStandard)]
     public bool MultiLineLambdaClosingNewline;
 
+    [SettingsEntry(WrapStyleSimple.WRAP_IF_LONG, "todo")]
+    public WrapStyleSimple WrapArguments;
+
+    [SettingsEntry(true, "todo")]
+    public bool PreferLineBreakAfterMultilineLparen;
+
+    [ExcludeFromEditorConfig]
+    [SettingsEntry(false, "Internal: Restricted format: no reindents, keep existing formatting where possible")]
+    public bool RestrictedFormat;
+    
     [SettingsIndexedEntry("Fantomas settings")]
     public readonly IIndexedEntry<string, string> FantomasSettings;
+  }
+
+  [ShellComponent(Instantiation.DemandAnyThreadSafe)]
+  public class FSharpDefaultFormattingSettings(ISettingsSchema settingsSchema, ILogger logger)
+    : HaveDefaultSettings<FSharpFormatSettingsKey>(settingsSchema, logger)
+  {
+    public override void InitDefaultSettings(ISettingsStorageMountPoint mountPoint) =>
+      SetValue(mountPoint, (FSharpFormatSettingsKey key) => key.ALLOW_FAR_ALIGNMENT, true);
+
+    public override string Name => "Todo";
   }
 
   [ZoneMarker]

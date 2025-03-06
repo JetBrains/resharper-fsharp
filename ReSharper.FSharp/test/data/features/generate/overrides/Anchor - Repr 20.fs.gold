@@ -9,9 +9,9 @@
 
 // ${KIND:Overrides}
 
-type R = 
-  { F1: int
-    
-    F2: int }
+type R =
+    { F1: int
+           
+      F2: int }
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}

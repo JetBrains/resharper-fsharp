@@ -605,21 +605,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       name = NamingManager.GetNamingLanguageService(fsIdentifier.Language).MangleNameIfNecessary(name);
       using var _ = WriteLockCookie.Create(fsIdentifier.IsPhysical());
-      LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
+      ModificationUtil.ReplaceChild(token, new FSharpIdentifierToken(name));
     }
 
     public static void AddTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      LowLevelModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
-      LowLevelModificationUtil.AddChildAfter(anchor, new Whitespace());
+      ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
     }
 
     public static void AddTokenBefore([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      LowLevelModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
-      LowLevelModificationUtil.AddChildBefore(anchor, new Whitespace());
+      ModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
     }
 
     [CanBeNull]
@@ -839,7 +837,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       [NotNull] string name)
     {
       if (referenceOwner.FSharpIdentifier?.IdentifierToken is { } id)
-        LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
+        ModificationUtil.ReplaceChild(id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
     }

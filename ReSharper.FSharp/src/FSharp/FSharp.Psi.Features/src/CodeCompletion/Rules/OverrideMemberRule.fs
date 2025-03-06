@@ -18,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.ProjectModel
-open JetBrains.Util.Media
 open JetBrains.Util.NetFX.Media.Colors
 
 type OverrideBehavior(info) =
@@ -127,7 +126,7 @@ type OverrideMemberRule() =
                 let owner = if isNotNull accessor then accessor.OwnerMember else null
                 if isNotNull owner then owner else elementMember
 
-            let memberDecl = GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls 0 generatorElement
+            let memberDecl = GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls generatorElement
             let overrideItem =
                 let info =
                     let text = memberDecl.GetText()

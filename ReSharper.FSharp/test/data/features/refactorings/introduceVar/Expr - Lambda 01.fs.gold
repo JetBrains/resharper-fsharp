@@ -3,7 +3,8 @@ module Module
 
 do
     let objectFunc =
-      fun _ ->
-          1
+        fun _ ->
+            1
+
     [] |> List.map(objectFunc
-    )
+              )

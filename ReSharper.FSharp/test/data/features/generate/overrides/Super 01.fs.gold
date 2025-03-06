@@ -25,5 +25,5 @@ type B() =
 type T() =
     inherit B()
 
-    override this.M(var0: int): unit = base.M(var0)
-    override this.M(var0: double): unit = {selstart}base.M(var0){selend}
+    override this.M(var0: int): unit = {selstart}base.M(var0){selend}
+    override this.M(var0: double): unit = base.M(var0)

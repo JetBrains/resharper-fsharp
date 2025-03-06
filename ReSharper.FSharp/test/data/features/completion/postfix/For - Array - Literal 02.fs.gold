@@ -2,4 +2,4 @@
 module Module
 
 for i in [|1|] do
-  {caret}
+    {caret}

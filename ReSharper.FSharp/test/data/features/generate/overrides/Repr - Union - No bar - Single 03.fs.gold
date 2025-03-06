@@ -7,7 +7,7 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type SingleCaseUnion = 
-  | Case
+type SingleCaseUnion =
+    | Case
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}

@@ -1,3 +1,4 @@
-type T() =
+﻿type T() =
     member val P = 42 with get, set
+
     member x.M() = x.P{caret} <- 23

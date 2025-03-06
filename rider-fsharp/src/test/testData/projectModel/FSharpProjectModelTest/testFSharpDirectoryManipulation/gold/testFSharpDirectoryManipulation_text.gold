@@ -5,8 +5,8 @@
 ﻿namespace ClassLibrary
 
 module Say =
-    let hello name =
-        printfn "Hello %s" name
+  let hello name =
+    printfn "Hello %s" name
 
 ===================
 2. Create folder 'NewFolder'
@@ -15,8 +15,8 @@ module Say =
 ﻿namespace ClassLibrary
 
 module Say =
-    let hello name =
-        printfn "Hello %s" name
+  let hello name =
+    printfn "Hello %s" name
 
 ===================
 3. Create subfolder 'NewFolder/NewSub'
@@ -25,8 +25,8 @@ module Say =
 ﻿namespace ClassLibrary
 
 module Say =
-    let hello name =
-        printfn "Hello %s" name
+  let hello name =
+    printfn "Hello %s" name
 
 ===================
 4. Move folder 'NewFolder/NewSub' to project root
@@ -35,8 +35,8 @@ module Say =
 ﻿namespace ClassLibrary
 
 module Say =
-    let hello name =
-        printfn "Hello %s" name
+  let hello name =
+    printfn "Hello %s" name
 
 ===================
 5. Delete folder 'NewSub'
@@ -45,6 +45,6 @@ module Say =
 ﻿namespace ClassLibrary
 
 module Say =
-    let hello name =
-        printfn "Hello %s" name
+  let hello name =
+    printfn "Hello %s" name
 

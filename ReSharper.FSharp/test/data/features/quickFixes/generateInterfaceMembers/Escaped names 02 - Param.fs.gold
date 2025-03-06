@@ -5,4 +5,4 @@ type I =
 
 type T() =
   interface I with
-    member this.M(``param 1``, ``param 2``) ``type`` = {selstart}failwith "todo"{selend}
+      member this.M(``param 1``, ``param 2``) ``type`` = {selstart}failwith "todo"{selend}

@@ -31,8 +31,6 @@ type FSharpImportMemberActionBase<'T when 'T :> IClrDeclaredElement>(reference: 
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(reference.GetElement().IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
         this.Bind()
         null
 

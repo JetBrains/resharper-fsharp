@@ -1,4 +1,4 @@
-let s:int =
+﻿let s: int =
     try
         ""
     with ex ->

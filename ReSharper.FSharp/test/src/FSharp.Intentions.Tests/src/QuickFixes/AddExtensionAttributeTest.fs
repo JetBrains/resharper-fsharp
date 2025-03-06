@@ -16,5 +16,6 @@ type AddExtensionAttributeTest() =
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 02``() = x.DoNamedTest()
 
+    // todo: recursive types
     [<Test>] member x.``Type member 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member 02 - Add open``() = x.DoNamedTest()

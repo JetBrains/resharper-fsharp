@@ -1,4 +1,4 @@
 ﻿Suggested names: i
 type T() =
-    static member P = 
-      let i = 1
+    static member P =
+        let i = 1

@@ -1,5 +1,5 @@
-// ${CHAR:Enter} 
+﻿// ${CHAR:Enter} 
 module Module
 
 let foo = List
-            {caret}.map id
+              {caret}.map id

@@ -17,7 +17,6 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(error.RecordFieldDeclaration.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         match recordFieldDeclaration with
         | None -> ()

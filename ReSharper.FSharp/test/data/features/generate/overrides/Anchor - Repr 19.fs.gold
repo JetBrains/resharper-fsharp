@@ -8,13 +8,13 @@
 
 // ${KIND:Overrides}
 
-type C(y: int) = 
-  class
-    // comment 1
-    let x = y // comment 2
+type C(y: int) =
+                 class
+                     // comment 1
+                     let x = y // comment 2
 
-    override this.ToString() = {selstart}failwith "todo"{selend}
+                     override this.ToString() = {selstart}failwith "todo"{selend}
 
-  end
-  // comment 3
-  override this.GetHashCode() = failwith "todo"
+                 end
+                 // comment 3
+                 override this.GetHashCode() = failwith "todo"

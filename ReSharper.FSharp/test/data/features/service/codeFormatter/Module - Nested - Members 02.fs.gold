@@ -1,0 +1,32 @@
+﻿BlankLinesBeforeFirstModuleMemberInNestedModule = 0
+  BlankLinesAroundMultilineModuleMembers = 0
+module M =
+    let x =
+        ()
+    let y = ()
+
+================
+  BlankLinesAroundMultilineModuleMembers = 1
+module M =
+    let x =
+        ()
+
+    let y = ()
+
+================
+BlankLinesBeforeFirstModuleMemberInNestedModule = 1
+  BlankLinesAroundMultilineModuleMembers = 0
+module M =
+
+    let x =
+        ()
+    let y = ()
+
+================
+  BlankLinesAroundMultilineModuleMembers = 1
+module M =
+
+    let x =
+        ()
+
+    let y = ()

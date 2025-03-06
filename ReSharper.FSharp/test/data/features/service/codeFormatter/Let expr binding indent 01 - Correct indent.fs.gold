@@ -1,5 +1,5 @@
 ﻿do
-  let
-    foo = ()
+    let
+        foo = ()
 
-  ()
+    ()

@@ -23,6 +23,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CachingLexers
 open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
@@ -1337,6 +1338,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
 
     member x.HandleLeftBracket(context: ITypingContext) =
+        use disableFormatter = new DisableCodeFormatter()
         let hasSelection = context.TextControl.Selection.HasSelection()
 
         this.HandleLeftBracketTyped(context,
@@ -1359,6 +1361,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         true
 
     member x.HandleRightBracket(context: ITypingContext) =
+        use disableFormatter = new DisableCodeFormatter()
+
         let textControl = context.TextControl
         let offset = textControl.Caret.Offset()
         let lexer = x.GetCachingLexer(textControl)

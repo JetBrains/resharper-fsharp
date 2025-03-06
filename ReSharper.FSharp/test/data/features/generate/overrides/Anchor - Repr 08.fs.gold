@@ -7,7 +7,7 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type C = 
-  struct // some comment
-    override this.ToString() = {selstart}failwith "todo"{selend}
-  end 
+type C =
+    struct // some comment
+        override this.ToString() = {selstart}failwith "todo"{selend}
+    end 

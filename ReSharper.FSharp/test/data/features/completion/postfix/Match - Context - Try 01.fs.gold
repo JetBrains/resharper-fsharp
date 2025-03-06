@@ -4,5 +4,5 @@ module Module
 do
    try ()
    with _ -> 
-     match true with
-     | {caret}
+       match true with
+       | {caret}

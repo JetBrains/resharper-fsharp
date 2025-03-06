@@ -26,7 +26,6 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
     override x.ExecutePsiTransaction(_, _) =
         let moduleDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()
         use writeCookie = WriteLockCookie.Create(moduleDeclaration.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         if isNamespace moduleDeclaration then convertNamespaceToModule moduleDeclaration
         else convertModuleToNamespace moduleDeclaration

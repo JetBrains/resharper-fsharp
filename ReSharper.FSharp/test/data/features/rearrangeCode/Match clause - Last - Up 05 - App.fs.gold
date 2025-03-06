@@ -4,5 +4,5 @@ do
     match () with
     | a -> ()
     | b ->
-      ignore
-          ()
+        ignore
+            ()

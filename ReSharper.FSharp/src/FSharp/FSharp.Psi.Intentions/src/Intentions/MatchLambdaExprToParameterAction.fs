@@ -9,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -41,7 +40,6 @@ type MatchLambdaExprToParameterAction(dataProvider) =
 
         let elementFactory = binding.CreateElementFactory()
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let mfv = getMfv binding
         if isNull mfv then null else
@@ -65,28 +63,19 @@ type MatchLambdaExprToParameterAction(dataProvider) =
 
         let parameterDecl =
             let prevSibling = binding.EqualsToken.GetPreviousMeaningfulSibling()
-            addNodesAfter prevSibling [
-                Whitespace()
-                ElementType.PARAMETERS_PATTERN_DECLARATION.Create()
-            ]
+            let paramDecl = ElementType.PARAMETERS_PATTERN_DECLARATION.Create()
+            ModificationUtil.AddChildAfter(prevSibling, paramDecl)
 
         let parameterDecl = parameterDecl.As<IParametersPatternDeclaration>()
         let pat = elementFactory.CreatePattern(name, false)
         parameterDecl.SetPattern(pat) |> ignore
 
-        let clauses = matchLambdaExpr.Clauses
-
-        let equalsTokenNextSibling = binding.EqualsToken.NextSibling
-        if isWhitespace equalsTokenNextSibling then
-            let treeRange = TreeRange(equalsTokenNextSibling, equalsTokenNextSibling |> getLastMatchingNodeAfter isWhitespaceOrComment)
-            ModificationUtil.DeleteChildRange(treeRange)
-
-        let afterFunctionKeywordRange = TreeRange(matchLambdaExpr.FunctionKeyword.NextSibling, clauses[0].PrevSibling)
-        ModificationUtil.AddChildRangeAfter(binding.EqualsToken |> getLastMatchingNodeAfter isWhitespaceOrComment, afterFunctionKeywordRange) |> ignore
+        moveCommentsAndWhitespaceAfterAnchor binding.EqualsToken matchLambdaExpr.FunctionKeyword
 
         let matchExpr = elementFactory.CreateExpr($"match {name} with | _ -> ()") :?> IMatchExpr
         let generatedClausesRange = TreeRange(matchExpr.WithKeyword.NextSibling, matchExpr.LastChild)
 
+        let clauses = matchLambdaExpr.Clauses
         let originalClausesRange = TreeRange(clauses[0] |> getFirstMatchingNodeBefore isInlineSpaceOrComment |> getThisOrPrevNewLine, clauses.Last())
 
         ModificationUtil.ReplaceChildRange(generatedClausesRange, originalClausesRange) |> ignore
@@ -99,5 +88,4 @@ type MatchLambdaExprToParameterAction(dataProvider) =
         Action<_>(fun texControl ->
             let offset = parameterDecl.GetDocumentEndOffset()
             BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, offset).Invoke(texControl)
-            ()
         )

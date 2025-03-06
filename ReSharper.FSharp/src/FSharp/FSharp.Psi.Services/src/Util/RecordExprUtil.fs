@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -161,7 +160,6 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
     let elementFactory = fsFile.CreateElementFactory()
 
     use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-    use disableFormatter = new DisableCodeFormatter()
 
     let isSingleLine = recordExpr.IsSingleLine
 
@@ -183,9 +181,6 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
 
     let existingBindings = recordExpr.FieldBindings
 
-    if recordExpr.LeftBrace.NextSibling :? IRecordFieldBindingList then
-        ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
-
     if generateSingleLine then
         let lastBinding = existingBindings.Last()
         ModificationUtil.DeleteChild(lastBinding.Semicolon)
@@ -199,13 +194,6 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
             if isFirstBinding && generatedBindings.First() == existingBindings.FirstOrDefault() then
                 isFirstBinding <- false
             else
-                let nodeBeforeSpace = skipMatchingNodesBefore isInlineSpaceOrComment binding
-                if getTokenType nodeBeforeSpace != FSharpTokenType.NEW_LINE then
-                    addNodesBefore binding [
-                        NewLine(binding.GetLineEnding())
-                        Whitespace(existingBindings[0].Indent)
-                    ] |> ignore
-
                 if getTokenType binding.PrevSibling == FSharpTokenType.NEW_LINE then
                     ModificationUtil.AddChildBefore(binding, Whitespace(existingBindings[0].Indent)) |> ignore
 

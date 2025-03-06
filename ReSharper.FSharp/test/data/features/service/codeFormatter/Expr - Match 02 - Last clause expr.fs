@@ -7,6 +7,7 @@ do
     | _ ->
     ()
 
+do
     match () with
     | _ ->
         ()
@@ -14,6 +15,7 @@ do
 
     ()
 
+do
     match () with
     | _ ->
         ()
@@ -22,12 +24,14 @@ do
 
     ()
 
+do
     match () with
     | _ ->
         ()
     | _ ->
         ()
 
+do
     match () with
     | _ ->
         ()
@@ -35,6 +39,15 @@ do
 
         ()
 
+do
+    match () with
+    | _ ->
+        ()
+    | _ ->
+
+     ()
+
+do
     match () with
     | _ ->
         ()

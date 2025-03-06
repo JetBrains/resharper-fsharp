@@ -3,5 +3,5 @@
 module Module
 
 let opAddition =
-  1
-  |> (+) 1{caret}
+    1
+    |> (+) 1{caret}

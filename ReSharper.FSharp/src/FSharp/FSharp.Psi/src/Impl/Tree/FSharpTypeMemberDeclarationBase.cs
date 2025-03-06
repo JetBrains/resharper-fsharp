@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public void SetStatic(bool value)
+    public virtual void SetStatic(bool value)
     {
     }
 

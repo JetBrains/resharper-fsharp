@@ -12,3 +12,5 @@ type ReplaceUseWithLet() =
 
     [<Test>] member x.``Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Type let binding 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type let binding 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type let binding 03``() = x.DoNamedTest()

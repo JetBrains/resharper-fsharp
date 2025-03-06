@@ -12,3 +12,4 @@ type RemoveInlineTest() =
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - More space``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 03``() = x.DoNamedTest()

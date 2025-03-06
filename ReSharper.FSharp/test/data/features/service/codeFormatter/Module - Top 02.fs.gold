@@ -1,8 +1,8 @@
 ﻿[<A>]
 module
-  private
-  rec
-  Namespace.
-  Module
+    private
+    rec
+    Namespace.
+    Module
 
 ()

@@ -1,7 +1,8 @@
 ﻿Suggested names: i
 do
   let i =
-    id
       id
-        1
+          id
+          1
+
   ignore i

@@ -3,9 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 open System.Collections.Generic
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Refactorings.Test.Common
+open JetBrains.Util
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; AssertCorrectTreeStructure>]
 type IntroduceVarTest() =
     inherit IntroduceVariableTestBase()
 
@@ -37,11 +38,18 @@ type IntroduceVarTest() =
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 02``() = x.DoNamedTest() // todo: formatter: move closing paren to the new line
+    [<Test>] member x.``Lambda 03``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
     [<Test>] member x.``Let 04 - After other``() = x.DoNamedTest()
     [<Test>] member x.``Let 05 - Nested indent``() = x.DoNamedTest()
+    [<Test>] member x.``Let 06 - Nested indent``() = x.DoNamedTest()
+    [<Test>] member x.``Let 07 - Nested indent``() = x.DoNamedTest()
 
     [<Test>] member x.``CompExpr - Computation 01``() = x.DoNamedTest()
     [<Test>] member x.``CompExpr - Computation - Deconstruction - Tuple 01``() = x.DoNamedTest()
@@ -75,14 +83,16 @@ type IntroduceVarTest() =
     [<Test>] member x.``Member - Auto property 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Binary app 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 05``() = x.DoNamedTest()
 
-    [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest() // todo: formatter: move closing paren
     [<Test>] member x.``Expr - Lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
@@ -106,7 +116,14 @@ type IntroduceVarTest() =
     [<Test>] member x.``Expr - Space - After 06 - Object expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Before 01 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Before 02 - List``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Space - Before 03 - Record``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Space - Before 03 - Record``() =
+                let path = x.GetGoldTestDataPath2(x.TestName).ChangeExtension("txt")
+                // use logger = new FormatterTestLogger(path)
+                // logger.LeftNodeToLog <- "="
+                // logger.RightNodeToLog <- "{"
+                x.DoNamedTest()
+
     [<Test>] member x.``Expr - Space - Before 04 - Anon record``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Before 05 - Array``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Before 06 - Object expr``() = x.DoNamedTest()

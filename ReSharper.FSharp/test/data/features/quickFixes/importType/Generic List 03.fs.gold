@@ -1,5 +1,4 @@
 ﻿// ${RUN:4}
-
 open System.Collections
 
 let l = IList{caret}()

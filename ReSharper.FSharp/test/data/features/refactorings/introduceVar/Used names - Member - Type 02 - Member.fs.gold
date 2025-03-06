@@ -2,4 +2,5 @@
 type T() =
     let i1 = 123
     let x = i1
+
     member val i = 1

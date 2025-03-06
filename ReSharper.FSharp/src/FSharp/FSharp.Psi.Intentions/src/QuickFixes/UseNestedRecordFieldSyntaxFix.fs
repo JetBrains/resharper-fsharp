@@ -22,7 +22,6 @@ type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWar
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(outerBinding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let factory = outerBinding.CreateElementFactory()
 

@@ -433,21 +433,15 @@ let needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     needsParensImpl allowHighPrecedenceAppParens context expr
 
 let addParens (expr: IFSharpExpression) =
-    let exprCopy = expr.Copy()
     let factory = expr.CreateElementFactory()
+    let exprCopy = expr.Copy()
 
     let parenExpr = factory.CreateParenExpr()
     let parenExpr = ModificationUtil.ReplaceChild(expr, parenExpr)
-    let expr = parenExpr.SetInnerExpression(exprCopy)
-
-    shiftNode 1 expr
-    expr
+    parenExpr.SetInnerExpression(exprCopy)
 
 
 let addParensIfNeeded (expr: IFSharpExpression) =
     let context = expr.IgnoreParentParens(includingBeginEndExpr = false)
     if context != expr || not (needsParens context expr) then expr else
     addParens expr
-
-let shouldAddSpaceAfter (prevToken: ITokenNode) = isIdentifierOrKeyword prevToken
-let shouldAddSpaceBefore (nextToken: ITokenNode) = isIdentifierOrKeyword nextToken

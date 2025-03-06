@@ -2,4 +2,4 @@
 module Module
 
 for o in [||] do
-  {caret}
+    {caret}

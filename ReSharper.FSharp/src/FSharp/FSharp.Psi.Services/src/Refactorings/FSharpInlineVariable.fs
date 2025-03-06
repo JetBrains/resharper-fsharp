@@ -40,8 +40,6 @@ type FSharpInlineHelper(driver) =
 type FSharpInlineVariable(workflow, solution, driver) =
     inherit InlineVarBase(workflow, solution, driver)
 
-    let mutable exprIndent = 0
-
     override x.InlineHelper = FSharpInlineHelper(driver) :> _
 
     override x.ProcessReferenceWithContext(reference, _, info) =
@@ -54,14 +52,11 @@ type FSharpInlineVariable(workflow, solution, driver) =
             match referenceOwner with
             | :? IExpressionReferenceName as referenceName when
                     isNotNull (ReferenceNameOwnerPatNavigator.GetByReferenceName(referenceName)) ->
-                let factory = expr.CreateElementFactory()
+                let factory = referenceOwner.CreateElementFactory()
                 let newPattern = factory.CreatePattern(expr.GetText(), false) :> ITreeNode
                 let oldPattern = ReferenceNameOwnerPatNavigator.GetByReferenceName(referenceName) :> ITreeNode
                 oldPattern, newPattern
             | _ -> referenceOwner, expr.Copy()
-
-        let indentShift = referenceOwner.Indent - exprIndent
-        shiftNode indentShift newNode
 
         let newNode = ModificationUtil.ReplaceChild(oldNode, newNode)
         let newExpr = newNode.As<IFSharpExpression>()
@@ -72,30 +67,19 @@ type FSharpInlineVariable(workflow, solution, driver) =
 
     override x.RemoveVariableDeclaration(decl) =
         use cookie = WriteLockCookie.Create(decl.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let refPat = decl.As<IReferencePat>()
         let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
         match LetBindingsNavigator.GetByBinding(binding) with
         | :? ILetOrUseExpr as letExpr ->
-            let inKeyword = letExpr.InKeyword
-            let lastNode: ITreeNode = if isNotNull inKeyword then inKeyword :> _ else binding :> _
-
-            let first =
-                skipMatchingNodesAfter isInlineSpaceOrComment lastNode
-                |> getThisOrNextNewLine
-                |> skipMatchingNodesAfter isInlineSpace
-
-            ModificationUtil.AddChildRangeBefore(letExpr, TreeRange(first, letExpr.LastChild)) |> ignore
-            ModificationUtil.DeleteChild(letExpr)
+            replaceWithCopy letExpr letExpr.InExpression
 
         | :? ILetBindingsDeclaration as letDecl ->
             removeModuleMember letDecl
 
         | _ -> ()
 
-    override x.RemoveAssignment(expr) =
-        exprIndent <- expr.Indent
+    override x.RemoveAssignment(expr) = ()
 
 
 type FSharpInlineVarAnalyser(workflow) =

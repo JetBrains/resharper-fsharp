@@ -1,0 +1,23 @@
+module Top
+
+module Nested1 =
+    /// Comment
+    let _ = 1
+
+module Nested2 =
+    let _ = 1
+
+module Nested3 =
+    let _ =
+        1
+
+module Nested4 =
+    let _ =
+        1
+
+    let e = 1
+
+module Nested5 =
+    let _ =
+        1
+    let _ = 1

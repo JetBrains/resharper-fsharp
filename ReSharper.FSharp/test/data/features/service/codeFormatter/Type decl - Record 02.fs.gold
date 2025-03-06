@@ -1,107 +1,99 @@
-﻿TypeDeclarationBraces = END_OF_LINE
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
-namespace Namespace
-
-type R1 = {
-  F: int
-}
-
-type R2 = {
-  F1: int
-  F2: int
-}
-
-type R3 = {
-  F: int
-}
-================
-TypeDeclarationBraces = END_OF_LINE_NO_SPACE
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
-namespace Namespace
-
-type R1 ={
-  F: int
-}
-
-type R2 ={
-  F1: int
-  F2: int
-}
-
-type R3 ={
-  F: int
-}
-================
-TypeDeclarationBraces = NEXT_LINE
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+﻿TypeDeclarationBraces = END_OF_LINE,END_OF_LINE_NO_SPACE,NEXT_LINE,NEXT_LINE_SHIFTED_2
+  KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
     {
-      F: int
+        F: int
     }
 
 type R2 =
     {
-      F1: int
-      F2: int
+        F1: int
+        F2: int
+    }
+
+type R3 = {
+    F: int
+}
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type R1 =
+    {
+        F: int
+    }
+
+type R2 =
+    {
+        F1: int
+        F2: int
     }
 
 type R3 =
     {
-      F: int
+        F: int
     }
 ================
 TypeDeclarationBraces = NEXT_LINE_SHIFTED
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+  KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  {
-  F: int
-  }
+        {
+        F: int
+        }
 
 type R2 =
-  {
-  F1: int
-  F2: int
-  }
+        {
+        F1: int
+        F2: int
+        }
 
-type R3 =
-  {
-  F: int
-  }
+type R3 = {
+    F: int
+    }
 ================
-TypeDeclarationBraces = NEXT_LINE_SHIFTED_2
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+  KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
 type R1 =
-  {
-    F: int
-  }
+        {
+        F: int
+        }
 
 type R2 =
-  {
-    F1: int
-    F2: int
-  }
+        {
+        F1: int
+        F2: int
+        }
 
 type R3 =
-  {
-    F: int
-  }
+        {
+        F: int
+        }
 ================
 TypeDeclarationBraces = PICO
-  unaffected by KeepExistingLineBreakBeforeDeclarationBody
+  KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  { F: int }
+    { F: int }
 
 type R2 =
-  { F1: int
-    F2: int }
+    { F1: int
+      F2: int }
 
-type R3 =
-  { F: int }
+type R3 = { F: int }
+================
+  KeepExistingLineBreakBeforeDeclarationBody = False
+namespace Namespace
+
+type R1 = { F: int }
+
+type R2 =
+    { F1: int
+      F2: int }
+
+type R3 = { F: int }

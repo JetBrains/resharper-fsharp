@@ -144,17 +144,6 @@ let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpre
 
     factory.CreateAppExpr("not", expr) :> _
 
-let setBindingExpression (expr: IFSharpExpression) contextIndent (binding: IBinding) =
-    let newExpr = binding.SetExpression(expr.Copy())
-    if not expr.IsSingleLine then
-        let nextSibling = binding.EqualsToken.NextSibling
-        if getTokenType nextSibling == FSharpTokenType.WHITESPACE then
-            ModificationUtil.DeleteChild(nextSibling)
-
-        let indentSize = expr.GetIndentSize()
-        ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
-        ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
-        shiftNode indentSize newExpr
 
 let tryGetEffectiveParentComputationExpression (expr: IFSharpExpression) =
     let rec loop isLetInExpr (expr: IFSharpExpression) =

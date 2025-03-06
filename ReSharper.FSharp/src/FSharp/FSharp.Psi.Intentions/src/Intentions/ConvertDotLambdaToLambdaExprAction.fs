@@ -59,7 +59,6 @@ type ConvertDotLambdaToLambdaExprAction(dataProvider: FSharpContextActionDataPro
         let refExpr = getQualifierReferenceExpr dotLambdaExpr.Expression
 
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let names =
             let apparentType = dotLambdaExpr.Shorthand.GetExpressionTypeFromFcs()

@@ -35,8 +35,7 @@ type ToPositionalFieldPatternsAction(dataProvider: FSharpContextActionDataProvid
 
     override this.IsAvailable _ =
         let unionCaseFieldsPat, parametersOwnerPat = getUnionCasePatterns ()
-        if isNull parametersOwnerPat then false else
-        if not parametersOwnerPat.IsSingleLine || parametersOwnerPat.Parameters.Count > 1 then false else
+        if isNull parametersOwnerPat || parametersOwnerPat.Parameters.Count > 1 then false else
 
         let fcsUnionCase = parametersOwnerPat.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase || fcsUnionCase.Fields.Count < 1 then false else
@@ -52,8 +51,7 @@ type ToPositionalFieldPatternsAction(dataProvider: FSharpContextActionDataProvid
         let unionCaseFieldsPat, parametersOwnerPat = getUnionCasePatterns ()
 
         use writeCookie = WriteLockCookie.Create(parametersOwnerPat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        
+
         let fcsUnionCase = parametersOwnerPat.Reference.GetFcsSymbol() :?> FSharpUnionCase
 
         let existingPatterns = Dictionary()

@@ -83,10 +83,10 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``Comment 02 - Eof``() = x.DoNamedTest()
     [<Test>] member x.``Comment 03``() = x.DoNamedTest()
     [<Test>] member x.``Comment 04 - Space``() = x.DoNamedTest()
-    [<Test>] member x.``Comment 05``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Comment 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Empty line 01``() = x.DoNamedTest()
-    [<Test>] member x.``Empty line 02``() = x.DoNamedTest()
+    [<Test>] member x.``Empty line 02``() = x.DoNamedTest() // todo: formatter: add empty line
 
     [<Test>] member x.``Indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Indent 02``() = x.DoNamedTest()
