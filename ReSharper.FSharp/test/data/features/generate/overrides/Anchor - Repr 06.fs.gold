@@ -7,9 +7,9 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type MyRecord = 
-  { Field1: int
-    Field2: int
-    Field3: int }
+type MyRecord =
+    { Field1: int
+      Field2: int
+      Field3: int }
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}

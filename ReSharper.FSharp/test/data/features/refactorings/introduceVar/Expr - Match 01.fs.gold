@@ -3,8 +3,9 @@ module Module
 
 do
     let i =
-      match () with
-      | a -> 1
-      | b -> 2
+        match () with
+        | a -> 1
+        | b -> 2
+
     i
     |> ignore

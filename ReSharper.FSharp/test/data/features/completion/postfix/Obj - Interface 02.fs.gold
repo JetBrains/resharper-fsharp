@@ -2,4 +2,4 @@
 module Module
 
 { new System.IDisposable with
-  member this.Dispose() = failwith "todo"{caret} }
+    member this.Dispose() = failwith "todo"{caret} }

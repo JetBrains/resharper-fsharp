@@ -3,4 +3,3 @@
 let f x{caret} =
     match x with
     | _ -> ()
-}

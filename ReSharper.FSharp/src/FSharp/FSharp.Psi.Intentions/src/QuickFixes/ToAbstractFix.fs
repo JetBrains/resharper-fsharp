@@ -24,7 +24,6 @@ type ToAbstractFix(typeDecl: IFSharpTypeDeclaration) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(typeDecl.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let attributeList = getTypeDeclarationAttributeList typeDecl
         let attribute = typeDecl.CreateElementFactory().CreateAttribute("AbstractClass")

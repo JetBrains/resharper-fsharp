@@ -5,5 +5,5 @@ type A() =
 type T() =
     inherit A()
 
-    override this.Item with get var0 = failwith "todo"
-    override this.Item with set var0 value = {selstart}failwith "todo"{selend}
+    override this.Item with get var0 = {selstart}failwith "todo"{selend}
+    override this.Item with set var0 value = failwith "todo"

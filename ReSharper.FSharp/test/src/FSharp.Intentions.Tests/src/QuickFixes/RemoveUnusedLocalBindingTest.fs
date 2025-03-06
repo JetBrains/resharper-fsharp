@@ -18,8 +18,8 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02 - Wrong seq``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 03 - Wrong seq in seq``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 04 - New lines``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 05``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 04 - New lines``() = x.DoNamedTest() // todo: formatter: remove blank line
+    [<Test>] member x.``Multiline 05``() = x.DoNamedTest() // todo: formatter: remove blank line
     [<Test>] member x.``Multiline 06 - Nested pattern``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 07 - In other let``() = x.DoNamedTest()
 
@@ -45,6 +45,7 @@ type RemoveUnusedLocalBindingTest() =
 
     [<Test>] member x.``Type - Single 01``() = x.DoNamedTest()
     [<Test>] member x.``Type - Single 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Single 03``() = x.DoNamedTest()
     [<Test; Explicit "Regression https://github.com/dotnet/fsharp/issues/13849">] member x.``Type - Recursive 01``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()

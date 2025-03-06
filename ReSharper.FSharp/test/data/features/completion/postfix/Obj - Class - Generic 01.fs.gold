@@ -6,4 +6,4 @@ type Base<'T>() =
     abstract M: 'T -> unit
 
 { new Base<int>() with
-  override this.M(var0) = failwith "todo"{caret} }
+    override this.M(var0) = failwith "todo"{caret} }

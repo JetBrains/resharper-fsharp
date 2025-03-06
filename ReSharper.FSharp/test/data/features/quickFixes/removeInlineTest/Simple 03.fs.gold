@@ -1,0 +1,3 @@
+﻿type T() =
+    let {caret}foo x = [1
+                 2]

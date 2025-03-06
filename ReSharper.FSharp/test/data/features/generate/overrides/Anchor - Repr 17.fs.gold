@@ -9,15 +9,15 @@
 
 // ${KIND:Overrides}
 
-type MyClass() = 
-  class
-    override this.ToString() = {selstart}failwith "todo"{selend}
+type MyClass() =
+    class
+        override this.ToString() = {selstart}failwith "todo"{selend}
 
-    interface IA<int> with
-      member x.Get() = 1
+        interface IA<int> with
+            member x.Get() = 1
 
-    // comment 1
-    interface IA<string> with
-      // comment 2
-      member x.Get() = "hello"
-  end
+        // comment 1
+        interface IA<string> with
+            // comment 2
+            member x.Get() = "hello"
+    end

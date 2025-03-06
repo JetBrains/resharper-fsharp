@@ -15,6 +15,5 @@ type RemoveRedundantAttributeParensFix(warning: RedundantAttributeParensWarning)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attribute.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         deleteChild attribute.ArgExpression

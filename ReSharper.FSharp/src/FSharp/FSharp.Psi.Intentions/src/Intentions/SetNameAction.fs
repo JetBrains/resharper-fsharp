@@ -34,7 +34,6 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
         let factory = wildPat.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(wildPat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let names =
             createEmptyNamesCollection wildPat

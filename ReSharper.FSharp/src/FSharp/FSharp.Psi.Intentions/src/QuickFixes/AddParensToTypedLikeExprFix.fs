@@ -1,9 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -27,12 +26,12 @@ type AddParensToTypedLikeExprFix(typedLikeExpr: ITypedLikeExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+        let factory = expr.CreateElementFactory()
 
         let exprCopy = expr.Copy()
         let typedLikeExprCopy = typedLikeExpr.Copy()
-        let prefixApp = ModificationUtil.ReplaceChild(typedLikeExpr, prefixApp.Copy())
 
+        let prefixApp = ModificationUtil.ReplaceChild(typedLikeExpr, prefixApp.Copy())
+        let parenExpr = prefixApp.SetArgumentExpression(factory.CreateParenExpr()) :?> IParenExpr
+        let typedLikeExprCopy = parenExpr.SetInnerExpression(typedLikeExprCopy) :?> ITypedLikeExpr
         typedLikeExprCopy.SetExpression(exprCopy) |> ignore
-        let parenExpr = ParenExprNavigator.GetByInnerExpression(addParens typedLikeExprCopy)
-        prefixApp.SetArgumentExpression(parenExpr) |> ignore

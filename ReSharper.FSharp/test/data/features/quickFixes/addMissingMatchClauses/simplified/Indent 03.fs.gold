@@ -9,6 +9,6 @@ do
     match A with
     | A -> ()
     | B ->
-      ()
-      ()
+        ()
+        ()
     | C -> {selstart}failwith "todo"{selend}

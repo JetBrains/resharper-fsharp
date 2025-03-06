@@ -12,17 +12,17 @@ type UpdateRecordFieldsInSignatureFix(typeDecl: IFSharpTypeDeclaration) =
     let implementationRecordRepr =
         getRecordRepresentation typeDecl
 
-    new(error: DefinitionsInSigAndImplNotCompatibleFieldWasPresentError) =
-        UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
-    new(error: DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError) =
+    new (error: DefinitionsInSigAndImplNotCompatibleFieldWasPresentError) =
         UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
 
-    new(error: DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError) =
+    new (error: DefinitionsInSigAndImplNotCompatibleFieldOrderDifferError) =
+        UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
+
+    new (error: DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError) =
         UpdateRecordFieldsInSignatureFix(error.TypeDeclaration)
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(typeDecl.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         match implementationRecordRepr with
         | None -> ()

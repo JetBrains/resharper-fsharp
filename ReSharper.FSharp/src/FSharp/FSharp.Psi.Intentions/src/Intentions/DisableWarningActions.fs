@@ -8,7 +8,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -37,10 +38,8 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(file.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let highlightingRanges = highlightingRanges |> Array.sortBy _.StartOffset.Offset
-        let lineEnding = file.GetLineEnding()
 
         let firstRange = highlightingRanges[0]
         let firstNode = file.FindNodeAt(firstRange)
@@ -53,29 +52,21 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
         match this.DisableNode with
         | null -> null
         | openNode ->
-        let offset = document.GetLineStartDocumentOffset(firstNode.StartLine)
-        let nodeToAddBefore = file.FindNodeAt(offset + 1)
-        let indent = if nodeToAddBefore :? Whitespace then nodeToAddBefore.GetTextLength() else 0
 
+        let offset = document.GetLineStartDocumentOffset(firstNode.StartLine)
+        let nodeToAddBefore = JetBrains.ReSharper.Psi.Impl.CodeStyle.FormatterImplHelper.SkipRightWhitespaces(file.FindNodeAt(offset + 1))
         let nodeToAddBefore = skipParentsWithSameOffset nodeToAddBefore true
-        addNodesBefore nodeToAddBefore [
-            if indent > 0 then Whitespace(indent)
-            openNode
-            NewLine(lineEnding)
-        ] |> ignore
+        addNodeBefore nodeToAddBefore openNode
 
         match this.RestoreNode with
         | null -> null
         | closeNode ->
+
         let offset = document.GetLineEndDocumentOffsetNoLineBreak(lastNode.EndLine)
         let nodeToAddAfter = file.FindNodeAt(offset)
 
         let nodeToAddAfter = skipParentsWithSameOffset nodeToAddAfter false
-        addNodesAfter nodeToAddAfter [
-            NewLine(lineEnding)
-            if indent > 0 then Whitespace(indent)
-            closeNode
-        ] |> ignore
+        addNodeAfter nodeToAddAfter closeNode
 
         null
 
@@ -140,20 +131,22 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(file.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
-        let lineEnding = file.GetLineEnding()
         let firstNode, lastNode, needsAdditionalNewLine = findInsertRange file severityId
 
-        let treeNodes: ITreeNode list =
-            [
-                FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisablePrefix} {severityId}")
-                NewLine(lineEnding)
-                if needsAdditionalNewLine then NewLine(lineEnding)
-            ]
+        let commentNode =
+            FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisablePrefix} {severityId}")
+
         if firstNode == lastNode then
-            addNodesBefore firstNode treeNodes |> ignore
+            let commentNode = ModificationUtil.AddChildBefore(firstNode, commentNode)
+            if needsAdditionalNewLine then
+                commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
         else
-            addNodesAfter lastNode treeNodes |> ignore
-            if disableAll then deleteChildRange firstNode lastNode
+            let commentNode = ModificationUtil.AddChildAfter(lastNode, commentNode)
+            if needsAdditionalNewLine then
+                commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
+
+            if disableAll then
+                deleteChildRange firstNode lastNode
+
         null

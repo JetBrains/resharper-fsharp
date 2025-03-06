@@ -1,0 +1,5 @@
+﻿module Module =
+    {caret}type E =
+        | A = 1
+
+    type Abbr = int

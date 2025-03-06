@@ -58,7 +58,6 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let bindings = letBindings.Bindings
         if bindings.Count = 1 then

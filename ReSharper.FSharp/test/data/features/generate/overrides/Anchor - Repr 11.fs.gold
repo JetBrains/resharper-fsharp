@@ -7,12 +7,12 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type C() = 
-  class
-    override this.ToString() = {selstart}failwith "todo"{selend}
+type C() =
+    class
+        override this.ToString() = {selstart}failwith "todo"{selend}
 
-    member this.X = [ 1
-                      // comment 1
-                      2 // comment 2
-                      3 ]
-  end
+        member this.X = [ 1
+                          // comment 1
+                          2 // comment 2
+                          3 ]
+    end

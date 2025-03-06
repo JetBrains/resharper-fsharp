@@ -3,7 +3,6 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpModulesUtil
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
@@ -31,6 +30,5 @@ type NamespaceToModuleFix(node: IFSharpTreeNode) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         convertNamespaceToModule namespaceDeclaration

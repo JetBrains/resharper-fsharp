@@ -8,5 +8,5 @@ type I =
 type T() =
   interface I with
     member x.P1 = 1
-    member this.P2 = failwith "todo"
-    member this.P3 = {selstart}failwith "todo"{selend}
+    member this.P2 = {selstart}failwith "todo"{selend}
+    member this.P3 = failwith "todo"

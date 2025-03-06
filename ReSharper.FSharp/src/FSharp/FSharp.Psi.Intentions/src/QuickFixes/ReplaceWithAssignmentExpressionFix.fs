@@ -51,7 +51,6 @@ type ReplaceWithAssignmentExpressionFix(expr: IBinaryAppExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let factory = expr.CreateElementFactory()
         let setExpr = factory.CreateSetExpr(expr.LeftArgument, expr.RightArgument)

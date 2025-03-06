@@ -2,4 +2,4 @@
 module Module
 
 type A() =
-    member _.M(a: 'a) (b: 'b, [<Attr>]?c: 'c{caret}) = ()
+    member _.M(a: 'a) (b: 'b, [<Attr>] ?c: 'c{caret}) = ()

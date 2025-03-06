@@ -5,5 +5,5 @@ type I =
 
 type T() =
   interface I with
-    member this.P = failwith "todo"
-    member this.P with set value = {selstart}failwith "todo"{selend}
+      member this.P = {selstart}failwith "todo"{selend}
+      member this.P with set value = failwith "todo"

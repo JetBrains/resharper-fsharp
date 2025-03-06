@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantAsPatFix(warning: RedundantAsPatternWarning) =
@@ -22,9 +22,8 @@ type RemoveRedundantAsPatFix(warning: RedundantAsPatternWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(asPat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let refPat = asPat.RightPattern :?> IReferencePat
         let elementFactory = asPat.CreateElementFactory()
         let refPat = elementFactory.CreatePattern(refPat.SourceName, not refPat.IsLocal)
-        replace asPat refPat
+        ModificationUtil.ReplaceChild(asPat, refPat) |> ignore

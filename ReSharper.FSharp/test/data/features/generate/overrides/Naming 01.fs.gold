@@ -12,5 +12,5 @@ type Base() =
     abstract M: ``process``: int -> unit
     default this.M(``process``: int) = ()
 
-{ new Base() with  
-  override this.M(``process``) = {selstart}base.M(``process``){selend} } |> ignore
+{ new Base() with
+    override this.M(``process``) = {selstart}base.M(``process``){selend} } |> ignore

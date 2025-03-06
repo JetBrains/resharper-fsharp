@@ -11,5 +11,6 @@ type ToStaticMemberTest() =
     override x.RelativeTestDataPath = "features/quickFixes/toStaticMember"
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 02``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available 01 - Override``() = x.DoNamedTest()

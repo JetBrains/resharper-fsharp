@@ -3,6 +3,6 @@ module Module
 
 do
    [] |> List.map (fun _ -> 
-     match true with
-     | {caret}
+       match true with
+       | {caret}
    )

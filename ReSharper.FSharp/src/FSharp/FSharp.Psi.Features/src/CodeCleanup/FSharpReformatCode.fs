@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
@@ -26,9 +27,11 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         CodeCleanupOptionDescriptor.ReformatGroup,
         typeof<Strings>)
 
+    let language = FSharpLanguage.Instance
+
     interface IReformatCodeCleanupModule with
         member x.Name = Strings.FSharpReformatCode_Name_Reformat_FSharp
-        member x.LanguageType = FSharpLanguage.Instance :> _
+        member x.LanguageType = language
         member x.Descriptors = [| REFORMAT_CODE_DESCRIPTOR |]
         member x.IsAvailableOnSelection = true
         member x.SetDefaultSetting(profile, profileType) =
@@ -46,7 +49,15 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         member x.IsAvailable(profile: CodeCleanupProfile) =
             profile.GetSetting(REFORMAT_CODE_DESCRIPTOR)
 
-        member x.Process(sourceFile, rangeMarker, _, _, _) =
+        member x.Process(sourceFile, rangeMarker, profile, progressIndicator, _) =
+            // let solution = sourceFile.GetSolution()
+            // let codeFormatProfile = profile.GetSetting(ReformatOptions.CODE_FORMATER_PROFILE_DESCRIPTOR)
+            //
+            // sourceFile.GetPsiServices().Transactions.Execute("F# Reformat code", fun () ->
+            //     CodeFormatterHelper.Format(language, solution, rangeMarker.DocumentRange, codeFormatProfile, true,
+            //     false, progressIndicator)
+            // ) |> ignore
+
             let fsFile = sourceFile.FSharpFile
             if isNull fsFile then () else
 

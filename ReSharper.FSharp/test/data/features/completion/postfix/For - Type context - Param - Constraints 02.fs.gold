@@ -3,5 +3,5 @@ module Module
 
 let f (x: #seq<_>) =
     for b in x do
-      {caret}
+        {caret}
     ()

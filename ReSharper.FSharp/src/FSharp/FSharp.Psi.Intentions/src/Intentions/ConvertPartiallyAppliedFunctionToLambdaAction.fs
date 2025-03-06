@@ -72,7 +72,6 @@ type ConvertPartiallyAppliedFunctionToLambdaAction(dataProvider: FSharpContextAc
         let isOperator = isOperatorReferenceExpr refExpr
 
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let hotspotsRegistry = HotspotsRegistry(refExpr.GetPsiServices())
         let factory = refExpr.CreateElementFactory()

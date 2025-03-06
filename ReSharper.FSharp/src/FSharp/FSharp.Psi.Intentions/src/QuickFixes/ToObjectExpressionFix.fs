@@ -29,7 +29,6 @@ type ToObjectExpressionFix(error: AbstractTypeCannotBeInstantiatedError) =
         let factory = expr.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let psiModule = expr.GetPsiModule()
         let objExpr = GenerateOverrides.convertToObjectExpression factory psiModule expr

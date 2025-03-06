@@ -1,0 +1,5 @@
+﻿module Module
+
+let _ =
+    fun _ -> let i = 1
+             i + 1

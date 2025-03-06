@@ -7,7 +7,7 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type U = 
-  | ``A B``
+type U =
+    | ``A B``
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}

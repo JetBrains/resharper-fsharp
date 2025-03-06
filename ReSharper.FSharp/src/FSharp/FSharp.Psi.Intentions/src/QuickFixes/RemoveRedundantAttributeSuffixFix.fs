@@ -15,7 +15,6 @@ type RemoveRedundantAttributeSuffixFix(warning: RedundantAttributeSuffixWarning)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attribute.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let shortAttributeName = attribute.ReferenceName.ShortName.TrimFromEnd("Attribute")
         attribute.ReferenceName.SetName(shortAttributeName) |> ignore

@@ -1,7 +1,7 @@
 ﻿//${NEW_NAME:Zzz}
 module Module
 
-let (    |  B  |    Zzz | ) x =
+let (    |  B  | Zzz | ) x =
     if x then B else Zzz
 
 match true with

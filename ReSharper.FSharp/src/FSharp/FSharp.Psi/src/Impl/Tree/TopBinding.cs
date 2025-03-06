@@ -68,11 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         throw new NotImplementedException();
 
       using var _ = WriteLockCookie.Create(IsPhysical());
-      var inlineKeyword = InlineKeyword;
-      if (inlineKeyword.PrevSibling is Whitespace whitespace)
-        ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
-      else
-        ModificationUtil.DeleteChild(inlineKeyword);
+      ModificationUtil.DeleteChild(InlineKeyword);
     }
 
     public bool IsMutable => MutableKeyword != null;
