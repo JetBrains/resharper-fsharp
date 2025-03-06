@@ -6,5 +6,5 @@ type I =
 
 type T() =
   interface I with
-    member this.M(var0: int): unit = failwith "todo"
-    member this.M(var0: double): unit = {selstart}failwith "todo"{selend}
+      member this.M(var0: int): unit = {selstart}failwith "todo"{selend}
+      member this.M(var0: double): unit = failwith "todo"

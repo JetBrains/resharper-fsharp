@@ -1,0 +1,8 @@
+﻿module Module
+
+type U =
+    private
+        /// B
+        | B = 2
+
+        | A = 1

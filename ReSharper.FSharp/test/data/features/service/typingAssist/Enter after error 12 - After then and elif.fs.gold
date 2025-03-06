@@ -1,4 +1,4 @@
-// ${CHAR:Enter} 
+﻿// ${CHAR:Enter} 
 module Module
 
 do
@@ -6,4 +6,4 @@ do
       ()
    elif true &&
        false then
-     {caret}
+       {caret}

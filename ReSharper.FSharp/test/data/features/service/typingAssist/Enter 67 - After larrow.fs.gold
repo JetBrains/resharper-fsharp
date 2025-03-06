@@ -1,6 +1,6 @@
-// ${CHAR:Enter} 
+﻿// ${CHAR:Enter} 
 module Module
 
 x <-
 
-  {caret}2
+    {caret}2

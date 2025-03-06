@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -30,7 +29,6 @@ type LetToUseAction(dataProvider: FSharpContextActionDataProvider) =
 
     static member Execute(letExpr: ILetOrUseExpr) =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let tokenType = getTokenType letExpr.BindingKeyword
         let tokenType = if tokenType == FSharpTokenType.LET_BANG then FSharpTokenType.USE_BANG else FSharpTokenType.USE

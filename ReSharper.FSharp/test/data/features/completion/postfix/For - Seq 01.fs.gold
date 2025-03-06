@@ -4,5 +4,5 @@ module Module
 let f classes =
     [()
      for ``class`` in classes do
-       {caret}
+         {caret}
      ()]

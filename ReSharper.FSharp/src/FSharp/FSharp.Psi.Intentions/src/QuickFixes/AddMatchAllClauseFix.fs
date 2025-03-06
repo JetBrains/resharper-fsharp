@@ -1,21 +1,17 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-
 
 [<RequireQualifiedAccess>]
 type GeneratedClauseExpr =
@@ -38,53 +34,21 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
         isValid expr && not expr.Clauses.IsEmpty
 
     override x.ExecutePsiTransaction(_, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let factory = expr.CreateElementFactory()
-        use disableFormatter = new DisableCodeFormatter()
 
-        let isSingleLineMatch = expr.IsSingleLine
+        MatchExprUtil.addBarIfNeeded expr
+        moveCommentsAndWhitespaceInside expr
 
-        let addToNewLine = not isSingleLineMatch // todo: cover more cases
-
-        let singleClause = expr.Clauses.SingleItem
-        if isNotNull singleClause && isNull singleClause.Bar && singleClause.StartLine <> expr.StartLine then
-            addNodesBefore singleClause.FirstChild [
-                FSharpTokenType.BAR.CreateLeafElement()
-                Whitespace()
-            ] |> ignore
-
-        let lastClause = expr.ClausesEnumerable |> Seq.tryLast
-
-        let clause =
-            addNodesAfter expr.LastChild [
-                if addToNewLine then
-                    let lineEnding = expr.GetLineEnding()
-
-                    let lastClause = expr.Clauses.Last()
-                    if not lastClause.IsSingleLine && isAfterEmptyLine lastClause then
-                        NewLine(lineEnding)
-
-                    NewLine(lineEnding)
-
-                    let indent = lastClause.Indent
-                    if indent > 0 then
-                        Whitespace(indent) // may be wrong in some cases
-                else
-                    Whitespace()
-                factory.CreateMatchClause()
-            ] :?> IMatchClause
+        let clause = ModificationUtil.AddChild(expr, factory.CreateMatchClause())
 
         if generatedExpr = GeneratedClauseExpr.ArgumentOutOfRange then
-            let typeName =
-                let typeName = "ArgumentOutOfRangeException"
-                match expr.CheckerService.ResolveNameAtLocation(expr, [typeName], false, "AddMatchAllClauseFix") with
-                | None -> $"System.{typeName}"
-                | Some _ -> typeName
-
-            clause.SetExpression(factory.CreateExpr($"{typeName}() |> raise")) |> ignore
-
-        lastClause |> Option.iter (MatchTree.moveSubsequentCommentToMatchClause expr)
+            let exnTypeElement = expr.GetPredefinedType().ArgumentOutOfRangeException.GetTypeElement()
+            let bodyExpr = factory.CreateExpr($"{exnTypeElement.ShortName}() |> raise")
+            let binaryAppExpr = clause.SetExpression(bodyExpr) :?> IBinaryAppExpr
+            let ctorExpr = binaryAppExpr.LeftArgument :?> IPrefixAppExpr
+            let refExpr = ctorExpr.FunctionExpression :?> IReferenceExpr
+            FSharpBindUtil.bindDeclaredElementToReference expr refExpr.Reference exnTypeElement ""
 
         Action<_>(fun textControl ->
             let range = clause.Expression.GetDocumentRange()

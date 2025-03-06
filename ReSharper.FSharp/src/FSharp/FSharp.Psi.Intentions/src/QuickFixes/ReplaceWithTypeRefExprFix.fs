@@ -30,7 +30,6 @@ type ReplaceWithTypeRefExprFix(refExpr: IReferenceExpr) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
-        use disableFormatterCookie = new DisableCodeFormatter()
 
         let fcsSymbolUse = refExpr.Reference.GetSymbolUse()
         let fcsType = refExpr.Qualifier.TryGetFcsType()

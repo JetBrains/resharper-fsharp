@@ -1,2 +1,3 @@
-﻿let x =  id
-           (){caret}
+﻿let x =
+    id
+        (){caret}

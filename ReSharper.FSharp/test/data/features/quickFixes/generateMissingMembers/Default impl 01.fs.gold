@@ -13,5 +13,5 @@ type A() =
 type B() =
     inherit A()
 
-    override this.M1(var0) = failwith "todo"
-    override this.P1 = {selstart}failwith "todo"{selend}
+    override this.M1(var0) = {selstart}failwith "todo"{selend}
+    override this.P1 = failwith "todo"

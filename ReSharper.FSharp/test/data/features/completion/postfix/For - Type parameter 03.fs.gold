@@ -4,6 +4,6 @@ module Module
 let f x =
     if true then
         for a in x do
-          {caret}
+            {caret}
 
     ()

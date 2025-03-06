@@ -1,6 +1,6 @@
-// ${CHAR:Tab}
+﻿// ${CHAR:Tab}
 module Module
 
 let x =
-  {caret}
+    {caret}
     123

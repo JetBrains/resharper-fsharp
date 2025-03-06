@@ -5,6 +5,6 @@ module Module =
         type T() = class end
 
     open Module1
-    
+
     module Module2 =
         let t = T{caret}

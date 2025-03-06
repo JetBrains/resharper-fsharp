@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -54,6 +55,11 @@ and MatchPostfixTemplateBehavior(info) =
             let matchExpr = ModificationUtil.ReplaceChild(expr, expr.CreateElementFactory().CreateMatchExpr(expr))
             let matchClause = matchExpr.Clauses[0]
             ModificationUtil.DeleteChildRange(matchClause.Pattern, matchClause.LastChild)
+
+            let indent = matchExpr.Indent
+            let lineEnding = matchExpr.GetLineEnding()
+            let whitespace = ModificationUtil.ReplaceChild(matchClause.PrevSibling, Whitespace(indent))
+            ModificationUtil.AddChildBefore(whitespace, NewLine(lineEnding)) |> ignore
 
             matchExpr :> ITreeNode
         )

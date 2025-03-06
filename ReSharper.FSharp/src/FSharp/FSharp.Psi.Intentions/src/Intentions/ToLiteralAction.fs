@@ -57,7 +57,6 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     override x.ExecutePsiTransaction(_, _) =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let attributeList = getAttributeList binding
         let attribute = binding.CreateElementFactory().CreateAttribute("Literal")

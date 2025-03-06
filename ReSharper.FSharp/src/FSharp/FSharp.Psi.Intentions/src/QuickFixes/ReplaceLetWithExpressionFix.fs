@@ -35,6 +35,6 @@ type ReplaceLetWithExpressionFix(error: ExpectedExpressionAfterLetError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+
         let expr = ModificationUtil.ReplaceChild(letExpr, letExpr.Bindings[0].Expression.Copy())
         removeDanglingIn expr

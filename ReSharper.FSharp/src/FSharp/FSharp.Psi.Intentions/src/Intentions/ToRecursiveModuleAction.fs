@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
 [<ContextAction(Name = "ToRecursiveModule", GroupType = typeof<FSharpContextActions>, Description = "To recursive")>]
@@ -17,7 +16,6 @@ type ToRecursiveModuleAction(dataProvider: FSharpContextActionDataProvider) =
         isAtModuleDeclarationKeyword dataProvider moduleDeclaration
 
     override x.ExecutePsiTransaction(_, _) =
-        use cookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         let moduleLikeDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()
         moduleLikeDeclaration.SetIsRecursive(true)
 

@@ -1,0 +1,6 @@
+﻿module Module
+
+do
+    "hello wodld", fun _ ->
+        1
+    ()

@@ -1,0 +1,9 @@
+﻿Suggested names: objectFunc, func
+module Module
+
+do
+    let objectFunc =
+        fun _ ->
+            1
+
+    ()

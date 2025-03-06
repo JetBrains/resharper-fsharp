@@ -27,7 +27,7 @@ IFSharpImplFile
                 FSharpTokenType+AmpTokenElement(type:AMP, text:&)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 IHashTypeUsage
-                  FSharpToken(type:HASH, text:#)
+                  FSharpTokenType+HashTokenElement(type:HASH, text:#)
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:A)
@@ -35,7 +35,7 @@ IFSharpImplFile
                 FSharpTokenType+AmpTokenElement(type:AMP, text:&)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 IHashTypeUsage
-                  FSharpToken(type:HASH, text:#)
+                  FSharpTokenType+HashTokenElement(type:HASH, text:#)
                   INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:B)

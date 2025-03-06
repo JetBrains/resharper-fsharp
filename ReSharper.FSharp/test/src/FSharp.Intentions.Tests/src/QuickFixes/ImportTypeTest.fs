@@ -138,7 +138,7 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Expr - Literal 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 04``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Expr - Literal 05``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 05``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Union 01``() = x.DoNamedTest()
@@ -163,7 +163,7 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Pattern - Literal 03``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Literal 04``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Literal 05``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Pattern - Literal 06``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union 02 - Rqa``() = x.DoNamedTest()

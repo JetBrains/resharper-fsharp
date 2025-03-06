@@ -1,0 +1,16 @@
+module Top
+
+module Nested =
+    /// Comment
+    let rec x = 1
+    and y = 2
+
+    let
+        rec
+        a
+        =
+        1
+    and
+        b
+        =
+        2

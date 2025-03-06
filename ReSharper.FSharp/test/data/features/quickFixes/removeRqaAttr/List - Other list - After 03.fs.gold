@@ -1,0 +1,6 @@
+﻿module Module =
+    type Abbr = int
+
+    {caret}[<CompiledName "E">]
+    type E =
+        | A = 1

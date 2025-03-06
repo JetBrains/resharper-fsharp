@@ -4,7 +4,6 @@ open System
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -17,11 +16,7 @@ let addAttribute (attributeList: IAttributeList) (attribute: IAttribute) =
     let attribute = ModificationUtil.AddChildAfter(attributeList.LBrack, attribute)
 
     if attributeList.Attributes.Count > 1 then
-        addNodesAfter attribute [
-            FSharpTokenType.SEMICOLON.CreateLeafElement()
-            if not (isWhitespace attribute.NextSibling) then
-                Whitespace()
-        ] |> ignore
+        ModificationUtil.AddChildAfter(attribute, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
 
     attribute
 
@@ -37,75 +32,34 @@ let addAttributeAfter (anchor: IAttribute) (attribute: IAttribute) =
     addNodesAfter anchor [
         if not seenSemi then
             FSharpTokenType.SEMICOLON.CreateLeafElement()
-        Whitespace()
         attribute
-
-        let nextSiblingType = getTokenType anchor.NextSibling
-        if isNotNull nextSiblingType &&
-                not (nextSiblingType.IsWhitespace || nextSiblingType == FSharpTokenType.GREATER_RBRACK) then
-            Whitespace()
     ] |> ignore
 
 
 let removeAttributeList (attrList: IAttributeList) =
-    if isOnlyMeaningfulNodeOnLine attrList then
-        let first = getFirstMatchingNodeBefore isInlineSpaceOrComment attrList
-        let last =
-            match attrList.PrevSibling with
-            | null -> getLastInlineSpaceOrCommentSkipNewLine attrList
-            | _ -> skipMatchingNodesAfter isInlineSpaceOrComment attrList
-        deleteChildRange first last
-
-    elif isFirstMeaningfulNodeOnLine attrList then
-        let last =
-            match attrList.PrevSibling with
-            | null -> getLastInlineSpaceOrCommentSkipNewLine attrList
-            | _ -> getLastMatchingNodeAfter isInlineSpaceOrComment attrList
-        deleteChildRange attrList last
-
-    else
-        let first = getFirstMatchingNodeBefore isInlineSpaceOrComment attrList
-        let last = getLastMatchingNodeAfter isInlineSpaceOrComment attrList
-
-        if isLastMeaningfulNodeOnLine attrList then
-            deleteChildRange first last
-        else
-            replaceRangeWithNode first last (Whitespace())
+    let last = getLastMatchingNodeAfter isInlineSpaceOrComment attrList
+    ModificationUtil.DeleteChildRange(attrList, last)
 
 let removeAttributeFromList (attr: IAttribute) =
-    let attrList = AttributeListNavigator.GetByAttribute(attr)
-    let attrs = attrList.Attributes
-    let rBrack = attrList.RBrack
+    let attrs = AttributeListNavigator.GetByAttribute(attr).Attributes
+    Assertion.Assert(attrs.Count > 1)
 
-    if isNotNull rBrack && attrs.Count = 1 then
-        deleteChildRange attrList.LBrack.NextSibling rBrack.PrevSibling else
+    let isLast = attrs.Last() == attr
 
-    if attrs.Count > 1 && attrs.First() == attr then
-        deleteChildRange attrList.LBrack.NextSibling attrs[1].PrevSibling else
+    let first: ITreeNode =
+        if not isLast then attr else
 
-    if isNotNull rBrack && attrs.Last() == attr then
-        deleteChildRange attrs[attrs.Count - 2].NextSibling rBrack.PrevSibling else
-
-    let isFirstOnLine = isFirstMeaningfulNodeOnLine attr
-
-    let first =
-        if not isFirstOnLine then getFirstMatchingNodeBefore isInlineSpaceOrComment attr else attr :> _
+        let nodeBefore = skipMatchingNodesBefore isInlineSpaceOrComment attr
+        if getTokenType nodeBefore == FSharpTokenType.SEMICOLON then nodeBefore else attr
 
     let last =
         let nodeAfter = skipMatchingNodesAfter isWhitespaceOrComment attr
-        let last =
-            if getTokenType nodeAfter == FSharpTokenType.SEMICOLON then
-                getLastMatchingNodeAfter isInlineSpaceOrComment nodeAfter
-            else
-                getLastMatchingNodeAfter isInlineSpaceOrComment attr
+        if getTokenType nodeAfter == FSharpTokenType.SEMICOLON then
+            getLastMatchingNodeAfter isInlineSpaceOrComment nodeAfter
+        else
+            getLastMatchingNodeAfter isInlineSpaceOrComment attr
 
-        if not isFirstOnLine then last else
-        getThisOrNextNewLine last |> getLastMatchingNodeAfter isInlineSpaceOrComment
-
-    if isFirstOnLine then
-        deleteChildRange first last
-    else
-        replaceRangeWithNode first last (Whitespace())
+    ModificationUtil.DeleteChildRange(first, last)
 
 
 let removeAttributeOrList (attr: IAttribute) =
@@ -116,50 +70,38 @@ let removeAttributeOrList (attr: IAttribute) =
         removeAttributeFromList attr
 
 
-let addAttributeListWithIndent newLine (indent: int) (anchor: ITreeNode) =
-    addNodesBefore anchor [
-        anchor.CreateElementFactory().CreateEmptyAttributeList()
-        if newLine then
-            NewLine(anchor.GetLineEnding())
-            if indent > 0 then
-                Whitespace(indent)
-        else
-            Whitespace()
-    ] |> ignore
+let addAttributeListWithIndent (anchor: ITreeNode) =
+    let attrList = anchor.CreateElementFactory().CreateEmptyAttributeList()
+    addNodeBefore anchor attrList
 
-let addOuterAttributeListWithIndent newLine (indent: int) (anchor: ITreeNode) =
-    addAttributeListWithIndent newLine indent anchor.FirstChild
+let addOuterAttributeList (decl: ITreeNode) =
+    addAttributeListWithIndent decl.FirstChild
 
-let addOuterAttributeList newLine (decl: ITreeNode) =
-    addAttributeListWithIndent newLine decl.Indent decl.FirstChild
-
-let addAttributeList newLine (anchor: ITreeNode) =
-    addAttributeListWithIndent newLine anchor.Indent anchor
+let addAttributeList (anchor: ITreeNode) =
+    addAttributeListWithIndent anchor
 
 
 let addAttributeListToTypeDeclaration (decl: IFSharpTypeOrExtensionDeclaration) =
-    addNodesAfter decl.TypeKeyword [
-        Whitespace()
-        decl.CreateElementFactory().CreateEmptyAttributeList()
-    ] |> ignore
+    let attrList = decl.CreateElementFactory().CreateEmptyAttributeList()
+    addNodeAfter decl.TypeKeyword attrList
 
 let addAttributeListToLetBinding newLine (binding: IBinding) =
     if newLine then
-        addOuterAttributeList true binding
+        addOuterAttributeList binding
     else
         let inlineKeyword = binding.InlineKeyword
         if isNotNull inlineKeyword then
-            addAttributeList false inlineKeyword else
+            addAttributeList inlineKeyword else
 
         let mutableKeyword = binding.MutableKeyword
         if isNotNull mutableKeyword then
-            addAttributeList false mutableKeyword else
+            addAttributeList mutableKeyword else
 
         let headPattern = binding.HeadPattern
         if isNotNull headPattern then
-            addAttributeList false headPattern else
+            addAttributeList headPattern else
 
-        addOuterAttributeList false binding
+        addOuterAttributeList binding
 
 
 let isOuterAttributeList (typeDecl: IFSharpTypeOrExtensionDeclaration) (attrList: IAttributeList) =
@@ -171,7 +113,7 @@ let getTypeDeclarationAttributeList (typeDecl: #IFSharpTypeOrExtensionDeclaratio
         if attributeLists.Count > 0 && isOuterAttributeList typeDecl attributeLists[0] then
             attributeLists[0]
         else
-            addOuterAttributeList true typeDecl
+            addOuterAttributeList typeDecl
             typeDecl.AttributeLists[0]
     else
         let attributeLists = typeDecl.AttributeLists

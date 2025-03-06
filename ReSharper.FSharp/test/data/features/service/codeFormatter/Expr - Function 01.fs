@@ -1,0 +1,70 @@
+module Module
+
+module Nested =
+    let _ =
+        aaaaa |> bbbbb aadfwfg (function
+                        | _ -> ())
+
+
+        f 1
+            2
+
+        f 1 2 + g 2 3
+
+        f 1 2 3 4 (function
+            | _ -> ())
+
+        f 1 2 3 4 (function
+            | _ -> ()
+        )
+
+        f 1 2 3 4 (function
+            | _ -> ())
+            6
+
+        f 1 2 3 4 (function
+            | _ -> ()
+        )
+            6
+
+
+        f 1 2 + g 2 3
+
+        123 + f 1 2 3 4 (function
+            | _ -> ())
+
+        123 + f 1 2 3 4 (function
+            | _ -> ()
+        )
+
+        123 + f 1 2 3 4 (function
+            | _ -> ())
+            6
+
+        123 + f 1 2 3 4 (function
+            | _ -> ()
+        )
+            6
+
+
+
+        a 1 2 3 |> b (function
+            | _ -> ())
+
+
+        a 1 2 3 |> b (function
+            | _ -> ())
+
+
+        a (1 + 1)
+
+
+
+        1 + a (
+                function
+                | _ -> ()
+        )
+
+        1 + a (
+                function
+                | _ -> ())

@@ -1,6 +1,5 @@
 ﻿type E =
     | A = 1
 
-
 match E.A with
 | E.A -> ()

@@ -1,3 +1,3 @@
 ﻿type T(a, b) =
   interface System.IDisposable with
-    member this.Dispose() = {selstart}failwith "todo"{selend}
+      member this.Dispose() = {selstart}failwith "todo"{selend}

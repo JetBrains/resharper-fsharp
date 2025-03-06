@@ -37,7 +37,6 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(warning.Pattern.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         
         match declaredElementAndParameterPatterns with
         | None -> ()

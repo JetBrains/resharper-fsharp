@@ -22,7 +22,6 @@ type ReplaceWithRegularStringFix(warning: RedundantStringInterpolationWarning) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatterCookie = new DisableCodeFormatter()
 
         let interpolatedStringToken = expr.Literals.Single()
         let text = interpolatedStringToken.GetText()

@@ -1672,10 +1672,11 @@ type IndexerArgsProcessor() =
 
     override x.Process(synExpr, builder) =
         match synExpr with
-        | SynExpr.DotIndexedGet(_, args, dotRange, range)
-        | SynExpr.DotIndexedSet(_, args, _, range, dotRange, _) ->
-            let argsListRange = Range.unionRanges dotRange.EndRange range.EndRange
-            builder.PushRange(argsListRange, ElementType.INDEXER_ARG_LIST)
+        | SynExpr.DotIndexedGet(_, (ExprRange argsRange as args), dotRange, range)
+        | SynExpr.DotIndexedSet(_, (ExprRange argsRange as args), _, range, dotRange, _) ->
+            builder.AdvanceToEnd(dotRange)
+            let argListMark = builder.MarkTokenOrRange(FSharpTokenType.LBRACK, argsRange)
+            builder.PushRangeForMark(range, argListMark, ElementType.INDEXER_ARG_LIST)
             builder.PushExpression(args)
 
         | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr

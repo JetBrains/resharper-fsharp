@@ -132,10 +132,11 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionAttributeIsRedundant">
-    <Parameter type="IAttribute" name="attr"/>
-    <Range>attr.GetHighlightingRange()</Range>
+    <Parameter type="IAttribute" name="attribute"/>
+    <Range>attribute.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <Message resourceName="ExtensionAttributeIsRedundantMessage" resourceType="Strings"/>
+    <QuickFix>RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">

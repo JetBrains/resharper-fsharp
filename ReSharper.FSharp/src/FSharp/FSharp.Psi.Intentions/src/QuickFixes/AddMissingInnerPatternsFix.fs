@@ -41,7 +41,6 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
     override this.ExecutePsiTransaction(_, _) =
         use pinCheckResultsCookie = matchExpr.FSharpFile.PinTypeCheckResults(true, this.Text)
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let value, nodes, deconstructions = MatchTree.ofMatchExpr matchExpr
 

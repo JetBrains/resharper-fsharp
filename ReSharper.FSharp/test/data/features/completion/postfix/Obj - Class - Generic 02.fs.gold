@@ -7,5 +7,5 @@ type Base<'T>() =
     abstract M: string -> unit
 
 { new Base<int>() with
-  override this.M(var0: int): unit = failwith "todo"{caret}
-  override this.M(var0: string): unit = failwith "todo" }
+    override this.M(var0: int): unit = failwith "todo"{caret}
+    override this.M(var0: string): unit = failwith "todo" }

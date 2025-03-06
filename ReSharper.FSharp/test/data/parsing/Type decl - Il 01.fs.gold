@@ -11,11 +11,11 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IIlAssemblyRepresentation
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          FSharpToken(type:HASH, text:#)
+          FSharpTokenType+HashTokenElement(type:HASH, text:#)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpString(type:STRING, text:"!0[]")
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpToken(type:HASH, text:#)
+          FSharpTokenType+HashTokenElement(type:HASH, text:#)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

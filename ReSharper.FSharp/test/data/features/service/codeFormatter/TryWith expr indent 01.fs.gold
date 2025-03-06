@@ -1,12 +1,12 @@
 ﻿IndentOnTryWith = True
 try
-  ()
+    ()
 with
-  | _ -> ()
+    | _ -> ()
 
 ================
 IndentOnTryWith = False
 try
-  ()
+    ()
 with
 | _ -> ()

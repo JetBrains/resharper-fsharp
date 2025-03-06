@@ -1,0 +1,6 @@
+module Module
+
+do
+    A
+        B
+            .C

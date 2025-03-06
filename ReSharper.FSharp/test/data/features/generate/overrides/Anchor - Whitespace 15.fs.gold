@@ -14,6 +14,4 @@ and B() =
   class end
 
 and C() =
-  override this.ToString() = {selstart}failwith "todo"{selend}
-
-  
+    override this.ToString() = {selstart}failwith "todo"{selend}

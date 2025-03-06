@@ -3,5 +3,5 @@ module Module
 
 let f ((x, y): _) =
     for a in x do
-      {caret}
+        {caret}
     ()

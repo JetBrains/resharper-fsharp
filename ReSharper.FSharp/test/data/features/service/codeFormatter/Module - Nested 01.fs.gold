@@ -1,23 +1,23 @@
 ﻿
 [<A>]
 module private rec M1 =
-  ()
+    ()
 
 
 module
-  M1 =
+    M1 =
 
-  ()
-
-module
-  rec
-  M2 =
-
-  ()
+    ()
 
 module
-  private
-  rec
-  M3 =
+    rec
+    M2 =
 
-  ()
+    ()
+
+module
+    private
+    rec
+    M3 =
+
+    ()

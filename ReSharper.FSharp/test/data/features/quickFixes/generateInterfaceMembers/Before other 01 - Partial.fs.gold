@@ -7,4 +7,5 @@
    interface I with
      member x.P1 = 1
      member this.P2 = {selstart}failwith "todo"{selend}
+
   type T2() = class end

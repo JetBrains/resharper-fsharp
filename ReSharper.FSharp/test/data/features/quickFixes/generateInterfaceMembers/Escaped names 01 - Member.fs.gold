@@ -6,5 +6,5 @@ type I =
 
 type T() =
   interface I with
-    member this.``My prop`` = failwith "todo"
-    member this.``type`` = {selstart}failwith "todo"{selend}
+      member this.``My prop`` = {selstart}failwith "todo"{selend}
+      member this.``type`` = failwith "todo"

@@ -9,12 +9,12 @@
 
 // ${KIND:Overrides}
 
-type C() = 
-  class
-    
-    let f x = x
+type C() =
+    class
+             
+        let f x = x
 
-    override this.ToString() = {selstart}failwith "todo"{selend}
+        override this.ToString() = {selstart}failwith "todo"{selend}
 
-    member _.Func(x) = x
-  end
+        member _.Func(x) = x
+    end

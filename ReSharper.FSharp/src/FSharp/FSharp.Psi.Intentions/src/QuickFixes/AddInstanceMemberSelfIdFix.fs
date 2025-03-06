@@ -20,7 +20,6 @@ type AddInstanceMemberSelfIdFix(error: InstanceMemberRequiresTargetError) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(memberDecl.IsPhysical())
-        use disableFormatterCookie = new DisableCodeFormatter()
 
         let elementFactory = memberDecl.CreateElementFactory()
         let name = if FSharpLanguageLevel.isFSharp47Supported memberDecl then "_" else "x"
@@ -29,7 +28,3 @@ type AddInstanceMemberSelfIdFix(error: InstanceMemberRequiresTargetError) =
             elementFactory.CreateSelfId(name)
             FSharpTokenType.DOT.CreateLeafElement()
         ] |> ignore
-
-        let expr = memberDecl.Expression
-        if isNotNull expr && expr.StartLine = memberDecl.StartLine then
-            shiftNode 2 expr

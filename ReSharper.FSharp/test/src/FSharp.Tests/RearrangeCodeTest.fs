@@ -32,6 +32,8 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Enum case 02 - Xml doc``() = x.DoNamedTest()
     [<Test>] member x.``Enum case 03 - Xml doc``() = x.DoNamedTest()
     [<Test>] member x.``Enum case 04 - Xml doc``() = x.DoNamedTest()
+    [<Test>] member x.``Enum case 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enum case 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Field - Exception 01``() = x.DoNamedTest()
 
@@ -60,9 +62,10 @@ type RearrangeCodeTest() =
     [<Test>] member x.``Match clause - Last - Down 07 - New line``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Down 08 - Operator deindent``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Down 09 - Operator deindent``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause - Last - Down 10``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Up 01 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Up 02``() = x.DoNamedTest()
-    [<Test>] member x.``Match clause - Last - Up 03 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Match clause - Last - Up 03 - Multiline``() = x.DoNamedTest() // todo: formatter: remove extra blank line
     [<Test; Explicit>] member x.``Match clause - Last - Up 04 - Lambda body``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Last - Up 05 - App``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - Match 01``() = x.DoNamedTest()

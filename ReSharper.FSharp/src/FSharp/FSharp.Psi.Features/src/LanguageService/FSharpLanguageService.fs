@@ -158,5 +158,5 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
             FSharpParser(lexer, document, sourceFile, checkerService, null, overrideExtension) :> _
 
-        member x.CreateElementFactory(sourceFile, psiModule, [<Optional; DefaultParameterValue(null)>] extension) =
-            FSharpElementFactory(x, sourceFile, psiModule, extension) :> _
+        member x.CreateElementFactory(context, [<Optional; DefaultParameterValue(null)>] extension) =
+            FSharpElementFactory(x, context, extension) :> _

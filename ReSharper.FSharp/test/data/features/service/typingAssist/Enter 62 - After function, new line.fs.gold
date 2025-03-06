@@ -1,6 +1,6 @@
-// ${CHAR:Enter} 
+﻿// ${CHAR:Enter} 
 module Module
 
 let foo = function
 
-  {caret}
+    {caret}

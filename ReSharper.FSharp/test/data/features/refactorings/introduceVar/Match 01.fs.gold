@@ -2,5 +2,5 @@
 do
   match () with
   | _ ->
-    let i = 1
-    1 + i
+      let i = 1
+      1 + i

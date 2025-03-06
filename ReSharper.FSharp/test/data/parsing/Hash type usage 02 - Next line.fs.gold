@@ -1,4 +1,4 @@
-Language: PsiLanguageType:F#
+﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
     ILetBindingsDeclaration
@@ -16,7 +16,7 @@ IFSharpImplFile
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:        ) spaces:"        "
             IHashTypeUsage
-              FSharpToken(type:HASH, text:#)
+              FSharpTokenType+HashTokenElement(type:HASH, text:#)
               INamedTypeUsage
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:A)

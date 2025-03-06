@@ -6,5 +6,5 @@
 
 open System
 
-{ new IDisposable with 
-  member this.Dispose() = {selstart}failwith "todo"{selend} }
+{ new IDisposable with
+    member this.Dispose() = {selstart}failwith "todo"{selend} }

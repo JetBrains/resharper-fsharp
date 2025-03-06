@@ -27,7 +27,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+
         let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
         let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())

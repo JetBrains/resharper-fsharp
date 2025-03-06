@@ -3,193 +3,249 @@
 namespace Namespace
 
 type R1 =
-  private {
-    F: int
-  }
+    private {
+        F: int
+    }
 
 type R2 =
-  private {
-    F1: int
-    F2: int
-  }
+    private {
+        F1: int
+        F2: int
+    }
 
 type R3 = private {
-  F: int
+    F: int
 }
+
+
+type R4 =
+    private {
+        F: int
+    }
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
 type R1 =
-  private {
-    F: int
-  }
+    private {
+        F: int
+    }
 
 type R2 =
-  private {
-    F1: int
-    F2: int
-  }
+    private {
+        F1: int
+        F2: int
+    }
 
 type R3 =
-  private {
-    F: int
-  }
+    private {
+        F: int
+    }
+
+
+type R4 =
+    private {
+        F: int
+    }
 ================
 TypeDeclarationBraces = END_OF_LINE_NO_SPACE
   KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  private{
-    F: int
-  }
+    private{
+        F: int
+    }
 
 type R2 =
-  private{
-    F1: int
-    F2: int
-  }
+    private {
+        F1: int
+        F2: int
+    }
 
 type R3 = private{
-  F: int
+    F: int
 }
+
+
+type R4 =
+    private {
+        F: int
+    }
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
 type R1 =
-  private{
-    F: int
-  }
+    private{
+        F: int
+    }
 
 type R2 =
-  private{
-    F1: int
-    F2: int
-  }
+    private {
+        F1: int
+        F2: int
+    }
 
 type R3 =
-  private{
-    F: int
-  }
+    private{
+        F: int
+    }
+
+
+type R4 =
+    private {
+        F: int
+    }
 ================
 TypeDeclarationBraces = NEXT_LINE,NEXT_LINE_SHIFTED_2
   KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  private
-    {
-      F: int
-    }
+    private
+        {
+            F: int
+        }
 
 type R2 =
-  private
-    {
-      F1: int
-      F2: int
-    }
+    private
+        {
+            F1: int
+            F2: int
+        }
 
 type R3 = private
-            {
-              F: int
-            }
+              {
+                  F: int
+              }
+
+
+type R4 =
+    private
+        {
+            F: int
+        }
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
 type R1 =
-  private
-    {
-      F: int
-    }
+    private
+        {
+            F: int
+        }
 
 type R2 =
-  private
-    {
-      F1: int
-      F2: int
-    }
+    private
+        {
+            F1: int
+            F2: int
+        }
 
 type R3 =
-  private
-    {
-      F: int
-    }
+    private
+        {
+            F: int
+        }
+
+
+type R4 =
+    private
+        {
+            F: int
+        }
 ================
 TypeDeclarationBraces = NEXT_LINE_SHIFTED
   KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  private
-    {
-    F: int
-    }
+    private
+        {
+        F: int
+        }
 
 type R2 =
-  private
-    {
-    F1: int
-    F2: int
-    }
+    private
+        {
+        F1: int
+        F2: int
+        }
 
 type R3 = private
-            {
-            F: int
-            }
+              {
+              F: int
+              }
+
+
+type R4 =
+    private
+        {
+        F: int
+        }
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
 type R1 =
-  private
-    {
-    F: int
-    }
+    private
+        {
+        F: int
+        }
 
 type R2 =
-  private
-    {
-    F1: int
-    F2: int
-    }
+    private
+        {
+        F1: int
+        F2: int
+        }
 
 type R3 =
-  private
-    {
-    F: int
-    }
+    private
+        {
+        F: int
+        }
+
+
+type R4 =
+    private
+        {
+        F: int
+        }
 ================
 TypeDeclarationBraces = PICO
   KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type R1 =
-  private
-    { F: int }
+    private { F: int }
 
 type R2 =
-  private
-    { F1: int
-      F2: int }
+    private
+        { F1: int
+          F2: int }
 
-type R3 = private
-            { F: int }
+type R3 = private { F: int }
+
+
+type R4 =
+    private
+        { F: int }
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
 namespace Namespace
 
-type R1 =
-  private
-    { F: int }
+type R1 = private { F: int }
 
 type R2 =
-  private
-    { F1: int
-      F2: int }
+    private
+        { F1: int
+          F2: int }
 
-type R3 =
-  private
-    { F: int }
+type R3 = private { F: int }
+
+
+type R4 =
+    private
+        { F: int }

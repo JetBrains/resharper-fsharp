@@ -18,7 +18,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.DataContext
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
@@ -41,7 +43,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (element: IFSharpGeneratorElement) =
+let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
     let displayContext = element.DisplayContext
     let addTypes = element.AddTypes
@@ -155,7 +157,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
 
     if element.Mfv.IsCliEvent() then
         let attribute = context.CreateElementFactory().CreateAttribute("CLIEvent")
-        FSharpAttributesUtil.addOuterAttributeListWithIndent true indent memberDeclaration
+        FSharpAttributesUtil.addOuterAttributeList memberDeclaration
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists[0] attribute |> ignore
 
     if addTypes then
@@ -179,42 +181,18 @@ let noEmptyLineAnchors =
 let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
     if isNotNull node && node.IsFiltered() then node.GetPreviousMeaningfulSibling() else node
 
-let addEmptyLineBeforeIfNeeded (anchor: ITreeNode) =
-    let addEmptyLine =
-        not noEmptyLineAnchors[getTokenType anchor] &&
-
-        let anchor = getThisOrPreviousMeaningfulSibling anchor
-        not ((anchor :? IOverridableMemberDeclaration) && anchor.IsSingleLine)
-
-    if addEmptyLine then
-        let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment anchor
-        ModificationUtil.AddChildAfter(anchor, NewLine(anchor.GetLineEnding())) :> ITreeNode
-    else
-        anchor
-    |> getLastMatchingNodeAfter isInlineSpaceOrComment
-
-let addSpaceAfterIfNeeded (lastGeneratedNode: ITreeNode) =
-    if isBeforeEmptyLine lastGeneratedNode then () else
-
-    let nextNode = lastGeneratedNode.GetNextMeaningfulSibling()
-    if nextNode :? ITypeBodyMemberDeclaration && not nextNode.IsSingleLine then
-        addNodeAfter lastGeneratedNode (NewLine(lastGeneratedNode.GetLineEnding()))
-
-    if getTokenType lastGeneratedNode.NextSibling == FSharpTokenType.RBRACE then
-        addNodeAfter lastGeneratedNode (Whitespace())
-
-let getGeneratedSelectionTreeRange (lastNode: ITreeNode) (generatedNodes: seq<ITreeNode>) =
-    generatedNodes
-    |> Seq.takeWhile (fun node -> node.GetTreeEndOffset().Offset <= lastNode.GetTreeEndOffset().Offset)
-    |> Seq.choose (fun node ->
-           match node with
-           | :? IMemberDeclaration as memberDecl -> Some(memberDecl)
-           | _ -> None)
-    |> Seq.tryLast
+let getGeneratedSelectionTreeRange (addedMembers: ITreeNode seq) =
+    addedMembers
+    |> Seq.tryPick (fun node ->
+        match node with
+        | :? IMemberDeclaration as memberDecl -> Some(memberDecl)
+        | _ -> None
+    )
     |> Option.map (fun memberDecl ->
         match memberDecl.AccessorDeclarationsEnumerable |> Seq.tryHead with
         | Some accessorDecl -> accessorDecl.Expression.GetTreeTextRange()
-        | _ -> memberDecl.Expression.GetTreeTextRange())
+        | _ -> memberDecl.Expression.GetTreeTextRange()
+    )
     |> Option.defaultValue TreeTextRange.InvalidRange
 
 let private getObjectTypeReprAnchor (objectTypeRepr: IObjectModelTypeRepresentation) (psiView: IPsiView) =
@@ -476,17 +454,18 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
               FSharpGeneratorElement(prop.Setter, { element.MfvInstance with Mfv = mfv.SetterMethod }, element.AddTypes) ]
     )
 
-let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) indent anchor =
+let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) anchor =
     let mayHaveBaseCalls = mayHaveBaseCalls typeDecl
-    let lastNode =
+    let addedMembers =
         inputElements
+        |> Seq.map (generateMember typeDecl mayHaveBaseCalls)
         |> Seq.cast
-        |> Seq.map (generateMember typeDecl mayHaveBaseCalls indent)
-        |> Seq.collect (withNewLineAndIndentBefore indent)
         |> addNodesAfter anchor
+    
+    for addedMember in addedMembers do
+        addedMember.FormatNode(CodeFormatProfile.INDENT)
 
-    addSpaceAfterIfNeeded lastNode
-    lastNode
+    addedMembers
 
 let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiModule) (expr: IFSharpExpression) =
     let reference = NewObjPostfixTemplate.getReference expr
@@ -494,17 +473,26 @@ let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiM
 
     let objExpr = NewObjPostfixTemplate.createObjExpr factory expr
     let inputElements = getOverridableMembersForType null fcsSymbolUse true true psiModule
+
     let indent = expr.Indent + expr.GetIndentSize()
-    addMembers inputElements objExpr indent objExpr.WithKeyword |> ignore
+    let lineEnding = expr.GetLineEnding()
+
+    let objExpr =
+        use disableFormatter = new DisableCodeFormatter()
+        ModificationUtil.ReplaceChild(expr, objExpr)
+
+    addMembers inputElements objExpr objExpr.WithKeyword |> ignore
 
     if Seq.isEmpty objExpr.MemberDeclarationsEnumerable then
+        use disableFormatter = new DisableCodeFormatter()
+
         deleteChildRange objExpr.WithKeyword.NextSibling objExpr.RightBrace.PrevSibling
         addNodesAfter objExpr.WithKeyword [
-            NewLine(expr.GetLineEnding())
+            NewLine(lineEnding)
             Whitespace(indent + 1)
         ] |> ignore
 
-    ModificationUtil.ReplaceChild(expr, objExpr)
+    objExpr
 
 let selectObjExprMemberOrCallCompletion (objExpr: IObjExpr) (textControl: ITextControl) =
     match objExpr.MemberDeclarationsEnumerable |> Seq.tryHead with

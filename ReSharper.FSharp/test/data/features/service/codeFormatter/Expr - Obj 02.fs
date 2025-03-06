@@ -1,0 +1,14 @@
+module Module
+
+let _ =
+    { new
+          I
+          with
+        member this.P1 =
+            1 +
+            1
+
+        member this.P2 =
+            1 +
+            1
+    }

@@ -54,7 +54,6 @@ type GenerateMatchExprPatternsBehavior(info) =
 
         do
             use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices,
                     GenerateMatchExprPatternsInfo.Id)

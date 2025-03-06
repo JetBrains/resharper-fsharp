@@ -26,5 +26,5 @@ type b = B<double>
 type T() =
     inherit b()
 
-    override this.M(var0: int): unit = failwith "todo"
-    override this.M(var0: double): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: int): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: double): unit = failwith "todo"

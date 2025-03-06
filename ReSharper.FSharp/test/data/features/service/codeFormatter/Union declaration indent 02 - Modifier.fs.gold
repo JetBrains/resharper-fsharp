@@ -1,6 +1,6 @@
 ﻿namespace Namespace
 
 type Foo =
-  private
-    | A
-    | B
+    private
+        | A
+        | B

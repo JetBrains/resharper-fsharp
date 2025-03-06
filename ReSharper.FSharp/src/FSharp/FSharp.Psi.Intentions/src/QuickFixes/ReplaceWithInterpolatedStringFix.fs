@@ -58,7 +58,6 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(formatStringExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let appliedExprFormatSpecs =
             let startOffset = formatStringExpr.GetDocumentRange().StartOffset.Offset

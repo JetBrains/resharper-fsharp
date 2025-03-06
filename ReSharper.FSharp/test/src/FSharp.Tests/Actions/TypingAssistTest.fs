@@ -127,7 +127,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 64 - After rarrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 65 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 66 - After larrow - Comment``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest() // todo: check indent from the <- line, should not add indent
     [<Test>] member x.``Enter 68 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 69 - After parens on new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
@@ -392,7 +392,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 03``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 04``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
-    [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest() // todo: formatter: fix disabling formatter
 
     member x.``Brackets - left angle - disabled``() = x.DoNamedTest()
     member x.``Brackets - quotation - disabled``() = x.DoNamedTest()

@@ -1,0 +1,7 @@
+﻿module Module
+
+type T() =
+  class
+    // some comment
+    override this.ToString() = failwith "todo"
+  end
