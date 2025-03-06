@@ -59,8 +59,7 @@ type UseNamedAccessAction(dataProvider: FSharpContextActionDataProvider) =
     override x.ExecutePsiTransaction _ : unit =
         let pattern = dataProvider.GetSelectedElement<IParametersOwnerPat>().NotNull()
         use writeCookie = WriteLockCookie.Create(pattern.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        
+
         let rec visit (pat: IFSharpPattern) =
             match pat.IgnoreInnerParens() with
             | :? IWildPat-> None

@@ -1,4 +1,4 @@
-let [<Literal>] A = 1
+﻿let [<Literal>] A = 1
 
 match 1 with
-| A{caret} -> ()
+| A {caret}-> ()

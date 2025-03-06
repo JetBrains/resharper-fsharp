@@ -1,0 +1,29 @@
+﻿BlankLinesBeforeFirstModuleMemberInTopLevelModule = 0
+  BlankLinesAroundMultilineModuleMembers = 0
+module M
+let x =
+    ()
+let y = ()
+================
+  BlankLinesAroundMultilineModuleMembers = 1
+module M
+let x =
+    ()
+
+let y = ()
+================
+BlankLinesBeforeFirstModuleMemberInTopLevelModule = 1
+  BlankLinesAroundMultilineModuleMembers = 0
+module M
+
+let x =
+    ()
+let y = ()
+================
+  BlankLinesAroundMultilineModuleMembers = 1
+module M
+
+let x =
+    ()
+
+let y = ()

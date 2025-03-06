@@ -27,7 +27,6 @@ type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         match expr with
         | :? ITupleExpr as tuple ->

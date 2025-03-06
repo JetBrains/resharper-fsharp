@@ -1,0 +1,8 @@
+﻿module Module
+
+do        
+    try
+        ()
+    with
+        | _ -> ()
+    ()

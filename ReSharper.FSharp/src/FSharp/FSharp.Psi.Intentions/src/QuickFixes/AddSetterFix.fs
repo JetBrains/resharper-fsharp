@@ -36,7 +36,6 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let factory = refExpr.CreateElementFactory()
         let accessors = factory.CreateAccessorsNamesClause(true, true)

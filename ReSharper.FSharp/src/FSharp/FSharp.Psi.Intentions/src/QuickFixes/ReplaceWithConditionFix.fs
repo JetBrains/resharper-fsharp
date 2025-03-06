@@ -22,14 +22,8 @@ type ReplaceWithConditionFix(warning: ExpressionCanBeReplacedWithConditionWarnin
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let newExpr =
             if needsNegation then createLogicallyNegatedExpression expr.ConditionExpr else expr.ConditionExpr
 
-        let ifExprIndent = expr.Indent
-        let newExprIndent = newExpr.Indent
-        let indentDiff = ifExprIndent - newExprIndent
-
-        let expr = ModificationUtil.ReplaceChild(expr, newExpr.Copy())
-        shiftNode indentDiff expr
+        ModificationUtil.ReplaceChild(expr, newExpr.Copy()) |> ignore

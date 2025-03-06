@@ -23,7 +23,6 @@ let toParameterOwnerPat (pat: IFSharpPattern) opName =
     match pat with
     | :? IReferencePat as refPat ->
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let referenceName = refPat.ReferenceName.NotNull()
         let factory = pat.CreateElementFactory()
@@ -31,6 +30,7 @@ let toParameterOwnerPat (pat: IFSharpPattern) opName =
         let newPat = ModificationUtil.ReplaceChild(refPat, newPattern.Pattern) :?> IParametersOwnerPat
         ModificationUtil.ReplaceChild(newPat.ReferenceName, referenceName) |> ignore
         newPat
+
     | _ -> failwith $"Unexpected pattern: {pat}"
 
 let rec ignoreParentAsPatsFromRight (pat: IFSharpPattern) =

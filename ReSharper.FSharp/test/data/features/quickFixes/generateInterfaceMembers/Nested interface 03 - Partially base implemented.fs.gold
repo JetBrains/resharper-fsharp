@@ -16,4 +16,4 @@ type T2() =
     inherit T1()
 
     interface I2 with
-      member this.P2 = {selstart}failwith "todo"{selend}
+        member this.P2 = {selstart}failwith "todo"{selend}

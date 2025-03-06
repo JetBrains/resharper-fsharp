@@ -9,6 +9,6 @@ type I<'a> =
     override this.ToString() = ""
 
   interface I<_> with
-    member this.M(var0: obj): unit = failwith "todo"
-    member this.M(var0: string): unit = failwith "todo"
-    member this.P = {selstart}failwith "todo"{selend} }
+      member this.M(var0: obj): unit = {selstart}failwith "todo"{selend}
+      member this.M(var0: string): unit = failwith "todo"
+      member this.P = failwith "todo" }

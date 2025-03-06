@@ -1,2 +1,2 @@
 ﻿type T() =
-    let{caret} foo x = 1
+    let {caret}foo x = 1

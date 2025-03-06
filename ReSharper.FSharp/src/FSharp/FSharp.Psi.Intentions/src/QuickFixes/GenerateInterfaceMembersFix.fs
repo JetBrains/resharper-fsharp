@@ -3,17 +3,14 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
@@ -56,7 +53,6 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
     override x.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let typeDeclaration: IFSharpTypeElementDeclaration =
             match FSharpTypeDeclarationNavigator.GetByTypeMember(impl) with
@@ -164,35 +160,20 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
             |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.DisplayNameCore) // todo: try to preserve declaration sorting?
             |> List.map (fun mfvInstance -> FSharpGeneratorMfvElement(mfvInstance, needsTypesAnnotations mfvInstance))
 
-        let indent =
-            if existingMemberDecls.IsEmpty then
-                impl.Indent + impl.GetIndentSize()
-            else
-                existingMemberDecls.Last().Indent
-
-        let generatedMembers =
-            let mayHaveBaseCalls = GenerateOverrides.mayHaveBaseCalls typeDeclaration
-            membersToGenerate
-            |> List.map (GenerateOverrides.generateMember impl mayHaveBaseCalls indent)
-            |> List.collect (withNewLineAndIndentBefore indent)
-
-        let existingMembers = impl.TypeMembers
-        let anchor, lastNode = 
+        let (anchor: ITreeNode) =
+            let existingMembers = impl.TypeMembers
             if not existingMembers.IsEmpty then
-                let lastMember = existingMembers.Last()
-                let anchor = GenerateOverrides.addEmptyLineBeforeIfNeeded lastMember
-                anchor, addNodesAfter anchor generatedMembers
+                existingMembers.Last()
             else
                 if isNull impl.WithKeyword then
-                    addNodesAfter impl.TypeName [
-                        Whitespace()
-                        FSharpTokenType.WITH.CreateLeafElement()
-                    ] |> ignore
+                    ModificationUtil.AddChildAfter(impl.TypeName, FSharpTokenType.WITH.CreateLeafElement()) |> ignore
 
-                impl.WithKeyword, addNodesAfter impl.WithKeyword generatedMembers
+                impl.WithKeyword
+
+        let addedMembers = GenerateOverrides.addMembers membersToGenerate typeDeclaration anchor
 
         Action<_>(fun textControl ->
-            let treeTextRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode (anchor.RightSiblings())
+            let treeTextRange = GenerateOverrides.getGeneratedSelectionTreeRange addedMembers
             if treeTextRange.IsValid() then
                 let documentRange = anchor.GetContainingFile().GetDocumentRange(treeTextRange)
                 textControl.Caret.MoveTo(documentRange.StartOffset, CaretVisualPlacement.DontScrollIfVisible)

@@ -3,4 +3,4 @@
 open System
 
 { new IDisposable with
-  member this.Dispose() = {selstart}failwith "todo"{selend} }
+    member this.Dispose() = {selstart}failwith "todo"{selend} }

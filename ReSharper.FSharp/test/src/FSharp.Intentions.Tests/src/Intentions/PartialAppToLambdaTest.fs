@@ -12,6 +12,10 @@ type PartialAppToLambdaTest() =
     override this.ExtraPath = "partialToLambda"
 
     [<Test>] member x.``Args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Args 02``() = x.DoNamedTest()
+    [<Test>] member x.``Args 03``() = x.DoNamedTest()
+    [<Test>] member x.``Args 04``() = x.DoNamedTest()
+    [<Test>] member x.``Args 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Op 01``() = x.DoNamedTest()
     [<Test>] member x.``Op 02``() = x.DoNamedTest()

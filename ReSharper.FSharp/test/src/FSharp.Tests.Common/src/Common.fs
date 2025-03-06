@@ -8,6 +8,8 @@ open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
+open JetBrains.Application.Settings.Implementation
+open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.HabitatDetector
@@ -21,6 +23,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -106,6 +109,18 @@ type TestReferenceProjectOutputAttribute(projectName: string) =
         member this.GetReferences(test, _, _) =
             let testReferencesCompiler = Shell.Instance.GetComponent<TestReferencesCompiler>()
             testReferencesCompiler.GetReference(test.BaseTestDataPath, projectName)
+
+
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
+type FSharpTestFormatterSettings(settingsSchema, logger: ILogger) =
+    inherit HaveDefaultSettings<FSharpFormatSettingsKey>(settingsSchema, logger)
+
+    override this.Name = "F# formatter default settings"
+
+    override this.InitDefaultSettings(mountPoint) =
+        this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.INDENT_SIZE), 4)
+        this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.USE_INDENT_FROM_VS), false)
+
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()

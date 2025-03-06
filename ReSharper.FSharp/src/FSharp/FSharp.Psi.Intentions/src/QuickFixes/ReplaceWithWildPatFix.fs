@@ -22,16 +22,9 @@ open JetBrains.ReSharper.Resources.Shell
 
 module ReplaceWithWildPat =
     let replaceWithWildPat (pat: IFSharpPattern) =
-        if isIdentifierOrKeyword (pat.GetPreviousToken()) then
-            ModificationUtil.AddChildBefore(pat, Whitespace()) |> ignore
-
-        if isIdentifierOrKeyword (pat.GetNextToken()) then
-            ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
-
+        let factory = pat.GetFSharpLanguageService().CreateElementFactory(pat)
         for pat in pat.GetPartialDeclarations() do
-            let sourceFile = pat.GetSourceFile()
-            let psiModule = pat.GetPsiModule()
-            replace pat (pat.GetFSharpLanguageService().CreateElementFactory(sourceFile, psiModule).CreateWildPat())
+            replace pat (factory.CreateWildPat())
 
     let getPatOwner (pat: IFSharpPattern) =
         if isNull pat then null else
@@ -86,8 +79,6 @@ type ReplaceWithWildPatScopedFix(pat: IFSharpPattern, highlightingType) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
         ReplaceWithWildPat.replaceWithWildPat pat
 
 
@@ -140,5 +131,4 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern, isFromUnusedValue) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         ReplaceWithWildPat.replaceWithWildPat pat

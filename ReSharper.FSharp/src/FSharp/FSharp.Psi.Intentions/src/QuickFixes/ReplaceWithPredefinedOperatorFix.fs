@@ -30,6 +30,5 @@ type ReplaceWithPredefinedOperatorFix(error: AddingConstraintError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(ref.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         ref.SetName(predefinedOperator) |> ignore

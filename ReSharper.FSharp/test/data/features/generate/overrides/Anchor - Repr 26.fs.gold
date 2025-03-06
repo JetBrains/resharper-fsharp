@@ -10,11 +10,11 @@ module Module
 
 let x1 = ()
 
-type R =  
-  {
-    I: int
-  }
+type R =
+    {
+        I: int
+    }
 
-  override this.ToString() = {selstart}failwith "todo"{selend} 
+    override this.ToString() = {selstart}failwith "todo"{selend}
 
 and T = int

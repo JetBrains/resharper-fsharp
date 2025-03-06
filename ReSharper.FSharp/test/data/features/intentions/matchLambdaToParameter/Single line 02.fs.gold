@@ -1,0 +1,3 @@
+﻿module Module
+
+let f x{caret} = match x with | 1 -> () | 2 -> ()

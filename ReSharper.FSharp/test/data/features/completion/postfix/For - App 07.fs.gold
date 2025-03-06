@@ -2,4 +2,4 @@
 module Module
 
 for s in List.singleton "" do
-  {caret}
+    {caret}

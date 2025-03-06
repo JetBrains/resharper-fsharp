@@ -1,5 +1,5 @@
-// ${CHAR:Enter} 
+﻿// ${CHAR:Enter} 
 module Module
 
 let foo = // comment
-  {caret}
+    {caret}

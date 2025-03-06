@@ -39,7 +39,6 @@ type AddIgnoreFix(expr: IFSharpExpression) =
 
     let addIgnore (expr: IFSharpExpression) =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let expr = expr.IgnoreParentParens()
         let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine expr)

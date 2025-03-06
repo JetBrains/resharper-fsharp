@@ -1,4 +1,4 @@
-Provided elements:
+﻿Provided elements:
  0: Equals(System.Object?):System.Boolean
  1: Finalize():System.Void
  2: GetHashCode():System.Int32
@@ -7,5 +7,5 @@ Provided elements:
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-{ new obj() with 
-  override this.ToString() = {selstart}base.ToString(){selend} }
+{ new obj() with
+    override this.ToString() = {selstart}base.ToString(){selend} }

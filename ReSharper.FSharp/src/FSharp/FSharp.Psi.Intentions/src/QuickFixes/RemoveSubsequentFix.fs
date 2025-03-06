@@ -28,7 +28,6 @@ type RemoveSubsequentFix(expr: IFSharpExpression) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let seqExpr = SequentialExprNavigator.GetByExpression(expr)
 

@@ -7,5 +7,5 @@ match Some (),
                       2] |> ignore
 
               | _ -> ignore
-                       [1
-                        2]
+                         [1
+                          2]

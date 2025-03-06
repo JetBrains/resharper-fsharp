@@ -7,10 +7,10 @@
 // ${KIND:Overrides}
 // ${SELECT0:ToString():System.String?}
 
-type R = 
-  {
-    F: int
-    G: int
-  }
+type R =
+    {
+        F: int
+        G: int
+    }
 
-  override this.ToString() = {selstart}failwith "todo"{selend}
+    override this.ToString() = {selstart}failwith "todo"{selend}

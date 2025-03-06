@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
@@ -191,7 +192,6 @@ let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
 
 let removeOpen (openStatement: IOpenStatement) =
     use writeLock = WriteLockCookie.Create(true)
-    use disableFormatter = new DisableCodeFormatter()
 
     removeModuleMember openStatement
 
@@ -211,37 +211,10 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
     let lineEnding = fsFile.GetLineEnding()
 
     let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
-        let indent = moduleMember.Indent
+        ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
 
-        addNodesBefore moduleMember [
-            // todo: add setting for adding space before first module member
-            // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
-                NewLine(lineEnding)
-
-            elementFactory.CreateOpenStatement(ns)
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-
-            // Add space after new opens group.
-            if not (moduleMember :? IOpenStatement) then
-                NewLine(lineEnding)
-                if indent > 0 then
-                    Whitespace(indent)
-        ] |> ignore
-
-    let insertAfterAnchor (ns: string) (anchor: ITreeNode) indent =
-        addNodesAfter anchor [
-            if not (anchor :? IOpenStatement) then
-                NewLine(lineEnding)
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-            elementFactory.CreateOpenStatement(ns)
-            if not (anchor :? IOpenStatement) && not (isFollowedByEmptyLineOrComment anchor) then
-                NewLine(lineEnding)
-        ] |> ignore
+    let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
+        ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let duplicates (ns: string) (openStatement: IOpenStatement) =
         let referenceName = openStatement.ReferenceName
@@ -256,7 +229,7 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
             insertBeforeModuleMember ns openStatement
         else
             match rest with
-            | [] -> insertAfterAnchor ns openStatement openStatement.Indent
+            | [] -> insertAfterAnchor ns openStatement
             | _ -> addOpenToOpensGroup rest ns
 
     let moduleDecl, searchAnchor = findModuleToInsertTo fsFile offset settings moduleToImport
@@ -323,15 +296,13 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
     if firstModuleMember != memberToInsertBefore || moduleDecl :? IAnonModuleDeclaration then
         insertBeforeModuleMember ns memberToInsertBefore else
 
-    let indent = memberToInsertBefore.Indent
-
     let anchor =
         match moduleDecl with
         | :? INestedModuleDeclaration as nestedModule -> nestedModule.EqualsToken :> ITreeNode
         | :? ITopLevelModuleLikeDeclaration as moduleDecl -> moduleDecl.NameIdentifier :> _
         | _ -> failwithf "Unexpected module: %O" moduleDecl
 
-    insertAfterAnchor ns anchor indent
+    insertAfterAnchor ns anchor
 
 let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (moduleToImport: ModuleToImport) =
     let settings = fsFile.GetSettingsStoreWithEditorConfig()

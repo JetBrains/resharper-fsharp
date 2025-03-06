@@ -40,9 +40,7 @@ and NewObjPostfixTemplateBehavior(info) =
 
         psiModule.GetPsiServices().Transactions.Execute(this.ExpandCommandName, fun _ ->
             let factory = node.CreateElementFactory()
-
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
 
             let expr = this.GetExpression(context)
             GenerateOverrides.convertToObjectExpression factory psiModule expr

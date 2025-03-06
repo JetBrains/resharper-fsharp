@@ -1,3 +1,5 @@
 ﻿Suggested names: i
 do
-  let x = fun _ -> let i = 1 in 1 + i
+  let x = fun _ ->
+      let i = 1
+      1 + i

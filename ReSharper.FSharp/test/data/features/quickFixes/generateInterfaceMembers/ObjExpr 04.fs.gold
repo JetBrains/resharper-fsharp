@@ -10,5 +10,5 @@ type I<'a> =
 
   interface I<int> with
       member this.M(s: string) = ()
-      member this.M(var0: int): unit = failwith "todo"
-      member this.P = {selstart}failwith "todo"{selend} }
+      member this.M(var0: int): unit = {selstart}failwith "todo"{selend}
+      member this.P = failwith "todo" }

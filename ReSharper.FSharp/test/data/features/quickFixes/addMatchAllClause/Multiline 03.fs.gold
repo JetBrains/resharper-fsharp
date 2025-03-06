@@ -6,5 +6,4 @@ match 1 with
 
 | 2 ->
     ()
-
 | _ -> {selstart}failwith "todo"{selend}

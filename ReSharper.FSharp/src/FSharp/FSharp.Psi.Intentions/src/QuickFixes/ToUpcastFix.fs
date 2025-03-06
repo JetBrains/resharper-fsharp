@@ -22,7 +22,6 @@ type ToUpcastFix(error: TypeTestUnnecessaryWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         replaceWithToken expr.OperatorToken FSharpTokenType.COLON_GREATER
         let upcastExpr = ModificationUtil.ReplaceChild(expr, ElementType.UPCAST_EXPR.Create())

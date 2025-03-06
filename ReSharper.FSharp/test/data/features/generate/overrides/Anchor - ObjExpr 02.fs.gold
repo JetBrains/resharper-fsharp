@@ -12,5 +12,5 @@ module Module
 type T() =
     static member M() =
         { new obj() with
-          override this.ToString() = {selstart}base.ToString(){selend}
+            override this.ToString() = {selstart}base.ToString(){selend}
         }

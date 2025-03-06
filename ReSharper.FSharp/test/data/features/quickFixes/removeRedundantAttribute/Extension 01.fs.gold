@@ -1,0 +1,6 @@
+﻿module Module
+
+open System.Runtime.CompilerServices
+
+{caret}type T() =
+    member this.P = 1

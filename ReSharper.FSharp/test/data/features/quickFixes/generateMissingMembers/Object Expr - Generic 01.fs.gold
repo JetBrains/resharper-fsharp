@@ -5,5 +5,5 @@ type Base<'T>() =
     abstract M2: 'T -> unit
 
 { new Base<int>() with
-    override this.M1 _ = () 
+    override this.M1 _ = ()
     override this.M2(var0) = {selstart}failwith "todo"{selend} }

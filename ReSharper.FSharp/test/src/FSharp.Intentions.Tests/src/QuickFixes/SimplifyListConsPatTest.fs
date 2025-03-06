@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<AssertCorrectTreeStructure>]
 type SimplifyListConsPatTest() =
     inherit FSharpQuickFixTestBase<SimplifyListConsPatFix>()
 

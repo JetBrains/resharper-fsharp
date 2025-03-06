@@ -115,8 +115,6 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
             | _ -> null
         with _ -> null
 
-    override x.DisableFormatter = true
-
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         use pinCheckResultsCookie =
             Assertion.Assert(context.ParseAndCheckResults.IsValueCreated)
@@ -134,7 +132,6 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         let psiServices = fsFile.GetPsiServices()
 
         use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
 
         let declaredElement = x.FcsSymbol.GetDeclaredElement(context.PsiModule)

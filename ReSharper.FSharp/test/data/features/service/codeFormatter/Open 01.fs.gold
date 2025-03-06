@@ -2,12 +2,12 @@
 open B
 
 open
-  C
+    C
 
 open
-  type
-  D
+    type
+    D
 
 open E
-       .F
-       .G
+         .F
+         .G

@@ -2,7 +2,6 @@
 namespace SomeNamespace
 
 module Module =
-
     open System
 
     let foo () =

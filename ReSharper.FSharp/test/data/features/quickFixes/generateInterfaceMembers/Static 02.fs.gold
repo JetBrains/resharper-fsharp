@@ -5,4 +5,4 @@ type I =
 
 type T() =
   interface I with
-    static member P with set value = {selstart}failwith "todo"{selend}
+      static member P with set value = {selstart}failwith "todo"{selend}

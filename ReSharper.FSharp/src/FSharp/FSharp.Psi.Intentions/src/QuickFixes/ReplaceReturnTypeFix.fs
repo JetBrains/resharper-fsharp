@@ -58,7 +58,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let bindingReturnTypeInfo = binding.ReturnTypeInfo
         if isNotNull bindingReturnTypeInfo && isNotNull bindingReturnTypeInfo.ReturnType then

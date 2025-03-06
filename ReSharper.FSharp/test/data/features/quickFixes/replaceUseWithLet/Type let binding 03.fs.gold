@@ -1,0 +1,4 @@
+﻿type T() =
+    let{caret} x = ()
+
+    do ()

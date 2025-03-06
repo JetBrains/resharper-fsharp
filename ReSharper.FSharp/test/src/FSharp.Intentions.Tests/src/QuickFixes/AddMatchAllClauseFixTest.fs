@@ -14,7 +14,7 @@ type AddMatchAllClauseFixTest() =
     [<Test>] member x.``Enum 02``() = x.DoNamedTest()
     [<Test>] member x.``Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function 02``() = x.DoNamedTest()
-    [<Test>] member x.``Function 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function 03``() = x.DoNamedTest() // todo: formatter: indent clauses
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - Indent``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03 - Multiple clauses``() = x.DoNamedTest()
@@ -25,6 +25,6 @@ type AddMatchAllClauseFixTest() =
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 03``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 03``() = x.DoNamedTest() // todo: formatter: add blank lines
 
     [<Test>] member x.``Comment 01``() = x.DoNamedTest()

@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Intentions.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -29,7 +28,6 @@ type FSharpQuickFixBase() =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 
@@ -81,7 +79,6 @@ type FSharpScopedQuickFixBase(contextNode: ITreeNode) =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 
@@ -95,7 +92,6 @@ type FSharpScopedNonIncrementalQuickFixBase(contextNode: ITreeNode) =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 

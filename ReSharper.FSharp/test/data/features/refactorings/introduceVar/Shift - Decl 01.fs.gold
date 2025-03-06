@@ -1,5 +1,6 @@
 ﻿Suggested names: identity, i
 let identity =
-  id
-    1
+    id
+        1
+
 ignore identity

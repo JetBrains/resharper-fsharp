@@ -4,7 +4,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpAttributesUtil
@@ -28,13 +27,12 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(warning.Attr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let attributeList = 
             match declaration with
             | :? IDeclaredModuleDeclaration as moduleDecl ->
                 if moduleDecl.AttributeLists.IsEmpty then
-                    addOuterAttributeList true moduleDecl
+                    addOuterAttributeList moduleDecl
                 moduleDecl.AttributeLists[0]
 
             | :? IFSharpTypeOrExtensionDeclaration as t ->

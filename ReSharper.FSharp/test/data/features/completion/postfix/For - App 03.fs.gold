@@ -2,4 +2,4 @@
 module Module
 
 for i in List.map id [1] do
-  {caret}
+    {caret}

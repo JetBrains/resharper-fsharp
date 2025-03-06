@@ -5,5 +5,5 @@ type A() =
 type T() =
     inherit A()
 
-    override this.P = failwith "todo"
-    override this.P with set value = {selstart}failwith "todo"{selend}
+    override this.P = {selstart}failwith "todo"{selend}
+    override this.P with set value = failwith "todo"

@@ -1,4 +1,4 @@
 ﻿Suggested names: i
 type T() =
-    member val P = 
-      let i = 1
+    member val P =
+        let i = 1

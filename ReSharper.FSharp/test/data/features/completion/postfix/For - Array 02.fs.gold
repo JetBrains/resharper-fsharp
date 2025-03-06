@@ -3,4 +3,4 @@ module Module
 
 let a = [||]
 for o in a do
-  {caret}
+    {caret}

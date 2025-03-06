@@ -91,9 +91,9 @@ module SpecifyTypes =
         | _ -> Availability.Unavailable
 
     let private specifyParametersOwnerReturnType
-                    (declaration: IParameterOwnerMemberDeclaration)
-                    (mfv: FSharpMemberOrFunctionOrValue)
-                    displayContext =
+            (declaration: IParameterOwnerMemberDeclaration)
+            (mfv: FSharpMemberOrFunctionOrValue)
+            displayContext =
         let typeString =
             let fullType = mfv.FullType
             if declaration :? IBinding && fullType.IsFunctionType then
@@ -123,10 +123,7 @@ module SpecifyTypes =
                 | x -> failwith $"Expected binding or member declaration, but was {x}"
             else parameters.Last() :> _
 
-        let returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage))
-
-        if parameters.Count > 0 && declaration :? IBinding then
-            ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
+        ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
 
     let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
@@ -247,7 +244,6 @@ module SpecifyTypesActionHelper =
 
     let executePsiTransaction (node: ITreeNode) (availability: Availability) =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         specifyTypes node availability
 
 

@@ -2,6 +2,6 @@
 
 (fun _ ->
     match Some() with
-    | None -> () (* *) 
+    | None -> () (* *)
     | Some value -> {selstart}failwith "todo"{selend})
 |> ignore

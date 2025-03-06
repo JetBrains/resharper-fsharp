@@ -3,17 +3,17 @@
 type B() = class end
 
 type A(a) =
-  inherit B()
+    inherit B()
 
-  let a = ()
+    let a = ()
 
-  do ()
+    do ()
 
-  new () = A(3)
+    new () = A(3)
 
-  member x.B() = ()
+    member x.B() = ()
 
-  abstract member C: unit -> unit
-  default x.C() = ()
+    abstract member C: unit -> unit
+    default x.C() = ()
 
-  member val D = ()
+    member val D = ()

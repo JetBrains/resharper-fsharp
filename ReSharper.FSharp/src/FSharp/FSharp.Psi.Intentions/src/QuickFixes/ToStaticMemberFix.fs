@@ -1,12 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type ToStaticMemberFix(error: InstanceMemberRequiresTargetError) =
@@ -21,13 +17,5 @@ type ToStaticMemberFix(error: InstanceMemberRequiresTargetError) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(memberDecl.IsPhysical())
-        use disableFormatterCookie = new DisableCodeFormatter()
 
-        addNodesBefore memberDecl.MemberKeyword [
-            FSharpTokenType.STATIC.CreateLeafElement()
-            Whitespace()
-        ] |> ignore
-
-        let expr = memberDecl.Expression
-        if isNotNull expr && expr.StartLine = memberDecl.StartLine then
-            shiftNode 7 expr
+        memberDecl.SetStatic(true)

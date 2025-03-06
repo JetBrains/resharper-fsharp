@@ -1,16 +1,16 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.RearrangeCode.RearrangeCode
 
 open System
-open System.Runtime.InteropServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.RearrangeCode
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -32,21 +32,15 @@ type RearrangeableCaseFieldDeclarationProvider() =
 
 
 [<AbstractClass>]
-type FSharpRearrangeableElementSwap<'T when 'T: not struct and 'T :> ITreeNode>(node, title, direction,
-        [<Optional; DefaultParameterValue(true)>] enableFormatter) =
+type FSharpRearrangeableElementSwap<'T when 'T: not struct and 'T :> ITreeNode>(node, title, direction) =
     inherit RearrangeableElementSwap<'T>(node, title, direction)
 
     abstract BeforeSwap: child: 'T * target: 'T -> unit
     default this.BeforeSwap(_, _) = ()
 
     override this.Swap(child, target) =
-        if enableFormatter then
-            use enableFormatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
-            this.BeforeSwap(child, target)
-            base.Swap(child, target)
-        else
-            this.BeforeSwap(child, target)
-            base.Swap(child, target)
+        this.BeforeSwap(child, target)
+        base.Swap(child, target)
 
 
 type FSharpRearrangeableSingleElementBase<'TNode, 'TParent when
@@ -158,8 +152,7 @@ type RearrangeableFunctionParameterProvider() =
 
 
 type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =
-    inherit FSharpRearrangeableElementSwap<IEnumCaseLikeDeclaration>(decl, "enum case like declaration", Direction.All,
-        false)
+    inherit FSharpRearrangeableElementSwap<IEnumCaseLikeDeclaration>(decl, "enum case like declaration", Direction.All)
 
     override this.GetSiblings() =
         EnumLikeTypeRepresentationNavigator.GetByEnumLikeCase(decl).NotNull().Cases :> _
@@ -184,23 +177,27 @@ type RearrangeableMatchClause(matchClause: IMatchClause, matchExpr: IMatchLikeEx
         isNotNull expr && clause.Indent = expr.Indent
 
     let removeIndent (clause: IMatchClause) (expr: IFSharpExpression) =
-        let clauseIndent = clause.Indent
-        let indentDiff = expr.Indent - clauseIndent
+        do
+            use disableFormatter = new DisableCodeFormatter()
+            let clauseIndent = clause.Indent
+            let indentDiff = expr.Indent - clauseIndent
 
-        shiftWithWhitespaceBefore -indentDiff expr
+            shiftWithWhitespaceBefore -indentDiff expr
 
-        let arrow = clause.RArrow
-        let arrowStartLine = arrow.StartLine
-        let exprStartLine = expr.StartLine
+            let arrow = clause.RArrow
+            let arrowStartLine = arrow.StartLine
+            let exprStartLine = expr.StartLine
 
-        if arrowStartLine.Plus1() >= exprStartLine then
-            let lineEnding = expr.GetLineEnding()
-            addNodesAfter arrow [
-                NewLine(lineEnding)
-                if arrowStartLine = exprStartLine then
+            if arrowStartLine.Plus1() >= exprStartLine then
+                let lineEnding = expr.GetLineEnding()
+                addNodesAfter arrow [
                     NewLine(lineEnding)
-                    Whitespace(clauseIndent)
-            ] |> ignore
+                    if arrowStartLine = exprStartLine then
+                        NewLine(lineEnding)
+                        Whitespace(clauseIndent)
+                ] |> ignore
+
+        clause.FormatNode()
 
     override this.BeforeSwap(child, target) =
         MatchExprUtil.addIndent child

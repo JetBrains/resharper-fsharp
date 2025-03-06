@@ -7,5 +7,5 @@ type Base() =
     abstract P2: int
 
 { new Base() with
-    override this.P1 = 1 
+    override this.P1 = 1
     override this.P2 = {selstart}failwith "todo"{selend} }

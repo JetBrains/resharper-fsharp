@@ -4,5 +4,5 @@ module Module
 do
     match () with
     | a -> 
-      match true with
-      | {caret}
+        match true with
+        | {caret}

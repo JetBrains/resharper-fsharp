@@ -9,6 +9,7 @@ type ToModuleNamespaceActionExecuteTest() =
     override x.ExtraPath = "toModuleNamespace"
 
     [<Test>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module 02``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
 
 

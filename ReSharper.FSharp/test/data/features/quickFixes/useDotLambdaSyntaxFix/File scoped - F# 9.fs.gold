@@ -15,6 +15,7 @@ ignore <| <@ fun x -> _.ToString() @>
 [1] |> _.ToString(_.ToString()) |> ignore
 [1] |> _.Equals(let x = 5 in x) |> ignore
 type A1 = member _.M() = _.ToString()
+
 let f (a, (b, c)) = fun x -> _.ToString()
 match 1 with _ -> _.ToString()
 let _ = let _ = 3 in _.ToString()
@@ -30,6 +31,7 @@ ignore <| <@@ _.ToString() @@>
 (fun _ -> fun y -> _.ToString()) |> ignore
 (fun (a, (b, _)) -> fun y -> _.ToString()) |> ignore
 type A2 = member _.M _ = _.ToString()
+
 let g (a, (b, Some _)) = fun x -> _.ToString()
 
 type A with static member M(x: int, y: Func<int, string>) = ()
