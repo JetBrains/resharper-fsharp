@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageLock Include="Antlr2.Runtime" Version="2.7.7.3" />
     <PackageLock Include="Fantomas.Core" Version="6.3.15" />
-    <PackageLock Include="FSharp.Core" Version="9.0.100-beta.24466.6" />
+    <PackageLock Include="FSharp.Core" Version="9.0.201" />
     <PackageLock Include="JetBrains.Annotations" Version="2024.3.0" />
     <PackageLock Include="JetBrains.Build.Platform.DistributedCache" Version="1.1.20250130.230" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2025.1.5" />
