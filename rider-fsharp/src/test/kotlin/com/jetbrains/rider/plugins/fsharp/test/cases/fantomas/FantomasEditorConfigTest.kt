@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
-import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
+import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold

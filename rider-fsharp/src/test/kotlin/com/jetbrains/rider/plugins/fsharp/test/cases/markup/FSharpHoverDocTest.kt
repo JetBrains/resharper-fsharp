@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup
 
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
-import com.jetbrains.rider.plugins.fsharp.test.withCultureInfo
+import com.jetbrains.rider.plugins.fsharp.test.framework.withCultureInfo
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment

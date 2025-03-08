@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment

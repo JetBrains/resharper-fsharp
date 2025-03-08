@@ -1,8 +1,9 @@
-package com.jetbrains.rider.plugins.fsharp.test
+package com.jetbrains.rider.plugins.fsharp.test.framework
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
@@ -21,7 +22,7 @@ import java.io.PrintStream
 import java.nio.file.Path
 import kotlin.time.Duration.Companion.minutes
 
-fun com.intellij.openapi.editor.Editor.dumpTypeProviders(stream: PrintStream) {
+fun Editor.dumpTypeProviders(stream: PrintStream) {
   with(stream) {
     println((project ?: return).solution.rdFSharpModel.fsharpTestHost.dumpTypeProvidersProcess.sync(Unit))
     println("\nSevereHighlighters:")

@@ -6,7 +6,11 @@ import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.*
+import com.jetbrains.rider.plugins.fsharp.test.framework.editFSharpBackendSettings
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
+import com.jetbrains.rider.plugins.fsharp.test.framework.runProcessWaitForExit
+import com.jetbrains.rider.plugins.fsharp.test.framework.withSetting
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.OpenSolutionParams
