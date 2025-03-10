@@ -8,7 +8,9 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.InlayHints
+open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
@@ -19,10 +21,10 @@ open JetBrains.UI.RichText
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
 type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode, suffix,
-                          bulbActionsProvider: IInlayHintBulbActionsProvider) =
+                          bulbActionsProvider: IInlayHintBulbActionsProvider, owner: ITreeNode) =
     let text = RichText(": " + typeNameString + suffix)
     new (typeNameString: string, range: DocumentRange) =
-        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null)
+        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null, null)
 
     interface IHighlighting with
         member x.ToolTip = null
@@ -38,10 +40,11 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
     member x.Text = text
     member x.PushToHintMode = pushToHintMode
     member x.BulbActionsProvider = bulbActionsProvider
+    member x.Owner = owner
     member x.IsValid() = not text.IsEmpty && range.IsEmpty
 
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
-    TypeHintAdornmentProvider(settingsStore: ISettingsStore) =
+    TypeHintAdornmentProvider(settingsStore: ISettingsStore, specifyTypeActionProvider: ISpecifyTypeActionProvider) =
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.GetHighlighting() with
@@ -54,15 +57,21 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                 let data =
                     AdornmentData(thh.Text, null, AdornmentFlags.None, AdornmentPlacement.DefaultAfterPrevChar,
                                   thh.PushToHintMode)
-                let actionsProvider = thh.BulbActionsProvider
+                let visibilityActionsProvider = thh.BulbActionsProvider
 
                 { new IAdornmentDataModel with
                     override x.ContextMenuTitle = null
                     override x.ContextMenuItems =
                         [|
-                            if isNotNull actionsProvider then
-                                yield! actionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)
+                            // First-class context items
+                            let specifyTypeAction = specifyTypeActionProvider.TryCreateSpecifyTypeAction(thh.Owner)
+                            if isNotNull specifyTypeAction then
+                                yield specifyTypeAction
 
+                            if isNotNull visibilityActionsProvider then
+                                yield! visibilityActionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)
+
+                            // Second-class context items
                             yield IntraTextAdornmentDataModelHelper.CreateTurnOffAllInlayHintsBulbMenuItem(settingsStore)
                             yield IntraTextAdornmentDataModelHelper.CreateConfigureBulbMenuItem(nameof(FSharpTypeHintsOptionsPage))
                         |]
