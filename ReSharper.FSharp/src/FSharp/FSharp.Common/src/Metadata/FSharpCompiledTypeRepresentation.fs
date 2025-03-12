@@ -46,6 +46,7 @@ type FSharpMetadataModuleNameKind =
 type FSharpCompiledTypeRepresentation =
     | Module of nameKind: FSharpMetadataModuleNameKind * values: FSharpMetadataValue[]
     | Union of cases: string[]
+    | TypeAbbreviation
     | Other
 
     member this.HasRepresentation =

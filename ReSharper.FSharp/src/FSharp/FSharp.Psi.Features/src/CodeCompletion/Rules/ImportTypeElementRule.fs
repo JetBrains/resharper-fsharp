@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open System.Collections.Generic
+open System.Diagnostics
 open FSharp.Compiler.EditorServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -115,12 +117,26 @@ module ImportRule =
 type ImportRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
+    let relevance = CLRLookupItemRelevance.TypesAndNamespaces ||| CLRLookupItemRelevance.NotImportedType
+
+    let isNestedType (typeElement: ITypeElement) =
+        match typeElement.GetContainingType() with
+        | null -> false
+        | :? IFSharpModule -> false
+        | _ -> true
+
     let isAllowed (typeElement: ITypeElement) =
-        not (isFSharpProjectOrAssemblyModule typeElement.Module) &&
-        isNull (typeElement.GetContainingType()) &&
+        // not (isFSharpProjectOrAssemblyModule typeElement.Module) &&
+        not (isNestedType typeElement) &&
         
-        let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
-        isNotNull accessRightsOwner && accessRightsOwner.GetAccessRights() = AccessRights.PUBLIC
+        // let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
+        // isNotNull accessRightsOwner && accessRightsOwner.GetAccessRights() = AccessRights.PUBLIC
+        true
+
+    let getSourceName (typeElement: ITypeElement) =
+        match typeElement with
+        | :? IFSharpDeclaredElement as fsDeclaredElement -> fsDeclaredElement.SourceName
+        | _ -> typeElement.ShortName
 
     override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
 
@@ -146,8 +162,7 @@ type ImportRule() =
         if FSharpCodeCompletionContext.isFullEvaluationDisabled context.BasicContext then false else
 
         let element = reference.GetElement()
-        let psiServices = element.GetPsiServices()
-        let solution = psiServices.Solution
+        let solution = element.GetPsiServices().Solution
         let iconManager = solution.GetComponent<PsiIconManager>()
         let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
@@ -155,25 +170,41 @@ type ImportRule() =
         let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
         if isNull fsFile then false else
 
-        let openedModulesProvider = OpenedModulesProvider(element.FSharpFile, autoOpenCache)
-        let scopes = openedModulesProvider.OpenedModuleScopes
+        let scopes =
+            let openedModulesProvider = OpenedModulesProvider(element.FSharpFile, autoOpenCache)
+            openedModulesProvider.OpenedModuleScopes
 
         let isAttributeReferenceContext = context.IsInAttributeContext
 
-        let symbolScope = getSymbolScope context.PsiModule false
+        let getNsQualifiedName =
+            let nsQualifiedNames = Dictionary()
+            fun (ns: INamespace) ->
+                match nsQualifiedNames.TryGetValue(ns) with
+                | true, qualifiedName -> qualifiedName
+                | _ ->
+                    let qualifiedName = ns.QualifiedName
+                    nsQualifiedNames[ns] <- qualifiedName
+                    qualifiedName
+
+        let symbolScope = getSymbolScope context.PsiModule false // todo: allow alternative names
         ("", symbolScope.GetAllTypeElementsGroupedByName())
         ||> Seq.fold (fun prevTypeName typeElement ->
             if not (isAllowed typeElement) then prevTypeName else
 
             // todo: check scope ranges
-            let ns = typeElement.GetContainingNamespace().QualifiedName
+            let ns = typeElement.GetContainingNamespace() |> getNsQualifiedName
+
             if scopes.ContainsKey(ns) then prevTypeName else
 
             let name =
-                let shortName = typeElement.ShortName
+                let shortName = getSourceName typeElement
                 if isAttributeReferenceContext then shortName.SubstringBeforeLast("Attribute") else shortName
 
+            // todo: also check namespace name
             if name = prevTypeName then prevTypeName else
+
+            if name = "Rec1" then
+                Debugger.Break()
 
             let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
             let item =
@@ -182,7 +213,7 @@ type ImportRule() =
                 let item = ImportRule.createItem info name ns icon
                 item
                     .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
-                    .WithRelevance(CLRLookupItemRelevance.NotImportedType)
+                    .WithRelevance(relevance)
 
             collector.Add(item)
             name

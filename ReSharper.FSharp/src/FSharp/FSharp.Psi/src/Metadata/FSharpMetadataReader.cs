@@ -68,16 +68,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
   internal delegate T Reader<out T>(FSharpMetadataStreamReader reader);
 
-  internal class FSharpMetadataStreamReader : BinaryReader
+  internal class FSharpMetadataStreamReader([NotNull] Stream input, [NotNull] Encoding encoding, 
+    IMetadataAssembly metadataAssembly) : BinaryReader(input, encoding)
   {
-    private readonly IMetadataAssembly myMetadataAssembly;
-
-    public FSharpMetadataStreamReader([NotNull] Stream input, [NotNull] Encoding encoding,
-      IMetadataAssembly metadataAssembly) : base(input, encoding)
-    {
-      myMetadataAssembly = metadataAssembly;
-    }
-
     internal FSharpMetadata Metadata { get; set; }
 
     private readonly Stack<FSharpMetadataEntity> myState = new();
@@ -300,16 +293,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         {
           var nameKind = GetModuleNameKind(entity.EntityKind, range);
           entity.Representation = FSharpCompiledTypeRepresentation.NewModule(nameKind, metadataValues);
-          Metadata.AddEntity(entity, myMetadataAssembly);
+          Metadata.AddEntity(entity, metadataAssembly);
         }
       }
       else
       {
-        if (typeAbbreviation == null)
-        {
-          entity.Representation = typeRepresentation;
-          Metadata.AddEntity(entity, myMetadataAssembly);
-        }
+        entity.Representation =
+          typeAbbreviation == null
+            ? typeRepresentation
+            : FSharpCompiledTypeRepresentation.TypeAbbreviation;
+
+        Metadata.AddEntity(entity, metadataAssembly);
       }
 
       myState.Pop();

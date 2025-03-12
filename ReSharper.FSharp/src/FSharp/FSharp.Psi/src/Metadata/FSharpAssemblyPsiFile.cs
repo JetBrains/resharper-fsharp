@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi;
@@ -25,6 +26,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       FSharpMetadata = FSharpMetadataReader.ReadMetadata(containingModule, assembly);
       base.LoadAssembly(assembly, containingModule);
       FSharpMetadata = null;
+    }
+
+    protected override ReflectionTypeBuilder CreateReflectionTypeBuilder(IAssemblyDataCache cache, IMetadataAssembly assembly)
+    {
+      return base.CreateReflectionTypeBuilder(cache, assembly);
+    }
+
+    protected override void LoadMetadataErasedTypes(IMetadataAssembly metadataAssembly, List<CompiledTypeElement> loadedTypes)
+    {
+      using var builder = GetReflectionBuilder(metadataAssembly);
     }
 
     protected override ReflectionElementPropertiesProvider CreateReflectionElementPropertiesProvider() =>

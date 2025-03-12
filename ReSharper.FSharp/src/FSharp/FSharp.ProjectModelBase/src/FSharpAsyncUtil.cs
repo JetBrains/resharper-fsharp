@@ -229,7 +229,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     /// Provides the token, depending on the request thread.
     /// When the request is coming from an FCS thread, then its cancellation token is propagated to the new request.
     /// Otherwise, and new lifetime definition (with a new token) is created. 
-    private class FcsCancellationTokenSource : IDisposable
+    private readonly ref struct FcsCancellationTokenSource
     {
       [CanBeNull] private readonly LifetimeDefinition myLifetimeDefinition;
       public CancellationToken Token { get; }
