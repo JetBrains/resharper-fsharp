@@ -371,6 +371,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
+        member this.IsProjectOutput(outputPath) = false
 
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
