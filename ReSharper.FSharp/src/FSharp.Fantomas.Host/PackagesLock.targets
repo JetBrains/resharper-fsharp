@@ -5,7 +5,7 @@
     <PackageLock Include="Fantomas.FCS" Version="6.3.15" />
     <PackageLock Include="FSharp.Core" Version="9.0.201" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2024.3.0" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.13.20250303.151" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="6.13.20250313.152" />
     <PackageLock Include="JetBrains.RdFramework" Version="2024.3.0" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="1.1.1" />
     <PackageLock Include="Microsoft.NETCore.Targets" Version="1.1.3" />
