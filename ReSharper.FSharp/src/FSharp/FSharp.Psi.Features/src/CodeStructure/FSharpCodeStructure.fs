@@ -106,13 +106,13 @@ type FSharpCodeStructureProvider() =
                 for pat in binding.HeadPattern.Declarations do
                     match pat with
                     | :? IReferencePat as refPat ->
-                        FSharpDeclarationCodeStructureElement(refPat, parent, null) |> ignore
+                        FSharpPatternDeclarationCodeStructureElement(refPat, parent, null) |> ignore
                     | _ -> ()
 
         | :? IBindingSignature as bindingSig ->
             let refPat = bindingSig.HeadPattern.As<IReferencePat>()
             if isNotNull refPat then
-                FSharpDeclarationCodeStructureElement(refPat, parent, null) |> ignore
+                FSharpPatternDeclarationCodeStructureElement(refPat, parent, null) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
             for typeDeclaration in declarationGroup.TypeDeclarations do
@@ -136,7 +136,6 @@ type FSharpCodeStructureProvider() =
 
         member this.SupportsBackgroundUpdate = false
 
-
 type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, parentBlock: ICodeStructureBlockStart) =
     inherit CodeStructureElement(parent)
 
@@ -146,7 +145,6 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 
     let language = declaration.Language
     let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
-    let textRange = declaration.GetDocumentRange()
     let aspects = CodeStructureDeclarationAspects(declaration)
 
     let getDeclaration () = declarationPointer.GetTreeNode()
@@ -154,7 +152,7 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
     override x.Language = language
 
     override x.TreeNode = getDeclaration () :> _
-    override x.GetTextRange() = textRange
+    override x.GetTextRange() = declaration.GetDocumentRange()
 
     override x.GetFileStructureAspect() = aspects :> _
     override x.GetGotoMemberAspect() = aspects :> _
@@ -179,6 +177,15 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 
             let declaredElement = declaration.DeclaredElement
             if isValid declaredElement then declaredElement else null
+
+
+type FSharpPatternDeclarationCodeStructureElement(pat: IReferencePat, parent, parentBlock: ICodeStructureBlockStart) =
+    inherit FSharpDeclarationCodeStructureElement(pat, parent, parentBlock)
+
+    override this.GetTextRange() =
+        match pat.Binding with
+        | null -> base.GetTextRange()
+        | binding -> binding.GetDocumentRange()
 
 
 type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
