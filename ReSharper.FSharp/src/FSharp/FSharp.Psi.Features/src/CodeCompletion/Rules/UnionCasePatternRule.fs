@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -42,11 +43,13 @@ type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEn
     member val Case = symbol
     member val EntityInstance = fcsEntityInstance
 
+    member this.Context = context
+
     interface IEnumCaseLikePatternInfo
 
     interface IDescriptionProvidingLookupItem with
         member this.GetDescription() =
-            match context.GetCheckResults(UnionCasePatternInfo.Id) with
+            match context.GetCheckResults() with
             | None -> null
             | Some(checkResults) ->
 
@@ -66,9 +69,13 @@ type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikeP
     inherit TextualBehavior<EnumCaseLikePatternInfo<'T>>(info)
 
     override this.Accept(textControl, nameRange, _, _, solution, _) =
-        use writeCookie = WriteLockCookie.Create(true)
         use pinCheckResultsCookie =
-            textControl.GetFSharpFile(solution).PinTypeCheckResults(true, UnionCasePatternInfo.Id)
+            Assertion.Assert(info.Context.ParseAndCheckResults.IsValueCreated)
+            textControl
+                .GetFSharpFile(solution)
+                .PinTypeCheckResults(info.Context.ParseAndCheckResults.Value, UnionCasePatternInfo.Id)
+
+        use writeCookie = WriteLockCookie.Create(true)
 
         textControl.Document.ReplaceText(nameRange, "__")
         let nameRange = nameRange.StartOffset.ExtendRight("__".Length)

@@ -74,7 +74,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         | _ ->
 
         let basicContext = context.BasicContext
-        match context.BasicContext.File, context.GetCheckResults(opName) with
+        match context.BasicContext.File, context.GetCheckResults() with
         | :? IFSharpFile as fsFile, Some checkResults ->
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes

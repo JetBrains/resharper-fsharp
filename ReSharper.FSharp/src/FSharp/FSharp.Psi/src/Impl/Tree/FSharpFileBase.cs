@@ -48,6 +48,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IDisposable PinTypeCheckResults(bool prohibitTypeCheck, string opName) =>
       CheckerService.PinCheckResults(SourceFile, prohibitTypeCheck, opName);
 
+    public IDisposable PinTypeCheckResults(FSharpOption<FSharpParseAndCheckResults> results, string opName) =>
+      CheckerService.PinCheckResults(results, SourceFile, true, opName);
+
     public FSharpSymbol GetSymbol(int offset) =>
       ResolvedSymbolsCache.GetSymbol(SourceFile, offset);
 
