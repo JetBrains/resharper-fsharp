@@ -271,7 +271,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
     if escapesTupleAppArg context expr then true else
     if expr :? IParenOrBeginEndExpr then false
 
-    elif expr :? IDotLambdaExpr && not (FSharpLanguageLevel.isFSharp90Supported expr) then true else
+    elif expr :? IDotLambdaExpr && not (FSharpLanguageLevel.isFSharp81Supported expr) then true else
 
     let expr = expr.IgnoreInnerParens()
     if isNull expr|| contextRequiresParens expr context then true else
