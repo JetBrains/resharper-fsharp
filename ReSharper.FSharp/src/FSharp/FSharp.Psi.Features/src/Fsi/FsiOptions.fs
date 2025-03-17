@@ -95,7 +95,7 @@ type FsiOptions =
 
 
 [<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
-type FsiOptionsProvider(lifetime, settings, settingsSchema, shellLocks: IShellLocks) =
+type FsiOptionsProvider [<NotUsedByComponentContainer>] (lifetime, settings, settingsSchema, shellLocks: IShellLocks) =
     inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema, shellLocks)
 
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema) =
