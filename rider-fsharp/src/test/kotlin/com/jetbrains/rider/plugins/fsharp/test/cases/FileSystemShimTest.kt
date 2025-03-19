@@ -32,7 +32,7 @@ class FileSystemShimTest : PerTestSolutionTestBase() {
     waitAndPump(
       project.lifetime,
       { getTimestamp(file) > stampBefore },
-      Duration.ofSeconds(15000),
+      Duration.ofSeconds(30),
       { "Timestamp wasn't changed." })
     val stampAfter = getTimestamp(file)
 
