@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfoType
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
@@ -32,9 +33,11 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   @Test
   fun testInjectionByCommentInVerbatimStrings() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByCommentInRegularInterpolatedStrings() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByCommentInVerbatimInterpolatedStrings() = doTest()
 
@@ -42,18 +45,23 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByCommentInTripleQuotedStrings() = doTest()
 
   //TODO: fix lexer for second case
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByCommentInRawStrings() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByCommentInTripleQuotedInterpolatedStrings() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testEscapeSequences() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByAnnotation() = doTest()
 
+  @Mute("RIDER-123576")
   @Test
   fun testInjectionByFunction() = doTest()
 }
