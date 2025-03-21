@@ -450,6 +450,34 @@ public interface FSharpTokenType {
     DECIMAL
   );
 
+  TokenSet LEFT_BRACES = TokenSet.create(
+    LPAREN,
+    LBRACE,
+    LBRACK,
+    LQUOTE_UNTYPED,
+    LBRACK_BAR,
+    LBRACK_LESS,
+    LQUOTE_TYPED,
+    LBRACE_BAR
+  );
+
+  TokenSet RIGHT_BRACES = TokenSet.create(
+    RPAREN,
+    RBRACE,
+    RBRACK,
+    RQUOTE_UNTYPED,
+    BAR_RBRACK,
+    RQUOTE_TYPED,
+    GREATER_RBRACK,
+    BAR_RBRACE
+  );
+
+  TokenSet INTERPOLATED_STRING_ENDINGS = TokenSet.create(
+    FSharpTokenType.REGULAR_INTERPOLATED_STRING_END,
+    FSharpTokenType.VERBATIM_INTERPOLATED_STRING_END,
+    FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END
+  );
+
   static @NotNull FSharpTokenNodeType createToken(@NotNull String value) {
     return new FSharpTokenNodeType(value);
   }
