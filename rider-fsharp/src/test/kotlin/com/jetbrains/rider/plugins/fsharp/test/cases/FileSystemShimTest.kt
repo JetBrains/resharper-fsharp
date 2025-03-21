@@ -9,6 +9,7 @@ import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.PlatformType
@@ -20,7 +21,10 @@ import java.time.Duration
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FileSystemShimTest : PerTestSolutionTestBase() {
   @Test
-  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL])
+  @Mutes([
+    Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL]),
+    Mute("RIDER-124028")
+  ])
   fun externalFileChange() {
     val file = activeSolutionDirectory.resolve("Program.fs")
     val stampBefore = getTimestamp(file)
