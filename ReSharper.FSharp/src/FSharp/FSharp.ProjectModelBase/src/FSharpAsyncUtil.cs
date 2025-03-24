@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using FSharp.Compiler;
@@ -23,7 +22,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     private static readonly FSharpReadLockRequestsQueue ReadRequests = new();
 
-    [Conditional("JET_MODE_ASSERT")]
     public static void CheckAndThrow()
     {
       // If the FCS cancellation token is set, then this is FCS background analysis thread.
