@@ -61,10 +61,6 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   PatchEngineEditorTestBase(PatchEngineEditorTestMode.SpeculativeRebaseProhibited) {
   override val checkTextControls = false
   override val testSolution = "CoreConsoleApp"
-  override val testDataDirectory
-    get() = testDataStorage.testDataDirectory.resolve("../../../../ReSharper.FSharp/test/data/features/service/typingAssist")
-  override val testCaseSourceDirectory
-    get() = activeSolutionDirectory
 
   private val backendCases
     get() =
@@ -209,4 +205,21 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
 
   override fun isSupported(sourceFile: String) =
     tests.contains(sourceFile)
+}
+
+
+@Test
+@Subsystem(SubsystemConstants.TYPING_ASSIST)
+@Feature("Typing Assist")
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpBackspaceTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(IdeActions.ACTION_EDITOR_BACKSPACE) {
+  override fun isApplicable(sourceFile: String) = sourceFile.startsWith("Backspace")
+  override fun isSupported(sourceFile: String) = false
+
+  @Test
+  fun testA() {
+    dumpOpenedEditorFacade("Program.fs", "Test.fs") {
+      typeOrCallAction(IdeActions.ACTION_EDITOR_BACKSPACE)
+    }
+  }
 }

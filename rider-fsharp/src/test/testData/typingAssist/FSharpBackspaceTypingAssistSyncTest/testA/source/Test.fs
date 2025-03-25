@@ -1,4 +1,4 @@
 ﻿// ${CHAR:Backspace}
 module Module
 
-$" {<caret>} "
+$<caret>""
