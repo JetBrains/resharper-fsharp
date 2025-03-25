@@ -323,9 +323,16 @@ tasks {
     }
   }
 
+  val buildTestReferencedAssemblies by registering(Exec::class) {
+    group = riderFSharpTargetsGroup
+
+    executable = "dotnet"
+    args("build", "-consoleloggerparameters:ErrorsOnly", "$resharperPluginPath/test/data/TestAssembliesSources/TestAssembliesSources.sln")
+  }
+
   val prepare = create("prepare") {
     group = riderFSharpTargetsGroup
-    dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, ":lexer:generateLexer")
+    dependsOn(":protocol:rdgen", writeNuGetConfig, writeDotNetSdkPathProps, ":lexer:generateLexer", buildTestReferencedAssemblies)
   }
 
   val buildReSharperPlugin by registering(Exec::class) {
