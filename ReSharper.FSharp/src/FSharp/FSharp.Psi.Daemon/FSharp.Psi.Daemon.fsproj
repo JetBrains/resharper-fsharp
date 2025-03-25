@@ -24,6 +24,7 @@
       <DependentUpon>Strings.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="src\Common\ActionUtils.fs" />
     <Compile Include="src\Options\FSharpTypeHintOptionsPage.fs" />
     <Compile Include="src\Options\FSharpTypeHintsOptionsRegistrator.fs" />
     <Compile Include="src\ReadLockCookieUtil.fs" />
