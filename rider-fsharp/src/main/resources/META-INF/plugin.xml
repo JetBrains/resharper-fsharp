@@ -21,12 +21,12 @@
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
-      <applicationService
-              serviceInterface="com.jetbrains.rdclient.editorActions.cwm.FrontendAsyncEditorActionHandler$CallEditorActionRequestFactory"
-              serviceImplementation="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpCallEditorActionRequestFactory"
-              order="first"
-              overrides="true"
-              client="frontend"/>
+<!--      <applicationService-->
+<!--              serviceInterface="com.jetbrains.rdclient.editorActions.cwm.FrontendAsyncEditorActionHandler$CallEditorActionRequestFactory"-->
+<!--              serviceImplementation="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpCallEditorActionRequestFactory"-->
+<!--              order="first"-->
+<!--              overrides="true"-->
+<!--              client="frontend"/>-->
     <enterHandlerDelegate implementation="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpEnterHandlerDelegate"
                           order="before EnterInLineCommentHandler, before EnterBetweenBracesHandler"/>
     <editorActionHandler action="EditorBackSpace" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpBackspaceHandlerDelegate"
