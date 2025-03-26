@@ -9,6 +9,9 @@ import kotlin.math.abs
 val HighlighterIterator.tokenText: String
     get() = this.document.charsSequence.substring(this.start, this.end)
 
+val HighlighterIterator.tokenTypeSafe: IElementType?
+  get() = if (this.atEnd()) null else this.tokenTypeSafe
+
 // TODO: Move to the platform
 abstract class BracketMatcher(
   private val myBrackets: Array<Pair<IElementType, IElementType>>,
@@ -23,7 +26,7 @@ abstract class BracketMatcher(
     }
   }
 
-  fun getDirection(type: IElementType): Int {
+  fun getDirection(type: IElementType?): Int {
     return myDirection[type] ?: 0
   }
 
@@ -35,7 +38,7 @@ abstract class BracketMatcher(
    */
   fun findMatchingBracket(iterator: HighlighterIterator): Int? {
     myStack.clear()
-    var tokenType = iterator.tokenType
+    var tokenType = iterator.tokenTypeSafe
 
     val delta = getDirection(tokenType)
     if (delta == 0) {
@@ -51,7 +54,7 @@ abstract class BracketMatcher(
 
       repeat(abs(delta)) { if (delta > 0) iterator.advance() else iterator.retreat() }
 
-      tokenType = iterator.tokenType ?: return null
+      tokenType = iterator.tokenTypeSafe ?: return null
     }
   }
 
@@ -59,7 +62,7 @@ abstract class BracketMatcher(
     return myStack.isEmpty()
   }
 
-  fun proceedStack(tokenType: IElementType, failIfRightOnEmpty: Boolean = false): Boolean {
+  fun proceedStack(tokenType: IElementType?, failIfRightOnEmpty: Boolean = false): Boolean {
     // Check that token is a bracket
     val direction = getDirection(tokenType)
     if (direction == 0) return true
