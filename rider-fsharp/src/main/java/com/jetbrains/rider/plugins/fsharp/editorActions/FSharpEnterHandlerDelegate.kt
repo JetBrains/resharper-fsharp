@@ -83,7 +83,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
 
   fun getAdditionalSpacesBeforeToken(editor: Editor, offset: Int, lineStart: Int): Int {
     val iterator = editor.highlighter.createIterator(offset)
-    if (iterator.tokenType == null) return 0
+    if (iterator.atEnd()) return 0
 
     // Always add a single space before -> so completion works nicely
     if (iterator.tokenType == FSharpTokenType.RARROW) return 1
@@ -156,14 +156,14 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     if (caretOffset == document.getLineStartOffset(line)) return line
 
     val iterator = editor.highlighter.createIterator(caretOffset - 1)
-    if (iterator.tokenType == null) return line
+    if (iterator.atEnd()) return line
 
     tailrec fun tryFindContinuedLine(
       line: Int,
       lineStartOffset: Int,
       hasLeadingLeftBracket: Boolean
     ): Int {
-      if (iterator.tokenType == null) return line
+      if (iterator.atEnd()) return line
       if (iterator.end <= lineStartOffset && !hasLeadingLeftBracket) return line
 
       val interpolatedStringExpr =
@@ -275,7 +275,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
 
   fun handleEnterInTripleQuotedString(editor: Editor, caretOffset: Int): Boolean {
     val iterator = editor.highlighter.createIterator(caretOffset)
-    if (iterator.tokenType == null) return false
+    if (iterator.atEnd()) return false
 
     // """{caret} foo"""
     if (iterator.tokenType != FSharpTokenType.TRIPLE_QUOTED_STRING) return false
@@ -391,7 +391,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
   fun handleEnterFindLeftBracket(editor: Editor, caretOffset: Int): Boolean {
     val iterator = editor.highlighter.createIterator(caretOffset - 1)
 
-    if (iterator.tokenType == null) return false
+    if (iterator.atEnd()) return false
 
     val document = editor.document
     val caretLine = document.getLineNumber(caretOffset)
@@ -429,7 +429,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     val iterator = editor.highlighter.createIterator(caretOffset)
 
     val trimSpacesAfterCaret =
-      if (iterator.tokenType == null) false
+      if (iterator.atEnd()) false
       else {
         while (iterator.tokenType == FSharpTokenType.WHITESPACE) iterator.retreat()
         shouldTrimSpacesBeforeToken(iterator.tokenType)
