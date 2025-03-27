@@ -1,6 +1,6 @@
 ﻿module Module
 
-open FSharp.Data.Sql
+open FSharp.Data
 
 let [<Literal>] zzz = "hello"
-let _ = new SqlDataProvider<zzz>()
+type A = JsonProvider<zzz>
