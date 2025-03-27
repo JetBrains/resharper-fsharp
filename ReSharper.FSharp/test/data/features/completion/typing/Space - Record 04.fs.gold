@@ -61,6 +61,7 @@ asin
 async
 atan
 atan2
+backgroundTask
 box
 byte
 ceil
@@ -140,6 +141,7 @@ stdout
 string
 tan
 tanh
+task
 truncate
 tryUnbox
 typedefof
@@ -213,6 +215,7 @@ AsyncReplyChannel
 AsyncReturn
 AutoOpenAttribute
 AutoSerializableAttribute
+BackgroundTaskBuilder
 CLIEventAttribute
 CLIMutableAttribute
 Checked
@@ -253,6 +256,7 @@ Handler
 HashIdentity
 IDelegateEvent
 IEvent
+InlineIfLambdaAttribute
 InterfaceAttribute
 LanguagePrimitives
 LazyExtensions
@@ -267,6 +271,7 @@ MeasureAttribute
 Microsoft
 NativeInterop
 NoComparisonAttribute
+NoCompilerInliningAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
 NonStructuralComparison
@@ -300,6 +305,10 @@ StructuralComparisonAttribute
 StructuralEqualityAttribute
 StructuredFormatDisplayAttribute
 System
+TailCallAttribute
+TaskBuilder
+TaskBuilderBase
+TaskBuilderExtensions
 Unchecked
 UnverifiableAttribute
 ValueOption

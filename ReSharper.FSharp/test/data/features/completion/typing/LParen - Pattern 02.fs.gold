@@ -116,6 +116,7 @@ AsyncReplyChannel
 AsyncReturn
 AutoOpenAttribute
 AutoSerializableAttribute
+BackgroundTaskBuilder
 CLIEventAttribute
 CLIMutableAttribute
 Checked
@@ -156,6 +157,7 @@ Handler
 HashIdentity
 IDelegateEvent
 IEvent
+InlineIfLambdaAttribute
 InterfaceAttribute
 LanguagePrimitives
 LazyExtensions
@@ -171,6 +173,7 @@ Microsoft
 Module
 NativeInterop
 NoComparisonAttribute
+NoCompilerInliningAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
 NonStructuralComparison
@@ -204,6 +207,10 @@ StructuralComparisonAttribute
 StructuralEqualityAttribute
 StructuredFormatDisplayAttribute
 System
+TailCallAttribute
+TaskBuilder
+TaskBuilderBase
+TaskBuilderExtensions
 Text
 Unchecked
 UnverifiableAttribute

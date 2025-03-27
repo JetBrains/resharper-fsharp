@@ -1,3 +1,5 @@
-﻿open System
+﻿//${RUN:Import type 'System.String'}
+
+open System
 
 let s: String{caret} = ""

@@ -37,6 +37,7 @@ open JetBrains.TestFramework.Projects
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
+open NuGet.Frameworks
 
 module FSharpTestUtil =
     let referencedProjectGuid = "C13207C7-045E-485A-BC1A-AFA1472CD8BC"
@@ -57,12 +58,17 @@ module FSharpTestAttribute =
         |> HashSet
 
     let targetFrameworkId =
-        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+        TargetFrameworkId.Create(
+            FallbackFramework(
+                FrameworkConstants.CommonFrameworks.Net80,
+                [NuGetFramework(FrameworkConstants.FrameworkIdentifiers.Net, FrameworkConstants.Version8)]
+            )
+        )
 
 
 [<AutoOpen>]
 module PackageReferences =
-    let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/8.0.101"
     let [<Literal>] JetBrainsAnnotationsPackage = "JetBrains.Annotations/2022.1.0"
     let [<Literal>] SqlProviderPackage = "SQLProvider/1.1.101"
     let [<Literal>] FsPickler = "FsPickler/5.3.2"
@@ -81,8 +87,9 @@ type FSharpTestAttribute(extension) =
 
     interface ITestPackagesProvider with
         override this.GetPackages _ =
-            [| if this.ReferenceFSharpCore then
-                TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+            [| TestPackagesAttribute.ParsePackageName "Microsoft.NETCore.App.Ref/8.0.0"
+               if this.ReferenceFSharpCore then
+                   TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
 
         member this.Inherits = false
 

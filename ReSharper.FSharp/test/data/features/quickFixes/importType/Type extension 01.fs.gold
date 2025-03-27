@@ -1,4 +1,6 @@
-﻿open System
+﻿//${RUN:Import type 'System.String'}
+
+open System
 
 type String{caret} with
     member x.Foo = 123

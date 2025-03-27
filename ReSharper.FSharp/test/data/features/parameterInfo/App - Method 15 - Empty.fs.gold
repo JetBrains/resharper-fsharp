@@ -3,17 +3,17 @@
 (<no parameters>) : [NotNull] string
 Parameter: 0 ''
 
-(provider: IFormatProvider) : [NotNull] string
-Parameter: 0 'provider: IFormatProvider'
-
 (format: string) : [NotNull] string
 Parameter: 0 'format: string'
+
+(provider: IFormatProvider) : [NotNull] string
+Parameter: 0 'provider: IFormatProvider'
 
 (format: string, provider: IFormatProvider) : [NotNull] string
 Parameter: 0 'format: string'
 
 --- Accepted invocables: ---
 (<no parameters>) : [NotNull] string
-(provider: IFormatProvider) : [NotNull] string
 (format: string) : [NotNull] string
+(provider: IFormatProvider) : [NotNull] string
 (format: string, provider: IFormatProvider) : [NotNull] string

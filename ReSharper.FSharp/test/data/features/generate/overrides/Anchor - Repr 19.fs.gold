@@ -1,10 +1,10 @@
 ﻿Provided elements:
- 0: ToString():System.String
- 1: Equals(System.Object):System.Boolean
- 2: Finalize():System.Void
+ 0: Equals(System.Object?):System.Boolean
+ 1: Finalize():System.Void
+ 2: ToString():System.String?
 
 // ${KIND:Overrides}
-// ${SELECT0:ToString():System.String}
+// ${SELECT0:ToString():System.String?}
 
 // ${KIND:Overrides}
 
