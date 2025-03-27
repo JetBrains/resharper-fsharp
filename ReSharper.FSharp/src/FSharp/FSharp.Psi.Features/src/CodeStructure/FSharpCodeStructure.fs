@@ -182,8 +182,10 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 type FSharpPatternDeclarationCodeStructureElement(pat: IReferencePat, parent, parentBlock: ICodeStructureBlockStart) =
     inherit FSharpDeclarationCodeStructureElement(pat, parent, parentBlock)
 
+    let patternPointer = pat.GetPsiServices().Pointers.CreateTreeElementPointer(pat)
+
     override this.GetTextRange() =
-        match pat.Binding with
+        match patternPointer.GetTreeNode().Binding with
         | null -> base.GetTextRange()
         | binding -> binding.GetDocumentRange()
 
