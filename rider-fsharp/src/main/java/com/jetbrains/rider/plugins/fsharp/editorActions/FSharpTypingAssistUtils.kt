@@ -10,7 +10,7 @@ val HighlighterIterator.tokenText: String
     get() = this.document.charsSequence.substring(this.start, this.end)
 
 val HighlighterIterator.tokenTypeSafe: IElementType?
-  get() = if (this.atEnd()) null else this.tokenTypeSafe
+  get() = if (this.atEnd()) null else this.tokenType
 
 // TODO: Move to the platform
 abstract class BracketMatcher(
