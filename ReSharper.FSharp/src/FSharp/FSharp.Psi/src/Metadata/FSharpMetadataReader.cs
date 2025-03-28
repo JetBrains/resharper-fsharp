@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Metadata;
@@ -45,14 +46,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       {
         foreach (var metadataResource in metadataResources)
         {
+          Interruption.Current.CheckAndThrow();
+
           var isCompressed =
             metadataResource.ResourceName
               .StartsWith(FSharpAssemblyUtil.CompressedSignatureInfoResourceName, StringComparison.Ordinal);
 
           using var stream = metadataResource.CreateResourceReader();
-          using var decompressedStream = isCompressed ? new DeflateStream(stream, CompressionMode.Decompress) : stream;
+          using var decompressed = new MemoryStream();
 
-          ReadMetadata(decompressedStream, metadata, assembly);
+          var decompressedStream = isCompressed ? new DeflateStream(stream, CompressionMode.Decompress) : stream;
+          decompressedStream.CopyTo(decompressed);
+          decompressedStream.Close();
+
+          ReadMetadata(decompressed, metadata, assembly);
         }
       }
 
@@ -262,6 +269,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     private object ReadEntitySpec()
     {
+      Interruption.Current.CheckAndThrow();
+
       var index = ReadPackedInt();
       var typeParameters = ReadArray(reader => reader.ReadTypeParameterSpec());
       var logicalName = ReadUniqueString();
