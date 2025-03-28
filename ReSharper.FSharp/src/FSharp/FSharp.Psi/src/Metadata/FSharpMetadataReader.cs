@@ -59,6 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
           decompressedStream.CopyTo(decompressed);
           decompressedStream.Close();
 
+          decompressed.Position = 0;
           ReadMetadata(decompressed, metadata, assembly);
         }
       }
