@@ -18,6 +18,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.parentOfType
 import com.intellij.psi.util.startOffset
+import com.intellij.util.text.CharArrayUtil
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.editors.getPsiFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
@@ -119,18 +120,16 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
         val document = editor.document
         val line = document.getLineNumber(caretOffset)
         val lineStartOffset = document.getLineStartOffset(line)
-
-        if (document.getText(TextRange(lineStartOffset, caretOffset)).all(::isWhitespace)) return caretOffset
-
         val buffer = document.charsSequence
+
+        if (buffer.subSequence(lineStartOffset, caretOffset).all(::isWhitespace)) return caretOffset
         val lineEndOffset = document.getLineEndOffset(line)
 
         // skip whitespace before
-        val startOffset = (caretOffset - 1 downTo 0).firstOrNull { !buffer[it].isWhitespace() }?.plus(1) ?: 0
+        val startOffset = CharArrayUtil.shiftBackward(buffer, -1, caretOffset - 1, " ") + 1
 
         val endOffset =
-            if (trimAfterCaret) (caretOffset until lineEndOffset).firstOrNull { !buffer[it].isWhitespace() }
-                ?: lineEndOffset
+            if (trimAfterCaret) CharArrayUtil.shiftForward(buffer, caretOffset, lineEndOffset, " ")
             else caretOffset
 
         val additionalSpaces =
@@ -269,7 +268,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
         } else {
             val startOffset = document.getLineStartOffset(line)
 
-            val pos = (startOffset until caretOffset).firstOrNull { buffer[it] != ' ' } ?: caretOffset
+            val pos = CharArrayUtil.shiftForward(buffer, startOffset, caretOffset, " ")
 
             val indent = pos - startOffset
             insertNewLineAt(editor, indent, caretOffset, trimSpacesAfterCaret)
