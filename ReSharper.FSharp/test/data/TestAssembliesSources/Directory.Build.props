@@ -1,6 +1,0 @@
-﻿<Project>
-  <PropertyGroup>
-    <OutputPath>$(SolutionDir)..\assemblies\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
-</Project>

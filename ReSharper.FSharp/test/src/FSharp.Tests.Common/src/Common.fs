@@ -10,6 +10,7 @@ open JetBrains.Application.Parts
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
+open JetBrains.HabitatDetector
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
@@ -34,6 +35,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
+open JetBrains.TestFramework.TestCompiler
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
@@ -76,6 +78,26 @@ module PackageReferences =
 type ITestAssemblyReaderShim =
     abstract CreateReferencedProjectCookie: IProject -> IDisposable
     abstract Dispose: unit -> unit
+
+
+type TestReferenceProjectOutput(projectName: string) =
+    inherit Attribute()
+
+    interface ITestLibraryReferencesProvider with
+        member this.Inherits = true
+
+        member this.GetReferences(test, packageManager, targetFrameworkId) =
+            let compiler = DotNetTestCodeCompiler(test.TestLifetime)
+            let slnPath = test.BaseTestDataPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
+
+            let compileResult =
+                compiler.Compile(slnPath, TestTargetFramework.Net80, HabitatInfo.OSArchitecture,
+                    compileMode = DotNetTestCodeCompiler.CompileMode.Build
+                ).Result
+
+            let fileName = projectName + ".dll"
+            let dllPath = compileResult.OutputDir / fileName
+            [dllPath.FullPath]
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()
