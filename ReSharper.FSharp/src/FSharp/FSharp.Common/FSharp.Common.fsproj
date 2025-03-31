@@ -74,7 +74,6 @@
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
     <Compile Include="src\Checker\FcsProjectProvider.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
-    <Compile Include="src\Intentions\SpecifyTypeActionsProvider.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

@@ -1,8 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 
 open FSharp.Compiler.Symbols
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 
 let getFunctionTypeArgs includeReturnType fcsType =
     let rec loop (fcsType: FSharpType) acc =
@@ -21,8 +19,3 @@ let getFunctionTypeArgs includeReturnType fcsType =
                 acc
 
     loop fcsType [] |> List.rev
-
-let tryGetOuterOptionalParameterAndItsType (pattern: IReferencePat) fcsType =
-    let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
-    if isNotNull optionalValPat && isOption fcsType then (optionalValPat : IFSharpPattern), fcsType.GenericArguments[0]
-    else pattern, fcsType
