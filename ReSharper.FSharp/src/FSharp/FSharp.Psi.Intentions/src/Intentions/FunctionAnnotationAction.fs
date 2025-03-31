@@ -23,12 +23,12 @@ open JetBrains.ReSharper.Feature.Services.Util
 
 module SpecifyTypes =
     type Availability = {
-        ParameterTypes: bool
-        ReturnType: bool
+        CanSpecifyParameterTypes: bool
+        CanSpecifyReturnType: bool
     } with
         member x.IsAvailable = x <> Availability.Unavailable
-        static member Unavailable = { ParameterTypes = false; ReturnType = false }
-        static member ReturnTypeOnly = { ParameterTypes = false; ReturnType = true }
+        static member Unavailable = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = false }
+        static member ReturnTypeOnly = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = true }
 
     let rec private (|TupleLikePattern|_|) (pattern: IFSharpPattern) =
         match pattern with
@@ -39,7 +39,7 @@ module SpecifyTypes =
             | _ -> None
         | _ -> None
 
-    let private isParametersAnnotated (binding: IParameterOwnerMemberDeclaration) =
+    let private areParametersAnnotated (binding: IParameterOwnerMemberDeclaration) =
         let rec isAnnotated isTopLevel (pattern: IFSharpPattern) =
             let pattern = pattern.IgnoreInnerParens()
             match pattern with
@@ -49,25 +49,19 @@ module SpecifyTypes =
 
         binding.ParametersDeclarations |> Seq.forall (fun p -> isAnnotated true p.Pattern)
 
-    let private hasBangInBindingKeyword (binding: IBinding) =
-        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        if isNull letExpr then false else
-        letExpr.IsComputed
-
-    let rec getAvailability (node: ITreeNode) =
+    let rec isAvailable (node: ITreeNode) =
         if not (isValid node) then Availability.Unavailable else
 
         match node with
         | :? IBinding as binding ->
-            //TODO: support
-            if hasBangInBindingKeyword binding then Availability.Unavailable else
+            if binding.IsComputed then Availability.Unavailable else
 
-            { ParameterTypes = not (isParametersAnnotated binding)
-              ReturnType = isNull binding.ReturnTypeInfo }
+            { CanSpecifyParameterTypes = not (areParametersAnnotated binding)
+              CanSpecifyReturnType = isNull binding.ReturnTypeInfo }
 
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
-            if isNotNull binding then getAvailability binding else
+            if isNotNull binding then isAvailable binding else
 
             let pattern =
                 match OptionalValPatNavigator.GetByPattern(pattern) with
@@ -75,22 +69,21 @@ module SpecifyTypes =
                 | x -> x
 
             { Availability.Unavailable with
-                ReturnType = isNotNull pattern && isNull (TypedPatNavigator.GetByPattern(pattern)) }
+                CanSpecifyReturnType = isNotNull pattern && isNull (TypedPatNavigator.GetByPattern(pattern)) }
 
         | :? IMemberDeclaration as memberDeclaration ->
-            { ReturnType =
+            { CanSpecifyReturnType =
                 isNull memberDeclaration.ReturnTypeInfo &&
                 Seq.isEmpty memberDeclaration.AccessorDeclarationsEnumerable
 
-              ParameterTypes = not (isParametersAnnotated memberDeclaration) }
+              CanSpecifyParameterTypes = not (areParametersAnnotated memberDeclaration) }
 
         | _ -> Availability.Unavailable
 
     let private specifyParametersOwnerReturnType
-        (declaration: IParameterOwnerMemberDeclaration)
-        (mfv: FSharpMemberOrFunctionOrValue)
-        displayContext=
-
+                    (declaration: IParameterOwnerMemberDeclaration)
+                    (mfv: FSharpMemberOrFunctionOrValue)
+                    displayContext =
         let typeString =
             let fullType = mfv.FullType
             if declaration :? IBinding && fullType.IsFunctionType then
@@ -137,11 +130,6 @@ module SpecifyTypes =
         parenPat :> IFSharpPattern
 
     let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        let pattern, fcsType =
-            match pattern with
-            | :? IReferencePat as pattern -> tryGetOuterOptionalParameterAndItsType pattern fcsType
-            | _ -> pattern, fcsType
-
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
 
@@ -180,9 +168,7 @@ module SpecifyTypes =
 
         specifyParameterTypes types parameters true
 
-    let rec specifyTypes
-        (node: ITreeNode)
-        (availability: Availability) =
+    let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
@@ -197,13 +183,9 @@ module SpecifyTypes =
 
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let fcsType = mfv.FullType
-                let pattern, fcsType = tryGetOuterOptionalParameterAndItsType pattern fcsType
                 let displayContext = symbolUse.DisplayContext
 
                 specifyPatternType displayContext fcsType pattern
-
-            | :? IOptionalValPat as optionalPat ->
-                specifyTypes optionalPat.Pattern availability
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
@@ -218,10 +200,10 @@ module SpecifyTypes =
             let symbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
             let displayContext = symbolUse.DisplayContext
 
-            if availability.ParameterTypes then
+            if availability.CanSpecifyParameterTypes then
                 specifyParameterTypes declaration symbol displayContext
 
-            if availability.ReturnType then
+            if availability.CanSpecifyReturnType then
                 specifyParametersOwnerReturnType declaration symbol displayContext
 
         | _ -> ()
@@ -238,7 +220,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
         if not (isAtBindingKeywordOrReferencePattern dataProvider binding) then false else
-        SpecifyTypes.getAvailability binding |> _.IsAvailable
+        SpecifyTypes.isAvailable binding |> _.IsAvailable
 
     override x.ExecutePsiTransaction _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
@@ -246,12 +228,13 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let availability = SpecifyTypes.getAvailability binding
+        let availability = SpecifyTypes.isAvailable binding
         SpecifyTypes.specifyTypes binding availability
 
 
 type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Availability) =
     inherit BulbActionBase()
+
     override this.Text = "Add type annotation"
 
     override this.ExecutePsiTransaction(_, _) =
@@ -265,7 +248,7 @@ type SpecifyTypeActionsProvider(solution) =
     interface ISpecifyTypeActionProvider with
         member this.TryCreateSpecifyTypeAction(node: ITreeNode) =
             use _ = ReadLockCookie.Create()
-            let availability = { SpecifyTypes.getAvailability node with ParameterTypes = false }
+            let availability = { SpecifyTypes.isAvailable node with CanSpecifyParameterTypes = false }
             if not availability.IsAvailable then null else
 
             SpecifyTypeAction(node, availability)

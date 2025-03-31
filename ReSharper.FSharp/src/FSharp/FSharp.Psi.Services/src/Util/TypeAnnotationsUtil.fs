@@ -14,6 +14,7 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
     | :? IParenPat as parenPat -> visitPattern acc parenPat.Pattern
     | :? IAsPat as asPat -> visitPattern acc asPat.LeftPattern
 
+    | :? IOptionalValPat
     | :? IReferencePat as pat -> pat :: acc
 
     | :? IRecordPat as recordPat ->
@@ -31,8 +32,6 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
         let acc = (parametersOwnerPat : ITreeNode) :: acc
         parametersOwnerPat.ParametersEnumerable
         |> Seq.fold visitPattern acc
-
-    | :? IOptionalValPat as optionalPat -> visitPattern acc optionalPat.Pattern
 
     | :? INamedUnionCaseFieldsPat as unionCaseFieldsPat ->
         unionCaseFieldsPat.FieldPatternsEnumerable

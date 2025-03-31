@@ -9,5 +9,6 @@
 
     /// Is compiled to a .NET literal
     bool IsLiteral { get; }
+    bool IsComputed { get; }
   }
 }

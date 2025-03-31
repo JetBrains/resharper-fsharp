@@ -87,6 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => Attributes.HasAttribute("Literal"); // todo: cache
+    public bool IsComputed => false;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
       HeadPattern is IReferencePat rp

@@ -13,6 +13,8 @@ open JetBrains.ReSharper.Feature.Services.InlayHints
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Common.ActionUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.TextControl.DocumentMarkup.Adornments
@@ -24,11 +26,32 @@ open JetBrains.UI.RichText
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHintMode: PushToHintMode, suffix,
-                          bulbActionsProvider: IInlayHintBulbActionsProvider, owner: ITreeNode) =
-    let text = RichText(": " + typeNameString + suffix)
+type TypeHintHighlighting private (typeString: string, owner: ITreeNode, range: DocumentRange,
+                                   pushToHintMode: PushToHintMode, bulbActionsProvider: IInlayHintBulbActionsProvider,
+                                   suffix) =
+    let text = RichText(": " + typeString + suffix)
+
     new (typeNameString: string, range: DocumentRange) =
-        TypeHintHighlighting(typeNameString, range, PushToHintMode.Default, "", null, null)
+        TypeHintHighlighting(typeNameString, null, range, PushToHintMode.Default, null, "")
+
+    new (typeNameString: string, binding: IBinding, pushToHintMode: PushToHintMode, bulbActionsProvider: IInlayHintBulbActionsProvider) =
+        let range =
+            if binding.HasParameters then binding.EqualsToken.GetDocumentRange().StartOffsetRange()
+            else binding.HeadPattern.GetDocumentRange().EndOffsetRange()
+
+        TypeHintHighlighting(typeNameString, binding, range, pushToHintMode, bulbActionsProvider, " ")
+
+    new (typeNameString: string, memberDecl: IMemberDeclaration, pushToHintMode: PushToHintMode, bulbActionsProvider: IInlayHintBulbActionsProvider) =
+        let range =
+            if memberDecl.ParameterPatternsEnumerable.IsEmpty() then
+                memberDecl.NameIdentifier.GetDocumentRange().EndOffsetRange()
+            else memberDecl.EqualsToken.GetDocumentRange().StartOffsetRange()
+
+        TypeHintHighlighting(typeNameString, memberDecl, range, pushToHintMode, bulbActionsProvider, " ")
+
+    new (typeNameString: string, pat: IFSharpPattern, pushToHintMode: PushToHintMode, bulbActionsProvider: IInlayHintBulbActionsProvider) =
+        let range = pat.GetDocumentRange().EndOffsetRange()
+        TypeHintHighlighting(typeNameString, pat, range, pushToHintMode, bulbActionsProvider, "")
 
     interface IHighlighting with
         member x.ToolTip = null
@@ -42,7 +65,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
         member x.TestOutput = text.Text
 
     member x.Text = text
-    member x.TypeText = typeNameString
+    member x.TypeText = typeString
     member x.PushToHintMode = pushToHintMode
     member x.BulbActionsProvider = bulbActionsProvider
     member x.Owner = owner

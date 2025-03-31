@@ -40,10 +40,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => false;
+    public bool IsComputed => LetOrUseExprNavigator.GetByBinding(this)?.IsComputed == true;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
       HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
 
-    public FSharpSymbolUse GetFcsSymbolUse() => (HeadPattern as IReferencePat)?.GetFcsSymbolUse();
+    FSharpSymbolUse IParameterOwnerMemberDeclaration.GetFcsSymbolUse() =>
+      HeadPattern is IReferencePat rp ? rp.GetFcsSymbolUse() : null;
   }
 }
