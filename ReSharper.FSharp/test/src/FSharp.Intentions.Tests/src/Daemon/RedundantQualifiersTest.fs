@@ -1,8 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Daemon
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 type RedundantQualifiersTest() =
@@ -34,7 +34,7 @@ type RedundantQualifiersTest() =
 
     [<Test>] member x.``Compiled names - ModuleSuffix 01``() = x.DoNamedTest()
 
-    [<TestReferences("../../../assemblies/ImplicitModule.dll")>]
+    [<TestReferenceProjectOutput("ImplicitModule")>]
     [<Test>] member x.``Compiled names - ModuleSuffix 02 - Implicit``() = x.DoNamedTest()
 
     [<Test>] member x.``Opens 01``() = x.DoNamedTest()

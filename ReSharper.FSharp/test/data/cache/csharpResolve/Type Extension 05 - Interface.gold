@@ -1,8 +1,16 @@
 ﻿using static Module;
 
-  public |class Class1 : IT|(0)
-  {
-  }
+public class Class1 : IT1
+{
+}
+
+public class Class2 : IT2
+{
+}
+
+public |class Class3 : IT3|(0)
+{
+}
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Interface member 'int Module.IT.Foo' is not implemented
+(0): ReSharper Underlined Error Highlighting: Interface member 'int Module.IT3.Foo1' is not implemented

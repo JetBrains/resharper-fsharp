@@ -1,9 +1,9 @@
 ﻿Provided elements:
  0: E:Microsoft.FSharp.Control.FSharpHandler`1[T -> System.Int32]
- 1: ToString():System.String
- 2: Equals(System.Object):System.Boolean
+ 1: Equals(System.Object?):System.Boolean
+ 2: Finalize():System.Void
  3: GetHashCode():System.Int32
- 4: Finalize():System.Void
+ 4: ToString():System.String?
 
 // ${KIND:Overrides}
 // ${SELECT0:E:Microsoft.FSharp.Control.FSharpHandler`1[T -> System.Int32]}

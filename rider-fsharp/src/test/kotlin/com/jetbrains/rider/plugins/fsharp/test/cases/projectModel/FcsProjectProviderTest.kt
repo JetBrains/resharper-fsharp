@@ -5,8 +5,8 @@ import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.testFramework.ProjectViewTestUtil
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withoutNonFSharpProjectReferences
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.withoutNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity

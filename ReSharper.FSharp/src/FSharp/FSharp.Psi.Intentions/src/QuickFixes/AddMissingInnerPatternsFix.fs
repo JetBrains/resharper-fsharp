@@ -39,9 +39,9 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
         (matchExpr :? IMatchLambdaExpr || firstClause.Indent = matchExpr.Indent)
 
     override this.ExecutePsiTransaction(_, _) =
+        use pinCheckResultsCookie = matchExpr.FSharpFile.PinTypeCheckResults(true, this.Text)
         use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        use pinCheckResultsCookie = matchExpr.FSharpFile.PinTypeCheckResults(true, this.Text)
 
         let value, nodes, deconstructions = MatchTree.ofMatchExpr matchExpr
 

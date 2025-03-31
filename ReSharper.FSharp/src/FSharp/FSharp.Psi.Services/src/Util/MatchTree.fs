@@ -44,6 +44,14 @@ type MatchType =
         | Enum(fcsEntity, _) -> Some(fcsEntity.AsType())
         | _ -> None
 
+    member this.SupportsNullTest: bool =
+        match this with
+        | Other fcsType ->
+            match tryGetAbbreviatedTypeEntity fcsType with
+            | Some fcsEntity -> not fcsEntity.IsFSharp && not fcsEntity.IsValueType
+            | _ -> false
+        | _ -> false
+
 
 [<RequireQualifiedAccess>]
 type MatchTest =
@@ -64,6 +72,7 @@ type MatchTest =
     | As
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
     | Record
+    | Null
 
 and MatchValue =
     { Type: MatchType
@@ -129,6 +138,8 @@ and MatchNode =
 
         | (MatchTest.Or, [node1; node2]), _ ->
             $"({string node1}) | ({string node2})"
+
+        | (MatchTest.Null, _), _ -> "null"
 
         | _ -> "other case"
 
@@ -274,6 +285,8 @@ module MatchTest =
         | (MatchTest.Record, fields1), (MatchTest.Record, fields2) ->
             List.forall2 matches fields2 fields1
 
+        | (MatchTest.Null, []), (MatchTest.Null, []) -> true
+
         | _ -> false
 
     let rec initialPattern (deconstructions: Deconstructions) (context: ITreeNode) isGenerating (value: MatchValue) =
@@ -380,6 +393,9 @@ module MatchTest =
                 let fields = recordInstance.Entity.FSharpFields
                 let fieldNodes = makeInitialFieldPatterns recordInstance.Substitution recordPath fields
                 test, fieldNodes
+
+            | MatchType.Other _ as matchType when matchType.SupportsNullTest ->
+                MatchTest.Null, []
 
             | _ ->
                 MatchTest.Named None, []
@@ -565,6 +581,9 @@ module MatchNode =
                 let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
 
                 Seq.iter2 (bind context usedNames) fieldPats fieldNodes
+
+            | MatchTest.Null, [] ->
+                createPattern "null" |> replaceWithPattern oldPat |> ignore
 
             | _ -> ()
 
@@ -829,6 +848,10 @@ module MatchNode =
                     tail.Pattern <- MatchTest.initialPattern deconstructions context isGenerating tail.Value
                 | _ -> ()
 
+            true
+
+        | MatchTest.Null, [] ->
+            node.Pattern <- MatchTest.Named None, []
             true
 
         | nodePattern -> failwith $"Unexpected pattern: {nodePattern}"
@@ -1184,6 +1207,9 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
 
     | :? IFieldPat as fieldPat, _ ->
         getMatchPattern deconstructions value skipOnNull fieldPat.Pattern
+
+    | :? INullPat, _ ->
+        MatchTest.Null, []
 
     | null, _ when skipOnNull ->
         addDeconstruction value.Path (Deconstruction.Discard true)

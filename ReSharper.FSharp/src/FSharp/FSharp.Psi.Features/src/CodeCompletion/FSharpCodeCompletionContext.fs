@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -27,6 +28,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Threading
 open JetBrains.Util
+open JetBrains.Util.Concurrency
 open JetBrains.Util.Extension
 open JetBrains.Util.Logging
 
@@ -190,6 +192,14 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
 
         not (FSharpCodeCompletionContext.isFullEvaluationDisabled context)
 
+    member val ParseAndCheckResults =
+        InterruptibleLazy<FSharpParseAndCheckResults option>(fun _ ->
+            match context.File with
+            | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
+                fsFile.GetParseAndCheckResults(true, "FSharpCodeCompletionContext.FcsCheckResults")
+            | _ -> None
+        )
+
     override this.ContextId = "FSharpCodeCompletionContext"
 
     member this.FcsCompletionContext = fcsCompletionContext
@@ -207,11 +217,8 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
         let completionType = context.CodeCompletionType
         completionType = CodeCompletionType.SmartCompletion || completionType = CodeCompletionType.BasicCompletion
 
-    member this.GetCheckResults(opName) =
-        match this.BasicContext.File with
-        | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
-            fsFile.GetParseAndCheckResults(true, opName) |> Option.map (fun results -> results.CheckResults)
-        | _ -> None
+    member this.GetCheckResults() =
+        this.ParseAndCheckResults.Value |> Option.map (fun results -> results.CheckResults)
 
 [<IntellisensePart(Instantiation.DemandAnyThreadUnsafe)>]
 type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =

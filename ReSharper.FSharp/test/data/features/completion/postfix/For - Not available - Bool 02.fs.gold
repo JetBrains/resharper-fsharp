@@ -5,6 +5,7 @@ GetHashCode
 GetType
 GetTypeCode
 ToString
+TryFormat
 let
 match
 not{caret}

@@ -60,9 +60,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
           result.Add(typeElement);
       }
 
-      foreach (var compiledTypeName in myCompiledModuleToNestedAutoOpenModules.GetReadOnlyValues(qualifiedName))
-        if (symbolScope.GetTypeElementByCLRName(compiledTypeName) is { } compiledTypeElement)
-          result.Add(compiledTypeElement);
+      lock (this)
+      {
+        foreach (var compiledTypeName in myCompiledModuleToNestedAutoOpenModules.GetReadOnlyValues(qualifiedName))
+          if (symbolScope.GetTypeElementByCLRName(compiledTypeName) is { } compiledTypeElement)
+            result.Add(compiledTypeElement);
+      }
 
       return result;
     }
@@ -190,7 +193,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         if (typeInfo.HasCustomAttribute(FSharpPredefinedType.AutoOpenAttrTypeName.FullName))
         {
           foreach (var moduleName in GetCompiledImportingParentModuleNames(typeInfo))
-            myCompiledModuleToNestedAutoOpenModules.Add(moduleName, typeInfo.FullyQualifiedName);
+            lock (this)
+              myCompiledModuleToNestedAutoOpenModules.Add(moduleName, typeInfo.FullyQualifiedName);
 
           modulesNames.Add(typeInfo.TypeName);
         }

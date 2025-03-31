@@ -2,7 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.plugins.fsharp.test.withDisabledOutOfProcessTypeProviders
+import com.jetbrains.rider.plugins.fsharp.test.framework.withDisabledOutOfProcessTypeProviders
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldBeFalse

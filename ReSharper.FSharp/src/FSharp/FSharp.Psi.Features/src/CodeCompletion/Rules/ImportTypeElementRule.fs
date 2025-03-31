@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open System.Collections.Generic
 open FSharp.Compiler.EditorServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -24,6 +25,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Transactions
@@ -115,12 +117,25 @@ module ImportRule =
 type ImportRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
+    let relevance = CLRLookupItemRelevance.TypesAndNamespaces ||| CLRLookupItemRelevance.NotImportedType
+
+    let isNestedType (typeElement: ITypeElement) =
+         match typeElement.GetContainingType() with
+         | null -> false
+         | :? IFSharpModule -> false
+         | _ -> true
+
     let isAllowed (typeElement: ITypeElement) =
-        not (isFSharpProjectOrAssemblyModule typeElement.Module) &&
-        isNull (typeElement.GetContainingType()) &&
-        
+        not (isFSharpAssembly typeElement.Module) &&
+        not (isNestedType typeElement) &&
+
         let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
         isNotNull accessRightsOwner && accessRightsOwner.GetAccessRights() = AccessRights.PUBLIC
+
+    let getSourceName (typeElement: ITypeElement) =
+         match typeElement with
+         | :? IFSharpDeclaredElement as fsDeclaredElement -> fsDeclaredElement.SourceName
+         | _ -> typeElement.ShortName
 
     override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
 
@@ -160,17 +175,34 @@ type ImportRule() =
 
         let isAttributeReferenceContext = context.IsInAttributeContext
 
-        let symbolScope = getSymbolScope context.PsiModule false
+        let symbolScope = getSymbolScope context.PsiModule true
+        
+        let getNsQualifiedName =
+             let moduleQualifiedNames = Dictionary()
+             fun (typeElement: ITypeElement) ->
+                 let moduleToOpen: IClrDeclaredElement =
+                     match typeElement.GetContainingType() with
+                     | :? IFSharpModule as fsModule -> fsModule
+                     | _ -> typeElement.GetContainingNamespace()
+
+                 match moduleQualifiedNames.TryGetValue(moduleToOpen) with
+                 | true, qualifiedName -> qualifiedName
+                 | _ ->
+                     match moduleToOpen with
+                     | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
+                     | :? INamespace as ns -> ns.QualifiedName
+                     | _ -> moduleToOpen.ShortName
+
         ("", symbolScope.GetAllTypeElementsGroupedByName())
         ||> Seq.fold (fun prevTypeName typeElement ->
             if not (isAllowed typeElement) then prevTypeName else
 
             // todo: check scope ranges
-            let ns = typeElement.GetContainingNamespace().QualifiedName
+            let ns = typeElement |> getNsQualifiedName
             if scopes.ContainsKey(ns) then prevTypeName else
 
             let name =
-                let shortName = typeElement.ShortName
+                let shortName = getSourceName typeElement
                 if isAttributeReferenceContext then shortName.SubstringBeforeLast("Attribute") else shortName
 
             if name = prevTypeName then prevTypeName else
@@ -182,7 +214,7 @@ type ImportRule() =
                 let item = ImportRule.createItem info name ns icon
                 item
                     .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
-                    .WithRelevance(CLRLookupItemRelevance.NotImportedType)
+                    .WithRelevance(relevance)
 
             collector.Add(item)
             name

@@ -3,13 +3,17 @@
 open System
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
+open JetBrains.Application.UI.Controls.BulbMenu.Anchors
+open JetBrains.Application.UI.Controls.BulbMenu.Items
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.InlayHints
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Common.ActionUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
@@ -38,6 +42,7 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
         member x.TestOutput = text.Text
 
     member x.Text = text
+    member x.TypeText = typeNameString
     member x.PushToHintMode = pushToHintMode
     member x.BulbActionsProvider = bulbActionsProvider
     member x.Owner = owner
@@ -45,6 +50,12 @@ type TypeHintHighlighting(typeNameString: string, range: DocumentRange, pushToHi
 
 and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
     TypeHintAdornmentProvider(settingsStore: ISettingsStore, specifyTypeActionProvider: ISpecifyTypeActionProvider) =
+
+    let createCopyToClipboardBulbItem (highlighting: TypeHintHighlighting) highlighter =
+        let text = highlighting.TypeText
+        BulbMenuItem(ExecutableItem(fun () -> copyToClipboard text highlighter),
+                     Strings.FSharpInferredTypeHighlighting_TooltipText, null, BulbMenuAnchors.FirstClassContextItems)
+
     interface IHighlighterAdornmentProvider with
         member x.IsValid(highlighter) =
             match highlighter.GetHighlighting() with
@@ -67,6 +78,11 @@ and [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
                             let specifyTypeAction = specifyTypeActionProvider.TryCreateSpecifyTypeAction(thh.Owner)
                             if isNotNull specifyTypeAction then
                                 yield specifyTypeAction
+
+                            yield createCopyToClipboardBulbItem thh highlighter
+
+                            if isNotNull actionsProvider then
+                                yield! actionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)
 
                             if isNotNull visibilityActionsProvider then
                                 yield! visibilityActionsProvider.CreateChangeVisibilityBulbMenuItems(settingsStore, thh)

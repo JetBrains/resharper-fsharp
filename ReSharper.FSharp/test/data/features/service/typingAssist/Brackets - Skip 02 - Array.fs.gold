@@ -1,4 +1,4 @@
-﻿// ${CHAR:|}
+// ${CHAR:|}
 // ${CHAR:]}
 module Module
 

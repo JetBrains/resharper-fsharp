@@ -8,9 +8,11 @@ open FSharp.Compiler.Xml
 open JetBrains.Annotations
 open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Threading
+open JetBrains.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -282,12 +284,23 @@ module rec FSharpMsBuildUtils =
 
 [<Extension; AutoOpen>]
 module PsiUtil =
+    let private alternativeNameScopeKey = Key<ISymbolScope>("cachedAlternativeNameScopeKey")
+
+    let private getAlternativeNameSymbolScope (psiModule: IPsiModule) =
+        let symbolCache = psiModule.GetPsiServices().Symbols
+        symbolCache.GetAlternativeNamesSymbolScope(psiModule, true)
+
     let private getModuleSymbolScope withReferences (alternativeNames: bool) (psiModule: IPsiModule) =
         let symbolCache = psiModule.GetPsiServices().Symbols
-        if alternativeNames then
-            symbolCache.GetAlternativeNamesSymbolScope(psiModule, withReferences)
-        else
+        match alternativeNames, withReferences with
+        | true, true ->
+            psiModule.GetOrCreateDataUnderLock(alternativeNameScopeKey, psiModule, getAlternativeNameSymbolScope)
+        | true, false ->
+            symbolCache.GetAlternativeNamesSymbolScope(psiModule, false)
+        | false, true ->
             psiModule.GetCachedCaseSensitiveSymbolScopeWithReferences()
+        | false, false ->
+            symbolCache.GetSymbolScope(psiModule, false, true)
 
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) (alternativeNames: bool) =

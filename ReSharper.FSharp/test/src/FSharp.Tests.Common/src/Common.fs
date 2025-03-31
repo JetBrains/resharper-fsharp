@@ -10,6 +10,7 @@ open JetBrains.Application.Parts
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
+open JetBrains.HabitatDetector
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
@@ -34,9 +35,11 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
+open JetBrains.TestFramework.TestCompiler
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
+open NuGet.Frameworks
 
 module FSharpTestUtil =
     let referencedProjectGuid = "C13207C7-045E-485A-BC1A-AFA1472CD8BC"
@@ -57,19 +60,44 @@ module FSharpTestAttribute =
         |> HashSet
 
     let targetFrameworkId =
-        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+        TargetFrameworkId.Create(
+            FallbackFramework(
+                FrameworkConstants.CommonFrameworks.Net80,
+                [NuGetFramework(FrameworkConstants.FrameworkIdentifiers.Net, FrameworkConstants.Version8)]
+            )
+        )
 
 
 [<AutoOpen>]
 module PackageReferences =
-    let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/8.0.101"
     let [<Literal>] JetBrainsAnnotationsPackage = "JetBrains.Annotations/2022.1.0"
-    let [<Literal>] SqlProviderPackage = "SQLProvider/1.1.101"
+    let [<Literal>] FSharpDataTypeProvidersPackage = "FSharp.Data/6.6.0"
     let [<Literal>] FsPickler = "FsPickler/5.3.2"
 
 type ITestAssemblyReaderShim =
     abstract CreateReferencedProjectCookie: IProject -> IDisposable
     abstract Dispose: unit -> unit
+
+
+type TestReferenceProjectOutput(projectName: string) =
+    inherit Attribute()
+
+    interface ITestLibraryReferencesProvider with
+        member this.Inherits = true
+
+        member this.GetReferences(test, packageManager, targetFrameworkId) =
+            let compiler = DotNetTestCodeCompiler(test.TestLifetime)
+            let slnPath = test.BaseTestDataPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
+
+            let compileResult =
+                compiler.Compile(slnPath, TestTargetFramework.Net80, HabitatInfo.OSArchitecture,
+                    compileMode = DotNetTestCodeCompiler.CompileMode.Build
+                ).Result
+
+            let fileName = projectName + ".dll"
+            let dllPath = compileResult.OutputDir / fileName
+            [dllPath.FullPath]
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()
@@ -81,8 +109,9 @@ type FSharpTestAttribute(extension) =
 
     interface ITestPackagesProvider with
         override this.GetPackages _ =
-            [| if this.ReferenceFSharpCore then
-                TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+            [| TestPackagesAttribute.ParsePackageName "Microsoft.NETCore.App.Ref/8.0.0"
+               if this.ReferenceFSharpCore then
+                   TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
 
         member this.Inherits = false
 
@@ -371,6 +400,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
+        member this.IsProjectOutput(outputPath) = false
 
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]

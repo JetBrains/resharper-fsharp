@@ -23,8 +23,6 @@ open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.Util
 
 type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbols) =
-    let [<Literal>] opName = "FSharpLookupItemsProviderBase"
-
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -74,7 +72,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
         | _ ->
 
         let basicContext = context.BasicContext
-        match context.BasicContext.File, context.GetCheckResults(opName) with
+        match context.BasicContext.File, context.GetCheckResults() with
         | :? IFSharpFile as fsFile, Some checkResults ->
             let skipFsiModules =
                 // Workaround for FSI_0123 modules generated in sandboxes
@@ -90,7 +88,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
             let line = int fcsContext.Coords.Line + 1
 
             let isAttributeReferenceContext = context.IsInAttributeContext
-            let getAllSymbols () = getAllSymbols checkResults
+            let getAllSymbols () = getAllSymbols (checkResults, context.BasicContext.Solution)
 
             try
                 let itemLists =
@@ -119,7 +117,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, filterResolved, getAllSymbol
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
-    inherit FSharpLookupItemsProviderBase(logger, false, (fun checkResults ->
+    inherit FSharpLookupItemsProviderBase(logger, false, (fun (checkResults, _) ->
         let assemblySignature = checkResults.PartialAssemblySignature
         let getSymbolsAsync = async {
             return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature }

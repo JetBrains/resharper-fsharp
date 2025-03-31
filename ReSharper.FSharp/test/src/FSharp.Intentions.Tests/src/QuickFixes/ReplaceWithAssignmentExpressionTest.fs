@@ -3,7 +3,6 @@
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -24,7 +23,7 @@ type ReplaceWithAssignmentExpressionTest() =
     [<Test; NotAvailable>] member x.``ReferenceExpr 3 - Function arg, not available``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``ReferenceExpr 4 - Pattern matching, not available``() = x.DoNamedTest()
 
-    [<TestReferences("../../../assemblies/FSharpRecord.dll")>]
+    [<TestReferenceProjectOutput("FSharpRecord")>]
     [<Test; NotAvailable>] member x.``ReferenceExpr 5 - Compiled record, not available``() = x.DoNamedTest()
 
 

@@ -68,6 +68,8 @@ type ImportExtensionMemberTest() =
 
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
 
+    [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type FSharpImportModuleMemberTest() =

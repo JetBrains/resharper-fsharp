@@ -5,9 +5,11 @@ CompareTo
 Contains
 CopyTo
 EndsWith
+EnumerateRunes
 Equals
 GetEnumerator
 GetHashCode
+GetPinnableReference
 GetReverseIndex
 GetType
 GetTypeCode
@@ -23,6 +25,7 @@ PadLeft
 PadRight
 Remove
 Replace
+ReplaceLineEndings
 Split
 StartsWith
 Substring
@@ -34,4 +37,5 @@ ToUpper
 ToUpperInvariant
 Trim
 TrimEnd
-TrimStart{caret}
+TrimStart
+TryCopyTo{caret}

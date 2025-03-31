@@ -1,4 +1,4 @@
-﻿// ${CHAR:Backspace}
+// ${CHAR:Backspace}
 module Module
 
 let foo = ({caret}))

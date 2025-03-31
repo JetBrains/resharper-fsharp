@@ -2,13 +2,14 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.PlatformType
@@ -20,7 +21,10 @@ import java.time.Duration
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 class FileSystemShimTest : PerTestSolutionTestBase() {
   @Test
-  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL])
+  @Mutes([
+    Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL]),
+    Mute("RIDER-124028")
+  ])
   fun externalFileChange() {
     val file = activeSolutionDirectory.resolve("Program.fs")
     val stampBefore = getTimestamp(file)
@@ -32,7 +36,7 @@ class FileSystemShimTest : PerTestSolutionTestBase() {
     waitAndPump(
       project.lifetime,
       { getTimestamp(file) > stampBefore },
-      Duration.ofSeconds(15000),
+      Duration.ofSeconds(30),
       { "Timestamp wasn't changed." })
     val stampAfter = getTimestamp(file)
 

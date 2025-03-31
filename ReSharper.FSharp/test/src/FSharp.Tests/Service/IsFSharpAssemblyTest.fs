@@ -4,6 +4,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -13,6 +14,8 @@ type IsFSharpAssemblyTest() =
 
     member x.DoTest(moduleName: string, expected: bool) =
         x.WithSingleProject([], fun lifetime solution (project: IProject) ->
+            use cookie = ReadLockCookie.Create()
+
             let modules = project.GetSolution().PsiModules().GetModules()
             match modules |> Seq.tryFind (fun m -> m.Name = moduleName) with
             | None -> failwith "Could not get module"

@@ -3,6 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
@@ -119,7 +120,12 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisableFormatter = true
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
-        use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(true, Id)
+        use pinCheckResultsCookie =
+            Assertion.Assert(context.ParseAndCheckResults.IsValueCreated)
+            textControl
+                .GetFSharpFile(solution)
+                .PinTypeCheckResults(context.ParseAndCheckResults.Value, Id)
+
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
 
     override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =

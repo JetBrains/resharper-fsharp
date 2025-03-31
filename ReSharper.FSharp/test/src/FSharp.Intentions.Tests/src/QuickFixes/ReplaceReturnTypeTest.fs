@@ -40,7 +40,7 @@ type ReplaceReturnTypeTest() =
     [<Test; NotAvailable>] member x.``Tuple return type, tuple as part of nested expression``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``No highlighting 01``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``No highlighting 02``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``No highlighting 02``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()

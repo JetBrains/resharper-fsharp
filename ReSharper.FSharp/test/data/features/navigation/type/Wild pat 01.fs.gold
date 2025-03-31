@@ -1,14 +1,14 @@
 ﻿## GotoTypeDeclarationProvider activity:
   Immediate result:
-    DEO: Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN as Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN as Envoy: Struct:System.Int32, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Navigation result:
       opened file: Int32.cs
       ------------------
-      [__DynamicallyInvokable]
-      [Serializable]
-      public struct |CARET|Int32 : IComparable, IFormattable, IConvertible, IComparable<int>, IEquatable<int>
-      {
-        [__DynamicallyInvokable]
+      namespace System;
+
+      public readonly struct |CARET|Int32 :
+        IComparable,
+        IComparable<int>,
       ------------------
 
 

@@ -1,0 +1,6 @@
+﻿module Say
+
+match "", "" with
+| null, s -> ()
+| s, null -> {selstart}failwith "todo"{selend}
+| s, s1 -> failwith "todo"

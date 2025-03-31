@@ -604,6 +604,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
             fcsAssemblyReaderShim.Value.PrepareForFcsRequest(fcsProject)
 
+        member this.IsProjectOutput(outputPath) =
+            outputPathToProjectKey.ContainsKey(outputPath)
+
 
 /// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built
 /// which makes FCS cached resolve results stale

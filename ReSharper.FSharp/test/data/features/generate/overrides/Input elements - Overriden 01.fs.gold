@@ -1,7 +1,7 @@
 ﻿Provided elements:
- 0: Equals(System.Object):System.Boolean
- 1: GetHashCode():System.Int32
- 2: Finalize():System.Void
+ 0: Equals(System.Object?):System.Boolean
+ 1: Finalize():System.Void
+ 2: GetHashCode():System.Int32
 
 // ${KIND:Overrides}
 
