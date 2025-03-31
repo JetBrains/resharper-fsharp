@@ -1,4 +1,4 @@
-﻿@{caret}// ${SMART_PARENTH_INSERT:false}
+@{caret}// ${SMART_PARENTH_INSERT:false}
 // ${CHAR:@}
 module Module
 
