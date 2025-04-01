@@ -1,6 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.BulbActions
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands.Menu
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
@@ -46,6 +49,28 @@ type FSharpQuickFixBase() =
         |> Option.ofObj
         |> Option.bind (fun occurrence -> occurrence.Entities |> Seq.tryHead)
         |> Option.toObj
+
+
+[<AbstractClass>]
+type FSharpModernQuickFixBase() =
+    inherit ModernQuickFixBase()
+
+    member x.SelectExpression(expressions: (IFSharpExpression * string) array, action) =
+        let menuItems =
+            expressions
+            |> Array.map (fun (expr, text) ->
+                let range = expr.GetDocumentRange()
+                BulbActionCommandMenuItem<IFSharpExpression>(Text = text, Data = expr, Range = range)
+            )
+
+        BulbActionCommandSequence.From(
+            BulbActionCommands.ShowMenu(menuItems, fun _ _ selectedExpr ->
+                BulbActionCommands.ExecutePsiTransaction(fun _ _ ->
+                    action selectedExpr
+                    null
+                )
+            )
+        )
 
 
 [<AbstractClass>]
