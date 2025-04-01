@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
 open FSharp.Compiler.EditorServices
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -195,6 +196,8 @@ type ImportRule() =
 
         ("", symbolScope.GetAllTypeElementsGroupedByName())
         ||> Seq.fold (fun prevTypeName typeElement ->
+            Interruption.Current.CheckAndThrow();
+
             if not (isAllowed typeElement) then prevTypeName else
 
             // todo: check scope ranges
