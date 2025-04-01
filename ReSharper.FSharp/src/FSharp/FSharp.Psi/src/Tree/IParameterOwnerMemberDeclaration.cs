@@ -1,3 +1,5 @@
+using FSharp.Compiler.CodeAnalysis;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -9,6 +11,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     ITokenNode EqualsToken { get; }
     IDeclaredElement DeclaredElement { get; }
     TreeNodeEnumerable<IParametersPatternDeclaration> ParametersDeclarationsEnumerable { get; }
+    TreeNodeCollection<IParametersPatternDeclaration> ParametersDeclarations { get; }
     TreeNodeCollection<IFSharpPattern> ParameterPatterns { get; }
+
+    [CanBeNull]
+    FSharpSymbolUse GetFcsSymbolUse();
   }
 }

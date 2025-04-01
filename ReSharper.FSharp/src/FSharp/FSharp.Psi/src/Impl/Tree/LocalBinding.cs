@@ -1,4 +1,5 @@
 using System;
+using FSharp.Compiler.CodeAnalysis;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -39,8 +40,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => false;
+    public bool IsComputed => LetOrUseExprNavigator.GetByBinding(this)?.IsComputed == true;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
       HeadPattern is IReferencePat rp ? rp.DeclaredElement : null;
+
+    FSharpSymbolUse IParameterOwnerMemberDeclaration.GetFcsSymbolUse() =>
+      HeadPattern is IReferencePat rp ? rp.GetFcsSymbolUse() : null;
   }
 }
