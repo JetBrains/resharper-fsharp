@@ -212,8 +212,7 @@ type ImportRule() =
 
             let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
             let item =
-                // todo: allow calculating icon extensions (now disabled because of the slow unit test icons)
-                let icon = iconManager.GetImage(typeElement, context.Language, false)
+                let icon = iconManager.GetImage(typeElement, context.Language, PsiIconRequestOptions.FastProvidersOnly)
                 let item = ImportRule.createItem info name ns icon
                 item
                     .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
