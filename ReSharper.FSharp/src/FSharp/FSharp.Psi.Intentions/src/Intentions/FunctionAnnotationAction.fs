@@ -26,7 +26,7 @@ module SpecifyTypes =
         CanSpecifyParameterTypes: bool
         CanSpecifyReturnType: bool
     } with
-        member x.IsAvailable = x <> Availability.Unavailable
+        member x.HasOptions = x <> Availability.Unavailable
         static member Unavailable = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = false }
         static member ReturnTypeOnly = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = true }
 
@@ -49,7 +49,7 @@ module SpecifyTypes =
 
         binding.ParametersDeclarations |> Seq.forall (fun p -> isAnnotated true p.Pattern)
 
-    let rec isAvailable (node: ITreeNode) =
+    let rec getAvailableOptions (node: ITreeNode) =
         if not (isValid node) then Availability.Unavailable else
 
         match node with
@@ -61,7 +61,7 @@ module SpecifyTypes =
 
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
-            if isNotNull binding then isAvailable binding else
+            if isNotNull binding then getAvailableOptions binding else
 
             let pattern =
                 match OptionalValPatNavigator.GetByPattern(pattern) with
@@ -220,7 +220,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
         if not (isAtBindingKeywordOrReferencePattern dataProvider binding) then false else
-        SpecifyTypes.isAvailable binding |> _.IsAvailable
+        SpecifyTypes.getAvailableOptions binding |> _.HasOptions
 
     override x.ExecutePsiTransaction _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
@@ -228,7 +228,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let availability = SpecifyTypes.isAvailable binding
+        let availability = SpecifyTypes.getAvailableOptions binding
         SpecifyTypes.specifyTypes binding availability
 
 
@@ -248,8 +248,8 @@ type SpecifyTypeActionsProvider(solution) =
     interface ISpecifyTypeActionProvider with
         member this.TryCreateSpecifyTypeAction(node: ITreeNode) =
             use _ = ReadLockCookie.Create()
-            let availability = { SpecifyTypes.isAvailable node with CanSpecifyParameterTypes = false }
-            if not availability.IsAvailable then null else
+            let availability = { SpecifyTypes.getAvailableOptions node with CanSpecifyParameterTypes = false }
+            if not availability.HasOptions then null else
 
             SpecifyTypeAction(node, availability)
                 .ToContextActionIntention(BulbMenuAnchors.FirstClassContextItems)

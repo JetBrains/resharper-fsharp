@@ -339,7 +339,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         IReferencePat pat => (pat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue)?.FullType,
         IOptionalValPat { Pattern: IReferencePat innerPattern } => innerPattern.TryGetFcsType()?.GenericArguments[0],
-        { } => (pattern as IFSharpTreeNode).TryGetFcsType()
+        IFSharpTreeNode node => node.TryGetFcsType()
       };
 
     public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode, DocumentRange documentRange)
@@ -369,7 +369,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         IReferencePat pat => pat.GetFcsSymbolUse()?.DisplayContext,
         IOptionalValPat { Pattern: IReferencePat innerPattern } => innerPattern.TryGetFcsDisplayContext(),
-        { } => (pattern as IFSharpTreeNode).TryGetFcsDisplayContext()
+        IFSharpTreeNode node => node.TryGetFcsDisplayContext()
       };
 
     [NotNull]
