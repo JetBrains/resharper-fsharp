@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Util.SettingsStoreUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -223,23 +224,23 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
             if isInlineSpace nextSibling && nextSibling.NextSibling == pattern && nextSibling.GetTextLength() = 1 then
                 ModificationUtil.DeleteChild(nextSibling)
 
-        let settingsStore = parenPattern.GetSettingsStoreWithEditorConfig()
+        let settingsStore = parenPattern.GetSettingsStoreWithEditorConfig().For<FSharpFormatSettingsKey>()
 
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
         if isNotNull parametersOwnerPat &&
-           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
             removeSpace parametersOwnerPat.ReferenceName parenPattern
 
         let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
         let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         if isNotNull memberDeclaration &&
-           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
             removeSpace memberDeclaration.Identifier patternDeclaration
 
         let ctorDeclaration = PrimaryConstructorDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         let typeDeclaration = FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(ctorDeclaration)
         if isNotNull typeDeclaration &&
-           not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeClassConstructor)) then
+           not (settingsStore.GetValue(_.SpaceBeforeClassConstructor)) then
             removeSpace typeDeclaration.Identifier ctorDeclaration
 
         pattern
