@@ -11,7 +11,7 @@
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />
     <method v="2">
-      <option name="Build" default="false" projectName="FSharp.RiderPlugin" projectPath="$PROJECT_DIR$/src/FSharp.RiderPlugin/FSharp.RiderPlugin.csproj" />
+      <option name="Build" default="false" projectName="FSharp.RiderPlugin" projectPath="$PROJECT_DIR$/src/FSharp.RiderPlugin/proj/src/FSharp.RiderPlugin.csproj" />
     </method>
   </configuration>
 </component>
