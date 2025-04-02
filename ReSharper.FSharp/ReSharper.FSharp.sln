@@ -41,7 +41,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Intentions.Tests", "
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Common", "test\src\FSharp.Tests.Common\FSharp.Tests.Common.fsproj", "{B5A9B84B-B69B-4DCD-863A-989023EAEF8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.RiderPlugin", "src\FSharp.RiderPlugin\FSharp.RiderPlugin.csproj", "{F7735C4C-A866-4C77-9F6C-804791246580}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.RiderPlugin", "src\FSharp.RiderPlugin\proj\src\FSharp.RiderPlugin.csproj", "{F7735C4C-A866-4C77-9F6C-804791246580}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
