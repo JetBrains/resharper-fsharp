@@ -1,13 +1,19 @@
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 
-public class FSharpExtensionMemberKind : ExtensionMemberKind
+/// <summary>
+/// Represents a kind of F#-specific extension member.
+/// </summary>
+public sealed class FSharpExtensionMemberKind : ExtensionMemberKind
 {
   private FSharpExtensionMemberKind([NotNull] string name) : base(name)
   {
   }
 
-  public static readonly ExtensionMemberKind FSharpExtensionMember = new("FSharpExtensionMember");
+  /// <summary>
+  /// F# type extension member.
+  /// </summary>
+  public static readonly FSharpExtensionMemberKind INSTANCE = new(nameof(INSTANCE));
 }

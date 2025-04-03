@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve.TypeInference
@@ -19,7 +18,7 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 
 type FSharpRequest(psiModule, exprType: IType, name: string option) =
-    static let memberKinds = [ExtensionMemberKind.ExtensionMethod; FSharpExtensionMemberKind.FSharpExtensionMember]
+    static let memberKinds = [ExtensionMemberKind.CLASSIC_METHOD; FSharpExtensionMemberKind.INSTANCE]
 
     let name = Option.toObj name
 
@@ -55,22 +54,25 @@ type FSharpRequest(psiModule, exprType: IType, name: string option) =
 
         result.AsReadOnly()
 
-    interface IRequest with
+    interface IExtensionMembersRequest with
         member this.Name = name
-        member this.EligibleExtensionArgumentTypes = baseTypes
-        member this.ExpressionType = exprType
-        member this.ForModule = psiModule
+        member this.IsCaseSensitive = true
+
         member this.Kinds = memberKinds
 
-        member this.IsCaseSensitive = true
-        member this.Namespaces = []
-        member this.Types = []
+        member this.ReceiverType = exprType
+        member this.PossibleReceiverTypes = baseTypes
 
-        member this.WithExpressionType _ = failwith "todo"
-        member this.WithModule _ = failwith "todo"
+        member this.ForModule = psiModule
+        member this.ContainingNamespaces = []
+        member this.ContainingTypes = []
+
         member this.WithName _ = failwith "todo"
-        member this.WithNamespaces _ = failwith "todo"
-        member this.WithTypes _ = failwith "todo"
+        member this.WithKinds _ = failwith "todo"
+        member this.WithReceiverType _ = failwith "todo"
+        member this.WithModule _ = failwith "todo"
+        member this.WithContainingNamespaces _ = failwith "todo"
+        member this.WithContainingTypes _ = failwith "todo"
 
 [<return: Struct>]
 let (|FSharpSourceExtensionMember|_|) (typeMember: ITypeMember) =
@@ -216,8 +218,8 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         isAccessible typeMember &&
         matchesType typeMember
 
-    let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
-    let methods = query.EnumerateMethods() |> List.ofSeq
+    let query = ExtensionMembersQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
+    let methods = query.EnumerateMembers() |> List.ofSeq
 
     methods
     |> Seq.filter isApplicable
