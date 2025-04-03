@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override int GetHashCode() => ShortName.GetHashCode();
 
-    public bool IsDefinedAsExtension => false;
+    public ExtensionMemberKind ExtensionMemberKind => ExtensionMemberKind.NONE;
     public bool IsExtensionMethod => false;
 
     public FSharpSymbol Symbol => null;

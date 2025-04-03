@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 using JetBrains.Util.Extension;
 
@@ -20,15 +21,25 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
 
   public HybridCollection<ITypeMember> FindExtensionMember()
   {
+    var result = new LocalList<ITypeMember>();
+    foreach (var member in owner.GetMembers())
+    {
+      if (Matches(member))
+        result.Add(member);
+    }
+
+    return new HybridCollection<ITypeMember>(result.ReadOnlyList());
+
     bool Matches(ITypeMember member)
     {
-      if (member.ShortName != value.CompiledName?.Value)
+      if (member is not IMethod method)
+        return false;
+
+      var methodName = method.ShortName;
+      if (method.ShortName != value.CompiledName?.Value)
         return false;
 
       if (value.ApparentEnclosingTypeReference is not FSharpMetadataTypeReference.NonLocal typeRef)
-        return false;
-
-      if (member is not IMethod method)
         return false;
 
       var parameters = method.Parameters;
@@ -42,8 +53,6 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
 
       return false;
     }
-
-    return new HybridCollection<ITypeMember>(owner.GetMembers().Where(Matches));
   }
 
   public string ShortName
@@ -58,21 +67,19 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
     }
   }
 
-  public ExtensionMemberKind Kind => FSharpExtensionMemberKind.FSharpExtensionMember;
+  public ExtensionMemberKind Kind => FSharpExtensionMemberKind.INSTANCE;
 
-  public bool GetExtendedTypePattern(out CompiledCandidateType candidateType)
+  public CompiledReceiverTypeDescriptor? TryGetExtensionReceiverType()
   {
     if (value.ApparentEnclosingTypeReference is FSharpMetadataTypeReference.NonLocal typeRef)
     {
       if (typeRef.typeNames.LastOrDefault() is { } name)
       {
-        candidateType = new CompiledCandidateType(name.SubstringBeforeLast("`"), false);
-        return true;
+        return new CompiledReceiverTypeDescriptor(name.SubstringBeforeLast("`"), isArray: false);
       }
     }
 
-    candidateType = default;
-    return false;
+    return null;
   }
 }
 

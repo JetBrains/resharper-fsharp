@@ -105,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsExtern => false;
     public virtual bool IsUnsafe => false;
     public virtual bool IsVolatile => false;
-    public virtual bool IsDefinedAsExtension => false;
+    public virtual ExtensionMemberKind ExtensionMemberKind => ExtensionMemberKind.NONE;
 
     public string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
 
