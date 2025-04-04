@@ -126,7 +126,9 @@ type ImportRule() =
          | :? IFSharpModule -> false
          | _ -> true
 
-    let isAllowed (typeElement: ITypeElement) =
+    let isAllowed (context: FSharpCodeCompletionContext) (typeElement: ITypeElement) =
+        context.PsiModule != typeElement.Module &&
+
         not (isFSharpAssembly typeElement.Module) &&
         not (isNestedType typeElement) &&
 
@@ -198,7 +200,7 @@ type ImportRule() =
         ||> Seq.fold (fun prevTypeName typeElement ->
             Interruption.Current.CheckAndThrow();
 
-            if not (isAllowed typeElement) then prevTypeName else
+            if not (isAllowed context typeElement) then prevTypeName else
 
             // todo: check scope ranges
             let ns = typeElement |> getNsQualifiedName
