@@ -2,6 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMembe
 
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
@@ -13,7 +14,9 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve
+open JetBrains.ReSharper.Psi.Resolve.TypeInference
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.Util
 
 type FSharpRequest(psiModule, exprType: IType, name: string option) =
     static let memberKinds = [ExtensionMemberKind.ExtensionMethod; FSharpExtensionMemberKind.FSharpExtensionMember]
@@ -21,13 +24,34 @@ type FSharpRequest(psiModule, exprType: IType, name: string option) =
     let name = Option.toObj name
 
     let baseTypes: IReadOnlyList<IType> =
-        let exprDeclaredType = exprType.As<IDeclaredType>()
+        if isNull exprType then [] else
+
+        let isArray = exprType :? IArrayType
+    
+        let rec removeArrayType (exprType: IType) =
+            match exprType with
+            | :? IArrayType as arrayType -> removeArrayType arrayType.ElementType
+            | _ -> exprType.As<IDeclaredType>()
+    
+        let exprDeclaredType = removeArrayType exprType
         if isNull exprDeclaredType then [] else
 
         let result = List<IType>()
-        result.Add(exprDeclaredType)
+        result.Add(exprType)
+
         for superType in exprDeclaredType.GetAllSuperTypes() do
+            let superType: IType =
+                if isArray then
+                    TypeFactory.CreateArrayType(superType, 1, NullableAnnotation.Unknown)
+                else
+                    superType
+
             result.Add(superType)
+            
+        if isArray then
+            let predefinedType = exprType.Module.GetPredefinedType()
+            result.Add(predefinedType.Array)
+            result.AddRange(predefinedType.Array.GetAllSuperTypes())
 
         result.AsReadOnly()
 
@@ -143,7 +167,9 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
             let parameters = method.Parameters
             if parameters.Count = 0 then false else
 
-            exprType.IsSubtypeOf(parameters[0].Type)
+            let consumer = RecursiveConsumer(method.TypeParameters.ToIReadOnlyList())
+            let typeInferenceMatcher = CLRTypeInferenceMatcher.Instance
+            typeInferenceMatcher.Match(TypeInferenceKind.LowerBound, exprType, parameters[0].Type, consumer)
 
         | _ -> false
 
@@ -192,7 +218,6 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         matchesType typeMember
 
     let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
-
     let methods = query.EnumerateMethods()
 
     methods

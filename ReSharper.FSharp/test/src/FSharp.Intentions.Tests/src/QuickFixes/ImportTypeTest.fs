@@ -66,9 +66,22 @@ type ImportExtensionMemberTest() =
     member x.DoNamedTestFsCs() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
+    [<Test>] member x.``Extension - CSharp - Array 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp - Array 02``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 02``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 03``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 04``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 05``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 06``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 07``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 08``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 09``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 10``() = x.DoNamedTestFsCs()
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
+
+    [<Test; NotAvailable>] member x.``Not Available - Type 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
