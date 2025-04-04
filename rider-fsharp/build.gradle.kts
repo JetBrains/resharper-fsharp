@@ -265,10 +265,6 @@ tasks {
 
   named<Test>("test") {
     dependsOn(parserTest)
-    classpath -= classpath.filter {
-      (it.name.startsWith("localization-") && it.name.endsWith(".jar")) // TODO[#478]: https://youtrack.jetbrains.com/issue/IJPL-178084/External-plugin-tests-break-due-to-localization-issues
-        || it.name == "cwm-plugin.jar" // TODO[#479]: Check after 251 EAP5 release
-    }
     useTestNG {
       groupByInstances = true
     }
