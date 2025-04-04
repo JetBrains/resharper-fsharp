@@ -181,6 +181,9 @@ artifacts {
 }
 
 tasks {
+  instrumentTestCode {
+    enabled = false
+  }
   instrumentCode {
     enabled = false
   }
