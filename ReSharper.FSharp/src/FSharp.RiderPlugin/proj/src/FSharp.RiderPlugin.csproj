@@ -13,16 +13,16 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Common\FSharp.Common.fsproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
-    <ProjectReference Include="..\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
-    <ProjectReference Include="..\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
-    <ProjectReference Include="..\FSharp\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
+    <ProjectReference Include="..\..\..\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host\FSharp.TypeProviders.Host.csproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Psi.Daemon\FSharp.Psi.Daemon.fsproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Psi.Intentions\FSharp.Psi.Intentions.fsproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\..\..\FSharp\FSharp.TypeProviders.Protocol\FSharp.TypeProviders.Protocol.csproj" />
   </ItemGroup>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
