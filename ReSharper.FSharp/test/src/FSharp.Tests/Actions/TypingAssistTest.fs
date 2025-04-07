@@ -19,6 +19,16 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
+    [<Test>] member x.``Enter - Else 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 08``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 09``() = x.DoNamedTest()
+
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
     [<Test>] member x.``Enter - Empty lambda 01``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]

@@ -845,7 +845,7 @@ ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   elseClause{ELSE_CLAUSE, ElseExpr}?;
 
 elifExpr options { stubBase="FSharpExpressionBase"; }:
-  ELIF<ELIF, ElifKeyword>
+  ELIF<ELIF, IfKeyword>
   fSharpExpression<IF_EXPR, ConditionExpr>
   THEN<THEN, ThenKeyword>
   fSharpExpression<THEN_EXPR, ThenExpr>

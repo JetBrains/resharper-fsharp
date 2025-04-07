@@ -24,7 +24,7 @@ type ElifToIfAction(dataProvider: FSharpContextActionDataProvider) =
         let elifExpr = dataProvider.GetSelectedElement<IElifExpr>()
         if isNull elifExpr then false else
 
-        let elifKeyword = elifExpr.ElifKeyword
+        let elifKeyword = elifExpr.IfKeyword
         if not (DisjointedTreeTextRange.From(elifKeyword).Contains(dataProvider.SelectedTreeRange)) then false else
 
         let ifExpr = IfThenElseExprNavigator.GetByElseExpr(elifExpr)
@@ -34,7 +34,7 @@ type ElifToIfAction(dataProvider: FSharpContextActionDataProvider) =
         let elifExpr = dataProvider.GetSelectedElement<IElifExpr>()
         use writeCookie = WriteLockCookie.Create(elifExpr.IsPhysical())
 
-        replaceWithToken elifExpr.ElifKeyword FSharpTokenType.IF
+        replaceWithToken elifExpr.IfKeyword FSharpTokenType.IF
 
         let ifExpr = IfExprNavigator.GetByElseExpr(elifExpr)
         let thenExpr = ifExpr.ThenExpr

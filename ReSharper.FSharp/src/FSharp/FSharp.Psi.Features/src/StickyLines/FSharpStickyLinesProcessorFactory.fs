@@ -90,7 +90,7 @@ type FSharpStickyLinesProcessor() =
             elseExpr |> addRegion context "elseExpr" (fun _ -> ifExpr.ElseKeyword)
 
     override this.VisitElifExpr(elifExpr, context) =
-        elifExpr |> addRegion context "elifExpr" (fun _ -> elifExpr.ElifKeyword)
+        elifExpr |> addRegion context "elifExpr" (fun _ -> elifExpr.IfKeyword)
 
     override this.VisitMatchClause(matchClause, context) =
         matchClause |> addRegion context "matchClause" _.Pattern
