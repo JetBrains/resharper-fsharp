@@ -87,7 +87,7 @@ type TestReferenceProjectOutput(projectName: string) =
         member this.Inherits = true
 
         member this.GetReferences(test, packageManager, targetFrameworkId) =
-            let compiler = DotNetTestCodeCompiler(test.TestLifetime)
+            let compiler = DotNetTestCodeCompiler(test.TestLifetime, DotNetTestCodeCompiler.ContinuousIntegrationMode.External)
             let slnPath = test.BaseTestDataPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
 
             let compileResult =
