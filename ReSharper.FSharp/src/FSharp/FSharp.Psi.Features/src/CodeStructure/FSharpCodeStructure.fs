@@ -152,7 +152,7 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
     override x.Language = language
 
     override x.TreeNode = getDeclaration () :> _
-    override x.GetTextRange() = declaration.GetDocumentRange()
+    override x.GetTextRange() = x.TreeNode.GetDocumentRange()
 
     override x.GetFileStructureAspect() = aspects :> _
     override x.GetGotoMemberAspect() = aspects :> _
