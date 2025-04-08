@@ -124,8 +124,7 @@
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithDotLambdaFix.fs" />
     <Compile Include="src\QuickFixes\ToObjectExpressionFix.fs" />
-    <Compile Include="src\QuickFixes\ImportExtensionMemberFix.fs" />
-    <Compile Include="src\QuickFixes\FSharpImportModuleMemberFix.fs" />
+    <Compile Include="src\QuickFixes\ImportMemberFix.fs" />
     <Compile Include="src\DisableWarning\DisableWarningActionProvider.fs" />
     <Compile Include="src\ZoneMarker.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">
