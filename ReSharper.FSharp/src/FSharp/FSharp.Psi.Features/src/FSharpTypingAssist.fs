@@ -461,9 +461,21 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         let indentSize = getLineWhitespaceIndent textControl line
         insertNewLineAt textControl indentSize
 
+    let isInsideString textControl =
+        let lexer = this.GetCachingLexer(textControl)
+        let offset = textControl.Caret.Offset()
+        isNotNull lexer && lexer.FindTokenAt(offset - 1) &&
+
+        FSharpTokenType.Strings[lexer.TokenType] &&
+
+        offset > lexer.TokenStart && offset < lexer.TokenEnd
+
     let doDumpIndent (textControl: ITextControl) =
         let document = textControl.Document
         let buffer = document.Buffer
+
+        if isInsideString textControl then
+            insertNewLineAt textControl 0 else
 
         let caretOffset = textControl.Caret.Offset()
         let caretLine = document.GetCoordsByOffset(caretOffset).Line

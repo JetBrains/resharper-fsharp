@@ -165,6 +165,22 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - Continue line - String 09``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 10``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter - String 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 08``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 09``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 10``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 11``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 12``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 13``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 14``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 15``() = x.DoNamedTest()
+
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
