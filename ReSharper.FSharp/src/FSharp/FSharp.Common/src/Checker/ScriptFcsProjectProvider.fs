@@ -2,10 +2,10 @@
 
 open System
 open System.Collections.Concurrent
-open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.Application.Parts
+open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -13,7 +13,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.Threading
@@ -21,12 +20,12 @@ open JetBrains.Util
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
-        scriptSettings: FSharpScriptSettingsProvider, fsSourceCache: FSharpSourceCache, toolset: ISolutionToolset) =
+        scriptSettings: FSharpScriptSettingsProvider, toolset: ISolutionToolset, locks: IShellLocks) =
 
     let defaultOptionsLock = obj()
 
     let scriptFcsProjects = ConcurrentDictionary<VirtualFileSystemPath, FcsProject option>()
-    let requiringUpdate = ConcurrentDictionary<VirtualFileSystemPath, LifetimeDefinition>()
+    let scriptsUpdateLifetimes = ConcurrentDictionary<VirtualFileSystemPath, SequentialLifetimes>()
 
     let mutable defaultOptions: FSharpProjectOptions option option = None
 
@@ -37,15 +36,6 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
         let var = Environment.GetEnvironmentVariable("JET_HEADLESS_MODE") |> Option.ofObj |> Option.defaultValue "false"
         let parsed, isHeadless = bool.TryParse(var)
         parsed && isHeadless
-
-    do
-        fsSourceCache.FileUpdated.Advise(lifetime, fun (path: VirtualFileSystemPath) ->
-            match path.ExtensionNoDot with
-            | "fsx" | "fsscript" ->
-                  requiringUpdate.AddOrUpdate(path,
-                      (fun path -> null),
-                      (fun path work -> (if isNull work then () else work.Terminate()); null)) |> ignore
-            | _ -> ())
 
     let defaultFlags =
         [| "--warnon:1182"
@@ -136,53 +126,46 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
               ReferencedModules = EmptySet.Instance }
         )
 
-    let rec updateOptionsIfNeeded path source oldOptionsExistence =
-        let lifetimeDefinition = new LifetimeDefinition()
-        if not (requiringUpdate.TryUpdate(path, lifetimeDefinition, null)) then () else
-        let lifetime = lifetimeDefinition.Lifetime
+    let rec updateOptionsIfNeeded path source =
+        let sequentialLifetimes = scriptsUpdateLifetimes.GetOrAdd(path, SequentialLifetimes(lifetime))
+        let currentLifetime = sequentialLifetimes.Next()
 
-        let updateOptionsAsync =
-            task {
-                if not lifetime.IsAlive then () else
+        locks.StartBackgroundRead(currentLifetime, (fun _ ->
+            if not currentLifetime.IsAlive then () else
 
-                let newOptions = getOptionsImpl path source
-                let oldOptions = oldOptionsExistence |> Option.bind id
-                let fcsProject = createFcsProject path newOptions
+            let newOptions = getOptionsImpl path source
+            let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id
 
-                if not (lifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then () else
+            if not currentLifetime.IsAlive then () else
 
-                match oldOptions, newOptions with
-                | Some oldOptions, Some newOptions ->
-                    let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
-                        let arrayEq a1 a2 =
-                            Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
+            let inline update path newOptions =
+                let fcsProject = createFcsProject path (Some newOptions)
+                if not (currentLifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then ()
+                else optionsUpdated.Fire((path, newOptions))
 
-                        arrayEq options1.OtherOptions options2.OtherOptions &&
-                        arrayEq options1.SourceFiles options2.SourceFiles
+            match oldOptions, newOptions with
+            | Some oldOptions, Some newOptions ->
+                let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
+                    let arrayEq a1 a2 =
+                        Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
-                    if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
-                        optionsUpdated.Fire((path, newOptions))
+                    arrayEq options1.OtherOptions options2.OtherOptions &&
+                    arrayEq options1.SourceFiles options2.SourceFiles
 
-                | _, Some newOptions ->
-                    optionsUpdated.Fire((path, newOptions))
+                if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
+                    update path newOptions
 
-                | _ -> ()
-            }
+            | _, Some newOptions -> update path newOptions
+            | _ -> ()
+        ), retryOnOperationCanceled = true).NoAwait()
 
-        if isHeadless then
-            updateOptionsAsync.GetAwaiter().GetResult()
-        else
-            updateOptionsAsync.NoAwait()
 
     let rec getFcsProject path source allowRetry : FcsProject option =
-        match tryGetValue path scriptFcsProjects with
-        | Some fcsProject as scriptFcsProject ->
-            updateOptionsIfNeeded path source scriptFcsProject
-            fcsProject
-        | _ ->
-            requiringUpdate.TryAdd(path, null) |> ignore
-            updateOptionsIfNeeded path source None
+        updateOptionsIfNeeded path source
 
+        match tryGetValue path scriptFcsProjects with
+        | Some fcsProject -> fcsProject
+        | _ ->
             if isHeadless && allowRetry then
                 getFcsProject path source false
             else
