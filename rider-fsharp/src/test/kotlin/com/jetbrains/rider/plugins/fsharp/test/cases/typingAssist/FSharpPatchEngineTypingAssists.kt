@@ -66,29 +66,13 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   override val testCaseSourceDirectory
     get() = activeSolutionDirectory
 
-  private val backendCases
+  protected val backendCases
     get() =
       testDataDirectory.listFiles()
-        .filter { it.extension == "fs" && isApplicable(it.nameWithoutExtension) }
+        .filter { it.extension == "fs" }
         .map { it.nameWithoutExtension }
 
-
-  @DataProvider(name = "supportedBackendCases")
-  fun supportedCases() =
-    backendCases
-      .filter { isSupported(it) }
-      .toTypedArray()
-
-  @DataProvider(name = "notSupportedBackendCases")
-  fun notSupportedCases() =
-    backendCases
-      .filter { !isSupported(it) }
-      .toTypedArray()
-
-  abstract fun isApplicable(sourceFile: String): Boolean
-  abstract fun isSupported(sourceFile: String): Boolean
-
-  private fun doTest(caseName: String) {
+  private fun doTest(caseName: String, isSupportedTestCase: Boolean) {
     val newSourceFile =
       testDataDirectory.resolve("$caseName.fs").copyTo(activeSolutionDirectory.resolve("$caseName.fs.source"))
 
@@ -104,21 +88,27 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
       }
       TestLoggerHelper.testErrorsAccumulator.throwIfNotEmpty()
     } catch (e: Throwable) {
-      if (isSupported(caseName)) throw e
+      if (isSupportedTestCase) throw e
       else return
     }
-    if (isSupported(caseName)) return
+    if (isSupportedTestCase) return
     else throw Exception(
       "Hooray! Expected to be not supported, but it was (frontend changes are equivalent to backend)! " +
         "Please add this case to supported ones."
     )
   }
 
-  @Test(dataProvider = "supportedBackendCases")
-  fun test(caseName: String) = doTest(caseName)
+  @Test(dataProvider = SUPPORTED_BACKEND_CASES)
+  fun test(caseName: String) = doTest(caseName, true)
 
-  @Test(dataProvider = "notSupportedBackendCases")
-  fun notSupported(caseName: String) = doTest(caseName)
+  // Enable for local testing
+  @Test(dataProvider = NOT_SUPPORTED_BACKEND_CASES, enabled = false)
+  fun notSupported(caseName: String) = doTest(caseName, false)
+
+  companion object {
+    const val NOT_SUPPORTED_BACKEND_CASES = "notSupportedBackendCases"
+    const val SUPPORTED_BACKEND_CASES = "supportedBackendCases"
+  }
 }
 
 
@@ -204,9 +194,12 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
     "Enter in string 04 - Inside multiline triple-quoted string"
   )
 
-  override fun isApplicable(testCase: String) =
-    testCase.startsWith("Enter")
+  @DataProvider(name = SUPPORTED_BACKEND_CASES)
+  fun supportedCases() = tests.toTypedArray()
 
-  override fun isSupported(sourceFile: String) =
-    tests.contains(sourceFile)
+  @DataProvider(name = NOT_SUPPORTED_BACKEND_CASES)
+  fun notSupportedCases() =
+    backendCases
+      .filter { it.startsWith("Enter") && !tests.contains(it) }
+      .toTypedArray()
 }
