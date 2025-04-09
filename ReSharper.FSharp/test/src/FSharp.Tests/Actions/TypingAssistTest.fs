@@ -153,6 +153,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - After comment - Line start 05``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Line start 06``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Line start 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 03 - Spaces``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter - Continue line - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 02``() = x.DoNamedTest()
@@ -202,6 +205,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 02``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in comment 04 - Documentation 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
