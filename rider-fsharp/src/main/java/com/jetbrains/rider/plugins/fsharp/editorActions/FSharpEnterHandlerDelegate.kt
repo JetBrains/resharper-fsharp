@@ -259,7 +259,19 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     insertNewLineAt(editor, indentSize, caretOffset, trimSpacesAfterCaret)
   }
 
+  fun isInsideString(editor: Editor, caretOffset: Int): Boolean {
+    val iterator = editor.highlighter.createIterator(caretOffset - 1)
+    return !iterator.atEnd() &&
+            FSharpTokenType.ALL_STRINGS.contains(iterator.tokenType) &&
+            caretOffset > iterator.start && caretOffset < iterator.end
+  }
+
   private fun doDumpIndent(editor: Editor, caretOffset: Int, trimSpacesAfterCaret: Boolean) {
+    if (isInsideString(editor, caretOffset)) {
+      insertNewLineAt(editor, 0, caretOffset, trimSpacesAfterCaret)
+      return
+    }
+
     val document = editor.document
     val buffer = document.charsSequence
     val caretLine = document.getLineNumber(caretOffset)

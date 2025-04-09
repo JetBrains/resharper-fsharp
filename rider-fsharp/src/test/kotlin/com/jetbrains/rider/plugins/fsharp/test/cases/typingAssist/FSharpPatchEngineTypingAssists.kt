@@ -196,7 +196,22 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
     "Enter in string 01 - Inside empty triple-quoted string",
     "Enter in string 02 - Inside triple-quoted string",
     "Enter in string 03 - Inside triple-quoted string",
-    "Enter in string 04 - Inside multiline triple-quoted string"
+    "Enter in string 04 - Inside multiline triple-quoted string",
+    "Enter - String 01",
+    "Enter - String 02",
+    "Enter - String 03",
+    "Enter - String 04",
+    "Enter - String 05",
+    "Enter - String 06",
+    "Enter - String 07",
+    "Enter - String 08",
+    "Enter - String 09",
+    "Enter - String 10",
+    "Enter - String 11",
+    "Enter - String 12",
+    "Enter - String 13",
+    "Enter - String 14",
+    "Enter - String 15"
   )
 
   @DataProvider(name = SUPPORTED_BACKEND_CASES)
