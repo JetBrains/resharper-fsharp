@@ -90,9 +90,9 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     if (iterator.atEnd()) return 0
 
     // Always add a single space before -> so completion works nicely
-    if (iterator.tokenType == FSharpTokenType.RARROW) return 1
+    if (iterator.tokenTypeSafe == FSharpTokenType.RARROW) return 1
 
-    if (!rightBracketsToAddSpace.contains(iterator.tokenType)) return 0
+    if (!rightBracketsToAddSpace.contains(iterator.tokenTypeSafe)) return 0
 
     val rightBracketOffset = iterator.start
     if (!findUnmatchedBracketToLeft(iterator, offset, lineStart)) return 0
@@ -100,7 +100,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     val leftBracketEndOffset = iterator.end
 
     iterator.advance()
-    while (iterator.tokenType == FSharpTokenType.WHITESPACE) iterator.advance()
+    while (iterator.tokenTypeSafe == FSharpTokenType.WHITESPACE) iterator.advance()
 
     // Empty list with spaces, add the same space as before caret.
     return if (iterator.start >= offset) {
@@ -170,7 +170,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
       if (iterator.end <= lineStartOffset && !hasLeadingLeftBracket) return line
 
       val interpolatedStringExpr =
-        if (!FSharpTokenType.INTERPOLATED_STRING_ENDINGS.contains(iterator.tokenType)) null
+        if (!FSharpTokenType.INTERPOLATED_STRING_ENDINGS.contains(iterator.tokenTypeSafe)) null
         else {
           val manager = PsiDocumentManager.getInstance(editor.project!!)
           manager.commitDocument(document)
@@ -191,7 +191,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
         }
       }
 
-      val continuedLine = if (deindentingTokens.contains(iterator.tokenType)) {
+      val continuedLine = if (deindentingTokens.contains(iterator.tokenTypeSafe)) {
         if (FSharpBracketMatcher().findMatchingBracket(iterator.asTokenIterator()) == null) {
           line
         } else {
@@ -208,15 +208,15 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
         else document.getLineStartOffset(continuedLine)
 
       val hasLeadingLeftParen = continueByLeadingLParen &&
-        (iterator.start > newLineStartOffset && iterator.tokenType == FSharpTokenType.LPAREN) ||
-        (hasLeadingLeftBracket && isIgnored(iterator.tokenType))
+        (iterator.start > newLineStartOffset && iterator.tokenTypeSafe == FSharpTokenType.LPAREN) ||
+        (hasLeadingLeftBracket && isIgnored(iterator.tokenTypeSafe))
 
       iterator.retreat()
       return tryFindContinuedLine(continuedLine, newLineStartOffset, hasLeadingLeftParen)
     }
 
     val lineStartOffset = document.getLineStartOffset(line)
-    return tryFindContinuedLine(line, lineStartOffset, iterator.tokenType == FSharpTokenType.LPAREN)
+    return tryFindContinuedLine(line, lineStartOffset, iterator.tokenTypeSafe == FSharpTokenType.LPAREN)
   }
 
   fun getLineWhitespaceIndent(editor: Editor, line: Int): Int {
@@ -282,7 +282,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     if (iterator.atEnd()) return false
 
     // """{caret} foo"""
-    if (iterator.tokenType != FSharpTokenType.TRIPLE_QUOTED_STRING) return false
+    if (iterator.tokenTypeSafe != FSharpTokenType.TRIPLE_QUOTED_STRING) return false
     if (caretOffset < iterator.start + 3 || caretOffset > iterator.end - 3) return false
 
     val document = editor.document
@@ -352,7 +352,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
   ): Boolean {
     val iterator = editor.highlighter.createIterator(caretOffset - 1)
 
-    if (iterator.tokenType != LINE_COMMENT) return false
+    if (iterator.tokenTypeSafe != LINE_COMMENT) return false
 
     val lineCommentStart = "//"
     val docCommentStart = "///"
@@ -405,14 +405,14 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     if (!findUnmatchedBracketToLeft(iterator, caretOffset, lineStartOffset)) return false
 
     val leftBracketOffset = iterator.start
-    val leftBracketType = iterator.tokenType
+    val leftBracketType = iterator.tokenTypeSafe
 
     iterator.advance()
-    while (iterator.tokenType == FSharpTokenType.WHITESPACE) iterator.advance()
+    while (iterator.tokenTypeSafe == FSharpTokenType.WHITESPACE) iterator.advance()
 
     val indent =
       // { new IInterface with {caret} }
-      if (leftBracketType == FSharpTokenType.LBRACE && iterator.tokenType == FSharpTokenType.NEW) {
+      if (leftBracketType == FSharpTokenType.LBRACE && iterator.tokenTypeSafe == FSharpTokenType.NEW) {
         val braceOffset = leftBracketOffset - document.getLineStartOffset(caretLine)
         val defaultIndent = getIndentSize(editor.getPsiFile()!!)
         braceOffset + defaultIndent
@@ -436,8 +436,8 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     val trimSpacesAfterCaret =
       if (iterator.atEnd()) false
       else {
-        while (iterator.tokenType == FSharpTokenType.WHITESPACE) iterator.retreat()
-        shouldTrimSpacesBeforeToken(iterator.tokenType)
+        while (iterator.tokenTypeSafe == FSharpTokenType.WHITESPACE) iterator.advance()
+        shouldTrimSpacesBeforeToken(iterator.tokenTypeSafe)
       }
 
     doDumpIndent(editor, caretOffset, trimSpacesAfterCaret)

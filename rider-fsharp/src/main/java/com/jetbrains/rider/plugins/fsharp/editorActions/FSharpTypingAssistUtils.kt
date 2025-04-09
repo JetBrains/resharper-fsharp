@@ -7,32 +7,32 @@ import com.intellij.resharper.assist.BracketMatcher.TokenIterator
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 
 val HighlighterIterator.tokenText: String
-  get() = this.document.charsSequence.substring(this.start, this.end)
+    get() = this.document.charsSequence.substring(this.start, this.end)
 
-fun HighlighterIterator.asTokenIterator(): TokenIterator =
-  object : TokenIterator {
+val HighlighterIterator.tokenTypeSafe: IElementType?
+    get() = if (this.atEnd()) null else this.tokenType
+
+fun HighlighterIterator.asTokenIterator(): TokenIterator = object : TokenIterator {
     override val tokenType: IElementType?
-      get() =
-        if (this@HighlighterIterator.atEnd()) null
-        else this@HighlighterIterator.tokenType
+        get() = this@asTokenIterator.tokenTypeSafe
 
     override val tokenStart: Int
-      get() = this@HighlighterIterator.start
+        get() = this@HighlighterIterator.start
 
     override fun advance() = this@HighlighterIterator.advance()
     override fun retreat() = this@HighlighterIterator.retreat()
-  }
+}
 
 
 class FSharpBracketMatcher : BracketMatcher(
-  arrayOf(
-    Pair(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN),
-    Pair(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK),
-    Pair(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
-    Pair(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK),
-    Pair(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE),
-    Pair(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK),
-    Pair(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED),
-    Pair(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
-  )
+    arrayOf(
+        Pair(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN),
+        Pair(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK),
+        Pair(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
+        Pair(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK),
+        Pair(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE),
+        Pair(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK),
+        Pair(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED),
+        Pair(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
+    )
 )
