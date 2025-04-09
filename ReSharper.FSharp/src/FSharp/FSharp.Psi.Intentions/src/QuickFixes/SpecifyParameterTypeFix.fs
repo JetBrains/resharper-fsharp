@@ -101,7 +101,7 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.IsApplicable(decl: IDeclaration) =
         match decl with
-        | :? IMemberDeclaration as decl -> SpecifyTypes.getAvailableOptions decl |> _.CanSpecifyReturnType
+        | :? IMemberDeclaration as decl -> SpecifyTypes.getAvailability decl |> _.CanSpecifyReturnType
         | _ -> false
 
     override this.SpecifyType(decl, mfv, displayContext) =
