@@ -68,7 +68,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
 
     val tokenIterator = iterator.asTokenIterator()
 
-    while (!foundToken && tokenIterator.tokenStart >= minOffset) {
+    while (!foundToken && !iterator.atEnd() && tokenIterator.tokenStart >= minOffset) {
       if (FSharpTokenType.RIGHT_BRACES.contains(tokenIterator.tokenType)) {
         if (matcher.findMatchingBracket(tokenIterator) != null) {
           tokenIterator.retreat()
