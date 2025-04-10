@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Xml;
+using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -23,6 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       HeadPattern?.NestedPatterns.FirstOrDefault() as ITypeMemberDeclaration;
 
     public ITypeMember DeclaredElement => FirstDeclaration?.DeclaredElement;
+    public FSharpSymbolUse GetFcsSymbolUse() => (FirstDeclaration as IFSharpDeclaration)?.GetFcsSymbolUse();
+
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
 
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -84,6 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => Attributes.HasAttribute("Literal"); // todo: cache
+    public bool IsComputed => false;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
       HeadPattern is IReferencePat rp

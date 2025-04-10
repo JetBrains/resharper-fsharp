@@ -1,0 +1,5 @@
+﻿// ${BULB_TEXT:Add type annotation}
+
+module Module
+
+let x: int{caret} = 5

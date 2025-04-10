@@ -15,6 +15,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     TreeNodeEnumerable<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
       ParametersDeclarationsEnumerable => new([ParametersDeclaration]);
 
+    TreeNodeCollection<IParametersPatternDeclaration> IParameterOwnerMemberDeclaration.
+      ParametersDeclarations => new([ParametersDeclaration]);
+
     TreeNodeCollection<IFSharpPattern> IParameterOwnerMemberDeclaration.ParameterPatterns => new([ParameterPatterns]);
   }
 }

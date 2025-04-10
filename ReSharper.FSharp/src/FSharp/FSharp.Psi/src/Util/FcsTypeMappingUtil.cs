@@ -333,6 +333,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode) =>
       TryGetFcsType(treeNode, treeNode.GetDocumentRange());
 
+    [CanBeNull]
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpPattern pattern) =>
+      pattern switch
+      {
+        IReferencePat pat => (pat.GetFcsSymbol() as FSharpMemberOrFunctionOrValue)?.FullType,
+        IOptionalValPat { Pattern: IReferencePat innerPattern } => innerPattern.TryGetFcsType()?.GenericArguments[0],
+        IFSharpTreeNode node => node.TryGetFcsType()
+      };
+
     public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode treeNode, DocumentRange documentRange)
     {
       if (!treeNode.TryGetFcsRange(documentRange, out var range)) return null;
@@ -353,6 +362,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? checkResults.GetExpressionDisplayContext(range)?.Value
         : null;
     }
+
+    [CanBeNull]
+    public static FSharpDisplayContext TryGetFcsDisplayContext([NotNull] this IFSharpPattern pattern) =>
+      pattern switch
+      {
+        IReferencePat pat => pat.GetFcsSymbolUse()?.DisplayContext,
+        IOptionalValPat { Pattern: IReferencePat innerPattern } => innerPattern.TryGetFcsDisplayContext(),
+        IFSharpTreeNode node => node.TryGetFcsDisplayContext()
+      };
 
     [NotNull]
     public static IType GetExpressionTypeFromFcs([NotNull] this IFSharpTreeNode fsTreeNode)
