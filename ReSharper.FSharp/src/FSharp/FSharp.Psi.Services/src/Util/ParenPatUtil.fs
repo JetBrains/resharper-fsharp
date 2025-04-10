@@ -1,6 +1,5 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.ParenPatUtil
 
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -110,7 +109,7 @@ let prefersReferenceResolveRules (refPat: IReferencePat) =
 
     let referenceName = refPat.ReferenceName
     isNotNull referenceName &&
-    
+
     let name = referenceName.ShortName
     not (name.IsEmpty()) && name[0].IsUpperFast()
 
@@ -228,19 +227,19 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
 
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
         if isNotNull parametersOwnerPat &&
-           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(fun x -> x.SpaceBeforeUppercaseInvocation)) then
             removeSpace parametersOwnerPat.ReferenceName parenPattern
 
         let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
         let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         if isNotNull memberDeclaration &&
-           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(fun x -> x.SpaceBeforeUppercaseInvocation)) then
             removeSpace memberDeclaration.Identifier patternDeclaration
 
         let ctorDeclaration = PrimaryConstructorDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         let typeDeclaration = FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(ctorDeclaration)
         if isNotNull typeDeclaration &&
-           not (settingsStore.GetValue(_.SpaceBeforeClassConstructor)) then
+           not (settingsStore.GetValue(fun x -> x.SpaceBeforeClassConstructor)) then
             removeSpace typeDeclaration.Identifier ctorDeclaration
 
         pattern
