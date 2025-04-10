@@ -49,7 +49,7 @@ type InferredTypeCodeVisionProvider() =
 
         member x.IsAvailableIn _ = true
 
-        member x.OnClick(highlighting, _) =
+        member x.OnClick(highlighting, _, _) =
             let codeInsightsHighlighting = highlighting.CodeInsightsHighlighting
             let entry = codeInsightsHighlighting.Entry.As<TextCodeVisionEntry>()
             if isNull entry then () else
