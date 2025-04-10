@@ -16,7 +16,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Options
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
 
