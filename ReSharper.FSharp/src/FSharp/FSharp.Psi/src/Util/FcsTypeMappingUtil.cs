@@ -237,11 +237,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(module);
     }
 
+    private static IFSharpTypeParametersOwner GetTypeMemberDeclaration(ITreeNode context)
+    {
+      var decl = context.GetContainingNode<ITypeMemberDeclaration>();
+      if (decl == null)
+        return null;
+
+      return decl is ITypeUsageOrUnionCaseDeclaration ||
+             decl.DeclaredElement is not IFSharpTypeParametersOwner typeParametersOwner
+        ? GetTypeMemberDeclaration(decl)
+        : typeParametersOwner;
+    }
+
     // todo: get type parameters for local bindings
     public static IType MapType([NotNull] this FSharpType fcsType, [NotNull] ITreeNode context)
     {
-      var typeMemberDeclaration = context.GetContainingNode<ITypeMemberDeclaration>();
-      var typeParametersOwner = typeMemberDeclaration?.DeclaredElement as IFSharpTypeParametersOwner;
+      var typeParametersOwner = GetTypeMemberDeclaration(context);
       var typeParameters = typeParametersOwner?.AllTypeParameters ?? EmptyList<ITypeParameter>.Instance;
       return MapType(fcsType, typeParameters, context.GetPsiModule());
     }
