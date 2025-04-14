@@ -1,6 +1,6 @@
 ﻿## GotoInheritorsProvider activity:
   Show context popup menu `Derived types of 'U'`:
-    [*] DEO: Envoy: Class:Module+U+A, PsiLanguageType:F# as Envoy: Class:Module+U+A, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
+    [*] DEO: Envoy: FSharpUnionCaseClass:Module+U+A, PsiLanguageType:F# as Envoy: FSharpUnionCaseClass:Module+U+A, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,EnumMember)
       text: **Module.U.A** <font color="FF6D6D6D"> (in Module.U)</font>
@@ -16,7 +16,7 @@
 
       ------------------
 
-    [*] DEO: Envoy: Class:Module+U+B, PsiLanguageType:F# as Envoy: Class:Module+U+B, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
+    [*] DEO: Envoy: FSharpUnionCaseClass:Module+U+B, PsiLanguageType:F# as Envoy: FSharpUnionCaseClass:Module+U+B, PsiLanguageType:F# RANGE: (0,0) @ Union case 01.fs
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,EnumMember)
       text: **Module.U.B** <font color="FF6D6D6D"> (in Module.U)</font>

@@ -29,6 +29,8 @@
     AbbreviationOrSingleCaseUnion = 19,
     StructAbbreviationOrSingleCaseUnion = 20,
 
-    HiddenType = 100
+    ILAssemblyAbbreviation = 21,
+
+    ModuleAbbreviation = 100
   }
 }

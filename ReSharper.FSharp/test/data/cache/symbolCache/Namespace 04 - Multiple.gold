@@ -2,20 +2,20 @@
 FSharpProjectFilePart:ImplFile
  QualifiedNamespacePart:Qualifier1
   FSharp.DeclaredNamespacePart:MyNamespace
-   ClassPart:T1->Class:Qualifier1.MyNamespace.T1
+   ClassPart:T1->Qualifier1.MyNamespace.T1
  QualifiedNamespacePart:Qualifier2
   FSharp.DeclaredNamespacePart:OtherNamespace
-   ClassPart:T2->Class:Qualifier2.OtherNamespace.T2
- ClassPart:T3->Class:T3
+   ClassPart:T2->Qualifier2.OtherNamespace.T2
+ ClassPart:T3->T3
  FSharp.DeclaredNamespacePart:NoQualifier
-  ClassPart:T4->Class:NoQualifier.T4
+  ClassPart:T4->NoQualifier.T4
 []: Namespace:
  [NoQualifier]: Namespace:NoQualifier
-  [T4]: Class:NoQualifier.T4[TestProject]
+  [T4]: FSharpClass:NoQualifier.T4[TestProject]
  [Qualifier1]: Namespace:Qualifier1
   [MyNamespace]: Namespace:MyNamespace
-   [T1]: Class:Qualifier1.MyNamespace.T1[TestProject]
+   [T1]: FSharpClass:Qualifier1.MyNamespace.T1[TestProject]
  [Qualifier2]: Namespace:Qualifier2
   [OtherNamespace]: Namespace:OtherNamespace
-   [T2]: Class:Qualifier2.OtherNamespace.T2[TestProject]
- [T3]: Class:T3[TestProject]
+   [T2]: FSharpClass:Qualifier2.OtherNamespace.T2[TestProject]
+ [T3]: FSharpClass:T3[TestProject]

@@ -1,6 +1,6 @@
 ﻿Project Files:Module 10 - Module suffix attribute - Backtics.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:BackticksModule->Class:BackticksModule
+ NamedModulePart:BackticksModule (Backticks)->BackticksModule
 []: Namespace:
- [Backticks]: Class:BackticksModule[TestProject]
- [BackticksModule]: Class:BackticksModule[TestProject]
+ [Backticks]: FSharpModule:BackticksModule (Backticks)[TestProject]
+ [BackticksModule]: FSharpModule:BackticksModule (Backticks)[TestProject]

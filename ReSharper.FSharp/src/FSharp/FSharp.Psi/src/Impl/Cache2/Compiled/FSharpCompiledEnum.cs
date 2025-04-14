@@ -7,22 +7,24 @@ using JetBrains.ReSharper.Psi.Impl.reflection2.elements.Compiled;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
-  // public class FSharpCompiledEnum : Enum, IFSharpCompiledTypeElement
-  // {
-  //   [NotNull] private FSharpDeclaredName FSharpName { get; }
-  //   public FSharpCompiledTypeRepresentation Representation { get; }
-  //
-  //   public CacheTrieNode AlternativeNameTrieNode { get; set; }
-  //
-  //   public FSharpCompiledEnum(FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
-  //     [NotNull] IReflectionBuilder builder,
-  //     [NotNull] IMetadataTypeInfo info) : base(parent, builder, info)
-  //   {
-  //     FSharpName = FSharpMetadataEntityModule.getCompiledModuleDeclaredName(entity);
-  //     Representation = entity.Representation;
-  //   }
-  //
-  //   public string SourceName => FSharpName.SourceName;
-  //   public string AlternativeName => FSharpName.AlternativeName;
-  // }
+  public class FSharpCompiledEnum : Enum, IFSharpCompiledTypeElement
+  {
+    [NotNull] private FSharpDeclaredName FSharpName { get; }
+    public FSharpCompiledTypeRepresentation Representation { get; }
+    public FSharpAccessRights FSharpAccessRights { get; }
+
+    public CacheTrieNode AlternativeNameTrieNode { get; set; }
+
+    public FSharpCompiledEnum([CanBeNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+      [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(parent, builder, info)
+    {
+      FSharpName = FSharpMetadataEntityModule.getCompiledModuleDeclaredName(entity);
+      Representation = FSharpMetadataEntityModule.getRepresentation(entity);
+      FSharpAccessRights = entity.GetFSharpAccessRights();
+    }
+
+    public string SourceName => FSharpName.SourceName;
+    public string AlternativeName => FSharpName.AlternativeName;
+    public ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.RequiresQualifiedAccess;
+  }
 }

@@ -1,0 +1,7 @@
+﻿Project Files:Union 04 - Single case 04 - Abbreviation.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Module
+  TypeAbbreviationOrDeclarationPart:A->Module+A
+[]: Namespace:
+ [Module]: FSharpModule:Module[TestProject]
+  [A]: FSharpClassOrProvidedTypeAbbreviation:Module+A (erased)[TestProject]

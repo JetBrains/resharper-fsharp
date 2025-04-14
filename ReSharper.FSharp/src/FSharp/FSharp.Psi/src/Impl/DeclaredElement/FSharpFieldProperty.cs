@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this, false);
   }
 
-  public interface IRecordField : IProperty, IRepresentationAccessRightsOwner, IMutableModifierOwner
+  public interface IRecordField : IProperty, IFSharpRepresentationAccessRightsOwner, IMutableModifierOwner
   {
   }
 }

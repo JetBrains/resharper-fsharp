@@ -1,7 +1,7 @@
 ﻿Project Files:Module 15 - CompiledName.fs:
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
-  NestedModulePart:M->Class:Ns.M
+  NestedModulePart:M->Ns.M
 []: Namespace:
  [Ns]: Namespace:Ns
-  [M]: Class:Ns.M[TestProject]
+  [M]: FSharpModule:Ns.M[TestProject]

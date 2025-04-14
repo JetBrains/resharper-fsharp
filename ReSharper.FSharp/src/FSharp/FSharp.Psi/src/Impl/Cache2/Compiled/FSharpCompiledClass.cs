@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
   public class FSharpCompiledClass : FSharpCompiledClassBase
   {
-    public FSharpCompiledClass(FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+    public FSharpCompiledClass([CanBeNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(entity, parent, builder, info)
     {
     }

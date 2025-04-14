@@ -1,0 +1,9 @@
+﻿Project Files:Accessibility 04.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:Ns1
+  QualifiedNamespacePart:Ns2
+   NamedModulePart:M (private)->Ns1.Ns2.M
+[]: Namespace:
+ [Ns1]: Namespace:Ns1
+  [Ns2]: Namespace:Ns2
+   [M]: FSharpModule:Ns1.Ns2.M (private, compiled: internal)[TestProject]

@@ -1,0 +1,7 @@
+﻿Project Files:Accessibility 05.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M (private)->M
+  RecordPart:R->M+R
+[]: Namespace:
+ [M]: FSharpModule:M (private, compiled: internal)[TestProject]
+  [R]: FSharpClass:M+R[TestProject]

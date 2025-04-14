@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -83,6 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public virtual ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.Normal;
+    public AccessRights SourceAccessRights => Modifiers.AccessRights;
 
     public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)
     {
@@ -195,10 +197,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string ToString()
     {
-      var typeElement = TypeElement?.ToString() ?? "null";
+      var typeElement = TypeElement?.GetClrName().FullName ?? "null";
       var typeParameters = PrintTypeParameters();
 
-      return $"{GetType().Name}:{ShortName}{typeParameters}->{typeElement}";
+      var list = this.GetTestFSharpTypePartModifiers().ToList();
+      var modifiersString = list.IsEmpty() ? "" : $" ({list.Join(", ")})";
+
+      return $"{GetType().Name}:{ShortName}{typeParameters}{modifiersString}->{typeElement}";
     }
 
     protected virtual string PrintTypeParameters() => "";

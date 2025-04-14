@@ -1,0 +1,7 @@
+﻿Project Files:Type def - Abbreviation 01.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  TypeAbbreviationOrDeclarationPart:T->M+T
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [T]: FSharpClassOrProvidedTypeAbbreviation:M+T (erased)[TestProject]

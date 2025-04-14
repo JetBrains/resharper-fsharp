@@ -1,11 +1,11 @@
 ﻿Project Files:Union 05 - Nested types.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  UnionPart:U->Class:Module+U
-   UnionCasePart:Case1->Class:Module+U+Case1
-   UnionCasePart:Case2->Class:Module+U+Case2
+ NamedModulePart:Module->Module
+  UnionPart:U->Module+U
+   UnionCasePart:Case1->Module+U+Case1
+   UnionCasePart:Case2->Module+U+Case2
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [U]: Class:Module+U[TestProject]
-   [Case1]: Class:Module+U+Case1[TestProject]
-   [Case2]: Class:Module+U+Case2[TestProject]
+ [Module]: FSharpModule:Module[TestProject]
+  [U]: FSharpClass:Module+U[TestProject]
+   [Case1]: FSharpUnionCaseClass:Module+U+Case1[TestProject]
+   [Case2]: FSharpUnionCaseClass:Module+U+Case2[TestProject]

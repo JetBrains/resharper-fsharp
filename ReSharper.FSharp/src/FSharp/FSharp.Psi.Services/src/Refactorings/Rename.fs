@@ -113,7 +113,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
-        | :? IFSharpTypeElement as fsTypeElement ->
+        | :? IFSharpSourceTypeElement as fsTypeElement ->
             match fsTypeElement.GetModuleToUpdateName(newName) with
             | null -> EmptyArray.Instance :> _
             | fsModule -> [| fsModule |] :> _

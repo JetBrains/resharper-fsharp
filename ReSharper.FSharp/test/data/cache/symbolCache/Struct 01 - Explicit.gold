@@ -1,7 +1,0 @@
-﻿Project Files:Struct 01 - Explicit.fs:
-FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  StructPart:S->Struct:Module+S
-[]: Namespace:
- [Module]: Class:Module[TestProject]
-  [S]: Struct:Module+S[TestProject]

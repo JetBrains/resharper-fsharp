@@ -1,8 +1,8 @@
 ﻿Project Files:Extension 01.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  ClassPart:T->Class:Module+T
-  ClassExtensionPart:T->Class:Module+T
+ NamedModulePart:M->M
+  ClassPart:T->M+T
+  ClassExtensionPart:T->M+T
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [T]: Class:Module+T[TestProject]
+ [M]: FSharpModule:M[TestProject]
+  [T]: FSharpClass:M+T[TestProject]

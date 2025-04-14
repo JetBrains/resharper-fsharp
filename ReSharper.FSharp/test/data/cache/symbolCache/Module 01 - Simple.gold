@@ -1,5 +1,5 @@
 ﻿Project Files:Module 01 - Simple.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:MyModule->Class:MyModule
+ NamedModulePart:MyModule->MyModule
 []: Namespace:
- [MyModule]: Class:MyModule[TestProject]
+ [MyModule]: FSharpModule:MyModule[TestProject]

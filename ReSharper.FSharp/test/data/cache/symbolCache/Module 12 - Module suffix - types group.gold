@@ -1,11 +1,11 @@
 ﻿Project Files:Module 12 - Module suffix - types group.fs:
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
-  NestedModulePart:TModule->Class:Ns.TModule
-  ClassPart:Foo->Class:Ns.Foo
-  ClassPart:T->Class:Ns.T
+  NestedModulePart:TModule (T)->Ns.TModule
+  ClassPart:Foo->Ns.Foo
+  ClassPart:T->Ns.T
 []: Namespace:
  [Ns]: Namespace:Ns
-  [Foo]: Class:Ns.Foo[TestProject]
-  [T]: Class:Ns.T[TestProject], Class:Ns.TModule[TestProject]
-  [TModule]: Class:Ns.TModule[TestProject]
+  [Foo]: FSharpClass:Ns.Foo[TestProject]
+  [T]: FSharpClass:Ns.T[TestProject], FSharpModule:Ns.TModule (T)[TestProject]
+  [TModule]: FSharpModule:Ns.TModule (T)[TestProject]
