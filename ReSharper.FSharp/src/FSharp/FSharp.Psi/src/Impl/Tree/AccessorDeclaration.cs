@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IMemberSignatureOrDeclaration OwnerMember =>
       MemberSignatureOrDeclarationNavigator.GetByAccessorDeclaration(this);
 
-    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+    public override AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
 
     public AccessorKind Kind =>
       NameIdentifier?.Name switch

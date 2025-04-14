@@ -1,7 +1,7 @@
-Project Files:Union - Struct 03 - Mixed.fs:
+﻿Project Files:Union - Struct 03 - Mixed.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  StructUnionPart:U->Struct:Module+U
+ NamedModulePart:Module->Module
+  StructUnionPart:U->Module+U
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [U]: Struct:Module+U[TestProject]
+ [Module]: FSharpModule:Module[TestProject]
+  [U]: FSharpStruct:Module+U[TestProject]

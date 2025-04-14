@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement() => new FSharpValField(this);
 
-    public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+    public override AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
   }
 }

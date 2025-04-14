@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.ObjectExpression;
 
     public override TypeElement CreateTypeElement() =>
-      new ObjectExpressionType(this);
+      new FSharpObjectExpressionClass(this);
 
     public ObjectExpressionTypePart(IReader reader) : base(reader) =>
       ExtendsListShortNames = reader.ReadStringArray();

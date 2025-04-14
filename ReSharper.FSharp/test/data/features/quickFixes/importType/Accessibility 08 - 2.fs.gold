@@ -1,0 +1,6 @@
+﻿namespace Ns2
+
+open Ns1
+
+module M =
+    let t = T{caret}()

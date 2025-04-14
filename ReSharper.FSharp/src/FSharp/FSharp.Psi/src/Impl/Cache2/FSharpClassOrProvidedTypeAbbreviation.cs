@@ -4,23 +4,21 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpClassOrProvidedTypeAbbreviation : FSharpClass
+  // todo: why provided type for simple union?
+  // type T = a
+  public class FSharpClassOrProvidedTypeAbbreviation([NotNull] Class.IClassPart part) : FSharpClass(part), ILanguageSpecificDeclaredElement
   {
     // Triggers FCS resolve
     private GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation> ProvidedClass =>
-      IsProvidedAndGenerated &&
-      ProvidedTypesResolveUtil.TryGetProvidedType(Module, GetClrName(), out var type)
+      IsProvidedAndGenerated && ProvidedTypesResolveUtil.TryGetProvidedType(Module, GetClrName(), out var type)
         ? new GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation>(type, this)
         : null;
 
     public bool IsProvidedAndGenerated => myParts is TypeAbbreviationOrDeclarationPart { IsProvidedAndGenerated: true };
-
-    public FSharpClassOrProvidedTypeAbbreviation([NotNull] IClassPart part) : base(part)
-    {
-    }
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       ProvidedClass is { } x ? x.GetMemberPresenceFlag() : base.GetMemberPresenceFlag();
@@ -53,5 +51,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override XmlNode GetXMLDoc(bool inherit) =>
       ProvidedClass is { } x ? x.GetXmlDoc() : base.GetXMLDoc(inherit);
+
+    bool ILanguageSpecificDeclaredElement.IsErased =>
+      myParts is TypeAbbreviationOrDeclarationPart { IsUnionCase: false, IsProvidedAndGenerated: false };
   }
 }

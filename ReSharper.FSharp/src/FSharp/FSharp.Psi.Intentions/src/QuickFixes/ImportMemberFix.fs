@@ -150,7 +150,7 @@ type FSharpImportModuleMemberFix(reference: IReference) =
 
             let names =
                 match typeElement with
-                | :? IFSharpTypeElement as fsTypeElement ->
+                | :? IFSharpSourceTypeElement as fsTypeElement ->
                     match fsTypeElement with
                     | :? IFSharpModule as fsModule ->
                         match referenceContext.Value with

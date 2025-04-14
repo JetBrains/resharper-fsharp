@@ -1,0 +1,7 @@
+﻿Project Files:Type def - Struct 01.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:Module->Module
+  StructPart:S->Module+S
+[]: Namespace:
+ [Module]: FSharpModule:Module[TestProject]
+  [S]: FSharpStruct:Module+S[TestProject]

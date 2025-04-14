@@ -1,7 +1,7 @@
 ﻿Project Files:Il 01.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  ClassPart:T->Class:Module+T
+ NamedModulePart:Module->Module
+  ILAssemblyTypeAbbreviationPart:T->Module+T
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [T]: Class:Module+T[TestProject]
+ [Module]: FSharpModule:Module[TestProject]
+  [T]: FSharpClass:Module+T[TestProject]

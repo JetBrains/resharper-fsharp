@@ -1,7 +1,7 @@
 ﻿Project Files:Record 04 - Prefix type parameters.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  RecordPart:R<T>->Class:Module+R`1<[0]:T>
+ NamedModulePart:Module->Module
+  RecordPart:R<T>->Module+R`1
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [R]: Class:Module+R`1<[0]:T>[TestProject]
+ [Module]: FSharpModule:Module[TestProject]
+  [R]: FSharpClass:Module+R`1<[0]:T>[TestProject]

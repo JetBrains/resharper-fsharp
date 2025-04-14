@@ -1,7 +1,7 @@
 ﻿Project Files:Union 03 - Single case 03 - No fields, no bar.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:Module->Class:Module
-  TypeAbbreviationOrDeclarationPart:U->Class:Module+U
+ NamedModulePart:Module->Module
+  TypeAbbreviationOrDeclarationPart:U->Module+U
 []: Namespace:
- [Module]: Class:Module[TestProject]
-  [U]: Class:Module+U[TestProject]
+ [Module]: FSharpModule:Module[TestProject]
+  [U]: FSharpClassOrProvidedTypeAbbreviation:Module+U[TestProject]

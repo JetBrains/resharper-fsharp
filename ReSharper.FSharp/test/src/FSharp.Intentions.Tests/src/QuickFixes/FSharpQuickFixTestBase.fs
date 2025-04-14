@@ -61,3 +61,18 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
         let fsExt = FSharpProjectFileType.FsExtension
         let fsiExt = FSharpSignatureProjectFileType.FsiExtension
         this.DoTestSolution(testName + fsiExt, testName + fsExt)
+
+    member this.DoNamedTestWithTwoFiles() =
+        let testName = this.TestMethodName
+        let firstName = testName + " - 1"
+        let secondName = testName + " - 2"
+        let ext = FSharpProjectFileType.FsExtension
+        this.DoTestSolution(firstName + ext, secondName + ext)
+
+    member this.DoNamedTestWithSignatureAndSecondFile() =
+        let testName = this.TestMethodName
+        let firstName = testName + " - 1"
+        let secondName = testName + " - 2"
+        let fsExt = FSharpProjectFileType.FsExtension
+        let fsiExt = FSharpSignatureProjectFileType.FsiExtension
+        this.DoTestSolution(firstName + fsiExt, firstName + fsExt, secondName + fsExt)

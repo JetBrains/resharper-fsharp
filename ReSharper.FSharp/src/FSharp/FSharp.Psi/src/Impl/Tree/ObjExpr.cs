@@ -18,6 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? "Object expression in " + path.Name + "@" + GetTreeStartOffset()
         : SharedImplUtil.MISSING_DECLARATION_NAME;
 
+    public override string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public bool IsConstantValue() => false;
     public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;

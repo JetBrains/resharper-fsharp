@@ -1,21 +1,21 @@
 ﻿Project Files:Module 03 - Module suffix.fs:
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:MyNamespace
-  NestedModulePart:RModule->Class:MyNamespace.RModule
-  RecordPart:R->Class:MyNamespace.R
-  NestedModulePart:UModule->Class:MyNamespace.UModule
-  UnionPart:U->Class:MyNamespace.U
-  NestedModulePart:OModule->Class:MyNamespace.OModule
-  ClassPart:O->Class:MyNamespace.O
-  NestedModulePart:EModule->Class:MyNamespace.EModule
-  EnumPart:E->Enum:MyNamespace.E
+  NestedModulePart:RModule (R)->MyNamespace.RModule
+  RecordPart:R->MyNamespace.R
+  NestedModulePart:UModule (U)->MyNamespace.UModule
+  UnionPart:U->MyNamespace.U
+  NestedModulePart:OModule (O)->MyNamespace.OModule
+  ClassPart:O->MyNamespace.O
+  NestedModulePart:EModule (E)->MyNamespace.EModule
+  EnumPart:E->MyNamespace.E
 []: Namespace:
  [MyNamespace]: Namespace:MyNamespace
-  [E]: Class:MyNamespace.EModule[TestProject], Enum:MyNamespace.E[TestProject]
-  [EModule]: Class:MyNamespace.EModule[TestProject]
-  [O]: Class:MyNamespace.O[TestProject], Class:MyNamespace.OModule[TestProject]
-  [OModule]: Class:MyNamespace.OModule[TestProject]
-  [R]: Class:MyNamespace.R[TestProject], Class:MyNamespace.RModule[TestProject]
-  [RModule]: Class:MyNamespace.RModule[TestProject]
-  [U]: Class:MyNamespace.U[TestProject], Class:MyNamespace.UModule[TestProject]
-  [UModule]: Class:MyNamespace.UModule[TestProject]
+  [E]: FSharpEnum:MyNamespace.E[TestProject], FSharpModule:MyNamespace.EModule (E)[TestProject]
+  [EModule]: FSharpModule:MyNamespace.EModule (E)[TestProject]
+  [O]: FSharpClass:MyNamespace.O[TestProject], FSharpModule:MyNamespace.OModule (O)[TestProject]
+  [OModule]: FSharpModule:MyNamespace.OModule (O)[TestProject]
+  [R]: FSharpClass:MyNamespace.R[TestProject], FSharpModule:MyNamespace.RModule (R)[TestProject]
+  [RModule]: FSharpModule:MyNamespace.RModule (R)[TestProject]
+  [U]: FSharpClass:MyNamespace.U[TestProject], FSharpModule:MyNamespace.UModule (U)[TestProject]
+  [UModule]: FSharpModule:MyNamespace.UModule (U)[TestProject]

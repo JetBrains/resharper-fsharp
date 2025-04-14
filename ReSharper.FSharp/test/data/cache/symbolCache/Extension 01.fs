@@ -1,4 +1,4 @@
-module Module
+module M
 
 type T() =
     class

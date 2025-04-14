@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IUnionCase : ITypeMember, IRepresentationAccessRightsOwner, IFSharpDeclaredElement,
+  public interface IUnionCase : ITypeMember, IFSharpRepresentationAccessRightsOwner, IFSharpDeclaredElement,
     IGeneratedConstructorOwner
   {
     bool HasFields { get; }

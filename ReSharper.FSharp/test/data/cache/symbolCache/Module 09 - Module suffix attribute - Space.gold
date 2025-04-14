@@ -1,6 +1,6 @@
 ﻿Project Files:Module 09 - Module suffix attribute - Space.fs:
 FSharpProjectFilePart:ImplFile
- NamedModulePart:SpaceModule->Class:SpaceModule
+ NamedModulePart:SpaceModule (Space)->SpaceModule
 []: Namespace:
- [Space]: Class:SpaceModule[TestProject]
- [SpaceModule]: Class:SpaceModule[TestProject]
+ [Space]: FSharpModule:SpaceModule (Space)[TestProject]
+ [SpaceModule]: FSharpModule:SpaceModule (Space)[TestProject]

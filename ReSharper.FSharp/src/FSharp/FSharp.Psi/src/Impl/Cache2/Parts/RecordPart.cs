@@ -111,7 +111,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       new FSharpGeneratedConstructorFromFields(this);
   }
 
-  public interface IRecordPart : IFieldsOwnerPart, IRepresentationAccessRightsOwner, IFSharpTypePart
+  public interface IRecordPart : IFieldsOwnerPart, IFSharpRepresentationAccessRightsOwner, IFSharpTypePart
   {
     bool CliMutable { get; }
   }

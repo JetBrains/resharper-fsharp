@@ -1,6 +1,6 @@
 ﻿## GotoInheritorsProvider activity:
   Immediate result:
-    [*] DEO: Envoy: Class:Module+TType, PsiLanguageType:F# as Envoy: Class:Module+TType, PsiLanguageType:F# RANGE: (0,0) @ Interface 08 - Union.fs
+    [*] DEO: Envoy: FSharpClass:Module+TType, PsiLanguageType:F# as Envoy: FSharpClass:Module+TType, PsiLanguageType:F# RANGE: (0,0) @ Interface 08 - Union.fs
     Navigation result:
       opened file: Interface 08 - Union.fs
       ------------------

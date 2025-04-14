@@ -16,8 +16,6 @@ open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
-    let [<Literal>] opName = "FSharpImportTypeHelper.FindTypeCandidates"
-
     let isApplicable (context: IFSharpReferenceOwner) =
         let referenceName = context.As<ITypeReferenceName>()
         not (isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)))
@@ -79,8 +77,8 @@ type FSharpImportTypeHelper() =
                     let fsModule = typeElement.As<IFSharpModule>()
                     if isNotNull fsModule && isNotNull fsModule.AssociatedTypeElement then false else
 
-                    let symbolUse = fsFile.CheckerService.ResolveNameAtLocation(context, names, false, opName)
-                    Option.isSome symbolUse)
+                    FSharpAccessRightUtil.IsAccessible(typeElement, context)
+                )
                 |> Seq.cast
 
 

@@ -77,7 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (element is IFSharpProperty property)
         return property.GetExplicitAccessors().Select(member => new RelatedDeclaredElement(member));
 
-      if (element is IFSharpTypeElement typeElement && typeElement.IsUnion())
+      if (element is IFSharpSourceTypeElement typeElement && typeElement.IsUnion())
       {
         var result = new List<RelatedDeclaredElement>();
         foreach (var sourceUnionCase in typeElement.GetSourceUnionCases())

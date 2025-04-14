@@ -10,10 +10,10 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, IFSharpClassPart,
-    IRepresentationAccessRightsOwner
+    IFSharpRepresentationAccessRightsOwner
   {
     public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration), TreeNodeCollection<ITypeParameterDeclaration>.Empty, 
+      : base(declaration, FSharpModifiersUtil.GetDecoration(declaration), TreeNodeCollection<ITypeParameterDeclaration>.Empty, 
         cacheBuilder, PartKind.Class) =>
       ExtendsListShortNames =
         UnionRepresentationNavigator.GetByUnionCase(declaration) is { } repr &&

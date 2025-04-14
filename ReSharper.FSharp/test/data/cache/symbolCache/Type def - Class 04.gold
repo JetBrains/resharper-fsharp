@@ -1,0 +1,7 @@
+﻿Project Files:Type def - Class 04.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  ClassPart:T->M+T
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [T]: FSharpClass:M+T[TestProject]

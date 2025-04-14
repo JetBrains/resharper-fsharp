@@ -248,9 +248,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitTypeAbbreviationRepresentation(ITypeAbbreviationRepresentation repr)
     {
       var decl = repr.TypeDeclaration;
-      var typePart = decl.GetSimpleTypeKindFromAttributes() == PartKind.Struct
+      TypePart typePart = decl.GetSimpleTypeKindFromAttributes() == PartKind.Struct
         ? new StructTypeAbbreviationOrDeclarationPart(decl, Builder)
-        : (TypePart) new TypeAbbreviationOrDeclarationPart(decl, Builder);
+        : new TypeAbbreviationOrDeclarationPart(decl, Builder);
       Builder.StartPart(typePart);
 
       var identifier = repr.AbbreviatedTypeOrUnionCase?.NameIdentifier;
@@ -260,11 +260,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public override void VisitIlAssemblyRepresentation(IIlAssemblyRepresentation repr) =>
-      Builder.StartPart(new ClassPart(repr.TypeDeclaration, Builder));
+      Builder.StartPart(new ILAssemblyTypeAbbreviationPart(repr.TypeDeclaration, Builder));
 
     public override void VisitModuleAbbreviationDeclaration(IModuleAbbreviationDeclaration decl)
     {
-      Builder.StartPart(new HiddenTypePart(decl, Builder));
+      Builder.StartPart(new FSharpModuleAbbreviationPart(decl, Builder));
       Builder.EndPart();
     }
 

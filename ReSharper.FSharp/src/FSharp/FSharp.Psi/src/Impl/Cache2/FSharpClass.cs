@@ -4,11 +4,12 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpClass : Class, IFSharpTypeElement, IFSharpTypeParametersOwner
+  public class FSharpClass : Class, IFSharpSourceTypeElement, IFSharpTypeParametersOwner
   {
     public int MeasureTypeParametersCount { get; }
 
@@ -18,6 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         MeasureTypeParametersCount = fsClassPart.MeasureTypeParametersCount;
     }
 
+    // todo: check the same file
     protected override bool AcceptsPart(TypePart part) =>
       // todo: make UnionPart/RecordPart implement IFSharpClassPart, simplify this check
       part.ShortName == ShortName &&
@@ -28,6 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public string SourceName => this.GetSourceName();
 
     public virtual ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
+    public ITypeDeclaration DefiningDeclaration => this.GetDefiningDeclaration();
 
     public override IClass GetSuperClass()
     {
@@ -50,5 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       this.GetAllTypeParametersReversed();
 
     public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
+
+    public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
 }

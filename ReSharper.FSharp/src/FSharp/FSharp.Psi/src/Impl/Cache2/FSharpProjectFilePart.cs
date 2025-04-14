@@ -14,14 +14,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   public class FSharpProjectFilePart : SimpleProjectFilePart
   {
     public FSharpFileKind FileKind { get; }
-    public bool HasPairFile { get; } // todo: rename HasPairFile to something better
+    public bool HasPairSignaturePairFile { get; }
     internal bool HasInternalsVisibleTo { get; set; }
 
-    public FSharpProjectFilePart(IPsiSourceFile sourceFile, FSharpFileKind fileKind, bool hasPairFile)
+    public FSharpProjectFilePart(IPsiSourceFile sourceFile, FSharpFileKind fileKind, bool hasPairSignatureFile)
       : base(sourceFile)
     {
       FileKind = fileKind;
-      HasPairFile = hasPairFile;
+      HasPairSignaturePairFile = hasPairSignatureFile;
     }
 
     public FSharpProjectFilePart(IPsiSourceFile sourceFile, IReader reader, FSharpFileKind fileKind)
@@ -29,13 +29,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
       FileKind = fileKind;
 
-      HasPairFile = reader.ReadBool();
+      HasPairSignaturePairFile = reader.ReadBool();
       HasInternalsVisibleTo = reader.ReadBool();
     }
 
     protected override void Write(IWriter writer)
     {
-      writer.WriteBool(HasPairFile);
+      writer.WriteBool(HasPairSignaturePairFile);
       writer.WriteBool(HasInternalsVisibleTo);
     }
 

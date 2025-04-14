@@ -1,0 +1,12 @@
+﻿namespace Ns1
+
+type internal T() =
+    class
+    end
+
+namespace Ns2
+
+open Ns1
+
+module M =
+    let t = T{caret}()

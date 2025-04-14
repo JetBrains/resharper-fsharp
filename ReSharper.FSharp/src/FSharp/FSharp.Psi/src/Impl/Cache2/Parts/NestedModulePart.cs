@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     public NestedModulePart([NotNull] INestedModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName),
-        ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes), cacheBuilder)
+        FSharpModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes), cacheBuilder)
     {
     }
 

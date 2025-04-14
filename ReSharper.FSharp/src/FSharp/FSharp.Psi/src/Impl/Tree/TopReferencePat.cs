@@ -26,7 +26,7 @@ internal partial class TopReferencePat
     this.GetBindingFromHeadPattern()?.FirstChild as XmlDocBlock;
 
   public bool IsDeclaration => this.IsDeclaration();
-  public override AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+  public override AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
 
   public override IEnumerable<IFSharpPattern> NestedPatterns => new[] { this };
 

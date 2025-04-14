@@ -300,7 +300,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     private static string GetTypeParameterFirstName([NotNull] ITypeParameter typeParameter)
     {
-      if (typeParameter.Owner is IFSharpTypeElement fsTypeElement)
+      if (typeParameter.Owner is IFSharpSourceTypeElement fsTypeElement)
         if (fsTypeElement.GetFirstTypePart() is { } firstTypePart)
           return firstTypePart.GetTypeParameterName(typeParameter.Index);
 
