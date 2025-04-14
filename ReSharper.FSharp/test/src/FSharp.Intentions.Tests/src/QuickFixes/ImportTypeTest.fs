@@ -56,6 +56,20 @@ type ImportTypeTest() =
 
     [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()
 
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 01``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 02``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 03``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 04``() = x.DoNamedTestWithSignatureAndSecondFile()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 05``() = x.DoNamedTestWithSignatureAndSecondFile()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 06``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 07``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 08``() = x.DoNamedTestWithTwoFiles()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 09``() = x.DoNamedTestWithTwoFiles()
+
 
 [<FSharpTest>]
 type ImportExtensionMemberTest() =

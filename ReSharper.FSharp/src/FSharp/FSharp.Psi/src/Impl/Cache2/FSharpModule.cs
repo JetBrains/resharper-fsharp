@@ -61,6 +61,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public string[] ActivePatternCaseNames => GetNames(part => part.ActivePatternCaseNames);
 
     string IAlternativeNameOwner.AlternativeName => SourceName != ShortName ? SourceName : null;
+
+    public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
 
   internal static class FSharpModuleUtil

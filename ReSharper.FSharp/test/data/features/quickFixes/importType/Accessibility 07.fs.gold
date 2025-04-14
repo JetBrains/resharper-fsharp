@@ -1,0 +1,11 @@
+﻿namespace rec Ns1
+
+open Ns1.M2
+
+module M1 =
+    let t = T{caret}()
+
+module M2 =
+    type T() =
+        class
+        end

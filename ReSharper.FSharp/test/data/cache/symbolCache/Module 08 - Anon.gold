@@ -1,5 +1,5 @@
 ﻿Project Files:Module 08 - Anon.fs:
 FSharpProjectFilePart:ImplFile
- AnonModulePart:Module 08 - Anon->Class:Module 08 - Anon
+ AnonModulePart:Module 08 - Anon->Module 08 - Anon
 []: Namespace:
- [Module 08 - Anon]: Class:Module 08 - Anon[TestProject]
+ [Module 08 - Anon]: FSharpModule:Module 08 - Anon[TestProject]

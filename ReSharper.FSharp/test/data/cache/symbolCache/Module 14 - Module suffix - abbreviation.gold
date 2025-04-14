@@ -1,9 +1,9 @@
 ﻿Project Files:Module 14 - Module suffix - abbreviation.fs:
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
-  NestedModulePart:TModule->Class:Ns.TModule
-  TypeAbbreviationOrDeclarationPart:T->Class:Ns.T
+  NestedModulePart:TModule (T)->Ns.TModule
+  TypeAbbreviationOrDeclarationPart:T->Ns.T
 []: Namespace:
  [Ns]: Namespace:Ns
-  [T]: Class:Ns.T[TestProject], Class:Ns.TModule[TestProject]
-  [TModule]: Class:Ns.TModule[TestProject]
+  [T]: FSharpClassOrProvidedTypeAbbreviation:Ns.T (erased)[TestProject], FSharpModule:Ns.TModule (T)[TestProject]
+  [TModule]: FSharpModule:Ns.TModule (T)[TestProject]

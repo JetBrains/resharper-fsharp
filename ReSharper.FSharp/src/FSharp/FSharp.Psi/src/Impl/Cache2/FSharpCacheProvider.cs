@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Application.Parts;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -13,13 +12,8 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   [Language(typeof(FSharpLanguage))]
-  public class FSharpCacheProvider : ILanguageCacheProvider, ILanguageCacheInvalidator
+  public class FSharpCacheProvider(FcsCheckerService checkerService) : ILanguageCacheProvider, ILanguageCacheInvalidator
   {
-    private readonly FcsCheckerService myCheckerService;
-
-    public FSharpCacheProvider(FcsCheckerService checkerService) =>
-      myCheckerService = checkerService;
-
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
       using var cookie = ProhibitTypeCheckCookie.Create();
@@ -27,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile);
 
-      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
+      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, checkerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);
     }
 
@@ -58,7 +52,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         FSharpPartKind.ObjectExpression => new ObjectExpressionTypePart(reader),
         FSharpPartKind.AbbreviationOrSingleCaseUnion => new TypeAbbreviationOrDeclarationPart(reader),
         FSharpPartKind.StructAbbreviationOrSingleCaseUnion => new StructTypeAbbreviationOrDeclarationPart(reader),
-        FSharpPartKind.HiddenType => new HiddenTypePart(reader),
+        FSharpPartKind.ILAssemblyAbbreviation => new ILAssemblyTypeAbbreviationPart(reader),
+        FSharpPartKind.ModuleAbbreviation => new FSharpModuleAbbreviationPart(reader),
         _ => throw new SerializationError("Unknown tag:" + tag)
       };
 

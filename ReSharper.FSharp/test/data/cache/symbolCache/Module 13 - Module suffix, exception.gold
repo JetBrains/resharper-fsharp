@@ -1,8 +1,8 @@
 ﻿Project Files:Module 13 - Module suffix, exception.fs:
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
-  NestedModulePart:E->Class:Ns.E
-  ExceptionPart:E->Class:Ns.E
+  NestedModulePart:E->Ns.E
+  ExceptionPart:E->Ns.E
 []: Namespace:
  [Ns]: Namespace:Ns
-  [E]: Class:Ns.E[TestProject], Class:Ns.E[TestProject]
+  [E]: FSharpClass:Ns.E[TestProject], FSharpModule:Ns.E[TestProject]

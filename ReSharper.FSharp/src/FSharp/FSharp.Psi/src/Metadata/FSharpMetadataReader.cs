@@ -13,6 +13,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.FSharp.Core;
@@ -284,7 +285,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var typeRepresentationFunc = ReadTypeRepresentation();
       var typeAbbreviation = ReadOption(ReadTypeFunc);
       var typeAugmentation = ReadTypeAugmentation();
-      var xmlDocId = ReadUniqueString(); // Should be empty string.
+      var xmlDocId = ReadUniqueString(); // Should be an empty string.
       var typeKind = ReadTypeKind();
       var flags = (EntityFlags) ReadInt64();
 
@@ -292,9 +293,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var isModuleOrNamespace = (entityFlags & EntityFlags.IsModuleOrNamespace) != 0;
       var reprIsProvidedIlType = flags & EntityFlags.ReservedBit;
 
-      var compilationPath = ReadOption(reader => reader.ReadCompilationPath());
+      var compilationPathWithScopeRef = ReadOption(reader => reader.ReadCompilationPath());
+      var compilationPath = compilationPathWithScopeRef?.Value is var (_, path) ? path : [];
 
-      var entity = FSharpMetadataEntityModule.create(index, logicalName, compiledName, typeParameters.Length, compilationPath);
+      var accessRights = GetAccessRights(accessibility);
+
+      var entity = FSharpMetadataEntityModule.create(index, logicalName, compiledName, typeParameters.Length, compilationPath, accessRights);
       myState.Push(entity);
       Metadata.Entities[index] = entity;
 
@@ -325,6 +329,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       myState.Pop();
 
       return null;
+    }
+
+    private static AccessRights GetAccessRights((bool, Tuple<string, EntityKind>[])[] accessibility)
+    {
+      if (accessibility.Length == 0)
+        return AccessRights.PUBLIC;
+
+      var (_, privateOwnerPath) = accessibility[0];
+      return privateOwnerPath.IsEmpty() ? AccessRights.INTERNAL : AccessRights.PRIVATE;
     }
 
     private FSharpMetadataModuleNameKind GetModuleNameKind(EntityKind entityKind, Range range)
@@ -395,23 +408,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return name;
     }
 
-    private Tuple<string, EntityKind>[] ReadCompilationPath()
+    private (bool, Tuple<string, EntityKind>[]) ReadCompilationPath()
     {
-      ReadIlScopeRef();
-      return ReadArray(reader =>
+      var isInternal = ReadIlScopeRef();
+      var accessPath = ReadArray(reader =>
         reader.ReadTuple2(
           ReadUniqueStringFunc,
           reader => reader.ReadEntityKind()));
+      return (isInternal, accessPath);
     }
 
     private EntityKind ReadEntityKind() =>
       ReadByteAsEnum<EntityKind>();
 
-    private object ReadIlScopeRef()
+    private bool ReadIlScopeRef()
     {
       var tag = ReadByteTagValue(2);
       if (tag == 0)
-        return null;
+        return true;
 
       if (tag == 1)
         ReadIlModuleRef();
@@ -419,7 +433,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       else if (tag == 2)
         ReadIlAssemblyRef();
 
-      return null;
+      return false;
     }
 
     private object ReadIlModuleRef()
@@ -1526,7 +1540,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return path;
     }
 
-    private Tuple<string, EntityKind>[][] ReadAccessibility()
+    private (bool, Tuple<string, EntityKind>[])[] ReadAccessibility()
     {
       return ReadArray(reader => reader.ReadCompilationPath());
     }

@@ -1,0 +1,7 @@
+﻿Project Files:Extension 03.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  ClassPart:T<T1>->M+T`1
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [T]: FSharpClass:M+T`1<[0]:T1>[TestProject]

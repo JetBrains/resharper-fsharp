@@ -1,0 +1,3 @@
+module M
+
+exception Exn

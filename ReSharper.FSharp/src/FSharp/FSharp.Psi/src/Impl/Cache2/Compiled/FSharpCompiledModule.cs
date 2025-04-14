@@ -14,8 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
   public class FSharpCompiledModule : FSharpCompiledClassBase, IFSharpModule
   {
-    public ModuleMembersAccessKind AccessKind { get; }
-
     public string[] LiteralNames { get; }
     public string[] ValueNames { get; }
     public string[] FunctionNames { get; }
@@ -27,8 +25,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
     public override ICollection<ICompiledExtensionMemberProxy> ExtensionMembers =>
       ArrayModule.Append(base.ExtensionMembers.AsArray(), myExtensionMemberInfos);
 
-    public FSharpCompiledModule(FSharpCompiledTypeRepresentation.Module repr,
-      FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+    public FSharpCompiledModule([NotNull] FSharpCompiledTypeRepresentation.Module repr,
+      [NotNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(entity, parent, builder, info)
     {
       AccessKind = GetModuleMembersAccessKind(info);
@@ -124,6 +122,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
           yield return name;
       }
     }
+
+    public override ModuleMembersAccessKind AccessKind { get; }
 
     public bool IsAnonymous =>
       Representation is FSharpCompiledTypeRepresentation.Module module && module.nameKind.IsAnon;

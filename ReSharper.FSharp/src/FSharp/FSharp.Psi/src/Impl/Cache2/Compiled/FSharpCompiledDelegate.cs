@@ -11,18 +11,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
   {
     [NotNull] private FSharpDeclaredName FSharpName { get; }
     public FSharpCompiledTypeRepresentation Representation { get; }
+    public FSharpAccessRights FSharpAccessRights { get; }
 
     public CacheTrieNode AlternativeNameTrieNode { get; set; }
 
-    public FSharpCompiledDelegate(FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+    public FSharpCompiledDelegate([CanBeNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder,
       [NotNull] IMetadataTypeInfo info) : base(parent, builder, info)
     {
       FSharpName = FSharpMetadataEntityModule.getCompiledModuleDeclaredName(entity);
-      Representation = entity.Representation;
+      Representation = FSharpMetadataEntityModule.getRepresentation(entity);
+      FSharpAccessRights = entity.GetFSharpAccessRights();
     }
 
     public string SourceName => FSharpName.SourceName;
     public string AlternativeName => FSharpName.AlternativeName;
+    public ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.Normal; // todo
   }
 }

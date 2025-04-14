@@ -1,6 +1,6 @@
 ﻿## NavigateToBaseProvider activity:
   Immediate result:
-    [*] DEO: Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# as Envoy: Class:Object expr - Type 01+A, PsiLanguageType:F# RANGE: (0,0) @ Object expr - Type 01.fs
+    [*] DEO: Envoy: FSharpClass:Object expr - Type 01+A, PsiLanguageType:F# as Envoy: FSharpClass:Object expr - Type 01+A, PsiLanguageType:F# RANGE: (0,0) @ Object expr - Type 01.fs
     Navigation result:
       opened file: Object expr - Type 01.fs
       ------------------
