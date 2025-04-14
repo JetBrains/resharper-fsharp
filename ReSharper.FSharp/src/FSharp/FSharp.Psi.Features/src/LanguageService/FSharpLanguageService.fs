@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -35,6 +36,8 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     let getSymbolsCache (psiModule: IPsiModule) =
         if isNull psiModule then null else
         psiModule.GetSolution().GetComponent<IFcsResolvedSymbolsCache>()
+
+    override this.CreateSourceExtensionMethodsIndex() = FSharpSourceExtensionsMembersIndex()
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true

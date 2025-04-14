@@ -97,6 +97,7 @@ type TestReferenceProjectOutput(projectName: string) =
 
             let fileName = projectName + ".dll"
             let dllPath = compileResult.OutputDir / fileName
+            Assertion.Assert(dllPath.ExistsFile)
             [dllPath.FullPath]
 
 type FSharpTestAttribute(extension) =

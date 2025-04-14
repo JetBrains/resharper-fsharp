@@ -122,7 +122,12 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
     let exprTypeElements =
         let typeElements = List()
 
-        let exprTypeElement = exprType.GetTypeElement()
+        let exprTypeElement =
+            if exprType :? IArrayType then
+                exprType.Module.GetPredefinedType().Array.GetTypeElement()
+            else
+                exprType.GetTypeElement()
+
         if isNotNull exprTypeElement then
             typeElements.Add(exprTypeElement)
             typeElements.AddRange(exprTypeElement.GetSuperTypeElements())
@@ -218,7 +223,7 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         matchesType typeMember
 
     let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
-    let methods = query.EnumerateMethods()
+    let methods = query.EnumerateMethods() |> List.ofSeq
 
     methods
     |> Seq.filter isApplicable
