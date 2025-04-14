@@ -85,6 +85,7 @@ module FSharpMetadataEntity =
     let getCompiledModuleDeclaredName (entity: FSharpMetadataEntity) =
         let logicalName = entity.LogicalName.SubstringBefore("`")
 
-        match entity.EntityKind with
-        | EntityKind.ModuleWithSuffix -> AlternativeNames(logicalName.SubstringBeforeLast("Module"), logicalName)
+        match entity.EntityKind, entity.CompiledName with
+        | EntityKind.ModuleWithSuffix, _ -> AlternativeNames(logicalName.SubstringBeforeLast("Module"), logicalName)
+        | _, Some compiledName -> AlternativeNames(logicalName, compiledName)
         | _ -> SingleName(logicalName)

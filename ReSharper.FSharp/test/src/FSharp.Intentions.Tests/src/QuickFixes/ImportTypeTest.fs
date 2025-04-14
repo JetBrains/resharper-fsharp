@@ -78,6 +78,31 @@ type ImportExtensionMemberTest() =
     [<Test>] member x.``Extension - CSharp 08``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp 09``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp 10``() = x.DoNamedTestFsCs()
+    
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 01``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 02``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 03``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 04``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 05``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 06``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 07``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 08``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 09``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 10``() = x.DoNamedTest()
+
+    [<Test>] member x.``FSharp - Source 01``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 02``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 03``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 04``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 05``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 06``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 07``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 08``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 09``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 10``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 11``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 12``() = x.DoNamedTest()
+
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
 

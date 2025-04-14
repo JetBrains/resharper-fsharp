@@ -54,7 +54,7 @@ type ImportExtensionMemberRule() =
 
         let members =
             members |> Seq.groupBy (fun typeMember ->
-                let name = typeMember.ShortName.SubstringAfter("get_").SubstringAfter("set_")
+                let name = typeMember.ShortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_")
 
                 let ns =
                     match typeMember.ContainingType with

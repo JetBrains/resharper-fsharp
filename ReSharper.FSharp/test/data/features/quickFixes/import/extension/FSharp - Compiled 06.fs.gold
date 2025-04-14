@@ -1,0 +1,5 @@
+﻿module Top
+
+open FSharpExtensions
+
+[1].Method{caret}()
