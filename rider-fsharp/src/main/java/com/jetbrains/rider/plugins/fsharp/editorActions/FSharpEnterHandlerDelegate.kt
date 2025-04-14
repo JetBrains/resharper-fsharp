@@ -11,7 +11,6 @@ import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import com.intellij.openapi.util.Ref
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
@@ -25,7 +24,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.LINE_COMMENT
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
-import org.intellij.markdown.html.isWhitespace
+import java.lang.Character.isWhitespace
 
 private val logger = Logger.getInstance(FSharpEnterHandlerDelegate::class.java)
 
