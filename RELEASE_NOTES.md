@@ -1,5 +1,35 @@
 # Release notes
 
+## 2025.1
+
+### Code editing and analysis
+* Type hints are implemented for patterns in `match` and other expressions
+* Fix `Nullable` flags were not propagated to F# compiler service correctly
+* File structure: fix tuple patterns weren't accessible in the file structure
+* 'Annotate types' intention: improved handling of tuple types
+* 'Generate overrides': fix `static` members generation
+* 'To lambda' intention: support operators
+* Introduce var: fix unexpected `use` suggestions
+* Recursion analyzer: fix wrong tail-position calculation in `if` expressions
+
+### Code completion:
+* Code completion popup appears faster due to no more waiting for import items calculcation
+* Presentation: fix description popup for import type suggestions, use short names for return types
+* Import: reimplement type import suggestions using R# engine for non-F# assemblies for reduced memory consumption and better performance
+* Import: better checks for already imported modules and faster RequireQualifiedAccess analysis
+* Import: various fixes for extension members
+* Import: fix unexpected import suggestions in bindings and other declarations
+* Local values: fix escaping names, duplicated items
+* Fix missing type suggestions in patterns
+
+### C#/VB.NET in-memory references:
+* Optimize building metadata for referenced projects
+* Fix deadlocks in metadata up-to-date checks
+* Fix possible inconsistent state after changes to C#/VB.NET sources
+* Fix incorrect threading that could lead to exceptions in F# compiler service
+* Fix delayed F# compiler service requests cancellation which could reduce performance
+* Fix incorrect default values metadata for attribute parameters
+
 ## 2024.3
 
 This release adds full support F# 9 and .NET 9. Various features were updated to take the languages changes into account
