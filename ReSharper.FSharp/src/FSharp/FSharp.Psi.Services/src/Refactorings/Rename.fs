@@ -54,8 +54,8 @@ module Util =
             x.Model :?> FSharpCustomRenameModel
 
 
-type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKind: ChangeNameKind) =
-    inherit ClrCustomRenameModel(declaredElement, reference, lifetime)
+type FSharpCustomRenameModel(declaredElement, reference, changeNameKind: ChangeNameKind) =
+    inherit ClrCustomRenameModel(declaredElement, reference)
 
     member x.ChangeNameKind = changeNameKind
 
@@ -120,8 +120,8 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         | _ -> EmptyArray.Instance :> _
 
-    override x.GetOptionsModel(declaredElement, reference, lifetime) =
-        FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
+    override x.GetOptionsModel(declaredElement, reference, _) =
+        FSharpCustomRenameModel(declaredElement, reference, (* todo *) ChangeNameKind.SourceName) :> _
 
     override x.IsValidName(decl: IDeclaration, _: DeclaredElementType, name: string) =
         namingService.IsValidName(decl.DeclaredElement, name)
