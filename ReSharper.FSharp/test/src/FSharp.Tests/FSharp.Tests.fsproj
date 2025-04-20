@@ -14,6 +14,7 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GlobalUsings.fs" />
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="ReadLockCookieUtil.fs" />
     <Compile Include="Service\DelegatingFileSystemShimTest.fs" />
