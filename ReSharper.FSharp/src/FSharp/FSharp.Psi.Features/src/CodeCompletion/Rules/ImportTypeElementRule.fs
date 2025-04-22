@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
+open System.Linq
 open FSharp.Compiler.EditorServices
 open JetBrains.Application
 open JetBrains.ProjectModel
@@ -33,6 +34,7 @@ open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
+open JetBrains.Util
 open JetBrains.Util.Extension
 
 [<RequireQualifiedAccess>]
@@ -188,40 +190,68 @@ type ImportRule() =
                      | :? IFSharpModule as fsModule -> fsModule
                      | _ -> typeElement.GetContainingNamespace()
 
-                 match moduleQualifiedNames.TryGetValue(moduleToOpen) with
-                 | true, qualifiedName -> qualifiedName
-                 | _ ->
-                     match moduleToOpen with
-                     | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
-                     | :? INamespace as ns -> ns.QualifiedName
-                     | _ -> moduleToOpen.ShortName
+                 let mutable qualifiedName = Unchecked.defaultof<_>
+                 if moduleQualifiedNames.TryGetValue(moduleToOpen, &qualifiedName) then
+                     qualifiedName
+                 else
+                     let ns =
+                         match moduleToOpen with
+                         | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
+                         | :? INamespace as ns -> ns.QualifiedName
+                         | _ -> moduleToOpen.ShortName
+                     moduleQualifiedNames[moduleToOpen] <- ns
+                     ns
 
-        ("", symbolScope.GetAllTypeElementsGroupedByName())
-        ||> Seq.fold (fun prevTypeName typeElement ->
-            Interruption.Current.CheckAndThrow();
+        let mutable name = ""
+        let typesWithSameName = List<struct (ITypeElement * string)>()
+        let typesGroupedByNamespace = OneToListMap<string, ITypeElement>()
 
-            if not (isAllowed context typeElement) then prevTypeName else
+        let addItems () =
+            let addItem (struct (typeElement: ITypeElement, ns: string)) =
+                let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
+                let item =
+                    let icon = iconManager.GetImage(typeElement, context.Language, PsiIconRequestOptions.FastProvidersOnly)
+                    let item = ImportRule.createItem info name ns icon
+                    item
+                        .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
+                        .WithRelevance(relevance)
+                collector.Add(item)
+
+            match typesWithSameName.Count with
+            | 0 -> ()
+            | 1 -> addItem typesWithSameName[0]
+            | _ ->
+
+            typesGroupedByNamespace.Clear()
+            for typeElement, ns in typesWithSameName do
+                typesGroupedByNamespace.Add(ns, typeElement)
+
+            for KeyValue(ns, typeElements) in typesGroupedByNamespace do
+                let typeElement = typeElements.FirstOrDefault()
+                if isNotNull typeElement then
+                    addItem struct (typeElement, ns)
+
+            typesWithSameName.Clear()
+
+        for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
+            Interruption.Current.CheckAndThrow()
+
+            if not (isAllowed context typeElement) then () else
 
             // todo: check scope ranges
-            let ns = typeElement |> getNsQualifiedName
-            if scopes.ContainsKey(ns) then prevTypeName else
+            let ns = getNsQualifiedName typeElement
+            if scopes.ContainsKey(ns) then () else
 
-            let name =
+            let currentName =
                 let shortName = getSourceName typeElement
                 if isAttributeReferenceContext then shortName.SubstringBeforeLast("Attribute") else shortName
 
-            if name = prevTypeName then prevTypeName else
+            if currentName <> name then
+                addItems ()
+                name <- currentName
 
-            let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
-            let item =
-                let icon = iconManager.GetImage(typeElement, context.Language, PsiIconRequestOptions.FastProvidersOnly)
-                let item = ImportRule.createItem info name ns icon
-                item
-                    .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
-                    .WithRelevance(relevance)
+            typesWithSameName.Add(struct (typeElement, ns))
 
-            collector.Add(item)
-            name
-        ) |> ignore
+        addItems ()
 
         true
