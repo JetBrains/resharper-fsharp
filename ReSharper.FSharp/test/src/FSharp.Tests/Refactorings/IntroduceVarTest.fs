@@ -24,7 +24,7 @@ type IntroduceVarTest() =
 
         if this.Occurrences.Count = 0 then baseOccurrence else
 
-        match occurrences |> Array.tryFind (fun occurrence -> occurrence.Name.Text = this.Occurrences.Peek()) with
+        match occurrences |> Seq.tryFind (fun occurrence -> occurrence.Name.Text = this.Occurrences.Peek()) with
         | Some occurrence ->
             this.Occurrences.Dequeue() |> ignore
             occurrence

@@ -463,7 +463,7 @@ module FSharpTestPopup =
         let workflowPopupMenu = solution.GetComponent<TestWorkflowPopupMenu>()
         workflowPopupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ ->
             occurrences
-            |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
+            |> Seq.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
             |> Option.defaultWith (fun _ ->
                 if assertExists then
                     failwithf $"Could not find %s{occurrenceName} occurrence"
