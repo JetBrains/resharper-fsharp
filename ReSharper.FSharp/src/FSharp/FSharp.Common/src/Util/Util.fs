@@ -284,22 +284,17 @@ module rec FSharpMsBuildUtils =
 
 [<Extension; AutoOpen>]
 module PsiUtil =
-    let private alternativeNameScopeKey = Key<ISymbolScope>("cachedAlternativeNameScopeKey")
-
-    let private getAlternativeNameSymbolScope (psiModule: IPsiModule) =
-        let symbolCache = psiModule.GetPsiServices().Symbols
-        symbolCache.GetAlternativeNamesSymbolScope(psiModule, true)
-
     let private getModuleSymbolScope withReferences (alternativeNames: bool) (psiModule: IPsiModule) =
-        let symbolCache = psiModule.GetPsiServices().Symbols
         match alternativeNames, withReferences with
         | true, true ->
-            psiModule.GetOrCreateDataUnderLock(alternativeNameScopeKey, psiModule, getAlternativeNameSymbolScope)
+            psiModule.GetCachedAlternativeNameSymbolScopeWithReferences()
         | true, false ->
+            let symbolCache = psiModule.GetPsiServices().Symbols
             symbolCache.GetAlternativeNamesSymbolScope(psiModule, false)
         | false, true ->
             psiModule.GetCachedCaseSensitiveSymbolScopeWithReferences()
         | false, false ->
+            let symbolCache = psiModule.GetPsiServices().Symbols
             symbolCache.GetSymbolScope(psiModule, false, true)
 
     [<Extension; CompiledName("GetSymbolScope")>]
