@@ -11,24 +11,21 @@ import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionCont
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider
 import com.jetbrains.rider.completion.patchEngine.isPreemptiveCompletionEnabled
 import com.jetbrains.rider.editors.startOffset
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
 
 class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContributor() {
 
-  override fun isAvailable(file: PsiFile, offset: Int): Boolean = file is FSharpFile && insideReferenceDirective(file, offset)
+  override fun isAvailable(file: PsiFile, offset: Int): Boolean = insideReferenceDirective(file, offset)
 
   override fun beforeCompletion(context: CompletionInitializationContext) {
     if (!isPatchEngineEnabled || !isPreemptiveCompletionEnabled)
       return
 
-    val psiElement = context.file.findElementAt(context.startOffset)?.parent ?: return
-    if (psiElement !is FSharpStringLiteralExpression) return
+    val psiElement = getStringInsideReferenceDirective(context.file, context.startOffset) ?: return
 
     val stringRange = ElementManipulators.getValueTextRange(psiElement)
     val stringContentRange = psiElement.startOffset + stringRange.startOffset
 
-    context.offsetMap.addOffset(CompletionInitializationContext.START_OFFSET, context.editor.startOffset - stringContentRange)
+    val startOffset = context.editor.startOffset - stringContentRange
     context.replacementOffset = psiElement.startOffset + stringRange.endOffset
 
     val stringText = ElementManipulators.getValueText(psiElement)
@@ -39,8 +36,8 @@ class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContribu
     val version = match.groups[GROUP_VERSION]
     val versionZone = match.groups[GROUP_VERSION_ZONE]
 
-    prepareCustomParams(stringText, context.startOffset, KEY_NAME, `package`, packageZone, context.editor)
-    || prepareCustomParams(stringText, context.startOffset, "$KEY_VERSION|${`package`.value}", version!!, versionZone!!, context.editor)
+    prepareCustomParams(stringText, startOffset, KEY_NAME, `package`, packageZone, context.editor)
+    || prepareCustomParams(stringText, startOffset, "$KEY_VERSION|${`package`.value}", version!!, versionZone!!, context.editor)
   }
 
   private fun prepareCustomParams(
