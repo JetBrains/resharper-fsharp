@@ -13,20 +13,7 @@ namespace global
 
 [<assembly: System.Reflection.AssemblyMetadataAttribute("Root", "Plugins/resharper-fsharp/ReSharper.FSharp/test/src/FSharp.Intentions.Tests")>]
 do ()
-#if INDEPENDENT_BUILD
-namespace NUnit.Framework
-
-type TestAttribute = NUnit.Framework.TestAttribute
-type TestCaseAttribute = NUnit.Framework.TestCaseAttribute
-type TestCaseSourceAttribute = NUnit.Framework.TestCaseSourceAttribute
-type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
-type TestFixtureSourceAttribute = NUnit.Framework.TestFixtureSourceAttribute
-type SetUpFixtureAttribute = NUnit.Framework.SetUpFixtureAttribute
-type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
-type CategoryAttribute = NUnit.Framework.CategoryAttribute
-type IgnoreAttribute = NUnit.Framework.IgnoreAttribute
-do()
-#else
+#if NUNIT_ATTRIBUTE_WRAPPERS
 namespace NUnit.Framework
 
 type TestAttribute = JetBrains.TestFramework.TestAttribute
@@ -38,5 +25,18 @@ type SetUpFixtureAttribute = JetBrains.TestFramework.SetUpFixtureAttribute
 type ExplicitAttribute = JetBrains.TestFramework.ExplicitAttribute
 type CategoryAttribute = JetBrains.TestFramework.CategoryAttribute
 type IgnoreAttribute = JetBrains.TestFramework.IgnoreAttribute
+do()
+#else
+namespace NUnit.Framework
+
+type TestAttribute = NUnit.Framework.TestAttribute
+type TestCaseAttribute = NUnit.Framework.TestCaseAttribute
+type TestCaseSourceAttribute = NUnit.Framework.TestCaseSourceAttribute
+type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
+type TestFixtureSourceAttribute = NUnit.Framework.TestFixtureSourceAttribute
+type SetUpFixtureAttribute = NUnit.Framework.SetUpFixtureAttribute
+type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
+type CategoryAttribute = NUnit.Framework.CategoryAttribute
+type IgnoreAttribute = NUnit.Framework.IgnoreAttribute
 do()
 #endif
