@@ -15,7 +15,6 @@ namespace global
 do ()
 #if NUNIT_ATTRIBUTE_WRAPPERS
 namespace NUnit.Framework
-
 type TestAttribute = JetBrains.TestFramework.TestAttribute
 type TestCaseAttribute = JetBrains.TestFramework.TestCaseAttribute
 type TestCaseSourceAttribute = JetBrains.TestFramework.TestCaseSourceAttribute
@@ -28,7 +27,6 @@ type IgnoreAttribute = JetBrains.TestFramework.IgnoreAttribute
 do()
 #else
 namespace NUnit.Framework
-
 type TestAttribute = NUnit.Framework.TestAttribute
 type TestCaseAttribute = NUnit.Framework.TestCaseAttribute
 type TestCaseSourceAttribute = NUnit.Framework.TestCaseSourceAttribute
