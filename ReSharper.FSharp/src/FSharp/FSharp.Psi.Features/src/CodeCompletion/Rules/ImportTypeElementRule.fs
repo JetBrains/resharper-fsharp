@@ -221,15 +221,14 @@ type ImportRule() =
             | 0 -> ()
             | 1 -> addItem typesWithSameName[0]
             | _ ->
+                typesGroupedByNamespace.Clear()
+                for typeElement, ns in typesWithSameName do
+                    typesGroupedByNamespace.Add(ns, typeElement)
 
-            typesGroupedByNamespace.Clear()
-            for typeElement, ns in typesWithSameName do
-                typesGroupedByNamespace.Add(ns, typeElement)
-
-            for KeyValue(ns, typeElements) in typesGroupedByNamespace do
-                let typeElement = typeElements.FirstOrDefault()
-                if isNotNull typeElement then
-                    addItem struct (typeElement, ns)
+                for KeyValue(ns, typeElements) in typesGroupedByNamespace do
+                    let typeElement = typeElements.FirstOrDefault()
+                    if isNotNull typeElement then
+                        addItem struct (typeElement, ns)
 
             typesWithSameName.Clear()
 
