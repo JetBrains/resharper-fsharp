@@ -1,6 +1,4 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -34,22 +32,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.Class;
 
-    [CanBeNull] internal IClrTypeName BaseTypeClrTypeName;
+    [CanBeNull] internal FcsTypeMappingUtil.FcsTypeClrName BaseTypeClrTypeName;
 
     public virtual IClass GetSuperClass()
     {
       if (BaseTypeClrTypeName != null)
-        return BaseTypeClrTypeName.CreateTypeByClrName(GetPsiModule()).GetTypeElement() as IClass;
+        return BaseTypeClrTypeName.GetTypeElement() as IClass;
 
-      var typeElement = GetBaseClassType()?.GetTypeElement();
-      if (typeElement == null)
-      {
-        BaseTypeClrTypeName = EmptyClrTypeName.Instance;
-        return null;
-      }
+      var typeElement = GetBaseClassType()?.GetTypeElement() as IClass;
+      if (typeElement != null)
+        BaseTypeClrTypeName = new FcsTypeMappingUtil.FcsTypeClrName(typeElement, GetPsiModule());;
 
-      BaseTypeClrTypeName = typeElement.GetClrName().GetPersistent();
-      return typeElement as IClass;
+      return typeElement;
     }
   }
 }

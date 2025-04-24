@@ -611,19 +611,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       LowLevelModificationUtil.AddChildBefore(anchor, new Whitespace());
     }
 
-    public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
-    {
-      var result = new List<ITypeElement>(names.Count);
-      foreach (var clrTypeName in names)
-      {
-        var typeElement = clrTypeName?.CreateTypeByClrName(psiModule).GetTypeElement();
-        if (typeElement != null)
-          result.Add(typeElement);
-      }
-
-      return result;
-    }
-
     [CanBeNull]
     public static IDeclaredElement GetModuleToUpdateName([NotNull] this IFSharpSourceTypeElement fsTypeElement,
       [CanBeNull] string newName)
