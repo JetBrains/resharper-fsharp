@@ -15,6 +15,8 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Impl.Types;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -150,8 +152,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           ? MapType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
 
+      // todo: prevent getting clr name
       var clrName = entity.GetClrName();
-
       if (clrName == null)
       {
         // bug Microsoft/visualfsharp#3532
@@ -165,15 +167,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           ProvidedTypesResolveUtil.TryGetProvidedType(psiModule, clrName, out var providedType))
         return MapType(providedType, psiModule);
 
-      var declaredType = clrName.CreateTypeByClrName(psiModule);
-      var genericArgs = type.GenericArguments;
-      if (genericArgs.IsEmpty())
-        return declaredType;
+      var typeElement = entity.GetTypeElement(psiModule);
+      if (typeElement == null)
+        return TypeFactory.CreateUnknownType(psiModule);
 
-      var typeElement = declaredType.GetTypeElement();
-      return typeElement != null
-        ? GetTypeWithSubstitution(typeElement, genericArgs, typeParams, psiModule, isFromMethod)
-        : TypeFactory.CreateUnknownType(psiModule);
+      var genericArgs = type.GenericArguments;
+      return genericArgs.IsEmpty()
+        ? TypeFactory.CreateType(typeElement)
+        : GetTypeWithSubstitution(typeElement, genericArgs, typeParams, psiModule, isFromMethod);
     }
 
     [NotNull]
@@ -357,10 +358,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       if (!treeNode.TryGetFcsRange(documentRange, out var range)) return null;
 
-      if (treeNode.GetCheckResults(nameof(TryGetFcsType)) is var checkResults)
-        return checkResults?.GetTypeOfExpression(range)?.Value;
-
-      return null;
+      var checkResults = treeNode.GetCheckResults(nameof(TryGetFcsType));
+      return checkResults?.GetTypeOfExpression(range)?.Value;
     }
 
     [CanBeNull]
@@ -396,5 +395,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IDeclaredType CreateTypeByClrName([NotNull] this IClrTypeName clrTypeName,
       [NotNull] IPsiModule psiModule) =>
       TypeFactory.CreateTypeByCLRName(clrTypeName, psiModule, true);
+
+    public class FcsTypeClrName : DeclaredTypeFromCLRName
+    {
+      private readonly string myModuleName;
+
+      protected internal FcsTypeClrName([NotNull] IClrTypeName clrName, string moduleName, [NotNull] IPsiModule module)
+        : base(clrName, module)
+      {
+        myModuleName = moduleName;
+      }
+
+      // todo: remove this type, implement resolve
+      internal FcsTypeClrName(ITypeElement typeElement, IPsiModule psiModule)
+        : this(typeElement.GetClrName().GetPersistent(), typeElement.Module.Name, psiModule)
+      {
+      }
+
+      protected override ISymbolScope GetSymbolScope(IModuleReferenceResolveContext resolveContext) =>
+        Module.GetCachedCaseSensitiveSymbolScopeWithReferences();
+
+      protected override ITypeElement ChooseBestCandidate(ICollection<ITypeElement> candidates)
+      {
+        var typeElements = candidates.Where(typeElement => typeElement.Module.Name == myModuleName).ToList();
+        return typeElements.Count == 1
+          ? typeElements[0]
+          : base.ChooseBestCandidate(typeElements);
+      }
+    }
   }
 }
