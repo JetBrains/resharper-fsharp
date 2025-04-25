@@ -1,4 +1,4 @@
-﻿# 330 ITEMS #
+﻿# 331 ITEMS #
 
 + F2    int
 + F3    int
@@ -121,6 +121,7 @@ FileStream (in System.IO)
 FileStreamOptions (in System.IO)
 FileStyleUriParser (in System)
 FileSystem (in Microsoft.VisualBasic)
+FileSystem (in Microsoft.VisualBasic.FileIO)
 FileSystemAccessRule (in System.Security.AccessControl)
 FileSystemAclExtensions (in System.IO)
 FileSystemAuditRule (in System.Security.AccessControl)
