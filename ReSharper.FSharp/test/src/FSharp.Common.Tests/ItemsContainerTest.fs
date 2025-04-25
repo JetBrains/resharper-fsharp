@@ -25,6 +25,9 @@ open JetBrains.Util.Logging
 open Moq
 
 type Assert = NUnit.Framework.Assert
+type TestAttribute = NUnit.Framework.TestAttribute
+type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
+type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
 
 let projectDirectory = VirtualFileSystemPath.Parse(@"C:\Solution\Project", InteractionContext.SolutionContext)
 let solutionMark = SolutionMarkFactory(EmptyImmutableEnumerableObject<ISolutionConfigurationDefaults>.Instance).Create(projectDirectory.Combine("Solution.sln"))
