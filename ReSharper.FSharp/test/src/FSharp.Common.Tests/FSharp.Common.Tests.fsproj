@@ -14,7 +14,6 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GlobalUsings.fs" />
     <Compile Include="ItemsContainerTest.fs" />
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="SciptPsiModulesTest.fs" />
