@@ -20,6 +20,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Feature.Services.Util
+open JetBrains.Util
 
 module SpecifyTypes =
     type Availability = {
@@ -214,28 +215,54 @@ module SpecifyTypes =
 
         | _ -> ()
 
+module SpecifyTypesAction =
+    open SpecifyTypes
+    let executePsiTransaction (node: ITreeNode) (availability: Availability) =
+        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+        specifyTypes node availability
 
-[<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
-                Description = "Annotate function with parameter types and return type")>]
-type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+
+[<AbstractClass>]
+type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    override x.Text = "Add type annotations"
+    abstract member IsAvailable: 'a -> bool
+    member x.ContextNode = dataProvider.GetSelectedElement<'a>()
 
-    override x.IsAvailable _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
-        if isNull binding then false else
-        if not (isAtBindingKeywordOrReferencePattern dataProvider binding) then false else
-        SpecifyTypes.getAvailability binding |> _.IsAvailable
+    override x.IsAvailable(_: IUserDataHolder) =
+        let node = x.ContextNode
+
+        isNotNull node && isValid (node :> ITreeNode) &&
+        x.IsAvailable(node) &&
+        SpecifyTypes.getAvailability node |> _.IsAvailable
 
     override x.ExecutePsiTransaction _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
+        let node = x.ContextNode
+        let availability = SpecifyTypes.getAvailability node
+        SpecifyTypesAction.executePsiTransaction node availability
 
-        use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+[<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
+                Description = "Annotate binding or member with parameter types and return type")>]
+type MfvAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit AnnotationActionBase<IParameterOwnerMemberDeclaration>(dataProvider)
 
-        let availability = SpecifyTypes.getAvailability binding
-        SpecifyTypes.specifyTypes binding availability
+    override this.IsAvailable(node: IParameterOwnerMemberDeclaration) =
+        isAtParametersOwnerKeywordOrIdentifier dataProvider node
+
+    override this.Text =
+        if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
+        else "Add type annotation"
+
+[<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
+                Description = "Annotate named pattern type")>]
+type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit AnnotationActionBase<IReferencePat>(dataProvider)
+
+    override x.IsAvailable(node: IReferencePat) =
+        isNull (BindingNavigator.GetByHeadPattern(node.IgnoreParentParens()))
+
+    override this.Text = "Add type annotation"
 
 
 type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Availability) =
@@ -244,9 +271,7 @@ type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Avail
     override this.Text = "Add type annotation"
 
     override this.ExecutePsiTransaction(_, _) =
-        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        SpecifyTypes.specifyTypes node availability
+        SpecifyTypesAction.executePsiTransaction node availability
         null
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]

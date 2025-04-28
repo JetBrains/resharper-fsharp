@@ -1,0 +1,4 @@
+﻿module Module
+
+type A() =
+    member this.P: int{caret} = 1

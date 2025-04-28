@@ -1,5 +1,15 @@
 module Module
 
 type NumberPrinter(num) =
-    // Class members aren't supported yet
-    member x.print{off}() = sprintf{off} "%d" num
+
+    member{on} x{off}.print{on}() = sprintf{off} "%d" num
+    member{off} _.print1{off}(): unit = ()
+    member{on} _.print2{on}(x): int = x + 1
+    member{off} _.print3{off}(x: int): int = x + 1
+
+    member x.P1{on} = 1
+    member x.P2{off}: int = 1
+
+    member x.P3{off}
+        with get{off}() = num
+        and set{off}(y: int) = ()

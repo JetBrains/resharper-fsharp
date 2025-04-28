@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.DataProviders
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -55,22 +56,25 @@ let isAtIfExprKeyword (dataProvider: IContextActionDataProvider) (ifExpr: IIfThe
 let isAtTreeNode (dataProvider: IContextActionDataProvider) (node: ITreeNode) =
     isNotNull node && DisjointedTreeTextRange.From(node).Contains(dataProvider.SelectedTreeRange)
 
-let isAtBindingKeywordOrReferencePattern (dataProvider: IContextActionDataProvider) (binding: IBinding) =
-    if isNull binding then false else
+let isAtParametersOwnerKeywordOrIdentifier (dataProvider: IContextActionDataProvider) (owner: IParameterOwnerMemberDeclaration) =
+    if isNull owner then false else
 
-    let bindingBindingKeyword = binding.BindingKeyword
-    if isNull bindingBindingKeyword then false else
+    let keyword, identifier =
+        match owner with
+        | :? IBinding as binding ->
+            let keyword = binding.BindingKeyword
+            let identifier =
+                binding.HeadPattern.IgnoreInnerParens().As<IReferencePat>() ?> _.Identifier
+            keyword, identifier
 
-    let ranges = DisjointedTreeTextRange.From(bindingBindingKeyword)
+        | :? IMemberDeclaration as memberDeclaration ->
+            memberDeclaration.MemberKeyword, memberDeclaration.Identifier.As<IFSharpIdentifier>()
+        | _ ->
+            null, null
 
-    match binding.HeadPattern.As<IReferencePat>() with
-    | null -> false
-    | parametersOwnerPat ->
+    if isNull keyword || isNull identifier then false else
 
-    match parametersOwnerPat.Identifier with
-    | null -> false
-    | identifier ->
-
+    let ranges = DisjointedTreeTextRange.From(keyword)
     ranges.Then(identifier) |> ignore
     ranges.Contains(dataProvider.SelectedTreeRange)
 
