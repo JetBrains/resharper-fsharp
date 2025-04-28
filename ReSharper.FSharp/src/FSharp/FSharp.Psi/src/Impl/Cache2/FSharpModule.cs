@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -63,30 +62,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     string IAlternativeNameOwner.AlternativeName => SourceName != ShortName ? SourceName : null;
 
     public override string ToString() => this.TestToString(BuildTypeParameterString());
-  }
-
-  internal static class FSharpModuleUtil
-  {
-    public static string GetQualifiedName(this IFSharpModule fsModule)
-    {
-      var builder = new StringBuilder(fsModule.SourceName);
-
-      var containingType = fsModule.GetContainingType();
-      while (containingType != null)
-      {
-        builder.Prepend(".");
-        builder.Prepend(containingType.GetSourceName());
-        containingType = containingType.GetContainingType();
-      }
-
-      var ns = fsModule.GetContainingNamespace();
-      if (!ns.IsRootNamespace)
-      {
-        builder.Prepend(".");
-        builder.Prepend(ns.QualifiedName);  
-      }
-
-      return builder.ToString();
-    }
   }
 }

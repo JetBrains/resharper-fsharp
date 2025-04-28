@@ -160,6 +160,9 @@ public static class FSharpAccessRightUtil
       if (accessRights == AccessRights.PRIVATE && !IsTheSameOwner(fsTypeElement, context))
         return false;
 
+      if (accessRights == AccessRights.INTERNAL && !typeElement.IsInternalsVisibleToApplies(context.GetPsiModule()))
+        return false;
+
       if (fsTypeElement is IFSharpSourceTypeElement fsSourceTypeElement)
       {
         var typeModule = fsSourceTypeElement.Module;

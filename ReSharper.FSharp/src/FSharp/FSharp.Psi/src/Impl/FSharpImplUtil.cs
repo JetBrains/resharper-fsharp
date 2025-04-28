@@ -834,6 +834,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
+    public static string GetQualifiedName(this IClrDeclaredElement typeOrNs)
+    {
+      if (typeOrNs is INamespace ns)
+        return ns.QualifiedName;
+
+      if (typeOrNs is not ITypeElement typeElement)
+        throw new InvalidOperationException($"Unexpected {typeOrNs.GetType()} element");
+
+      var builder = new StringBuilder(typeElement.GetSourceName());
+
+      var containingType = typeOrNs.GetContainingType();
+      while (containingType != null)
+      {
+        builder.Prepend(".");
+        builder.Prepend(containingType.GetSourceName());
+        containingType = containingType.GetContainingType();
+      }
+
+      var containingNs = typeElement.GetContainingNamespace();
+      if (!containingNs.IsRootNamespace)
+      {
+        builder.Prepend(".");
+        builder.Prepend(containingNs.QualifiedName);  
+      }
+
+      return builder.ToString();
+    }
+
+    [NotNull]
     public static string GetQualifiedName([CanBeNull] IReferenceName qualifier,
       [CanBeNull] IFSharpIdentifier identifier)
     {

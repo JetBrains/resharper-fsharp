@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Syntax;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -128,10 +129,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
     public bool IsAnonymous =>
       Representation is FSharpCompiledTypeRepresentation.Module module && module.nameKind.IsAnon;
 
+    public bool HasModuleSuffix =>
+      Representation is FSharpCompiledTypeRepresentation.Module module && module.nameKind.IsHasModuleSuffix;
+
     public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
     public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
-    public ITypeElement AssociatedTypeElement => null; // todo
+    public ITypeElement AssociatedTypeElement => TryGetAssociatedTypeElement(); // todo: cache
     public string QualifiedSourceName => this.GetQualifiedName();
 
     private static ModuleMembersAccessKind GetModuleMembersAccessKind(IMetadataTypeInfo info)
@@ -143,6 +147,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
         return ModuleMembersAccessKind.RequiresQualifiedAccess;
 
       return ModuleMembersAccessKind.Normal;
+    }
+
+    private ITypeElement TryGetAssociatedTypeElement()
+    {
+      if (!HasModuleSuffix)
+        return null;
+
+      var sourceName = SourceName;
+
+      var symbolScope = Module.GetModuleOnlySymbolScope(true);
+      if (GetContainingType() is { } containingType)
+        return containingType.NestedTypes.FirstOrDefault(HasSameName);
+
+      var containingNamespace = GetContainingNamespace();
+      return containingNamespace.GetNestedTypeElements(symbolScope).FirstOrDefault(HasSameName);
+
+      bool HasSameName(ITypeElement typeElement) =>
+        !Equals(typeElement) && typeElement.TypeParametersCount == 0 && typeElement.GetSourceName() == sourceName;
     }
   }
 }

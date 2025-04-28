@@ -4,6 +4,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -16,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -372,6 +374,8 @@ let getClrName (element: IClrDeclaredElement) =
 [<RequireQualifiedAccess>]
 type OpenScope =
     | Global
+    | OwnNamespace
+    | AssemblyAutoOpen of IPsiModule
     | Range of range: TreeTextRange
 
 [<RequireQualifiedAccess>]
@@ -395,7 +399,8 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
 
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
-    // todo: use scope with references?
+    let psiServices = psiModule.GetPsiServices()
+
     let symbolScope = getSymbolScope psiModule false
 
     let importQualifiedName scope (qualifiedName: string) =
@@ -426,6 +431,17 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
 
     do
         importElement OpenScope.Global symbolScope.GlobalNamespace
+
+        for referencedModule in getReferencedModules psiModule do
+            let autoOpenedModuleNames = autoOpenCache.GetAutoOpenedModules(referencedModule)
+            if autoOpenedModuleNames.IsEmpty() then () else
+
+            let symbolScope = getModuleOnlySymbolScope psiModule false
+            for autoOpenedModuleName in autoOpenCache.GetAutoOpenedModules(referencedModule) do
+                for autoOpenedModule in symbolScope.GetElementsByQualifiedName(autoOpenedModuleName) do
+                    let scope = OpenScope.AssemblyAutoOpen(referencedModule)
+                    importElement scope autoOpenedModule
+
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelDecl then

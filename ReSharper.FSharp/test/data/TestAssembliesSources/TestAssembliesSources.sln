@@ -11,6 +11,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImplicitModule", "ImplicitM
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpExtensions", "FSharpExtensions\FSharpExtensions.fsproj", "{0283F9F7-2F20-4516-839A-E104A6092A38}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpClassLib", "FSharpClassLib\FSharpClassLib.fsproj", "{E1848B22-15CE-48E5-9993-DF9DB033F45C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -27,5 +29,7 @@ Global
 		{39878E4E-83AE-4FAB-A775-2F0DA9E5B82A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0283F9F7-2F20-4516-839A-E104A6092A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0283F9F7-2F20-4516-839A-E104A6092A38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1848B22-15CE-48E5-9993-DF9DB033F45C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1848B22-15CE-48E5-9993-DF9DB033F45C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open System
 open System.Collections.Generic
 open System.Linq
 open FSharp.Compiler.EditorServices
@@ -19,6 +20,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
@@ -27,7 +29,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Transactions
@@ -105,7 +106,7 @@ type ImportDeclaredElementBehavior(info: ImportDeclaredElementInfo) =
             FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference declaredElement ImportInfo.Id
 
 
-module ImportRule =
+module FSharpImportTypeElementRule =
     let createItem info (name: string) ns icon =
         LookupItemFactory.CreateLookupItem(info)
             .WithPresentation(fun _ ->
@@ -117,7 +118,7 @@ module ImportRule =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type ImportRule() =
+type FSharpImportTypeElementRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let relevance = CLRLookupItemRelevance.TypesAndNamespaces ||| CLRLookupItemRelevance.NotImportedType
@@ -125,17 +126,21 @@ type ImportRule() =
     let isNestedType (typeElement: ITypeElement) =
          match typeElement.GetContainingType() with
          | null -> false
-         | :? IFSharpModule -> false
+         | :? IFSharpModule as fsModule -> fsModule.RequiresQualifiedAccess
          | _ -> true
+
+    let isAssociatedModule (typeElement: ITypeElement) =
+        match typeElement with
+        | :? IFSharpModule as fsModule -> isNotNull fsModule.AssociatedTypeElement
+        | _ -> false
 
     let isAllowed (context: FSharpCodeCompletionContext) (typeElement: ITypeElement) =
         context.PsiModule != typeElement.Module &&
 
-        not (isFSharpAssembly typeElement.Module) &&
         not (isNestedType typeElement) &&
+        not (isAssociatedModule typeElement) &&
 
-        let accessRightsOwner = typeElement.As<IAccessRightsOwner>()
-        isNotNull accessRightsOwner && accessRightsOwner.GetAccessRights() = AccessRights.PUBLIC
+        FSharpAccessRightUtil.IsAccessible(typeElement, context.NodeInFile)
 
     let getSourceName (typeElement: ITypeElement) =
          match typeElement with
@@ -166,8 +171,8 @@ type ImportRule() =
         if FSharpCodeCompletionContext.isFullEvaluationDisabled context.BasicContext then false else
 
         let element = reference.GetElement()
-        let psiServices = element.GetPsiServices()
-        let solution = psiServices.Solution
+        let language = context.Language
+        let solution = element.GetPsiServices().Solution
         let iconManager = solution.GetComponent<PsiIconManager>()
         let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
@@ -182,25 +187,17 @@ type ImportRule() =
 
         let symbolScope = getSymbolScope context.PsiModule true
         
-        let getNsQualifiedName =
-             let moduleQualifiedNames = Dictionary()
-             fun (typeElement: ITypeElement) ->
-                 let moduleToOpen: IClrDeclaredElement =
-                     match typeElement.GetContainingType() with
-                     | :? IFSharpModule as fsModule -> fsModule
-                     | _ -> typeElement.GetContainingNamespace()
+        let getContainingElementQualifiedName =
+             let moduleQualifiedNames = Dictionary<IClrDeclaredElement, string>()
+             let getQualifiedName = Func<_,_>(FSharpImplUtil.GetQualifiedName)
 
-                 let mutable qualifiedName = Unchecked.defaultof<_>
-                 if moduleQualifiedNames.TryGetValue(moduleToOpen, &qualifiedName) then
-                     qualifiedName
-                 else
-                     let ns =
-                         match moduleToOpen with
-                         | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
-                         | :? INamespace as ns -> ns.QualifiedName
-                         | _ -> moduleToOpen.ShortName
-                     moduleQualifiedNames[moduleToOpen] <- ns
-                     ns
+             fun (typeElement: ITypeElement) ->
+                 let containingElement: IClrDeclaredElement =
+                     match typeElement.GetContainingType() with
+                     | null -> typeElement.GetContainingNamespace()
+                     | containingType -> containingType
+
+                 moduleQualifiedNames.GetOrCreateValue(containingElement, getQualifiedName)
 
         let mutable name = ""
         let typesWithSameName = List<struct (ITypeElement * string)>()
@@ -210,8 +207,8 @@ type ImportRule() =
             let addItem (struct (typeElement: ITypeElement, ns: string)) =
                 let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
                 let item =
-                    let icon = iconManager.GetImage(typeElement, context.Language, PsiIconRequestOptions.FastProvidersOnly)
-                    let item = ImportRule.createItem info name ns icon
+                    let icon = iconManager.GetImage(typeElement, language, PsiIconRequestOptions.FastProvidersOnly)
+                    let item = FSharpImportTypeElementRule.createItem info name ns icon
                     item
                         .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
                         .WithRelevance(relevance)
@@ -238,7 +235,7 @@ type ImportRule() =
             if not (isAllowed context typeElement) then () else
 
             // todo: check scope ranges
-            let ns = getNsQualifiedName typeElement
+            let ns = getContainingElementQualifiedName typeElement
             if scopes.ContainsKey(ns) then () else
 
             let currentName =

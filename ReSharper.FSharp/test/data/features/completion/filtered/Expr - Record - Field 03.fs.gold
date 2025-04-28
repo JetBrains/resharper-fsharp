@@ -1,4 +1,4 @@
-﻿# 331 ITEMS #
+﻿# 337 ITEMS #
 
 + F2    int
 + F3    int
@@ -92,6 +92,10 @@ EventTypeFilter (in System.Diagnostics)
 ExcludeFromCodeCoverageAttribute (in System.Diagnostics.CodeAnalysis)
 FILETIME (in System.Runtime.InteropServices.ComTypes)
 FORMATETC (in System.Runtime.InteropServices.ComTypes)
+FSharpFunc (in Microsoft.FSharp.Core.OptimizedClosures)
+FSharpReflectionExtensions (in Microsoft.FSharp.Reflection)
+FSharpType (in Microsoft.FSharp.Reflection)
+FSharpValue (in Microsoft.FSharp.Reflection)
 FUNCDESC (in System.Runtime.InteropServices.ComTypes)
 FUNCFLAGS (in System.Runtime.InteropServices.ComTypes)
 FUNCKIND (in System.Runtime.InteropServices.ComTypes)
@@ -206,6 +210,7 @@ ImageFileMachine (in System.Reflection)
 ImageFormatLimitationException (in System.Reflection.Metadata)
 ImportedFromTypeLibAttribute (in System.Runtime.InteropServices)
 InheritanceFlags (in System.Security.AccessControl)
+IntrinsicFunctions (in Microsoft.FSharp.Core.LanguagePrimitives)
 InvalidFilterCriteriaException (in System.Reflection)
 IsolatedStorageFile (in System.IO.IsolatedStorage)
 IsolatedStorageFileStream (in System.IO.IsolatedStorage)
@@ -246,6 +251,7 @@ RectangleF (in System.Drawing)
 RegexRunnerFactory (in System.Text.RegularExpressions)
 RequiresAssemblyFilesAttribute (in System.Diagnostics.CodeAnalysis)
 RequiresPreviewFeaturesAttribute (in System.Runtime.Versioning)
+ResumptionFunc (in Microsoft.FSharp.Core.CompilerServices)
 RuntimeFeature (in System.Runtime.CompilerServices)
 RuntimeFieldHandle (in System)
 SafeFileHandle (in Microsoft.Win32.SafeHandles)
