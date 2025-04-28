@@ -196,7 +196,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
             lock (this)
               myCompiledModuleToNestedAutoOpenModules.Add(moduleName, typeInfo.FullyQualifiedName);
 
-          modulesNames.Add(typeInfo.TypeName);
+          modulesNames.Add(typeInfo.FullyQualifiedName);
         }
 
       return modulesNames;

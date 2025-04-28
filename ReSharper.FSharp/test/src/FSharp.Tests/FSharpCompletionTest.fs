@@ -230,6 +230,17 @@ type FSharpCompletionTest() =
     [<Test; Explicit("243")>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
 
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 01``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 02``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 03``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 04``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 05``() = x.DoNamedTest()
+
     [<Test>] member x.``XmlDoc - tags``() = x.DoNamedTest()
 
     [<Test>] member x.``Interpolated string 01``() = x.DoNamedTest()

@@ -157,7 +157,7 @@ type ImportModuleMemberRule() =
                 if values.ContainsKey(name) then () else
 
                 let info = ImportModuleMemberInfo(typeElement, name, context, Ranges = context.Ranges)
-                let item = ImportRule.createItem info name ns icon
+                let item = FSharpImportTypeElementRule.createItem info name ns icon
                 let item =
                     item
                         .WithBehavior(fun _ -> ImportModuleMemberBehavior(info))
