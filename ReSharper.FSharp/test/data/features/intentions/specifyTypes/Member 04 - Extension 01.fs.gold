@@ -1,0 +1,6 @@
+﻿module Module
+
+type IEnumerableExtensions =
+    [<Extension>]
+    static member M{caret}(xs: IEnumerable<string>, a: string * 'a): bool =
+        Seq.contains (a ||> String.concat) xs 

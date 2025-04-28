@@ -64,6 +64,9 @@ type SpecifyTypesActionTest() =
 
     [<Test>] member x.``Member 01 - Method`` () = x.DoNamedTest()
     [<Test>] member x.``Member 02 - Property`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 03 - Method - Param groups`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 04 - Extension 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 05 - Extension 02`` () = x.DoNamedTest()
 
 // Most tests are in TypeHintContextActionsTests
 [<AssertCorrectTreeStructure>]
