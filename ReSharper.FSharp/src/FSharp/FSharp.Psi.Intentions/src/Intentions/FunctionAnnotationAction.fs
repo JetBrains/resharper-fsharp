@@ -141,6 +141,15 @@ module SpecifyTypes =
             | :? IAttribPat as attribPat -> attribPat.Pattern
             | _ -> pattern
 
+        let pattern, fcsType =
+            match pattern with
+            | :? IOptionalValPat -> pattern, fcsType.GenericArguments[0]
+            | _ ->
+
+            let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
+            if isNull optionalValPat then pattern, fcsType
+            else (optionalValPat : IFSharpPattern), fcsType.GenericArguments[0]
+
         let newPattern =
             match pattern.IgnoreInnerParens() with
             | :? ITuplePat as tuplePat -> addParens factory tuplePat
@@ -178,7 +187,7 @@ module SpecifyTypes =
         if mfv.IsMember then
             let selectMany x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
             let types = mfv.CurriedParameterGroups
-            specifyParameterTypes types _.Item(0).Type selectMany parameters true
+            specifyParameterTypes types (_.Item(0).Type) selectMany parameters true
         else
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id _.GenericArguments parameters true

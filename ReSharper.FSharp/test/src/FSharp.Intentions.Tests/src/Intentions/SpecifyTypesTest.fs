@@ -67,6 +67,8 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Member 03 - Method - Param groups`` () = x.DoNamedTest()
     [<Test>] member x.``Member 04 - Extension 01`` () = x.DoNamedTest()
     [<Test>] member x.``Member 05 - Extension 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 06 - Optional param`` () = x.DoNamedTest()
+
 
 // Most tests are in TypeHintContextActionsTests
 [<AssertCorrectTreeStructure>]
@@ -76,6 +78,7 @@ type SpecifyPatternTypeActionTest() =
     override x.ExtraPath = "specifyTypes"
 
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern 02 - Optional``() = x.DoNamedTest()
 
 
 type SpecifyTypesActionAvailabilityTest() =
