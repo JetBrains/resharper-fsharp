@@ -239,7 +239,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 16 - After last infix op token on line``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 17 - Nested pipe``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backspace - Interpolated string - Braces 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Simple 02 - Delete selection``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Regular 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 02 - Multiline``() = x.DoNamedTest()

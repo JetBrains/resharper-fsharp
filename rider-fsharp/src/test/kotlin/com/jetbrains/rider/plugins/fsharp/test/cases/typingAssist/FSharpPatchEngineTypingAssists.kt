@@ -223,3 +223,16 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
       .filter { it.startsWith("Enter") && !tests.contains(it) }
       .toTypedArray()
 }
+
+
+@Test
+@Subsystem(SubsystemConstants.TYPING_ASSIST)
+@Feature("Typing Assist")
+@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+class FSharpBackspaceTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(IdeActions.ACTION_EDITOR_BACKSPACE) {
+
+  @DataProvider(name = SUPPORTED_BACKEND_CASES)
+  fun supportedCases() = backendCases
+    .filter { it.startsWith("Backspace") || it.contains(" - Backspace") }
+    .toTypedArray()
+}
