@@ -215,7 +215,7 @@ module SpecifyTypes =
 
         | _ -> ()
 
-module SpecifyTypesAction =
+module SpecifyTypesActionHelper =
     open SpecifyTypes
     let executePsiTransaction (node: ITreeNode) (availability: Availability) =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
@@ -240,7 +240,7 @@ type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvid
     override x.ExecutePsiTransaction _ =
         let node = x.ContextNode
         let availability = SpecifyTypes.getAvailability node
-        SpecifyTypesAction.executePsiTransaction node availability
+        SpecifyTypesActionHelper.executePsiTransaction node availability
 
 [<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
                 Description = "Annotate binding or member with parameter types and return type")>]
@@ -271,7 +271,7 @@ type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Avail
     override this.Text = "Add type annotation"
 
     override this.ExecutePsiTransaction(_, _) =
-        SpecifyTypesAction.executePsiTransaction node availability
+        SpecifyTypesActionHelper.executePsiTransaction node availability
         null
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
