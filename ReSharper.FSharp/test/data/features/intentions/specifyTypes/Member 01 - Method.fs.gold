@@ -1,4 +1,4 @@
 ﻿module Module
 
 type A() =
-    member this.M{caret}(x, y): string = x.ToString() + y
+    member this.M{caret}(x: 'a, y: string): string = x.ToString() + y

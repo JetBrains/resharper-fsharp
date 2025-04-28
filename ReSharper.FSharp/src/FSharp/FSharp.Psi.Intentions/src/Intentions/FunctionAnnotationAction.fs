@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
+open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Parts
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
@@ -161,19 +162,26 @@ module SpecifyTypes =
             ParenPatUtil.addParens listConsParenPat |> ignore
 
     let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
-        let types = getFunctionTypeArgs true mfv.FullType
-        let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
-
-        let rec specifyParameterTypes (types: FSharpType seq) (parameters: IFSharpPattern seq) isTopLevel =
-            for fcsType, parameter in Seq.zip types parameters do
+        let rec specifyParameterTypes (fcsTypeGroups: 'a seq) (getSingle: 'a -> FSharpType) (selectMany: 'a -> 'a seq) (parameters: IFSharpPattern seq) isTopLevel =
+            for fcsTypeGroup, parameter in Seq.zip fcsTypeGroups parameters do
                 match parameter.IgnoreInnerParens() with
                 | :? IConstPat | :? ITypedPat -> ()
                 | TupleLikePattern pat when isTopLevel ->
-                    specifyParameterTypes fcsType.GenericArguments pat.Patterns false
+                    let fcsTypes = selectMany fcsTypeGroup
+                    specifyParameterTypes fcsTypes getSingle selectMany pat.Patterns false
                 | pattern ->
+                    let fcsType = getSingle fcsTypeGroup
                     specifyPatternType displayContext fcsType pattern
 
-        specifyParameterTypes types parameters true
+        let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
+
+        if mfv.IsMember then
+            let selectMany x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
+            let types = mfv.CurriedParameterGroups
+            specifyParameterTypes types _.Item(0).Type selectMany parameters true
+        else
+            let types = getFunctionTypeArgs true mfv.FullType
+            specifyParameterTypes types id _.GenericArguments parameters true
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
