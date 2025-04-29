@@ -210,7 +210,7 @@ type LambdaAnalyzer() =
             let hasOptionalArg =
                 x.CurriedParameterGroups
                 |> Seq.concat
-                |> Seq.exists (fun x -> x.IsOptionalArg)
+                |> Seq.exists _.IsOptionalArg
             if hasOptionalArg then null else ctor arg
 
         | _ -> ctor arg

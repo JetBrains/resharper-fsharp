@@ -295,7 +295,7 @@ type FSharpOverridingMembersBuilder() =
                 let indent =
                     memberDeclarations
                     |> Seq.tryHead
-                    |> Option.map (fun memberDecl -> memberDecl.Indent)
+                    |> Option.map _.Indent
                     |> Option.defaultWith (fun _ -> objExpr.Indent + objExpr.GetIndentSize())
 
                 let anchor: ITreeNode =

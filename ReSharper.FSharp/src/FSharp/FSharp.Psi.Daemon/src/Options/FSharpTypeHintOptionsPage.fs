@@ -56,4 +56,4 @@ type FSharpTypeHintsOptionsPage(lifetime: Lifetime, optionsPageContext: OptionsP
             let checkbox =
                 this.AddBoolOption((fun (s: FSharpTypeHintOptions) -> s.HideSameLine),
                                    Strings.FSharpTypeHints_HideSameLinePipe_Description)
-            this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), fun t -> t :> obj)
+            this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, _.ShowPipeReturnTypes, fun t -> t :> obj)

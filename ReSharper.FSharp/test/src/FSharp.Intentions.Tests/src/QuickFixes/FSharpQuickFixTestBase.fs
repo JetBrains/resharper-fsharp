@@ -50,7 +50,7 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
 
             textControl.TryGetSourceFiles(solution)
             |> Seq.tryExactlyOne
-            |> Option.map (fun sourceFile -> sourceFile.GetPrimaryPsiFile())
+            |> Option.map _.GetPrimaryPsiFile()
             |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
         )
 

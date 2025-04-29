@@ -228,7 +228,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 for KeyValue(dependency, referencedModule) in referencedModules do
                     builder.AppendLine($"  {dependency.Project.Name}, IsValid: {dependency.Project.IsValid()}") |> ignore
                     let referencingModules = referencedModule.ReferencingProjects
-                    for referencing in referencingModules |> Seq.sortBy (fun projectKey -> projectKey.Project.Name) do
+                    for referencing in referencingModules |> Seq.sortBy _.Project.Name do
                         builder.AppendLine($"    {referencing.Project.Name}") |> ignore
 
             if dirtyModules.Count > 0 then

@@ -438,7 +438,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         let typeNames = 
             clrTypeName.TypeNames
-            |> Seq.map (fun n -> n.TypeName)
+            |> Seq.map _.TypeName
             |> String.concat "."
 
         let name = 
@@ -1041,16 +1041,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
 
     let getOrCreateMethods (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
-        getOrCreateMembers table typeName EmptyArray.Instance (fun members -> members.Methods)
+        getOrCreateMembers table typeName EmptyArray.Instance _.Methods
 
     let getOrCreateFields (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
-        getOrCreateMembers table typeName [] (fun members -> members.Fields)
+        getOrCreateMembers table typeName [] _.Fields
 
     let getOrCreateProperties (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
-        getOrCreateMembers table typeName [] (fun members -> members.Properties)
+        getOrCreateMembers table typeName [] _.Properties
 
     let getOrCreateEvents (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
-        getOrCreateMembers table typeName [] (fun members -> members.Events)
+        getOrCreateMembers table typeName [] _.Events
 
     let getOrCreateNestedTypes (table: FcsTypeDefMembers) reader (typeName: IClrTypeName) =
         getOrCreateNestedTypes table typeName [||] reader

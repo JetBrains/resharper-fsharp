@@ -26,7 +26,7 @@ type RecordCtorSearchFactory() =
     override x.CreateReferenceSearcher(declaredElements, findCandidates) =
         let recordTypeElements =
             declaredElements.FilterByType<ITypeElement>()
-            |> Seq.filter (fun typeElement -> typeElement.IsRecord())
+            |> Seq.filter _.IsRecord()
             |> Array.ofSeq
 
         if recordTypeElements.IsEmpty() then null else
@@ -37,7 +37,7 @@ and RecordCtorReferenceSearcher(recordTypeElements, findCandidates) =
     member x.ProcessElement<'TResult>(treeNode: ITreeNode, consumer: IFindResultConsumer<'TResult>) =
         let names =
             recordTypeElements
-            |> Array.map (fun typeElement -> typeElement.GetRecordFieldNames())
+            |> Array.map _.GetRecordFieldNames()
             |> Seq.concat
             |> Seq.distinct
             |> Array.ofSeq

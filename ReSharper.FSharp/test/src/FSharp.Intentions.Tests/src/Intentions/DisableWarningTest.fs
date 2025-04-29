@@ -34,7 +34,7 @@ type DisableWarningTest() =
 
     override this.CreateQuickFix(project, textControl, highlighting) =
         let quickFixToExecute = BulbActionTestBase.GetSetting(textControl, "QF_TO_EXECUTE")
-        this.GetCustomWarningAction(project, textControl, (fun action -> action.Text.Equals(quickFixToExecute)), &highlighting)
+        this.GetCustomWarningAction(project, textControl, _.Text.Equals(quickFixToExecute), &highlighting)
 
     override this.ExecuteQuickFix(_, textControl, quickFix, _) =
         quickFix.Execute(this.Solution, textControl)

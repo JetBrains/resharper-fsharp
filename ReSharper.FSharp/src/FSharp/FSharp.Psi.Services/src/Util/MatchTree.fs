@@ -578,7 +578,7 @@ module MatchNode =
 
                 let recordPat = createPattern $"{{ {recordFieldsText} }}"
                 let recordPat = replaceWithPattern oldPat recordPat :?> IRecordPat
-                let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
+                let fieldPats = recordPat.FieldPatterns |> Seq.map _.As<IFieldPat>().Pattern
 
                 Seq.iter2 (bind context usedNames) fieldPats fieldNodes
 
@@ -1333,7 +1333,7 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
                 |> Option.map (fun case -> case :> FSharpSymbol)
             elif fcsEntity.IsEnum then
                 fcsEntity.FSharpFields
-                |> Seq.tryFind (fun fcsField -> fcsField.LiteralValue.IsSome)
+                |> Seq.tryFind _.LiteralValue.IsSome
                 |> Option.map (fun case -> case :> FSharpSymbol)
             else
                 None

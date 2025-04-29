@@ -56,7 +56,7 @@ type RegularStringLexer(buffer) =
         x.ProcessEscapeSequence(3, 0, isDigit)
 
     member x.ProcessLongHexEscapeSequence() =
-        let hex = x.ProcessEscapeSequence(8, max = 8, shift = 1, matcher = (fun c -> c.IsHexDigitFast()))
+        let hex = x.ProcessEscapeSequence(8, max = 8, shift = 1, matcher = _.IsHexDigitFast())
         if hex.Length <> 8 then StringTokenTypes.CHARACTER else
 
         let mutable codePoint = Unchecked.defaultof<uint32>

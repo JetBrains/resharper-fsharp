@@ -50,7 +50,7 @@ type ReplaceWithAbbreviatedTypeFix(error: TypeAbbreviationsCannotHaveAugmentatio
 
         quickFixUtil.BindTo(typeDecl.Reference, typeElement) |> ignore
 
-        let typeParameterNames = typeElement.TypeParameters |> Seq.map (fun p -> p.ShortName) |> Seq.toList
+        let typeParameterNames = typeElement.TypeParameters |> Seq.map _.ShortName |> Seq.toList
         if not typeParameterNames.IsEmpty then
             let factory = typeDecl.CreateElementFactory()
             let typeParameterList = factory.CreateTypeParameterOfTypeList(typeParameterNames)

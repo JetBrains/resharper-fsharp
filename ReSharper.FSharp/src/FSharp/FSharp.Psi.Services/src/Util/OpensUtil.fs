@@ -158,7 +158,7 @@ let findModuleToInsertTo (fsFile: IFSharpFile) (offset: DocumentOffset) (setting
     | Some(decl, searchAnchor) -> decl, searchAnchor
     | _ ->
 
-    if not (settings.GetValue(fun key -> key.TopLevelOpenCompletion)) then
+    if not (settings.GetValue(_.TopLevelOpenCompletion)) then
         match fsFile.GetNode<IModuleLikeDeclaration>(offset) with
         | :? IDeclaredModuleLikeDeclaration as moduleDecl when
                 // todo: F# 6: attributes can be after `module` keyword
@@ -354,7 +354,7 @@ let addOpens (reference: FSharpSymbolReference) (declaredElement: IClrDeclaredEl
 
 let getContainingModules (treeNode: ITreeNode) =
     treeNode.ContainingNodes<IModuleLikeDeclaration>().ToEnumerable()
-    |> Seq.map (fun decl -> decl.DeclaredElement)
+    |> Seq.map _.DeclaredElement
     |> Seq.filter isNotNull
     |> HashSet
 
