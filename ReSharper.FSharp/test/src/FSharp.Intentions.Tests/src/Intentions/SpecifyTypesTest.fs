@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<AssertCorrectTreeStructure>]
 type SpecifyTypesActionTest() =
-    inherit FSharpContextActionExecuteTestBase<MfvAnnotationAction>()
+    inherit FSharpContextActionExecuteTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -82,7 +82,7 @@ type SpecifyPatternTypeActionTest() =
 
 
 type SpecifyTypesActionAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<MfvAnnotationAction>()
+    inherit FSharpContextActionAvailabilityTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 

@@ -259,9 +259,9 @@ type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvid
         let availability = SpecifyTypes.getAvailability node
         SpecifyTypesActionHelper.executePsiTransaction node availability
 
-[<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
+[<ContextAction(Name = "AnnotateMemberOrFunction", GroupType = typeof<FSharpContextActions>,
                 Description = "Annotate binding or member with parameter types and return type")>]
-type MfvAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit AnnotationActionBase<IParameterOwnerMemberDeclaration>(dataProvider)
 
     override this.IsAvailable(node: IParameterOwnerMemberDeclaration) =
