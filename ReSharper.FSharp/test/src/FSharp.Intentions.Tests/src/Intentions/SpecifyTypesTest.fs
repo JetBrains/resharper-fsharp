@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<AssertCorrectTreeStructure>]
 type SpecifyTypesActionTest() =
     inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
@@ -35,6 +36,10 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Parameters - Pattern 10 - Nested tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 11 - Active pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 12 - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 13 - With attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 14 - With attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 15 - With attribute 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 16 - With attribute 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Function - Return - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return - Function 02``() = x.DoNamedTest()

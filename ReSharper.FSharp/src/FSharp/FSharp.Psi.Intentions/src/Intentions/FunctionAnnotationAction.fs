@@ -44,6 +44,7 @@ module SpecifyTypes =
             let pattern = pattern.IgnoreInnerParens()
             match pattern with
             | :? ITypedPat | :? IUnitPat -> true
+            | :? IAttribPat as attribPat -> isAnnotated isTopLevel attribPat.Pattern
             | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.forall (isAnnotated false)
             | _ -> false
 
@@ -132,6 +133,11 @@ module SpecifyTypes =
     let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
+
+        let pattern =
+            match pattern.IgnoreInnerParens() with
+            | :? IAttribPat as attribPat -> attribPat.Pattern
+            | _ -> pattern
 
         let newPattern =
             match pattern.IgnoreInnerParens() with
