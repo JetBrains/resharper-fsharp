@@ -8,28 +8,21 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
-let getResolveContext (resolveContextManager: PsiModuleResolveContextManager) project psiModule =
-    resolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, psiModule.TargetFrameworkId)
-
-let getModuleResolveContext (resolveContextManager: PsiModuleResolveContextManager) (psiModule: IPsiModule) =
-    let project = psiModule.ContainingProjectModule :?> IProject
-    getResolveContext resolveContextManager project psiModule
-
-let getModuleProject (psiModule: IPsiModule) =
-    psiModule.ContainingProjectModule.As<IProject>()
+let getResolveContext (resolveContextManager: PsiModuleResolveContextManager) (containingModule: IModule) psiModule =
+    resolveContextManager.GetOrCreateModuleResolveContext(containingModule, psiModule, psiModule.TargetFrameworkId)
 
 let getReferencedModules (psiModule: IPsiModule) =
-    let project = psiModule.ContainingProjectModule :?> _
+    let containingModule = psiModule.ContainingProjectModule
     let solution = psiModule.GetSolution()
 
     let psiModules = solution.PsiModules()
     let resolveContextManager = solution.GetComponent<PsiModuleResolveContextManager>()
 
-    let resolveContext = getResolveContext resolveContextManager project psiModule
+    let resolveContext = getResolveContext resolveContextManager containingModule psiModule
     psiModules.GetModuleReferences(psiModule, resolveContext)
     |> Seq.filter (fun reference ->
         match reference.Module with
-        | :? IProjectPsiModule as projectPsiModule -> projectPsiModule != project
+        | :? IProjectPsiModule as projectPsiModule -> projectPsiModule != containingModule
         | _ -> true)
     |> Seq.map _.Module
 
