@@ -11,7 +11,8 @@ let{off} ((x4{off}: int)): int = 1
 {off}[<CompiledName{off}("Foo")>]{off}
 let{on} foo{on} {off}x {off}= {off}()
 
-let{off} f{off} {off}(): unit = ()
+let{off} rec f{off} {off}(): unit = ()
+and{on} g{on} x = x + 1
 
 let{on} f1{on} ([<Attr>] x): int = x + 1
 let{on} f2{on} (([<Attr>] (x))): int = x + 1
