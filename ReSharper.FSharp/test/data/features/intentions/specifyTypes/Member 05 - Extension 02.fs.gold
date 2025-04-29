@@ -1,0 +1,4 @@
+﻿module Module
+
+type System.String with
+    member this.M{caret}(a: string * string seq): string = a ||> String.concat

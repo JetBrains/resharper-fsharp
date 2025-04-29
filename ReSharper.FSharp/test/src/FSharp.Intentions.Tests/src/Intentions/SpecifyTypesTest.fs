@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<AssertCorrectTreeStructure>]
 type SpecifyTypesActionTest() =
-    inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
+    inherit FSharpContextActionExecuteTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -62,9 +62,28 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Recursive - Function 03`` () = x.DoNamedTest()
     [<Test>] member x.``Function - Recursive - Function 04`` () = x.DoNamedTest()
 
+    [<Test>] member x.``Member 01 - Method`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 02 - Property`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 03 - Method - Param groups`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 04 - Extension 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 05 - Extension 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 06 - Optional param`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 07 - Optional param - With attribute``() = x.DoNamedTest()
+
+
+// Most tests are in TypeHintContextActionsTests
+[<AssertCorrectTreeStructure>]
+type SpecifyPatternTypeActionTest() =
+    inherit FSharpContextActionExecuteTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes"
+
+    [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern 02 - Optional``() = x.DoNamedTest()
+
 
 type SpecifyTypesActionAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
+    inherit FSharpContextActionAvailabilityTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -76,3 +95,10 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()
+
+type SpecifyPatternTypeActionAvailabilityTest() =
+    inherit FSharpContextActionAvailabilityTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes"
+
+    [<Test>] member x.``Patterns - 01``() = x.DoNamedTest()

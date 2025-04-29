@@ -1,0 +1,4 @@
+﻿module Module
+
+type A =
+    member _.M({caret}?x: int): int = x.Value + 1

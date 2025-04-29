@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
+open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application.Parts
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
@@ -20,6 +21,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Feature.Services.Util
+open JetBrains.Util
 
 module SpecifyTypes =
     type Availability = {
@@ -139,6 +141,15 @@ module SpecifyTypes =
             | :? IAttribPat as attribPat -> attribPat.Pattern
             | _ -> pattern
 
+        let pattern, fcsType =
+            match pattern with
+            | :? IOptionalValPat -> pattern, fcsType.GenericArguments[0]
+            | _ ->
+
+            let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
+            if isNull optionalValPat then pattern, fcsType
+            else (optionalValPat : IFSharpPattern), fcsType.GenericArguments[0]
+
         let newPattern =
             match pattern.IgnoreInnerParens() with
             | :? ITuplePat as tuplePat -> addParens factory tuplePat
@@ -160,19 +171,26 @@ module SpecifyTypes =
             ParenPatUtil.addParens listConsParenPat |> ignore
 
     let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
-        let types = getFunctionTypeArgs true mfv.FullType
-        let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
-
-        let rec specifyParameterTypes (types: FSharpType seq) (parameters: IFSharpPattern seq) isTopLevel =
-            for fcsType, parameter in Seq.zip types parameters do
+        let rec specifyParameterTypes (fcsParamGroups: 'a seq) (getFcsType: 'a -> FSharpType) (enumerate: 'a -> 'a seq) (parameters: IFSharpPattern seq) isTopLevel =
+            for fcsParamGroup, parameter in Seq.zip fcsParamGroups parameters do
                 match parameter.IgnoreInnerParens() with
                 | :? IConstPat | :? ITypedPat -> ()
                 | TupleLikePattern pat when isTopLevel ->
-                    specifyParameterTypes fcsType.GenericArguments pat.Patterns false
+                    let fcsTypes = enumerate fcsParamGroup
+                    specifyParameterTypes fcsTypes getFcsType enumerate pat.Patterns false
                 | pattern ->
+                    let fcsType = getFcsType fcsParamGroup
                     specifyPatternType displayContext fcsType pattern
 
-        specifyParameterTypes types parameters true
+        let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
+
+        if mfv.IsMember then
+            let enumerate x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
+            let types = mfv.CurriedParameterGroups
+            specifyParameterTypes types (fun x -> x[0].Type) enumerate parameters true
+        else
+            let types = getFunctionTypeArgs true mfv.FullType
+            specifyParameterTypes types id (_.GenericArguments) parameters true
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
@@ -214,28 +232,56 @@ module SpecifyTypes =
 
         | _ -> ()
 
+module SpecifyTypesActionHelper =
+    open SpecifyTypes
 
-[<ContextAction(Name = "AnnotateFunction", GroupType = typeof<FSharpContextActions>,
-                Description = "Annotate function with parameter types and return type")>]
-type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    let executePsiTransaction (node: ITreeNode) (availability: Availability) =
+        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+        specifyTypes node availability
+
+
+[<AbstractClass>]
+type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
-    override x.Text = "Add type annotations"
+    abstract member IsAvailable: 'a -> bool
 
-    override x.IsAvailable _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
-        if isNull binding then false else
-        if not (isAtBindingKeywordOrReferencePattern dataProvider binding) then false else
-        SpecifyTypes.getAvailability binding |> _.IsAvailable
+    member x.ContextNode = dataProvider.GetSelectedElement<'a>()
+
+    override x.IsAvailable(_: IUserDataHolder) =
+        let node = x.ContextNode
+
+        isValid (node :> ITreeNode) &&
+        x.IsAvailable(node) &&
+        SpecifyTypes.getAvailability node |> _.IsAvailable
 
     override x.ExecutePsiTransaction _ =
-        let binding = dataProvider.GetSelectedElement<IBinding>()
+        let node = x.ContextNode
+        let availability = SpecifyTypes.getAvailability node
+        SpecifyTypesActionHelper.executePsiTransaction node availability
 
-        use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
+[<ContextAction(Name = "AnnotateMemberOrFunction", GroupType = typeof<FSharpContextActions>,
+                Description = "Specify parameter types and the return type for the binding or type member")>]
+type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit AnnotationActionBase<IParameterOwnerMemberDeclaration>(dataProvider)
 
-        let availability = SpecifyTypes.getAvailability binding
-        SpecifyTypes.specifyTypes binding availability
+    override this.IsAvailable(node: IParameterOwnerMemberDeclaration) =
+        isAtParametersOwnerKeywordOrIdentifier dataProvider node
+
+    override this.Text =
+        if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
+        else "Add type annotation"
+
+[<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
+                Description = "Annotate named pattern type")>]
+type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit AnnotationActionBase<IReferencePat>(dataProvider)
+
+    override x.IsAvailable(node: IReferencePat) =
+        isNull (BindingNavigator.GetByHeadPattern(node.IgnoreParentParens()))
+
+    override this.Text = "Add type annotation"
 
 
 type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Availability) =
@@ -244,9 +290,7 @@ type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Avail
     override this.Text = "Add type annotation"
 
     override this.ExecutePsiTransaction(_, _) =
-        use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        SpecifyTypes.specifyTypes node availability
+        SpecifyTypesActionHelper.executePsiTransaction node availability
         null
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
