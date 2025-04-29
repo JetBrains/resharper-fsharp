@@ -187,7 +187,7 @@ module SpecifyTypes =
         if mfv.IsMember then
             let selectMany x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
             let types = mfv.CurriedParameterGroups
-            specifyParameterTypes types (_.Item(0).Type) selectMany parameters true
+            specifyParameterTypes types (fun x -> x[0].Type) selectMany parameters true
         else
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id _.GenericArguments parameters true
