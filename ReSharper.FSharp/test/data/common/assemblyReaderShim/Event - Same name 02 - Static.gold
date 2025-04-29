@@ -10,7 +10,7 @@ Class2.add_Event(fun (|_: System.EventArgs|(3)) -> ())
 Class2.add_Event|(|(4)VoidDelegate(ignore)
 
 |Class2().add_Event(fun (_: System.EventArgs) -> ())|(5)
-|Class2().add_Event|(|(7)VoidDelegate(ignore)|(6)
+|Class2().add_Event|(|(6)VoidDelegate(ignore)|(7)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
@@ -32,5 +32,5 @@ but here has type
     'System.EventArgs'    
 (4): ReSharper Underlined Error Highlighting: Unmatched '('
 (5): ReSharper Underlined Error Highlighting: Successive arguments should be separated by spaces, tupled, or parenthesized
-(6): ReSharper Underlined Error Highlighting: Successive arguments should be separated by spaces, tupled, or parenthesized
-(7): ReSharper Underlined Error Highlighting: Unmatched '('
+(6): ReSharper Underlined Error Highlighting: Unmatched '('
+(7): ReSharper Underlined Error Highlighting: Successive arguments should be separated by spaces, tupled, or parenthesized

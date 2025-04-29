@@ -11,7 +11,7 @@ let i2 = { new |IObsoleteInterface|(6) with
              member this.P = 1 }
 
 let d1: |ObsoleteDelegate|(7) = null
-let d2 = ||ObsoleteDelegate|(9)(fun _ -> ())|(8)
+let d2 = ||ObsoleteDelegate|(8)(fun _ -> ())|(9)
 
 let e1: |ObsoleteEnum|(10) = Unchecked.defaultof<_>
 let e2 = |ObsoleteEnum|(11)()

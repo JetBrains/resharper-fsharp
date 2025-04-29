@@ -1,8 +1,8 @@
 ﻿module Module
 
 let _: Enum = enum 0
-let _: Class = ||enum|(1) 0|(0)
+let _: Class = ||enum|(0) 0|(1)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Type constraint mismatch when applying the default type 'Class' for a type inference variable. The type 'Class' is not a CLI enum type Consider adding further type constraints
-(1): ReSharper Underlined Error Highlighting: Could not resolve the ambiguity in the use of a generic construct with an 'enum' constraint at or near this position
+(0): ReSharper Underlined Error Highlighting: Could not resolve the ambiguity in the use of a generic construct with an 'enum' constraint at or near this position
+(1): ReSharper Underlined Error Highlighting: Type constraint mismatch when applying the default type 'Class' for a type inference variable. The type 'Class' is not a CLI enum type Consider adding further type constraints
