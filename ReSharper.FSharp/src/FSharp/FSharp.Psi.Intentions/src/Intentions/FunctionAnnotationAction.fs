@@ -171,23 +171,23 @@ module SpecifyTypes =
             ParenPatUtil.addParens listConsParenPat |> ignore
 
     let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
-        let rec specifyParameterTypes (fcsTypeGroups: 'a seq) (getSingle: 'a -> FSharpType) (selectMany: 'a -> 'a seq) (parameters: IFSharpPattern seq) isTopLevel =
-            for fcsTypeGroup, parameter in Seq.zip fcsTypeGroups parameters do
+        let rec specifyParameterTypes (fcsParamGroups: 'a seq) (getFcsType: 'a -> FSharpType) (enumerate: 'a -> 'a seq) (parameters: IFSharpPattern seq) isTopLevel =
+            for fcsParamGroup, parameter in Seq.zip fcsParamGroups parameters do
                 match parameter.IgnoreInnerParens() with
                 | :? IConstPat | :? ITypedPat -> ()
                 | TupleLikePattern pat when isTopLevel ->
-                    let fcsTypes = selectMany fcsTypeGroup
-                    specifyParameterTypes fcsTypes getSingle selectMany pat.Patterns false
+                    let fcsTypes = enumerate fcsParamGroup
+                    specifyParameterTypes fcsTypes getFcsType enumerate pat.Patterns false
                 | pattern ->
-                    let fcsType = getSingle fcsTypeGroup
+                    let fcsType = getFcsType fcsParamGroup
                     specifyPatternType displayContext fcsType pattern
 
         let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
 
         if mfv.IsMember then
-            let selectMany x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
+            let enumerate x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
             let types = mfv.CurriedParameterGroups
-            specifyParameterTypes types (fun x -> x[0].Type) selectMany parameters true
+            specifyParameterTypes types (fun x -> x[0].Type) enumerate parameters true
         else
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id _.GenericArguments parameters true
