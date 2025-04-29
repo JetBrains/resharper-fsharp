@@ -234,6 +234,7 @@ module SpecifyTypes =
 
 module SpecifyTypesActionHelper =
     open SpecifyTypes
+
     let executePsiTransaction (node: ITreeNode) (availability: Availability) =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
@@ -245,12 +246,13 @@ type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvid
     inherit FSharpContextActionBase(dataProvider)
 
     abstract member IsAvailable: 'a -> bool
+
     member x.ContextNode = dataProvider.GetSelectedElement<'a>()
 
     override x.IsAvailable(_: IUserDataHolder) =
         let node = x.ContextNode
 
-        isNotNull node && isValid (node :> ITreeNode) &&
+        isValid (node :> ITreeNode) &&
         x.IsAvailable(node) &&
         SpecifyTypes.getAvailability node |> _.IsAvailable
 

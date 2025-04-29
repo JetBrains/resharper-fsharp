@@ -63,8 +63,8 @@ let isAtParametersOwnerKeywordOrIdentifier (dataProvider: IContextActionDataProv
         match owner with
         | :? IBinding as binding ->
             let keyword = binding.BindingKeyword
-            let identifier =
-                binding.HeadPattern.IgnoreInnerParens().As<IReferencePat>() ?> _.Identifier
+            let refPat = binding.HeadPattern.IgnoreInnerParens().As<IReferencePat>()
+            let identifier = if isNull refPat then null else refPat.Identifier
             keyword, identifier
 
         | :? IMemberDeclaration as memberDeclaration ->

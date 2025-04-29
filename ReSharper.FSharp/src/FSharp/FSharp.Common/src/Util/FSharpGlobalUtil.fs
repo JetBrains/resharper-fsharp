@@ -36,9 +36,6 @@ module FSharpGlobalUtil =
     let (|NotNull|_|) value =
         if isNotNull value then Some value else None
 
-    let inline (?>) (x: 'a) ([<InlineIfLambda>] f: 'a -> 'b) =
-        if isNull x then null else f x
-
 
 [<AutoOpen>]
 module FSharpGlobalAbbreviations =
