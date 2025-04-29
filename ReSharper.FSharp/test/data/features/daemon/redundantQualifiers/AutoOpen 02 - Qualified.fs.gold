@@ -6,8 +6,8 @@ module Nested1 =
 namespace Ns2
 module Nested2 =
     open Ns1
-    ||Ns1.|(1)Nested1.|(0)x
+    ||Ns1.|(0)Nested1.|(1)x
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Qualifier is redundant
-(1):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(0):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

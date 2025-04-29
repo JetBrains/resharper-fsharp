@@ -1,10 +1,10 @@
 ﻿module Module
 
 match () with
-| ||(|(1)_|)|(2) as|(0) |u|(3) -> ()
+| ||(|(0)_|)|(1) as|(2) |u|(3) -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Redundant 'as' pattern
-(1):<overlapped> ReSharper Dead Code: Redundant parentheses
-(2):<overlapped><secondary> ReSharper Dead Code: Redundant parentheses
+(0):<overlapped> ReSharper Dead Code: Redundant parentheses
+(1):<overlapped><secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant 'as' pattern
 (3): ReSharper Dead Code [FS1182]: The value 'u' is unused

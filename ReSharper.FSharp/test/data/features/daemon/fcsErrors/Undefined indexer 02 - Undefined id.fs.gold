@@ -1,8 +1,8 @@
 ﻿module Module
 
-||n|(1)|.|(2)[1]|(0)
+||n|(0)|.|(1)[1]|(2)
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point.
-(1): ReSharper Error Highlighting: The value or constructor 'n' is not defined.
-(2): ReSharper Dead Code: Redundant '.'
+(0): ReSharper Error Highlighting: The value or constructor 'n' is not defined.
+(1): ReSharper Dead Code: Redundant '.'
+(2): ReSharper Underlined Error Highlighting: The operator 'expr.[idx]' has been used on an object of indeterminate type based on information prior to this program point.
