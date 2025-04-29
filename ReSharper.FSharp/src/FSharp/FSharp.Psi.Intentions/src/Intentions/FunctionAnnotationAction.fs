@@ -260,7 +260,7 @@ type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvid
         SpecifyTypesActionHelper.executePsiTransaction node availability
 
 [<ContextAction(Name = "AnnotateMemberOrFunction", GroupType = typeof<FSharpContextActions>,
-                Description = "Annotate binding or member with parameter types and return type")>]
+                Description = "Specify parameter types and the return type for the binding or type member")>]
 type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit AnnotationActionBase<IParameterOwnerMemberDeclaration>(dataProvider)
 
