@@ -648,7 +648,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 |> Option.defaultValue null
 
             let toFindCandidateFromFcsSymbol () =
-                tryToFindCandidate (fun symbol -> symbol.IsEffectivelySameAs(mainSymbol))
+                tryToFindCandidate _.IsEffectivelySameAs(mainSymbol)
 
             match mainSymbol.GetDeclaredElement(reference) with
             | null -> toFindCandidateFromFcsSymbol ()

@@ -93,7 +93,7 @@ type FsiDetector() =
     member x.GetFsiTools(solution) =
         let packagesByProvider =
             providers
-            |> Array.map (fun provider -> provider.GetFsiTools(solution))
+            |> Array.map _.GetFsiTools(solution)
         packagesByProvider
         |> Seq.concat
         |> List.ofSeq
@@ -102,7 +102,7 @@ type FsiDetector() =
 
     member x.GetAutodetected(solution) =
         providers
-        |> Seq.map (fun provider -> provider.GetFsiTools(solution))
+        |> Seq.map _.GetFsiTools(solution)
         |> Seq.concat
         |> Seq.head
 
@@ -200,7 +200,7 @@ type SolutionInstalledFsiProvider() =
                 |> Array.ofSeq
 
             fctPackages
-            |> Array.sortByDescending (fun pkg -> pkg.PackageIdentity.Version)
+            |> Array.sortByDescending _.PackageIdentity.Version
             |> Array.choose (fun pkg ->
                 match nugetStorage.GetNupkg(pkg.PackageIdentity) with
                 | null -> None
@@ -245,7 +245,7 @@ type NugetCacheFsiProvider() =
             let nugetStorage = solution.GetComponent<NuGetNupkgStorage>()
 
             nugetStorage.GetAllNupkgsByName(fctPackageName)
-            |> Seq.sortByDescending (fun pkg -> pkg.PackageIdentity.Version)
+            |> Seq.sortByDescending _.PackageIdentity.Version
             |> Seq.choose (fun nupkg -> FsiTool.FromFSharpCompilerToolsPackage(nupkg, source))
 
 

@@ -206,32 +206,32 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
     do
         this.AddHeader("Imports")
-        this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
+        this.AddBoolOption(_.TopLevelOpenCompletion, RichText(topLevelOpenCompletion), null) |> ignore
 
         this.AddHeader("Script editing")
-        this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
+        this.AddComboEnum(_.LanguageVersion, FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
         if PlatformUtil.IsRunningUnderWindows then
-            this.AddBoolOption((fun key -> key.TargetNetFramework), RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
-        this.AddBoolOptionWithComment((fun key -> key.FsiInteractiveEditor), FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
+            this.AddBoolOption(_.TargetNetFramework, RichText(FSharpScriptOptions.targetNetFramework)) |> ignore
+        this.AddBoolOptionWithComment(_.FsiInteractiveEditor, FSharpExperimentalFeatures.fsiInteractiveEditor, "Experimental") |> ignore
 
         this.AddHeader("F# Compiler Service")
-        this.AddBoolOptionWithComment((fun key -> key.SkipImplementationAnalysis), skipImplementationAnalysis, "Requires restart") |> ignore
-        this.AddBoolOptionWithComment((fun key -> key.ParallelProjectReferencesAnalysis), parallelProjectReferencesAnalysis, "Requires restart") |> ignore
-        this.AddBoolOptionWithComment((fun key -> key.OutOfProcessTypeProviders), FSharpExperimentalFeatures.outOfProcessTypeProviders, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment(_.SkipImplementationAnalysis, skipImplementationAnalysis, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment(_.ParallelProjectReferencesAnalysis, parallelProjectReferencesAnalysis, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment(_.OutOfProcessTypeProviders, FSharpExperimentalFeatures.outOfProcessTypeProviders, "Requires restart") |> ignore
 
         do
             use indent = this.Indent()
-            [ this.AddBoolOptionWithComment((fun key -> key.GenerativeTypeProvidersInMemoryAnalysis), FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Requires restart") ]
+            [ this.AddBoolOptionWithComment(_.GenerativeTypeProvidersInMemoryAnalysis, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis, "Requires restart") ]
             |> Seq.iter (fun checkbox ->
-                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, _.OutOfProcessTypeProviders, fun t -> t :> obj))
 
-        this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryReferences), nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
+        this.AddBoolOptionWithComment(_.NonFSharpProjectInMemoryReferences, nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features")
-            this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
-            this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
-            this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
+            this.AddBoolOption(_.PostfixTemplates, RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
+            this.AddBoolOption(_.RedundantParensAnalysis, RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
+            this.AddBoolOption(_.Formatter, RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
 
 
 [<ShellComponent>]

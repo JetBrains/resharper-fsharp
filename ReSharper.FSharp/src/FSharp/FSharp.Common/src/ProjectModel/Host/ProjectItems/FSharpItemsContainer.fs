@@ -124,7 +124,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
     let tryGetProjectItem (viewItem: FSharpViewItem) =
         tryGetProjectMark viewItem.ProjectItem
         |> Option.bind tryGetProjectMapping
-        |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
+        |> Option.bind _.TryGetProjectItem(viewItem)
 
     let getItems (toolsetVersion: NuGetVersion) (msBuildProject: MsBuildProject) projectDescriptor
             (itemTypeFilter: MsBuildProjectItem -> bool) (itemsByName: HashSet<_>) allowNonDefaultItemType =
@@ -375,12 +375,12 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
         member x.TryGetSortKey(viewItem: FSharpViewItem) =
             use lock = locker.UsingReadLock()
-            tryGetProjectItem viewItem |> Option.map (fun item -> item.SortKey)
+            tryGetProjectItem viewItem |> Option.map _.SortKey
 
         member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
             use lock = locker.UsingReadLock()
             tryGetProjectMapping projectMark
-            |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
+            |> Option.map _.GetProjectItemsPaths(targetFrameworkId)
             |> Option.defaultValue [| |]
             
         member this.RemoveProject(project) =
@@ -443,7 +443,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let getChildrenSorted (parent: FSharpProjectModelElement) =
         children[parent]
-        |> Seq.sortBy (fun x -> x.SortKey)
+        |> Seq.sortBy _.SortKey
 
     let getNewSortKey parent =
         children[parent].Count + 1
@@ -468,7 +468,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let getOrCreateFolder folderRefresher parent path =
         folders[path]
-        |> Seq.sortBy (fun item -> item.SortKey)
+        |> Seq.sortBy _.SortKey
         |> Seq.tryLast
         |> Option.defaultWith (fun _ ->
             folderRefresher parent
@@ -1005,7 +1005,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
         let modifiedItemLocation =
             modifiedViewItem
-            |> Option.map (fun item -> item.ProjectItem.Location)
+            |> Option.map _.ProjectItem.Location
             |> Option.defaultValue null
 
         match getRelativeChildPathImpl relativeItem modifiedItemCompilerOrder relativeToType with
@@ -1234,7 +1234,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
 
         // todo: single identity
         member x.RefreshFolder(projectMark, folder, _) =
-            refresh projectMark (fun project -> project.FindProjectItemsByLocation(folder).OfType<IProjectFolder>())
+            refresh projectMark _.FindProjectItemsByLocation(folder).OfType<IProjectFolder>()
 
         member x.UpdateFile(projectMark, path) =
             update projectMark path (function
@@ -1257,7 +1257,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                 tryGetProject projectMark
                 |> Option.bind (fun project ->
                     project.FindProjectItemsByLocation(filePath).OfType<IProjectFile>() |> Seq.tryHead)
-                |> Option.filter (fun projectFile -> projectFile.IsValid())
+                |> Option.filter _.IsValid()
                 |> Option.iter (fun projectFile ->
 
                 let navigationManager = NavigationManager.GetInstance(solution)

@@ -37,7 +37,7 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
     let getInterfaces (fcsType: FSharpType) =
         fcsType.AllInterfaces
-        |> Seq.filter (fun t -> t.HasTypeDefinition)
+        |> Seq.filter _.HasTypeDefinition
         |> Seq.map FcsEntityInstance.create
         |> Seq.filter isNotNull
         |> Seq.toList
@@ -161,7 +161,7 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
                     | _ -> mfv.GetXmlDocId()
 
                 not (implementedMembers.Contains(xmlDocId)))
-            |> List.sortBy (fun mfvInstance -> mfvInstance.Mfv.DisplayNameCore) // todo: try to preserve declaration sorting?
+            |> List.sortBy _.Mfv.DisplayNameCore // todo: try to preserve declaration sorting?
             |> List.map (fun mfvInstance -> FSharpGeneratorMfvElement(mfvInstance, needsTypesAnnotations mfvInstance))
 
         let indent =

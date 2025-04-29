@@ -31,7 +31,7 @@ let getReferencedModules (psiModule: IPsiModule) =
         match reference.Module with
         | :? IProjectPsiModule as projectPsiModule -> projectPsiModule != project
         | _ -> true)
-    |> Seq.map (fun reference -> reference.Module)
+    |> Seq.map _.Module
 
 module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")

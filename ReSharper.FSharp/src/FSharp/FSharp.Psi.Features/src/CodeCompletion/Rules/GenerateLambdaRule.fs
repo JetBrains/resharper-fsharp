@@ -105,7 +105,7 @@ type GenerateLambdaRule() =
         if not expectedType.IsFunctionType then false else
 
         let fcsArgTypes = FcsTypeUtil.getFunctionTypeArgs false expectedType
-        let lambdaParamTypes = fcsArgTypes |> List.map (fun f -> f.MapType(referenceOwner))
+        let lambdaParamTypes = fcsArgTypes |> List.map _.MapType(referenceOwner)
 
         let paramNames = 
             lambdaParamTypes
@@ -125,7 +125,7 @@ type GenerateLambdaRule() =
 
         let text =
             fcsArgTypes
-            |> List.map (fun arg -> arg.Format(displayContext))
+            |> List.map _.Format(displayContext)
             |> String.concat " -> "
 
         let presentationText = $"fun {text} ->"

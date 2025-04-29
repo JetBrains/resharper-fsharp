@@ -19,7 +19,7 @@ type FantomasEditorConfigTest() =
     [<Test>] member x.``Fantomas settings``() = x.DoNamedTestFolder()
 
     override this.ProjectItems testProject =
-        testProject.GetSubItemsRecursively() |> Seq.filter (fun it -> it.Name.EndsWith(".fs"))
+        testProject.GetSubItemsRecursively() |> Seq.filter _.Name.EndsWith(".fs")
 
     override this.ProcessSingleTestData(_, testData, sourceFile, defaultContext, optimization, writer) =
         let ecContext = testData.BoundStore.SettingsStore.BindToContextTransientWithEditorConfig(sourceFile);

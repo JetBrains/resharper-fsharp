@@ -114,7 +114,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
     member x.DumpRunOptions() =
         let versionToRun = fantomasDetector.VersionToRun.Value
         fantomasDetector.GetSettings()
-        |> Seq.sortBy (fun x -> x.Key)
+        |> Seq.sortBy _.Key
         |> Seq.map (fun x -> $"{x.Key}: Version = ({x.Value.Location}, {x.Value.Version}), Status = {x.Value.Status}")
         |> String.concat "\n"
         |> (+) $"Version to run: ({versionToRun.Location}, {versionToRun.Version})\n\n"

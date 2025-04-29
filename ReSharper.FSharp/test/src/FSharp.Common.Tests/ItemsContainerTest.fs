@@ -97,10 +97,10 @@ let getOrCreateFile (AbsolutePath path) solutionItems: IProjectFile =
     solutionItems.GetOrCreateValue(path, fun () ->
 
     let file = Mock<IProjectFile>()
-    file.Setup(fun x -> x.Name).Returns(path.Name) |> ignore
-    file.Setup(fun x -> x.Location).Returns(path) |> ignore
-    file.Setup(fun x -> x.ParentFolder).Returns(getOrCreateFolder path.Parent solutionItems) |> ignore
-    file.Setup(fun x -> x.GetProject()).Returns(fun _ ->
+    file.Setup(_.Name).Returns(path.Name) |> ignore
+    file.Setup(_.Location).Returns(path) |> ignore
+    file.Setup(_.ParentFolder).Returns(getOrCreateFolder path.Parent solutionItems) |> ignore
+    file.Setup(_.GetProject()).Returns(fun _ ->
         getOrCreateFolder projectDirectory solutionItems :?> _) |> ignore
     file.Object :> IProjectItem) :?> _
 
@@ -109,20 +109,20 @@ let getOrCreateFolder (AbsolutePath path) solutionItems: IProjectFolder =
     solutionItems.GetOrCreateValue(path, fun () ->
 
     let solution = Mock<ISolution>()
-    solution.Setup(fun x -> x.FindProjectItemsByLocation(It.IsAny()))
+    solution.Setup(_.FindProjectItemsByLocation(It.IsAny()))
         .Returns(fun path -> [solutionItems.TryGetValue(path)].AsCollection()) |> ignore
 
     let folder = Mock<IProjectFolder>()
-    folder.Setup(fun x -> x.Name).Returns(path.Name) |> ignore
-    folder.Setup(fun x -> x.Location).Returns(path) |> ignore
-    folder.Setup(fun x -> x.ParentFolder).Returns(fun _ -> getOrCreateFolder path.Parent solutionItems) |> ignore
-    folder.Setup(fun x -> x.GetSolution()).Returns(solution.Object) |> ignore
-    folder.Setup(fun x -> x.GetProject()).Returns(fun _ ->
+    folder.Setup(_.Name).Returns(path.Name) |> ignore
+    folder.Setup(_.Location).Returns(path) |> ignore
+    folder.Setup(_.ParentFolder).Returns(fun _ -> getOrCreateFolder path.Parent solutionItems) |> ignore
+    folder.Setup(_.GetSolution()).Returns(solution.Object) |> ignore
+    folder.Setup(_.GetProject()).Returns(fun _ ->
         getOrCreateFolder projectDirectory solutionItems :?> _) |> ignore
 
     if path.Equals(projectDirectory) then
         let project = folder.As<IProject>()
-        project.Setup(fun x -> x.GetData(ProjectsHostExtensions.ProjectMarkKey)).Returns(projectMark) |> ignore
+        project.Setup(_.GetData(ProjectsHostExtensions.ProjectMarkKey)).Returns(projectMark) |> ignore
 
     folder.Object :> IProjectItem) :?> _
 
@@ -992,7 +992,7 @@ type FSharpItemsContainerTest() =
                     |> Seq.append emptyFolders
                     |> HashSet
 
-                for path in folders.OrderBy(fun x -> x.FullPath) do
+                for path in folders.OrderBy(_.FullPath) do
                     writer.WriteLine(path)
                     for folder, parent in container.CreateFoldersWithParents(getOrCreateFolder path solutionItems) do
                         writer.WriteLine(sprintf "  %O -> %O" folder parent)

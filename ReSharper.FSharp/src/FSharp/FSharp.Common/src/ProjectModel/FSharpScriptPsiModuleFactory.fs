@@ -64,7 +64,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             let platformInfos = platformManager.GetAllCompilePlatforms().AsList()
             if platformInfos.IsEmpty() then TargetFrameworkId.Default else
 
-            let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
+            let platformInfo = platformInfos |> Seq.maxBy _.TargetFrameworkId.Version
             platformInfo.TargetFrameworkId
         )
         

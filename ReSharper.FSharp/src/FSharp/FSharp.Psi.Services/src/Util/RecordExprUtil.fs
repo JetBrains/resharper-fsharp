@@ -148,7 +148,7 @@ let private generateUnorderedBindings recordExpr (existingBindings: TreeNodeColl
     let declaredFieldsCount = existingBindings.Count + fieldsToAdd.Count
     let indexedBindings = createUnorderedIndexedBindings existingBindings declaredFieldsCount
     let declaredFields =
-        [| yield! existingBindings |> Seq.map (fun binding -> binding.ReferenceName.ShortName )
+        [| yield! existingBindings |> Seq.map _.ReferenceName.ShortName
            yield! fieldsToAdd |]
 
     generateBindingsImpl recordExpr indexedBindings declaredFields

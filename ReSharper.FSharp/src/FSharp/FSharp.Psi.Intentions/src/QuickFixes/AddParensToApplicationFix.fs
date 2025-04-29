@@ -142,7 +142,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             |> Seq.rev
             |> Seq.map (fun i ->
                 let args = appData.ArgCandidates |> List.take i
-                let argsTexts = args |> List.map (fun x -> x.GetText()) |> String.concat " "
+                let argsTexts = args |> List.map _.GetText() |> String.concat " "
                 WorkflowPopupMenuOccurrence(
                     RichText(toDisplay(String.Join(" ", appData.App.GetText(), argsTexts))), RichText.Empty, args,
                     (fun args -> [| getTreeNodesDocumentRange appData.App (args |> List.last) |])))

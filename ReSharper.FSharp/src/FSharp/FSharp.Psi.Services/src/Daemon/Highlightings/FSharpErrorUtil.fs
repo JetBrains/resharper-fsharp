@@ -58,7 +58,7 @@ let getLetTokenText (token: ITokenNode) =
     tokenType.TokenRepresentation
 
 let getNodeRanges (exprs: #ITreeNode seq) =
-    exprs |> Seq.map (fun x -> x.GetHighlightingRange())
+    exprs |> Seq.map _.GetHighlightingRange()
 
 let getRefExprNameRange (refExpr: IReferenceExpr) =
     match refExpr.Identifier with

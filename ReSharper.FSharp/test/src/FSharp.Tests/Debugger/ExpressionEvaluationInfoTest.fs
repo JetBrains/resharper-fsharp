@@ -19,8 +19,7 @@ type ExpressionEvaluationInfoTest() =
         let textControl = x.OpenTextControl(lifetime)
         let expr = TextControlToPsi.GetElementFromCaretPosition<IFSharpExpression>(project.GetSolution(), textControl)
         let textToEvaluate = FSharpExpressionEvaluationInfoProvider.GetTextToEvaluate(expr)
-        x.ExecuteWithGold(fun writer ->
-            writer.WriteLine(textToEvaluate)) |> ignore
+        x.ExecuteWithGold(_.WriteLine(textToEvaluate)) |> ignore
 
     [<Test>] member x.``Id 01``() = x.DoNamedTest()
     [<Test>] member x.``Id 02 - Qualifier``() = x.DoNamedTest()

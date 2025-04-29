@@ -227,19 +227,19 @@ let addParensIfNeeded (pattern: IFSharpPattern) =
 
         let parametersOwnerPat = ParametersOwnerPatNavigator.GetByParameter(parenPattern)
         if isNotNull parametersOwnerPat &&
-           not (settingsStore.GetValue(fun x -> x.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
             removeSpace parametersOwnerPat.ReferenceName parenPattern
 
         let patternDeclaration = ParametersPatternDeclarationNavigator.GetByPattern(parenPattern)
         let memberDeclaration = MemberDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         if isNotNull memberDeclaration &&
-           not (settingsStore.GetValue(fun x -> x.SpaceBeforeUppercaseInvocation)) then
+           not (settingsStore.GetValue(_.SpaceBeforeUppercaseInvocation)) then
             removeSpace memberDeclaration.Identifier patternDeclaration
 
         let ctorDeclaration = PrimaryConstructorDeclarationNavigator.GetByParametersDeclaration(patternDeclaration)
         let typeDeclaration = FSharpTypeDeclarationNavigator.GetByPrimaryConstructorDeclaration(ctorDeclaration)
         if isNotNull typeDeclaration &&
-           not (settingsStore.GetValue(fun x -> x.SpaceBeforeClassConstructor)) then
+           not (settingsStore.GetValue(_.SpaceBeforeClassConstructor)) then
             removeSpace typeDeclaration.Identifier ctorDeclaration
 
         pattern

@@ -91,7 +91,7 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: ILazy<FsiDete
             | _ -> true
         )
         |> Seq.choose modulePathProvider.GetModulePath
-        |> Seq.map (fun path -> path.FullPath)
+        |> Seq.map _.FullPath
         |> List
 
     do
