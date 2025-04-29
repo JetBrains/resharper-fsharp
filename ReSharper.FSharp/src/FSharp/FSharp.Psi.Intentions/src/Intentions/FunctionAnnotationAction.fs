@@ -190,7 +190,7 @@ module SpecifyTypes =
             specifyParameterTypes types (fun x -> x[0].Type) enumerate parameters true
         else
             let types = getFunctionTypeArgs true mfv.FullType
-            specifyParameterTypes types id _.GenericArguments parameters true
+            specifyParameterTypes types id (_.GenericArguments) parameters true
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
