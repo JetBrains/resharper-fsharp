@@ -14,6 +14,7 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AssemblyAttributes.g.fs" />
     <Compile Include="src\ZoneMarker.fs" />
     <Compile Include="src\ErrorAttributes.fs" />
     <Compile Include="src\Daemon\AssemblyReaderTest.fs" />
