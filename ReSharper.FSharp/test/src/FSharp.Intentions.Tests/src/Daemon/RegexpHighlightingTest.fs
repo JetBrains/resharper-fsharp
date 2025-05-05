@@ -29,5 +29,6 @@ type RegexpHighlightingTest() =
 
     [<Test>] member x.``Detection 02 - Regex type provider``() = x.DoNamedTest()
     [<Test>] member x.``Detection 03 - Active pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Detection 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Injection 01 - Comments``() = x.DoNamedTest()

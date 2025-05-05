@@ -48,7 +48,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           if (paramGroup.Count == 0)
             return EmptyList<IArgument>.Instance;
 
-          if (paramGroup.Count == 1)
+          // RIDER-125426
+          // argExpr could be a tuple with a corresponding single param group parameter
+          // if it additionally contains property initializers
+          if (paramGroup.Count == 1 && argExpr is not ITupleExpr)
             return new[] {argExpr as IArgument};
 
           var tupleExprs =
