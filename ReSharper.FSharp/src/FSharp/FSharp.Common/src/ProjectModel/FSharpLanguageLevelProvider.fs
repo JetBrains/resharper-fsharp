@@ -183,6 +183,11 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     override this.LanguageLevelComparer = FSharpLanguageLevelComparer.Instance :> _
 
+    interface ISolutionToolsetListener with
+        member this.Changed _ =
+            compilerPathToLanguageLevels.Clear()
+
+
 [<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
     let (|PsiModule|) (psiModule: IPsiModule) =
