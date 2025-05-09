@@ -558,7 +558,7 @@ let rec getIndexerExprOrIgnoreParens (expr: IFSharpExpression) =
 let rec isContextWithoutWildPats (expr: ITreeNode) =
     let inline containsWildPat (patterns: TreeNodeCollection<IFSharpPattern>) =
         patterns
-        |> Seq.collect _.NestedPatterns
+        |> Seq.collect (fun x -> x.NestedPatterns)
         |> Seq.exists (fun x -> x :? IWildPat)
 
     match expr.Parent with

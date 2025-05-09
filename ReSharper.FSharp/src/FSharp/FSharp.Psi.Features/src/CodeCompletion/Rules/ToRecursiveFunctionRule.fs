@@ -72,7 +72,7 @@ type ToRecursiveFunctionRule() =
             if isNotNull pattern then
                 let names =
                     FSharpNamingService.getPatternsNames null [pattern]
-                    |> Seq.map _.RemoveBackticks()
+                    |> Seq.map (fun name -> name.RemoveBackticks())
                 usedNames.AddRange(names)
 
         for node in referenceOwner.ContainingNodes<ITreeNode>() do
@@ -93,7 +93,7 @@ type ToRecursiveFunctionRule() =
 
                 let names =
                     FSharpNamingService.getPatternsNames null parameterPatterns
-                    |> Seq.map _.RemoveBackticks()
+                    |> Seq.map (fun name -> name.RemoveBackticks())
                 usedNames.AddRange(names)
 
                 let name = refPat.SourceName

@@ -33,7 +33,7 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharp
     abstract member RestoreNode: ITreeNode
 
     override this.IsAvailable _ =
-        isValid file && highlightingRanges |> Seq.forall _.IsValid()
+        isValid file && highlightingRanges |> Seq.forall (fun x -> x.IsValid())
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(file.IsPhysical())

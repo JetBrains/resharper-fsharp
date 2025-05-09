@@ -114,7 +114,7 @@ type RecordFieldRule() =
             fcsEntity
             |> Option.map (fun fcsEntity ->
                 fcsEntity.FSharpFields
-                |> Seq.map _.Name
+                |> Seq.map (fun field -> field.Name)
                 |> HashSet
             )
 
@@ -126,7 +126,7 @@ type RecordFieldRule() =
 
             bindings
             |> Seq.choose (fun fieldBinding -> Option.ofObj fieldBinding.ReferenceName)
-            |> Seq.map _.ShortName
+            |> Seq.map (fun referenceName -> referenceName.ShortName)
             |> HashSet
 
         let removedFields = List()

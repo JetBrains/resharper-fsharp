@@ -82,7 +82,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
                 else
                     let textControl = textControlManager.VisibleTextControls
                                       |> Seq.tryFind (fun c -> c.Document == document && c.Window.IsFocused.Value)
-                    let cursorPosition = textControl |> Option.map _.Caret.Position.Value.ToDocLineColumn()
+                    let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
                     let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition, settingsStore)
                     let newCursorPosition = formatResult.CursorPosition
 

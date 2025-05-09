@@ -188,8 +188,8 @@ and FSharpTreeNodeSelection(fsFile, node: ITreeNode) =
 
 and FSharpTreeRangeSelection(fsFile, first: ITreeNode, last: ITreeNode) =
     inherit FSharpTreeRangeOffsetSelection(fsFile, first, last,
-        Func<ITreeNode, _>(_.GetTreeStartOffset()),
-        Func<ITreeNode, _>(_.GetTreeEndOffset()))
+        Func<ITreeNode, _>(fun node -> node.GetTreeStartOffset()),
+        Func<ITreeNode, _>(fun node -> node.GetTreeEndOffset()))
 
 
 and FSharpTreeRangeOffsetSelection(fsFile, first: ITreeNode, last: ITreeNode, firstOffsetFunc, lastOffsetFunc) =

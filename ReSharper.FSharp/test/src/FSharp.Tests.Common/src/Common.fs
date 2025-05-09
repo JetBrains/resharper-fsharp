@@ -255,7 +255,7 @@ type AssertCorrectTreeStructureAttribute() =
                         writer.Flush()
                     )
 
-                context.TestFixture.ExecuteWithSpecifiedGold(file, _.Write(afterModification))
+                context.TestFixture.ExecuteWithSpecifiedGold(file, fun writer -> writer.Write(afterModification))
                 |> ignore
         finally
             modifiedFilesCache.ModifiedFileCookies.Clear()
@@ -279,7 +279,7 @@ type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModule
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()
-        |> Seq.filter _.LanguageType.Is<FSharpProjectFileType>()
+        |> Seq.filter (fun file -> file.LanguageType.Is<FSharpProjectFileType>())
         |> Seq.map (fun file -> file.Location, file.Properties.GetBuildAction(targetFrameworkId))
         |> Seq.toArray
 
@@ -304,7 +304,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
     // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
         let getReferencedProjectOutputs (options: FSharpProjectOptions) =
-            options.ReferencedProjects |> Array.map _.OutputFile
+            options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
 
         let newOptions = newProject.ProjectOptions
         let oldOptions = oldProject.ProjectOptions

@@ -655,7 +655,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
                 | attrList :: _ -> x.Mark(attrList.Range)
                 | _ ->
 
-                let range = id |> Option.map _.idRange |> Option.defaultValue range
+                let range = id |> Option.map (fun id -> id.idRange) |> Option.defaultValue range
                 if isOptional then
                     x.MarkTokenOrRange(FSharpTokenType.QMARK, range)
                 else

@@ -50,4 +50,5 @@ type ElifToIfAction(dataProvider: FSharpContextActionDataProvider) =
         let ifExpr = ModificationUtil.ReplaceChild(elifExpr, ElementType.IF_THEN_ELSE_EXPR.Create())
         LowLevelModificationUtil.AddChild(ifExpr, elifExpr.Children().AsArray())
 
-        Action<_>(_.Caret.MoveTo(ifExpr.GetDocumentStartOffset(), CaretVisualPlacement.DontScrollIfVisible))
+        Action<_>(fun textControl ->
+            textControl.Caret.MoveTo(ifExpr.GetDocumentStartOffset(), CaretVisualPlacement.DontScrollIfVisible))

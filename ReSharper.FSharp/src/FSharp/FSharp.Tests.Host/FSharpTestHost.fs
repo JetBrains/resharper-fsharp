@@ -51,7 +51,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 
         let sourceFile =
             psiModule.SourceFiles
-            |> Seq.find _.LanguageType.Is<FSharpProjectFileType>()
+            |> Seq.find (fun sourceFile -> sourceFile.LanguageType.Is<FSharpProjectFileType>())
 
         projectProvider.GetProjectOptions(sourceFile)
         |> Option.map (fun options ->
@@ -59,7 +59,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
             |> Array.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
             |> Array.map (fun p -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
             |> Array.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
-            |> Array.map _.Name
+            |> Array.map (fun p -> p.Name)
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
@@ -109,7 +109,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 Title: {notification.Title}
 Body: {notification.Body}
 Actions: {notification.AdditionalCommands
-         |> Seq.map _.Title
+         |> Seq.map (fun x -> x.Title)
          |> String.concat ", "}
 ----------------------------------------------------
         """

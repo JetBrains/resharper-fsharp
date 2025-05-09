@@ -50,7 +50,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                     |> Option.ofObj
                     |> Option.bind (fun assemblyName ->
                         let psiModules = psiModules.GetAssemblyPsiModuleByName(assemblyName)
-                        psiModules |> Seq.tryFind _.Assembly.Location.Equals(dllPath))
+                        psiModules |> Seq.tryFind (fun psiModule -> psiModule.Assembly.Location.Equals(dllPath)))
                     |> Option.map (fun psiModule ->
                         let assemblyFile = psiServices.Symbols.GetLibraryFile(psiModule.Assembly)
                         assemblyFile.XmlDocIndex)

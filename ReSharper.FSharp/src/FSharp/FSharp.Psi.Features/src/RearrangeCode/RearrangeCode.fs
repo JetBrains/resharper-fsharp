@@ -28,7 +28,7 @@ type FSharpRearrangeableSimpleSwap<'TNode, 'TParent when
 type RearrangeableCaseFieldDeclarationProvider() =
     inherit FSharpRearrangeableSimpleSwap<ICaseFieldDeclaration, IUnionCaseFieldDeclarationList>(
         "case field declaration", Direction.LeftRight, UnionCaseFieldDeclarationListNavigator.GetByField,
-        _.FieldsEnumerable)
+        fun l -> l.FieldsEnumerable)
 
 
 [<AbstractClass>]
@@ -141,20 +141,20 @@ type RearrangeableTupleExprProvider() =
 type RearrangeableLambdaParamPatternProvider() =
     inherit FSharpRearrangeableSimpleSwap<IFSharpPattern, ILambdaExpr>(
         "lambda parameter", Direction.LeftRight, LambdaExprNavigator.GetByPattern,
-        _.PatternsEnumerable)
+        fun lambdaExpr -> lambdaExpr.PatternsEnumerable)
 
 
 [<RearrangeableElementType>]
 type RearrangeableRecordFieldDeclarationProvider() =
     inherit FSharpRearrangeableSimpleSwap<IRecordFieldDeclaration, IRecordFieldDeclarationList>(
         "record field declaration", Direction.All, RecordFieldDeclarationListNavigator.GetByFieldDeclaration,
-        _.FieldDeclarationsEnumerable)
+        fun l -> l.FieldDeclarationsEnumerable)
 
 [<RearrangeableElementType>]
 type RearrangeableFunctionParameterProvider() =
     inherit FSharpRearrangeableSimpleSwap<IParametersPatternDeclaration, IBinding>(
         "function parameter", Direction.LeftRight, BindingNavigator.GetByParametersDeclaration,
-        _.ParametersDeclarationsEnumerable)
+        fun binding -> binding.ParametersDeclarationsEnumerable)
 
 
 type RearrangeableEnumCaseLikeDeclaration(decl: IEnumCaseLikeDeclaration) =

@@ -172,7 +172,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                 getDefaultOptions path |> createFcsProject path
 
     let getOptions path source : FSharpProjectOptions option =
-        getFcsProject path source true |> Option.map _.ProjectOptions
+        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectOptions)
 
     interface IScriptFcsProjectProvider with
         member x.GetScriptOptions(path: VirtualFileSystemPath, source) =

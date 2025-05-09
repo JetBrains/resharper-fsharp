@@ -29,7 +29,7 @@ open JetBrains.TextControl
 let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     let sameParamNumberMembersGroups =
         mfvInstances
-        |> List.map _.Mfv
+        |> List.map (fun mfvInstance -> mfvInstance.Mfv)
         |> List.groupBy (fun mfv ->
             mfv.LogicalName, Seq.map Seq.length mfv.CurriedParameterGroups |> Seq.toList)
 
@@ -90,7 +90,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (indent: int) (
 
     let typeParams =
         if not addTypes then [] else
-        mfv.GenericParameters |> Seq.map _.Name |> Seq.toList
+        mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
 
     let memberName =
         if isPropertyAccessor then
@@ -433,7 +433,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     |> Seq.map (fun (m, mfvInstance) ->
         FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
     |> Seq.filter (fun i -> not (ownMembersDescriptors.Contains(i.TestDescriptor)))
-    |> Seq.distinctBy _.TestDescriptor // todo: better way to check shadowing/overriding members
+    |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
 
 let getOverridableMembers missingMembersOnly (typeDeclaration: IFSharpTypeElementDeclaration) : FSharpGeneratorElement seq =

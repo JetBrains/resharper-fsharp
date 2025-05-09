@@ -519,7 +519,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             | _ -> failwith "FSharpDeconstruction.deconstructImpl"
         else
             if data.Keywords.Length > 1 then
-                let keywords = data.Keywords |> List.map _.TokenRepresentation
+                let keywords = data.Keywords |> List.map (fun nodeType -> nodeType.TokenRepresentation)
                 let suggestions = NameSuggestionsExpression(keywords)
                 hotspotsRegistry.Register([| binding.BindingKeyword :> ITreeNode |], suggestions)
 
@@ -682,7 +682,7 @@ type FSharpIntroduceVarHelper() =
 
         // Replace the actual source expression with the outermost expression among usages,
         // since it's needed for calculating a common node to replace.
-        let sourceExpr = data.Usages |> Seq.minBy _.GetTreeStartOffset().Offset :?> IFSharpExpression
+        let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
 
         let commonParent = FSharpIntroduceVariable.getCommonParentExpr data sourceExpr
         let safeParentToInsertBefore = FSharpIntroduceVariable.getSafeParentExprToInsertBefore workflow commonParent
