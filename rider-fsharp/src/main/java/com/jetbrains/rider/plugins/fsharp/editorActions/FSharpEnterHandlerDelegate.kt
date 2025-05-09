@@ -20,15 +20,67 @@ import com.intellij.psi.util.startOffset
 import com.intellij.util.text.CharArrayUtil
 import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.editors.getPsiFile
+import com.jetbrains.rider.editors.offsetToDocCoordinates
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.LINE_COMMENT
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
+import com.jetbrains.rider.plugins.fsharp.editorActions.LineIndent.Type.*
 import java.lang.Character.isWhitespace
 
 private val logger = Logger.getInstance(FSharpEnterHandlerDelegate::class.java)
 
 class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
+  private val indentFromToken: TokenSet = TokenSet.create(
+    FSharpTokenType.LBRACK_LESS,
+    FSharpTokenType.LQUOTE_TYPED,
+    FSharpTokenType.LQUOTE_UNTYPED,
+    FSharpTokenType.STRUCT,
+    FSharpTokenType.CLASS,
+    FSharpTokenType.INTERFACE,
+    FSharpTokenType.TRY,
+    FSharpTokenType.NEW,
+    FSharpTokenType.LAZY
+  )
+
+  private val allowKeepIndent: TokenSet = TokenSet.create(
+    FSharpTokenType.LPAREN,
+    FSharpTokenType.LBRACK,
+    FSharpTokenType.LBRACE,
+    FSharpTokenType.LBRACK_BAR,
+    FSharpTokenType.EQUALS,
+    FSharpTokenType.LARROW,
+    FSharpTokenType.RARROW,
+    FSharpTokenType.IF,
+    FSharpTokenType.THEN,
+    FSharpTokenType.ELIF,
+    FSharpTokenType.ELSE,
+    FSharpTokenType.MATCH,
+    FSharpTokenType.WHILE,
+    FSharpTokenType.WHEN,
+    FSharpTokenType.DO,
+    FSharpTokenType.DO_BANG,
+    FSharpTokenType.YIELD,
+    FSharpTokenType.YIELD_BANG,
+    FSharpTokenType.BEGIN
+  )
+
+  private val indentFromPrevLine: TokenSet = TokenSet.create(
+    FSharpTokenType.FUNCTION,
+    FSharpTokenType.EQUALS,
+    FSharpTokenType.LARROW,
+    FSharpTokenType.MATCH,
+    FSharpTokenType.WHILE,
+    FSharpTokenType.WHEN,
+    FSharpTokenType.DO,
+    FSharpTokenType.DO_BANG,
+    FSharpTokenType.YIELD,
+    FSharpTokenType.YIELD_BANG,
+    FSharpTokenType.BEGIN
+  )
+
+  private val indentTokens: TokenSet = TokenSet.orSet(indentFromToken, indentFromPrevLine)
+
   private val deindentingTokens: TokenSet = TokenSet.create(
     FSharpTokenType.RPAREN,
     FSharpTokenType.RBRACK,
@@ -49,15 +101,25 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     Pair(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
   )
 
+  private val leftBracketsToAddIndent = TokenSet.create(
+    FSharpTokenType.LPAREN,
+    FSharpTokenType.LBRACE,
+    FSharpTokenType.LBRACK,
+    FSharpTokenType.LBRACK_BAR,
+    FSharpTokenType.LBRACK_LESS,
+    FSharpTokenType.LQUOTE_TYPED,
+    FSharpTokenType.LQUOTE_UNTYPED
+  )
+
   private val rightBracketsToAddSpace = emptyBracketsToAddSpace.map { it.second }.toSet()
 
   private fun isIgnored(tokenType: IElementType?) =
-    tokenType != null && (tokenType == FSharpTokenType.WHITESPACE || FSharpTokenType.COMMENTS.contains(tokenType))
+    tokenType != null && (tokenType == FSharpTokenType.WHITESPACE || tokenType.isComment)
 
   private fun shouldTrimSpacesBeforeToken(tokenType: IElementType?) =
     !(tokenType == null ||
       FSharpTokenType.RIGHT_BRACES.contains(tokenType) ||
-      FSharpTokenType.COMMENTS.contains(tokenType))
+      tokenType.isComment)
 
   private fun findUnmatchedBracketToLeft(iterator: HighlighterIterator, offset: Int, minOffset: Int): Boolean {
     if (iterator.end > offset) iterator.retreat()
@@ -261,8 +323,8 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
   fun isInsideString(editor: Editor, caretOffset: Int): Boolean {
     val iterator = editor.highlighter.createIterator(caretOffset - 1)
     return !iterator.atEnd() &&
-            FSharpTokenType.ALL_STRINGS.contains(iterator.tokenType) &&
-            caretOffset > iterator.start && caretOffset < iterator.end
+      FSharpTokenType.ALL_STRINGS.contains(iterator.tokenType) &&
+      caretOffset > iterator.start && caretOffset < iterator.end
   }
 
   private fun doDumpIndent(editor: Editor, caretOffset: Int, trimSpacesAfterCaret: Boolean) {
@@ -434,13 +496,224 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     return true
   }
 
+  private fun isFirstTokenOnLine(editor: Editor, offset: Int): Boolean {
+    val iterator = editor.highlighter.createIterator(offset)
+    iterator.retreat()
+    while (!iterator.atEnd() && isIgnored(iterator.tokenType)) {
+      iterator.retreat()
+    }
+    return iterator.atEnd() || iterator.tokenType == FSharpTokenType.NEW_LINE
+  }
+
+  private fun isLastTokenOnLine(editor: Editor, offset: Int): Boolean {
+    val iterator = editor.highlighter.createIterator(offset)
+    iterator.advance()
+    while (!iterator.atEnd() && isIgnored(iterator.tokenType)) {
+      iterator.advance()
+    }
+    return iterator.atEnd() || iterator.tokenType == FSharpTokenType.NEW_LINE
+  }
+
+  private fun getLineIndent(editor: Editor, line: Int): LineIndent? {
+    val document = editor.document
+    if (line >= document.lineCount) return null
+
+    val startOffset = document.getLineStartOffset(line)
+    val endOffset = document.getLineEndOffset(line)
+
+    val iterator = editor.highlighter.createIterator(startOffset)
+    if (iterator.atEnd()) return null
+
+    var commentOffset: LineIndent? = null
+    while (!iterator.atEnd() && iterator.start < endOffset && isIgnored(iterator.tokenType)) {
+      if (commentOffset == null && iterator.tokenType.isComment) {
+        commentOffset = LineIndent(Comments, iterator.start - startOffset)
+      }
+      iterator.advance()
+    }
+
+    val tokenType = iterator.tokenTypeSafe
+    return if (tokenType == null || isIgnored(tokenType) || tokenType == FSharpTokenType.NEW_LINE) {
+      commentOffset
+    } else {
+      LineIndent(Source, iterator.start - startOffset)
+    }
+  }
+
+  private fun tryGetNestedIndentBelow(
+    editor: Editor,
+    line: Int,
+    preferComment: Boolean,
+    currentIndent: Int
+  ): Pair<Int, LineIndent>? {
+
+    tailrec fun tryFindIndent(
+      editor: Editor,
+      firstFoundCommentIndent: Pair<Int, LineIndent>?,
+      line: Int
+    ): Pair<Int, LineIndent>? {
+      if (line >= editor.document.lineCount) return firstFoundCommentIndent
+
+      val lineIndent = getLineIndent(editor, line) ?: return tryFindIndent(editor, firstFoundCommentIndent, line + 1)
+      val indent = Pair(line, lineIndent)
+
+      return when (lineIndent.type) {
+        Source -> if (lineIndent.indent > currentIndent) indent else firstFoundCommentIndent
+        Comments -> {
+          if (preferComment) indent
+          else if (firstFoundCommentIndent == null && lineIndent.indent > currentIndent)
+            tryFindIndent(editor, indent, line + 1)
+          else tryFindIndent(editor, firstFoundCommentIndent, line + 1)
+        }
+      }
+    }
+
+    return tryFindIndent(editor, null, line + 1)
+  }
+
+  private fun tryGetNestedIndentBelowLine(
+    editor: Editor,
+    line: Int
+  ): Pair<Int, LineIndent>? {
+    val lineIndent = getLineIndent(editor, line)
+    return when (lineIndent?.type) {
+      null,
+      Comments -> null
+
+      Source -> tryGetNestedIndentBelow(editor, line, false, lineIndent.indent)
+    }
+  }
+
+  fun findRightBracket(iterator: HighlighterIterator): Boolean {
+    return leftBracketsToAddIndent.contains(iterator.tokenType) &&
+      FSharpBracketMatcher().findMatchingBracket(iterator.asTokenIterator()) != null
+  }
+
+  fun isSingleLineBrackets(editor: Editor, offset: Int): Boolean {
+    val iterator = editor.highlighter.createIterator(offset)
+    val document = editor.document
+    val startLine = document.getLineNumber(iterator.start)
+    return if (!findRightBracket(iterator)) {
+      false
+    } else {
+      document.getLineNumber(iterator.start) == startLine
+    }
+  }
+
+  fun getOffsetInLine(document: Document, line: Int, offset: Int) = offset - document.getLineStartOffset(line)
+
+  fun handleEnterAddIndent(editor: Editor, caretOffset: Int): Boolean {
+    var iterator = editor.highlighter.createIterator(caretOffset - 1)
+    if (iterator.atEnd()) return false
+
+    var encounteredNewLine = false
+    while (!iterator.atEnd() && (isIgnored(iterator.tokenType) || iterator.tokenType == FSharpTokenType.NEW_LINE)) {
+      if (iterator.tokenType == FSharpTokenType.NEW_LINE) encounteredNewLine = true
+      iterator.retreat()
+    }
+
+    if (iterator.atEnd()) return false
+    if (!indentTokens.contains(iterator.tokenType) && (encounteredNewLine || !allowKeepIndent.contains(iterator.tokenType)))
+      return false
+
+    val tokenStart = iterator.start
+    val tokenType = iterator.tokenType
+    val document = editor.document
+    val line = document.getLineNumber(tokenStart)
+
+    if (leftBracketsToAddIndent.contains(tokenType) &&
+      !isSingleLineBrackets(editor, tokenStart) &&
+      !isLastTokenOnLine(editor, tokenStart) &&
+      isFirstTokenOnLine(editor, tokenStart)
+    ) return false
+
+    val caretLine = document.getLineNumber(caretOffset)
+
+    val nestedIndent = tryGetNestedIndentBelowLine(editor, line)
+    if (nestedIndent != null) {
+      val (belowLine, lineIndent) = nestedIndent
+      if (belowLine == caretLine) return false
+
+      insertNewLineAt(editor, lineIndent.indent, caretOffset, true)
+      return true
+    }
+
+    iterator = editor.highlighter.createIterator(caretOffset)
+
+    if (!iterator.atEnd() &&
+      isFirstTokenOnLine(editor, iterator.start) &&
+      !isLastTokenOnLine(editor, iterator.start)
+    ) return false
+
+    val indentSize = run {
+      val lineIndent = getLineIndent(editor, caretLine)
+      if (lineIndent != null && lineIndent.type == Comments)
+        return@run lineIndent.indent
+
+      iterator = editor.highlighter.createIterator(caretOffset - 1)
+      val indent = getIndentSettings(editor).indentSize
+
+      if (tokenType == FSharpTokenType.EQUALS && !encounteredNewLine && isFirstTokenOnLine(editor, iterator.start)
+      ) {
+        getOffsetInLine(document, line, tokenStart)
+      } else if (indentFromToken.contains(tokenType)) {
+        indent + getOffsetInLine(document, line, tokenStart)
+      } else {
+        val prevIndentSize = run {
+          val continuedLine = getContinuedIndentLine(editor, tokenStart, true)
+          getLineWhitespaceIndent(editor, continuedLine)
+        }
+        prevIndentSize + indent
+      }
+    }
+
+    insertNewLineAt(editor, indentSize, caretOffset, true)
+    return true
+  }
+
+  fun handleEnterAddBiggerIndentFromBelow(editor: Editor, caretOffset: Int): Boolean {
+    val document = editor.document
+    val caretCoords = document.offsetToDocCoordinates(caretOffset)
+    val caretLine = caretCoords.line
+
+    if (caretLine + 1 >= document.lineCount) return false
+
+    val lineStartOffset = document.getLineStartOffset(caretLine)
+    val iterator = editor.highlighter.createIterator(lineStartOffset)
+    var seenComment = false
+
+    if (iterator.atEnd()) return false
+
+    while (!iterator.atEnd() && (
+        iterator.tokenType == FSharpTokenType.WHITESPACE ||
+          (iterator.tokenType != null && iterator.tokenType.isComment && iterator.start < caretOffset)
+        )
+    ) {
+      seenComment = seenComment || iterator.tokenType.isComment
+      iterator.advance()
+    }
+
+    if (iterator.tokenTypeSafe != FSharpTokenType.NEW_LINE) return false
+
+    val currentIndent = if (seenComment) 0 else caretCoords.column
+
+    val nestedIndentBelow = tryGetNestedIndentBelow(editor, caretLine, seenComment, currentIndent)
+    if (nestedIndentBelow == null) return false
+
+    val (_, lineIndent) = nestedIndentBelow
+    insertNewLineAt(editor, lineIndent.indent, caretOffset, false)
+    return true
+  }
+
   private fun handleEnter(
     editor: Editor,
     caretOffset: Int,
   ) {
     if (handleEnterInTripleQuotedString(editor, caretOffset)) return
     if (handleEnterInLineComment(editor, caretOffset)) return
+    if (handleEnterAddIndent(editor, caretOffset)) return
     if (handleEnterFindLeftBracket(editor, caretOffset)) return
+    if (handleEnterAddBiggerIndentFromBelow(editor, caretOffset)) return
 
     val iterator = editor.highlighter.createIterator(caretOffset)
 
@@ -472,5 +745,12 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
       logger.error("Couldn't execute enter handler for F#: ${exception.message}${System.lineSeparator()}$trace")
       return Result.Continue
     }
+  }
+}
+
+
+internal data class LineIndent(val type: Type, val indent: Int) {
+  enum class Type {
+    Source, Comments
   }
 }
