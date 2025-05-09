@@ -51,7 +51,7 @@ type FSharpExpressionEvaluationInfoProvider() =
                 let offset = range.StartOffset.Offset
                 let tokenOpt =
                     file.FindTokensAt(TreeTextRange(TreeOffset(offset - 1), TreeOffset(offset + 1)))
-                    |> Seq.tryFind _.GetTokenType().IsIdentifier
+                    |> Seq.tryFind (fun t -> t.GetTokenType().IsIdentifier)
                 match tokenOpt with
                 | Some(token) ->
                     let document = file.GetSourceFile().Document

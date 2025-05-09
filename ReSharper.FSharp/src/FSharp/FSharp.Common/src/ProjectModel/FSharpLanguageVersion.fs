@@ -89,7 +89,8 @@ module FSharpLanguageLevel =
         let levelProvider =
             psiModule.GetPsiServices()
                 .GetComponent<SolutionFeaturePartsContainer>()
-                .GetFeatureParts<ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion>>(_.IsApplicable(psiModule))
+                .GetFeatureParts<ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion>>(fun p ->
+                    p.IsApplicable(psiModule))
                 .SingleItem()
 
         levelProvider.GetLanguageLevel(psiModule)

@@ -621,9 +621,9 @@ type FSharpCodeCompletionTypingTest() =
 
     member this.Quote(e:Expression<System.Func<_, _>>) = e
 
-    override this.GetCompleteOnSpaceSetting() = this.Quote(_.CompleteOnSpace)
-    override this.GetDoNotCompleteOnSetting() = this.Quote(_.NonCompletingCharacters)
-    override this.GetAutopopupTypeSetting() = this.Quote(_.OnIdent)
+    override this.GetCompleteOnSpaceSetting() = this.Quote(fun key -> key.CompleteOnSpace)
+    override this.GetDoNotCompleteOnSetting() = this.Quote(fun key -> key.NonCompletingCharacters)
+    override this.GetAutopopupTypeSetting() = this.Quote(fun key -> key.OnIdent)
 
     [<Test>] member x.``Space - Pattern - As 01``() = x.DoNamedTest()
     [<Test>] member x.``Space - Pattern - As 02``() = x.DoNamedTest()

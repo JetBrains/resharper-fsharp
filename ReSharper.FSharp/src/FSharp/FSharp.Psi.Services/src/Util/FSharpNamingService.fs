@@ -113,7 +113,7 @@ module FSharpNamingService =
                             usedNames.Add(name.RemoveBackticks(), refExpr)
 
                     | :? ILetOrUseExpr as letExpr ->
-                        let patterns = letExpr.BindingsEnumerable |> Seq.map _.HeadPattern
+                        let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
                         addScopeForPatterns patterns letExpr.InExpression
 
                     | :? IBinding as binding ->
@@ -130,7 +130,7 @@ module FSharpNamingService =
                             let parameters = binding.ParametersDeclarationsEnumerable
                             if parameters.IsEmpty() then [| binding.HeadPattern |] :> IFSharpPattern seq else
 
-                            let parameters = parameters |> Seq.map _.Pattern
+                            let parameters = parameters |> Seq.map (fun paramDecl -> paramDecl.Pattern)
                             if letExpr.IsRecursive then
                                 Seq.append [| headPattern |] parameters
                             else
@@ -181,7 +181,7 @@ module FSharpNamingService =
             | seqExpr ->
                 seqExpr.ExpressionsEnumerable
                 |> Seq.skipWhile ((!=) expr)
-                |> Seq.iter _.ProcessThisAndDescendants(processor)
+                |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
 
         List.iter processExpr contextExprs
 
@@ -206,7 +206,7 @@ module FSharpNamingService =
                 pats 
 
         pats
-        |> Seq.collect _.NestedPatterns
+        |> Seq.collect (fun pat -> pat.NestedPatterns)
         |> Seq.choose (fun pat ->
             match pat with
             | :? IReferencePat as refPat -> Some(refPat.SourceName)

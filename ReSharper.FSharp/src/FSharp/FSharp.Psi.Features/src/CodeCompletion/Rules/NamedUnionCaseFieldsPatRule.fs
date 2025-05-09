@@ -57,7 +57,7 @@ type NamedUnionCaseFieldsPatRule() =
             if isNull namedUnionCaseFieldsPat then Set.empty else
 
             namedUnionCaseFieldsPat.FieldPatterns
-            |> Seq.map _.ShortName
+            |> Seq.map (fun fieldPat -> fieldPat.ShortName)
             |> Seq.filter (fun name -> name <> SharedImplUtil.MISSING_DECLARATION_NAME)
             |> Set.ofSeq
 

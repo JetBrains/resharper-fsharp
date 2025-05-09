@@ -69,7 +69,7 @@ type FSharpImportTypeHelper() =
                     let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)
                     let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToImport
                     let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
-                    let names = qualifiedElementList |> List.map _.GetSourceName()
+                    let names = qualifiedElementList |> List.map (fun el -> el.GetSourceName())
 
                     let autoOpenedModules = fsAssemblyAutoOpenCache.GetAutoOpenedModules(typeElement.Module)
                     if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else
@@ -93,7 +93,7 @@ type FSharpImportTypeHelper() =
             let typeReferenceName = context.As<ITypeReferenceName>()
             if isNotNull (AttributeNavigator.GetByReferenceName(typeReferenceName)) then
                 let attributeTypeElement = context.GetPredefinedType().Attribute.GetTypeElement()
-                candidates <- candidates |> Seq.filter _.IsDescendantOf(attributeTypeElement)
+                candidates <- candidates |> Seq.filter (fun c -> c.IsDescendantOf(attributeTypeElement))
 
             if isNotNull (InheritMemberNavigator.GetByTypeName(typeReferenceName)) then
                 candidates <- candidates |> Seq.filter (fun c -> c :? IInterface || c :? IClass || c :? IStruct)

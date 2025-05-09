@@ -163,7 +163,7 @@ type OverrideMemberRule() =
                                 mfvInstance.Mfv.CurriedParameterGroups
                                 |> Seq.map (fun group ->
                                     group
-                                    |> Seq.map _.Type.Instantiate(substitution).Format(displayContext)
+                                    |> Seq.map (fun p -> p.Type.Instantiate(substitution).Format(displayContext))
                                     |> String.concat ", "
                                     |> sprintf "(%s)"
                                 )

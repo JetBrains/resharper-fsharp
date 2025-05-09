@@ -89,7 +89,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
         this.AddBool(shadowCopyReferencesText, fsiOptions.ShadowCopyReferences)
         this.AddDescription(shadowCopyReferencesDescription)
 
-        this.AddString(fsiArgsText, _.FsiArgs)
+        this.AddString(fsiArgsText, fun key -> key.FsiArgs)
 
         this.AddHeader(FSharpScriptOptions.languageVersion)
         this.AddBool(specifyLanguageVersion, fsiOptions.SpecifyLanguageVersion)
@@ -123,7 +123,7 @@ type FsiOptionsPage(lifetime: Lifetime, optionsPageContext, settings, settingsSc
 
         let fileChooser =
             let path = fsiPath.Value.ToNativeFileSystemPath()
-            x.AddFileChooserOption(fsiPath.SelectTwoWay(lifetime, _.ToNativeFileSystemPath(), _.ToVirtualFileSystemPath()),
+            x.AddFileChooserOption(fsiPath.SelectTwoWay(lifetime, (fun p -> p.ToNativeFileSystemPath()), (fun p -> p.ToVirtualFileSystemPath())),
                                    null, path, iconHost, dialogs, canBeEmpty = true, predefinedValues = [])
         fsiOptions.IsCustomTool.FlowIntoRd(lifetime, fileChooser.Enabled)
 

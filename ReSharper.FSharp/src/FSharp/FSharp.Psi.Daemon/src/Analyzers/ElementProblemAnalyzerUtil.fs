@@ -32,7 +32,7 @@ type ElementProblemAnalyzerData with
                 match psiModule with
                 | :? FSharpScriptPsiModule ->
                     let psiModules = psiModule.GetPsiServices().Modules
-                    psiModules.GetModuleReferences(psiModule) |> Seq.map _.Module
+                    psiModules.GetModuleReferences(psiModule) |> Seq.map (fun reference -> reference.Module)
                 | _ ->
                     let project = psiModule.ContainingProjectModule.As<IProject>()
                     if isNull project || not project.IsFSharp then Seq.empty else

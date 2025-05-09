@@ -142,7 +142,7 @@ module FSharpDeconstructionImpl =
 
         let patternUsedNames =
             FSharpNamingService.getPatternContextUsedNames pat
-            |> Seq.map _.RemoveBackticks()
+            |> Seq.map (fun name -> name.RemoveBackticks())
         usedNames.AddRange(patternUsedNames)
 
         if isFromParameter && isNotNull binding then

@@ -519,7 +519,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             if isScriptLike sourceFile then false else
 
             tryGetFcsProject sourceFile.PsiModule
-            |> Option.map _.ImplementationFilesWithSignatures.Contains(sourceFile.GetLocation())
+            |> Option.map (fun project -> project.ImplementationFilesWithSignatures.Contains(sourceFile.GetLocation()))
             |> Option.defaultValue false
 
         member x.GetParsingOptions(sourceFile) =
@@ -546,7 +546,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             if isScriptLike sourceFile then 0 else
 
             tryGetFcsProject sourceFile.PsiModule
-            |> Option.map _.GetIndex(sourceFile)
+            |> Option.map (fun project -> project.GetIndex(sourceFile))
             |> Option.defaultValue -1
 
         member x.ProjectRemoved = fcsProjectInvalidated :> _

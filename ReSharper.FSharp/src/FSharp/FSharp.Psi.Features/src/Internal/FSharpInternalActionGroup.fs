@@ -60,7 +60,9 @@ type DumpFcsAssemblyReaderShimAction() =
             let solution = context.GetData(ProjectModelDataConstants.SOLUTION)
             let assemblyReaderShim = solution.GetComponent<IFcsAssemblyReaderShim>()
 
-            Dumper.DumpToNotepad(_.WriteLine(assemblyReaderShim.TestDump))
+            Dumper.DumpToNotepad(fun writer ->
+                writer.WriteLine(assemblyReaderShim.TestDump)
+            )
 
 
 [<Action("FSharp_Internal_DumpCurrentFile", "Dump current file")>]

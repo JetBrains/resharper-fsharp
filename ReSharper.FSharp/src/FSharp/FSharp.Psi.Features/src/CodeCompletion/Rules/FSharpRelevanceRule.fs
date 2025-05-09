@@ -63,7 +63,7 @@ type FSharpRelevanceRule() =
 
             | :? FSharpField as field when
                     field.DeclaringEntity
-                    |> Option.map _.IsEnum
+                    |> Option.map (fun e -> e.IsEnum)
                     |> Option.defaultValue false ->
                 markRelevance item CLRLookupItemRelevance.EnumMembers
 

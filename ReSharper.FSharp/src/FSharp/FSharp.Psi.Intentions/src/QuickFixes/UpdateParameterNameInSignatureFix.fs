@@ -56,7 +56,7 @@ type UpdateParameterNameInSignatureFix(warning: ArgumentNameMismatchWarning) =
                 | :? IReferencePat as rp ->
                     BindingSignatureNavigator.GetByHeadPattern(rp)
                     |> Option.ofObj
-                    |> Option.map _.ReturnTypeInfo.ReturnType
+                    |> Option.map (fun bs -> bs.ReturnTypeInfo.ReturnType)
                 | :? IMemberSignature as ms ->
                     Some(ms.ReturnTypeInfo.ReturnType)
                 | :? IConstructorSignature as cs ->
