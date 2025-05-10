@@ -51,11 +51,11 @@ type InheritClass() =
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
-(1): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
-(2): ReSharper Underlined Error Highlighting: This expression was expected to have type
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'int32'    
 but here has type
     'int16'    
+(2): ReSharper Underlined Error Highlighting: The type 'int32' does not match the type 'int16'
 (3): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'Class' is a CLI or F# struct type
 (4): ReSharper Warning: Enums may take values outside known cases. For example, the value 'enum<Enum> (3)' may indicate a case not covered by the pattern(s).
 (5): ReSharper Dead Code: This rule will never be matched

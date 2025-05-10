@@ -6,10 +6,10 @@ module Nested1 =
         type T() = class end
 
 open Nested1
-let t: ||Nested1.|(1)Nested2.|(0)T = ||Nested1.|(3)Nested2.|(2)T()
+let t: ||Nested1.|(0)Nested2.|(1)T = ||Nested1.|(2)Nested2.|(3)T()
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Qualifier is redundant
-(1):<overlapped> ReSharper Dead Code: Qualifier is redundant
-(2): ReSharper Dead Code: Qualifier is redundant
-(3):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(0):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant
+(2):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(3): ReSharper Dead Code: Qualifier is redundant

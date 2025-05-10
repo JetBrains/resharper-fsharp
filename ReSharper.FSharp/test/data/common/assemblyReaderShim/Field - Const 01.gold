@@ -1,5 +1,5 @@
-﻿|match |Class.ConstZero|(1) with
-|(0)| 1 -> ()
+﻿|match |Class.ConstZero|(0) with
+|(1)| 1 -> ()
 
 
 match |0|(2) with
@@ -18,8 +18,8 @@ match |0|(4) with
 let _: int = Class.ConstZero
 
 ---------------------------------------------------------
-(0): ReSharper Warning: The declarations in this file will be placed in an implicit module 'Field - Const 01' based on the file name 'Field - Const 01.fs'. However this is not a valid F# identifier, so the contents will not be accessible from other files. Consider renaming the file or adding a 'module' or 'namespace' declaration at the top of the file.
-(1): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '0' may indicate a case not covered by the pattern(s).
+(0): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '0' may indicate a case not covered by the pattern(s).
+(1): ReSharper Warning: The declarations in this file will be placed in an implicit module 'Field - Const 01' based on the file name 'Field - Const 01.fs'. However this is not a valid F# identifier, so the contents will not be accessible from other files. Consider renaming the file or adding a 'module' or 'namespace' declaration at the top of the file.
 (2): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '1' may indicate a case not covered by the pattern(s).
 (3): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '0' may indicate a case not covered by the pattern(s).
 (4): ReSharper Warning: Incomplete pattern matches on this expression. For example, the value '2' may indicate a case not covered by the pattern(s).

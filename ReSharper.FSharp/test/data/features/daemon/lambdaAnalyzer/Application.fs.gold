@@ -3,7 +3,7 @@
 |fun x () -> f x ()|(0)
 |fun () () -> f () ()|(1)
 
-|fun x -> |id|(3) x|(2)
+|fun x -> |id|(2) x|(3)
 |fun x -> (fun x -> 5) x|(4)
 
 |fun (a, b) c -> f (a, b) c|(5)
@@ -21,8 +21,8 @@ let a = A.M("" |> |fun x -> A.M x|(9))
 ---------------------------------------------------------
 (0): ReSharper Hint: Lambda can be replaced with 'f'
 (1): ReSharper Hint: Lambda can be replaced with 'f'
-(2): ReSharper Hint: Lambda can be replaced with 'id'
-(3): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application
+(3): ReSharper Hint: Lambda can be replaced with 'id'
 (4): ReSharper Hint: Lambda can be simplified
 (5): ReSharper Hint: Lambda can be replaced with 'f'
 (6): ReSharper Hint: Lambda can be replaced with 'f'

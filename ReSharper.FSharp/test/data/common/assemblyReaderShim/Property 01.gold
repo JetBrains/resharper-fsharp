@@ -48,22 +48,22 @@ let _: int = |Class.NoAccessors|(17)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Property 'StaticSet' is not readable
-(1): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(2): ReSharper Underlined Error Highlighting: Property 'StaticGet' cannot be set
-(3): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(4): ReSharper Underlined Error Highlighting: Property 'StaticExpressionBody' cannot be set
+(1): ReSharper Underlined Error Highlighting: Property 'StaticGet' cannot be set
+(2): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(3): ReSharper Underlined Error Highlighting: Property 'StaticExpressionBody' cannot be set
+(4): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
 (5): ReSharper Underlined Error Highlighting: Property 'Init' is not readable
-(6): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(7): ReSharper Underlined Error Highlighting: Property 'Get' cannot be set
-(8): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(9): ReSharper Underlined Error Highlighting: Property 'GetGet' cannot be set
+(6): ReSharper Underlined Error Highlighting: Property 'Get' cannot be set
+(7): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(8): ReSharper Underlined Error Highlighting: Property 'GetGet' cannot be set
+(9): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
 (10): ReSharper Underlined Error Highlighting: Property 'SetWithoutBody' is not readable
 (11): ReSharper Underlined Error Highlighting: Property 'InitWithoutBody' is not readable
 (12): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
-(13): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
-(14): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' cannot be set
-(15): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(16): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName2' cannot be set
+(13): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' cannot be set
+(14): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
+(15): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName2' cannot be set
+(16): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
 (17): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
-(18): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
-(19): ReSharper Underlined Error Highlighting: Property 'NoAccessors' cannot be set
+(18): ReSharper Underlined Error Highlighting: Property 'NoAccessors' cannot be set
+(19): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
