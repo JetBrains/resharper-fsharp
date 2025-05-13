@@ -170,7 +170,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
       private void VisitParametersOwner(IParameterOwnerMemberDeclaration decl, string memberName)
       {
         foreach (var parameterDeclaration in decl.ParameterPatterns)
-          VisitPatternDeclaration(parameterDeclaration, memberName);
+          VisitPatternDeclaration(parameterDeclaration, true, memberName);
       }
 
       private void VisitBindingNestedLambda(IFSharpExpression expr, string bindingName)
@@ -178,14 +178,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
         if (expr is not LambdaExpr lambdaExpr) return;
 
         foreach (var parameterDeclaration in lambdaExpr.PatternsEnumerable)
-          VisitPatternDeclaration(parameterDeclaration, bindingName);
+          VisitPatternDeclaration(parameterDeclaration, true, bindingName);
 
         VisitBindingNestedLambda(lambdaExpr.Expression, bindingName);
       }
 
-      private void VisitPatternDeclaration(IFSharpPattern patternDecl, string parametersOwnerName)
+      private void VisitPatternDeclaration(IFSharpPattern patternDecl, bool isTopLevel, string parametersOwnerName)
       {
-        if (patternDecl.IgnoreInnerParens() is IAttribPat attributedParam)
+        var pattern = patternDecl.IgnoreInnerParens();
+
+        if (isTopLevel && pattern is ITuplePat tuplePat)
+          foreach (var pat in tuplePat.Patterns)
+            VisitPatternDeclaration(pat, false, parametersOwnerName);
+
+        else if (pattern is IAttribPat attributedParam)
           CollectAttributes(attributedParam, parametersOwnerName);
       }
     }
