@@ -24,6 +24,7 @@ type TypeHintContextActionsTests() =
 
     [<Test>] member x.``Parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Parameter 02 - Optional``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter 03 - Optional``() = x.DoNamedTest()
 
     [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
 
