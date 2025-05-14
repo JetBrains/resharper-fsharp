@@ -3,6 +3,7 @@ module TestModuleWithAttr
 
 let binding = ()
 
+[<CompiledName("compiledName")>]
 [<MyAttribute>]
 let bindingWithAttr = ()
 
@@ -33,6 +34,7 @@ type MyType
   [<MyAttribute>]
   member x.MethodWithAttr() = ()
 
+  [<CompiledName("compiledName")>]
   member x.MethodWithParamAttr(a, [<MyAttribute>] b) = ()
 
   member x.PropertyWithAttrSetter with set([<MyAttribute>] v) = ()
