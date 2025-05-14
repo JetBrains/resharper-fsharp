@@ -28,8 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
 
-    public string DeclaredName =>
-      HeadPattern?.Declarations.SingleItem()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public TreeTextRange GetNameRange()
     {
