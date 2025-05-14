@@ -29,10 +29,7 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
             if isNull declaration then null
             else declaration.SourceName
 
-        else
-            let reference = getReference argsOwner
-            if isNull reference then null else
-            reference.GetName()
+        else getReferenceName argsOwner
 
     if isNull memberName then null else
 

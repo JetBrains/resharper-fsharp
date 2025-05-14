@@ -55,6 +55,19 @@ let getArgsOwner (expr: IFSharpExpression) =
     let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
     FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
+let getReferenceName (fsArgsOwner: IFSharpArgumentsOwner) =
+    let identifier =
+        match fsArgsOwner with
+        | :? IFSharpReferenceOwner as refOwner -> refOwner.FSharpIdentifier
+
+        | :? IPrefixAppExpr as prefixAppExpr ->
+            let invokedRefExpr = prefixAppExpr.InvokedReferenceExpression
+            if isNull invokedRefExpr then null else invokedRefExpr.Identifier
+
+        | _ -> null
+
+    if isNull identifier then null else identifier.Name
+
 let getReference (fsArgsOwner: IFSharpArgumentsOwner) =
     match fsArgsOwner with
     | :? IFSharpReferenceOwner as refOwner -> refOwner.Reference
