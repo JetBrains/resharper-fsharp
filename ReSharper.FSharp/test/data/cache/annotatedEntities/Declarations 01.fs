@@ -8,6 +8,8 @@ let bindingWithAttr = ()
 
 let bindingWithAttrPat ([<MyAttribute>] x) = ()
 
+let bindingWithAttrPat2 (a, [<MyAttribute>] b) = ()
+
 let bindingWithInnerFun =
   fun x ->
     fun ([<MyAttribute>] y) -> ()
@@ -30,6 +32,8 @@ type MyType
 
   [<MyAttribute>]
   member x.MethodWithAttr() = ()
+
+  member x.MethodWithParamAttr(a, [<MyAttribute>] b) = ()
 
   member x.PropertyWithAttrSetter with set([<MyAttribute>] v) = ()
 

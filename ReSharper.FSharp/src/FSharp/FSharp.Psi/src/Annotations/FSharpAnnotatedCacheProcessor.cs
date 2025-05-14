@@ -77,20 +77,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
       public override void VisitTopBinding(ITopBinding topBinding)
       {
-        var headPattern = topBinding.HeadPattern;
-        if (headPattern == null) return;
+        var declaredName = topBinding.DeclaredName;
+        if (declaredName == SharedImplUtil.MISSING_DECLARATION_NAME) return;
 
-        foreach (var declaration in headPattern.Declarations)
-        {
-          if (declaration is not ITypeMemberDeclaration decl) continue;
+        VisitAttributesAndParametersOwner(topBinding, declaredName);
 
-          var declaredName = decl.DeclaredName;
-          if (declaredName == SharedImplUtil.MISSING_DECLARATION_NAME) continue;
-          VisitAttributesAndParametersOwner(topBinding, declaredName);
-
-          if (topBinding.ChameleonExpression.IsLambdaExpression())
-            VisitBindingNestedLambda(topBinding.Expression, declaredName);
-        }
+        if (topBinding.ChameleonExpression.IsLambdaExpression())
+          VisitBindingNestedLambda(topBinding.Expression, declaredName);
       }
 
       public override void VisitBindingSignature(IBindingSignature bindingSignature)
