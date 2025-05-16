@@ -50,8 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
       public override void VisitNode(ITreeNode node)
       {
         //TODO: inherit IAttributesOwnerDeclaration from IDeclaration?
-        if (node is IAttributesOwnerDeclaration attributesOwnerDeclaration and IDeclaration decl)
-          CollectAttributes(attributesOwnerDeclaration, decl.DeclaredName);
+        if (node is IAttributesOwnerDeclaration attributesOwnerDeclaration and IFSharpDeclaration decl)
+          CollectAttributes(attributesOwnerDeclaration, decl.SourceName);
       }
 
       public override void VisitFSharpTypeDeclaration(IFSharpTypeDeclaration fSharpTypeDeclaration) =>
@@ -65,10 +65,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
       public override void VisitConstructorSignature(IConstructorSignature constructorSignature)
       {
-        var typeDeclaration = constructorSignature.GetContainingTypeDeclaration();
-        if (typeDeclaration == null) return;
+        if (constructorSignature.GetContainingTypeDeclaration() is not IFSharpTypeDeclaration typeDeclaration) return;
 
-        var defaultMemberName = typeDeclaration.DeclaredName;
+        var defaultMemberName = typeDeclaration.SourceName;
         CollectAttributes(constructorSignature, defaultMemberName);
 
         if (AttributeUtil.HasAttributeSuffix(defaultMemberName, out var nameWithoutAttributeSuffix))
@@ -82,9 +81,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
         foreach (var declaration in headPattern.Declarations)
         {
-          if (declaration is not ITypeMemberDeclaration decl) continue;
+          if (declaration is not ITypeMemberDeclaration) continue;
 
-          var declaredName = decl.DeclaredName;
+          var declaredName = declaration.SourceName;
           if (declaredName == SharedImplUtil.MISSING_DECLARATION_NAME) continue;
           VisitAttributesAndParametersOwner(topBinding, declaredName);
 
@@ -100,16 +99,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
         foreach (var declaration in headPattern.Declarations)
         {
-          if (declaration is not ITypeMemberDeclaration decl) continue;
+          if (declaration is not ITypeMemberDeclaration) continue;
 
-          var declaredName = decl.DeclaredName;
+          var declaredName = declaration.SourceName;
           CollectAttributes(bindingSignature, declaredName);
         }
       }
 
       public override void VisitMemberDeclaration(IMemberDeclaration memberDeclaration)
       {
-        var memberName = memberDeclaration.DeclaredName;
+        var memberName = memberDeclaration.SourceName;
         VisitAttributesAndParametersOwner(memberDeclaration, memberName);
 
         foreach (var accessor in memberDeclaration.AccessorDeclarationsEnumerable)
@@ -119,10 +118,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
       private void VisitConstructorDecl(IConstructorDeclaration constructorDeclaration)
       {
-        var typeDeclaration = constructorDeclaration.GetContainingTypeDeclaration();
-        if (typeDeclaration == null) return;
+        if (constructorDeclaration.GetContainingTypeDeclaration() is not IFSharpTypeDeclaration typeDeclaration) return;
 
-        var defaultMemberName = typeDeclaration.DeclaredName;
+        var defaultMemberName = typeDeclaration.SourceName;
         VisitAttributesAndParametersOwner(constructorDeclaration, defaultMemberName);
 
         if (AttributeUtil.HasAttributeSuffix(defaultMemberName, out var nameWithoutAttributeSuffix))
@@ -170,7 +168,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
       private void VisitParametersOwner(IParameterOwnerMemberDeclaration decl, string memberName)
       {
         foreach (var parameterDeclaration in decl.ParameterPatterns)
-          VisitPatternDeclaration(parameterDeclaration, memberName);
+          VisitPatternDeclaration(parameterDeclaration, true, memberName);
       }
 
       private void VisitBindingNestedLambda(IFSharpExpression expr, string bindingName)
@@ -178,14 +176,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
         if (expr is not LambdaExpr lambdaExpr) return;
 
         foreach (var parameterDeclaration in lambdaExpr.PatternsEnumerable)
-          VisitPatternDeclaration(parameterDeclaration, bindingName);
+          VisitPatternDeclaration(parameterDeclaration, true, bindingName);
 
         VisitBindingNestedLambda(lambdaExpr.Expression, bindingName);
       }
 
-      private void VisitPatternDeclaration(IFSharpPattern patternDecl, string parametersOwnerName)
+      private void VisitPatternDeclaration(IFSharpPattern patternDecl, bool isTopLevel, string parametersOwnerName)
       {
-        if (patternDecl.IgnoreInnerParens() is IAttribPat attributedParam)
+        var pattern = patternDecl.IgnoreInnerParens();
+
+        if (isTopLevel && pattern is ITuplePat tuplePat)
+          foreach (var pat in tuplePat.Patterns)
+            VisitPatternDeclaration(pat, false, parametersOwnerName);
+
+        else if (pattern is IAttribPat attributedParam)
           CollectAttributes(attributedParam, parametersOwnerName);
       }
     }

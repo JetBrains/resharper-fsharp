@@ -10,14 +10,17 @@ MEMBERS:
 [<MyAttribute>]
 - bindingWithAttr
 - bindingWithAttrPat
+- bindingWithAttrPat2
 - bindingWithInnerFun
 - RecordFieldWithAttr
 - MyType
 - AutoPropertyWithAttr
 - MethodWithAttr
+- MethodWithParamAttr
 - PropertyWithAttrSetter
 - MethodWithAttrPat
 - AbstractMethodWithAttr
+- MyTypeWithAttrCtor
 - MyTypeWithAttrCtor
 - valFieldWithAttr
 

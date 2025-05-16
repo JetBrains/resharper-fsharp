@@ -3,10 +3,13 @@ module TestModuleWithAttr
 
 let binding = ()
 
+[<CompiledName("compiledName")>]
 [<MyAttribute>]
 let bindingWithAttr = ()
 
 let bindingWithAttrPat ([<MyAttribute>] x) = ()
+
+let bindingWithAttrPat2 (a, [<MyAttribute>] b) = ()
 
 let bindingWithInnerFun =
   fun x ->
@@ -30,6 +33,9 @@ type MyType
 
   [<MyAttribute>]
   member x.MethodWithAttr() = ()
+
+  [<CompiledName("compiledName")>]
+  member x.MethodWithParamAttr(a, [<MyAttribute>] b) = ()
 
   member x.PropertyWithAttrSetter with set([<MyAttribute>] v) = ()
 

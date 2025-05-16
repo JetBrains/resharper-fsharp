@@ -10,6 +10,7 @@ type A() =
 
     member x.K = "[123]"
 
+[<CompiledName("compiledName")>]
 let f ([<RegexPattern>] x: string) = ()
 f ("|[|(2)123|]|(3)")
 f "|[|(4)123|]|(5)"
