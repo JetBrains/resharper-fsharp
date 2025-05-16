@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -142,8 +143,11 @@ module SpecifyTypes =
             | _ -> pattern
 
         let pattern, fcsType =
-            match pattern with
-            | :? IOptionalValPat -> pattern, fcsType.GenericArguments[0]
+            match pattern.IgnoreInnerParens() with
+            | :? IOptionalValPat ->
+                let fcsType = if isOption fcsType then fcsType.GenericArguments[0] else fcsType
+                pattern, fcsType
+
             | _ ->
 
             let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)

@@ -69,6 +69,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Member 05 - Extension 02`` () = x.DoNamedTest()
     [<Test>] member x.``Member 06 - Optional param`` () = x.DoNamedTest()
     [<Test>] member x.``Member 07 - Optional param - With attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Member 08 - Optional param - Parens``() = x.DoNamedTest()
 
 
 // Most tests are in TypeHintContextActionsTests
