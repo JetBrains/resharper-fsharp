@@ -53,8 +53,8 @@
     <Compile Include="src\Util\FSharpStringLexer.fs" />
     <Compile Include="src\Util\RecordExprUtil.fs" />
     <Compile Include="src\Util\ObjExprUtil.fs" />
-    <Compile Include="src\Util\FSharpCompletionUtil.fs" />
     <Compile Include="src\Util\FSharpExtensionMemberUtil.fs" />
+    <Compile Include="src\Util\FSharpImportStaticMemberUtil.fs" />
     <Compile Include="src\Util\TypeAnnotationsUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />

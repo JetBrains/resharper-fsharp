@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
+// todo: we modify the tree and then ask FCS. What tree is used? Do we wait for the new analysis?
 let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
         (declaredElement: IClrDeclaredElement) opName =
     reference.SetRequiredQualifiers(declaredElement, context)

@@ -29,6 +29,7 @@
     </EmbeddedResource>
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
+    <Compile Include="src\CodeCompletion\FSharpCompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FcsLookupItem.fs" />
     <Compile Include="src\CodeCompletion\Strategies\FSharpAutopopupStrategies.fs" />
     <Compile Include="src\CodeCompletion\Rules\GenerateLambdaRule.fs" />

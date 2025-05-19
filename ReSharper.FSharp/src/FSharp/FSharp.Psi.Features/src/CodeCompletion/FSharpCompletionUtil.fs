@@ -6,7 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.TextControl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -64,3 +66,18 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
             NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
 
     ParametersOwnerPatNavigator.GetByParameter(parentPat)
+
+let getQualifierExpr (context: FSharpCodeCompletionContext) =
+    let reference = context.ReparsedContext.Reference
+    let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+    if isNull refExpr then Unchecked.defaultof<_> else
+
+    refExpr.Qualifier
+
+let getNs (typeMember: ITypeMember) =
+    match typeMember.ContainingType with
+    | :? IFSharpModule as fsModule ->
+        fsModule.QualifiedSourceName
+
+    | containingType ->
+        containingType.GetContainingNamespace().QualifiedName

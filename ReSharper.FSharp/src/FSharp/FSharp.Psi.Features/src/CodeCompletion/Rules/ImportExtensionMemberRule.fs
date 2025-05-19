@@ -11,20 +11,19 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.RichText
 open JetBrains.Util.Extension
 
 [<Language(typeof<FSharpLanguage>)>]
 type ImportExtensionMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
-
-    let getQualifierExpr (context: FSharpCodeCompletionContext) =
-        FSharpExtensionMemberUtil.getQualifierExpr context.ReparsedContext.Reference
 
     override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
 
@@ -83,5 +82,46 @@ type ImportExtensionMemberRule() =
                     .WithRelevance(CLRLookupItemRelevance.ImportedType)
 
             collector.Add(item)
+
+        false
+
+[<Language(typeof<FSharpLanguage>)>]
+type ImportStaticMemberRule() =
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    let getReference context =
+        match getQualifierExpr context with
+        | :? IReferenceExpr as refExpr -> refExpr.Reference
+        | _ -> null
+
+    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+
+    override this.IsAvailable(context) =
+        let reference = getReference context
+        FSharpImportStaticMemberUtil.isAvailable reference
+
+    // todo: sandboxed node issues?
+    override this.AddLookupItems(context, collector) =
+        let reference = getReference context
+        let accessContext = FSharpAccessContext(reference.GetElement())
+
+        let typeElements = FSharpImportStaticMemberUtil.getTypeElements false reference
+        for typeElement in typeElements do
+            let ns = getNs typeElement
+            for typeMember in typeElement.GetMembers() do
+                if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
+                    let name = typeMember.ShortName
+                    let info = ImportDeclaredElementInfo(typeMember, name, context, Ranges = context.Ranges)
+                    let item =
+                        LookupItemFactory.CreateLookupItem(info)
+                            .WithPresentation(fun _ ->
+                                let name = RichText(name)
+                                LookupUtil.AddInformationText(name, $"(in {ns})")
+                                TextualPresentation(name, info, iconManager.GetImage(typeMember, typeMember.PresentationLanguage, true)))
+                            .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
+                            .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
+                            .WithRelevance(CLRLookupItemRelevance.ImportedType)
+
+                    collector.Add(item)
 
         false

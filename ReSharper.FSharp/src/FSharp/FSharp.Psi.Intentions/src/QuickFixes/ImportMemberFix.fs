@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open JetBrains.Application
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.BulbActions
@@ -19,6 +20,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
@@ -44,7 +46,7 @@ type FSharpImportModuleMemberAction(typeElement: ITypeElement, reference: FSharp
         let typeName =
             match typeElement with
             | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
-            | typeElement -> typeElement.GetSourceName()
+            | typeElement -> typeElement.GetSourceName() // todo: qualified name?
 
         $"Import '{typeName}.{reference.GetName()}'"
 
@@ -66,6 +68,20 @@ type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference) =
     override this.Text =
         let containingTypeShortName = typeMember.ContainingType.ShortName
         $"Use {containingTypeShortName}.{reference.GetName()}"
+
+
+type FSharpImportStaticMemberFromQualifierTypeAction(typeElement: ITypeElement, reference: FSharpSymbolReference) =
+    inherit FSharpImportMemberActionBase<ITypeElement>(reference)
+
+    let [<Literal>] id = "FSharpImportStaticMemberFromQualifierTypeAction"
+
+    override this.Text =
+        let typeName = typeElement.GetQualifiedName()
+        $"Import '{typeName}'"
+
+    override this.Bind() =
+        let referenceOwner = reference.GetElement()
+        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeElement id
 
 
 [<AbstractClass>]
@@ -142,6 +158,8 @@ type FSharpImportModuleMemberFix(reference: IReference) =
         let result = HashSet()
 
         for typeElement in typeElements do
+            Interruption.Current.CheckAndThrow()
+
             match typeElement with
             | :? IEnum as enum when enum.HasMemberWithName(name, false) ->
                 result.Add(typeElement) |> ignore
@@ -187,3 +205,26 @@ type FSharpImportModuleMemberFix(reference: IReference) =
 
     override this.CreateAction(typeElement, reference) =
         FSharpImportModuleMemberAction(typeElement, reference)
+
+
+type FSharpImportStaticMemberFromQualifierTypeFix(reference: IReference) =
+    inherit FSharpImportMemberFixBase<ITypeElement>(reference)
+
+    override this.FindMembers(reference) =
+        if not (FSharpImportStaticMemberUtil.isAvailable reference) then [] else
+
+        let memberName = reference.GetName()
+        let qualifierReference = reference.QualifierReference
+        let accessContext = FSharpAccessContext(qualifierReference.GetElement())
+
+        let result = HashSet()
+
+        for typeElement in FSharpImportStaticMemberUtil.getTypeElements true qualifierReference do
+            for typeMember in typeElement.EnumerateOwnMembersWithName(memberName, false) do
+                if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
+                    result.Add(typeElement) |> ignore
+
+        result
+
+    override this.CreateAction(typeElement, fcsReference) =
+        FSharpImportStaticMemberFromQualifierTypeAction(typeElement, fcsReference.QualifierReference)
