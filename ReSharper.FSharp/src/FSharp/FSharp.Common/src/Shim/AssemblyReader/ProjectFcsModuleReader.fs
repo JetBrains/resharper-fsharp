@@ -10,7 +10,6 @@ open FSharp.Compiler.AbstractIL.ILBinaryReader
 open Internal.Utilities.Library
 open JetBrains.Application
 open JetBrains.Application.Threading
-open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
@@ -980,7 +979,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let result = List<ILPreTypeDef>()
 
         for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
-            result.Add(PreTypeDef(typeElement, reader))
+            if isNull (typeElement.GetContainingType()) then
+                result.Add(PreTypeDef(typeElement, reader))
 
         result.ToArray()
 
@@ -1178,9 +1178,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         isUpToDateTypeDefCustomAttributes typeElement typeDef &&
         isUpToDateNestedTypesAndMembers typeElement fcsTypeDef.Members
 
-    and isUpToDateNestedTypeDefs  (preTypeDefs: ILPreTypeDef[]) =
+    and isUpToDateNestedTypeDefs (typeElement: ITypeElement) (preTypeDefs: ILPreTypeDef[]) =
         isNull preTypeDefs ||
 
+        preTypeDefs.Length = typeElement.NestedTypes.Count &&
         preTypeDefs |> Array.forall (fun preTypeDef ->
             let preTypeDef = preTypeDef :?> PreTypeDef
             let clrTypeName = preTypeDef.ClrTypeName
@@ -1188,13 +1189,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             isNull typeDef ||
 
             let symbolScope = getSymbolScope ()
-            let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName).NotNull("IsUpToDate: nested type")
-            isUpToDateTypeDef typeElement typeDef)
+            let typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName)
+            isNotNull typeElement && isUpToDateTypeDef typeElement typeDef)
 
     and isUpToDateNestedTypesAndMembers (typeElement: ITypeElement) (members: FcsTypeDefMembers) =
         isNull members ||
 
-        isUpToDateNestedTypeDefs members.NestedTypes &&
+        isUpToDateNestedTypeDefs typeElement members.NestedTypes &&
         isUpToDateMembers typeElement members.MemberTables
 
     and isUpToDateMembers (typeElement: ITypeElement) (tables: FcsTypeDefMemberTables) =
