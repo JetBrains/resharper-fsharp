@@ -11,7 +11,7 @@ import org.testng.annotations.Test
 @Test
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
-class UrlInStringsTest : BaseTestWithMarkup() {
+class FSharpUrlInStringsTest : BaseTestWithMarkup() {
   private fun doTest() {
     doTestWithMarkupModel("Program.fs", "Program.fs") {
       waitForDaemon()
@@ -19,5 +19,6 @@ class UrlInStringsTest : BaseTestWithMarkup() {
     }
   }
 
+  @Test
   fun simple() = doTest()
 }
