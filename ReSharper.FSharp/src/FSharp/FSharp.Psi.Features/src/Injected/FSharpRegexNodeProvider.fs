@@ -18,7 +18,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
-type FSharpRegexNodeProvider() =
+type FSharpRegexNodeProvider(codeAnnotationsCache: CodeAnnotationsCache) =
+    let regexPatternAnnotationProvider = codeAnnotationsCache.GetLazyProvider<RegexPatternAnnotationProvider>()
+    let stringSyntaxAnnotationProvider = codeAnnotationsCache.GetLazyProvider<StringSyntaxAnnotationProvider>()
+
     let rec evalOptionsArg (expr: IFSharpExpression) =
         match expr.IgnoreInnerParens() with
         //TODO: move to IBinaryExpr
@@ -55,14 +58,19 @@ type FSharpRegexNodeProvider() =
             | _ -> None)
 
     let checkForAttributes (expr: IFSharpExpression) =
-        let attributesOwner = getAttributesOwner expr
+        let attributeNames =
+            Seq.append
+                stringSyntaxAnnotationProvider.Value.AttributeShortNames
+                [| regexPatternAnnotationProvider.Value.CodeAnnotationShortName |]
+
+        let attributesOwner = getAttributesOwner expr attributeNames
         if isNull attributesOwner then ValueNone else
 
         let isSuccess =
-            let hasAnnotation = getAnnotationInfo<RegexPatternAnnotationProvider, _>(attributesOwner)
+            let hasAnnotation = regexPatternAnnotationProvider.Value.GetInfo(attributesOwner)
             hasAnnotation ||
 
-            let languageName = getAnnotationInfo<StringSyntaxAnnotationProvider, _>(attributesOwner)
+            let languageName = stringSyntaxAnnotationProvider.Value.GetInfo(attributesOwner)
             equalsIgnoreCase StringSyntaxAnnotationProvider.Regex languageName ||
             equalsIgnoreCase InjectedLanguageIDs.ClrRegExpLanguage languageName
 
@@ -87,7 +95,7 @@ type FSharpRegexNodeProvider() =
                 | :? IInterpolatedStringExpr as expr when expr.IsTrivial() ->
                     checkForAttributes expr
 
-                | :? ILiteralExpr as expr ->
+                | :? ILiteralExpr as expr when expr.IsValidHost ->
                     let checkAttributesResult = checkForAttributes expr
                     if checkAttributesResult.IsSome then checkAttributesResult else
 
