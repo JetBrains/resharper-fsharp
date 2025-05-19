@@ -11,6 +11,8 @@ let bindingWithAttrPat ([<MyAttribute>] x) = ()
 
 let bindingWithAttrPat2 (a, [<MyAttribute>] b) = ()
 
+let bindingWithAttrPat3 (a, b) ([<MyAttribute>] c) = ()
+
 let bindingWithInnerFun =
   fun x ->
     fun ([<MyAttribute>] y) -> ()
@@ -35,7 +37,9 @@ type MyType
   member x.MethodWithAttr() = ()
 
   [<CompiledName("compiledName")>]
-  member x.MethodWithParamAttr(a, [<MyAttribute>] b) = ()
+  member x.MethodWithParamAttr1(a, [<MyAttribute>] b) = ()
+
+  member x.MethodWithParamAttr2(a, b) ([<MyAttribute>] c) = ()
 
   member x.PropertyWithAttrSetter with set([<MyAttribute>] v) = ()
 

@@ -20,21 +20,24 @@ let f1 =
         fun ([<RegexPattern>] x: string) -> ()
 f1 "[123]" "|[|(6)123|]|(7)"
 
+let f2 (x, y) (x1, [<RegexPattern>] y1) = ()
+f2 (1, 2) (3, "|[|(8)123|]|(9)")
+
 let g (x: string) = ()
 g ("[123]")
 
 [<RegexPattern>]
-let x = "|[|(8)123|]|(9)"
+let x = "|[|(10)123|]|(11)"
 
 [<StringSyntax("regex")>]
-let y = "|[|(10)123|]|(11)"
+let y = "|[|(12)123|]|(13)"
 
 let _ =
     ()
-    let _ = "|[|(12)123|]|(13)" //language=regex
+    let _ = "|[|(14)123|]|(15)" //language=regex
     ()
 
-Regex(pattern = "|[|(14)123|]|(15)")
+Regex(pattern = "|[|(16)123|]|(17)")
 Regex((pattern = "[123]"))
 id (pattern = "[123]")
 
@@ -48,13 +51,17 @@ type F =
                       [<StringSyntax(StringSyntaxAttribute.Regex)>] b: string,
                       ?c: string) = ()
 
-F.Foo("|[|(16)123|]|(17)")
-F.Foo("|[|(18)123|]|(19)", "|[|(20)123|]|(21)")
-F.Foo("|[|(22)123|]|(23)", "|[|(24)123|]|(25)", "[123]")
+    static member Car(a, b) (c, [<RegexPattern>] d: string) = ()
+
+F.Foo("|[|(18)123|]|(19)")
+F.Foo("|[|(20)123|]|(21)", "|[|(22)123|]|(23)")
+F.Foo("|[|(24)123|]|(25)", "|[|(26)123|]|(27)", "[123]")
 
 F.Bar("[123]")
-F.Bar("|[|(26)123|]|(27)", "|[|(28)123|]|(29)")
-F.Bar("|[|(30)123|]|(31)", "|[|(32)123|]|(33)", "[123]")
+F.Bar("|[|(28)123|]|(29)", "|[|(30)123|]|(31)")
+F.Bar("|[|(32)123|]|(33)", "|[|(34)123|]|(35)", "[123]")
+
+F.Car (1, 2) (3, "|[|(36)123|]|(37)")
 
 ---------------------------------------------------------
 (0): ReSharper Regex Set: 
@@ -91,3 +98,7 @@ F.Bar("|[|(30)123|]|(31)", "|[|(32)123|]|(33)", "[123]")
 (31): ReSharper Regex Set: 
 (32): ReSharper Regex Set: 
 (33): ReSharper Regex Set: 
+(34): ReSharper Regex Set: 
+(35): ReSharper Regex Set: 
+(36): ReSharper Regex Set: 
+(37): ReSharper Regex Set: 
