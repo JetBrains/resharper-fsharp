@@ -24,10 +24,7 @@ open JetBrains.Util.Extension
 type ImportExtensionMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let getQualifierExpr (context: FSharpCodeCompletionContext) =
-        FSharpExtensionMemberUtil.getQualifierExpr context.ReparsedContext.Reference
-
-    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+    override this.SupportedEvaluationMode = EvaluationMode.Full
 
     override this.IsAvailable(context) =
         context.EnableImportCompletion &&

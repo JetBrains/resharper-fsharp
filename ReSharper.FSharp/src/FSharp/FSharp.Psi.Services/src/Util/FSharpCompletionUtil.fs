@@ -6,7 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.TextControl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -28,11 +30,6 @@ type ITextControl with
         solution.Locks.QueueReadLockOrRunSync(solution.GetSolutionLifetimes().MaximumLifetime, "Next code completion", fun _ ->
             solution.CompletionSessionManager
                 .ExecuteAutomaticCompletionAsync(x, FSharpLanguage.Instance, AutopopupType.SoftAutopopup))
-
-
-// A tribute to IntellijIdeaRulezzz:
-// intellij-community/blob/master/platform/core-api/src/com/intellij/codeInsight/completion/CompletionUtilCore.java
-let [<Literal>] DummyIdentifier = "ReSharperFSharpRulezzz"
 
 
 let inline markRelevance (lookupItem: ILookupItem) (relevance: 'T) =
@@ -64,3 +61,16 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
             NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat)
 
     ParametersOwnerPatNavigator.GetByParameter(parentPat)
+
+let getQualifierExpr (context: FSharpCodeCompletionContext) =
+    let reference = context.ReparsedContext.Reference
+    let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+    if isNull refExpr then Unchecked.defaultof<_> else
+
+    refExpr.Qualifier
+
+let rec getNs (typeElement: ITypeElement) =
+    match typeElement.GetContainingType() with
+    | null -> typeElement.GetContainingNamespace().QualifiedName
+    | :? IFSharpModule as fsModule -> fsModule.QualifiedSourceName
+    | containingType -> getNs containingType

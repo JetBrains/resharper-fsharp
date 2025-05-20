@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -76,6 +75,10 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
 
 
 module FSharpCodeCompletionContext =
+    // A tribute to IntellijIdeaRulezzz:
+    // intellij-community/blob/master/platform/core-api/src/com/intellij/codeInsight/completion/CompletionUtilCore.java
+    let [<Literal>] DummyIdentifier = "ReSharperFSharpRulezzz"
+
     let private disableFullEvaluationKey = Key<obj>("FSharpCodeCompletionContext.disableFullEvaluationKey") 
 
     let isFullEvaluationDisabled (context: CodeCompletionContext) =
@@ -249,7 +252,7 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let completedRangeStart = if isIdentifierStart then tokenBeforeCaret.GetDocumentStartOffset() else caretOffset
 
         let reparsedContext =
-            FSharpReparsedCodeCompletionContext(fsFile, selectedTreeRange, FSharpCompletionUtil.DummyIdentifier)
+            FSharpReparsedCodeCompletionContext(fsFile, selectedTreeRange, FSharpCodeCompletionContext.DummyIdentifier)
         reparsedContext.Init()
 
         let reference = reparsedContext.Reference.As<FSharpSymbolReference>()

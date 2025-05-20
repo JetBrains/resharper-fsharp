@@ -1,0 +1,9 @@
+﻿namespace Ns1.Debugger
+
+namespace Ns2
+
+open System.Diagnostics
+open Ns1
+
+module Nested =
+    Debugger.Launch{caret}

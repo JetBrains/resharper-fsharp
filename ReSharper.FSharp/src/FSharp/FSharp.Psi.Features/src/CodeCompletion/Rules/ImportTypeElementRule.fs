@@ -147,7 +147,7 @@ type FSharpImportTypeElementRule() =
          | :? IFSharpDeclaredElement as fsDeclaredElement -> fsDeclaredElement.SourceName
          | _ -> typeElement.ShortName
 
-    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+    override this.SupportedEvaluationMode = EvaluationMode.Full
 
     override this.IsAvailable(context) =
         context.EnableImportCompletion &&

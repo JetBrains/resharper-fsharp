@@ -179,3 +179,14 @@ type FSharpImportModuleMemberTest() =
     [<Test; NotAvailable>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpImporStaticMemberTest() =
+    inherit FSharpQuickFixTestBase<FSharpImportStaticMemberFromQualifierTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/staticMember"
+
+    [<Test>] member x.``Debugger 01``() = x.DoNamedTest()
+    [<Test>] member x.``Debugger 02``() = x.DoNamedTest()
+    [<Test>] member x.``String 01``() = x.DoNamedTest()

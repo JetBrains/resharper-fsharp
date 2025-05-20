@@ -60,5 +60,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
       return null;
     }
+
+    public static TNode TryGetOriginalNodeThroughSandBox<TNode>([NotNull] this TNode sandboxNode)
+      where TNode : class, ITreeNode
+    {
+      if (sandboxNode.GetContainingFile()?.Parent is not ISandBox { ContextNode: IFSharpFile fsFile })
+        return null;
+
+      var sandboxNodeStartOffset = sandboxNode.GetTreeStartOffset();
+      var token = fsFile.FindTokenAt(sandboxNodeStartOffset);
+
+      foreach (var treeNode in token.ContainingNodes<TNode>(true))
+      {
+        var nodeStartOffset = treeNode.GetTreeStartOffset();
+        if (nodeStartOffset == sandboxNodeStartOffset)
+          return treeNode;
+
+        if (nodeStartOffset < sandboxNodeStartOffset)
+          return null;
+      }
+
+      return null;
+    }
   }
 }

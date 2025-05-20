@@ -18,8 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsQualified => Qualifier != null;
     public FSharpSymbolReference QualifierReference => Qualifier?.Reference;
 
-    public void SetQualifier(IClrDeclaredElement declaredElement) =>
+    public void SetQualifier(IClrDeclaredElement declaredElement)
+    {
+      if (Qualifier != null) return;
+
       this.SetQualifier(this.CreateElementFactory().CreateTypeReferenceName, declaredElement);
+    }
   }
 
   internal partial class ExpressionReferenceName
@@ -40,8 +44,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsQualified => Qualifier != null;
     public FSharpSymbolReference QualifierReference => Qualifier?.Reference;
 
-    public void SetQualifier(IClrDeclaredElement declaredElement) =>
+    public void SetQualifier(IClrDeclaredElement declaredElement)
+    {
+      if (Qualifier != null) return;
+
       this.SetQualifier(this.CreateElementFactory().CreateExpressionReferenceName, declaredElement);
+    }
   }
 
   public static class ReferenceNameExtensions

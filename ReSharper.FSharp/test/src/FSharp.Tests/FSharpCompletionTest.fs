@@ -60,6 +60,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Extension 03``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 04 - Internal type``() = x.DoNamedTestFsCs()
 
+    [<Test>] member x.``Import - Static member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 03``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 01``() = x.DoNamedTest()

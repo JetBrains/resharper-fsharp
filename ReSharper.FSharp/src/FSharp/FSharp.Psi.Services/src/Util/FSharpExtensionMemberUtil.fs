@@ -14,7 +14,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Resolve.TypeInference
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
@@ -72,12 +71,6 @@ type FSharpRequest(psiModule, exprType: IType, name: string option) =
         member this.WithName _ = failwith "todo"
         member this.WithNamespaces _ = failwith "todo"
         member this.WithTypes _ = failwith "todo"
-
-let getQualifierExpr (reference: IReference) =
-    let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
-    if isNull refExpr then Unchecked.defaultof<_> else
-
-    refExpr.Qualifier
 
 [<return: Struct>]
 let (|FSharpSourceExtensionMember|_|) (typeMember: ITypeMember) =
