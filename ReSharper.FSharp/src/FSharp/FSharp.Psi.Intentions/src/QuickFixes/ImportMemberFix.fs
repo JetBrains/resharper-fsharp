@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open JetBrains.Application
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.BulbActions
@@ -142,6 +143,8 @@ type FSharpImportModuleMemberFix(reference: IReference) =
         let result = HashSet()
 
         for typeElement in typeElements do
+            Interruption.Current.CheckAndThrow()
+
             match typeElement with
             | :? IEnum as enum when enum.HasMemberWithName(name, false) ->
                 result.Add(typeElement) |> ignore

@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open FSharp.Compiler.Symbols
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -54,6 +55,8 @@ type ImportExtensionMemberRule() =
 
         let members =
             members |> Seq.groupBy (fun typeMember ->
+                Interruption.Current.CheckAndThrow()
+
                 let name = typeMember.ShortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_")
 
                 let ns =
@@ -68,6 +71,8 @@ type ImportExtensionMemberRule() =
             )
 
         for (ns, name), typeMembers in members do
+            Interruption.Current.CheckAndThrow()
+
             // todo: use all candidates for signatures
             let typeMember = typeMembers |> Seq.head
 

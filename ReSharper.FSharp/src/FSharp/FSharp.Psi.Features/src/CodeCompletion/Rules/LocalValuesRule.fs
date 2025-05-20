@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -68,6 +69,8 @@ module rec LocalValuesRule =
                 | _ -> ()
 
         for parentNode in context.ContainingNodes() do
+            Interruption.Current.CheckAndThrow()
+
             match parentNode with
             | :? IMatchClause as matchClause ->
                 addPatternValues matchClause.Pattern

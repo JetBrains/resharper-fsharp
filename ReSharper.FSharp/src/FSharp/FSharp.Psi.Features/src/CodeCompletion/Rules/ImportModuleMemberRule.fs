@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System
 open FSharp.Compiler.EditorServices
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -105,6 +106,8 @@ type ImportModuleMemberRule() =
             | _ -> EmptyDictionary.Instance
 
         for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
+            Interruption.Current.CheckAndThrow()
+
             let fsTypeElement = typeElement.As<IFSharpTypeElement>()
             if isNull fsTypeElement || fsTypeElement.RequiresQualifiedAccess() then () else
 
