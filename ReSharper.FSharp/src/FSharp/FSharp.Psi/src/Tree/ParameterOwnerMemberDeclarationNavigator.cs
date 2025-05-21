@@ -23,10 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
       param = param.IgnoreParentParens();
 
-      var tuplePat = TuplePatNavigator.GetByPattern(param).IgnoreParentParens();
-      param = tuplePat ?? param;
+      var parameterOwner = GetByParameterPattern(param);
+      if (parameterOwner != null) return parameterOwner;
 
-      return GetByParameterPattern(param);
+      var tuplePat = TuplePatNavigator.GetByPattern(param).IgnoreParentParens();
+      return GetByParameterPattern(tuplePat);
     }
 
     [Pure]
