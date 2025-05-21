@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [Pure]
     [CanBeNull]
     [ContractAnnotation("null => null")]
-    public static IParameterOwnerMemberDeclaration GetByParameterPattern([CanBeNull] IReferencePat pat)
+    public static IParameterOwnerMemberDeclaration GetByReferenceParameterPattern([CanBeNull] IReferencePat pat)
     {
       IFSharpPattern param = pat;
 

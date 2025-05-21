@@ -312,7 +312,7 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
             myActions.Add(SpecifyTypeAction(refPat, availability))
 
-            let parametersOwner = ParameterOwnerMemberDeclarationNavigator.GetByParameterPattern(refPat)
+            let parametersOwner = ParameterOwnerMemberDeclarationNavigator.GetByReferenceParameterPattern(refPat)
             if isNull parametersOwner then true else
 
             let scopedActionIsAvailable = SpecifyTypes.countParametersWithoutAnnotation parametersOwner > 1
