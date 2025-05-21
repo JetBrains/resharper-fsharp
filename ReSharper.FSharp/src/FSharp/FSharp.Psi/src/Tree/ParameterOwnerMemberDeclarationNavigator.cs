@@ -1,9 +1,34 @@
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public static class ParameterOwnerMemberDeclarationNavigator
   {
+    [Pure]
+    [CanBeNull]
+    [ContractAnnotation("null => null")]
+    public static IParameterOwnerMemberDeclaration GetByParameterPattern([CanBeNull] IReferencePat pat)
+    {
+      IFSharpPattern param = pat;
+
+      var optionalValPat = OptionalValPatNavigator.GetByPattern(pat);
+      param = optionalValPat ?? param;
+
+      var typedPat = TypedPatNavigator.GetByPattern(param);
+      param = typedPat ?? param;
+
+      var attributedPat = AttribPatNavigator.GetByPattern(param);
+      param = attributedPat ?? param;
+
+      param = param.IgnoreParentParens();
+
+      var tuplePat = TuplePatNavigator.GetByPattern(param).IgnoreParentParens();
+      param = tuplePat ?? param;
+
+      return GetByParameterPattern(param);
+    }
+
     [Pure]
     [CanBeNull]
     [ContractAnnotation("null => null")]
