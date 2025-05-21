@@ -284,7 +284,7 @@ type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProv
         if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
         else "Add type annotation"
 
-type private SpecifyTypeAction(node, availability, ?text) =
+type private SpecifyTypeAction(node: ITreeNode, availability, ?text) =
     inherit ModernBulbActionBase()
 
     override this.Text = defaultArg text "Add type annotation"
