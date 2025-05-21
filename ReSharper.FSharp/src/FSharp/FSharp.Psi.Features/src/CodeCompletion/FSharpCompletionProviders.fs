@@ -4,6 +4,7 @@ open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax
+open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -106,6 +107,8 @@ type FSharpLookupItemsProvider(logger: ILogger) =
 
                 // todo: filter unresolved when long evaluation is disabled?
                 for list in itemLists do
+                    Interruption.Current.CheckAndThrow()
+
                     if list.Name = ".. .." then () else
                     if skipFsiModules && isFsiModuleToSkip list then () else
 
