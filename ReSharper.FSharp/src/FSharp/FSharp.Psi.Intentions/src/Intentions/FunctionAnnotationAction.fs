@@ -46,16 +46,16 @@ module SpecifyTypes =
         | _ -> None
 
     let countParametersWithoutAnnotation (parametersOwner: IParameterOwnerMemberDeclaration) =
-        let rec isAnnotated isTopLevel (pattern: IFSharpPattern) =
+        let rec isWithoutAnnotation isTopLevel (pattern: IFSharpPattern) =
             let pattern = pattern.IgnoreInnerParens()
             match pattern with
             | :? ITypedPat | :? IUnitPat -> 0
-            | :? IAttribPat as attribPat -> isAnnotated isTopLevel attribPat.Pattern
-            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.sumBy (isAnnotated false)
+            | :? IAttribPat as attribPat -> isWithoutAnnotation isTopLevel attribPat.Pattern
+            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.sumBy (isWithoutAnnotation false)
             | _ -> 1
 
         parametersOwner.ParametersDeclarations
-        |> Seq.sumBy (fun p -> isAnnotated true p.Pattern)
+        |> Seq.sumBy (fun p -> isWithoutAnnotation true p.Pattern)
 
     let areParametersAnnotated (parametersOwner: IParameterOwnerMemberDeclaration) =
         countParametersWithoutAnnotation parametersOwner = 0
