@@ -55,8 +55,7 @@ module SpecifyTypes =
             | _ -> false
 
         parametersOwner.ParametersDeclarations
-        |> Seq.filter (fun p -> not (isAnnotated true p.Pattern))
-        |> Seq.length
+        |> Seq.sumBy (fun p -> if isAnnotated true p.Pattern then 0 else 1)
 
     let areParametersAnnotated (parametersOwner: IParameterOwnerMemberDeclaration) =
         countParametersWithoutAnnotation parametersOwner = 0
