@@ -49,13 +49,13 @@ module SpecifyTypes =
         let rec isAnnotated isTopLevel (pattern: IFSharpPattern) =
             let pattern = pattern.IgnoreInnerParens()
             match pattern with
-            | :? ITypedPat | :? IUnitPat -> true
+            | :? ITypedPat | :? IUnitPat -> 0
             | :? IAttribPat as attribPat -> isAnnotated isTopLevel attribPat.Pattern
-            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.forall (isAnnotated false)
-            | _ -> false
+            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.sumBy (isAnnotated false)
+            | _ -> 1
 
         parametersOwner.ParametersDeclarations
-        |> Seq.sumBy (fun p -> if isAnnotated true p.Pattern then 0 else 1)
+        |> Seq.sumBy (fun p -> isAnnotated true p.Pattern)
 
     let areParametersAnnotated (parametersOwner: IParameterOwnerMemberDeclaration) =
         countParametersWithoutAnnotation parametersOwner = 0
