@@ -285,7 +285,7 @@ type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProv
         else "Add type annotation"
 
 type private SpecifyTypeAction(node: ITreeNode, availability, ?text) =
-    inherit ModernBulbActionBase()
+    inherit BulbActionBase()
 
     override this.Text = defaultArg text "Add type annotation"
 
@@ -298,10 +298,11 @@ type private SpecifyTypeAction(node: ITreeNode, availability, ?text) =
 type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     static let submenuAnchor =
         SubmenuAnchor(IntentionsAnchors.ContextActionsAnchor, SubmenuBehavior.Executable)
-    let myActions = ResizeArray<IBulbAction>(2)
+    let mutable myActions: IList<IBulbAction> = EmptyList.Instance
 
     interface IContextAction with
         override x.IsAvailable(_: IUserDataHolder) =
+            myActions <- ResizeArray<IBulbAction>(2)
             let refPat = dataProvider.GetSelectedElement<IReferencePat>()
 
             if not (isValid refPat) then false else
