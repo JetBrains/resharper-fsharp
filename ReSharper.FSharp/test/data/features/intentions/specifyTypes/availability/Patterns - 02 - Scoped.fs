@@ -1,6 +1,7 @@
 // ${RUN:Annotate all parameters}
 module Module
 
+let{off} x{off} = 1
 let{off} f{off} x{on} y{on} = ()
 let{off} f{off} x{on} y{on}: int = ()
 let{off} f{off} x{off} (y{off}: int) = ()

@@ -1,0 +1,4 @@
+﻿// ${RUN:Annotate all parameters}
+module Module
+
+let f (x: 'a){caret} (y: 'b, Some z: 'c option) = ()

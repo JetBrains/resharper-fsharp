@@ -81,9 +81,9 @@ type SpecifyPatternTypeActionTest() =
 
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern 02 - Optional``() = x.DoNamedTest()
-    [<Test>] member x.``Scoped - Parameters 01``() = x.DoNamedTest()
-    [<Test>] member x.``Scoped - Parameters 02``() = x.DoNamedTest()
-    [<Test>] member x.``Scoped - Parameters 03``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 01 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 02 - Method``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 03 - Constructor``() = x.DoNamedTest()
 
 
 type SpecifyTypesActionAvailabilityTest() =
