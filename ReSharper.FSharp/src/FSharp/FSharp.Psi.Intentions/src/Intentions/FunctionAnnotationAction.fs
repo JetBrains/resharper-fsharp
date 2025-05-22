@@ -6,7 +6,6 @@ open JetBrains.Application.Parts
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
