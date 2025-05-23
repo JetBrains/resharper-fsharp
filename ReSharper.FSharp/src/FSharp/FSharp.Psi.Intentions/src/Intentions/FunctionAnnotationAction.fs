@@ -8,6 +8,7 @@ open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -31,6 +32,7 @@ module SpecifyTypes =
     } with
         member x.IsAvailable = x <> Availability.Unavailable
         static member Unavailable = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = false }
+        static member ParameterTypesOnly = { CanSpecifyParameterTypes = true; CanSpecifyReturnType = false }
         static member ReturnTypeOnly = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = true }
 
     let rec private (|TupleLikePattern|_|) (pattern: IFSharpPattern) =
@@ -42,16 +44,20 @@ module SpecifyTypes =
             | _ -> None
         | _ -> None
 
-    let private areParametersAnnotated (binding: IParameterOwnerMemberDeclaration) =
-        let rec isAnnotated isTopLevel (pattern: IFSharpPattern) =
+    let countParametersWithoutAnnotation (parametersOwner: IParameterOwnerMemberDeclaration) =
+        let rec isWithoutAnnotation isTopLevel (pattern: IFSharpPattern) =
             let pattern = pattern.IgnoreInnerParens()
             match pattern with
-            | :? ITypedPat | :? IUnitPat -> true
-            | :? IAttribPat as attribPat -> isAnnotated isTopLevel attribPat.Pattern
-            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.forall (isAnnotated false)
-            | _ -> false
+            | :? ITypedPat | :? IUnitPat -> 0
+            | :? IAttribPat as attribPat -> isWithoutAnnotation isTopLevel attribPat.Pattern
+            | TupleLikePattern pat when isTopLevel -> pat.PatternsEnumerable |> Seq.sumBy (isWithoutAnnotation false)
+            | _ -> 1
 
-        binding.ParametersDeclarations |> Seq.forall (fun p -> isAnnotated true p.Pattern)
+        parametersOwner.ParametersDeclarations
+        |> Seq.sumBy (fun p -> isWithoutAnnotation true p.Pattern)
+
+    let areParametersAnnotated (parametersOwner: IParameterOwnerMemberDeclaration) =
+        countParametersWithoutAnnotation parametersOwner = 0
 
     let rec getAvailability (node: ITreeNode) =
         if not (isValid node) then Availability.Unavailable else
@@ -277,25 +283,49 @@ type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProv
         if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
         else "Add type annotation"
 
-[<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
-                Description = "Annotate named pattern type")>]
-type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
-    inherit AnnotationActionBase<IReferencePat>(dataProvider)
-
-    override x.IsAvailable(node: IReferencePat) =
-        isNull (BindingNavigator.GetByHeadPattern(node.IgnoreParentParens()))
-
-    override this.Text = "Add type annotation"
-
-
-type private SpecifyTypeAction(node: ITreeNode, availability: SpecifyTypes.Availability) =
+type private SpecifyTypeAction(node: ITreeNode, availability, ?text) =
     inherit BulbActionBase()
 
-    override this.Text = "Add type annotation"
+    override this.Text = defaultArg text "Add type annotation"
 
     override this.ExecutePsiTransaction(_, _) =
         SpecifyTypesActionHelper.executePsiTransaction node availability
         null
+
+[<ContextAction(Name = "AnnotatePattern", GroupType = typeof<FSharpContextActions>,
+                Description = "Annotate named pattern type")>]
+type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
+    static let submenuAnchor =
+        SubmenuAnchor(IntentionsAnchors.ContextActionsAnchor, SubmenuBehavior.Executable)
+    let mutable myActions: IList<IBulbAction> = EmptyList.Instance
+
+    interface IContextAction with
+        override x.IsAvailable(_: IUserDataHolder) =
+            myActions <- ResizeArray<IBulbAction>(2)
+            let refPat = dataProvider.GetSelectedElement<IReferencePat>()
+
+            if not (isValid refPat) then false else
+            if isNotNull (BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())) then false else
+
+            let availability = SpecifyTypes.getAvailability refPat
+            if not availability.IsAvailable then false else
+
+            myActions.Add(SpecifyTypeAction(refPat, availability))
+
+            let parametersOwner = ParameterOwnerMemberDeclarationNavigator.GetByReferenceParameterPattern(refPat)
+            if isNull parametersOwner then true else
+
+            let scopedActionIsAvailable = SpecifyTypes.countParametersWithoutAnnotation parametersOwner > 1
+            if not scopedActionIsAvailable then true else
+
+            myActions.Add(SpecifyTypeAction(parametersOwner, SpecifyTypes.Availability.ParameterTypesOnly, "Annotate all parameters"))
+            true
+
+        override this.CreateBulbItems() =
+            let introduceSubmenu = myActions.Count > 1
+            let customAnchor = if introduceSubmenu then submenuAnchor else null
+            myActions.ToContextActionIntentions(customAnchor)
+
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type SpecifyTypeActionsProvider(solution) =
