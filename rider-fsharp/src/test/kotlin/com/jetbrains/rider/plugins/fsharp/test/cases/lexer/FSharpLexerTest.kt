@@ -4,7 +4,6 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
 import org.testng.annotations.Test
 
-@Test
 class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   override fun createLexer() = FSharpLexer()
 
