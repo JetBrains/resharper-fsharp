@@ -12,6 +12,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
 import com.jetbrains.rider.test.base.psi.parsing.RiderFrontendParserTest
 import org.junit.Assert
+import org.junit.Test
 
 abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) :
   RiderFrontendParserTest("", fileType.defaultExtension, FSharpParserDefinition()) {
@@ -35,37 +36,37 @@ abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileT
 class FSharpDummyParserTests : FSharpFrontendParserTest(FSharpFileType) {
   override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpFileImpl)
 
-  fun `test empty`() = doTest()
-  fun `test concatenation 01 - simple`() = doTest()
-  fun `test concatenation 02 - space before plus`() = doTest()
-  fun `test concatenation 03 - multiline`() = doTest()
+  @Test fun `test empty`() = doTest()
+  @Test fun `test concatenation 01 - simple`() = doTest()
+  @Test fun `test concatenation 02 - space before plus`() = doTest()
+  @Test fun `test concatenation 03 - multiline`() = doTest()
   //TODO: compromise to avoid proper parsing
-  fun `test concatenation 04 - multiline with wrong offset 01`() = doTest()
+  @Test fun `test concatenation 04 - multiline with wrong offset 01`() = doTest()
   //TODO: compromise to avoid proper parsing
-  fun `test concatenation 04 - multiline with wrong offset 02`() = doTest()
-  fun `test concatenation 05 - with ident`() = doTest()
-  fun `test concatenation 06 - unfinished`() = doTest()
-  fun `test concatenation 07 - multiline string`() = doTest()
+  @Test fun `test concatenation 04 - multiline with wrong offset 02`() = doTest()
+  @Test fun `test concatenation 05 - with ident`() = doTest()
+  @Test fun `test concatenation 06 - unfinished`() = doTest()
+  @Test fun `test concatenation 07 - multiline string`() = doTest()
   //TODO: compromise to avoid proper parsing
-  fun `test concatenation 08 - multiline string with wrong offset`() = doTest()
-  fun `test concatenation 09 - with interpolated`() = doTest()
-  fun `test concatenation 10 - with expression`() = doTest()
+  @Test fun `test concatenation 08 - multiline string with wrong offset`() = doTest()
+  @Test fun `test concatenation 09 - with interpolated`() = doTest()
+  @Test fun `test concatenation 10 - with expression`() = doTest()
 
-  fun `test regular strings 01`() = doTest()
-  fun `test regular strings 02 - unfinished`() = doTest()
+  @Test fun `test regular strings 01`() = doTest()
+  @Test fun `test regular strings 02 - unfinished`() = doTest()
 
-  fun `test interpolated strings 01`() = doTest()
-  fun `test interpolated strings 02 - unfinished`() = doTest()
+  @Test fun `test interpolated strings 01`() = doTest()
+  @Test fun `test interpolated strings 02 - unfinished`() = doTest()
 
-  fun `test unfinished 01 - regular`() = doTest()
-  fun `test unfinished 02 - interpolated 01`() = doTest()
-  fun `test unfinished 02 - interpolated 02`() = doTest()
-  fun `test unfinished 03 - interpolated in interpolated`() = doTest()
+  @Test fun `test unfinished 01 - regular`() = doTest()
+  @Test fun `test unfinished 02 - interpolated 01`() = doTest()
+  @Test fun `test unfinished 02 - interpolated 02`() = doTest()
+  @Test fun `test unfinished 03 - interpolated in interpolated`() = doTest()
 }
 
 
 class FSharpScriptDummyParserTests : FSharpFrontendParserTest(FSharpScriptFileType) {
   override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpScriptFileImpl)
 
-  fun `test empty`() = doTest()
+  @Test fun `test empty`() = doTest()
 }
