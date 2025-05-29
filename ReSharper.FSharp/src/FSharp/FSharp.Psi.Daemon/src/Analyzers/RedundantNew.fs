@@ -26,9 +26,10 @@ type RedundantNewAnalyzer() =
         if isNull newExpr.NewKeyword then () else
 
         match newExpr.CheckerService.ResolveNameAtLocation(typeName, typeName.Names, false, "RedundantNewAnalyzer") with
-        | None -> ()
-        | Some symbolUse ->
+        | [] -> ()
+        | symbolUses ->
 
+        let symbolUse = symbolUses.Head
         let fcsEntity = symbolUse.Symbol.As<FSharpEntity>()
         if isNull fcsEntity || isNull typeName.TypeArgumentList && fcsEntity.GenericParameters.Count <> 0 then () else
 

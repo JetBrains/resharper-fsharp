@@ -35,7 +35,7 @@ type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWar
             match outerBinding.CheckerService.ResolveNameAtLocation(outerBinding, fieldName, true, "UseNestedRecordFieldSyntaxFix") with
             // TODO: We must use an API that can fully resolve record fields.
             // Currently, if None is returned, then something other than the type has resolved.
-            | Some _ -> findRequiredQualifierForRecordField outerBinding |> Option.defaultValue []
+            | list when list <> [] -> findRequiredQualifierForRecordField outerBinding |> Option.defaultValue []
             | _ -> []
 
         let newBinding = factory.CreateRecordFieldBinding(fieldQualifier @ fieldName, isNotNull outerBinding.Semicolon)
