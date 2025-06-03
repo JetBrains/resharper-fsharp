@@ -2,4 +2,6 @@
 
 module Module
 
-let f (KeyValue(x, y) as (z: System.Collections.Generic.KeyValuePair<'a,'b>){caret}) = ()
+open System.Collections.Generic
+
+let f (KeyValue(x, y) as (z: KeyValuePair<'a,'b>){caret}) = ()

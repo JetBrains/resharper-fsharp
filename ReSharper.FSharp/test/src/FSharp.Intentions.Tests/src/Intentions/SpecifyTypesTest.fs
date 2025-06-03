@@ -71,6 +71,8 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Member 07 - Optional param - With attribute``() = x.DoNamedTest()
     [<Test>] member x.``Member 08 - Optional param - Parens``() = x.DoNamedTest()
 
+    [<Test>] member x.``Import types 01``() = x.DoNamedTest()
+
 
 // Most tests are in TypeHintContextActionsTests
 [<AssertCorrectTreeStructure>]
