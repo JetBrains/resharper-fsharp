@@ -99,4 +99,10 @@ internal class FsiInputOutputProcessor(val fsiRunner: FsiConsoleRunnerBase) {
   fun onServerPrompt() {
     isInitialText = false
   }
+
+  fun processAllPendingMessages() {
+    while (isInitialText) {
+      Thread.yield()
+    }
+  }
 }
