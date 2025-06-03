@@ -7,6 +7,7 @@
 
   <depends>com.intellij.modules.rider</depends>
   <depends>rider.intellij.plugin.appender</depends>
+  <depends>com.intellij.rider.rdclient.spellchecker</depends>
 
   <content>
     <module name="intellij.rider.plugins.fsharp/injections" />
