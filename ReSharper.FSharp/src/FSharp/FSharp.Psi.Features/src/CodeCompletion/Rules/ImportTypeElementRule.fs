@@ -52,8 +52,8 @@ module ImportInfo =
         let offset = context.BasicContext.CaretDocumentOffset
         let coords = offset.ToDocumentCoords()
         match treeNode.CheckerService.ResolveNameAtLocation(sourceFile, names, coords, useExprRules, "ImportModuleMemberInfo.GetDescription") with
-        | None -> null
-        | Some fcsSymbolUse ->
+        | [] -> null
+        | fcsSymbolUse :: _ ->
 
         match treeNode.FSharpFile.GetParseAndCheckResults(true, "ImportModuleMemberInfo.GetDescription") with
         | None -> null
