@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return myHasNestedTypes.Value;
 
         lock (this)
-          return myHasNestedTypes ??= TypePartKind != PartKind.Struct && UnionCases.Count > 1;
+          return myHasNestedTypes ??= TypePartKind != PartKind.Struct && UnionCasesEnumerable.Count() > 1;
       }
     }
 
