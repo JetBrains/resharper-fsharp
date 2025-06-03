@@ -18,7 +18,8 @@ let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbol
         (declaredElement: IClrDeclaredElement) opName =
     reference.SetRequiredQualifiers(declaredElement, context)
 
-    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference true opName) then
+    let resolveExpr = not (reference.GetElement() :? ITypeReferenceName)
+    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference resolveExpr opName) then
         addOpens reference declaredElement |> ignore
 
 let bindFcsSymbolToReference (context: ITreeNode) (reference: FSharpSymbolReference) (fcsSymbol: FSharpSymbol) opName =

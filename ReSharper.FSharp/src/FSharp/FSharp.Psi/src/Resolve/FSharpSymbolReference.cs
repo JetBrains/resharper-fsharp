@@ -17,7 +17,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using Microsoft.FSharp.Core;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -150,7 +150,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     /// Does not reuse existing file resolve results, does complete lookup by name.
-    public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool resolveExpr, bool qualified)
+    public FSharpList<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool resolveExpr, bool qualified)
     {
       var referenceOwner = GetElement();
       var checkerService = referenceOwner.CheckerService;
