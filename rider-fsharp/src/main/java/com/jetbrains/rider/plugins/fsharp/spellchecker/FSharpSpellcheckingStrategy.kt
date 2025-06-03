@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.spellchecker
 
+import com.intellij.rider.rdclient.dotnet.spellchecker.strategy.BackendLanguageSpellcheckingStrategy
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
-import com.jetbrains.rider.spellChecker.BackendLanguageSpellcheckingStrategy
 
 class FSharpSpellcheckingStrategy : BackendLanguageSpellcheckingStrategy(FSharpLanguage)
