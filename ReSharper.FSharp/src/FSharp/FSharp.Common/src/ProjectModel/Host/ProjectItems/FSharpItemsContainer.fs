@@ -848,7 +848,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         writer.Write(projectDirectory)
         writer.Write(projectUniqueName)
         writeTargetFrameworkIds targetFrameworkIds
-        writer.Write(files.Count + folders.AllValues.Count)
+        writer.Write(files.Count + folders.ValuesCount)
 
         let foldersIds = Dictionary<FSharpProjectModelElement, int>()
         let getFolderId el =

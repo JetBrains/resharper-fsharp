@@ -65,7 +65,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
 
         let fibers = daemonProcess.CreateTaskBarrierForStageExecution()
         for node in globalProcessor.MemberDeclarations do
-            fibers.EnqueueJobCaptureCurrentPsiContexts(fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer)))
+            fibers.EnqueueJob(fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer)))
 
         fibers.Dispose()
 
