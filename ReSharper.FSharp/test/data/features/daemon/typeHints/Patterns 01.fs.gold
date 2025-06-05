@@ -136,6 +136,12 @@ let (|String|) (x: MyStruct) : string = String(x.myString)
 
 let f1 (x||(60) & Int(i||(61)) & String(s||(62))) ||(63)= ()
 
+type B() =
+    member _.P1||(64) with set (_: int) = ()
+    member _.P1||(65) with set (_: string) = ()
+    member _.P2||(66) with get () = 5 
+    member _.P3||(67) with get () = 5 and set (_: int) = () 
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'b
 (1): ReSharper Parameter Name Hint: : 'c
@@ -201,3 +207,7 @@ let f1 (x||(60) & Int(i||(61)) & String(s||(62))) ||(63)= ()
 (61): ReSharper Parameter Name Hint: : int
 (62): ReSharper Parameter Name Hint: : string
 (63): ReSharper Parameter Name Hint: : unit 
+(64): ReSharper Parameter Name Hint: : int 
+(65): ReSharper Parameter Name Hint: : string 
+(66): ReSharper Parameter Name Hint: : int 
+(67): ReSharper Parameter Name Hint: : int 
