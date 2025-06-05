@@ -13,7 +13,7 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7)
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override val testSolution = "FormatCodeApp"
   override fun beforeDoTestWithDocuments() {
