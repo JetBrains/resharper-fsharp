@@ -134,6 +134,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 
     public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
     public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
+    public bool HasAssociatedType => AssociatedTypeElement != null;
 
     public ITypeElement AssociatedTypeElement => TryGetAssociatedTypeElement(); // todo: cache
     public string QualifiedSourceName => this.GetQualifiedName();
