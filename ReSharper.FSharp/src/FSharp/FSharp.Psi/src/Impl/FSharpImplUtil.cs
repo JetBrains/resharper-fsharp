@@ -337,7 +337,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string[] GetUnionCaseNames(this ITypeElement typeElement) =>
       typeElement is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union repr }
         ? repr.cases
-        : typeElement.GetSourceUnionCases().Select(unionCase => unionCase.SourceName).ToArray();
+        : GetPart<IUnionPart>(typeElement)?.CaseNames ?? EmptyArray<string>.Instance;
 
     [CanBeNull]
     public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>

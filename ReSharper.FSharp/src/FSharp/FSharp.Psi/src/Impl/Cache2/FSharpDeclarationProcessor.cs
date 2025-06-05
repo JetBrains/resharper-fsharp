@@ -217,25 +217,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitUnionRepresentation(IUnionRepresentation repr)
     {
       var unionCases = repr.UnionCases;
-      var isSingleCase = unionCases.Count == 1;
+      var caseNames = unionCases.Select(caseDecl => caseDecl.SourceName).AsArray();
 
+      var hasNestedTypes = repr.HasNestedTypes;
       if (repr.TypePartKind == PartKind.Struct)
-      {
-        Builder.StartPart(new StructUnionPart(repr.TypeDeclaration, Builder, isSingleCase));
-        foreach (var unionCase in unionCases)
-          ProcessTypeMembers(unionCase.Fields);
-      }
+        Builder.StartPart(new StructUnionPart(repr.TypeDeclaration, Builder, caseNames));
       else
-      {
-        var hasNestedTypes = repr.HasNestedTypes;
-        Builder.StartPart(new UnionPart(repr.TypeDeclaration, Builder, hasNestedTypes, isSingleCase));
+        Builder.StartPart(new UnionPart(repr.TypeDeclaration, Builder, hasNestedTypes, caseNames));
 
-        foreach (var unionCase in unionCases)
-          if (hasNestedTypes && unionCase.HasFields)
-            unionCase.Accept(this);
-          else
-            ProcessTypeMembers(unionCase.Fields);
-      }
+      foreach (var unionCase in unionCases)
+        if (hasNestedTypes && unionCase.HasFields)
+          unionCase.Accept(this);
+        else
+          ProcessTypeMembers(unionCase.Fields);
+
     }
 
     public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
@@ -248,13 +243,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitTypeAbbreviationRepresentation(ITypeAbbreviationRepresentation repr)
     {
       var decl = repr.TypeDeclaration;
-      TypePart typePart = decl.GetSimpleTypeKindFromAttributes() == PartKind.Struct
-        ? new StructTypeAbbreviationOrDeclarationPart(decl, Builder)
-        : new TypeAbbreviationOrDeclarationPart(decl, Builder);
-      Builder.StartPart(typePart);
-
       var identifier = repr.AbbreviatedTypeOrUnionCase?.NameIdentifier;
       var declaredName = identifier.GetSourceName();
+      var caseNames =
+        declaredName != SharedImplUtil.MISSING_DECLARATION_NAME
+          ? [declaredName]
+          : EmptyArray<string>.Instance;
+
+      TypePart typePart = decl.GetSimpleTypeKindFromAttributes() == PartKind.Struct
+        ? new StructTypeAbbreviationOrDeclarationPart(decl, Builder, caseNames)
+        : new TypeAbbreviationOrDeclarationPart(decl, Builder, caseNames);
+      Builder.StartPart(typePart);
+
       if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
         Builder.AddDeclaredMemberName(declaredName);
     }
