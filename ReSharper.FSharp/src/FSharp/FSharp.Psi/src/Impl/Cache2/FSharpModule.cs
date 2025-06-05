@@ -27,13 +27,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
     public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
+    public bool HasAssociatedType => EnumerateParts().Any(part => part is IModulePart { HasAssociatedType: true });
 
     protected override bool AcceptsPart(TypePart part) =>
       part is IModulePart && part.ShortName == ShortName;
 
     public ITypeElement AssociatedTypeElement =>
       EnumerateParts()
-        .Select(part => (part as IModulePart)?.AssociatedTypeElement)
+        .Select(part => part is IModulePart { HasAssociatedType: true } modulePart
+          ? modulePart.AssociatedTypeElement
+          : null)
         .WhereNotNull()
         .FirstOrDefault();
 

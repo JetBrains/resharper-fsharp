@@ -75,7 +75,7 @@ type FSharpImportTypeHelper() =
                     if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else
 
                     let fsModule = typeElement.As<IFSharpModule>()
-                    if isNotNull fsModule && isNotNull fsModule.AssociatedTypeElement then false else
+                    if isNotNull fsModule && fsModule.HasAssociatedType then false else
 
                     FSharpAccessRightUtil.IsAccessible(typeElement, context)
                 )

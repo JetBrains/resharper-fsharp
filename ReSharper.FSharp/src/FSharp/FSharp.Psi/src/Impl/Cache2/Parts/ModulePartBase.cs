@@ -9,7 +9,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -18,6 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     where T : class, IModuleDeclaration
   {
     private SourceExtensionMemberInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<SourceExtensionMemberInfo>.Instance;
+    public bool HasAssociatedType { get; }
 
     public string[] ValueNames { get; }
     public string[] FunctionNames { get; }
@@ -92,6 +92,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       LiteralNames = literalNames.ToArray();
       ActivePatternNames = activePatternNames.ToArray();
       ActivePatternCaseNames = activePatternCaseNames.ToArray();
+
+      HasAssociatedType =
+        declaration is INestedModuleDeclaration nestedModuleDecl &&
+        nestedModuleDecl.GetAssociatedTypeDeclaration(out _) != null;
     }
 
     private static IEnumerable<IFSharpDeclaration> EnumerateExtensionMembers(T declaration)
@@ -130,6 +134,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteStringArray(LiteralNames);
       writer.WriteStringArray(ActivePatternNames);
       writer.WriteStringArray(ActivePatternCaseNames);
+
+      writer.WriteBool(HasAssociatedType);
     }
 
     protected ModulePartBase(IReader reader) : base(reader)
@@ -148,6 +154,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       LiteralNames = reader.ReadStringArray();
       ActivePatternNames = reader.ReadStringArray();
       ActivePatternCaseNames = reader.ReadStringArray();
+
+      HasAssociatedType = reader.ReadBool();
     }
 
     public override ITypeMember FindExtensionMember(SourceExtensionMemberInfo info)

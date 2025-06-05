@@ -131,7 +131,7 @@ type FSharpImportTypeElementRule() =
 
     let isAssociatedModule (typeElement: ITypeElement) =
         match typeElement with
-        | :? IFSharpModule as fsModule -> isNotNull fsModule.AssociatedTypeElement
+        | :? IFSharpModule as fsModule -> fsModule.HasAssociatedType
         | _ -> false
 
     let isAllowed (context: FSharpCodeCompletionContext) (typeElement: ITypeElement) =
