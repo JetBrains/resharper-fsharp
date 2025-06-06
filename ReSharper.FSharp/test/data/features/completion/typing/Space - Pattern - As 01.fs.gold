@@ -149,7 +149,6 @@ Operators
 OptimizedClosures
 Option
 OptionalArgumentAttribute
-Primitives
 Printf
 PrintfFormat
 ProjectionParameterAttribute
@@ -175,7 +174,6 @@ TailCallAttribute
 TaskBuilder
 TaskBuilderBase
 TaskBuilderExtensions
-Text
 Unchecked
 UnverifiableAttribute
 ValueOption

@@ -7,10 +7,10 @@ Class1().add_Event(fun (|_: System.EventArgs|(2)) -> ())
 Class1().add_Event(VoidDelegate(ignore))
 
 Class2.add_Event(fun (|_: System.EventArgs|(3)) -> ())
-Class2.add_Event|(|(4)VoidDelegate(ignore)
+Class2.add_Event(VoidDelegate(ignore))
 
-|Class2().add_Event(fun (_: System.EventArgs) -> ())|(5)
-|Class2().add_Event|(|(6)VoidDelegate(ignore)|(7)
+Class2().add_Event(|fun (|_: System.EventArgs|(4)) -> ()|(5))
+Class2().add_Event(|VoidDelegate(ignore)|(6))
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
@@ -30,7 +30,16 @@ but here has type
     'unit'    
 but here has type
     'System.EventArgs'    
-(4): ReSharper Underlined Error Highlighting: Unmatched '('
-(5): ReSharper Underlined Error Highlighting: Successive arguments should be separated by spaces, tupled, or parenthesized
-(6): ReSharper Underlined Error Highlighting: Unmatched '('
-(7): ReSharper Underlined Error Highlighting: Successive arguments should be separated by spaces, tupled, or parenthesized
+(4): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'unit'    
+but here has type
+    'System.EventArgs'    
+(5): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'unit -> 'a'    
+is not compatible with type
+    'System.EventHandler'    
+
+(6): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'System.EventHandler'    
+but here has type
+    'VoidDelegate'    

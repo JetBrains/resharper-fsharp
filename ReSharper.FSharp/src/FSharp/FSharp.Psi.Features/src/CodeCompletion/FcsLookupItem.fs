@@ -82,8 +82,6 @@ type IFcsLookupItemInfo =
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
-    let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
-
     member this.AllFcsSymbolUses = items.SymbolUses
     member this.FcsSymbolUse = items.SymbolUses.Head
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
@@ -122,9 +120,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         use pinCheckResultsCookie =
             Assertion.Assert(context.ParseAndCheckResults.IsValueCreated)
-            textControl
-                .GetFSharpFile(solution)
-                .PinTypeCheckResults(context.ParseAndCheckResults.Value, Id)
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(context.ParseAndCheckResults.Value)
 
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
 

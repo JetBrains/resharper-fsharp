@@ -203,6 +203,11 @@ module rec FcsUtil =
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
 
+    let inline (|WarningDirectiveRange|) (directiveTrivia: WarnDirectiveTrivia) =
+        match directiveTrivia with
+        | WarnDirectiveTrivia.Nowarn(range)
+        | WarnDirectiveTrivia.Warnon(range) -> range
+
     let inline (|IdentText|_|) text (id: Ident) =
         if id.idText = text then someUnit else None
 

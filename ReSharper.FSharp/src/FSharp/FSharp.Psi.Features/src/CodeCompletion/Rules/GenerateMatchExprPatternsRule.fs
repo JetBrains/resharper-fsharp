@@ -47,9 +47,7 @@ type GenerateMatchExprPatternsBehavior(info) =
 
         use pinCheckResultsCookie =
             Assertion.Assert(info.Context.ParseAndCheckResults.IsValueCreated)
-            textControl
-                .GetFSharpFile(solution)
-                .PinTypeCheckResults(info.Context.ParseAndCheckResults.Value, UnionCasePatternInfo.Id)
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(info.Context.ParseAndCheckResults.Value)
 
         let node = textControl.Document.GetPsiSourceFile(solution).FSharpFile.FindNodeAt(nameRange)
         let matchExpr = node.GetContainingNode<IMatchExpr>()

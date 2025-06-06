@@ -13,11 +13,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
-open JetBrains.ReSharper.Psi.Tree
-open JetBrains.TextControl
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPath, sourceFile: IPsiSourceFile,
         checkerService: FcsCheckerService, symbolsCache: IFcsResolvedSymbolsCache) =
@@ -25,13 +22,14 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
     let tryCreateTreeBuilder lexer lifetime =
         Option.map (fun (parseResults: FSharpParseFileResults) ->
             match parseResults.ParseTree  with
-            | ParsedInput.ImplFile(ParsedImplFileInput(contents = decls)) ->
-                FSharpImplTreeBuilder(lexer, document, decls, lifetime, path) :> FSharpTreeBuilderBase
-            | ParsedInput.SigFile(ParsedSigFileInput(contents = sigs)) ->
-                FSharpSigTreeBuilder(lexer, document, sigs, lifetime, path) :> FSharpTreeBuilderBase)
+            | ParsedInput.ImplFile(ParsedImplFileInput(contents = decls; trivia = { WarnDirectives = directives })) ->
+                FSharpImplTreeBuilder(lexer, document, decls, directives, lifetime, path) :> FSharpTreeBuilderBase
+
+            | ParsedInput.SigFile(ParsedSigFileInput(contents = sigs; trivia = { WarnDirectives = directives })) ->
+                FSharpSigTreeBuilder(lexer, document, sigs, directives, lifetime, path) :> FSharpTreeBuilderBase)
 
     let createFakeBuilder lexer lifetime =
-        { new FSharpTreeBuilderBase(lexer, document, lifetime, path) with
+        { new FSharpTreeBuilderBase(lexer, document, [], lifetime, path) with
             override x.CreateFSharpFile() =
                 x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) }
 
@@ -88,6 +86,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
         member this.ParseExpression(chameleonExpr: IChameleonExpression, syntheticDocument) =
             let isSyntheticDocument = isNotNull syntheticDocument
             let document = if isSyntheticDocument then syntheticDocument else chameleonExpr.GetSourceFile().Document
+            let directives = chameleonExpr.WarningDirectives
 
             let projectedOffset, lineShift =
                 let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
@@ -106,7 +105,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: VirtualFileSystemPat
             Lifetime.Using(fun lifetime ->
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
                 let treeBuilder =
-                    FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffset, lineShift)
+                    FSharpExpressionTreeBuilder(lexer, document, directives, lifetime, path, projectedOffset, lineShift)
 
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> IFSharpExpression
