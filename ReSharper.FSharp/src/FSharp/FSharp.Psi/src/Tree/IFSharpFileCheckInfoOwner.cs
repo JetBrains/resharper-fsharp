@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     IDisposable PinTypeCheckResults(bool prohibitTypeCheck, string opName);
 
-    IDisposable PinTypeCheckResults(FSharpOption<FSharpParseAndCheckResults> results, string opName);
+    IDisposable PinTypeCheckResults(FSharpOption<FSharpParseAndCheckResults> results);
 
     [NotNull] FcsCheckerService FcsCheckerService { get; set; }
 

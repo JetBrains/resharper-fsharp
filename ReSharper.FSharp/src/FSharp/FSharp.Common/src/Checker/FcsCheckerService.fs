@@ -133,7 +133,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             new PinTypeCheckResultsCookie(sourceFile, parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
         | _ -> { new IDisposable with member this.Dispose() = () }
 
-    member x.PinCheckResults(results, sourceFile, prohibitTypeCheck, opName) =
+    member x.PinCheckResults(results, sourceFile, prohibitTypeCheck) =
         match results with
         | Some results ->
             new PinTypeCheckResultsCookie(sourceFile, results.ParseResults, results.CheckResults, prohibitTypeCheck) :> IDisposable
