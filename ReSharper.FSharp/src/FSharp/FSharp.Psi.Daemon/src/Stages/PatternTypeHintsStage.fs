@@ -146,6 +146,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         let symbol = symbolUse.Symbol.As<FSharpMemberOrFunctionOrValue>()
         if isNull symbol then ValueNone else
 
+        let symbol = symbol.AccessorProperty |> Option.defaultValue symbol
         let typeString = symbol.ReturnParameter.Type.Format(defaultDisplayContext)
 
         match decl with
