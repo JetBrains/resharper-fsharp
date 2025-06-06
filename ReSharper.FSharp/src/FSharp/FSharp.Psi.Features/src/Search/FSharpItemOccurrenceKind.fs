@@ -44,7 +44,7 @@ module FSharpOccurrenceKinds =
 [<ShellComponent>]
 type FsharpSpecificOccurrenceKindIconsProvider() =
     interface IOccurrenceKindIconProvider with
-        member this.GetImageId(occurrenceKind) =
+        member this.GetImageId(occurrenceKind, occurrence) =
             FSharpOccurrenceKinds.icons.TryGetValue(occurrenceKind)
 
         member this.GetPriority _ =
