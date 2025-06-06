@@ -1,7 +1,9 @@
 using System;
 using FSharp.Compiler.Syntax;
+using FSharp.Compiler.SyntaxTrivia;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.TreeBuilder;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -12,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public static readonly NodeType Instance = new ChameleonExpressionNodeType();
 
-    public ChameleonExpressionNodeType() : base("F# Chameleon Expression Node Type", NodeIndex)
+    private ChameleonExpressionNodeType() : base("F# Chameleon Expression Node Type", NodeIndex)
     {
     }
 
@@ -21,8 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override CompositeElement Create(object data)
     {
-      var (expr, startOffset, lineStart) = (Tuple<SynExpr, int, int>) data;
-      var chameleonExpression = new ChameleonExpression(expr, startOffset, lineStart);
+      var (expr, warningDirectives, startOffset, lineStart) = (Tuple<SynExpr, FSharpList<WarnDirectiveTrivia>, int, int>) data;
+      var chameleonExpression = new ChameleonExpression(expr, warningDirectives, startOffset, lineStart);
       return chameleonExpression;
     }
   }

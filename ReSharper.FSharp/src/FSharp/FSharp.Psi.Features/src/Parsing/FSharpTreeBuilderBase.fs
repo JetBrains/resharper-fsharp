@@ -10,6 +10,7 @@ open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -23,10 +24,10 @@ open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.ReSharper.Resources.Shell
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFileSystemPath, projectedOffset, lineShift) =
+type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: WarnDirectiveTrivia list,
+        lifetime: Lifetime, path: VirtualFileSystemPath, projectedOffset: int, lineShift: int) =
     inherit TreeBuilderBase(lifetime, lexer)
 
-    // FCS ranges are 1-based.
     let lineShift = lineShift - 1
 
     let lineOffsets =
@@ -36,8 +37,21 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     let getLineOffset line =
         lineOffsets[line + lineShift]
 
-    new (sourceFile, lexer, lifetime, path) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, path, 0, 0)
+    let getNextDirectiveOffset warnDirectives =
+        warnDirectives
+        |> List.tryHead
+        |> Option.map (fun (WarningDirectiveRange range) -> getLineOffset range.StartLine + range.StartColumn)
+        |> Option.defaultValue -1
+
+    let mutable warnDirectives = warnDirectives
+    let mutable nextDirectiveOffset = getNextDirectiveOffset warnDirectives
+
+    let setWarnDirectives directives =
+        warnDirectives <- directives
+        nextDirectiveOffset <- getNextDirectiveOffset directives
+
+    new (sourceFile, lexer, warnDirectives, lifetime, path) =
+        FSharpTreeBuilderBase(sourceFile, lexer, warnDirectives, lifetime, path, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -52,7 +66,16 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
 
     override x.SkipWhitespaces() = ()
 
-    member x.AdvanceLexer() = x.Builder.AdvanceLexer() |> ignore
+    member x.AdvanceLexer() =
+        if nextDirectiveOffset <> -1 && x.CurrentOffset = nextDirectiveOffset then
+            let (WarningDirectiveRange directiveRange) = warnDirectives.Head
+            setWarnDirectives warnDirectives.Tail
+
+            let mark = x.Mark()
+            x.AdvanceToEnd(directiveRange)
+            x.Done(directiveRange, mark, FSharpWarningDirectiveNodeType.Instance)
+
+        x.Builder.AdvanceLexer() |> ignore
 
     member x.AdvanceToStart(range: range) =
         x.AdvanceToOffset(x.GetStartOffset(range))
@@ -82,7 +105,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
     member x.Done(mark, elementType) =
         base.Done(mark, elementType)
 
-    member x.Done(range, mark, elementType) =
+    member x.Done(range, mark, elementType: NodeType) =
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
 
@@ -978,7 +1001,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         | _ -> ElementType.LITERAL_EXPR
     
     member x.MarkChameleonExpression(expr: SynExpr) =
-        let ExprRange range as expr = x.FixExpression(expr)
+        let ExprRange exprRange as expr = x.FixExpression(expr)
 
         let isInternalMode () =
             let productConfigurations = Shell.Instance.GetComponent<RunsProducts.ProductConfigurations>()
@@ -987,20 +1010,42 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, path: VirtualFi
         let dumpFileContent () =
             if isInternalMode () then $"\nContent: {document.GetText()}" else ""
 
-        let startOffset = x.GetStartOffset(range)
+        let startOffset = x.GetStartOffset(exprRange)
         let mark = x.Mark(startOffset)
 
         if x.CurrentOffset <> startOffset then
-            Assertion.Fail($"Can't convert FCS tree expression in {path} at {range}.{dumpFileContent ()}")
+            Assertion.Fail($"Can't convert FCS tree expression in {path} at {exprRange}.{dumpFileContent ()}")
 
-        // Replace all tokens with single chameleon token.
-        let tokenMark = x.Mark(range)
-        x.AdvanceToEnd(range)
+        let extractContainedWarningDirectives () =
+            if warnDirectives.IsEmpty then [] else
+
+            let rec loop acc directives =
+                match directives with
+                | [] -> acc, []
+                | WarningDirectiveRange range as directive :: rest ->
+                    let directiveStart = range.Start
+
+                    if Position.posGt directiveStart exprRange.End then
+                        acc, directives
+                    elif Range.rangeContainsPos exprRange directiveStart then
+                        loop (directive :: acc) rest
+                    else
+                        loop acc rest
+
+            let containedDirectives, restDirectives = loop [] warnDirectives
+            setWarnDirectives restDirectives
+            List.rev containedDirectives
+
+        let exprWarningDirectives = extractContainedWarningDirectives ()
+
+        // Replace all tokens with a single chameleon token.
+        let tokenMark = x.Mark(exprRange)
+        x.AdvanceToEnd(exprRange)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
-        let lineStart = lineOffsets[range.StartLine - 1]
-        let data = expr, startOffset, lineStart
-        x.Done(range, mark, ChameleonExpressionNodeType.Instance, data)
+        let lineStart = lineOffsets[exprRange.StartLine - 1]
+        let data = expr, exprWarningDirectives, startOffset, lineStart
+        x.Done(exprRange, mark, ChameleonExpressionNodeType.Instance, data)
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)

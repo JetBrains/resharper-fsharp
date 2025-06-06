@@ -16,6 +16,7 @@ type FSharpParserTest() =
     [<Test; Explicit>] member x.``_``() = x.DoNamedTest()
 
     [<Test>] member x.``Directive - Nowarn 01``() = x.DoNamedTest()
+    [<Test>] member x.``Directive - Nowarn 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()

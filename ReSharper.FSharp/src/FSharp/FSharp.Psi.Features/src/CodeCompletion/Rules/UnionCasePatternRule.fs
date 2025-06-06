@@ -71,9 +71,7 @@ type EnumCaseLikePatternBehavior<'T when 'T :> FSharpSymbol>(info: EnumCaseLikeP
     override this.Accept(textControl, nameRange, _, _, solution, _) =
         use pinCheckResultsCookie =
             Assertion.Assert(info.Context.ParseAndCheckResults.IsValueCreated)
-            textControl
-                .GetFSharpFile(solution)
-                .PinTypeCheckResults(info.Context.ParseAndCheckResults.Value, UnionCasePatternInfo.Id)
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(info.Context.ParseAndCheckResults.Value)
 
         use writeCookie = WriteLockCookie.Create(true)
 

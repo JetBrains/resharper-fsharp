@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using FSharp.Compiler.Syntax;
+using FSharp.Compiler.SyntaxTrivia;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -14,12 +15,14 @@ using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ChameleonExpression
   {
     public SynExpr SynExpr { get; private set; }
+    public FSharpList<WarnDirectiveTrivia> WarningDirectives { get; }
 
     public int OriginalStartOffset { get; }
     public int OriginalLineStart { get; }
@@ -27,9 +30,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [NotNull] private readonly object mySyncObject = new();
     private bool myOpened;
 
-    public ChameleonExpression([CanBeNull] SynExpr expr, int startOffset, int lineStart)
+    public ChameleonExpression([NotNull] SynExpr expr, FSharpList<WarnDirectiveTrivia> warningDirectives,
+      int startOffset, int lineStart)
     {
       SynExpr = expr;
+      WarningDirectives = warningDirectives;
       OriginalStartOffset = startOffset;
       OriginalLineStart = lineStart;
     }
