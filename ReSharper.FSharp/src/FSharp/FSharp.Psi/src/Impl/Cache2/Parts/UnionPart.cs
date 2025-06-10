@@ -78,7 +78,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       base.Write(writer);
       writer.WriteBool(HasNestedTypes);
-      writer.WriteBool(IsSingleCase);
       writer.WriteStringArray(CaseNames);
       writer.WriteByte((byte) RepresentationAccessRights);
     }
