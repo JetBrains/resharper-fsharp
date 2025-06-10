@@ -44,25 +44,19 @@ let private addSemicolon (binding: IRecordFieldBinding) =
         | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
 
 let private areBindingsOrdered (bindings: TreeNodeCollection<IRecordFieldBinding>)
-    (declaredFields: IList<string>): bool =
-    if bindings.Count <= 1 then true else
+        (declaredFields: IList<string>): bool =
 
-    let mutable declaredFieldIndex = 0
-    let mutable bindingIndex = 0
-    let mutable ordered = true
+    let fieldIndices: IDictionary<string, int> =
+        declaredFields
+        |> Seq.mapi (fun i field -> field, i)
+        |> dict
 
-    while bindingIndex < bindings.Count && ordered do
-        while declaredFieldIndex < declaredFields.Count &&
-              declaredFields[declaredFieldIndex] != bindings[bindingIndex].ReferenceName.ShortName do
-            declaredFieldIndex <- declaredFieldIndex + 1
+    let tryGetIndex (fieldIndices: IDictionary<string, int>) (binding: IRecordFieldBinding) =
+        tryGetValue binding.ReferenceName.ShortName fieldIndices
 
-        if declaredFieldIndex >= declaredFields.Count then
-            ordered <- false
-
-        bindingIndex <- bindingIndex + 1
-        declaredFieldIndex <- declaredFieldIndex + 1
-
-    ordered
+    let indices = bindings |> Seq.map (tryGetIndex fieldIndices) |> Seq.toList
+    indices |> List.forall Option.isSome &&
+    indices |> Seq.choose id |> Seq.pairwise |> Seq.forall (fun (i1, i2) -> i1 <= i2)
 
 let private createOrderedIndexedBindings (bindings: TreeNodeCollection<IRecordFieldBinding>)
     (declaredFields: IList<string>): IRecordFieldBinding[] =
@@ -235,6 +229,3 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
     | _ -> ()
 
     generatedBindings
-
-let showHotspotsForGeneratedBindings recordExpr bindings =
-    ()
