@@ -79,8 +79,8 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
             let typeName =
                 let typeName = "ArgumentOutOfRangeException"
                 match expr.CheckerService.ResolveNameAtLocation(expr, [typeName], false, "AddMatchAllClauseFix") with
-                | None -> $"System.{typeName}"
-                | Some _ -> typeName
+                | [] -> $"System.{typeName}"
+                | _ -> typeName
 
             clause.SetExpression(factory.CreateExpr($"{typeName}() |> raise")) |> ignore
 
