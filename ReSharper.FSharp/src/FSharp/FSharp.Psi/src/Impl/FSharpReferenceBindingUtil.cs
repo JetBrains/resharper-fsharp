@@ -97,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (containingType.Equals(typeDecl.DeclaredElement))
           return;
 
-      reference.SetQualifier(containingType);
+      reference.SetQualifier(containingType, context);
     }
   }
 }

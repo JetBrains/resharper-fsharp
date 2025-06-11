@@ -85,12 +85,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpSymbolReference QualifierReference =>
       Qualifier is IReferenceExpr refExpr ? refExpr.Reference : null;
 
-    public void SetQualifier(IClrDeclaredElement declaredElement)
+    public void SetQualifier(IClrDeclaredElement declaredElement, ITreeNode context = null)
     {
       // todo: implement for existing qualifiers
       if (Qualifier != null) return;
 
-      this.SetQualifier(this.CreateElementFactory().CreateReferenceExpr, declaredElement);
+      this.SetQualifier(this.CreateElementFactory().CreateReferenceExpr, declaredElement, context);
     }
 
     public IList<string> Names => this.GetNames();

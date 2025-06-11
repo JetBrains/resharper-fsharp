@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
@@ -142,10 +143,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpSymbolReference QualifierReference =>
       GetElement() is IFSharpQualifiableReferenceOwner referenceOwner ? referenceOwner.QualifierReference : null;
 
-    public void SetQualifier([NotNull] IClrDeclaredElement declaredElement)
+    public void SetQualifier([NotNull] IClrDeclaredElement declaredElement, ITreeNode context = null)
     {
       if (GetElement() is IFSharpQualifiableReferenceOwner referenceOwner)
-        referenceOwner.SetQualifier(declaredElement);
+        referenceOwner.SetQualifier(declaredElement, context);
     }
 
     /// Does not reuse existing file resolve results, does complete lookup by name.

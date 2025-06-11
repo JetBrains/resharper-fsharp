@@ -168,3 +168,4 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``Union 20``() = x.DoNamedTest()
     [<Test>] member x.``Union 21``() = x.DoNamedTest()
     [<Test>] member x.``Union 22``() = x.DoNamedTest()
+    [<Test>] member x.``Union 23``() = x.DoNamedTest()

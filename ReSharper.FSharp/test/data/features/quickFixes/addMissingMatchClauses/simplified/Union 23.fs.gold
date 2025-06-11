@@ -1,0 +1,14 @@
+﻿[<RequireQualifiedAccess>]
+module TopModule
+
+[<RequireQualifiedAccess>]
+type U =
+    | A
+    | B
+
+[<RequireQualifiedAccess>]
+module U =
+    let _ =
+        match U.A with
+        | U.A -> ()
+        | U.B -> {selstart}failwith "todo"{selend}
