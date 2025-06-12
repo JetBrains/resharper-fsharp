@@ -1,6 +1,7 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.tasks.BuildSearchableOptionsTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
@@ -246,6 +247,13 @@ tasks {
       validateFiles(listOf(externalAnnotationsDirectory), "dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")
     }
   }
+
+  fun JavaForkOptions.configureDotNet() {
+    systemProperty("rider.backend.dotnet.runtime.path", file("dotnet-sdk.cmd").absolutePath)
+  }
+  withType<RunIdeTask>().configureEach { this.configureDotNet() }
+  withType<BuildSearchableOptionsTask>().configureEach { this.configureDotNet() }
+  withType<Test>().configureEach { this.configureDotNet() }
 
   // Initially introduced in:
   // https://github.com/JetBrains/ForTea/blob/master/Frontend/build.gradle.kts
