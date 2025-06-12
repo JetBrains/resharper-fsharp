@@ -121,6 +121,7 @@
     <Compile Include="src\AI\FSharpDocGenSupportProvider.fs" />
     <Compile Include="src\AI\FSharpFileSummarizer.fs" />
     <Compile Include="src\AI\FSharpCodeSetNodesFactory.fs" />
+    <Compile Include="src\AI\ErrorCheck\FSharpBackendSyntaxErrorChecker.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
