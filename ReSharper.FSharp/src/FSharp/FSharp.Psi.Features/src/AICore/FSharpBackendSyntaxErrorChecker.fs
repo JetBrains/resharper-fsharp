@@ -1,13 +1,13 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.AI.FSharpBackendSyntaxErrorChecker
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.AICore.FSharpBackendSyntaxErrorChecker
 
 open System.Collections.Generic
+open JetBrains.ReSharper.Feature.Services.AICore
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpRangeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util.CommonUtil
 open FSharp.Compiler.Diagnostics
 open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.AI
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Rider.Model
 open JetBrains.Util
 
-// TODO: probably might be moved to AI zone once API stabilizes
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpBackendSyntaxErrorChecker(checkerService: FcsCheckerService, documentFactory: IInMemoryDocumentFactory) =    
     let convertDiagnostic(document: IDocument) (diagnostic: FSharpDiagnostic) :BackendError =
