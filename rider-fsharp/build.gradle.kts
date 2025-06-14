@@ -248,13 +248,6 @@ tasks {
     }
   }
 
-  fun JavaForkOptions.configureDotNet() {
-    systemProperty("rider.backend.dotnet.runtime.path", file("dotnet-sdk.cmd").absolutePath)
-  }
-  withType<RunIdeTask>().configureEach { this.configureDotNet() }
-  withType<BuildSearchableOptionsTask>().configureEach { this.configureDotNet() }
-  withType<Test>().configureEach { this.configureDotNet() }
-
   // Initially introduced in:
   // https://github.com/JetBrains/ForTea/blob/master/Frontend/build.gradle.kts
   withType<RunIdeTask> {
