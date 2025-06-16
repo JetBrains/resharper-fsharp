@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
         myLogger,
         myShellLocks,
         mySolutionProcessStartInfoPatcher,
-        JetProcessRuntimeRequest.CreateCore(), version, path);
+        JetProcessRuntimeRequest.CreateInternalRuntime(), version, path);
     }
   }
 }
