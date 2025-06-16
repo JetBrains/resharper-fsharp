@@ -1,0 +1,36 @@
+﻿Module or namespace import
+---
+UsageInUsings TO: [O] open |NsPropAndType| RANGE: (20,33) @ Write - Extension - Compiled 01.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] "".|ToString|(P = 1) RANGE: (38,46) @ Write - Extension - Compiled 01.fs
+UsageInvocation TO: [O] let a = "".|ToString|(P = 1) RANGE: (65,73) @ Write - Extension - Compiled 01.fs
+
+
+Other
+---
+UsageOther TO: [O] "".|ToString|(P = 1) RANGE: (38,46) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] "".ToString(|P| = 1) RANGE: (47,48) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] "".ToString(P |=| 1) RANGE: (49,50) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] "".ToString(P |=| 1) RANGE: (49,50) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] let |a| = "".ToString(P = 1) RANGE: (58,59) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] let a = "".|ToString|(P = 1) RANGE: (65,73) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] let a = "".ToString(|P| = 1) RANGE: (74,75) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] let a = "".ToString(P |=| 1) RANGE: (76,77) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] let a = "".ToString(P |=| 1) RANGE: (76,77) @ Write - Extension - Compiled 01.fs
+UsageOther TO: [O] "".|P| RANGE: (84,85) @ Write - Extension - Compiled 01.fs
+
+
+Write access
+---
+UsageWrite TO: [W] "".ToString(|P| = 1) RANGE: (47,48) @ Write - Extension - Compiled 01.fs
+UsageWrite TO: [W] let a = "".ToString(|P| = 1) RANGE: (74,75) @ Write - Extension - Compiled 01.fs
+
+
+Read access
+---
+UsageRead TO: [R] "".|P| RANGE: (84,85) @ Write - Extension - Compiled 01.fs
+
+

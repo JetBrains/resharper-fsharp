@@ -80,7 +80,7 @@ type ITestAssemblyReaderShim =
     abstract Dispose: unit -> unit
 
 
-type TestReferenceProjectOutput(projectName: string) =
+type TestReferenceProjectOutputAttribute(projectName: string) =
     inherit Attribute()
 
     interface ITestLibraryReferencesProvider with

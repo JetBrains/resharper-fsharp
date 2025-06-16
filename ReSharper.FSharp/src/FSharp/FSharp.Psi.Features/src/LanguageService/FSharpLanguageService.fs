@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
-open JetBrains.Application.Parts
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -116,8 +115,16 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
                 let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
                 FSharpMethodInvocationUtil.isNamedArgSyntactically binaryAppExpr
 
-            if isInstanceFieldOrProperty declaredElement && isNamedArg () then
+            let isFcsProperty =
+                let fcsSymbol = symbolReference.GetFcsSymbol()
+                let mfv = fcsSymbol.As<FSharpMemberOrFunctionOrValue>()
+                isNotNull mfv && mfv.IsProperty
+
+            if (isFcsProperty || isInstanceFieldOrProperty declaredElement) && isNamedArg () then
                 ReferenceAccessType.WRITE else
+
+            if isFcsProperty then
+                ReferenceAccessType.READ else
 
             x.GetDefaultAccessType(declaredElement)
 

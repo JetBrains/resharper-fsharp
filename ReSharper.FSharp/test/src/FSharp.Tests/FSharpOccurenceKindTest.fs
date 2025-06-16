@@ -70,6 +70,10 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Write - Expr 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Write - Expr 02 - Paren``() = x.DoNamedTest()
     [<Test>] member x.``Write - Expr 03 - Indexer``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Write - Extension - Compiled 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Write - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Write - Record 02 - Qualified name``() = x.DoNamedTest()
     [<Test>] member x.``Write - Record 03 - Copy and update``() = x.DoNamedTest()

@@ -206,7 +206,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetMfvCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
+    public static string GetMfvCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv, ITypeElement typeElement)
     {
       try
       {
@@ -214,7 +214,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
-        return compiledName ?? (IsImplicitAccessor(mfv) ? mfv.DisplayName : mfv.LogicalName); // todo: map to accessor
+
+        if (compiledName != null)
+          return compiledName;
+
+        if (IsImplicitAccessor(mfv))
+          return mfv.DisplayName;
+
+        var isCompiled = typeElement is ICompiledTypeElement;
+        if (isCompiled)
+          return mfv.CompiledName;
+
+        return mfv.LogicalName;
       }
       catch (Exception e)
       {

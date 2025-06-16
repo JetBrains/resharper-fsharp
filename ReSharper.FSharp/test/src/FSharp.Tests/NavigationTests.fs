@@ -72,6 +72,9 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Type private function - Generic 01``() = x.DoNamedTest()
 
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Extension - Compiled 01``() = x.DoNamedTest()
+
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
 

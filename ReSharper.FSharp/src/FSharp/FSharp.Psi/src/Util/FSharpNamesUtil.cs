@@ -63,7 +63,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
       }
 
+      if (element is ICompiledElement and IMethod method)
+        names.Add(GetCompiledExtensionMemberSourceName(method));
+
       return names;
+    }
+
+    private static string GetCompiledExtensionMemberSourceName(ITypeMember member)
+    {
+      return member.ShortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_");
     }
 
     private static void GetPossibleSourceNames(ITypeElement type, ISet<string> names)

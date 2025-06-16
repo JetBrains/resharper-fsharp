@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="TypeDecl.fs" />
     <Compile Include="Extensions.fs" />
+    <Compile Include="PropertyAndType.fs" />
   </ItemGroup>
 
   <ItemGroup>
