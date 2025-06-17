@@ -22,6 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
       fsFile?.ProcessThisAndDescendants(new Processor(attributeNames, context));
     }
 
+    public void CollectPossibleMemberNames(List<string> consumer, IMetadataTypeMember member, IMetadataTypeInfo type)
+    {
+    }
+
     private class Processor : TreeNodeVisitor, IRecursiveElementProcessor
     {
       private readonly HashSet<string> myAttributeNames;
