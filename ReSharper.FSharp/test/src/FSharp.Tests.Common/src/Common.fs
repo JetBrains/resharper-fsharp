@@ -4,10 +4,10 @@ open System
 open System.Collections.Generic
 open System.IO
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
-open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.HabitatDetector
@@ -80,25 +80,32 @@ type ITestAssemblyReaderShim =
     abstract Dispose: unit -> unit
 
 
+[<ShellComponent>]
+type TestReferencesCompiler(lifetime: Lifetime) =
+    let compiler = DotNetTestCodeCompiler(lifetime, ContinuousIntegration.External)
+
+    member this.GetReference(testPath: FileSystemPath, projectName: string) =
+        let slnPath = testPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
+
+        let compileResult =
+            compiler.Compile(slnPath, TestTargetFramework.Net80, HabitatInfo.OSArchitecture,
+                compileMode = DotNetTestCodeCompiler.CompileMode.Build
+            ).Result
+
+        let fileName = projectName + ".dll"
+        let dllPath = compileResult.OutputDir / fileName
+        Assertion.Assert(dllPath.ExistsFile)
+        [dllPath.FullPath]
+
 type TestReferenceProjectOutputAttribute(projectName: string) =
     inherit Attribute()
 
     interface ITestLibraryReferencesProvider with
         member this.Inherits = true
 
-        member this.GetReferences(test, packageManager, targetFrameworkId) =
-            let compiler = DotNetTestCodeCompiler(test.TestLifetime, ContinuousIntegration.External)
-            let slnPath = test.BaseTestDataPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
-
-            let compileResult =
-                compiler.Compile(slnPath, TestTargetFramework.Net80, HabitatInfo.OSArchitecture,
-                    compileMode = DotNetTestCodeCompiler.CompileMode.Build
-                ).Result
-
-            let fileName = projectName + ".dll"
-            let dllPath = compileResult.OutputDir / fileName
-            Assertion.Assert(dllPath.ExistsFile)
-            [dllPath.FullPath]
+        member this.GetReferences(test, _, _) =
+            let testReferencesCompiler = Shell.Instance.GetComponent<TestReferencesCompiler>()
+            testReferencesCompiler.GetReference(test.BaseTestDataPath, projectName)
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()
@@ -401,7 +408,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
-        member this.IsProjectOutput(outputPath) = false
+        member this.IsProjectOutput _ = false
 
 
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
