@@ -40,9 +40,9 @@ type FSharpCompilerWarningProcessor() =
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(frameworkId)
 
     interface ICompilerWarningProcessor with
-        member this.ProcessCompilerWarning(file, info, compilerIds, _, _, _) =
+        member this.ProcessCompilerWarning(file, info, compilerIds, _, _, _): CompilerWarningPreProcessResult =
             let configuration = getConfiguration file
-            if isNull configuration then info else
+            if isNull configuration then CompilerWarningPreProcessResult.NoChange else
 
             let props = configuration.PropertiesCollection
  
@@ -75,9 +75,4 @@ type FSharpCompilerWarningProcessor() =
                 if not (warningsNotAsErrors.IsEmpty()) && Seq.exists warningsNotAsErrors.Contains compilerIds then
                     warningIsError <- false
 
-            if not warningIsError then info else            
-
-            info.Override(
-              overriddenSeverity = Severity.ERROR,
-              overriddenAttributeId = AnalysisHighlightingAttributeIds.ERROR,
-              overriddenOverlapResolve = OverlapResolveKind.ERROR)
+            if not warningIsError then CompilerWarningPreProcessResult.NoChange else CompilerWarningPreProcessResult.LiftToError
