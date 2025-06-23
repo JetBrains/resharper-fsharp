@@ -1,0 +1,7 @@
+﻿module Test
+
+let _ = InjectionsOwner(InjectionProp = "|[|(0)123|]|(1)")
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 

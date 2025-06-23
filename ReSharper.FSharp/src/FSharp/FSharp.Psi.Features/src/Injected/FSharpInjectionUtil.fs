@@ -8,6 +8,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocation
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 let getAttributesOwner (expr: IFSharpExpression) attributeNames =
+    let getAttributesOwner (declaredElement: IDeclaredElement) =
+        match declaredElement with
+        | :? IAccessor as accessor -> accessor.OwnerMember.As<IAttributesOwner>()
+        | _ -> declaredElement.As<IAttributesOwner>()
+
     let psiServices = expr.GetPsiServices()
 
     let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
@@ -22,6 +27,22 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
         if isNotNull typeMemberDecl then typeMemberDecl else
         let topBinding = TopBindingNavigator.GetByExpression(expr)
         if isNull topBinding then null else topBinding.HeadPattern.As<IFSharpDeclaration>()
+
+    let namedArgRef = if isNamedArg then tryGetNamedArgRefExpr binaryExpr else null
+
+    let propertySetter =
+        if isNamedArg then
+            let propertyName = namedArgRef.ShortName
+            let hasAttributes =
+                attributeNames
+                |> Seq.exists (fun attributeName ->
+                    psiServices.HasMemberWithAttribute(propertyName, attributeName))
+
+            if hasAttributes then getAttributesOwner (namedArgRef.Reference.Resolve().DeclaredElement)
+            else null
+        else null
+
+    if isNotNull propertySetter then propertySetter else
 
     let memberName =
         if isNull argsOwner then
@@ -40,9 +61,8 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
     if not hasAttributes then null else
 
     if isNamedArg then
-        let namedRef = tryGetNamedArgRefExpr binaryExpr
-        if isNull namedRef then null else
-        namedRef.Reference.Resolve().DeclaredElement.As<IAttributesOwner>()
+        if isNull namedArgRef then null else
+        getAttributesOwner (namedArgRef.Reference.Resolve().DeclaredElement)
 
     else
         if isNotNull argsOwner then
@@ -50,7 +70,7 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
             if isNotNull matchingParameter then matchingParameter :> IAttributesOwner else null
 
         else
-            declaration.DeclaredElement.As<IAttributesOwner>()
+            getAttributesOwner declaration.DeclaredElement
 
 let tryGetTypeProviderName (expr: IConstExpr) =
     let providedTypeName =
