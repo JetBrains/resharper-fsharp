@@ -261,18 +261,18 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 if lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp then () else
 
                 markDirtyReaders ()
+
+                use barrier = locks.Tasks.CreateBarrier(lifetime)
+                for referencedProjectKey in fcsProject.ReferencedModules do
+                    let referencedModule = projectKeyToPsiModules.TryGetValue(referencedProjectKey)
+                    if isNotNull referencedModule && assemblyReadersByModule.ContainsKey(referencedModule) then
+                        barrier.EnqueueJob(fun _ ->
+                            tryGetReaderFromModule referencedModule |> Option.iter _.UpdateTimestamp()
+                        )
+
                 lastSyncedWriteLockTimestamp <- locks.ContentModelLocks.WriteLockTimestamp
+                logger.Trace("Finish invalidating assembly reader")
             )
-
-            use barrier = locks.Tasks.CreateBarrier(lifetime)
-            for referencedProjectKey in fcsProject.ReferencedModules do
-                let referencedModule = projectKeyToPsiModules.TryGetValue(referencedProjectKey)
-                if isNotNull referencedModule && assemblyReadersByModule.ContainsKey(referencedModule) then
-                    barrier.EnqueueJob(fun _ ->
-                        tryGetReaderFromModule referencedModule |> Option.iter _.UpdateTimestamp()
-                    )
-
-            logger.Trace("Finish invalidating assembly reader")
 
     interface IChangeProvider with
         member this.Execute(map) =
