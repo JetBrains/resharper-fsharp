@@ -64,8 +64,10 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
 
 let getQualifierExpr (context: FSharpCodeCompletionContext) =
     let reference = context.ReparsedContext.Reference
+    if isNull reference then null else
+
     let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
-    if isNull refExpr then Unchecked.defaultof<_> else
+    if isNull refExpr then null else
 
     refExpr.Qualifier
 

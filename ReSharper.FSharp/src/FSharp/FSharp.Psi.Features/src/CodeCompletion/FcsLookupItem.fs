@@ -82,10 +82,16 @@ type IFcsLookupItemInfo =
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
+    let mutable emphasize = false
+
     member this.AllFcsSymbolUses = items.SymbolUses
     member this.FcsSymbolUse = items.SymbolUses.Head
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
     member this.NamespaceToOpen = items.NamespaceToOpen
+
+    member this.Emphasize() =
+        emphasize <- true
+        this.Invalidate()
 
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = this.FcsSymbol
@@ -172,6 +178,9 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(items.Name, x.TextColor)
+
+        if emphasize then
+            LookupUtil.AddEmphasize(name, TextRange(0, name.Length))
 
         let ns = items.NamespaceToOpen
         if not (ns.IsEmpty()) then

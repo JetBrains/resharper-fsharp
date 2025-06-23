@@ -9,11 +9,31 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRelevanceRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    let isObjectEntity (fcsEntity: FSharpEntity) =
+        match fcsEntity.LogicalName with
+        | "Object" ->
+            match fcsEntity.Namespace with
+            | Some "System" -> true
+            | _ -> false
+        | _ -> false
+
+    let emphasize (item: ILookupItem) =
+        match item with
+        | :? FcsLookupItem as fcsLookupItem ->
+            fcsLookupItem.Emphasize()
+        | _ -> ()
+
+    let getFcsType context =
+        match getQualifierExpr context with
+        | null -> Unchecked.defaultof<_>
+        | qualifierExpr -> qualifierExpr.TryGetFcsType()
 
     override this.DecorateItems(context, items) =
         let isCustomOperationPossible =
@@ -24,13 +44,15 @@ type FSharpRelevanceRule() =
                         reference.GetTreeNode().As<IReferenceExpr>() |> Option.ofObj)
                 refExpr |> Option.exists isInsideComputationExpressionForCustomOperation
 
+        let fcsType = getFcsType context
+
         for item in items do
             let info =
                 match item with
                 | :? IFcsLookupItemInfo as info -> info
                 | :? IAspectLookupItem<ILookupItemInfo> as item -> item.Info.As<IFcsLookupItemInfo>()
                 | _ -> null
-            
+
             if isNull info then () else
 
             match info.FcsSymbol with
@@ -52,23 +74,46 @@ type FSharpRelevanceRule() =
                 if mfv.IsExtensionMember then
                     markRelevance item CLRLookupItemRelevance.ExtensionMethods else
 
-                if mfv.IsMember && mfv.IsProperty then
-                    markRelevance item CLRLookupItemRelevance.FieldsAndProperties
-                else
-                    if info.FcsSymbolUse.IsFromComputationExpression then
-                        if isCustomOperationPossible.Value then
-                            markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+                if mfv.IsMember then
+                    if mfv.IsProperty then
+                        markRelevance item CLRLookupItemRelevance.FieldsAndProperties
+                    else
+                        if info.FcsSymbolUse.IsFromComputationExpression then
+                            if isCustomOperationPossible.Value then
+                                markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 
-                    markRelevance item CLRLookupItemRelevance.Methods
+                        markRelevance item CLRLookupItemRelevance.Methods
+
+                    if isNull fcsType then () else
+
+                    let fcsType = fcsType.ErasedType
+                    if fcsType.HasTypeDefinition then
+                        let contextFcsEntity = fcsType.TypeDefinition
+
+                        match mfv.DeclaringEntity with
+                        | None -> ()
+                        | Some fcsEntity ->
+
+                        if fcsEntity.Equals(contextFcsEntity) then
+                            markRelevance item CLRLookupItemRelevance.MemberOfCurrentType
+                            emphasize item
+
+                        elif isObjectEntity fcsEntity then
+                            markRelevance item CLRLookupItemRelevance.MemberOfObject
+
+                        else
+                            markRelevance item CLRLookupItemRelevance.MemberOfBaseType
 
             | :? FSharpField as field when
                     field.DeclaringEntity
                     |> Option.map (fun e -> e.IsEnum)
                     |> Option.defaultValue false ->
                 markRelevance item CLRLookupItemRelevance.EnumMembers
+                emphasize item
 
             | :? FSharpField ->
                 markRelevance item CLRLookupItemRelevance.FieldsAndProperties
+                emphasize item
 
             | :? FSharpUnionCase
             | :? FSharpActivePatternCase ->
