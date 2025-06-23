@@ -1090,6 +1090,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         isUpToDateCustomAttributes method.ReturnTypeAttributes methodDefReturn.CustomAttrs
 
     let isUpToDateMethodDef (method: IFunction) (methodDef: ILMethodDef) =
+        method.ShortName = methodDef.Name &&
         mkMethodAttributes method = methodDef.Attributes &&
 
         let parameters = method.Parameters
@@ -1112,6 +1113,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         Array.forall2 isUpToDateMethodDef methods methodDefs
 
     let isUpToDateFieldDef (field: IField) (fieldDef: ILFieldDef) =
+        field.ShortName = fieldDef.Name &&
         mkType field.Type = fieldDef.FieldType &&
         mkFieldLiteralValue field = fieldDef.LiteralValue &&
         isUpToDateCustomAttributes field fieldDef.CustomAttrs
@@ -1125,6 +1127,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         List.forall2 isUpToDateFieldDef fields fieldDefs
 
     let isUpToDateEventDef (event: IEvent) (eventDef: ILEventDef) =
+        event.ShortName = eventDef.Name &&
         mkEventDefType event = eventDef.EventType &&
         mkEventAddMethod event = eventDef.AddMethod &&
         mkEventRemoveMethod event = eventDef.RemoveMethod &&
@@ -1140,6 +1143,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         List.forall2 isUpToDateEventDef events eventDefs
 
     let isUpToDatePropertyDef (property: IProperty) (propertyDef: ILPropertyDef) =
+        property.ShortName = propertyDef.Name &&
         mkPropertyParams property = propertyDef.Args &&
         mkPropertySetter property = propertyDef.SetMethod &&
         mkPropertyGetter property = propertyDef.GetMethod &&
