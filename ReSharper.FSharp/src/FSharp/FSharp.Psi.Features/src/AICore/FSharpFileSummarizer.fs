@@ -1,9 +1,9 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.AI
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.AICore
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.Rider.Backend.Features.AI.Chat.Summarization
+open JetBrains.Rider.Backend.Features.AICore.Summarization
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.DocumentModel
 
