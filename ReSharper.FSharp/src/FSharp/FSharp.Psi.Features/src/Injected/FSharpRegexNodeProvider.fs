@@ -63,7 +63,7 @@ type FSharpRegexNodeProvider(codeAnnotationsCache: CodeAnnotationsCache) =
                 stringSyntaxAnnotationProvider.Value.AttributeShortNames
                 [| regexPatternAnnotationProvider.Value.CodeAnnotationShortName |]
 
-        let attributesOwner = getAttributesOwner expr attributeNames
+        let attributesOwner = findAttributesOwner expr attributeNames
         if isNull attributesOwner then ValueNone else
 
         let isSuccess =

@@ -1,0 +1,9 @@
+﻿module Test
+
+open NsPropAndType
+
+let _ = System.String("", Injection = "|[|(0)123|]|(1)")
+
+---------------------------------------------------------
+(0): ReSharper Regex Set: 
+(1): ReSharper Regex Set: 

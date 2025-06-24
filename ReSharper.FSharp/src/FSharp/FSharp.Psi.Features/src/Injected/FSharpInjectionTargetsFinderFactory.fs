@@ -29,7 +29,7 @@ type FSharpInjectionTargetsFinder() =
         let attrNames =
             Seq.append stringSyntaxAnnotationProvider.AttributeShortNames languageInjectionAnnotationProvider.AttributeShortNames
 
-        let attributesOwner = getAttributesOwner expr attrNames
+        let attributesOwner = findAttributesOwner expr attrNames
         if isNull attributesOwner then ValueNone else
         let info = stringSyntaxAnnotationProvider.GetInfo(attributesOwner)
         if isNotNull info then ValueSome(info, "", "") else

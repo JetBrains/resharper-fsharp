@@ -1,5 +1,7 @@
 ﻿module FSharpExtensions
 
+open System.Diagnostics.CodeAnalysis
+
 type SourceName with
     member this.Prop = 1
     member this.Method() = 1
@@ -7,6 +9,9 @@ type SourceName with
 type System.String with
     member this.Prop = 1
     member this.Method() = 1
+
+    [<StringSyntax("regex")>]
+    member _.Injection with set (_: string) = ()
 
 type List<'T> with
     member this.Prop = 1
@@ -19,3 +24,7 @@ type System.Array with
 type System.Collections.IList with
     member this.PropIList = 1
     member this.MethodIList() = 1
+
+type InjectionsOwner with
+    [<StringSyntax("regex")>]
+    member this.InjectionExtensionProp with set (_: string) = ()

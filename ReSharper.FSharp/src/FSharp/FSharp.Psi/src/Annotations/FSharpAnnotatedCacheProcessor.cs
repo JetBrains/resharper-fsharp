@@ -6,6 +6,7 @@ using JetBrains.Metadata.Utils;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches.AnnotatedEntities;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -24,6 +25,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
     public void CollectPossibleMemberNames(List<string> consumer, IMetadataTypeMember member, IMetadataTypeInfo type)
     {
+      if (member is not IMetadataMethod { IsStatic: true } method) return;
+
+      var accessorName = method.Name;
+      var propertyName = FSharpNamesUtil.TryRemoveCompiledAccessorPrefix(accessorName);
+
+      if (accessorName == propertyName) return;
+
+      consumer.Add(propertyName);
     }
 
     private class Processor : TreeNodeVisitor, IRecursiveElementProcessor
