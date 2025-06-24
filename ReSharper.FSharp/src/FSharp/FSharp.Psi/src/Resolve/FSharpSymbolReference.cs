@@ -159,7 +159,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? qualifiableReferenceOwner.Names
         : new[] {GetName()};
 
-      return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+      var symbolUses =
+        checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+
+      return FilterSymbols(symbolUses);
     }
+
+    protected virtual FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) =>
+      symbols.GetSlice(null, 0);
   }
 }
