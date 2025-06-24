@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using FSharp.Compiler.CodeAnalysis;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Psi;
@@ -28,6 +29,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       get;
       private set;
     }
+
+    [Conditional("JET_MODE_ASSERT")]
+    public static void AssertResultsArePinned() => Assertion.Assert(PinnedResults != null);
 
     public void Dispose()
     {
