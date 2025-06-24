@@ -64,12 +64,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (element is ICompiledElement and IMethod method)
-        names.Add(GetCompiledExtensionMemberSourceName(method.ShortName));
+        names.Add(TryRemoveCompiledAccessorPrefix(method.ShortName));
 
       return names;
     }
 
-    public static string GetCompiledExtensionMemberSourceName(string shortName)
+    public static string TryRemoveCompiledAccessorPrefix(string shortName)
     {
       return shortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_");
     }

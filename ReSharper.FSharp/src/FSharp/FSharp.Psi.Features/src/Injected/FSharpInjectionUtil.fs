@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Psi.CodeAnnotations
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
-let getAttributesOwner (expr: IFSharpExpression) attributeNames =
+let findAttributesOwner (expr: IFSharpExpression) attributeNames =
     let getAttributesOwner (declaredElement: IDeclaredElement) =
         match declaredElement with
         | :? IAccessor as accessor -> accessor.OwnerMember.As<IAttributesOwner>()
@@ -28,17 +28,17 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
         let topBinding = TopBindingNavigator.GetByExpression(expr)
         if isNull topBinding then null else topBinding.HeadPattern.As<IFSharpDeclaration>()
 
-    let namedArgRef = if isNamedArg then tryGetNamedArgRefExpr binaryExpr else null
+    let namedArgRefExpr = if isNamedArg then tryGetNamedArgRefExpr binaryExpr else null
 
     let propertySetter =
         if isNamedArg then
-            let propertyName = namedArgRef.ShortName
+            let propertyName = namedArgRefExpr.ShortName
             let hasAttributes =
                 attributeNames
                 |> Seq.exists (fun attributeName ->
                     psiServices.HasMemberWithAttribute(propertyName, attributeName))
 
-            if hasAttributes then getAttributesOwner (namedArgRef.Reference.Resolve().DeclaredElement)
+            if hasAttributes then getAttributesOwner (namedArgRefExpr.Reference.Resolve().DeclaredElement)
             else null
         else null
 
@@ -61,8 +61,8 @@ let getAttributesOwner (expr: IFSharpExpression) attributeNames =
     if not hasAttributes then null else
 
     if isNamedArg then
-        if isNull namedArgRef then null else
-        getAttributesOwner (namedArgRef.Reference.Resolve().DeclaredElement)
+        if isNull namedArgRefExpr then null else
+        getAttributesOwner (namedArgRefExpr.Reference.Resolve().DeclaredElement)
 
     else
         if isNotNull argsOwner then
