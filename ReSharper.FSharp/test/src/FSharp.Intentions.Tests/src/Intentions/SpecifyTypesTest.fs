@@ -80,6 +80,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 02 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Anon record 03 - Nested record``() = x.DoNamedTest()
     [<Test>] member x.``Import types - RQA 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Single open 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Single open 02 - Full signature``() = x.DoNamedTest()
