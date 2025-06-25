@@ -1,0 +1,12 @@
+﻿namespace Test
+
+open System
+open System.Reflection
+
+module A =
+    let x = 1, ("".GetType(), "".GetType().GetMethod(""))
+
+module B =
+    open A
+
+    let y: int * (Type * MethodInfo){caret} = x

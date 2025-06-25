@@ -1,0 +1,10 @@
+﻿//${OCCURRENCE:System.IDisposable}
+
+open System
+
+type I2 =
+    inherit System.IDisposable
+
+let f (x: IDisposable) y =
+    match x, y with
+    | :? I2{caret}, y as z -> ()
