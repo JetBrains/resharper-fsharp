@@ -168,4 +168,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     protected virtual FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) =>
       symbols.GetSlice(null, 0);
   }
+
+  public class FSharpMultiplySymbolCandidatesReference(IFSharpReferenceOwner owner) : FSharpSymbolReference(owner)
+  {
+    protected override FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) => symbols;
+  }
+
+  public static class FSharpSymbolReferenceExtensions
+  {
+    public static FSharpMultiplySymbolCandidatesReference AllowAllSymbolCandidatesCheck(this FSharpSymbolReference reference) =>
+      new(reference.GetElement());
+  }
 }

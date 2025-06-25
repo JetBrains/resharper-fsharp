@@ -26,17 +26,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.Util
 
-[<AutoOpen>]
-module private Extensions =
-    type FSharpMultiplySymbolCandidatesReference(owner) =
-        inherit FSharpSymbolReference(owner)
-        override _.FilterSymbols(symbols) = symbols
-
-    type FSharpSymbolReference with
-        member this.AllowAllSymbolCandidatesCheck() =
-            FSharpMultiplySymbolCandidatesReference(this.GetElement())
-
-
 module SpecifyTypes =
     type Availability = {
         CanSpecifyParameterTypes: bool
@@ -73,13 +62,13 @@ module SpecifyTypes =
             collectTypeUsages acc (context, fcsType, typeUsage.InnerTypeUsage)
 
         | :? IFunctionTypeUsage as typeUsage ->
-            let typeUsage1 = typeUsage.ArgumentTypeUsage
+            let argTypeUsage = typeUsage.ArgumentTypeUsage
             let argType = fcsType.GenericArguments[0]
-            let acc = collectTypeUsages acc (context, argType, typeUsage1)
+            let acc = collectTypeUsages acc (context, argType, argTypeUsage)
 
-            let typeUsage2 = typeUsage.ReturnTypeUsage
+            let returnTypeUsage = typeUsage.ReturnTypeUsage
             let returnType = fcsType.GenericArguments[1]
-            collectTypeUsages acc (context, returnType, typeUsage2)
+            collectTypeUsages acc (context, returnType, returnTypeUsage)
 
         | :? IArrayTypeUsage as typeUsage ->
             let typeUsage = typeUsage.TypeUsage
@@ -264,7 +253,7 @@ module SpecifyTypes =
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id (_.GenericArguments) parameters [] true
 
-    let private postProcessAnnotations (file: IFSharpFile) annotationsInfo =
+    let private bindAnnotations annotationsInfo =
         let annotationsInfo =
             annotationsInfo
             |> Seq.fold collectTypeUsages []
@@ -273,17 +262,13 @@ module SpecifyTypes =
                 let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
                 let fcsSymbol = fcsType.TypeDefinition
                 let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
-                context, reference, fcsSymbol, declaredElement)
-            |> Seq.filter (fun (_, reference, _, declaredElement) -> isNotNull reference && isNotNull declaredElement)
+                context, reference, declaredElement
+            )
+            |> Seq.filter (fun (_, reference, declaredElement) -> isNotNull reference && isNotNull declaredElement)
             |> Seq.toArray
 
-        for context, reference, _, declaredElement in annotationsInfo do
-            reference.SetRequiredQualifiers(declaredElement, context)
-
-        use pinCheckResultsCookie = file.PinTypeCheckResults(true, "Specify types")
-
-        for _, reference, _, declaredElement in annotationsInfo do
-            addOpensIfNeeded reference declaredElement "Specify types"
+        for context, reference, declaredElement in annotationsInfo do
+            bindDeclaredElementToReference context reference declaredElement "Specify types"
 
     let rec specifyTypes (node: IFSharpTreeNode) (availability: Availability) =
         match node with
@@ -301,18 +286,16 @@ module SpecifyTypes =
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let fcsType = mfv.FullType
                 let displayContext = symbolUse.DisplayContext
-                let file = pattern.FSharpFile
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-                postProcessAnnotations file annotationInfo
+                bindAnnotations annotationInfo
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
                 let displayContext = pattern.TryGetFcsDisplayContext()
-                let file = pattern.FSharpFile
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext patType pattern |]
-                postProcessAnnotations file annotationInfo
+                bindAnnotations annotationInfo
 
         | :? IParameterOwnerMemberDeclaration as declaration ->
             let symbolUse = declaration.GetFcsSymbolUse()
@@ -320,7 +303,6 @@ module SpecifyTypes =
 
             let symbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
             let displayContext = symbolUse.DisplayContext
-            let file = declaration.FSharpFile
 
             let annotationsInfo = [
                 if availability.CanSpecifyParameterTypes then
@@ -330,22 +312,20 @@ module SpecifyTypes =
                     yield specifyParametersOwnerReturnType declaration symbol displayContext
             ]
 
-            postProcessAnnotations file annotationsInfo
+            bindAnnotations annotationsInfo
 
         | _ -> ()
 
     let specifyPatternType (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        let file = pattern.FSharpFile
-        let annotationData = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-        postProcessAnnotations file annotationData
+        let annotationsInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
+        bindAnnotations annotationsInfo
 
     let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
-        let file = decl.FSharpFile
         let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv displayContext |]
-        postProcessAnnotations file annotationsInfo
+        bindAnnotations annotationsInfo
 
 module SpecifyTypesActionHelper =
     open SpecifyTypes
