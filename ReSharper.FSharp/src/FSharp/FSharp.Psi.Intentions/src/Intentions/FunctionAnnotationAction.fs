@@ -9,6 +9,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
+open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -23,7 +24,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.Util
 
 module SpecifyTypes =
@@ -270,7 +270,7 @@ module SpecifyTypes =
         for context, reference, declaredElement in annotationsInfo do
             bindDeclaredElementToReference context reference declaredElement "Specify types"
 
-    let rec specifyTypes (node: IFSharpTreeNode) (availability: Availability) =
+    let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
@@ -330,13 +330,13 @@ module SpecifyTypes =
 module SpecifyTypesActionHelper =
     open SpecifyTypes
 
-    let executePsiTransaction (node: IFSharpTreeNode) (availability: Availability) =
+    let executePsiTransaction (node: ITreeNode) (availability: Availability) =
         use writeCookie = WriteLockCookie.Create(node.IsPhysical())
         specifyTypes node availability
 
 
 [<AbstractClass>]
-type AnnotationActionBase<'a when 'a: not struct and 'a :> IFSharpTreeNode>(dataProvider: FSharpContextActionDataProvider) =
+type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     abstract member IsAvailable: 'a -> bool
@@ -367,7 +367,7 @@ type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProv
         if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
         else "Add type annotation"
 
-type private SpecifyTypeAction(node: IFSharpTreeNode, availability, ?text) =
+type private SpecifyTypeAction(node: ITreeNode, availability, ?text) =
     inherit BulbActionBase()
 
     override this.Text = defaultArg text "Add type annotation"
@@ -414,7 +414,7 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type SpecifyTypeActionsProvider(solution) =
     interface ISpecifyTypeActionProvider with
-        member this.TryCreateSpecifyTypeAction(node: IFSharpTreeNode) =
+        member this.TryCreateSpecifyTypeAction(node: ITreeNode) =
             use _ = ReadLockCookie.Create()
             let availability = { SpecifyTypes.getAvailability node with CanSpecifyParameterTypes = false }
             if not availability.IsAvailable then null else

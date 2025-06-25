@@ -25,7 +25,7 @@ open JetBrains.UI.RichText
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting private (typeString: string, owner: IFSharpTreeNode, range: DocumentRange,
+type TypeHintHighlighting private (typeString: string, owner: ITreeNode, range: DocumentRange,
                                    pushToHintMode: PushToHintMode, bulbActionsProvider: IInlayHintBulbActionsProvider,
                                    suffix) =
     let text = RichText(": " + typeString + suffix)
