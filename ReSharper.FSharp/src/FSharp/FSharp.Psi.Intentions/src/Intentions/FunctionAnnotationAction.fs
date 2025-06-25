@@ -234,8 +234,8 @@ module SpecifyTypes =
         // In the case `x :: _: Type` add parens to the whole listConsPat
         //TODO: improve parens analyzer
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
-            let listConstPat = ParenPatUtil.addParens listConsParenPat |> _.As<IListConsPat>()
-            let typedPat = getInnermostListConsTail listConstPat |> _.As<ITypedPat>()
+            let listConstPat = (ParenPatUtil.addParens listConsParenPat).As<IListConsPat>()
+            let typedPat = (getInnermostListConsTail listConstPat).As<ITypedPat>()
             (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
 
         else (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
