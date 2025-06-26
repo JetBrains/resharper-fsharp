@@ -78,6 +78,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Generic type 02 - Prefix``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Parens 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Function 02 - Abbreviation``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 02 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 03 - Nested record``() = x.DoNamedTest()

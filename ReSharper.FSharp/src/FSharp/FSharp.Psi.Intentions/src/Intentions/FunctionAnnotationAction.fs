@@ -62,6 +62,9 @@ module SpecifyTypes =
             collectTypeUsages acc (context, fcsType, typeUsage.InnerTypeUsage)
 
         | :? IFunctionTypeUsage as typeUsage ->
+            let fcsType =
+                if fcsType.IsFunctionType then fcsType else getAbbreviatedType fcsType
+
             let argTypeUsage = typeUsage.ArgumentTypeUsage
             let argType = fcsType.GenericArguments[0]
             let acc = collectTypeUsages acc (context, argType, argTypeUsage)
