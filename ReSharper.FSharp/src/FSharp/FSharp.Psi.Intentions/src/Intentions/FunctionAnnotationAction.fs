@@ -227,7 +227,7 @@ module SpecifyTypes =
         //TODO: improve parens analyzer
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
             let listConstPat = (ParenPatUtil.addParens listConsParenPat).As<IListConsPat>()
-            let typedPat = (getInnermostListConsTail listConstPat).As<ITypedPat>()
+            let typedPat = (FSharpPatternUtil.getLastTailPattern listConstPat).As<ITypedPat>()
             (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
 
         else (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
