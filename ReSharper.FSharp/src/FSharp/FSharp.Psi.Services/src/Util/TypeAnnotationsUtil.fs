@@ -4,45 +4,45 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
-    match pattern with
+let rec private collectPatterns (acc: ITreeNode list) (root: IFSharpPattern) =
+    match root with
     | null
     | :? IConstPat
     | :? IWildPat
     | :? ITypedPat -> acc
 
-    | :? IParenPat as parenPat -> visitPattern acc parenPat.Pattern
-    | :? IAsPat as asPat -> visitPattern acc asPat.LeftPattern
+    | :? IParenPat as parenPat -> collectPatterns acc parenPat.Pattern
+    | :? IAsPat as asPat -> collectPatterns acc asPat.LeftPattern
 
     | :? IOptionalValPat
     | :? IReferencePat as pat -> pat :: acc
 
     | :? IRecordPat as recordPat ->
         recordPat.FieldPatternsEnumerable
-        |> Seq.fold visitPattern acc
+        |> Seq.fold collectPatterns acc
 
-    | :? IFieldPat as fieldPat -> visitPattern acc fieldPat.Pattern
-    | :? IAttribPat as attribPat -> visitPattern acc attribPat.Pattern
+    | :? IFieldPat as fieldPat -> collectPatterns acc fieldPat.Pattern
+    | :? IAttribPat as attribPat -> collectPatterns acc attribPat.Pattern
 
     | :? ITuplePat as tuplePat ->
         tuplePat.PatternsEnumerable
-        |> Seq.fold visitPattern acc
+        |> Seq.fold collectPatterns acc
 
     | :? IParametersOwnerPat as parametersOwnerPat ->
         let acc = (parametersOwnerPat : ITreeNode) :: acc
         parametersOwnerPat.ParametersEnumerable
-        |> Seq.fold visitPattern acc
+        |> Seq.fold collectPatterns acc
 
     | :? INamedUnionCaseFieldsPat as unionCaseFieldsPat ->
         unionCaseFieldsPat.FieldPatternsEnumerable
-        |> Seq.fold visitPattern acc
+        |> Seq.fold collectPatterns acc
 
     | :? IAndsPat as andPat ->
         andPat.PatternsEnumerable
-        |> Seq.fold visitPattern acc
+        |> Seq.fold collectPatterns acc
 
     | :? IOrPat as orPat ->
-        visitPattern acc orPat.Pattern1
+        collectPatterns acc orPat.Pattern1
 
     | :? IListConsPat as pat ->
         let tailPat = getLastTailPattern pat
@@ -55,7 +55,7 @@ let rec private visitPattern (acc: ITreeNode list) (pattern: IFSharpPattern) =
 
 let private collectPatternsRequiringAnnotations acc (parametersOwner: IParameterOwnerMemberDeclaration) =
     parametersOwner.ParameterPatterns
-    |> Seq.fold visitPattern acc
+    |> Seq.fold collectPatterns acc
 
 let collectTypeHintAnchorsForBinding (binding: IBinding) =
     let acc: ITreeNode list = []
@@ -65,7 +65,7 @@ let collectTypeHintAnchorsForBinding (binding: IBinding) =
     let acc =
         if isNotNull binding.ReturnTypeInfo then acc
         elif binding.HasParameters then [binding :> ITreeNode]
-        else  visitPattern acc binding.HeadPattern
+        else collectPatterns acc binding.HeadPattern
 
     collectPatternsRequiringAnnotations acc binding
 
@@ -75,7 +75,7 @@ let collectTypeHintAnchorsForLambda (lambda: ILambdaExpr) =
     if isNull lambda || isNull lambda.RArrow then acc else
 
     lambda.PatternsEnumerable
-    |> Seq.fold visitPattern acc
+    |> Seq.fold collectPatterns acc
 
 let collectTypeHintsAnchorsForMember (m: IMemberDeclaration) =
     let accessorDeclarations = m.AccessorDeclarations
@@ -93,8 +93,8 @@ let collectTypeHintAnchorsForConstructor (ctor: IConstructorDeclaration) =
 
 let collectTypeHintAnchorsForEachExpr (forEachExpr: IForEachExpr) =
     if isNull forEachExpr.InExpression then []
-    else visitPattern [] forEachExpr.Pattern
+    else collectPatterns [] forEachExpr.Pattern
 
 let collectTypeHintAnchorsForMatchClause (matchClause: IMatchClause) =
     if isNull matchClause.RArrow then []
-    else visitPattern [] matchClause.Pattern
+    else collectPatterns [] matchClause.Pattern
