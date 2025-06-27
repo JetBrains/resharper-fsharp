@@ -27,10 +27,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
     {
       if (member is not IMetadataMethod { IsStatic: true } method) return;
 
-      var accessorName = method.Name;
-      var propertyName = FSharpNamesUtil.TryRemoveCompiledAccessorPrefix(accessorName);
+      var methodName = method.Name;
+      if (methodName == DeclaredElementConstants.STATIC_CONSTRUCTOR_NAME) return;
 
-      if (accessorName == propertyName) return;
+      var propertyName = FSharpNamesUtil.TryRemoveCompiledAccessorPrefix(methodName);
+      if (methodName == propertyName) return;
 
       consumer.Add(propertyName);
     }
