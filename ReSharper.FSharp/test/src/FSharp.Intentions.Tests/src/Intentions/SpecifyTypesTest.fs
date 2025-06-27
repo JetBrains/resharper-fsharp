@@ -91,6 +91,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Ambiguous 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Ambiguous 02``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Ambiguous 03``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 04 - Generics``() = x.DoNamedTest()
 
 
 // Most tests are in TypeHintContextActionsTests
