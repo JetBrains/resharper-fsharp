@@ -53,6 +53,7 @@ type TypeHintContextActionsTests() =
     [<Test>] member x.``Match 02 - List 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 03 - List 02``() = x.DoNamedTest()
     [<Test>] member x.``Match 04 - List 03``() = x.DoNamedTest()
+    [<Test>] member x.``Match 05 - List 04 - Import type``() = x.DoNamedTest()
 
     [<Test; ActionNotAvailable>] member x.``Not available 01 - Let bang``() = x.DoNamedTest()
     [<Test; ActionNotAvailable>] member x.``Not available 02 - Property with accessors``() = x.DoNamedTest()

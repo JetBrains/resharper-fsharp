@@ -75,6 +75,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                     if not fcsEntity.IsInterface then acc else
 
                     pat.CheckerService.ResolveNameAtLocation(pat, ["obj"], false, "SpecifyParameterBaseTypeFix.getSuperTypes")
+                    |> List.tryHead
                     |> Option.map (fun symbolUse ->
                         match symbolUse.Symbol with
                         | :? FSharpEntity as fcsEntity -> loop (types, level + 1) (fcsEntity.AsType())
