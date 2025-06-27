@@ -531,12 +531,6 @@ let rec getOutermostListConstPat ([<CanBeNull>] pattern: IFSharpPattern) =
 
     getOutermostListConstPat listConsPat
 
-[<CanBeNull>]
-let rec getInnermostListConsTail ([<CanBeNull>] pattern: IListConsPat) =
-    match pattern.TailPattern.IgnoreInnerParens() with
-    | :? IListConsPat as listConsPat -> getInnermostListConsTail listConsPat
-    | tail -> tail
-
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with
     | :? IPrefixAppExpr as appExpr -> appExpr.IsIndexerLike

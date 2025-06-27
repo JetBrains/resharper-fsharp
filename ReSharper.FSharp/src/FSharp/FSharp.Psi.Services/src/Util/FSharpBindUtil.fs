@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -19,8 +20,23 @@ let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbol
     reference.SetRequiredQualifiers(declaredElement, context)
 
     let resolveExpr = not (reference.GetElement() :? ITypeReferenceName)
-    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference resolveExpr opName) then
+    if resolvesToQualified declaredElement reference resolveExpr opName <> Resolved then
         addOpens reference declaredElement |> ignore
+
+let tryBindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
+        (declaredElement: IClrDeclaredElement) opName =
+    reference.SetRequiredQualifiers(declaredElement, context)
+
+    let resolveExpr = not (reference.GetElement() :? ITypeReferenceName)
+    let resolveResult = resolvesToQualified declaredElement reference resolveExpr opName
+
+    match resolveResult with
+    | NotResolved ->
+        addOpens reference declaredElement |> ignore
+        true
+
+    | Resolved -> true
+    | Ambiguous -> false
 
 let bindFcsSymbolToReference (context: ITreeNode) (reference: FSharpSymbolReference) (fcsSymbol: FSharpSymbol) opName =
     let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()

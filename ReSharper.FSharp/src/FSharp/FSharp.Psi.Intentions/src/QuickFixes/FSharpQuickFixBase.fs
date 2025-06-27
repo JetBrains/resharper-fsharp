@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -111,7 +112,7 @@ type FSharpQuickFixUtilComponent() =
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
         reference.SetRequiredQualifiers(typeElement, referenceOwner)
-        if FSharpResolveUtil.resolvesToQualified typeElement reference false FcsOpName then reference else
+        if resolvesToQualified typeElement reference false FcsOpName = Resolved then reference else
 
         addOpens reference typeElement
 

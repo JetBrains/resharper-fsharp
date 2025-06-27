@@ -88,6 +88,9 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Composite type 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Already imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Full signature 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 03``() = x.DoNamedTest()
 
 
 // Most tests are in TypeHintContextActionsTests

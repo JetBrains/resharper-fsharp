@@ -256,22 +256,29 @@ module SpecifyTypes =
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id (_.GenericArguments) parameters [] true
 
-    let private bindAnnotations annotationsInfo =
+    let private bindAnnotations annotationsInfo (displayContext: FSharpDisplayContext) =
         let annotationsInfo =
             annotationsInfo
             |> Seq.fold collectTypeUsages []
-            |> Seq.map (fun (typeUsage, fcsType, context: ITreeNode) ->
-                let typeReference = typeUsage.ReferenceName
-                let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
-                let fcsSymbol = fcsType.TypeDefinition
-                let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
-                context, reference, declaredElement
-            )
-            |> Seq.filter (fun (_, reference, declaredElement) -> isNotNull reference && isNotNull declaredElement)
-            |> Seq.toArray
+            |> Seq.toList
 
-        for context, reference, declaredElement in annotationsInfo do
-            bindDeclaredElementToReference context reference declaredElement "Specify types"
+        match annotationsInfo with
+        | [] -> ()
+        | (typeUsage, _, _) :: _ ->
+
+        use pinResultsCookie = typeUsage.FSharpFile.PinTypeCheckResults(true, "Specify types")
+
+        for typeUsage, fcsType, context: #ITreeNode in annotationsInfo do
+            let typeReference = typeUsage.ReferenceName
+            let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
+            let fcsSymbol = fcsType.TypeDefinition
+            let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
+            if isNotNull declaredElement && isNotNull reference && tryBindDeclaredElementToReference context reference declaredElement "Specify types" then () else
+
+            let factory = typeUsage.CreateElementFactory()
+            let typeString = fcsType.Format(displayContext)
+            ModificationUtil.ReplaceChild(typeUsage, factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel))
+            |> ignore
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
@@ -291,14 +298,14 @@ module SpecifyTypes =
                 let displayContext = symbolUse.DisplayContext
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-                bindAnnotations annotationInfo
+                bindAnnotations annotationInfo displayContext
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
                 let displayContext = pattern.TryGetFcsDisplayContext()
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext patType pattern |]
-                bindAnnotations annotationInfo
+                bindAnnotations annotationInfo displayContext
 
         | :? IParameterOwnerMemberDeclaration as declaration ->
             let symbolUse = declaration.GetFcsSymbolUse()
@@ -315,20 +322,20 @@ module SpecifyTypes =
                     yield specifyParametersOwnerReturnType declaration symbol displayContext
             ]
 
-            bindAnnotations annotationsInfo
+            bindAnnotations annotationsInfo displayContext
 
         | _ -> ()
 
     let specifyPatternType (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let annotationsInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-        bindAnnotations annotationsInfo
+        bindAnnotations annotationsInfo displayContext
 
     let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
         let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv displayContext |]
-        bindAnnotations annotationsInfo
+        bindAnnotations annotationsInfo displayContext
 
 module SpecifyTypesActionHelper =
     open SpecifyTypes
