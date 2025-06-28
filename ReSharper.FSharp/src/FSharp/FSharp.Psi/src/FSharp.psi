@@ -1342,10 +1342,10 @@ ctorSelfId options { stubBase="LocalDeclarationBase"; }:
   AS
   identifier<IDENTIFIER, Identifier>;
 
-namedSelfId options { stubBase="LocalDeclarationBase"; }:
+namedSelfId options { stubBase="SelfIdDeclarationBase"; }:
   identifier<IDENTIFIER, Identifier>;  
 
-wildSelfId options { stubBase="LocalDeclarationBase"; }:
+wildSelfId options { stubBase="SelfIdDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
 constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {

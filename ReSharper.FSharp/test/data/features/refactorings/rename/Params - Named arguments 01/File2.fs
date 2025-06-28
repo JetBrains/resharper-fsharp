@@ -1,5 +1,4 @@
 module Module
 
-let CalculateFine (ticket : SpeedingTicket) =
-    let delta = ticket.GetMPHOver(limit = 55, speed = 70)
-    if delta < 20 then 50.0 else 100.0
+let _ =
+    T.M(a = 55, b = 70)

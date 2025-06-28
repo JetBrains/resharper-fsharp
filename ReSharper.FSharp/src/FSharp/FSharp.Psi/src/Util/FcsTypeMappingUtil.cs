@@ -423,5 +423,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : base.ChooseBestCandidate(typeElements);
       }
     }
+
   }
 }

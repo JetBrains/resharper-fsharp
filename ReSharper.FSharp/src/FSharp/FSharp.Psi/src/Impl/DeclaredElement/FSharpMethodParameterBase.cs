@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -12,19 +13,63 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public abstract class FSharpMethodParameterBase : IParameter
+  internal abstract class FSharpMethodParameterBase<T>([NotNull] T decl)
+    : FSharpCachedTypeMemberBase<T>(decl), IParameter where T : IFSharpDeclaration
   {
-    public readonly IParametersOwner Owner;
-    public readonly int Index;
+    public abstract IParametersOwner Owner { get; }
+    public abstract int Index { get; }
+    public abstract IType Type { get; }
 
-    protected FSharpMethodParameterBase([NotNull] IParametersOwner owner, int index, [NotNull] IType type)
+    public ITypeMember GetContainingTypeMember() => Owner as ITypeMember;
+
+    public override ISubstitution IdSubstitution => Owner.IdSubstitution;
+    public abstract bool IsParams { get; }
+    public abstract bool IsParameterArray { get; }
+    public abstract bool IsParameterCollection { get; }
+    public bool IsValueVariable => false;
+    public abstract bool IsOptional { get; }
+    public ScopedKind GetScope(IResolveContext context = null) => ScopedKind.None;
+    public IParametersOwner ContainingParametersOwner => Owner;
+
+    public override DeclaredElementType GetElementType() => CLRDeclaredElementType.PARAMETER;
+
+    public abstract DefaultValue GetDefaultValue();
+    public abstract ParameterKind Kind { get; }
+    public virtual bool IsVarArg => false;
+
+    public override bool Equals(object obj)
     {
-      Type = type;
-      Owner = owner;
-      Index = index;
+      if (ReferenceEquals(this, obj))
+        return true;
+
+      if (obj is not FSharpMethodParameterBase<T> parameter)
+        return false;
+
+      return Owner.Equals(parameter.Owner) &&
+             Index == parameter.Index;
     }
 
-    public IType Type { get; }
+    public override int GetHashCode()
+    {
+      unchecked
+      {
+        return 197 * Owner.GetHashCode() + 47 * Index;
+      }
+    }
+
+    public abstract IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource);
+
+    public abstract IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName,
+      AttributesSource attributesSource);
+
+    public abstract bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource);
+  }
+  
+    public abstract class FSharpFunctionParameterBase : IParameter
+  {
+    public abstract IParametersOwner Owner { get; }
+    public abstract int Index { get; }
+    public abstract IType Type { get; }
 
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
@@ -58,7 +103,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
-      if (!(obj is FSharpMethodParameterBase parameter)) return false;
+      if (ReferenceEquals(this, obj))
+        return true;
+
+      if (obj is not FSharpFunctionParameterBase parameter)
+        return false;
 
       return Owner.Equals(parameter.Owner) &&
              Index == parameter.Index;
@@ -79,4 +128,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public abstract bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource);
   }
+
 }

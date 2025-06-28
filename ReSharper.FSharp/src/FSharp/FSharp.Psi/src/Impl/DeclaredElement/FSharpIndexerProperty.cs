@@ -5,26 +5,26 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpIndexerProperty : FSharpPropertyWithExplicitAccessors
+  internal class FSharpIndexerProperty(IMemberSignatureOrDeclaration declaration)
+    : FSharpPropertyWithExplicitAccessors(declaration)
   {
-    public FSharpIndexerProperty(IMemberSignatureOrDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsReadable => HasPublicAccessor(AccessorKind.GETTER);
     public override bool IsWritable => HasPublicAccessor(AccessorKind.SETTER);
     public override bool IsDefault => true;
 
     public override AccessRights GetAccessRights()
     {
-      var accessRights = GetDeclaration()?.GetAccessRights();
+      if (GetDeclaration() is not { } decl)
+        return AccessRights.NONE;
+      
+      var accessRights = decl.GetAccessRights();
       if (accessRights == AccessRights.PUBLIC)
         return IsReadable || IsWritable ? AccessRights.PUBLIC : AccessRights.INTERNAL;
 
-      return accessRights ?? AccessRights.NONE;
+      return accessRights;
     }
 
-    public override IList<IParameter> Parameters => this.GetParameters(Mfv);
+    public override IList<IParameter> Parameters => this.GetFunctionParameters(Mfv);
 
     private bool HasPublicAccessor(AccessorKind kind) =>
       GetDeclaration()?.AccessorDeclarationsEnumerable.TryGet(kind) is { } declaration &&
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is FSharpIndexerProperty indexer))
+      if (obj is not FSharpIndexerProperty indexer)
         return false;
 
       return SignatureComparers.Strict.CompareWithoutName(GetSignature(IdSubstitution),

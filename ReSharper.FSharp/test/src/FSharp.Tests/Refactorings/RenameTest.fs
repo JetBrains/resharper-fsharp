@@ -96,11 +96,11 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
 
-    [<Ignore("""
-        Parameters of methods are currently implemented as local variables so inline rename is being executed.
-        Also for named arguments there is no reference to a parameter on callsite.
-        Revive `FSharpNamedArgumentLanguageService` when fixing this.
-        """)>]
+    // [<Ignore("""
+    //     Parameters of methods are currently implemented as local variables so inline rename is being executed.
+    //     Also for named arguments there is no reference to a parameter on callsite.
+    //     Revive `FSharpNamedArgumentLanguageService` when fixing this.
+    //     """)>]
     [<Test>] member x.``Params - Named arguments 01``() = x.DoTestFiles("File1.fs", "File2.fs")
 
     [<Test>] member x.``Ctor params 01``() = x.DoNamedTest()

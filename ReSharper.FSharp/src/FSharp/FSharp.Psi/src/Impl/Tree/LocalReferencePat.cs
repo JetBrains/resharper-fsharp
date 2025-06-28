@@ -1,14 +1,46 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 
-internal partial class LocalReferencePat
+internal partial class LocalReferencePat : ICachedTypeMemberDeclaration
 {
+  private volatile IDeclaredElement myCachedDeclaredElement;
+
+  protected override void PreInit()
+  {
+    base.PreInit();
+    myCachedDeclaredElement = null;
+  }
+
+  IDeclaredElement ICachedTypeMemberDeclaration.CachedDeclaredElement
+  {
+    get => myCachedDeclaredElement;
+    set => myCachedDeclaredElement = value;
+  }
+
+  [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+  public override IDeclaredElement DeclaredElement
+  {
+    get
+    {
+      if (!FSharpParameterUtil.IsMemberParameterDeclaration(this))
+        return this;
+
+      this.AssertIsValid("Asking declared element from invalid declaration");
+      var cache = GetPsiServices().Caches.SourceDeclaredElementsCache;
+      return cache.GetOrCreateDeclaredElement(this, static pat => new FSharpMethodParameter(pat));
+    }
+  }
+
+
   public override IFSharpIdentifier NameIdentifier => ReferenceName?.Identifier;
 
   public bool IsDeclaration => this.IsDeclaration();

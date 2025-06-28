@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     string IDeclaredElement.ShortName => SourceName;
     public override string CompiledName => SourceName;
 
-    public IList<IDeclaration> GetDeclarations() => new IDeclaration[] {this};
+    public IList<IDeclaration> GetDeclarations() => [this];
 
     public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) =>
       SharedImplUtil.GetDeclarationsIn(this, sourceFile);

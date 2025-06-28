@@ -455,7 +455,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return idToken?.GetContainingNode<T>(true);
     }
 
-    public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
+    public static IList<IParameter> GetFunctionParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
       where T : IParametersOwner, IFSharpTypeParametersOwner
     {
       if (mfv == null)
@@ -472,7 +472,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
-      var typeParameters = function.AllTypeParameters;
       var methodParams = new List<IParameter>(paramsCount);
       if (isFsExtension && mfv.IsInstanceMember)
       {
@@ -483,18 +482,95 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
             ? TypeFactory.CreateType(typeElement)
             : TypeFactory.CreateUnknownType(function.Module);
 
-        methodParams.Add(new FSharpExtensionMemberParameter(function, type));
+        methodParams.Add(new FSharpExtensionMemberThisParameter(function));
       }
 
       if (isVoidReturn)
         return methodParams;
 
       foreach (var paramsGroup in paramGroups)
-      foreach (var param in paramsGroup)
-        methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
-          param.Type.MapType(typeParameters, function.Module, true)));
+      foreach (var _ in paramsGroup)
+        methodParams.Add(new FSharpMethodParameter(function, methodParams.Count));
 
       return methodParams;
+    }
+
+    public static IList<IParameter> GetMethodParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
+      where T : IParametersOwner, IFSharpTypeParametersOwner
+    {
+      if (mfv == null)
+        return EmptyList<IParameter>.Instance;
+
+      var paramGroups = mfv.CurriedParameterGroups;
+      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit();
+
+      if (!mfv.IsExtensionMember && isVoidReturn)
+        return EmptyArray<IParameter>.Instance;
+
+      var paramsCount = paramGroups.Sum(list => list.Count);
+      if (paramsCount == 0)
+        return EmptyList<IParameter>.Instance;
+
+      var methodParams = new List<IParameter>(paramsCount);
+      if (mfv.IsExtensionMember && mfv.IsInstanceMember)
+      {
+        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(function.Module);
+
+        var type =
+          typeElement != null
+            ? TypeFactory.CreateType(typeElement)
+            : TypeFactory.CreateUnknownType(function.Module);
+
+        methodParams.Add(new FSharpExtensionMemberThisParameter(function));
+      }
+
+      if (isVoidReturn)
+        return methodParams;
+
+      foreach (var paramsGroup in paramGroups)
+      foreach (var _ in paramsGroup)
+        methodParams.Add(new FSharpMethodParameter(function, methodParams.Count));
+
+      return methodParams;
+    }
+
+
+    [CanBeNull]
+    public static FSharpParameter GetFcsParameter([NotNull] IParametersOwner parametersOwner, int index) =>
+      parametersOwner is IFSharpFunction fsFunction
+        ? fsFunction.Mfv?.CurriedParameterGroups.SelectMany(paramList => paramList).ElementAtOrDefault(index)
+        : null;
+
+    [NotNull]
+    public static IType GetThisParameterType([NotNull] IParametersOwner parametersOwner)
+    {
+      if (parametersOwner is IFSharpFunction { Mfv: { } mfv })
+      {
+        if (mfv.IsExtensionMember && mfv.IsInstanceMember &&
+            mfv.ApparentEnclosingEntity.GetTypeElement(parametersOwner.Module) is { } typeElement)
+          return TypeFactory.CreateType(typeElement);
+      }
+
+      return TypeFactory.CreateUnknownType(parametersOwner.Module);
+    }
+
+    [NotNull]
+    public static IType GetParameterType([NotNull] FSharpParameter fcsParam, [NotNull] IParametersOwner function)
+    {
+      var typeParameters = function is IFSharpTypeParametersOwner typeParametersOwner
+        ? typeParametersOwner.AllTypeParameters
+        : EmptyList<ITypeParameter>.Instance;
+
+      return fcsParam.Type.MapType(typeParameters, function.Module, true);
+    }
+
+    [NotNull]
+    public static IType GetParameterType(IParametersOwner fsFunction, int index)
+    {
+      if (GetFcsParameter(fsFunction, index) is not { } fcsParam)
+        return TypeFactory.CreateUnknownType(fsFunction.Module);
+
+      return GetParameterType(fcsParam, fsFunction);
     }
   }
 }

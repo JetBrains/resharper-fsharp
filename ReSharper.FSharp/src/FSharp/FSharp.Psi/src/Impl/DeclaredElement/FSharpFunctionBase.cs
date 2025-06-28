@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override IList<IParameter> Parameters => this.GetParameters(Mfv);
+    public override IList<IParameter> Parameters => this.GetFunctionParameters(Mfv);
 
     public InvocableSignature GetSignature(ISubstitution substitution) =>
       new(this, substitution, FSharpOverrideSignatureComparer.Instance);

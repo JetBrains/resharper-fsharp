@@ -37,8 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private IDeclaredElement DeclaredElementFactory(ITopActivePatternCaseDeclaration arg) =>
-      new TopActivePatternCase(this);
+    private static IDeclaredElement DeclaredElementFactory(ITopActivePatternCaseDeclaration arg) =>
+      new TopActivePatternCase(arg);
 
     public int Index => this.GetIndex();
   }

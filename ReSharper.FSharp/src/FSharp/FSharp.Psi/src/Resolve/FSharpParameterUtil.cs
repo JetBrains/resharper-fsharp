@@ -160,5 +160,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ITupleTypeUsage tuplePat => tuplePat.Items.SelectMany(GetParameterNames),
         _ => EmptyList<IEnumerable<(string, ITreeNode)>>.Enumerable
       };
+
+    public static bool IsMemberParameterDeclaration(IFSharpPattern fsPat)
+    {
+      var pat = fsPat.IgnoreParentParens();
+      
+      if (MemberDeclarationNavigator.GetByParameterPattern(pat) != null ||
+          AccessorDeclarationNavigator.GetByParameterPattern(pat) != null)
+        return true;
+
+      return false;
+    }
   }
 }

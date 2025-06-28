@@ -28,7 +28,7 @@ internal partial class TopReferencePat
   public bool IsDeclaration => this.IsDeclaration();
   public override AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
 
-  public override IEnumerable<IFSharpPattern> NestedPatterns => new[] { this };
+  public override IEnumerable<IFSharpPattern> NestedPatterns => [this];
 
   public bool IsMutable => Binding?.IsMutable ?? false;
 

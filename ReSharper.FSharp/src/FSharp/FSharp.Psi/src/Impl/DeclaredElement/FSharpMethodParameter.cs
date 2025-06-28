@@ -4,6 +4,7 @@ using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -12,13 +13,23 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public class FSharpMethodParameter : FSharpMethodParameterBase
-  {
-    public FSharpMethodParameter(FSharpParameter fsParam, [NotNull] IParametersOwner owner,
-      int index, [NotNull] IType type) : base(owner, index, type) =>
-      FSharpSymbol = fsParam;
+  // public class FSharpFunctionParameter : IParameter
+  // {
+  //   
+  // }
 
-    public FSharpParameter FSharpSymbol { get; }
+  internal class FSharpMethodParameter([NotNull] IReferencePat pat) : FSharpMethodParameterBase<IReferencePat>(pat)
+  {
+    public FSharpParameter FSharpSymbol => FcsSymbolMappingUtil.GetFcsParameter(Owner, Index);
+
+    public override IParametersOwner Owner =>
+      GetDeclaration() is { } pat
+        ? pat.GetContainingNode<IParameterOwnerMemberDeclaration>()?.DeclaredElement as IParametersOwner
+        : null;
+
+    public override int Index => throw new NotImplementedException();
+
+    public override IType Type => FcsSymbolMappingUtil.GetParameterType(Owner, Index);
 
     public override string ShortName =>
       FSharpSymbol.DisplayName is var name && name.RemoveBackticks().IsEmpty()
