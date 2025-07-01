@@ -273,7 +273,10 @@ module SpecifyTypes =
             let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
             let fcsSymbol = fcsType.TypeDefinition
             let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
-            if isNotNull declaredElement && isNotNull reference && tryBindDeclaredElementToReference context reference declaredElement "Specify types" then () else
+
+            if isNotNull declaredElement &&
+               isNotNull reference &&
+               tryBindDeclaredElementToReference context reference declaredElement "Specify types" then () else
 
             let factory = typeUsage.CreateElementFactory()
             let typeString = fcsType.Format(displayContext)
