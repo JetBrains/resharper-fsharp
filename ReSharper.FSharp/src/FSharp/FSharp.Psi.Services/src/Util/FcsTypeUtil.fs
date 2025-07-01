@@ -25,3 +25,7 @@ let getFunctionTypeArgs includeReturnType fcsType =
                 acc
 
     loop fcsType [] |> List.rev
+
+let stripNull (fcsType: FSharpType) =
+    if fcsType.HasNullAnnotation then fcsType.TypeDefinition.AsType()
+    else fcsType

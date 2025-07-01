@@ -86,7 +86,7 @@ module SpecifyTypes =
                 collectTypeUsages acc (context, fcsType.GenericArguments[i], typeUsage)) acc
 
         | :? IWithNullTypeUsage as typeUsage ->
-            collectTypeUsages acc (context, fcsType, typeUsage.TypeUsage)
+            collectTypeUsages acc (context, stripNull fcsType, typeUsage.TypeUsage)
 
         | _ -> acc
 

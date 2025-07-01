@@ -74,6 +74,7 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Tuple type 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Type with null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Type with null 02``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Generic type 01 - Suffix``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Generic type 02 - Prefix``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Parens 01``() = x.DoNamedTest()
