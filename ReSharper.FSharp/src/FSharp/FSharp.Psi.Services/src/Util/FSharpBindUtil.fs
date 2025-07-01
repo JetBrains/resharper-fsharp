@@ -14,15 +14,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
-// todo: we modify the tree and then ask FCS. What tree is used? Do we wait for the new analysis?
-let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
-        (declaredElement: IClrDeclaredElement) opName =
-    reference.SetRequiredQualifiers(declaredElement, context)
-
-    let resolveExpr = not (reference.GetElement() :? ITypeReferenceName)
-    if resolvesToQualified declaredElement reference resolveExpr opName <> Resolved then
-        addOpens reference declaredElement |> ignore
-
 let tryBindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
         (declaredElement: IClrDeclaredElement) opName =
     reference.SetRequiredQualifiers(declaredElement, context)
@@ -31,12 +22,18 @@ let tryBindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSym
     let resolveResult = resolvesToQualified declaredElement reference resolveExpr opName
 
     match resolveResult with
+    | Resolved -> true
+    | Ambiguous -> false
     | NotResolved ->
         addOpens reference declaredElement |> ignore
         true
 
-    | Resolved -> true
-    | Ambiguous -> false
+// todo: we modify the tree and then ask FCS. What tree is used? Do we wait for the new analysis?
+let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
+        (declaredElement: IClrDeclaredElement) opName =
+
+    if not (tryBindDeclaredElementToReference context reference declaredElement opName) then
+        addOpens reference declaredElement |> ignore
 
 let bindFcsSymbolToReference (context: ITreeNode) (reference: FSharpSymbolReference) (fcsSymbol: FSharpSymbol) opName =
     let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()

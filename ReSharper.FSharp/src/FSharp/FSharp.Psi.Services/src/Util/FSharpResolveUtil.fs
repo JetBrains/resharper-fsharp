@@ -27,7 +27,7 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName)
     declaredElement.Equals(typeElement)
 
-type ResolvesToResult =
+type FcsResolveResult =
     | Resolved
     | NotResolved
     | Ambiguous
@@ -54,21 +54,22 @@ let resolvesToQualified (declaredElement: IDeclaredElement) (reference: FSharpSy
     resolvesTo declaredElement reference true resolveExpr opName
 
 let resolvesToFcsSymbol (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) qualified resolveExpr opName =
-    let symbolUses = reference.ResolveWithFcs(opName, resolveExpr, qualified)
-    symbolUses |> Seq.exists (fun symbolUse ->
-        let resolvedFcsSymbol = symbolUse.Symbol
-        if resolvedFcsSymbol.IsEffectivelySameAs(fcsSymbol) then true else
+    match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
+    | [] -> false
+    | symbolUse :: _ ->
 
-        if not (resolvedFcsSymbol :? FSharpEntity) then false else
+    let resolvedFcsSymbol = symbolUse.Symbol
+    if resolvedFcsSymbol.IsEffectivelySameAs(fcsSymbol) then true else
 
-        let referenceOwner = reference.GetElement()
-        let psiModule = referenceOwner.GetPsiModule()
+    if not (resolvedFcsSymbol :? FSharpEntity) then false else
 
-        let declaredElement = fcsSymbol.GetDeclaredElement(psiModule, referenceOwner)
-        let resolvedElement = resolvedFcsSymbol.GetDeclaredElement(psiModule, referenceOwner)
+    let referenceOwner = reference.GetElement()
+    let psiModule = referenceOwner.GetPsiModule()
 
-        resolvesToAssociatedModule declaredElement resolvedElement reference
-    )
+    let declaredElement = fcsSymbol.GetDeclaredElement(psiModule, referenceOwner)
+    let resolvedElement = resolvedFcsSymbol.GetDeclaredElement(psiModule, referenceOwner)
+
+    resolvesToAssociatedModule declaredElement resolvedElement reference
 
 /// Workaround check for compiler issue with delegates not fully shadowing other types, see dotnet/fsharp#10228.
 let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (fcsSymbol: FSharpSymbol) =
@@ -97,15 +98,15 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
 
 let resolvesToPredefinedFunction (context: ITreeNode) name opName =
     let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
-    let symbolUses = checkerService.ResolveNameAtLocation(context, [name], false, opName)
-    symbolUses |> Seq.exists (fun symbolUse ->
+    match checkerService.ResolveNameAtLocation(context, [name], false, opName) with
+    | symbolUse :: _ ->
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as symbol ->
             match predefinedFunctionTypes.TryGetValue(name), symbol.DeclaringEntity with
             | (true, typeName), Some entity -> typeName.FullName = entity.FullName
             | _ -> false
         | _ -> false
-    )
+    | [] -> false
 
 let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
     let referenceOwner = reference.GetElement()
@@ -141,13 +142,12 @@ let findRequiredQualifierForRecordField (fieldBinding: IRecordFieldBinding) =
         | Some declaringEntity ->
 
         let qualifiedField = declaringEntity.DisplayName :: qualifiedField
-        let symbolUses = context.CheckerService.ResolveNameAtLocation(context, qualifiedField, true, "findRequiredQualifierForRecordField")
-
-        if symbolUses |> Seq.exists (_.Symbol.IsEffectivelySameAs(field)) then
+        match context.CheckerService.ResolveNameAtLocation(context, qualifiedField, true, "findRequiredQualifierForRecordField") with
+        | symbolUse :: _ when symbolUse.Symbol.IsEffectivelySameAs(field) ->
             qualifiedField
             |> List.take (qualifiedField.Length - 1)
             |> Some
-        else findRequiredQualifier context declaringEntity.DeclaringEntity field qualifiedField
+        | _ -> findRequiredQualifier context declaringEntity.DeclaringEntity field qualifiedField
 
     let field = fieldBinding.ReferenceName.Reference.GetFcsSymbol().As<FSharpField>()
     findRequiredQualifier fieldBinding field.DeclaringEntity field [field.DisplayName]

@@ -156,7 +156,7 @@ module SpecifyTypes =
             let fullType = mfv.FullType
             if declaration :? IBinding && fullType.IsFunctionType then
                 let specifiedTypesCount = declaration.ParametersDeclarations.Count
-                getFunctionSuffixReturnType fullType specifiedTypesCount
+                getFunctionReturnType fullType specifiedTypesCount
             else
                 mfv.ReturnParameter.Type
 
@@ -268,7 +268,7 @@ module SpecifyTypes =
 
         use pinResultsCookie = typeUsage.FSharpFile.PinTypeCheckResults(true, "Specify types")
 
-        for typeUsage, fcsType, context: #ITreeNode in annotationsInfo do
+        for typeUsage, fcsType, context: ITreeNode in annotationsInfo do
             let typeReference = typeUsage.ReferenceName
             let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
             let fcsSymbol = fcsType.TypeDefinition

@@ -531,6 +531,7 @@ let rec getOutermostListConstPat ([<CanBeNull>] pattern: IFSharpPattern) =
 
     getOutermostListConstPat listConsPat
 
+
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
     match expr with
     | :? IPrefixAppExpr as appExpr -> appExpr.IsIndexerLike
