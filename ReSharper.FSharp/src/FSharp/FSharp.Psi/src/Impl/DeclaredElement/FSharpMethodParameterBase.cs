@@ -12,19 +12,14 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public abstract class FSharpMethodParameterBase : IParameter
+  public abstract class FSharpMethodParameterBase([NotNull] IParametersOwner owner, FSharpParameterIndex index)
+    : IFSharpParameter
   {
-    public readonly IParametersOwner Owner;
-    public readonly int Index;
+    public abstract IType Type { get; }
 
-    protected FSharpMethodParameterBase([NotNull] IParametersOwner owner, int index, [NotNull] IType type)
-    {
-      Type = type;
-      Owner = owner;
-      Index = index;
-    }
+    public readonly IParametersOwner Owner = owner;
 
-    public IType Type { get; }
+    public FSharpParameterIndex FSharpIndex => index;
 
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
@@ -55,22 +50,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract DefaultValue GetDefaultValue();
     public abstract ParameterKind Kind { get; }
     public virtual bool IsVarArg => false;
-
-    public override bool Equals(object obj)
-    {
-      if (!(obj is FSharpMethodParameterBase parameter)) return false;
-
-      return Owner.Equals(parameter.Owner) &&
-             Index == parameter.Index;
-    }
-
-    public override int GetHashCode()
-    {
-      unchecked
-      {
-        return 197 * Owner.GetHashCode() + 47 * Index;
-      }
-    }
 
     public abstract IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource);
 

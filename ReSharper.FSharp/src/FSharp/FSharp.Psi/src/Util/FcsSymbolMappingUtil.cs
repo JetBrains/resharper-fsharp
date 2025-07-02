@@ -472,27 +472,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
-      var typeParameters = function.AllTypeParameters;
       var methodParams = new List<IParameter>(paramsCount);
+
       if (isFsExtension && mfv.IsInstanceMember)
-      {
-        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(function.Module);
-
-        var type =
-          typeElement != null
-            ? TypeFactory.CreateType(typeElement)
-            : TypeFactory.CreateUnknownType(function.Module);
-
-        methodParams.Add(new FSharpExtensionMemberParameter(function, type));
-      }
+        methodParams.Add(new FSharpExtensionMemberThisParameter(function));
 
       if (isVoidReturn)
         return methodParams;
 
-      foreach (var paramsGroup in paramGroups)
-      foreach (var param in paramsGroup)
-        methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
-          param.Type.MapType(typeParameters, function.Module, true)));
+      for (var groupIndex = 0; groupIndex < paramGroups.Count; groupIndex++)
+      {
+        var paramGroup = paramGroups[groupIndex];
+        for (var paramIndex = 0; paramIndex < paramGroup.Count; paramIndex++)
+        {
+          methodParams.Add(new FSharpMethodParameter(function, new FSharpParameterIndex(groupIndex, paramIndex)));
+        }
+      }
 
       return methodParams;
     }
