@@ -50,9 +50,18 @@ type ArgumentsOwnerTest() =
                         if isNull matchingParam then None else
 
                         match matchingParam.Element with
-                        | :? FSharpMethodParameter as param when
-                                 VirtualFileSystemPath.TryParse(param.FSharpSymbol.DeclarationLocation.FileName, InteractionContext.SolutionContext) = filePath ->
-                            Some (FSharpRangeUtil.getTextRange document param.FSharpSymbol.DeclarationLocation)
+                        | :? FSharpMethodParameter as param ->
+                            let fcsParameter = param.FcsParameter
+                            if isNull fcsParameter then None else
+
+                            let declRange = fcsParameter.DeclarationLocation
+                            let declPath =
+                                VirtualFileSystemPath.TryParse(declRange.FileName, InteractionContext.SolutionContext)
+
+                            if declPath = filePath then
+                                Some(getTextRange document declRange)
+                            else
+                                None
                         | _ ->
                             None
 
