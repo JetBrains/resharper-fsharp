@@ -7,6 +7,7 @@ open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
 open JetBrains.Diagnostics
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -69,8 +70,11 @@ type internal TypeProvidersCache() =
 
         $"Type Providers:\n{typeProviders}"
 
+type TypeProvidersHostScope =
+    | Solution
+    | Script of scriptName: string
 
-type IProxyTypeProvidersManager =
+type ITypeProvidersManager =
     abstract member GetOrCreate:
         runTimeAssemblyFileName: string *
         designTimeAssemblyNameString: string *
@@ -82,28 +86,17 @@ type IProxyTypeProvidersManager =
         compilerToolsPath: string list *
         m: range -> ITypeProvider list
 
+    abstract member Connection: TypeProvidersConnection
     abstract member Context: TypeProvidersContext
-    abstract member HasGenerativeTypeProviders: project: IProject -> bool
+    abstract member Terminate: unit -> unit
     abstract member Dump: unit -> string
 
-type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvider: IFcsProjectProvider,
-                          scriptPsiModulesProvider: FSharpScriptPsiModulesProvider,
-                          outputAssemblies: OutputAssemblies, enableGenerativeTypeProvidersInMemoryAnalysis) =
+[<AbstractClass>]
+type TypeProvidersManagerBase(lifetimeDef: LifetimeDefinition, connection: TypeProvidersConnection, enableGenerativeTypeProvidersInMemoryAnalysis) =
     let protocol = connection.ProtocolModel.RdTypeProviderProcessModel
     let lifetime = connection.Lifetime
     let tpContext = TypeProvidersContext(connection, enableGenerativeTypeProvidersInMemoryAnalysis)
     let typeProviders = TypeProvidersCache()
-    let lock = SpinWaitLockRef()
-    let projectsWithGenerativeProviders = HashSet<string>()
-
-    let addProjectWithGenerativeProvider outputPath =
-        let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
-        Assertion.Assert(not outputAssemblyPath.IsEmpty, "OutputAssemblyPath expected to be not empty")
-        match outputAssemblies.TryGetProjectByOutputAssemblyLocation(outputAssemblyPath) with
-        | null -> ()
-        | project ->
-            use lock = lock.Push()
-            projectsWithGenerativeProviders.Add(project.GetPersistentID()) |> ignore
 
     let disposeTypeProviders (path: string) =
         let providersToDispose = typeProviders.Get(path)
@@ -123,28 +116,20 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                 | true, provider -> provider.OnInvalidate()
                 | _ -> ()))
 
-        fcsProjectProvider.ProjectRemoved.Advise(lifetime, fun (projectKey, fcsProject) ->
-            use lock = lock.Push()
-            let project = projectKey.Project
-            projectsWithGenerativeProviders.Remove(project.GetPersistentID()) |> ignore
-            disposeTypeProviders fcsProject.OutputPath.FullPath
-        )
+    member this.Lifetime = lifetime
+    member this.DisposeTypeProviders(path: string) = disposeTypeProviders path
+    abstract member CreateTypeProvider: RdTypeProvider * TypeProvidersContext * ResolutionEnvironment -> IProxyTypeProvider
 
-        scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
-            fun psiModule -> disposeTypeProviders psiModule.Path.FullPath)
-
-    interface IProxyTypeProvidersManager with
+    interface ITypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
                 compilerToolsPath: string list, m: range) =
 
-            let envPath, projectPsiModule =
+            let envPath =
                 match resolutionEnvironment.OutputFile with
-                | Some file ->
-                    // todo: module might have been changed after project changes
-                    file, fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext))
-                | None -> m.FileName, None
+                | Some file -> file
+                | None -> m.FileName
 
             let fakeTcImports = TcImportsHack.GetFakeTcImports(systemRuntimeContainsType)
 
@@ -157,24 +142,75 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
                             compilerToolsPath |> Array.ofList, fakeTcImports, envPath), RpcTimeouts.Maximal)
 
                     [ for tp in result.TypeProviders ->
-                         let tp = new ProxyTypeProvider(tp, tpContext, Option.toObj projectPsiModule)
-
-                         if not isInteractive then
-                             tp.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider envPath)
-
+                         let tp = x.CreateTypeProvider(tp, tpContext, resolutionEnvironment)
                          typeProviders.Add(envPath, tp)
                          tp :> ITypeProvider
 
                       for id in result.CachedIds ->
-                         typeProviders.Get(id) :> ITypeProvider ])
+                         typeProviders.Get(id) ])
 
             typeProviderProxies
 
         member this.Context = tpContext
 
-        member this.HasGenerativeTypeProviders(project) =
-            use lock = lock.Push()
-            projectsWithGenerativeProviders.Contains(project.GetPersistentID())
-
         member this.Dump() =
             $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
+
+        member this.Connection = connection
+        member this.Terminate() = lifetimeDef.Terminate()
+
+type SolutionTypeProvidersManager(lifetimeDef: LifetimeDefinition,
+                                  connection: TypeProvidersConnection,
+                                  fcsProjectProvider: IFcsProjectProvider,
+                                  outputAssemblies: OutputAssemblies,
+                                  enableGenerativeTypeProvidersInMemoryAnalysis) as this =
+    inherit TypeProvidersManagerBase(lifetimeDef, connection, enableGenerativeTypeProvidersInMemoryAnalysis)
+
+    let lock = SpinWaitLockRef()
+    let projectsWithGenerativeProviders = HashSet<string>()
+
+    do
+        fcsProjectProvider.ProjectRemoved.Advise(this.Lifetime, fun (projectKey, fcsProject) ->
+            use lock = lock.Push()
+            let project = projectKey.Project
+            projectsWithGenerativeProviders.Remove(project.GetPersistentID()) |> ignore
+            this.DisposeTypeProviders(fcsProject.OutputPath.FullPath)
+        )
+
+    let addProjectWithGenerativeProvider outputPath =
+        let outputAssemblyPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
+        Assertion.Assert(not outputAssemblyPath.IsEmpty, "OutputAssemblyPath expected to be not empty")
+        match outputAssemblies.TryGetProjectByOutputAssemblyLocation(outputAssemblyPath) with
+        | null -> ()
+        | project ->
+            use lock = lock.Push()
+            projectsWithGenerativeProviders.Add(project.GetPersistentID()) |> ignore
+
+    override this.CreateTypeProvider(tp, context, resolutionEnv) =
+        let psiModule =
+            resolutionEnv.OutputFile
+            |> Option.bind (fun file -> fcsProjectProvider.GetPsiModule(VirtualFileSystemPath.Parse(file, InteractionContext.SolutionContext)))
+            |> Option.toObj
+
+        let typeProvider = new ProxyTypeProvider(tp, context, psiModule)
+
+        match resolutionEnv.OutputFile with
+        | Some outputFile -> typeProvider.ContainsGenerativeTypes.Add(fun _ -> addProjectWithGenerativeProvider outputFile)
+        | None -> ()
+
+        typeProvider
+
+    member this.HasGenerativeTypeProviders(project: IProject) =
+        use lock = lock.Push()
+        projectsWithGenerativeProviders.Contains(project.GetPersistentID())
+
+type ScriptTypeProvidersManager(lifetimeDef: LifetimeDefinition, connection: TypeProvidersConnection,
+                                scriptPsiModulesProvider: FSharpScriptPsiModulesProvider) as this =
+    inherit TypeProvidersManagerBase(lifetimeDef, connection, false)
+
+    do
+        scriptPsiModulesProvider.ModuleInvalidated.Advise(this.Lifetime,
+        fun psiModule -> this.DisposeTypeProviders(psiModule.Path.FullPath))
+
+    override this.CreateTypeProvider(tp, context, _) =
+        new ProxyTypeProvider(tp, context, null)
