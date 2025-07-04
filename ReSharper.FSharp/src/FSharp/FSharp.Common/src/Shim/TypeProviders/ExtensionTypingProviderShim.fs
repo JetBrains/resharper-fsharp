@@ -53,13 +53,13 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         | true, manager when manager.Connection.IsActive -> Some manager
         | _ ->
 
-        let typeProvidersHostLifetime = Lifetime.Define(lifetime)
+        let tpHostLifetimeDef = Lifetime.Define(lifetime)
         let isInternalMode = productConfigurations.IsInternalMode()
         let externalProcess =
             typeProvidersProcessFactory.Create(
-                    typeProvidersHostLifetime.Lifetime,
-                    Option.toObj resolutionEnv.OutputFile,
-                    isInternalMode)
+                tpHostLifetimeDef.Lifetime,
+                Option.toObj resolutionEnv.OutputFile,
+                isInternalMode)
 
         if isNull externalProcess then None else
         let newConnection = externalProcess.Run()
@@ -67,10 +67,10 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
         let tpManager: ITypeProvidersManager =
             match scope with
             | Solution ->
-                SolutionTypeProvidersManager(typeProvidersHostLifetime, newConnection, fcsProjectProvider, outputAssemblies,
+                SolutionTypeProvidersManager(tpHostLifetimeDef, newConnection, fcsProjectProvider, outputAssemblies,
                                              generativeTypeProvidersInMemoryAnalysisEnabled.Value)
             | Script _ ->
-                ScriptTypeProvidersManager(typeProvidersHostLifetime, newConnection, scriptPsiModulesProvider)
+                ScriptTypeProvidersManager(tpHostLifetimeDef, newConnection, scriptPsiModulesProvider)
 
         dict.TryAdd(scope, tpManager) |> ignore
         Some tpManager
