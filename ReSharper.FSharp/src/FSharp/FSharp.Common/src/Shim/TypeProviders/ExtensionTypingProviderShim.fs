@@ -55,11 +55,17 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
 
         let tpHostLifetimeDef = Lifetime.Define(lifetime)
         let isInternalMode = productConfigurations.IsInternalMode()
+
+        let logPrefix =
+            match scope with
+            | Solution -> "Solution"
+            | Script scriptName -> "Script_" + scriptName.Replace(".fsx", "")
+
         let externalProcess =
             typeProvidersProcessFactory.Create(
                 tpHostLifetimeDef.Lifetime,
                 Option.toObj resolutionEnv.OutputFile,
-                isInternalMode)
+                isInternalMode, logPrefix)
 
         if isNull externalProcess then None else
         let newConnection = externalProcess.Run()
