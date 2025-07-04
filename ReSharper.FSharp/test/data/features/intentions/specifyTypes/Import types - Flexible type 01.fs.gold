@@ -1,0 +1,13 @@
+﻿namespace Test
+
+open System
+
+module A =
+    open System
+
+    let f (x: #IDisposable) = ()
+
+module B =
+    open A
+
+    let g (x: IDisposable){caret} = f x 

@@ -1,0 +1,19 @@
+﻿namespace NS
+
+[<RequireQualifiedAccess>]
+module NS_A =
+    [<RequireQualifiedAccess>]
+    module NS_B =
+        type R = { Field: System.Type }
+
+namespace Test
+
+open NS
+
+module A =
+    let x = { NS.NS_A.NS_B.R.Field = "".GetType() }
+
+module B =
+    open A
+
+    let y: NS_A.NS_B.R{caret} = x

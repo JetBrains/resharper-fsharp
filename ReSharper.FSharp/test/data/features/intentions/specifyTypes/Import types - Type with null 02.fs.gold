@@ -1,0 +1,12 @@
+﻿namespace Test
+
+module A =
+    type Type = class end
+    let x: Type | null = null
+
+open A
+
+module B =
+    open System
+
+    let y: Type | null{caret} = A.x
