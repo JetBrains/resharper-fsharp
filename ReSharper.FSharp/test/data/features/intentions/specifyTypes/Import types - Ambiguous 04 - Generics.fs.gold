@@ -1,6 +1,7 @@
 ﻿namespace Test
 
 open System.Collections
+open System.Collections.Generic
 
 module A =
     open System.Collections.Generic
@@ -10,4 +11,4 @@ module A =
 module B =
     open A
 
-    let y: Generic.Queue<int>{caret} = x
+    let y: Queue<int>{caret} = x

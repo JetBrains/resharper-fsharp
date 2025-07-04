@@ -7,6 +7,8 @@ module System =
 
 namespace Test
 
+open Ns
+
 module A =
     open Ns
 
@@ -15,4 +17,4 @@ module A =
 module B =
     open A
 
-    let y: Ns.System.Type{caret} = x
+    let y: System.Type{caret} = x

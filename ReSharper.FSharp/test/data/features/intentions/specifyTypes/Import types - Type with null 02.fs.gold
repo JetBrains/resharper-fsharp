@@ -4,7 +4,9 @@ module A =
     type Type = class end
     let x: Type | null = null
 
+open A
+
 module B =
     open System
 
-    let y: A.Type | null{caret} = A.x
+    let y: Type | null{caret} = A.x

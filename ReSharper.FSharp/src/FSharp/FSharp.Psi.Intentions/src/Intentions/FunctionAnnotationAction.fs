@@ -20,7 +20,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -256,7 +255,7 @@ module SpecifyTypes =
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id (_.GenericArguments) parameters [] true
 
-    let private bindAnnotations annotationsInfo (displayContext: FSharpDisplayContext) =
+    let private bindAnnotations annotationsInfo =
         let annotationsInfo =
             annotationsInfo
             |> Seq.fold collectTypeUsages []
@@ -272,16 +271,8 @@ module SpecifyTypes =
             let typeReference = typeUsage.ReferenceName
             let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
             let fcsSymbol = fcsType.TypeDefinition
-            let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
 
-            if isNotNull declaredElement &&
-               isNotNull reference &&
-               tryBindDeclaredElementToReference context reference declaredElement "Specify types" then () else
-
-            let factory = typeUsage.CreateElementFactory()
-            let typeString = fcsType.Format(displayContext)
-            ModificationUtil.ReplaceChild(typeUsage, factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel))
-            |> ignore
+            bindFcsSymbolToReference context reference fcsSymbol "Specify type"
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
@@ -301,14 +292,14 @@ module SpecifyTypes =
                 let displayContext = symbolUse.DisplayContext
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-                bindAnnotations annotationInfo displayContext
+                bindAnnotations annotationInfo
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
                 let displayContext = pattern.TryGetFcsDisplayContext()
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext patType pattern |]
-                bindAnnotations annotationInfo displayContext
+                bindAnnotations annotationInfo
 
         | :? IParameterOwnerMemberDeclaration as declaration ->
             let symbolUse = declaration.GetFcsSymbolUse()
@@ -325,20 +316,20 @@ module SpecifyTypes =
                     yield specifyParametersOwnerReturnType declaration symbol displayContext
             ]
 
-            bindAnnotations annotationsInfo displayContext
+            bindAnnotations annotationsInfo
 
         | _ -> ()
 
     let specifyPatternType (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let annotationsInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
-        bindAnnotations annotationsInfo displayContext
+        bindAnnotations annotationsInfo
 
     let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
         let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv displayContext |]
-        bindAnnotations annotationsInfo displayContext
+        bindAnnotations annotationsInfo
 
 module SpecifyTypesActionHelper =
     open SpecifyTypes

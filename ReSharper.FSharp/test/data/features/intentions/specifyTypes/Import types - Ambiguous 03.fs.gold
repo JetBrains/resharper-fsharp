@@ -6,6 +6,7 @@ type Type() = class end
 namespace Test
 
 open System
+open Ns
 
 module A =
     open Ns
@@ -15,4 +16,4 @@ module A =
 module B =
     open A
 
-    let y: Ns.Type{caret} = x
+    let y: Type{caret} = x

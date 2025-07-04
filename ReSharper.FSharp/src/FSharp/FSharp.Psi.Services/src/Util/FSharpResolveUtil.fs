@@ -27,25 +27,15 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName)
     declaredElement.Equals(typeElement)
 
-type FcsResolveResult =
-    | Resolved
-    | NotResolved
-    | Ambiguous
-
 let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified resolveExpr opName =
-    match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
-    | [] -> NotResolved
-    | symbolUses ->
-
-    let exists = symbolUses |> Seq.exists (fun symbolUse ->
+    reference.ResolveWithFcs(opName, resolveExpr, qualified)
+    |> Seq.exists (fun symbolUse ->
         let referenceOwner = reference.GetElement()
         let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
         if declaredElement.Equals(unqualifiedElement) then true else
 
         resolvesToAssociatedModule declaredElement unqualifiedElement reference
     )
-
-    if exists then Resolved else Ambiguous
 
 let resolvesToUnqualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) resolveExpr opName =
     resolvesTo declaredElement reference false resolveExpr opName

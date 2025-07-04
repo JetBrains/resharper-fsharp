@@ -3,7 +3,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -14,25 +13,13 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
-let tryBindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
+// todo: we modify the tree and then ask FCS. What tree is used? Do we wait for the new analysis?
+let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
         (declaredElement: IClrDeclaredElement) opName =
     reference.SetRequiredQualifiers(declaredElement, context)
 
     let resolveExpr = not (reference.GetElement() :? ITypeReferenceName)
-    let resolveResult = resolvesToQualified declaredElement reference resolveExpr opName
-
-    match resolveResult with
-    | Resolved -> true
-    | Ambiguous -> false
-    | NotResolved ->
-        addOpens reference declaredElement |> ignore
-        true
-
-// todo: we modify the tree and then ask FCS. What tree is used? Do we wait for the new analysis?
-let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbolReference)
-        (declaredElement: IClrDeclaredElement) opName =
-
-    if not (tryBindDeclaredElementToReference context reference declaredElement opName) then
+    if not (FSharpResolveUtil.resolvesToQualified declaredElement reference resolveExpr opName) then
         addOpens reference declaredElement |> ignore
 
 let bindFcsSymbolToReference (context: ITreeNode) (reference: FSharpSymbolReference) (fcsSymbol: FSharpSymbol) opName =

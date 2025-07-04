@@ -13,4 +13,4 @@ module A =
 module B =
     open A
 
-    let y: System.Type{caret} = x
+    let y: Type{caret} = x
