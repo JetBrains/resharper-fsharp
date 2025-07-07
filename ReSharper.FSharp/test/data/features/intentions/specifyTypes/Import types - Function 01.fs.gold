@@ -1,0 +1,16 @@
+﻿namespace Test
+
+open System
+open System.Collections
+open System.IO
+
+module A =
+    open System.IO
+    open System.Collections
+
+    let x = fun (_: Stream) -> fun (_: BitArray) -> "".GetType()
+
+module B =
+    open A
+
+    let y: Stream -> BitArray -> Type{caret} = x

@@ -17,7 +17,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using Microsoft.FSharp.Core;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -150,7 +150,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     /// Does not reuse existing file resolve results, does complete lookup by name.
-    public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool resolveExpr, bool qualified)
+    public FSharpList<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool resolveExpr, bool qualified)
     {
       var referenceOwner = GetElement();
       var checkerService = referenceOwner.CheckerService;
@@ -159,7 +159,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? qualifiableReferenceOwner.Names
         : new[] {GetName()};
 
-      return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+      var symbolUses =
+        checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+
+      return FilterSymbols(symbolUses);
     }
+
+    protected virtual FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) =>
+      symbols.GetSlice(null, 0);
+  }
+
+  public class FSharpMultipleSymbolCandidatesReference(IFSharpReferenceOwner owner) : FSharpSymbolReference(owner)
+  {
+    protected override FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) => symbols;
+  }
+
+  public static class FSharpSymbolReferenceExtensions
+  {
+    public static FSharpMultipleSymbolCandidatesReference AllowAllSymbolCandidatesCheck(this FSharpSymbolReference reference) =>
+      new(reference.GetElement());
   }
 }

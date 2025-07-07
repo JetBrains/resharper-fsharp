@@ -1,0 +1,13 @@
+﻿namespace Test
+
+open System
+
+module A =
+    open System
+
+    let f (x: IDisposable) (y: IDisposable) = "".GetType()
+
+module B =
+    open A
+
+    let g{caret} (x: IDisposable) (y: IDisposable) : Type = f x y 
