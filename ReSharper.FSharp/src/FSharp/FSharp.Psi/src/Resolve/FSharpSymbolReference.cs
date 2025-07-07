@@ -169,14 +169,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       symbols.GetSlice(null, 0);
   }
 
-  public class FSharpMultiplySymbolCandidatesReference(IFSharpReferenceOwner owner) : FSharpSymbolReference(owner)
+  public class FSharpMultipleSymbolCandidatesReference(IFSharpReferenceOwner owner) : FSharpSymbolReference(owner)
   {
     protected override FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) => symbols;
   }
 
   public static class FSharpSymbolReferenceExtensions
   {
-    public static FSharpMultiplySymbolCandidatesReference AllowAllSymbolCandidatesCheck(this FSharpSymbolReference reference) =>
+    public static FSharpMultipleSymbolCandidatesReference AllowAllSymbolCandidatesCheck(this FSharpSymbolReference reference) =>
       new(reference.GetElement());
   }
 }

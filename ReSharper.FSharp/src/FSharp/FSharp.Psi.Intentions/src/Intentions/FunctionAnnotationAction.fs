@@ -38,6 +38,12 @@ module SpecifyTypes =
     let rec private collectTypeUsages acc (context, fcsType: FSharpType, typeUsage: ITypeUsage) =
         if fcsType.IsGenericParameter then acc else
 
+        let collectMany typeUsages context acc =
+            typeUsages
+            |> Seq.zip fcsType.GenericArguments
+            |> Seq.fold (fun acc (fcsType, typeUsage) ->
+                collectTypeUsages acc (context, fcsType, typeUsage)) acc
+
         match typeUsage with
         | :? INamedTypeUsage as typeUsage ->
             let typeReference = typeUsage.ReferenceName
@@ -46,23 +52,16 @@ module SpecifyTypes =
             let typeArgs = typeReference.TypeArgumentList
             if isNull typeArgs then acc else
 
-            typeArgs.TypeUsagesEnumerable
-            |> Seq.mapi (fun i typeArg -> i, typeArg)
-            |> Seq.fold (fun acc (i, typeArg) ->
-                let fcsType = fcsType.GenericArguments[i]
-                collectTypeUsages acc (context, fcsType, typeArg)) acc
+            collectMany typeArgs.TypeUsagesEnumerable context acc
 
         | :? ITupleTypeUsage as typeUsage ->
-            typeUsage.Items
-            |> Seq.mapi (fun i field -> i, field)
-            |> Seq.fold (fun acc (i, typeUsage) -> collectTypeUsages acc (context, fcsType.GenericArguments[i], typeUsage)) acc
+            collectMany typeUsage.Items context acc
 
         | :? IParenTypeUsage as typeUsage ->
             collectTypeUsages acc (context, fcsType, typeUsage.InnerTypeUsage)
 
         | :? IFunctionTypeUsage as typeUsage ->
-            let fcsType =
-                if fcsType.IsFunctionType then fcsType else getAbbreviatedType fcsType
+            let fcsType = getAbbreviatedType fcsType
 
             let argTypeUsage = typeUsage.ArgumentTypeUsage
             let argType = fcsType.GenericArguments[0]
@@ -78,14 +77,12 @@ module SpecifyTypes =
             collectTypeUsages acc (context, fcsType, typeUsage)
 
         | :? IAnonRecordTypeUsage as typeUsage ->
-            typeUsage.Fields
-            |> Seq.mapi (fun i field -> i, field)
-            |> Seq.fold (fun acc (i, field) ->
-                let typeUsage = field.TypeUsage
-                collectTypeUsages acc (context, fcsType.GenericArguments[i], typeUsage)) acc
+            let typeUsages = typeUsage.Fields |> Seq.map (_.TypeUsage)
+            collectMany typeUsages context acc
 
         | :? IWithNullTypeUsage as typeUsage ->
-            collectTypeUsages acc (context, stripNull fcsType, typeUsage.TypeUsage)
+            let fcsType = fcsType.TypeDefinition.AsType()
+            collectTypeUsages acc (context, fcsType, typeUsage.TypeUsage)
 
         | _ -> acc
 
@@ -149,13 +146,11 @@ module SpecifyTypes =
             (mfv: FSharpMemberOrFunctionOrValue)
             (displayContext: FSharpDisplayContext) =
 
-        let displayContext = displayContext.WithShortTypeNames(true)
-
         let returnType =
             let fullType = mfv.FullType
             if declaration :? IBinding && fullType.IsFunctionType then
                 let specifiedTypesCount = declaration.ParametersDeclarations.Count
-                getFunctionReturnType fullType specifiedTypesCount
+                skipFunctionParameters fullType specifiedTypesCount
             else
                 mfv.ReturnParameter.Type
 
@@ -206,8 +201,6 @@ module SpecifyTypes =
             match pattern.IgnoreInnerParens() with
             | :? ITuplePat as tuplePat -> addParens factory tuplePat
             | pattern -> pattern
-
-        let displayContext = displayContext.WithShortTypeNames(true)
 
         let typedPat =
             let typeUsage = factory.CreateTypeUsage(fcsType.Format(displayContext), TypeUsageContext.TopLevel)
@@ -289,14 +282,14 @@ module SpecifyTypes =
 
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let fcsType = mfv.FullType
-                let displayContext = symbolUse.DisplayContext
+                let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
                 bindAnnotations annotationInfo
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
-                let displayContext = pattern.TryGetFcsDisplayContext()
+                let displayContext = pattern.TryGetFcsDisplayContext().WithShortTypeNames(true)
 
                 let annotationInfo = [| specifyPatternTypeImpl displayContext patType pattern |]
                 bindAnnotations annotationInfo
@@ -306,7 +299,7 @@ module SpecifyTypes =
             if isNull symbolUse then () else
 
             let symbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-            let displayContext = symbolUse.DisplayContext
+            let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
             let annotationsInfo = [
                 if availability.CanSpecifyParameterTypes then
@@ -321,13 +314,15 @@ module SpecifyTypes =
         | _ -> ()
 
     let specifyPatternType (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
+        let displayContext = displayContext.WithShortTypeNames(true)
         let annotationsInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
         bindAnnotations annotationsInfo
 
-    let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
+    let specifyMemberReturnType (decl: IMemberDeclaration) mfv (displayContext: FSharpDisplayContext) =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
+        let displayContext = displayContext.WithShortTypeNames(true)
         let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv displayContext |]
         bindAnnotations annotationsInfo
 
