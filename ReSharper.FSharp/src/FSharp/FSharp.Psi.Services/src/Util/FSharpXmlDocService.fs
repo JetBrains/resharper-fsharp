@@ -23,7 +23,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming,
         factory: XmlDocSectionFactory, renderer: IXmlDocHtmlRenderer) =
 
-    static let сrefManager =
+    static let crefManager =
         { new CrefManager() with
             member x.Process(cref, _, _, _, _) = XmlDocPresenterUtil.ProcessCref(cref)
             member x.Create _ = null }
@@ -34,7 +34,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         let result = RichText()
         let builder = XmlDocHtmlUtil.HTMLBuilder(renderer)
         XmlDocHtmlPresenter
-            .ConvertProcessor(node, null, null :> DeclaredElementInstance, false, FSharpLanguage.Instance, сrefManager, factory, theming, null)
+            .ConvertProcessor(node, null, null :> DeclaredElementInstance, false, FSharpLanguage.Instance, crefManager, factory, theming, null)
             .AppendTextBody(builder, result, true)
         result
 
