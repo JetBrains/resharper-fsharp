@@ -106,6 +106,11 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Mute("RIDER-103648")
   @Test(description = "RIDER-73091")
   fun script() {
+    // Force solution type providers analysis
+    withOpenedEditor(defaultSourceFile) {
+      waitForDaemon()
+    }
+
     checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
 
     unloadAllProjects()
