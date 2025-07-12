@@ -37,22 +37,19 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
 
-    override this.DumpTextControl(textControl) =
-        if this.GetAttributes<DumpPsiTreeAttribute>() |> Seq.isEmpty then
-            base.DumpTextControl(textControl) else
+    override this.DumpTextControl(textControl, writer) =
+        base.DumpTextControl(textControl, writer)
+        
+        if this.GetAttributes<DumpPsiTreeAttribute>() |> Seq.isEmpty then () else
 
-        let dumpTextControl = base.DumpTextControl(textControl)
         let solution = this.Solution
 
-        Action<TextWriter>(fun writer ->
-            dumpTextControl.Invoke(writer)
-            writer.WriteLine("---------------------------------------------------------\n")
+        writer.WriteLine("---------------------------------------------------------\n")
 
-            textControl.TryGetSourceFiles(solution)
-            |> Seq.tryExactlyOne
-            |> Option.map (fun sourceFile -> sourceFile.GetPrimaryPsiFile())
-            |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
-        )
+        textControl.TryGetSourceFiles(solution)
+        |> Seq.tryExactlyOne
+        |> Option.map (fun sourceFile -> sourceFile.GetPrimaryPsiFile())
+        |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
 
     override this.CheckAllFiles = true
 
