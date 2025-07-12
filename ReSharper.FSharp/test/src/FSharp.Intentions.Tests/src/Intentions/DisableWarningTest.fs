@@ -9,7 +9,7 @@ open NUnit.Framework
 
 [<FSharpTest; AssertCorrectTreeStructure>]
 type DisableWarningTest() =
-    inherit BulbActionTestBase<IBulbAction>()
+    inherit DisableWarningActionTestBase()
 
     override x.RelativeTestDataPath = "features/intentions/disableWarning"
 
@@ -30,13 +30,6 @@ type DisableWarningTest() =
     [<Test>] member x.``Disable all 01``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 02``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 03``() = x.DoNamedTest()
-
-    override this.ExecuteAllTexts(_, _, _) = ()
-    override this.IsAvailable _ = true
-
-    override this.CreateQuickFix(project, textControl, highlighting) =
-        let quickFixToExecute = BulbActionTestBase.GetSetting(textControl, "QF_TO_EXECUTE")
-        this.GetCustomWarningAction(project, textControl, (fun action -> action.Text.Equals(quickFixToExecute)), &highlighting)
 
     override this.ExecuteQuickFix(_, textControl, quickFix, _) =
         use logger = new FormatterTestLogger(FileSystemPath.Parse("C:\\Developer\\123.txt"))
