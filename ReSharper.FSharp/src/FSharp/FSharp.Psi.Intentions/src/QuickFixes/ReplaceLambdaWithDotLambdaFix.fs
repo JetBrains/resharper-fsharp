@@ -38,6 +38,6 @@ type ReplaceLambdaWithDotLambdaFix(warning: DotLambdaCanBeUsedWarning) =
 
         let exprToReplace: ITreeNode =
             let possibleParenExpr = lambda.IgnoreParentParens(includingBeginEndExpr = false)
-            if needsParens possibleParenExpr lambda then lambda else possibleParenExpr
+            if needsParens possibleParenExpr dotLambda then lambda else possibleParenExpr
 
         ModificationUtil.ReplaceChild(exprToReplace, dotLambda) |> ignore

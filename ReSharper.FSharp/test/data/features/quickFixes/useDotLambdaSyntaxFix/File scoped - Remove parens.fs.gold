@@ -4,7 +4,7 @@ f(_{caret}.ToString())
 f x(_.ToString())x
 
 open System.Linq
-[1;2;3] |> List.map (_.ToString())
+[1;2;3] |> List.map _.ToString()
 [1;2;3] |> List.map(_.ToString())
-[1;2;3] |> List.map (_.ToString())|> List.map id
+[1;2;3] |> List.map _.ToString()|> List.map id
 [1;2;3].Select(_.GetHashCode()).Where(_.Equals)
