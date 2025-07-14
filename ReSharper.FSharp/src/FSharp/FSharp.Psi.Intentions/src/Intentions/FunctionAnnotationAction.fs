@@ -9,20 +9,20 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
+open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.Util
 
 module SpecifyTypes =
@@ -34,6 +34,57 @@ module SpecifyTypes =
         static member Unavailable = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = false }
         static member ParameterTypesOnly = { CanSpecifyParameterTypes = true; CanSpecifyReturnType = false }
         static member ReturnTypeOnly = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = true }
+
+    let rec private collectTypeUsages acc (context, fcsType: FSharpType, typeUsage: ITypeUsage) =
+        if fcsType.IsGenericParameter then acc else
+
+        let collectMany typeUsages context acc =
+            typeUsages
+            |> Seq.zip fcsType.GenericArguments
+            |> Seq.fold (fun acc (fcsType, typeUsage) ->
+                collectTypeUsages acc (context, fcsType, typeUsage)) acc
+
+        match typeUsage with
+        | :? INamedTypeUsage as typeUsage ->
+            let typeReference = typeUsage.ReferenceName
+            let acc = (typeUsage, fcsType, context) :: acc
+
+            let typeArgs = typeReference.TypeArgumentList
+            if isNull typeArgs then acc else
+
+            collectMany typeArgs.TypeUsagesEnumerable context acc
+
+        | :? ITupleTypeUsage as typeUsage ->
+            collectMany typeUsage.Items context acc
+
+        | :? IParenTypeUsage as typeUsage ->
+            collectTypeUsages acc (context, fcsType, typeUsage.InnerTypeUsage)
+
+        | :? IFunctionTypeUsage as typeUsage ->
+            let fcsType = getAbbreviatedType fcsType
+
+            let argTypeUsage = typeUsage.ArgumentTypeUsage
+            let argType = fcsType.GenericArguments[0]
+            let acc = collectTypeUsages acc (context, argType, argTypeUsage)
+
+            let returnTypeUsage = typeUsage.ReturnTypeUsage
+            let returnType = fcsType.GenericArguments[1]
+            collectTypeUsages acc (context, returnType, returnTypeUsage)
+
+        | :? IArrayTypeUsage as typeUsage ->
+            let typeUsage = typeUsage.TypeUsage
+            let fcsType = fcsType.GenericArguments[0]
+            collectTypeUsages acc (context, fcsType, typeUsage)
+
+        | :? IAnonRecordTypeUsage as typeUsage ->
+            let typeUsages = typeUsage.Fields |> Seq.map (_.TypeUsage)
+            collectMany typeUsages context acc
+
+        | :? IWithNullTypeUsage as typeUsage ->
+            let fcsType = fcsType.TypeDefinition.AsType()
+            collectTypeUsages acc (context, fcsType, typeUsage.TypeUsage)
+
+        | _ -> acc
 
     let rec private (|TupleLikePattern|_|) (pattern: IFSharpPattern) =
         match pattern with
@@ -93,24 +144,17 @@ module SpecifyTypes =
     let private specifyParametersOwnerReturnType
             (declaration: IParameterOwnerMemberDeclaration)
             (mfv: FSharpMemberOrFunctionOrValue)
-            displayContext =
-        let typeString =
+            (displayContext: FSharpDisplayContext) =
+
+        let returnType =
             let fullType = mfv.FullType
             if declaration :? IBinding && fullType.IsFunctionType then
                 let specifiedTypesCount = declaration.ParametersDeclarations.Count
-
-                let types = getFunctionTypeArgs true fullType
-                if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
-
-                let remainingTypes = types |> List.skip specifiedTypesCount
-                remainingTypes
-                |> List.map (fun fcsType ->
-                    let typeString = fcsType.Format(displayContext)
-                    if fcsType.IsFunctionType then sprintf "(%s)" typeString else typeString)
-                |> String.concat " -> "
+                skipFunctionParameters fullType specifiedTypesCount
             else
-                mfv.ReturnParameter.Type.Format(displayContext)
+                mfv.ReturnParameter.Type
 
+        let typeString = returnType.Format(displayContext)
         let factory = declaration.CreateElementFactory()
         let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel)
 
@@ -123,20 +167,16 @@ module SpecifyTypes =
                 | x -> failwith $"Expected binding or member declaration, but was {x}"
             else parameters.Last() :> _
 
-        ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
+        let returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage))
 
-    let specifyMemberReturnType (decl: IMemberDeclaration) mfv displayContext =
-        Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
-        Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
-
-        specifyParametersOwnerReturnType decl mfv displayContext
+        (declaration: ITreeNode), returnType, returnTypeInfo.ReturnType
 
     let private addParens (factory: IFSharpElementFactory) (pattern: IFSharpPattern) =
         let parenPat = factory.CreateParenPat()
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let specifyPatternType displayContext (fcsType: FSharpType) (pattern: IFSharpPattern) =
+    let private specifyPatternTypeImpl (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
         let pattern = pattern.IgnoreParentParens()
         let factory = pattern.CreateElementFactory()
 
@@ -168,36 +208,64 @@ module SpecifyTypes =
 
         let listConsParenPat = getOutermostListConstPat pattern |> _.IgnoreParentParens()
 
-        ModificationUtil.ReplaceChild(pattern, typedPat)
-        |> ParenPatUtil.addParensIfNeeded
-        |> ignore
+        let typedPat =
+            let pat =
+                ModificationUtil.ReplaceChild(pattern, typedPat)
+                |> ParenPatUtil.addParensIfNeeded
+
+            pat.IgnoreInnerParens().As<ITypedPat>()
 
         // In the case `x :: _: Type` add parens to the whole listConsPat
         //TODO: improve parens analyzer
         if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
-            ParenPatUtil.addParens listConsParenPat |> ignore
+            let listConstPat = (ParenPatUtil.addParens listConsParenPat).As<IListConsPat>()
+            let typedPat = (FSharpPatternUtil.getLastTailPattern listConstPat).As<ITypedPat>()
+            (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
+
+        else (typedPat: ITreeNode), fcsType, typedPat.TypeUsage
 
     let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
-        let rec specifyParameterTypes (fcsParamGroups: 'a seq) (getFcsType: 'a -> FSharpType) (enumerate: 'a -> 'a seq) (parameters: IFSharpPattern seq) isTopLevel =
-            for fcsParamGroup, parameter in Seq.zip fcsParamGroups parameters do
+        let rec specifyParameterTypes (fcsParamGroups: 'a seq) (getFcsType: 'a -> FSharpType) (enumerate: 'a -> 'a seq) (parameters: IFSharpPattern seq) acc isTopLevel =
+            Seq.zip fcsParamGroups parameters
+            |> Seq.fold (fun acc (fcsParamGroup, parameter) ->
                 match parameter.IgnoreInnerParens() with
-                | :? IConstPat | :? ITypedPat -> ()
+                | :? IConstPat | :? ITypedPat -> acc
                 | TupleLikePattern pat when isTopLevel ->
                     let fcsTypes = enumerate fcsParamGroup
-                    specifyParameterTypes fcsTypes getFcsType enumerate pat.Patterns false
+                    specifyParameterTypes fcsTypes getFcsType enumerate pat.Patterns acc false
                 | pattern ->
                     let fcsType = getFcsType fcsParamGroup
-                    specifyPatternType displayContext fcsType pattern
+                    specifyPatternTypeImpl displayContext fcsType pattern :: acc
+            ) acc
 
         let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
 
         if mfv.IsMember then
             let enumerate x = x |> Seq.map (fun x -> [|x|] :> IList<_>)
             let types = mfv.CurriedParameterGroups
-            specifyParameterTypes types (fun x -> x[0].Type) enumerate parameters true
+            specifyParameterTypes types (fun x -> x[0].Type) enumerate parameters [] true
         else
             let types = getFunctionTypeArgs true mfv.FullType
-            specifyParameterTypes types id (_.GenericArguments) parameters true
+            specifyParameterTypes types id (_.GenericArguments) parameters [] true
+
+    let private bindAnnotations annotationsInfo =
+        let annotationsInfo =
+            annotationsInfo
+            |> Seq.fold collectTypeUsages []
+            |> Seq.toList
+
+        match annotationsInfo with
+        | [] -> ()
+        | (typeUsage, _, _) :: _ ->
+
+        use pinResultsCookie = typeUsage.FSharpFile.PinTypeCheckResults(true, "Specify types")
+
+        for typeUsage, fcsType, context: ITreeNode in annotationsInfo do
+            let typeReference = typeUsage.ReferenceName
+            let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
+            let fcsSymbol = fcsType.TypeDefinition
+
+            bindFcsSymbolToReference context reference fcsSymbol "Specify type"
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
@@ -214,30 +282,49 @@ module SpecifyTypes =
 
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let fcsType = mfv.FullType
-                let displayContext = symbolUse.DisplayContext
+                let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
-                specifyPatternType displayContext fcsType pattern
+                let annotationInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
+                bindAnnotations annotationInfo
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
-                let displayContext = pattern.TryGetFcsDisplayContext()
+                let displayContext = pattern.TryGetFcsDisplayContext().WithShortTypeNames(true)
 
-                specifyPatternType displayContext patType pattern
+                let annotationInfo = [| specifyPatternTypeImpl displayContext patType pattern |]
+                bindAnnotations annotationInfo
 
         | :? IParameterOwnerMemberDeclaration as declaration ->
             let symbolUse = declaration.GetFcsSymbolUse()
             if isNull symbolUse then () else
 
             let symbol = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
-            let displayContext = symbolUse.DisplayContext
+            let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
 
-            if availability.CanSpecifyParameterTypes then
-                specifyParameterTypes declaration symbol displayContext
+            let annotationsInfo = [
+                if availability.CanSpecifyParameterTypes then
+                    yield! specifyParameterTypes declaration symbol displayContext
 
-            if availability.CanSpecifyReturnType then
-                specifyParametersOwnerReturnType declaration symbol displayContext
+                if availability.CanSpecifyReturnType then
+                    yield specifyParametersOwnerReturnType declaration symbol displayContext
+            ]
+
+            bindAnnotations annotationsInfo
 
         | _ -> ()
+
+    let specifyPatternType (displayContext: FSharpDisplayContext) (fcsType: FSharpType) (pattern: IFSharpPattern) =
+        let displayContext = displayContext.WithShortTypeNames(true)
+        let annotationsInfo = [| specifyPatternTypeImpl displayContext fcsType pattern |]
+        bindAnnotations annotationsInfo
+
+    let specifyMemberReturnType (decl: IMemberDeclaration) mfv (displayContext: FSharpDisplayContext) =
+        Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
+        Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
+
+        let displayContext = displayContext.WithShortTypeNames(true)
+        let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv displayContext |]
+        bindAnnotations annotationsInfo
 
 module SpecifyTypesActionHelper =
     open SpecifyTypes

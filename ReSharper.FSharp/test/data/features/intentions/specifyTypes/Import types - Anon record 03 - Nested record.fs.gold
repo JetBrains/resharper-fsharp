@@ -1,0 +1,14 @@
+﻿namespace Test
+
+open System
+open System.IO
+
+module A =
+    open System.IO
+
+    let x = {| A = {| A = "".GetType(); B = MemoryStream() |}; B = 4 |}
+
+module B =
+    open A
+
+    let y: {| A: {| A: Type; B: MemoryStream |}; B: int |}{caret} = x

@@ -47,6 +47,6 @@ type NameResolutionTest() =
         let fullName = BaseTestWithTextControl.GetSetting(textControl, FullName) |> Option.ofObj
         let coords = textControl.Caret.Position.Value.ToDocLineColumn()
 
-        let symbol = checkerService.ResolveNameAtLocation(sourceFile, name, coords, false, x.TestName).Value.Symbol
+        let symbol = checkerService.ResolveNameAtLocation(sourceFile, name, coords, false, x.TestName).Head.Symbol
         let symbolFullName = getFullName symbol
         Assert.AreEqual(fullName, symbolFullName)

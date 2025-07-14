@@ -1,0 +1,14 @@
+﻿namespace Test
+
+open System
+open System.IO
+
+module A =
+    open System.IO
+
+    let x = {| A = ["".GetType()]; B = StreamReader("") |}
+
+module B =
+    open A
+
+    let y: {| A: Type list; B: StreamReader |}{caret} = x
