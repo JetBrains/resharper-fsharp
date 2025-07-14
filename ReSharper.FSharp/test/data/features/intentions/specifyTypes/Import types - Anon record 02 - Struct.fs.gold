@@ -1,0 +1,14 @@
+﻿namespace Test
+
+open System
+open System.IO
+
+module A =
+    open System.IO
+
+    let x = struct {| A = ["".GetType()]; B = StreamReader("") |}
+
+module B =
+    open A
+
+    let y: struct {| A: Type list; B: StreamReader |}{caret} = x

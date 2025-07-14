@@ -174,15 +174,19 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
         // todo: different type parameters count
-        x.ParseAndCheckFile(sourceFile, opName, true)
-        |> Option.bind (fun results ->
-            let checkResults = results.CheckResults
-            let fcsPos = getPosFromCoords coords
-            if resolveExpr then
-                checkResults.ResolveNamesAtLocation(fcsPos, names)
-            else
-                let lineText = sourceFile.Document.GetLineText(coords.Line)
-                checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names))
+        match x.ParseAndCheckFile(sourceFile, opName, true) with
+        | None -> []
+        | Some results ->
+
+        let checkResults = results.CheckResults
+        let fcsPos = getPosFromCoords coords
+        if resolveExpr then
+            match checkResults.ResolveNamesAtLocation(fcsPos, names) with
+            | None -> []
+            | Some result -> [result]
+        else
+            let lineText = sourceFile.Document.GetLineText(coords.Line)
+            checkResults.GetSymbolUsesAtLocation(fcsPos.Line, fcsPos.Column, lineText, names)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name: string, coords, resolveExpr, opName) =
