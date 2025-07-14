@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpProperty : IProperty, IFSharpRepresentationAccessRightsOwner
+  public interface IFSharpProperty : IProperty, IFSharpParameterOwner, IFSharpRepresentationAccessRightsOwner
   {
     public bool HasExplicitAccessors { get; }
     public IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors();

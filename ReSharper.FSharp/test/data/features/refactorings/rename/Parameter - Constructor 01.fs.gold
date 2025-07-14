@@ -1,0 +1,6 @@
+﻿module Module
+
+type T(zzz) =
+    let _ = zzz
+
+let t = T(zzz = 1)

@@ -1,0 +1,8 @@
+﻿module Module
+
+type T() =
+    abstract M: zzz: int -> unit
+    default this.M(zzz) = zzz |> ignore
+
+let t = T()
+t.M(zzz = 1)

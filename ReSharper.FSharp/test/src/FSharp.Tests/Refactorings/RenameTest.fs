@@ -96,12 +96,47 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
 
-    [<Ignore("""
-        Parameters of methods are currently implemented as local variables so inline rename is being executed.
-        Also for named arguments there is no reference to a parameter on callsite.
-        Revive `FSharpNamedArgumentLanguageService` when fixing this.
-        """)>]
-    [<Test>] member x.``Params - Named arguments 01``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Parameter - Abstract 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Abstract 02``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Abstract 03``() = x.DoNamedTest()
+
+    [<Test; Explicit("Fix FCS accessor mapping")>] member x.``Parameter - Accessor 01``() = x.DoNamedTest()
+    [<Test; Explicit("Fix FCS accessor mapping")>] member x.``Parameter - Accessor 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Parameter - Constructor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Constructor 02``() = x.DoNamedTest()
+    [<Test; Explicit("FCS: fix type checker recovery")>] member x.``Parameter - Constructor 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Parameter - Function 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 02``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 03``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 04``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 05``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 06``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 07``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 08``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 09``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 10``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 11``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 12``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 13``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Parameter - Function 14``() = x.DoNamedTestFsCs()
+
+    [<Test>] member x.``Parameter - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 02``() = x.DoNamedTest()
+    [<Test; Explicit("FCS: fix type checker recovery")>] member x.``Parameter - Method 03``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 04``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 05``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 06``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 07``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Method 08``() = x.DoNamedTestFsiFsProgram()
+
+    [<Test>] member x.``Parameter - Virtual 01``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Virtual 02``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Virtual 03``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Virtual 04``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Virtual 05``() = x.DoNamedTest()
+    [<Test>] member x.``Parameter - Virtual 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Ctor params 01``() = x.DoNamedTest()
     [<Test>] member x.``Ctor params 02``() = x.DoNamedTest()

@@ -7,13 +7,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpConstructorBase<TDeclaration> : FSharpFunctionBase<TDeclaration>, IConstructor
+  internal abstract class FSharpConstructorBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpFunctionBase<TDeclaration>(declaration), IConstructor
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpConstructorBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONSTRUCTOR;
 
@@ -32,21 +29,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override int GetHashCode() => ShortName.GetHashCode();
   }
 
-  internal class FSharpSecondaryConstructor : FSharpConstructorBase<IConstructorSignatureOrDeclaration>
+  internal class FSharpSecondaryConstructor([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpConstructorBase<IConstructorSignatureOrDeclaration>(declaration)
   {
-    public FSharpSecondaryConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsImplicit => false;
   }
 
-  internal class FSharpPrimaryConstructor : FSharpConstructorBase<PrimaryConstructorDeclaration>
+  internal class FSharpPrimaryConstructor([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpConstructorBase<PrimaryConstructorDeclaration>(declaration)
   {
-    public FSharpPrimaryConstructor([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsImplicit => true;
   }
 }

@@ -12,14 +12,27 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public class FSharpMethodParameter([NotNull] IParametersOwner owner, FSharpParameterIndex index)
+  public class FSharpMethodParameter([NotNull] IFSharpParameterOwner owner, FSharpParameterIndex index)
     : FSharpMethodParameterBase(owner, index)
   {
     [CanBeNull]
-    public FSharpParameter FcsParameter =>
-      Owner is IFSharpMember { Mfv.CurriedParameterGroups: var paramGroups }
-        ? paramGroups.ElementAtOrDefault(FSharpIndex.GroupIndex)?.ElementAtOrDefault(FSharpIndex.ParameterIndex)
-        : null;
+    public FSharpParameter FcsParameter
+    {
+      get
+      {
+        if (Owner is not IFSharpMember { Mfv.CurriedParameterGroups: var fcsParamGroups })
+          return null;
+
+        var paramGroup = fcsParamGroups.ElementAtOrDefault(FSharpIndex.GroupIndex);
+        if (paramGroup == null)
+          return null;
+
+        if (FSharpIndex.ParameterIndex is not { } paramIndex)
+          return paramGroup.Count == 1 ? paramGroup[0] : null;
+
+        return paramGroup.ElementAtOrDefault(paramIndex);
+      }
+    }
 
     public override IType Type =>
       Owner is IFSharpTypeParametersOwner fsTypeParamOwner && FcsParameter is { } fcsParam
@@ -30,6 +43,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       FcsParameter?.DisplayName is { } name && !name.RemoveBackticks().IsEmpty()
         ? name
         : SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public override string SourceName => ShortName; // todo: calc from decl
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       FcsParameter?.Attributes.HasAttributeInstance(clrName.FullName) ?? false;

@@ -8,19 +8,19 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpMethodBase<TDeclaration> : FSharpTypeParametersOwnerBase<TDeclaration>, IMethod
+  internal abstract class FSharpMethodBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpTypeParametersOwnerBase<TDeclaration>(declaration), IMethod
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.METHOD;
 
     public bool IsExtensionMethod => ExtensionMemberKind == ExtensionMemberKind.CLASSIC_METHOD;
 
-    public override ExtensionMemberKind ExtensionMemberKind => Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS) ? ExtensionMemberKind.CLASSIC_METHOD : ExtensionMemberKind.NONE;
+    public override ExtensionMemberKind ExtensionMemberKind =>
+      Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS)
+        ? ExtensionMemberKind.CLASSIC_METHOD
+        : ExtensionMemberKind.NONE;
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

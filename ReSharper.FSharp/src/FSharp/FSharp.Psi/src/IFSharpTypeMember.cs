@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using FSharp.Compiler.Symbols;
+﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
@@ -12,40 +10,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     bool IsVisibleFromFSharp { get; }
     bool CanNavigateTo { get; }
-  }
-
-  public interface IFSharpMember : IFSharpTypeMember, IOverridableMember
-  {
-    [CanBeNull] FSharpMemberOrFunctionOrValue Mfv { get; }
-  }
-
-  public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
-  {
-    IList<ITypeParameter> AllTypeParameters { get; }
-  }
-
-  public interface ISecondaryDeclaredElement
-  {
-    [NotNull] IClrDeclaredElement OriginElement { get; }
-    bool IsReadOnly { get; }
-  }
-
-  public interface IFSharpGeneratedElement : IFSharpDeclaredElement;
-
-  public interface IFSharpGeneratedFromOtherElement : IFSharpGeneratedElement, ISecondaryDeclaredElement
-  {
-    IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
-  }
-
-  public interface IFSharpGeneratedFromUnionCase : IFSharpGeneratedFromOtherElement;
-
-  public interface IFSharpParameter : IParameter
-  {
-    FSharpParameterIndex FSharpIndex { get; }
-  }
-
-  public record struct FSharpParameterIndex(int GroupIndex, int ParameterIndex)
-  {
-    public static readonly FSharpParameterIndex Zero = new(0, 0);
   }
 }

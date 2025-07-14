@@ -1,0 +1,4 @@
+﻿module Module
+
+let f (a: int) zzz =
+    a + zzz |> ignore

@@ -1,6 +1,8 @@
-﻿using FSharp.Compiler.Symbols;
+﻿using System.Collections.Generic;
+using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -31,5 +33,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsStatic => StaticKeyword != null;
     public override bool IsVirtual => MemberKeyword?.GetTokenType() == FSharpTokenType.DEFAULT;
     public override bool IsOverride => this.IsOverride();
+
+    public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
+      ReturnTypeUsage.GetParameterDeclaration(index);
+
+    public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
+      ReturnTypeUsage.GetParameterDeclarations();
   }
 }

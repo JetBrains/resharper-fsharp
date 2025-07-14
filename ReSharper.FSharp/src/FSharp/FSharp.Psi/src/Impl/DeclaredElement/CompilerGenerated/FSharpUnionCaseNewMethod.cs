@@ -7,16 +7,13 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpUnionCaseNewMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseNewMethod([NotNull] IUnionCase unionCase)
+    : FSharpGeneratedMethodBase, IFSharpGeneratedFromUnionCase
   {
-    [NotNull] internal IUnionCase UnionCase { get; }
+    [NotNull] internal IUnionCase UnionCase { get; } = unionCase;
 
-    public FSharpUnionCaseNewMethod([NotNull] IUnionCase unionCase) =>
-      UnionCase = unionCase;
-
-    public override ITypeElement GetContainingType() => UnionCase.GetContainingType();
+    public override ITypeElement GetContainingType() => UnionCase.ContainingType;
     public IClrDeclaredElement OriginElement => UnionCase;
-    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseNewMethodPointer(this);
@@ -47,12 +44,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       ContainingType.GetRepresentationAccessRights();
 
     public override bool IsValid() =>
-      OriginElement.IsValid();
+      UnionCase.IsValid();
 
     public override bool Equals(object obj) =>
       obj is FSharpUnionCaseNewMethod other && Equals(OriginElement, other.OriginElement);
 
     public override int GetHashCode() =>
-      OriginElement.GetHashCode();
+      UnionCase.GetHashCode();
   }
 }

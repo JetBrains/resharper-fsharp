@@ -8,17 +8,13 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpGeneratedConstructorFromFields : FSharpGeneratedConstructor
+  public class FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart) : FSharpGeneratedConstructor(typePart)
   {
-    public FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart) : base(typePart)
-    {
-    }
-
     public override IList<IParameter> Parameters
     {
       get
       {
-        if (!(TypePart is IFieldsOwnerPart typePart))
+        if (TypePart is not IFieldsOwnerPart typePart)
           return EmptyList<IParameter>.Instance;
 
         var fields = typePart.Fields;
@@ -31,12 +27,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     }
   }
 
-  public abstract class FSharpGeneratedConstructor : FSharpGeneratedFunctionBase, IConstructor
+  public abstract class FSharpGeneratedConstructor(TypePart typePart) : FSharpGeneratedFunctionBase, IConstructor
   {
-    [NotNull] protected readonly TypePart TypePart;
-
-    protected FSharpGeneratedConstructor(TypePart typePart) =>
-      TypePart = typePart;
+    [NotNull] protected readonly TypePart TypePart = typePart;
 
     public override string ShortName => StandardMemberNames.Constructor;
 

@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -11,6 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     : FSharpMethodParameterBase(owner, FSharpParameterIndex.Zero)
   {
     public override string ShortName => "this"; // todo: calc from member self id
+    public override string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override ParameterKind Kind => ParameterKind.VALUE;
     public override DefaultValue GetDefaultValue() => DefaultValue.BAD_VALUE;

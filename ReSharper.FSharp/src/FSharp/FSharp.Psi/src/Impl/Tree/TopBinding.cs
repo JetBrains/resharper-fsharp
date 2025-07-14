@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -89,5 +92,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       HeadPattern is IReferencePat rp
         ? rp.DeclaredElement
         : null;
+
+    IFSharpParameterDeclaration IFSharpParameterOwnerDeclaration.GetParameterDeclaration(FSharpParameterIndex index) =>
+      this.GetBindingParameterPatterns().GetParameterDeclaration(index);
+
+    IList<IList<IFSharpParameterDeclaration>> IFSharpParameterOwnerDeclaration.GetParameterDeclarations() =>
+      this.GetBindingParameterDeclarations();
+
+    IFSharpIdentifier INameIdentifierOwner.NameIdentifier => null;
+
+    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => throw new InvalidOperationException();
+    string IFSharpDeclaration.SourceName => throw new InvalidOperationException();
+    string IFSharpDeclaration.CompiledName => throw new InvalidOperationException();
+    void IFSharpDeclaration.SetName(string name, ChangeNameKind changeNameKind) => throw new InvalidOperationException();
+    TreeTextRange IFSharpDeclaration.GetNameIdentifierRange() => throw new InvalidOperationException();
+    XmlDocBlock IFSharpDeclaration.XmlDocBlock => throw new InvalidOperationException();
   }
 }
