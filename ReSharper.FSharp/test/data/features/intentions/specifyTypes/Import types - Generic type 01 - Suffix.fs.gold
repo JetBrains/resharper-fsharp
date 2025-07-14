@@ -1,0 +1,15 @@
+﻿namespace Test
+
+open System.Collections.Generic
+open System.IO
+
+module A =
+    open System.Collections.Generic
+    open System.IO
+
+    let x = Queue<Stream>()
+
+module B =
+    open A
+
+    let y: Queue<Stream>{caret} = x
