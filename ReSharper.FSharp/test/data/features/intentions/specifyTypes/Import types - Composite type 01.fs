@@ -1,0 +1,15 @@
+namespace Test
+
+module A =
+    open System
+    open System.Collections
+    open System.Collections.Generic
+    open System.IO
+    open System.Linq.Expressions
+    
+    let x = Queue<MemoryStream * BitArray | null -> (Type list -> {| A: int; B: Expression |}) -> unit>()
+
+module B =
+    open A
+
+    let y{caret} = x

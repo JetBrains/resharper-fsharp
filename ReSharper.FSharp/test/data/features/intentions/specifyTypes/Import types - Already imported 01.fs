@@ -1,0 +1,12 @@
+namespace Test
+
+open System.IO
+
+module A =
+    let x = "".GetType(), MemoryStream()
+
+module B =
+    open A
+    open System
+
+    let y{caret} = x

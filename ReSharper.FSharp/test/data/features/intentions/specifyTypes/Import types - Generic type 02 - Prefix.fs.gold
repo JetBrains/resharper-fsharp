@@ -1,0 +1,11 @@
+﻿namespace Test
+
+open System
+
+module A =
+    let x = [ "".GetType() ]
+
+module B =
+    open A
+
+    let y: Type list{caret} = x

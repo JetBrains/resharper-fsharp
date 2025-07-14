@@ -1,0 +1,22 @@
+﻿namespace A
+
+[<RequireQualifiedAccess>]
+module M =
+    type T() =
+        member _.P = 1
+
+namespace B
+
+open A
+
+module B_1 =
+    open A
+
+    let f (t: M.T) = ()
+
+module B_2 =
+    open B_1
+
+    let g (t: M.T) =
+        t.P{caret}
+        f t
