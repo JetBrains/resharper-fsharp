@@ -69,7 +69,7 @@
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersClient.fs" />
-    <Compile Include="src\Shim\TypeProviders\TypeProvidersShim.fs" />
+    <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\ZoneMarker.fs" />
     <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
