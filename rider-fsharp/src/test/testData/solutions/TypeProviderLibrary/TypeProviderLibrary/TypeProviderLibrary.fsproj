@@ -16,7 +16,6 @@
         <Compile Include="SimpleGenerativeProvider.fs" />
         <Compile Include="ProvidersErrors.fs" />
         <Compile Include="Caches.fs" />
-        <None Include="Script.fsx" />
     </ItemGroup>
 
     <ItemGroup>

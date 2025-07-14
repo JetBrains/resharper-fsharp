@@ -25,6 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     private readonly DotNetCoreToolset myToolset;
     private readonly bool myIsInternalMode;
     private readonly LoggerModel myLoggerModel;
+    private readonly string myLogPrefix;
     private Lifetime myLifetime;
 
     protected override string Name => "Out-of-Process TypeProviders";
@@ -102,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
       var processStartInfo = new ProcessStartInfo
       {
         Arguments =
-          $"{dotnetArgs} \"{launchPath.FullPath}\" {port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_ffff}.log")}\"",
+          $"{dotnetArgs} \"{launchPath.FullPath}\" {port} \"{TypeProvidersProtocolConstants.LogFolder.Combine($"{myLogPrefix}_{DateTime.UtcNow:yyyy_MM_dd_HH_mm}.log")}\"",
         FileName = "exec"
       };
 
@@ -151,13 +152,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     public TypeProvidersExternalProcess(Lifetime lifetime, ILogger logger, IShellLocks locks,
       IProcessStartInfoPatcher processInfoPatcher, JetProcessRuntimeRequest request, DotNetCoreToolset toolset,
-      bool isInternalMode, LoggerModel loggerModel)
+      bool isInternalMode, LoggerModel loggerModel, string logPrefix)
       : base(lifetime, logger, locks, processInfoPatcher, request, InteractionContext.SolutionContext)
     {
       myRequest = request;
       myToolset = toolset;
       myIsInternalMode = isInternalMode;
       myLoggerModel = loggerModel;
+      myLogPrefix = logPrefix;
     }
   }
 }
