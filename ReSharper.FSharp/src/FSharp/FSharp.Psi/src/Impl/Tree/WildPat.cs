@@ -12,11 +12,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifier NameIdentifier => null;
 
     public bool IsDeclaration => true;
-    public override IEnumerable<IFSharpPattern> NestedPatterns => new[] {this};
+    public override IEnumerable<IFSharpPattern> NestedPatterns => [this];
 
     public override IType GetPatternType() => this.GetExpressionTypeFromFcs();
     public override IType Type => GetPatternType();
 
     public override TreeTextRange GetNameRange() => this.GetTreeTextRange();
+
+    public IFSharpParameter FSharpParameter => this.TryGetDeclaredFSharpParameter();
   }
 }

@@ -49,18 +49,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   }
 
 
-  public abstract class FSharpGenerativeProvidedMember<T> : FSharpGenerativeProvidedElement<T>, IOverridableMember,
-    ISecondaryDeclaredElement where T : ProvidedMemberInfo
+  public abstract class FSharpGenerativeProvidedMember<T>(T info, ITypeElement containingType)
+    : FSharpGenerativeProvidedElement<T>(info, containingType), IOverridableMember, IProvidedSecondaryDeclaredElement
+    where T : ProvidedMemberInfo
   {
     private IClrDeclaredElement myOriginElement;
 
-    protected FSharpGenerativeProvidedMember(T info, ITypeElement containingType) : base(info, containingType)
-    {
-    }
-
     public override string ShortName => Info.Name;
     public IClrDeclaredElement OriginElement => myOriginElement ??= GetOriginElement();
-    public bool IsReadOnly => true;
 
     private IClrDeclaredElement GetOriginElement()
     {

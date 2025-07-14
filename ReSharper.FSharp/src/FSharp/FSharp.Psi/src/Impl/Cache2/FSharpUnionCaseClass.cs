@@ -14,8 +14,6 @@ public class FSharpUnionCaseClass([NotNull] Class.IClassPart part) : FSharpClass
   public IClrDeclaredElement OriginElement =>
     EnumerateParts().Select(part => (part as UnionCasePart)?.UnionCase).WhereNotNull().First();
 
-  public bool IsReadOnly => false;
-
   public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
     new FSharpUnionCaseClassPointer(this);
 

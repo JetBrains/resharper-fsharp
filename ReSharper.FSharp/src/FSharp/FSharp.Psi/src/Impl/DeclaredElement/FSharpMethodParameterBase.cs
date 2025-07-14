@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -44,6 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
     public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
     public abstract string ShortName { get; }
+    public abstract string SourceName { get; }
     public ITypeElement GetContainingType() => Owner.GetContainingType();
     public ITypeMember GetContainingTypeMember() => (ITypeMember) Owner;
 
@@ -57,5 +61,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       AttributesSource attributesSource);
 
     public abstract bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource);
+
+    public IEnumerable<IFSharpParameterDeclaration> GetParameterOriginDeclarations()
+    {
+      if (ContainingParametersOwner is not { } owner)
+        return EmptyList<IFSharpParameterDeclaration>.Instance;
+
+      var result = new List<IFSharpParameterDeclaration>();
+      foreach (var ownerDecl in owner.GetDeclarations())
+      {
+        if (GetParameterOwnerDeclaration(ownerDecl) is not { } parameterOwnerDecl)
+          continue;
+
+        var paramDecl = parameterOwnerDecl.GetParameterDeclaration(index);
+        if (paramDecl is IFSharpPattern pat && pat.TryGetNameIdentifierOwner() is IFSharpParameterDeclaration paramPatternDecl)
+          result.Add(paramPatternDecl);
+        if (paramDecl is IParameterSignatureTypeUsage paramSigTypeUsage)
+          result.Add(paramSigTypeUsage);
+      }
+
+      return result;
+    }
+
+    [CanBeNull]
+    private static IFSharpParameterOwnerDeclaration GetParameterOwnerDeclaration(IDeclaration decl) =>
+      decl switch
+      {
+        IReferencePat refPat => refPat.Binding,
+        IFSharpParameterOwnerDeclaration paramOwnerDecl => paramOwnerDecl,
+        _ => null
+      };
+
+    public IEnumerable<ILocalVariable> GetParameterOriginElements() =>
+      GetParameterOriginDeclarations().OfType<ILocalVariable>();
   }
 }

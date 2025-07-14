@@ -10,14 +10,13 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFSharpFunction
+  internal abstract class FSharpFunctionBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpMemberBase<TDeclaration>(declaration), IFSharpFunction
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override IList<IParameter> Parameters => this.GetParameters(Mfv);
+    public IList<IList<IFSharpParameter>> FSharpParameterGroups => this.GetFSharpParameterGroups();
+    public IFSharpParameter GetParameter(FSharpParameterIndex index) => this.GetFSharpParameter(index);
 
     public InvocableSignature GetSignature(ISubstitution substitution) =>
       new(this, substitution, FSharpOverrideSignatureComparer.Instance);

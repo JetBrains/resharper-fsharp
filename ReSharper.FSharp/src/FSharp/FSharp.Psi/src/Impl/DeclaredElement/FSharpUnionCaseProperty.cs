@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IList<IUnionCaseField> CaseFields =>
       HasFields
-        ? GetDeclaration()?.Fields.Select(d => (IUnionCaseField) d.DeclaredElement).ToIList()
+        ? GetDeclaration()?.Fields.Select(d => (IUnionCaseField) d.DeclaredElement.NotNull()).ToIList()
         : EmptyList<IUnionCaseField>.Instance;
 
     public FSharpUnionCaseClass NestedType =>

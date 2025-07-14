@@ -33,4 +33,5 @@ internal partial class LocalReferencePat
   public FSharpSymbolReference Reference => ReferenceName?.Reference;
   public override ConstantValue ConstantValue => this.GetConstantValue();
   public AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
+  public IFSharpParameter FSharpParameter => this.TryGetDeclaredFSharpParameter();
 }

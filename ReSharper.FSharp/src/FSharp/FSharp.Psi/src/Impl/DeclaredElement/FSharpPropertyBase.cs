@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -78,14 +80,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
   }
 
-  internal abstract class FSharpPropertyBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IProperty
+  internal abstract class FSharpPropertyBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwner, IProperty
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
-
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
     {
       if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
@@ -140,5 +138,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override int GetHashCode() =>
       ShortName.GetHashCode();
+
+    public IList<IList<IFSharpParameter>> FSharpParameterGroups => this.GetFSharpParameterGroups();
+    public IFSharpParameter GetParameter(FSharpParameterIndex index) => this.GetFSharpParameter(index);
   }
 }

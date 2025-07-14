@@ -13,9 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     internal FSharpUnionCaseIsCaseProperty([NotNull] IUnionCase unionCase) =>
       UnionCase = unionCase;
 
-    public override ITypeElement GetContainingType() => UnionCase.GetContainingType();
+    public override ITypeElement GetContainingType() => UnionCase.ContainingType;
     public IClrDeclaredElement OriginElement => UnionCase;
-    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseIsCasePropertyPointer(this);
@@ -33,12 +32,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override string SourceName => ShortName;
 
     public override bool IsValid() =>
-      OriginElement.IsValid();
+      UnionCase.IsValid();
 
     public override bool Equals(object obj) =>
       obj is FSharpUnionCaseIsCaseProperty other && Equals(OriginElement, other.OriginElement);
 
     public override int GetHashCode() =>
-      OriginElement.GetHashCode();
+      UnionCase.GetHashCode();
   }
 }

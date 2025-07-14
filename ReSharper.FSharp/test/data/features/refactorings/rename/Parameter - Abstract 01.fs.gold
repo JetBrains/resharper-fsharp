@@ -1,0 +1,8 @@
+﻿module Module
+
+type I =
+    abstract M: zzz: int -> unit
+
+let i: I = Unchecked.defaultof<_>
+i.M(zzz = 1)
+

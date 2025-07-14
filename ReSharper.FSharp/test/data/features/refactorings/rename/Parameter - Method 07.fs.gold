@@ -1,0 +1,6 @@
+﻿module Module
+
+type T() =
+    static M([<obj>] zzz) = zzz |> ignore
+
+T.M(zzz = 1)

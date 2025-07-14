@@ -5,11 +5,11 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 
-[*.{java,kt,kts}]
+[*.{cs, csproj, fsproj, java,kt,kts}]
 indent_style = space
 indent_size = 2
 tab_width = 2
 
-[*.{csproj,fsproj}]
+[*.{fs}]
 indent_style = space
-indent_size = 2
+indent_size = 

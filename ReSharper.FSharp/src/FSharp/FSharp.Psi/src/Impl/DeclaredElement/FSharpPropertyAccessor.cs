@@ -5,19 +5,14 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpPropertyAccessor : FSharpMethodBase<AccessorDeclaration>, IFSharpExplicitAccessor
+  internal class FSharpPropertyAccessor(ITypeMemberDeclaration declaration)
+    : FSharpMethodBase<AccessorDeclaration>(declaration), IFSharpExplicitAccessor
   {
-    public FSharpPropertyAccessor(ITypeMemberDeclaration declaration)
-      : base(declaration)
-    {
-    }
-
-    public IClrDeclaredElement OriginElement => GetDeclaration().OwnerMember.DeclaredElement;
-    public bool IsReadOnly => false;
+    public IClrDeclaredElement OriginElement => GetDeclaration()?.OwnerMember.DeclaredElement;
     public AccessorKind Kind => GetDeclaration()?.Kind ?? AccessorKind.UNKNOWN;
     public override bool IsVisibleFromFSharp => false;
     public override IList<ITypeParameter> AllTypeParameters => GetContainingType().GetAllTypeParametersReversed();
-    public override IList<IDeclaration> GetDeclarations() => new IDeclaration[] {GetDeclaration()};
+    public override IList<IDeclaration> GetDeclarations() => [GetDeclaration()];
 
     public override bool Equals(object obj) =>
       obj is FSharpPropertyAccessor accessor && base.Equals(accessor);

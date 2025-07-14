@@ -1,7 +1,4 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IConstructorDeclaration : IParameterOwnerMemberDeclaration
-  {
-    
-  }
+  public partial interface IConstructorDeclaration : IFSharpParameterOwnerDeclaration, IParameterOwnerMemberDeclaration;
 }

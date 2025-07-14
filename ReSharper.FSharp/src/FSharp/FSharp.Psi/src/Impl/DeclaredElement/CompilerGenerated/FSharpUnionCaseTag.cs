@@ -5,20 +5,17 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpUnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromUnionCase
+  public class FSharpUnionCaseTag(IUnionCase unionCase)
+    : FSharpGeneratedMemberBase, IFSharpGeneratedFromUnionCase, IField
   {
-    private IUnionCase UnionCase { get; }
-
-    public FSharpUnionCaseTag(IUnionCase unionCase) =>
-      UnionCase = unionCase;
+    private IUnionCase UnionCase { get; } = unionCase;
 
     public override string ShortName => UnionCase.ShortName;
 
-    private ITypeElement Union => UnionCase.GetContainingType();
+    private ITypeElement Union => UnionCase.ContainingType;
     private FSharpUnionTagsClass TagsClass => Union.GetUnionTagsClass();
 
     IClrDeclaredElement ISecondaryDeclaredElement.OriginElement => UnionCase;
-    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpUnionCaseTagPointer(this);

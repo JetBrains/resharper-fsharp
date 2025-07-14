@@ -1,0 +1,6 @@
+﻿module Module
+
+let f =
+        fun a ->
+            fun zzz ->
+    a + zzz |> ignore

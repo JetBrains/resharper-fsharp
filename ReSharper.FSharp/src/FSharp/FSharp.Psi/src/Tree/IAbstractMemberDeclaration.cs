@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IAbstractMemberDeclaration: IAccessorsNamesClauseOwner
+  public partial interface IAbstractMemberDeclaration : IAccessorsNamesClauseOwner, IFSharpParameterOwnerDeclaration
   {
     bool HasDefaultImplementation { get; }
   }

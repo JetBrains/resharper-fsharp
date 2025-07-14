@@ -47,13 +47,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
       // We should check generated member type instead
       // but we don't handle source member overrides like ToString() correctly yet.
-      if (!(obj is IFSharpTypeMember other))
+      if (obj is not IFSharpTypeMember other)
         return false;
 
       if (!ShortName.Equals(other.ShortName))
         return false;
 
-      return Equals(GetContainingType(), other.GetContainingType());
+      return Equals(GetContainingType(), other.ContainingType);
     }
 
     public override int GetHashCode() => ShortName.GetHashCode();

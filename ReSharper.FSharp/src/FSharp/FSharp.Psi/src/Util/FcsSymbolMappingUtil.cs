@@ -456,7 +456,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
-      where T : IParametersOwner, IFSharpTypeParametersOwner
+      where T : IFSharpParameterOwner, IFSharpTypeParametersOwner
     {
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
@@ -472,24 +472,57 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
-      var methodParams = new List<IParameter>(paramsCount);
+      var result = new List<IParameter>(paramsCount);
 
       if (isFsExtension && mfv.IsInstanceMember)
-        methodParams.Add(new FSharpExtensionMemberThisParameter(function));
+        result.Add(new FSharpExtensionMemberThisParameter(function));
 
       if (isVoidReturn)
-        return methodParams;
+        return result;
 
-      for (var groupIndex = 0; groupIndex < paramGroups.Count; groupIndex++)
+      foreach (var parameterGroup in function.FSharpParameterGroups)
+        result.AddRange(parameterGroup);
+
+      return result;
+    }
+
+    public static IList<IList<IFSharpParameter>> GetFSharpParameterGroups<T>(this T function)
+      where T : IFSharpParameterOwner
+    {
+      var mfv = function.Mfv;
+      if (mfv == null)
+        return EmptyList<IList<IFSharpParameter>>.Instance;
+
+      var fcsParamGroups = mfv.CurriedParameterGroups;
+      var result = new List<IList<IFSharpParameter>>(fcsParamGroups.Count);
+      for (var groupIndex = 0; groupIndex < fcsParamGroups.Count; groupIndex++)
       {
-        var paramGroup = paramGroups[groupIndex];
-        for (var paramIndex = 0; paramIndex < paramGroup.Count; paramIndex++)
+        var fcsParamGroup = fcsParamGroups[groupIndex];
+        var isSingleParamGroup = fcsParamGroup.Count == 1;
+        var paramGroup = new List<IFSharpParameter>(fcsParamGroup.Count);
+        result.Add(paramGroup);
+
+        for (var paramIndex = 0; paramIndex < fcsParamGroup.Count; paramIndex++)
         {
-          methodParams.Add(new FSharpMethodParameter(function, new FSharpParameterIndex(groupIndex, paramIndex)));
+          var index = new FSharpParameterIndex(groupIndex, isSingleParamGroup ? null : paramIndex);
+          paramGroup.Add(new FSharpMethodParameter(function, index));
         }
       }
 
-      return methodParams;
+      return result;
+    }
+
+    public static IFSharpParameter GetFSharpParameter<T>(this T function, FSharpParameterIndex index)
+      where T : IFSharpParameterOwner
+    {
+      var parameterGroup = function.FSharpParameterGroups.ElementAtOrDefault(index.GroupIndex);
+      if (parameterGroup == null)
+        return null;
+
+      if (index.ParameterIndex is not { } paramIndex)
+        return parameterGroup.Count == 1 ? parameterGroup[0] : null;
+
+      return parameterGroup.ElementAtOrDefault(paramIndex);
     }
   }
 }

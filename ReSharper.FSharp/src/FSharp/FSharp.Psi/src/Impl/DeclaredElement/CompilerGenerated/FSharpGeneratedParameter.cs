@@ -1,45 +1,32 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Pointers;
 using JetBrains.ReSharper.Psi.Resolve.Managed;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpGeneratedParameter : FSharpGeneratedElementBase, IParameter,
-    IFSharpGeneratedFromOtherElement
+  public class FSharpGeneratedParameter([NotNull] IParametersOwner owner, [NotNull] ITypeOwner origin, bool addPrefix)
+    : FSharpGeneratedElementBase, IParameter, IFSharpGeneratedFromOtherElement
   {
-    private readonly bool myAddPrefix;
-    [NotNull] protected IParametersOwner Owner { get; }
+    [NotNull] protected IParametersOwner Owner { get; } = owner;
 
-    [CanBeNull] internal ITypeOwner Origin { get; }
-
-    public FSharpGeneratedParameter([NotNull] IParametersOwner owner, [CanBeNull] ITypeOwner origin, bool addPrefix)
-    {
-      myAddPrefix = addPrefix;
-      Owner = owner;
-      Origin = origin;
-    }
+    [NotNull] internal ITypeOwner Origin { get; } = origin;
 
     public override string ShortName
     {
       get
       {
-        var origin = Origin;
-        if (origin == null) return SharedImplUtil.MISSING_DECLARATION_NAME;
-
-        var name = origin.ShortName.Decapitalize();
-        return myAddPrefix ? "_" + name : name;
+        var name = Origin.ShortName.Decapitalize();
+        return addPrefix ? "_" + name : name;
       }
     }
 
-    public IType Type =>
-      Origin?.Type ?? TypeFactory.CreateUnknownType(Module);
+    public IType Type => Origin.Type;
 
     public override bool IsValid() =>
-      Owner.IsValid() && Origin != null && Origin.IsValid();
+      Owner.IsValid() && Origin.IsValid();
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PARAMETER;
@@ -66,9 +53,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override int GetHashCode() => ShortName.GetHashCode();
     public IClrDeclaredElement OriginElement => Origin;
-    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new FSharpGeneratedParameterPointer(this, myAddPrefix);
+      new FSharpGeneratedParameterPointer(this, addPrefix);
   }
 }
