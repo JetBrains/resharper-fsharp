@@ -100,7 +100,6 @@ suspend fun getFsiRunOptions(
     workingDirectory = workingDirectory,
     envs = configuration?.envs ?: mapOf(),
     isPassParentEnvs = true,
-    useExternalConsole = false,
     executeAsIs = false,
     assemblyToDebug = null,
     runtimeType = runtimeType,
