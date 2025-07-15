@@ -9,6 +9,7 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <NoWarn>FS0057</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>

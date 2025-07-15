@@ -9,7 +9,6 @@ open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings.Implementation
-open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.HabitatDetector
@@ -285,13 +284,14 @@ type AssertCorrectTreeStructureAttribute() =
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFSharpResolvedSymbolsCache(lifetime, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
-    inherit FcsResolvedSymbolsCache(lifetime, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
+type TestFcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks) =
+    inherit FcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
-        x.ProjectSymbolsCaches.Clear()
+        x.ModuleCaches.Clear()
+        x.ScriptCaches.Clear()
 
-    interface IHideImplementation<FcsResolvedSymbolsCache>
+    interface IHideImplementation<FcsCapturedInfoCache>
 
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]

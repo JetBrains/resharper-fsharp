@@ -62,7 +62,7 @@ type FSharpReparseContext(fsFile: IFSharpFile, treeTextRange: TreeTextRange) =
                     let newFile =
                         parser.ParseFSharpFile(true,
                             StandaloneDocument = document,
-                            ResolvedSymbolsCache = fsFile.ResolvedSymbolsCache,
+                            FcsCapturedInfoCache = fsFile.FcsCapturedInfoCache,
                             DocumentRangeTranslator = IdenticalDocumentRangeTranslator(document))
                     SandBox.CreateSandBoxFor(newFile, fsFile.GetPsiModule())
                     newFile

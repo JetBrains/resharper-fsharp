@@ -9,19 +9,13 @@ using Microsoft.FSharp.Core;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
   [AllowNullLiteral]
-  public abstract class FSharpDaemonStageProcessBase : TreeNodeVisitor<IHighlightingConsumer>, IDaemonStageProcess
+  public abstract class FSharpDaemonStageProcessBase(IFSharpFile fsFile, IDaemonProcess daemonProcess)
+    : TreeNodeVisitor<IHighlightingConsumer>, IDaemonStageProcess
   {
-    [NotNull] public IFSharpFile FSharpFile;
-    [NotNull] public IModuleReferenceResolveContext ResolveContext { get; }
+    [NotNull] public IFSharpFile FSharpFile = fsFile;
+    [NotNull] public IModuleReferenceResolveContext ResolveContext { get; } = fsFile.GetResolveContext();
 
-    protected FSharpDaemonStageProcessBase(IFSharpFile fsFile, IDaemonProcess daemonProcess)
-    {
-      FSharpFile = fsFile;
-      DaemonProcess = daemonProcess;
-      ResolveContext = fsFile.GetResolveContext();
-    }
-
-    public IDaemonProcess DaemonProcess { get; }
+    public IDaemonProcess DaemonProcess { get; } = daemonProcess;
     public abstract void Execute(Action<DaemonStageResult> committer);
   }
 }
