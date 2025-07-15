@@ -21,7 +21,8 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, replacementTypeName: string) 
 
     new (error: TypeEquationError) =
         // error FS0001: This expression was expected to have type↔    'int'    ↔but here has type↔    'string'
-        ReplaceReturnTypeFix(error.Expr, error.ActualType.TypeString)
+        let fcsData = error.DiagnosticInfo.TypeMismatchData
+        ReplaceReturnTypeFix(error.Expr, fcsData.ActualType.Format(fcsData.DisplayContext))
 
     new (error: TypeMisMatchTuplesHaveDifferingLengthsError) =
         // Type mismatch. Expecting a

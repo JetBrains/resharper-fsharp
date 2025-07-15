@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Diagnostics.ExtendedData
 open FSharp.Compiler.Symbols
@@ -12,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -108,6 +110,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     let document = daemonProcess.Document
     let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
+    let cachedFcsDiagnostics = Dictionary()
 
     let getDocumentRange (error: FSharpDiagnostic) =
         if error.StartLine = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
@@ -226,8 +229,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     elif isUnit expectedType then
                         createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                     else
-                        let actualTypeInfo = FSharpDiagnosticTypeInfo.Create(actualType, displayContext)
-                        TypeEquationError(actualTypeInfo, expr, error.Message) :> _
+                        let offset = range.StartOffset.Offset
+                        cachedFcsDiagnostics[offset] <- error
+                        TypeEquationError(FcsCachedDiagnosticInfo(error, fsFile, offset), expr, error.Message) :> _
 
             | _ -> createGenericHighlighting error range
 
@@ -565,6 +569,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | _ -> createGenericHighlighting error range
 
+    abstract CacheDiagnostics: bool
+    default this.CacheDiagnostics = false
+
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpDiagnostic, _) =
         error.ErrorNumber <> UnrecognizedOption &&
@@ -592,5 +599,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     consumer.ConsumeHighlighting(HighlightingInfo(highlighting.CalculateRange(), highlighting))
 
             Interruption.Current.CheckAndThrow()
+
+        if x.CacheDiagnostics then
+            fsFile.FcsCapturedInfo.SetCachedDiagnostics(cachedFcsDiagnostics)
 
         committer.Invoke(DaemonStageResult(consumer.CollectHighlightings()))

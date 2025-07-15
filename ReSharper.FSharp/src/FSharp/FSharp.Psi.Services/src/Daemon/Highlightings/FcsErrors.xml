@@ -421,7 +421,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeEquation" ID="FS0001: Type equation error">
-    <Parameter type="FSharpDiagnosticTypeInfo" name="actualType" isValid="skip"/>
+    <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">

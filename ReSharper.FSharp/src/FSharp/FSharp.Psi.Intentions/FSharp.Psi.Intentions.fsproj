@@ -9,6 +9,7 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <NoWarn>FS0057</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>

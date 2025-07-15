@@ -5,20 +5,20 @@ using JetBrains.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FcsModuleResolvedSymbols
+  public class FcsModuleCapturedInfo
   {
-    private readonly FcsFileResolvedSymbols[] myFileResolvedSymbols;
+    private readonly FcsFileCapturedInfo[] myFileResolvedSymbols;
     private readonly JetFastSemiReenterableRWLock myLock = new();
 
     public bool IsScript { get; }
     [CanBeNull] public readonly FcsProject FcsProject;
 
-    public static readonly FcsModuleResolvedSymbols Empty = new(null);
+    public static readonly FcsModuleCapturedInfo Empty = new(null);
 
-    public FcsModuleResolvedSymbols([CanBeNull] FcsProject fcsProject, bool isScript = false)
+    public FcsModuleCapturedInfo([CanBeNull] FcsProject fcsProject, bool isScript = false)
     {
       var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? (isScript ? 1 : 0);
-      myFileResolvedSymbols = new FcsFileResolvedSymbols[filesCount];
+      myFileResolvedSymbols = new FcsFileCapturedInfo[filesCount];
 
       FcsProject = fcsProject;
       IsScript = isScript;
@@ -52,16 +52,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    private FcsFileResolvedSymbols TryGetResolvedSymbols(int fileIndex)
+    private FcsFileCapturedInfo TryGetResolvedSymbols(int fileIndex)
     {
       using (myLock.UsingReadLock())
         return myFileResolvedSymbols[fileIndex];
     }
 
-    public IFcsFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
+    public IFcsFileCapturedInfo GetResolvedSymbols(IPsiSourceFile sourceFile)
     {
       if (!TryGetFileIndex(sourceFile, out var fileIndex))
-        return EmptyFcsFileResolvedSymbols.Instance;
+        return EmptyFcsFileCapturedInfo.Instance;
 
       var fileResolvedSymbols = TryGetResolvedSymbols(fileIndex);
       if (fileResolvedSymbols != null)
@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (fileResolvedSymbols != null)
           return fileResolvedSymbols;
 
-        fileResolvedSymbols = new FcsFileResolvedSymbols(sourceFile);
+        fileResolvedSymbols = new FcsFileCapturedInfo(sourceFile);
         myFileResolvedSymbols[fileIndex] = fileResolvedSymbols;
       }
 

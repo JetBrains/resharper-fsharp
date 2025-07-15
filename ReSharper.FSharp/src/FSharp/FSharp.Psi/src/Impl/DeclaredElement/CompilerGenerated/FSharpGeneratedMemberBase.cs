@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Util;
@@ -62,6 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsExtensionMethod => false;
 
     public FSharpSymbol Symbol => null;
+    public FSharpSymbolUse SymbolUse => null;
 
     public IList<ITypeParameter> AllTypeParameters =>
       GetContainingType().GetAllTypeParameters().ResultingList().Reverse();

@@ -24,7 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull] FcsCheckerService FcsCheckerService { get; set; }
 
-    [NotNull] IFcsResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
+    [NotNull] IFcsFileCapturedInfo FcsCapturedInfo { get; }
+    [NotNull] IFcsCapturedInfoCache FcsCapturedInfoCache { get; set; }
 
     [CanBeNull] FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
 

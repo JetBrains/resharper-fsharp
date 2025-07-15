@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Diagnostics;
 using FSharp.Compiler.Symbols;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -19,33 +21,29 @@ using JetBrains.Text;
 using JetBrains.Util;
 using JetBrains.Util.Concurrency.Threading;
 using JetBrains.Util.DataStructures;
+using JetBrains.Util.dataStructures.TypedIntrinsics;
 using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FcsFileResolvedSymbols : IFcsFileResolvedSymbols
+  public class FcsFileCapturedInfo([NotNull] IPsiSourceFile sourceFile) : IFcsFileCapturedInfo
   {
-    private const string OpName = "FSharpFileResolvedSymbols";
-
     private ResolvedSymbols mySymbols;
+    private IDictionary<int, FSharpDiagnostic> myDiagnostics;
     private readonly object myLock = new();
 
-    [NotNull] public IPsiSourceFile SourceFile { get; }
-
-    public FcsFileResolvedSymbols([NotNull] IPsiSourceFile sourceFile)
-    {
-      SourceFile = sourceFile;
-    }
+    [NotNull] public IPsiSourceFile SourceFile { get; } = sourceFile;
 
     private ResolvedSymbols GetResolvedSymbols()
     {
       using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
+      return mySymbols ??= CreateFileResolvedSymbols();
+    }
 
-      if (mySymbols != null)
-        return mySymbols;
-
-      mySymbols = CreateFileResolvedSymbols();
-      return mySymbols;
+    private IDictionary<int, FSharpDiagnostic> GetCachedDiagnostics()
+    {
+      using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
+      return myDiagnostics ??= CreateDiagnostics();
     }
 
     public FSharpSymbolUse GetSymbolUse(int offset)
@@ -82,14 +80,46 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpSymbol GetSymbol(int offset) =>
       GetSymbolDeclaration(offset)?.Symbol ?? GetSymbolUse(offset)?.Symbol;
 
+    public FSharpDiagnostic GetDiagnostic(int offset) =>
+      GetCachedDiagnostics().TryGetValue(offset);
+
+    public void SetCachedDiagnostics(IDictionary<int, FSharpDiagnostic> diagnostics)
+    {
+      using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
+      myDiagnostics ??= diagnostics;
+    }
+
+    [NotNull]
+    private IDictionary<int, FSharpDiagnostic> CreateDiagnostics()
+    {
+      const string opName = "FcsFileCapturedInfo.CreateDiagnostics";
+
+      var fsFile = SourceFile.GetPrimaryPsiFile() as IFSharpFile;
+      var checkResults = fsFile?.GetParseAndCheckResults(false, opName)?.Value.CheckResults;
+      if (checkResults == null)
+        return EmptyDictionary<int, FSharpDiagnostic>.Instance;
+
+      var result = new Dictionary<int, FSharpDiagnostic>();
+      foreach (var diagnostic in checkResults.Diagnostics)
+      {
+        if (!FcsCachedDiagnosticInfo.CanBeCached(diagnostic))
+          continue;
+
+        var coords = new DocumentCoords((Int32<DocLine>)diagnostic.StartLine, (Int32<DocColumn>)diagnostic.StartColumn);
+        var startOffset = SourceFile.Document.GetDocumentOffset(coords).Offset;
+        result[startOffset] = diagnostic;
+      }
+
+      return result;
+    }
+
     [NotNull]
     private ResolvedSymbols CreateFileResolvedSymbols()
     {
-      // todo: cancellation
-      if (!(SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
-        return ResolvedSymbols.Empty;
+      const string opName = "FcsFileCapturedInfo.CreateFileResolvedSymbols";
 
-      var checkResults = fsFile.GetParseAndCheckResults(false, OpName)?.Value.CheckResults;
+      var fsFile = SourceFile.GetPrimaryPsiFile() as IFSharpFile;
+      var checkResults = fsFile?.GetParseAndCheckResults(false, opName)?.Value.CheckResults;
       var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile(null);
       if (symbolUses == null)
         return ResolvedSymbols.Empty;
@@ -146,7 +176,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
                 endOffset--;
               }
             }
-            // ReSharper disable once EmptyGeneralCatchClause
             catch (Exception)
             {
               continue;
@@ -336,28 +365,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return new TextRange(startOffset, endOffset);
     }
 
-    private class ResolvedSymbols
+    private class ResolvedSymbols(int symbolUsesCount = 0)
     {
       public static readonly ResolvedSymbols Empty = new();
 
-      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Declarations;
-      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Uses;
-
-      public ResolvedSymbols(int symbolUsesCount = 0)
-      {
-        Declarations = new CompactMap<int, FcsResolvedSymbolUse>(symbolUsesCount / 4);
-        Uses = new CompactMap<int, FcsResolvedSymbolUse>(symbolUsesCount);
-      }
+      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Declarations = new(symbolUsesCount / 4);
+      [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Uses = new(symbolUsesCount);
     }
 
-    private class ParenMatcher : BracketMatcher
+    private class ParenMatcher() : BracketMatcher(ourParens)
     {
-      private static readonly Pair<TokenNodeType, TokenNodeType>[] Parens =
-        {new(FSharpTokenType.LESS, FSharpTokenType.GREATER)};
-
-      public ParenMatcher() : base(Parens)
-      {
-      }
+      private static readonly Pair<TokenNodeType, TokenNodeType>[] ourParens =
+        [new(FSharpTokenType.LESS, FSharpTokenType.GREATER)];
     }
   }
 }

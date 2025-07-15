@@ -34,7 +34,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
     let getSymbolsCache (psiModule: IPsiModule) =
         if isNull psiModule then null else
-        psiModule.GetSolution().GetComponent<IFcsResolvedSymbolsCache>()
+        psiModule.GetSolution().GetComponent<IFcsCapturedInfoCache>()
 
     override this.CreateSourceExtensionMethodsIndex() = FSharpSourceExtensionsMembersIndex()
 
