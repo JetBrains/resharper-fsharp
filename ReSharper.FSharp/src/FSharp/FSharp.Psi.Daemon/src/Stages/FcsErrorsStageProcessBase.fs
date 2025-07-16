@@ -186,40 +186,39 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
         if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
 
+    let createCachedDiagnostic error range =
+        let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, range)
+        cachedFcsDiagnostics[diagnosticInfo.Offset] <- error
+        diagnosticInfo
+
+    let createTypeMismatchHighlighting highlightingCtor range error : IHighlighting =
+        match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+        | null -> null
+        | expr ->
+            let diagnosticInfo = createCachedDiagnostic error range
+            highlightingCtor (diagnosticInfo, expr, error.Message) :> _
+
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
-            let createTypeMismatchHighlighting highlightingCtor expected actual : IHighlighting =
-                match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
-                | null -> null
-                | expr -> highlightingCtor (expected, actual, expr, error.Message) :> _
-
             match error.ExtendedData with
-            | Some(:? TypeMismatchDiagnosticExtendedData as data)
-                when data.ContextInfo = DiagnosticContextInfo.OmittedElseBranch ->
+            | Some(:? TypeMismatchDiagnosticExtendedData as data) when
+                    data.ContextInfo = DiagnosticContextInfo.OmittedElseBranch ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
-            | Some(:? TypeMismatchDiagnosticExtendedData as data)
-                // TODO: currently FollowingPatternMatchClause context info can be returned
-                // even if the expression is not returned from the end of the branch
-                when data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
-                let displayContext = data.DisplayContext
-                createTypeMismatchHighlighting
-                    MatchClauseWrongTypeError
-                        (data.ExpectedType.Format(displayContext))
-                        (data.ActualType.Format(displayContext))
+            | Some(:? TypeMismatchDiagnosticExtendedData as data) when
+                    // TODO: currently FollowingPatternMatchClause context info can be returned
+                    // even if the expression is not returned from the end of the branch
+                    data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
+                createTypeMismatchHighlighting MatchClauseWrongTypeError range error
 
             | Some(:? TypeMismatchDiagnosticExtendedData as data) ->
                 let expectedType = data.ExpectedType
                 let actualType = data.ActualType
-                let displayContext = data.DisplayContext
 
                 if expectedType.IsTupleType && actualType.IsTupleType &&
                    expectedType.GenericArguments.Count <> actualType.GenericArguments.Count then
-                   createTypeMismatchHighlighting
-                       TypeMisMatchTuplesHaveDifferingLengthsError
-                           (expectedType.Format(displayContext))
-                           (actualType.Format(displayContext))
+                    createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError range error
                 else
                     let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
                     let expr = getResultExpr expr
@@ -229,9 +228,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     elif isUnit expectedType then
                         createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                     else
-                        let offset = range.StartOffset.Offset
-                        cachedFcsDiagnostics[offset] <- error
-                        TypeEquationError(FcsCachedDiagnosticInfo(error, fsFile, offset), expr, error.Message) :> _
+                        createTypeMismatchHighlighting TypeEquationError range error
 
             | _ -> createGenericHighlighting error range
 
@@ -554,9 +551,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
             | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
-                if isUnit data.ExpectedType then createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                if isNotNull expr then TypeConstraintMismatchError(data.ActualType.Format(data.DisplayContext), expr, error.Message) else null
+                if isUnit data.ExpectedType then
+                    createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
+
+                createTypeMismatchHighlighting TypeConstraintMismatchError range error
 
             | _ -> null
 

@@ -453,7 +453,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch" ID="FS0193: Type constraint mismatch">
-    <Parameter type="string" name="mismatchedType"/>
+    <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
@@ -604,8 +604,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="TypeMisMatchTuplesHaveDifferingLengths" ID="FS0001: Type mismatch. Expecting">
-    <Parameter type="string" name="expectedType"/>
-    <Parameter type="string" name="actualType"/>
+    <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
@@ -616,8 +615,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="MatchClauseWrongType" ID="FS0001: 'match' clause has wrong type">
-    <Parameter type="string" name="expectedType"/>
-    <Parameter type="string" name="actualType"/>
+    <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/> 
     <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
