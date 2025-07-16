@@ -32,7 +32,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
 
           refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
 
-    let mutable baseType: (FSharpType * FSharpDisplayContext) option = None
+    let mutable baseType: FSharpType option = None
 
     let getFcsEntity (typeUsage: ITypeUsage) =
         let namedTypeUsage = typeUsage.As<INamedTypeUsage>()
@@ -122,8 +122,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
 
-        let baseType, displayContext = baseType.Value
-        SpecifyTypes.specifyPatternType displayContext baseType pat
+        SpecifyTypes.specifyPatternType baseType.Value pat
 
     override this.Execute(solution, textControl) =
         let fcsEntity, displayContext = getFcsEntity typeUsage |> Option.get
@@ -151,7 +150,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                 let richText = RichText(fcsType.Format(displayContext))
                 if isImmediateSuperType then
                     richText.SetStyle(JetFontStyles.Bold, 0, richText.Length) |> ignore
-                WorkflowPopupMenuOccurrence(richText, RichText.Empty, (fcsType, displayContext), icon))
+                WorkflowPopupMenuOccurrence(richText, RichText.Empty, fcsType, icon))
             |> List.toArray
 
         let occurrence =

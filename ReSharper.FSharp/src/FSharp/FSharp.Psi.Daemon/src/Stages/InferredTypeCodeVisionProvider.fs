@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Common.ActionUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -74,8 +75,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         stringBuilder.Append(s) |> ignore
 
     let formatMfv (symbolUse: FSharpSymbolUse) (mfv: FSharpMemberOrFunctionOrValue) =
-        let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-        let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
+        let returnTypeStr = mfv.ReturnParameter.Type.Format()
 
         if mfv.IsPropertyGetterMethod then returnTypeStr else
 
@@ -100,7 +100,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
                     fcsType.IsTupleType && group.Count > 1
 
                 if addParens then append builder "("
-                append builder (fcsType.Format(displayContext))
+                append builder (fcsType.Format())
                 if addParens then append builder ")"
 
                 isFirstParam <- false

@@ -28,7 +28,7 @@ type SpecifyTypeFixBase(refExpr: IQualifiedExpr) =
     abstract IsApplicable: declaredElement: IDeclaredElement -> bool
     abstract IsApplicable: decl: IDeclaration -> bool
 
-    abstract SpecifyType: decl: IDeclaration * mfv: FSharpMemberOrFunctionOrValue * displayContext: FSharpDisplayContext -> unit
+    abstract SpecifyType: decl: IDeclaration * mfv: FSharpMemberOrFunctionOrValue -> unit
 
     override this.IsAvailable _ =
         isValid this.QualifierRefExpr &&
@@ -52,7 +52,7 @@ type SpecifyTypeFixBase(refExpr: IQualifiedExpr) =
         let symbolUse = reference.GetSymbolUse()
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
 
-        this.SpecifyType(declaration, mfv, symbolUse.DisplayContext)
+        this.SpecifyType(declaration, mfv)
 
 
 type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
@@ -79,9 +79,9 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
     override this.IsApplicable(decl: IDeclaration) =
         decl :? ILocalReferencePat
 
-    override this.SpecifyType(decl, mfv, d) =
+    override this.SpecifyType(decl, mfv) =
         let decl = decl :?> ILocalReferencePat
-        SpecifyTypes.specifyPatternType d mfv.FullType decl
+        SpecifyTypes.specifyPatternType mfv.FullType decl
 
 
 type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
@@ -104,6 +104,6 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
         | :? IMemberDeclaration as decl -> SpecifyTypes.getAvailability decl |> _.CanSpecifyReturnType
         | _ -> false
 
-    override this.SpecifyType(decl, mfv, displayContext) =
+    override this.SpecifyType(decl, mfv) =
         let memberDecl = decl :?> IMemberDeclaration
-        SpecifyTypes.specifyMemberReturnType memberDecl mfv displayContext
+        SpecifyTypes.specifyMemberReturnType memberDecl mfv

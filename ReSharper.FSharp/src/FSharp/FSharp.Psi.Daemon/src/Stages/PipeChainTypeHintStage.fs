@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -133,8 +134,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
 
             if not isApplicable then () else
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
-            let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(displayContext), range))
+            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(), range))
 
         highlightingConsumer.CollectHighlightings()
 

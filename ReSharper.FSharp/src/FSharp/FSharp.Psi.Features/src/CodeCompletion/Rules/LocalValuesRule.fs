@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -172,7 +173,7 @@ type LocalValuesRule() =
                 if isNull fcsSymbolUse then null else
 
                 match getReturnType fcsSymbolUse.Symbol with
-                | Some t -> RichText(t.Format(fcsSymbolUse.DisplayContext.WithShortTypeNames(true)))
+                | Some t -> RichText(t.Format())
                 | _ -> null
 
             collector.Add(item)
