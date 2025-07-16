@@ -13,13 +13,12 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExpectedTypes
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 
@@ -108,8 +107,6 @@ type RecordFieldRule() =
         let fcsEntity =
             if isNull fcsEntity then None else Some fcsEntity
 
-        let displayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
-
         let fieldNames =
             fcsEntity
             |> Option.map (fun fcsEntity ->
@@ -167,7 +164,7 @@ type RecordFieldRule() =
                 let info = TextualInfo(name, name, Ranges = context.Ranges)
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        let typeText = field.FieldType.Format(displayContext)
+                        let typeText = field.FieldType.Format()
                         TextPresentation(info, typeText, emphasize, PsiSymbolsThemedIcons.Field.Id) :> _)
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)

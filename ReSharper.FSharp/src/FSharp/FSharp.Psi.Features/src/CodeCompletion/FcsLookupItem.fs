@@ -13,13 +13,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
@@ -117,7 +117,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisplayTypeName =
         try
             match getReturnType x.FcsSymbol with
-            | Some t -> RichText(t.Format(x.FcsSymbolUse.DisplayContext.WithShortTypeNames(true)))
+            | Some t -> RichText(t.Format())
             | _ -> null
         with _ -> null
 

@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Highlightings.FSharpTypeHints
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Utils.VisibleRangeContainer
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -132,7 +133,6 @@ type private MembersVisitor(settings) =
 
 type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSettingsStore, daemonProcess: IDaemonProcess, settings) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
-    static let defaultDisplayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
     let getReturnTypeHint (decl: IParameterOwnerMemberDeclaration) pushToHintMode actionsProvider =
         match decl with
@@ -147,7 +147,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         if isNull symbol then ValueNone else
 
         let symbol = symbol.AccessorProperty |> Option.defaultValue symbol
-        let typeString = symbol.ReturnParameter.Type.Format(defaultDisplayContext)
+        let typeString = symbol.ReturnParameter.Type.Format()
 
         match decl with
         | :? IBinding as binding ->
@@ -178,14 +178,14 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull symbol then ValueNone else
 
             let fcsType = symbol.FullType
-            let typeString = fcsType.Format(defaultDisplayContext)
+            let typeString = fcsType.Format()
             TypeHintHighlighting(typeString, pattern, pushToHintMode, actionsProvider) |> ValueSome
 
         | pattern ->
             let fcsType = pattern.TryGetFcsType()
             if isNull fcsType then ValueNone else
 
-            let typeString = fcsType.Format(defaultDisplayContext)
+            let typeString = fcsType.Format()
             TypeHintHighlighting(typeString, pattern, pushToHintMode, actionsProvider) |> ValueSome
 
     let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =

@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
@@ -157,12 +158,11 @@ type OverrideMemberRule() =
  
                                 let mfvInstance = generatorElement.MfvInstance
                                 let substitution = mfvInstance.Substitution
-                                let displayContext = mfvInstance.DisplayContext
 
                                 mfvInstance.Mfv.CurriedParameterGroups
                                 |> Seq.map (fun group ->
                                     group
-                                    |> Seq.map (fun p -> p.Type.Instantiate(substitution).Format(displayContext))
+                                    |> Seq.map (fun p -> p.Type.Instantiate(substitution).Format())
                                     |> String.concat ", "
                                     |> sprintf "(%s)"
                                 )

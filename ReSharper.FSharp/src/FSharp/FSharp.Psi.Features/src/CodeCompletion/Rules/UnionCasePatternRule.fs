@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -195,11 +196,11 @@ type UnionCasePatternRule() =
         let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
         let referenceName = reference.GetElement() :?> IExpressionReferenceName
 
-        let createItem info behavior (fcsType: FSharpType) displayContext matchesType =
+        let createItem info behavior (fcsType: FSharpType) matchesType =
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        let typeText = fcsType.Format(displayContext)
+                        let typeText = fcsType.Format()
                         TextPresentation(info, typeText, matchesType, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
                     .WithBehavior(fun _ -> behavior)
                     .WithMatcher(fun _ -> TextualMatcher(info) :> _)
@@ -214,19 +215,19 @@ type UnionCasePatternRule() =
 
             item
 
-        let createUnionCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) displayContext name
+        let createUnionCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) name
                 symbol matchesType =
             let fcsType = returnType.Instantiate(fcsEntityInstance.Substitution)
             let info = EnumCaseLikePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
             let behavior = UnionCasePatternBehavior(info)
-            createItem info behavior fcsType displayContext matchesType
+            createItem info behavior fcsType matchesType
 
-        let createEnumCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) displayContext name
+        let createEnumCaseItem (fcsEntityInstance: FcsEntityInstance) (returnType: FSharpType) name
                 symbol matchesType =
             let fcsType = returnType.Instantiate(fcsEntityInstance.Substitution)
             let info = EnumCaseLikePatternInfo(name, symbol, fcsEntityInstance, context, Ranges = context.Ranges)
             let behavior = EnumCaseLikePatternBehavior(info)
-            createItem info behavior fcsType displayContext matchesType
+            createItem info behavior fcsType matchesType
 
         let expectedType = getExpectedUnionOrEnumType referenceName
 
@@ -260,19 +261,17 @@ type UnionCasePatternRule() =
                 if not (matchesType returnType || isFSharpList returnType) then
                     let text = fcsUnionCase.Name
                     let fcsEntityInstance = FcsEntityInstance.create returnType
-                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext.WithShortTypeNames(true)
-                    let item = createUnionCaseItem fcsEntityInstance returnType displayContext text fcsUnionCase false
+                    let item = createUnionCaseItem fcsEntityInstance returnType text fcsUnionCase false
                     unionCaseItems.Add(item)
 
                 true
 
-            | :? FSharpField as fcsField when FSharpSymbolUtil.isEnumMember fcsField ->
+            | :? FSharpField as fcsField when isEnumMember fcsField ->
                 let fieldType = fcsField.FieldType
                 if not (matchesType fieldType) then
                     let text = fcsField.Name
                     let fcsEntityInstance = FcsEntityInstance.create fieldType
-                    let displayContext = lookupItem.FcsSymbolUse.DisplayContext
-                    let item = createEnumCaseItem fcsEntityInstance fieldType displayContext text fcsField false 
+                    let item = createEnumCaseItem fcsEntityInstance fieldType text fcsField false 
                     unionCaseItems.Add(item)
 
                 true
@@ -290,11 +289,10 @@ type UnionCasePatternRule() =
             let typeName = expectedTypeElement.GetSourceName()
 
             if fcsEntity.IsFSharpUnion then
-                let displayContext = displayContext.WithShortTypeNames(true)
                 let requiresQualifiedName = expectedTypeElement.RequiresQualifiedAccess()
                 for fcsUnionCase in fcsEntity.UnionCases do
                     let text = if requiresQualifiedName then $"{typeName}.{fcsUnionCase.Name}" else fcsUnionCase.Name
-                    let item = createUnionCaseItem fcsEntityInstance fcsType displayContext text fcsUnionCase true
+                    let item = createUnionCaseItem fcsEntityInstance fcsType text fcsUnionCase true
                     collector.Add(item)
 
             elif fcsEntity.IsEnum then
@@ -302,5 +300,5 @@ type UnionCasePatternRule() =
                     if not field.IsLiteral then () else
 
                     let text = $"{typeName}.{field.Name}"
-                    let item = createEnumCaseItem fcsEntityInstance fcsType displayContext text field true
+                    let item = createEnumCaseItem fcsEntityInstance fcsType text field true
                     collector.Add(item)
