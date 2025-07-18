@@ -1,0 +1,24 @@
+
+module Program
+
+[<Literal>]
+val bar: int = 123
+
+val foo: unit -> int
+
+val baz: qux: 'a -> qaz: 'b -> string
+
+type MyMegaType =
+  interface System.IDisposable
+  
+  new: foo: string * bar: int -> MyMegaType
+  
+  static member Frob: unit -> unit
+  
+  member FooMember: unit -> int
+  
+  member BarMember: int
+
+[<Struct>]
+type MyMegaStruct =
+  struct end
