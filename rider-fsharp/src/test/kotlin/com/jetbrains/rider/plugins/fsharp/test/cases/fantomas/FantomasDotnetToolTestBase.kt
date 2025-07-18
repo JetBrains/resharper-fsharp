@@ -6,18 +6,13 @@ import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.framework.editFSharpBackendSettings
-import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
-import com.jetbrains.rider.plugins.fsharp.test.framework.runProcessWaitForExit
-import com.jetbrains.rider.plugins.fsharp.test.framework.withSetting
+import com.jetbrains.rider.plugins.fsharp.test.framework.*
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.env.Environment
-import com.jetbrains.rider.test.env.dotNetSdk
+import com.jetbrains.rider.test.tooling.testTools
 import com.jetbrains.rider.test.facades.solution.RiderSolutionWithFoldersApiFacade
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
@@ -96,7 +91,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
       withDotnetToolsUpdate {
         runProcessWaitForExit(
-          Environment.dotNetSdk(testMethod.environment.sdk).dotnetExecutable.toPath(),
+          testTools().build.dotNetSdk[testMethod.environment.sdk].dotnetExecutable.toPath(),
           listOf("tool", "install", "fantomas-tool", "-g", "--version", globalVersion),
           env
         )
