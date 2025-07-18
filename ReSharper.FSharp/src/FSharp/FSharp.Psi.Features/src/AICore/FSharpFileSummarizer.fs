@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.Rider.Backend.Features.AICore.Summarization
 open JetBrains.ReSharper.Psi.Files
-open JetBrains.DocumentModel
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpFileSummarizer() =
@@ -29,7 +28,7 @@ type FSharpFileSummarizer() =
         | _ -> ""
 
     interface IRiderFileSummarizer with
-        member this.GetSummary(file: IPsiSourceFile) =
+        member this.GetSummary(file: IPsiSourceFile, flavor: SummarizationFlavor) =
             file.GetPsiServices().Files.AssertAllDocumentAreCommitted()
             let fsharpLang = FSharpLanguage.Instance
             match fsharpLang with
