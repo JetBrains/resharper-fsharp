@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.PatchEngineCompletionTestBase
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import org.testng.annotations.Test
 

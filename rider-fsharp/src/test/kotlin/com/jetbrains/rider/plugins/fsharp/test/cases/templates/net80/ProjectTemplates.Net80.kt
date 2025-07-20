@@ -6,8 +6,8 @@ import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBa
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.PlatformType
-import com.jetbrains.rider.test.env.enums.BuildTool
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 
 @Suppress("unused")
