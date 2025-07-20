@@ -4,7 +4,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CodeFoldingTestBase
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Test
 
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)

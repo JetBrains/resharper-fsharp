@@ -8,7 +8,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.time.Duration

@@ -7,7 +7,7 @@ import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Test
 
 @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
