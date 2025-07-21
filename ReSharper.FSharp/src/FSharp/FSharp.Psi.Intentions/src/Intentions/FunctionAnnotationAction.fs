@@ -15,8 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpBindUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -36,57 +35,6 @@ module SpecifyTypes =
         static member val Unavailable = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = false }
         static member val ParameterTypesOnly = { CanSpecifyParameterTypes = true; CanSpecifyReturnType = false }
         static member val ReturnTypeOnly = { CanSpecifyParameterTypes = false; CanSpecifyReturnType = true }
-
-    let rec private collectTypeUsages acc (fcsType: FSharpType, typeUsage: ITypeUsage) =
-        if fcsType.IsGenericParameter then acc else
-
-        let collectMany typeUsages acc =
-            typeUsages
-            |> Seq.zip fcsType.GenericArguments
-            |> Seq.fold (fun acc (fcsType, typeUsage) ->
-                collectTypeUsages acc (fcsType, typeUsage)) acc
-
-        match typeUsage with
-        | :? INamedTypeUsage as typeUsage ->
-            let typeReference = typeUsage.ReferenceName
-            let acc = (typeUsage, fcsType) :: acc
-
-            let typeArgList = typeReference.TypeArgumentList
-            if isNull typeArgList then acc else
-
-            collectMany typeArgList.TypeUsagesEnumerable acc
-
-        | :? ITupleTypeUsage as typeUsage ->
-            collectMany typeUsage.Items acc
-
-        | :? IParenTypeUsage as typeUsage ->
-            collectTypeUsages acc (fcsType, typeUsage.InnerTypeUsage)
-
-        | :? IFunctionTypeUsage as typeUsage ->
-            let fcsType = getAbbreviatedType fcsType
-
-            let argTypeUsage = typeUsage.ArgumentTypeUsage
-            let argType = fcsType.GenericArguments[0]
-            let acc = collectTypeUsages acc (argType, argTypeUsage)
-
-            let returnTypeUsage = typeUsage.ReturnTypeUsage
-            let returnType = fcsType.GenericArguments[1]
-            collectTypeUsages acc (returnType, returnTypeUsage)
-
-        | :? IArrayTypeUsage as typeUsage ->
-            let typeUsage = typeUsage.TypeUsage
-            let fcsType = fcsType.GenericArguments[0]
-            collectTypeUsages acc (fcsType, typeUsage)
-
-        | :? IAnonRecordTypeUsage as typeUsage ->
-            let typeUsages = typeUsage.Fields |> Seq.map _.TypeUsage
-            collectMany typeUsages acc
-
-        | :? IWithNullTypeUsage as typeUsage ->
-            let fcsType = fcsType.TypeDefinition.AsType()
-            collectTypeUsages acc (fcsType, typeUsage.TypeUsage)
-
-        | _ -> acc
 
     let rec private (|TupleLikePattern|_|) (pattern: IFSharpPattern) =
         match pattern with
@@ -251,25 +199,6 @@ module SpecifyTypes =
         else
             let types = getFunctionTypeArgs true mfv.FullType
             specifyParameterTypes types id _.GenericArguments parameters [] true
-
-    let bindAnnotations annotationsInfo =
-        let annotationsInfo =
-            annotationsInfo
-            |> Seq.fold collectTypeUsages []
-            |> Seq.toList
-
-        match annotationsInfo with
-        | [] -> ()
-        | (typeUsage, _) :: _ ->
-
-        use pinResultsCookie = typeUsage.FSharpFile.PinTypeCheckResults(true, "Specify types")
-
-        for typeUsage, fcsType in annotationsInfo do
-            let typeReference = typeUsage.ReferenceName
-            let reference = typeReference.Reference.AllowAllSymbolCandidatesCheck()
-            let fcsSymbol = fcsType.TypeDefinition
-
-            bindFcsSymbolToReference typeUsage reference fcsSymbol "Specify type"
 
     let rec specifyTypes (node: ITreeNode) (availability: Availability) =
         match node with
