@@ -824,7 +824,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<FormattingRule>()
         .Name("SpaceAfterPunctuation")
         .Group(SpaceRuleGroup)
-        .Where(Left().In(FSharpTokenType.COLON, FSharpTokenType.RARROW))
+        .Where(Left().In(FSharpTokenType.COLON, FSharpTokenType.RARROW, ElementType.RETURN_TYPE_INFO))
         .Return(IntervalFormatType.Space)
         .Build();
 

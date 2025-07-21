@@ -29,15 +29,19 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``IfThenElse - Else``() = x.DoNamedTest()
     [<Test>] member x.``Elif - Then``() = x.DoNamedTest()
     [<Test>] member x.``Elif - Else``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``FunctionType 01``() = x.DoNamedTest()
+    [<Test>] member x.``FunctionType 01``() = x.DoNamedTest()
     [<Test>] member x.``FunctionType 02``() = x.DoNamedTest()
     [<Test>] member x.``FunctionType 03``() = x.DoNamedTest()
     [<Test>] member x.``Paren around return type``() = x.DoNamedTest()
 
     [<Test>] member x.``Type - No annotation 01``() = x.DoNamedTest()
-    [<Explicit("Check if getting/modifying the whole expression type possible")>]
     [<Test>] member x.``Type - No annotation 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - No annotation 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation 05``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation - Lambda return 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation - Lambda return 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation - Lambda return 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Type - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Type - Tuple 02``() = x.DoNamedTest()

@@ -41,7 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static readonly Func<IFSharpExpression, bool> IsLambdaExpressionFunc = IsLambdaExpression;
 
     // TODO: change name
-    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn(this IFSharpExpression expression, bool allowFromLambdaReturn = false)
+    [CanBeNull]
+    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn([NotNull] this IFSharpExpression expression, bool allowFromLambdaReturn = false)
     {
       var currentExpr = expression;
       while (true)

@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
@@ -14,9 +14,21 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit FSharpQuickFixBase()
 
+    let skipParentLambdaBodies (expr: IFSharpExpression) =
+        let rec loop acc (expr: IFSharpExpression) =
+            let lambdaExpr = LambdaExprNavigator.GetByExpression(expr)
+            if isNotNull lambdaExpr then
+                loop (acc + 1) lambdaExpr
+            else
+                expr, acc
+
+        loop 0 expr
+
     let expr, path = FSharpTypeUsageUtil.getTupleParentNavigationPath expr
-    let mostOuterParentExpr = expr.GetOutermostParentExpressionFromItsReturn()
-    let binding = BindingNavigator.GetByExpression(mostOuterParentExpr)
+    let expr = expr.GetOutermostParentExpressionFromItsReturn()
+    let expr, lambdaParametersCount = skipParentLambdaBodies expr
+
+    let binding = BindingNavigator.GetByExpression(expr)
     let actualFcsType = diagnosticInfo.TypeMismatchData.ActualType
 
     new (error: TypeConstraintMismatchError) =
@@ -48,18 +60,20 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
             let returnTypeUsage = returnTypeInfo.ReturnType
             isNotNull returnTypeUsage &&
 
-            let typeUsage = FSharpTypeUsageUtil.navigateTuplePath returnTypeUsage path
+            let typeUsage = FSharpTypeUsageUtil.navigateTuplePath path returnTypeUsage
             isNotNull typeUsage
 
         // An invalid binary infix application will yield a similar error and could be mistaken for an invalid return type.
         // F.ex. 1 + "a", error FS0001: The type 'string' does not match the type 'int'
         // We ignore this scenario for now.
-        match mostOuterParentExpr with
+        match expr with
         | :? IBinaryAppExpr
         | :? IMatchLambdaExpr -> false
         | _ ->
 
-        isNotNull binding && binding.HeadPattern :? IReferencePat &&
+        isNotNull binding &&
+        let refPat = binding.HeadPattern.As<IReferencePat>()
+        isNotNull refPat && isNotNull (refPat.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()) &&
 
         let returnTypeInfo = binding.ReturnTypeInfo
         isNull returnTypeInfo || canUpdateReturnType returnTypeInfo
@@ -68,10 +82,9 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
 
         if isNull binding.ReturnTypeInfo then
-            let factory = binding.CreateElementFactory()
-            let typeUsage = factory.CreateTypeUsage("_", TypeUsageContext.TopLevel)
-            let returnTypeInfo = factory.CreateReturnTypeInfo(typeUsage)
-            binding.SetReturnTypeInfo(returnTypeInfo) |> ignore
+            FSharpTypeUsageUtil.setParametersOwnerReturnType binding
 
-        let typeUsage = FSharpTypeUsageUtil.navigateTuplePath binding.ReturnTypeInfo.ReturnType path
-        FSharpTypeUsageUtil.updateTypeUsage actualFcsType typeUsage
+        binding.ReturnTypeInfo.ReturnType
+        |> FSharpTypeUsageUtil.skipParameters lambdaParametersCount
+        |> FSharpTypeUsageUtil.navigateTuplePath path
+        |> FSharpTypeUsageUtil.updateTypeUsage actualFcsType

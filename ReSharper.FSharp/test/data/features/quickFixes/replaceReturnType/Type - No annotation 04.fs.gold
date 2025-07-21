@@ -1,0 +1,5 @@
+﻿let f (i: int) : int * string =
+    if true then
+        1, 1
+    else
+        "", ""{caret}
