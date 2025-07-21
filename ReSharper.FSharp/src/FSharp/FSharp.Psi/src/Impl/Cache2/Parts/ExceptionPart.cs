@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteBool(HasFields);
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpClass(this);
 
     protected override byte SerializationTag =>
