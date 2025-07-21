@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpDelegate(this);
 
     protected override byte SerializationTag =>

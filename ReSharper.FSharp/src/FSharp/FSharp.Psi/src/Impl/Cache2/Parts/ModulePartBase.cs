@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
@@ -168,7 +169,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return base.FindExtensionMember(info);
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpModule(this);
 
     public IEnumerable<ITypeMember> GetTypeMembers() =>
