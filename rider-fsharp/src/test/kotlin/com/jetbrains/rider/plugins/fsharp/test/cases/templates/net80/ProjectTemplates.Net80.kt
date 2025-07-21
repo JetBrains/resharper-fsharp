@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net80
 
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestRequirements
 import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
 import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
@@ -11,7 +12,8 @@ import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 
 @Suppress("unused")
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK, platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
+@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
+@TestRequirements(platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
 object Net80 {
   class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.classLibrary) {
     override val targetFramework: String = "net8.0"
