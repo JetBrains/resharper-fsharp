@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -90,34 +91,6 @@ module SpecifyTypes =
               CanSpecifyParameterTypes = not (areParametersAnnotated memberDeclaration) }
 
         | _ -> Availability.Unavailable
-
-    let private specifyParametersOwnerReturnType (declaration: IParameterOwnerMemberDeclaration)
-            (mfv: FSharpMemberOrFunctionOrValue) =
-
-        let returnType =
-            let fullType = mfv.FullType
-            if declaration :? IBinding && fullType.IsFunctionType then
-                let specifiedTypesCount = declaration.ParametersDeclarations.Count
-                skipFunctionParameters fullType specifiedTypesCount
-            else
-                mfv.ReturnParameter.Type
-
-        let typeString = returnType.Format()
-        let factory = declaration.CreateElementFactory()
-        let typeUsage = factory.CreateTypeUsage(typeString, TypeUsageContext.TopLevel)
-
-        let parameters = declaration.ParametersDeclarations
-        let anchor =
-            if parameters.IsEmpty then
-                match declaration with
-                | :? IBinding as binding -> binding.HeadPattern :> ITreeNode
-                | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.Identifier
-                | x -> failwith $"Expected binding or member declaration, but was {x}"
-            else parameters.Last() :> _
-
-        let returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage))
-
-        returnType, returnTypeInfo.ReturnType
 
     let private addParens (factory: IFSharpElementFactory) (pattern: IFSharpPattern) =
         let parenPat = factory.CreateParenPat()
@@ -235,7 +208,7 @@ module SpecifyTypes =
                     yield! specifyParameterTypes declaration symbol
 
                 if availability.CanSpecifyReturnType then
-                    yield specifyParametersOwnerReturnType declaration symbol
+                    yield FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind declaration symbol
             ]
 
             bindAnnotations annotationsInfo
@@ -250,7 +223,7 @@ module SpecifyTypes =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
-        let annotationsInfo = [| specifyParametersOwnerReturnType decl mfv |]
+        let annotationsInfo = [| FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind decl mfv |]
         bindAnnotations annotationsInfo
 
 [<AbstractClass>]
