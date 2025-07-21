@@ -73,7 +73,6 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context)) ||
 
         let longestReturn = getLongestReturnFromReturn context
-        isNotNull (ReturnTypeInfoNavigator.GetByReturnType(longestReturn)) ||
         isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn)) ||
 
         let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(context))

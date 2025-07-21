@@ -1,1 +1,1 @@
-let a: (string) = ""{caret}
+﻿let a: string = ""{caret}

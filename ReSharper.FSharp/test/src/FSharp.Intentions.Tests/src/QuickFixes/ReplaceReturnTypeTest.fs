@@ -33,11 +33,24 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``FunctionType 02``() = x.DoNamedTest()
     [<Test>] member x.``FunctionType 03``() = x.DoNamedTest()
     [<Test>] member x.``Paren around return type``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Tuple return type``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Tuple return type, mismatch in number of items, to few in return type``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Tuple return type, mismatch in number of items, to many in return type``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple return type, to non-tuple``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Tuple return type, tuple as part of nested expression``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type - No annotation 01``() = x.DoNamedTest()
+    [<Explicit("Check if getting/modifying the whole expression type possible")>]
+    [<Test>] member x.``Type - No annotation 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 05``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type - Partial 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Partial 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Partial 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Partial 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Partial 05``() = x.DoNamedTest()
 
     [<Test; NotAvailable>] member x.``No highlighting 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``No highlighting 02``() = x.DoNamedTest()

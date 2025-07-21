@@ -14,7 +14,6 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Util\SequentialExprUtil.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -42,6 +41,8 @@
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\Util\FSharpBindUtil.fs" />
+    <Compile Include="src\Util\TypeAnnotationUtil.fs" />
+    <Compile Include="src\Util\FSharpTypeUsageUtil.fs" />
     <Compile Include="src\Util\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Util\UnusedOpensUtil.fs" />
     <Compile Include="src\Util\FSharpModulesUtil.fs" />

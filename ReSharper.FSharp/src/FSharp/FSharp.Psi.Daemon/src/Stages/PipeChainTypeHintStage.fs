@@ -54,7 +54,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
         if isNull rightArgument || rightArgument :? IFromErrorExpr then () else
 
         let isTopBinary =
-            let outermostParent = binaryAppExpr.GetOutermostParentExpressionFromItsReturn()
+            let outermostParent = binaryAppExpr.GetOutermostParentExpressionFromItsReturn(true)
 
             let binaryAppExpr =
                 outermostParent

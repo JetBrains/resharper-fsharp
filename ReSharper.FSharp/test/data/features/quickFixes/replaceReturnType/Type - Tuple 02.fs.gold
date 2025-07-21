@@ -1,0 +1,1 @@
+﻿let b: string * string * string = "", "", ""{caret}

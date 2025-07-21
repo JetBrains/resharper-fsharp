@@ -76,10 +76,10 @@ type RemoveRedundantParenTypeUsageFix(warning: RedundantParenTypeUsageWarning) =
     override this.IsAvailable(data) =
         base.IsAvailable(data) &&
 
-        let innerExpr = warning.ParenTypeUsage.InnerTypeUsage
-        let context = innerExpr.IgnoreParentParens()
+        let innerTypeUsage = warning.ParenTypeUsage.InnerTypeUsage
+        let context = innerTypeUsage.IgnoreParentParens()
 
-        not (RedundantParenTypeUsageAnalyzer.needsParens context innerExpr)
+        not (RedundantParenTypeUsageAnalyzer.needsParens context innerTypeUsage)
 
 type RemoveRedundantParenPatFix(warning: RedundantParenPatWarning) =
     inherit FSharpRemoveRedundantParensFixBase(warning.ParenPat, warning.ParenPat.Pattern)

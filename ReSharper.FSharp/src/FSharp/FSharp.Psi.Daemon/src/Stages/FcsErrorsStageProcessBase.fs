@@ -213,22 +213,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createTypeMismatchHighlighting MatchClauseWrongTypeError range error
 
             | Some(:? TypeMismatchDiagnosticExtendedData as data) ->
-                let expectedType = data.ExpectedType
-                let actualType = data.ActualType
-
-                if expectedType.IsTupleType && actualType.IsTupleType &&
-                   expectedType.GenericArguments.Count <> actualType.GenericArguments.Count then
-                    createTypeMismatchHighlighting TypeMisMatchTuplesHaveDifferingLengthsError range error
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> getResultExpr
+                if isNull expr then
+                    null
+                elif isUnit data.ExpectedType then
+                    createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                 else
-                    let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                    let expr = getResultExpr expr
-
-                    if isNull expr then
-                        null
-                    elif isUnit expectedType then
-                        createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                    else
-                        createTypeMismatchHighlighting TypeEquationError range error
+                    createTypeMismatchHighlighting TypeEquationError range error
 
             | _ -> createGenericHighlighting error range
 

@@ -603,17 +603,6 @@
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeMisMatchTuplesHaveDifferingLengths" ID="FS0001: Type mismatch. Expecting">
-    <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
-    <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>fcsMessage</Argument>
-    </Message>
-    <Range>expr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-  </Error>
-
   <Error staticGroup="FSharpErrors" name="MatchClauseWrongType" ID="FS0001: 'match' clause has wrong type">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/> 
     <Parameter type="IFSharpExpression" name="expr"/>
