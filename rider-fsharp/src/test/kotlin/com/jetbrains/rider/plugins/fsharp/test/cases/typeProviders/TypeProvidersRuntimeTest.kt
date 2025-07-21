@@ -6,6 +6,7 @@ import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestRequirements
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
@@ -19,11 +20,8 @@ import org.testng.annotations.Test
 @Solution("CoreTypeProviderLibrary")
 class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @Test
-  @TestEnvironment(
-    sdkVersion = SdkVersion.LATEST_STABLE,
-    buildTool = BuildTool.FULL,
-    platform = [PlatformType.WINDOWS_ALL]
-  )
+  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+  @TestRequirements(platform = [PlatformType.WINDOWS_ALL])
   @Solution("TypeProviderLibrary")
   fun framework461() = doTest(".NET Framework 4.8")
 
