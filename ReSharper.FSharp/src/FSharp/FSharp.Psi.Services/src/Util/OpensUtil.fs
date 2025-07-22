@@ -4,10 +4,10 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -371,9 +371,11 @@ module OpenScope =
         else
             scopes |> Seq.exists (includesOffset offset)
 
-type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCache) =
+type OpenedModulesProvider(context: ITreeNode) =
     let map = OneToListMap<string, OpenScope>()
 
+    let autoOpenCache = context.GetSolution().GetComponent<FSharpAutoOpenCache>()
+    let fsFile = context.GetContainingFileThroughSandBox() :?> IFSharpFile
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
 
@@ -436,6 +438,7 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
                 if isNotNull declaredElement then
                     importElement scope declaredElement
 
+    member x.Context = context
     member x.OpenedModuleScopes = map
 
     member this.Contains(declaredElement: IClrDeclaredElement, context: ITreeNode) =

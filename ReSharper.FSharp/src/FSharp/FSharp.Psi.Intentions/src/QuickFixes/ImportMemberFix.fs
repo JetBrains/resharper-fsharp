@@ -3,14 +3,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -147,8 +145,7 @@ type FSharpImportModuleMemberFix(reference: IReference) =
         let symbolScope = getSymbolScope psiModule false
         let typeElements = symbolScope.GetAllTypeElementsGroupedByName()
 
-        let autoOpenCache = referenceOwner.GetPsiServices().Solution.GetComponent<FSharpAutoOpenCache>()
-        let openedScopes = OpenedModulesProvider(referenceOwner.FSharpFile, autoOpenCache)
+        let openedScopes = OpenedModulesProvider(referenceOwner)
 
         let result = HashSet()
 

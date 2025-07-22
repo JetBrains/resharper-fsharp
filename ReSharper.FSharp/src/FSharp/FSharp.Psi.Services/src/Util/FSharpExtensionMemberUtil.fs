@@ -135,24 +135,8 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
 
         typeElements.AsReadOnly()
 
-    let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
-    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile, autoOpenCache)
-    let scopes = openedModulesProvider.OpenedModuleScopes
+    let openedModulesProvider = OpenedModulesProvider(context)
     let accessContext = FSharpAccessContext(context)
-
-    let isInScope (typeMember: ITypeMember) =
-        let isInScope declaredElement =
-            let name = getQualifiedName declaredElement
-            let scopes = scopes.GetValuesSafe(name)
-            OpenScope.inAnyScope context scopes
-        
-        match typeMember.ContainingType with
-        | :? IFSharpModule as fsModule ->
-            isInScope fsModule
-
-        | containingType ->
-            let ns = containingType.GetContainingNamespace()
-            isInScope ns
 
     let matchesType (typeMember: ITypeMember) : bool =
         match typeMember with
@@ -229,7 +213,7 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
     let isApplicable (typeMember: ITypeMember) =
         resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
-        not (isInScope typeMember) &&
+        not (FSharpImportUtil.isTypeMemberInScope openedModulesProvider typeMember) &&
         isAccessible typeMember &&
         matchesCallingConvention typeMember &&
         matchesType typeMember
