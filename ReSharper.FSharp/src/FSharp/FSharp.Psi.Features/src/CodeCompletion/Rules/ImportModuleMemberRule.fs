@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -90,11 +89,7 @@ type ImportModuleMemberRule() =
         let referenceContext = referenceOwner.ReferenceContext
         if not referenceContext.HasValue then false else
 
-        let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
-        if isNull fsFile then false else
-
-        let autoOpenCache = referenceOwner.GetPsiServices().Solution.GetComponent<FSharpAutoOpenCache>()
-        let scopes = OpenedModulesProvider(fsFile, autoOpenCache).OpenedModuleScopes
+        let scopes = OpenedModulesProvider(referenceOwner).OpenedModuleScopes
         let symbolScope = getSymbolScope context.PsiModule false
 
         let values =

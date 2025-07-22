@@ -21,7 +21,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -177,13 +176,12 @@ type FSharpImportTypeElementRule() =
         let language = context.Language
         let solution = element.GetPsiServices().Solution
         let iconManager = solution.GetComponent<PsiIconManager>()
-        let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
 
         // todo: try to use nodes from sandbox for better parser recovery
         let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
         if isNull fsFile then false else
 
-        let openedModulesProvider = OpenedModulesProvider(element.FSharpFile, autoOpenCache)
+        let openedModulesProvider = OpenedModulesProvider(element)
         let scopes = openedModulesProvider.OpenedModuleScopes
 
         let isAttributeReferenceContext = context.IsInAttributeContext

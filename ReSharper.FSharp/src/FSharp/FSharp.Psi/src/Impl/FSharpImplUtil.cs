@@ -411,25 +411,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ChooseType(ns.GetNestedTypeElements(symbolScope));
     }
 
-    public static string GetSourceName([NotNull] this CompiledTypeElement typeElement)
+    [NotNull]
+    private static string GetSourceName([NotNull] this ICompiledElement compiledElement)
     {
-      if (typeElement is FSharpCompiledModule compiledModule)
-        return compiledModule.SourceName;
-
-      if (typeElement.GetFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
+      if (compiledElement.IsFromFSharpAssembly() &&
+          compiledElement.GetFirstArgValue(FSharpPredefinedType.CompilationSourceNameAttrTypeName) is string sourceName &&
           sourceName != SharedImplUtil.MISSING_DECLARATION_NAME)
         return sourceName;
 
-      return typeElement.ShortName;
+      return compiledElement.ShortName;
     }
 
-    public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
+    [NotNull] public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
       declaredElement switch
       {
         IConstructor ctor => ctor.ContainingType?.GetSourceName() ?? ctor.ShortName,
         INamespace ns => ns.IsRootNamespace ? "global" : ns.ShortName,
         IFSharpDeclaredElement fsElement => fsElement.SourceName,
-        CompiledTypeElement compiledTypeElement => GetSourceName(compiledTypeElement),
+        ICompiledElement compiledElement => GetSourceName(compiledElement),
         _ => declaredElement.ShortName
       };
 

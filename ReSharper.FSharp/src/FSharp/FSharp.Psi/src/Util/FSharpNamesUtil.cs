@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (element is IAttributesOwner attrOwner)
       {
-        if (GetFirstArgStringValue(attrOwner, SourceNameAttrTypeName) is { } sourceName)
+        if (GetFirstArgStringValue(attrOwner, CompilationSourceNameAttrTypeName) is { } sourceName)
           names.Add(sourceName);
 
         if (GetFirstArgStringValue(attrOwner, CustomOperationAttrTypeName) is { } customOpName)

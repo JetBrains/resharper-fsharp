@@ -17,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.RichText
@@ -36,15 +37,16 @@ type ImportStaticMemberRule() =
 
     override this.AddLookupItems(context, collector) =
         let reference = getReference context
-        let accessContext = FSharpAccessContext(reference.GetElement())
+        let referenceOwner = reference.GetElement()
+        let accessContext = FSharpAccessContext(referenceOwner)
 
         let language = context.Language
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
         let seenNamesAndNs = HashSet()
+        let openedModulesProvider = OpenedModulesProvider(referenceOwner)
 
-        let qualifierReference = reference.QualifierReference
-        let qualifierReferenceOwner = qualifierReference.GetElement().As<IFSharpReferenceOwner>()
+        let qualifierReferenceOwner = reference.QualifierReference.GetElement().As<IFSharpReferenceOwner>()
         if isNull qualifierReferenceOwner then false else
 
         let qualifierReferenceOwner = qualifierReferenceOwner.TryGetOriginalNodeThroughSandBox()
@@ -54,10 +56,13 @@ type ImportStaticMemberRule() =
         for typeElement in typeElements do
             Interruption.Current.CheckAndThrow()
 
+            if typeElement :? IFSharpModule then () else
+            if FSharpImportUtil.isTypeElementInScope openedModulesProvider typeElement then () else
+
             let qualifiedName = typeElement.GetQualifiedName()
             for typeMember in typeElement.GetMembers() do
                 if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
-                    let name = typeMember.ShortName
+                    let name = typeMember.GetSourceName()
                     let info = ImportDeclaredElementInfo(typeMember, name, context, Ranges = context.Ranges)
                     let item =
                         LookupItemFactory.CreateLookupItem(info)
