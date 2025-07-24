@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public abstract class AssemblyReaderShimChangeListenerBase
   {
     protected AssemblyReaderShimChangeListenerBase(Lifetime lifetime, ChangeManager changeManager) =>
-      changeManager.Changed.Advise(lifetime, Execute);
+      changeManager.Changed2.Advise(lifetime, Execute);
 
     protected virtual void Execute(ChangeEventArgs obj)
     {
