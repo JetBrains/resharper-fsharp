@@ -99,7 +99,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
     do
         // todo: schedule listening after project model is ready; create fcs projects for all projects
-        changeManager.Changed.Advise(lifetime, this.ProcessChange)
+        changeManager.Changed2.Advise(lifetime, this.ProcessChange)
         fsItemsContainer.ProjectLoaded.Advise(lifetime, this.ProcessItemsContainerUpdate)
         fsItemsContainer.ProjectUpdated.Advise(lifetime, this.ProcessItemsContainerUpdate)
         checkerService.FcsProjectProvider <- this
