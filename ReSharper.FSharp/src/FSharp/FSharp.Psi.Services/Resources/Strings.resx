@@ -307,4 +307,7 @@
     <data name="DotLambdaCanBeUsedStringMessage" xml:space="preserve">
         <value>Shorthand lambda can be used</value>
     </data>
+    <data name="ValueMustBeMutableMessage" xml:space="preserve">
+        <value>A value must be mutable in order to mutate the contents or take the address of a value type</value>
+    </data>
 </root>

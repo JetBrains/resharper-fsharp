@@ -63,6 +63,7 @@ module FSharpErrors =
     let [<Literal>] MissingErrorNumber = 193
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] ValueMustBeMutable = 256
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldWasPresent = 311
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer = 312
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified = 313
@@ -171,6 +172,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match node.GetContainingNode() with
         | null -> null
         | parent -> highlightingCtor (parent, error.Message) :> _
+
+    let createSetExprTargetHighlighting highlightingCtor (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
+        let setExpr = fsFile.GetNode<ISetExpr>(range)
+        if isNull setExpr then createGenericHighlighting error range else
+
+        let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
+        if isNull refExpr then createGenericHighlighting error range else
+        
+        highlightingCtor refExpr :> _ 
 
     /// Finds the smallest node of the corresponding type at offset.
     let createHighlightingFromNodeAtOffset highlightingCtor offset: IHighlighting =
@@ -336,13 +346,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromParentNodeWithMessage EnumMatchIncompleteWarning range error
 
         | ValNotMutable ->
-            let setExpr = fsFile.GetNode<ISetExpr>(range)
-            if isNull setExpr then createGenericHighlighting error range else
-
-            let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
-            if isNull refExpr then createGenericHighlighting error range else
-
-            ValueNotMutableError(refExpr) :> _
+            createSetExprTargetHighlighting ValueNotMutableError error range
 
         | ValueNotContainedMutability ->
             match error.ExtendedData with
@@ -364,6 +368,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             match typeDecl.PrimaryConstructorDeclaration with
             | null -> createGenericHighlighting error range
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
+
+        | ValueMustBeMutable ->
+            createSetExprTargetHighlighting ValueMustBeMutableError error range
 
         | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
             createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error

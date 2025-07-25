@@ -637,6 +637,14 @@
     <QuickFix>UpdateParameterNameInSignatureFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="ValueMustBeMutable" ID="FS0256: A value must be mutable in order to mutate the contents or take the address of a value type">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message resourceName="ValueMustBeMutableMessage" resourceType="Strings"/>
+    <Range>getQualifierExprOrThisRange refExpr</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToMutableFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldWasPresent" ID="FS0311: The type definitions for type in the signature and implementation are not compatible because the field was present in the implementation but not in the signature">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
     <Parameter type="string" name="fcsMessage"/>

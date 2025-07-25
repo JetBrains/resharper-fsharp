@@ -13,11 +13,13 @@ type ToMutableFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/toMutable"
 
-    [<Test>] member x.``Record field 01``() = x.DoNamedTest()
-    [<Test>] member x.``Record field 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Local 01``() = x.DoNamedTest()
     [<Test>] member x.``Val - Top level 01``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Struct qualifier 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Val - Parameter pattern 01 - Union case param``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Val - Parameter pattern 02 - Function param``() = x.DoNamedTest()
