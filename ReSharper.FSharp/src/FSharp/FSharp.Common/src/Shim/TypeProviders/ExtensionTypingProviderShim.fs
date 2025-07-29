@@ -1,14 +1,17 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
 open System
+open System.Collections.Concurrent
 open FSharp.Compiler
 open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
+open JetBrains
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Parts
 open JetBrains.Core
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
@@ -19,78 +22,100 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions
 open JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
-type IProxyExtensionTypingProvider =
+type ITypeProvidersShim =
     inherit IExtensionTypingProvider
 
     abstract RuntimeVersion: unit -> string
     abstract HasGenerativeTypeProviders: project: IProject -> bool
     abstract DumpTypeProvidersProcess: unit -> string
-    abstract TypeProvidersManager: IProxyTypeProvidersManager
+    abstract SolutionTypeProvidersClient: ITypeProvidersClient
+
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
-type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
-        experimentalFeatures: FSharpExperimentalFeaturesProvider, fcsProjectProvider: IFcsProjectProvider,
-        scriptPsiModulesProvider: FSharpScriptPsiModulesProvider, outputAssemblies: OutputAssemblies,
-        typeProvidersProcessFactory: TypeProvidersExternalProcessFactory,
-        productConfigurations: RunsProducts.ProductConfigurations) as this =
+type TypeProvidersShim(solution: ISolution, toolset: ISolutionToolset,
+                       experimentalFeatures: FSharpExperimentalFeaturesProvider,
+                       fcsProjectProvider: IFcsProjectProvider,
+                       scriptPsiModulesProvider: FSharpScriptPsiModulesProvider,
+                       outputAssemblies: OutputAssemblies,
+                       typeProvidersProcessFactory: TypeProvidersExternalProcessFactory,
+                       productConfigurations: RunsProducts.ProductConfigurations) as this =
+
     let lifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let defaultShim = ExtensionTyping.Provider
     let outOfProcessHosting = lazy experimentalFeatures.OutOfProcessTypeProviders.Value
-    let generativeTypeProvidersInMemoryAnalysisEnabled = lazy experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis.Value
-    let createProcessLockObj = obj()
+    let analyzeGenerativeTypeProvidersInMemory = lazy experimentalFeatures.GenerativeTypeProvidersInMemoryAnalysis.Value
+    let clients = ConcurrentDictionary<TypeProvidersHostingScope, ITypeProvidersClient Lazy>()
 
-    let [<VolatileField>] mutable connection: TypeProvidersConnection = null
-    let mutable typeProvidersHostLifetime: LifetimeDefinition = null
-    let mutable typeProvidersManager = Unchecked.defaultof<IProxyTypeProvidersManager>
+    let getSolutionTypeProvidersClient () =
+        let client = clients.GetValueSafe(TypeProvidersHostingScope.Solution)
+        if isNull client then null.As<ITypeProvidersClient>() else client.Value
 
-    let isConnectionAlive () =
-        isNotNull connection && connection.IsActive
+    let terminateConnections () =
+        for client in clients.Values do
+            client.Value.Terminate()
 
-    let terminateConnection () =
-        if isConnectionAlive() then typeProvidersHostLifetime.Terminate()
+        clients.Clear()
 
-    let connect requestingProjectOutputPath =
-        if isConnectionAlive () then true else
+    let rec connect (scope: TypeProvidersHostingScope) (resolutionEnv: ResolutionEnvironment) =
+        match clients.TryGetValue(scope) with
+        | true, client ->
+            if client.Value.IsActive then
+                client.Value
+            else
+                clients.TryRemove(scope) |> ignore
+                connect scope resolutionEnv
+        | _ ->
 
-        lock createProcessLockObj (fun () ->
-            if isConnectionAlive () then true else
+        let client: ITypeProvidersClient Lazy =
+            lazy
+                let clientLifetimeDef = Lifetime.Define(lifetime)
+                let isInternalMode = productConfigurations.IsInternalMode()
+                let logPrefix = scope.ToString()
 
-            typeProvidersHostLifetime <- Lifetime.Define(lifetime)
-            let isInternalMode = productConfigurations.IsInternalMode()
-            let externalProcess =
-                typeProvidersProcessFactory.Create(
-                        typeProvidersHostLifetime.Lifetime,
-                        requestingProjectOutputPath,
-                        isInternalMode)
+                let externalProcess =
+                    typeProvidersProcessFactory.Create(
+                        clientLifetimeDef.Lifetime,
+                        Option.toObj resolutionEnv.OutputFile,
+                        isInternalMode, logPrefix)
 
-            if isNull externalProcess then false else
-            let newConnection = externalProcess.Run()
+                let connection = externalProcess.Run()
 
-            typeProvidersManager <- TypeProvidersManager(newConnection, fcsProjectProvider, scriptPsiModulesProvider,
-                                                         outputAssemblies, generativeTypeProvidersInMemoryAnalysisEnabled.Value) :?> _
-            connection <- newConnection
-            true)
+                match scope with
+                | Solution ->
+                    SolutionTypeProvidersClient(clientLifetimeDef, connection, fcsProjectProvider, outputAssemblies,
+                                                analyzeGenerativeTypeProvidersInMemory.Value) :> _
+                | Scripts ->
+                    ScriptTypeProvidersClient(clientLifetimeDef, connection, scriptPsiModulesProvider) :> _
+
+        let client = clients.GetOrAdd(scope, client)
+        client.Value
 
     do
         lifetime.Bracket((fun () -> ExtensionTyping.Provider <- this),
             fun () -> ExtensionTyping.Provider <- defaultShim)
 
-        toolset.Changed.Advise(lifetime, fun _ -> terminateConnection ())
+        toolset.Changed.Advise(lifetime, fun _ -> terminateConnections ())
 
-    interface IProxyExtensionTypingProvider with
+    interface ITypeProvidersShim with
         member this.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName: string,
                 designTimeAssemblyNameString: string, resolutionEnvironment: ResolutionEnvironment,
                 isInvalidationSupported: bool, isInteractive: bool, systemRuntimeContainsType: string -> bool,
                 systemRuntimeAssemblyVersion: Version, compilerToolsPath: string list,
                 logError: TypeProviderError -> unit, m: range) =
+
             if not outOfProcessHosting.Value then
                defaultShim.InstantiateTypeProvidersOfAssembly(runTimeAssemblyFileName, designTimeAssemblyNameString,
                     resolutionEnvironment, isInvalidationSupported, isInteractive,
                     systemRuntimeContainsType, systemRuntimeAssemblyVersion, compilerToolsPath, logError, m)
             else
-                if not (connect (Option.toObj resolutionEnvironment.OutputFile)) then [] else
+                let scope =
+                    if isInteractive then TypeProvidersHostingScope.Scripts
+                    else TypeProvidersHostingScope.Solution
+
+                let typeProvidersClient = connect scope resolutionEnvironment
+                Assertion.Assert(typeProvidersClient.IsActive, "typeProvidersClient.IsActive")
                 try
-                    typeProvidersManager.GetOrCreate(runTimeAssemblyFileName, designTimeAssemblyNameString,
+                    typeProvidersClient.GetOrCreate(runTimeAssemblyFileName, designTimeAssemblyNameString,
                         resolutionEnvironment, isInvalidationSupported, isInteractive, systemRuntimeContainsType,
                         systemRuntimeAssemblyVersion, compilerToolsPath, m)
                 with :? TypeProvidersInstantiationException as e  ->
@@ -118,28 +143,37 @@ type ExtensionTypingProviderShim(solution: ISolution, toolset: ISolutionToolset,
             | _ -> defaultShim.DisplayNameOfTypeProvider(provider, fullName)
 
         member this.RuntimeVersion() =
-            if not (isConnectionAlive ()) then null else
+            let client = getSolutionTypeProvidersClient()
+            if isNull client || not client.IsActive then null else
 
-            connection.Execute(fun _ -> connection.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance))
+            client.Execute(_.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance))
 
         member this.DumpTypeProvidersProcess() =
-            if not (isConnectionAlive ()) then raise (InvalidOperationException("Out-of-process disabled")) else
+            clients
+            |> Seq.map (fun (KeyValue(scope, client)) ->
+                let client = client.Value
 
-            let inProcessDump =
-                $"[In-Process dump]:\n\n{typeProvidersManager.Dump()}"
+                if not client.IsActive then $"{scope}: Out-of-process disabled" else
 
-            let outOfProcessDump =
-                $"[Out-Process dump]:\n\n{connection.Execute(fun _ ->
-                    connection.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance))}"
+                let inProcessDump =
+                    $"[{scope} - In-Process dump]:\n\n{client.Dump()}"
 
-            $"{inProcessDump}\n\n{outOfProcessDump}"
+                let outOfProcessDump =
+                    $"[{scope} - Out-Process dump]:\n\n{client.Execute( _.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance))}"
+
+                $"{inProcessDump}\n\n{outOfProcessDump}"
+            )
+            |> String.concat "\n\n-----------------------------------------------------\n\n"
 
         member this.HasGenerativeTypeProviders(project) =
+            let client = getSolutionTypeProvidersClient()
             // We can determine which projects contain generative provided types
             // only from type providers hosted out-of-process
-            isConnectionAlive() && typeProvidersManager.HasGenerativeTypeProviders(project)
-        
-        member this.TypeProvidersManager = typeProvidersManager
+            isNotNull client &&
+            client.IsActive &&
+            client.As<SolutionTypeProvidersClient>().HasGenerativeTypeProviders(project)
+
+        member this.SolutionTypeProvidersClient = getSolutionTypeProvidersClient ()
 
     interface IDisposable with
-        member this.Dispose() = terminateConnection ()
+        member this.Dispose() = terminateConnections ()

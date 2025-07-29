@@ -1,4 +1,4 @@
-[In-Process dump]:
+[Solution - In-Process dump]:
 
 Type Providers:
 1 FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
@@ -129,7 +129,7 @@ GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] =
 	TypeProviderLibrary.SwaggerProvider+PetStore+Tag
 	TypeProviderLibrary.SwaggerProvider+PetStore+User
 
-[Out-Process dump]:
+[Solution - Out-Process dump]:
 
 Type Providers:
 1 FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider, FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
