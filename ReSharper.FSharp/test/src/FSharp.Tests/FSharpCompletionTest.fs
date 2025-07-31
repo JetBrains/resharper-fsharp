@@ -447,8 +447,10 @@ type FSharpKeywordCompletionTestBase() =
 
     override x.TestType = CodeCompletionTestType.List
 
-    override this.ItemSelector =
-        Func<_, _>(function :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware | _ -> false)
+    override this.LookupItemFilter(lookupItem) =
+        match lookupItem with
+        | :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware
+        | _ -> false
 
 type FSharpKeywordCompletionTest() =
     inherit FSharpKeywordCompletionTestBase()
@@ -560,13 +562,11 @@ type FSharpFilteredCompletionTest() =
 
     member val CompleteItem = null with get, set
 
-    override this.ItemSelector =
-        Func<_, _>(fun lookupItem ->
-            isNull this.CompleteItem ||
-
-            match lookupItem with
+    override this.LookupItemFilter(lookupItem) =
+        isNull this.CompleteItem ||
+        match lookupItem with
             | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-            | _ -> lookupItem.DisplayName.Text = this.CompleteItem)
+            | _ -> lookupItem.DisplayName.Text = this.CompleteItem
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
@@ -699,8 +699,8 @@ type FSharpCompletionListTest() =
 
     override x.TestType = CodeCompletionTestType.List
 
-    override this.ItemSelector =
-            Func<_, _>(fun lookupItem -> lookupItem :? IAspectLookupItem<FSharpNameSuggestionInfo>)
+    override this.LookupItemFilter(lookupItem) =
+        lookupItem :? IAspectLookupItem<FSharpNameSuggestionInfo>
 
     [<Test>] member x.``Naming - Pat - As - IsInst 01``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Pat - As - IsInst 02``() = x.DoNamedTest()
