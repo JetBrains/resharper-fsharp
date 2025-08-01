@@ -1,10 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 
-open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.Psi.Impl
-open JetBrains.Util
 open NUnit.Framework
 
 [<FSharpTest; AssertCorrectTreeStructure>]
@@ -30,7 +27,3 @@ type DisableWarningTest() =
     [<Test>] member x.``Disable all 01``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 02``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 03``() = x.DoNamedTest()
-
-    override this.ExecuteQuickFix(_, textControl, quickFix, _) =
-        use logger = new FormatterTestLogger(FileSystemPath.Parse("C:\\Developer\\123.txt"))
-        quickFix.Execute(this.Solution, textControl)
