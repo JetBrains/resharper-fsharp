@@ -83,7 +83,10 @@ type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<I
 
     interface IDescriptionProvidingLookupItem with
         member this.GetDescription() =
-            ImportInfo.getDescription context this.DeclaredElement None false
+            let typeElement = this.DeclaredElement.As<ITypeElement>()
+            if isNull typeElement then null else
+
+            ImportInfo.getDescription context typeElement None false
 
 
 type ImportDeclaredElementBehavior(info: ImportDeclaredElementInfo) =

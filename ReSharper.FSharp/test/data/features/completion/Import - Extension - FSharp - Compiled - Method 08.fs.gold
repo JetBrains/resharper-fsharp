@@ -1,0 +1,27 @@
+﻿
+AsyncState
+ConfigureAwait
+ContinueWith
+CreationOptions
+Dispose
+Equals
+Exception
+GetAwaiter
+GetHashCode
+GetType
+Id
+Instance1 (in FSharpExtensions)
+Instance2 (in FSharpExtensions)
+IsCanceled
+IsCompleted
+IsCompletedSuccessfully
+IsFaulted
+Result
+RunSynchronously
+Start
+Status
+ToString
+Wait
+WaitAsync
+let
+match{caret}

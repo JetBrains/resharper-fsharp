@@ -1,10 +1,13 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMemberUtil
 
+open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -16,6 +19,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve.TypeInference
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
+open JetBrains.Util.Extension
 
 type FSharpRequest(psiModule, exprType: IType, name: string option) =
     static let memberKinds = [ExtensionMemberKind.CLASSIC_METHOD; FSharpExtensionMemberKind.INSTANCE]
@@ -92,10 +96,8 @@ let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
     | :? IMethod as method ->
         let containingType = method.ContainingType
         if containingType :? IFSharpModule && containingType :? IFSharpCompiledTypeElement then
-            let parameters = method.Parameters
-            if parameters.Count = 0 then ValueNone else
-
-            ValueSome(parameters[0].Type.GetTypeElement())
+            let typeShortName = method.ShortName.SubstringBefore(".", StringComparison.Ordinal)
+            ValueSome(typeShortName)
         else
             ValueNone
 
@@ -108,7 +110,9 @@ let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
     | FSharpCompiledExtensionMember _ -> ValueSome()
     | _ -> ValueNone
 
-let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOpt: string option) =
+let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) isStaticContext (nameOpt: string option) =
+    if isNull fcsType then EmptyList.InstanceList else
+
     let psiModule = context.GetPsiModule()
     let solution = psiModule.GetSolution()
     use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -150,19 +154,19 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
             isInScope ns
 
     let matchesType (typeMember: ITypeMember) : bool =
-        let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =
-            if isNull extendedTypeElement then false else
-
-            // todo: arrays and other non-declared-types?
-            exprTypeElements |> Seq.exists extendedTypeElement.Equals
-
         match typeMember with
         | FSharpSourceExtensionMember mfv ->
             let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
-            matchesWithoutSubstitution extendedTypeElement
+            isNotNull exprTypeElements && exprTypeElements |> Seq.exists extendedTypeElement.Equals
 
-        | FSharpCompiledExtensionMember extendedTypeElement ->
-            matchesWithoutSubstitution extendedTypeElement
+        | FSharpCompiledExtensionMember extendedTypeShortName ->
+            let getFSharpTypeName (typeElement: ITypeElement) =
+                let sourceName = typeElement.GetSourceName()
+                match typeElement.TypeParametersCount with
+                | 0 -> sourceName
+                | count -> $"{sourceName}`{count}"
+
+            exprTypeElements |> Seq.exists (getFSharpTypeName >> (=) extendedTypeShortName)
 
         | :? IMethod as method ->
             let parameters = method.Parameters
@@ -211,11 +215,22 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         | :? IFSharpDeclaredElement -> typeMember :? IFSharpMethod || typeMember :? IFSharpProperty
         | _ -> true
 
+    let matchesCallingConvention (typeMember: ITypeMember) =
+        match typeMember with
+        | FSharpSourceExtensionMember mfv ->
+            mfv.IsInstanceMember <> isStaticContext
+
+        | FSharpCompiledExtensionMember _ ->
+            typeMember.ShortName.EndsWith(".Static", StringComparison.Ordinal) = isStaticContext
+
+        | _ -> not isStaticContext
+
     let isApplicable (typeMember: ITypeMember) =
         resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
         not (isInScope typeMember) &&
         isAccessible typeMember &&
+        matchesCallingConvention typeMember &&
         matchesType typeMember
 
     let query = ExtensionMembersQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
@@ -223,4 +238,9 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
 
     methods
     |> Seq.filter isApplicable
-    |> List
+    |> List :> _
+
+let getExtensionMembers (expr: IFSharpExpression) (nameOpt: string option) =
+    let isStaticContext = FSharpExpressionUtil.isStaticContext expr
+    let fcsType = getFcsType expr
+    getExtensionMembersForType expr fcsType isStaticContext nameOpt

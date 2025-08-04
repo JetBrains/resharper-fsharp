@@ -2,16 +2,17 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 open FSharp.Compiler.Syntax
+open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
 let isPredefinedFunctionRef name (expr: IFSharpExpression) =
@@ -239,3 +240,39 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
 
             currentExpr <- null
     }
+
+let rec isStaticContext (expr: IFSharpExpression) =
+    let isTypeReferenceOrUnresolved (fsReference: FSharpSymbolReference) =
+        let fcsSymbol = fsReference.GetFcsSymbol()
+        isNull fcsSymbol ||
+
+        match fcsSymbol with
+        | :? FSharpEntity -> true
+        | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsConstructor
+        | _ -> false
+
+    let refExpr = expr.As<IReferenceExpr>()
+    isNotNull refExpr &&
+
+    isTypeReferenceOrUnresolved refExpr.Reference &&
+
+    let qualifierExpr = refExpr.Qualifier
+    (isNull qualifierExpr || isStaticContext qualifierExpr)
+
+let private getFcsEntity (fsReference: FSharpSymbolReference) =
+    match fsReference.GetFcsSymbol() with
+    | :? FSharpEntity as fcsEntity -> fcsEntity
+    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity
+    | _ -> Unchecked.defaultof<_>
+
+let getFcsType (expr: IFSharpExpression) =
+    let fcsType = expr.TryGetFcsType()
+    if isNotNull fcsType then fcsType else
+
+    let refExpr = expr.As<IReferenceExpr>()
+    if isNull refExpr then Unchecked.defaultof<_> else
+
+    let fcsEntity = getFcsEntity refExpr.Reference
+    if isNull fcsEntity then Unchecked.defaultof<_> else
+
+    fcsEntity.AsType()

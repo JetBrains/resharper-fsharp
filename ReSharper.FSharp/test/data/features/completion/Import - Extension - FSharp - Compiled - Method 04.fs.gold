@@ -1,0 +1,17 @@
+﻿
+CompletedTask
+CurrentId
+Delay
+Factory
+FromCanceled
+FromException
+FromResult
+Run
+Static1 (in FSharpExtensions)
+Static2 (in FSharpExtensions)
+WaitAll
+WaitAny
+WhenAll
+WhenAny
+Yield
+new{caret}

@@ -35,9 +35,12 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
       if (member is not IMethod method)
         return false;
 
-      var methodName = method.ShortName;
-      if (method.ShortName != value.CompiledName?.Value)
+      var shortName = method.ShortName;
+      if (shortName != value.CompiledName?.Value)
         return false;
+
+      if (shortName.EndsWith(".Static", StringComparison.OrdinalIgnoreCase))
+        return true;
 
       if (value.ApparentEnclosingTypeReference is not FSharpMetadataTypeReference.NonLocal typeRef)
         return false;

@@ -38,7 +38,12 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
             | null -> loop acc (typeElement.GetContainingNamespace())
             | containingType -> loop acc containingType
 
-        | _ -> failwithf "Expecting a namespace or a type element"
+        | _ ->
+            let containingType = declaredElement.GetContainingType()
+            if isNull containingType then [] else
+
+            let acc = declaredElement :: acc
+            loop acc containingType
 
     loop [] declaredElement
 
@@ -208,12 +213,13 @@ let canInsertBefore (openStatement: IOpenStatement) ns =
 
 let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (moduleToImport: ModuleToImport) =
     let elementFactory = fsFile.CreateElementFactory()
-    let lineEnding = fsFile.GetLineEnding()
 
     let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
+        moduleMember.InnerTokens() |> Seq.iter ignore
         ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
+        anchor.InnerTokens() |> Seq.iter ignore
         ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let duplicates (ns: string) (openStatement: IOpenStatement) =
@@ -370,7 +376,6 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
 
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
-    let psiServices = psiModule.GetPsiServices()
 
     let symbolScope = getSymbolScope psiModule false
 

@@ -380,7 +380,7 @@ module PsiModificationUtil =
     let addNodesAfter (anchor: ITreeNode) (nodes: ITreeNode seq) =
         let nodes = nodes |> List.ofSeq
         nodes |> Seq.fold (fun (anchor: ITreeNode, addedNodes) treeNode ->
-            anchor.InnerTokens() |> List.ofSeq |> ignore
+            anchor.InnerTokens() |> Seq.iter ignore
             let addedNode = ModificationUtil.AddChildAfter(anchor, treeNode)
             addedNode, addedNode :: addedNodes
         ) (anchor, [])
@@ -389,7 +389,7 @@ module PsiModificationUtil =
 
     let addNodesBefore (anchor: ITreeNode) (nodes: ITreeNode seq) =
         nodes |> Seq.rev |> Seq.fold (fun (anchor: ITreeNode) treeNode ->
-            anchor.InnerTokens() |> List.ofSeq |> ignore
+            anchor.InnerTokens() |> Seq.iter ignore
             ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
     let addNodeBefore anchor node = ModificationUtil.AddChildBefore(anchor, node) |> ignore

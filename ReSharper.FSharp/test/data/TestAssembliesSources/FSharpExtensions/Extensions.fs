@@ -28,3 +28,9 @@ type System.Collections.IList with
 type InjectionsOwner with
     [<StringSyntax("regex")>]
     member this.InjectionExtensionProp with set (_: string) = ()
+
+type System.Threading.Tasks.Task with
+    member this.Instance1() = ()
+    member this.Instance2(i: int) = ()
+    static member Static1() = ()
+    static member Static2(i: int) = ()

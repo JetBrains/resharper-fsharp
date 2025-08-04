@@ -12,10 +12,10 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.UI.RichText
 open JetBrains.Util.Extension
@@ -33,7 +33,7 @@ type ImportExtensionMemberRule() =
         let qualifierExpr = getQualifierExpr context
         isNotNull qualifierExpr &&
 
-        let fcsType = qualifierExpr.TryGetFcsType()
+        let fcsType = getFcsType qualifierExpr
         isNotNull fcsType &&
 
         match qualifierExpr with
@@ -45,8 +45,7 @@ type ImportExtensionMemberRule() =
 
     override this.AddLookupItems(context, collector) =
         let qualifierExpr = getQualifierExpr context
-        let fcsType = qualifierExpr.TryGetFcsType()
-        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType None
+        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr None
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
@@ -54,7 +53,12 @@ type ImportExtensionMemberRule() =
             members |> Seq.groupBy (fun typeMember ->
                 Interruption.Current.CheckAndThrow()
 
-                let name = typeMember.ShortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_")
+                let name =
+                    typeMember.ShortName
+                        .SubstringBeforeLast(".Static")
+                        .SubstringAfterLast(".")
+                        .SubstringAfter("get_")
+                        .SubstringAfter("set_")
 
                 let ns =
                     match typeMember.ContainingType with
