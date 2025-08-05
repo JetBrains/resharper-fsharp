@@ -1,35 +1,118 @@
 ﻿
+Aggregate (in System.Linq)
+All (in System.Linq)
+Ancestors (in System.Xml.Linq)
+AncestorsAndSelf (in System.Xml.Linq)
+Any (in System.Linq)
+Append (in System.Linq)
+AsEnumerable (in System.Linq)
+AsMemory (in System)
+AsParallel (in System.Linq)
+AsQueryable (in System.Linq)
+AsSpan (in System)
+Attributes (in System.Xml.Linq)
+Average (in System.Linq)
+Cast (in System.Linq)
 Chars
+Chunk (in System.Linq)
 Clone
 CompareTo
+Concat (in System.Linq)
+Contains (in System.Linq)
 Contains
 CopyTo
+CopyToDataTable (in System.Data)
+Count (in System.Linq)
+DefaultIfEmpty (in System.Linq)
+DescendantNodes (in System.Xml.Linq)
+DescendantNodesAndSelf (in System.Xml.Linq)
+Descendants (in System.Xml.Linq)
+DescendantsAndSelf (in System.Xml.Linq)
+Distinct (in System.Linq)
+DistinctBy (in System.Linq)
+ElementAt (in System.Linq)
+ElementAtOrDefault (in System.Linq)
+Elements (in System.Xml.Linq)
 EndsWith
 EnumerateRunes
 Equals
+Except (in System.Linq)
+ExceptBy (in System.Linq)
+First (in System.Linq)
+FirstOrDefault (in System.Linq)
 GetEnumerator
 GetHashCode
 GetPinnableReference
 GetReverseIndex
+GetReverseIndex (in Microsoft.FSharp.Core.Operators.ArrayExtensions)
 GetType
 GetTypeCode
+GroupBy (in System.Linq)
+GroupJoin (in System.Linq)
+InDocumentOrder (in System.Xml.Linq)
 IndexOf
 IndexOfAny
 Insert
+Intersect (in System.Linq)
+IntersectBy (in System.Linq)
+IsNormalized (in System)
 IsNormalized
+Join (in System.Linq)
+Last (in System.Linq)
 LastIndexOf
 LastIndexOfAny
+LastOrDefault (in System.Linq)
 Length
+LongCount (in System.Linq)
+Max (in System.Linq)
+MaxBy (in System.Linq)
+Min (in System.Linq)
+MinBy (in System.Linq)
+Nodes (in System.Xml.Linq)
+Normalize (in System)
 Normalize
+OfType (in System.Linq)
+Order (in System.Linq)
+OrderBy (in System.Linq)
+OrderByDescending (in System.Linq)
+OrderDescending (in System.Linq)
 PadLeft
 PadRight
+Prepend (in System.Linq)
+Remove (in System.Xml.Linq)
 Remove
 Replace
 ReplaceLineEndings
+Reverse (in System.Linq)
+Select (in System.Linq)
+SelectMany (in System.Linq)
+SequenceEqual (in System.Linq)
+Single (in System.Linq)
+SingleOrDefault (in System.Linq)
+Skip (in System.Linq)
+SkipLast (in System.Linq)
+SkipWhile (in System.Linq)
 Split
 StartsWith
 Substring
+Sum (in System.Linq)
+Take (in System.Linq)
+TakeLast (in System.Linq)
+TakeWhile (in System.Linq)
+ToArray (in System.Linq)
 ToCharArray
+ToDictionary (in System.Linq)
+ToFrozenDictionary (in System.Collections.Frozen)
+ToFrozenSet (in System.Collections.Frozen)
+ToHashSet (in System.Linq)
+ToImmutableArray (in System.Collections.Immutable)
+ToImmutableDictionary (in System.Collections.Immutable)
+ToImmutableHashSet (in System.Collections.Immutable)
+ToImmutableList (in System.Collections.Immutable)
+ToImmutableSortedDictionary (in System.Collections.Immutable)
+ToImmutableSortedSet (in System.Collections.Immutable)
+ToList (in System.Linq)
+ToLookup (in System.Linq)
 ToLower
 ToLowerInvariant
 ToString
@@ -38,4 +121,9 @@ ToUpperInvariant
 Trim
 TrimEnd
 TrimStart
-TryCopyTo{caret}
+TryCopyTo
+TryGetNonEnumeratedCount (in System.Linq)
+Union (in System.Linq)
+UnionBy (in System.Linq)
+Where (in System.Linq)
+Zip (in System.Linq){caret}

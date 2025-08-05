@@ -6,10 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -30,11 +29,6 @@ type FSharpRelevanceRule() =
             fcsLookupItem.Emphasize()
         | _ -> ()
 
-    let getFcsType context =
-        match getQualifierExpr context with
-        | null -> Unchecked.defaultof<_>
-        | qualifierExpr -> qualifierExpr.TryGetFcsType()
-
     override this.DecorateItems(context, items) =
         let isCustomOperationPossible =
             lazy
@@ -44,7 +38,7 @@ type FSharpRelevanceRule() =
                         reference.GetTreeNode().As<IReferenceExpr>() |> Option.ofObj)
                 refExpr |> Option.exists isInsideComputationExpressionForCustomOperation
 
-        let fcsType = getFcsType context
+        let fcsType = getQualifierType context
 
         for item in items do
             let info =

@@ -276,3 +276,16 @@ let getFcsType (expr: IFSharpExpression) =
     if isNull fcsEntity then Unchecked.defaultof<_> else
 
     fcsEntity.AsType()
+
+let getQualifierFcsType (refExpr: IReferenceExpr) =
+    if isNull refExpr then Unchecked.defaultof<_> else
+
+    let qualifier = refExpr.Qualifier
+    if isNotNull qualifier then
+        getFcsType qualifier else
+
+    let dotLambdaExpr = DotLambdaExprNavigator.GetByFirstQualifier(refExpr)
+    if isNotNull dotLambdaExpr then
+        dotLambdaExpr.Shorthand.TryGetFcsType()
+    else
+        Unchecked.defaultof<_>

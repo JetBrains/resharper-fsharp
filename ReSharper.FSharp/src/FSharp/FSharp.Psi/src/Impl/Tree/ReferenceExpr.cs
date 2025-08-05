@@ -80,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsQualified => 
       Qualifier != null ||
-      DotLambdaExprNavigator.GetByExpression(this) != null;
+      DotLambdaExprNavigator.GetByFirstQualifier(this) != null;
 
     public FSharpSymbolReference QualifierReference =>
       Qualifier is IReferenceExpr refExpr ? refExpr.Reference : null;

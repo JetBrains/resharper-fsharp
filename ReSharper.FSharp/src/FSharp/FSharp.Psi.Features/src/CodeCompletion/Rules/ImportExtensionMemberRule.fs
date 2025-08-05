@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -30,12 +29,10 @@ type ImportExtensionMemberRule() =
         context.EnableImportCompletion &&
         context.IsQualified &&
 
-        let qualifierExpr = getQualifierExpr context
-        isNotNull qualifierExpr &&
-
-        let fcsType = getFcsType qualifierExpr
+        let fcsType = getQualifierType context
         isNotNull fcsType &&
 
+        let qualifierExpr = getQualifierExpr context
         match qualifierExpr with
         | :? IReferenceExpr as refExpr ->
             match refExpr.Reference.GetFcsSymbol() with
@@ -44,8 +41,8 @@ type ImportExtensionMemberRule() =
         | _ -> true
 
     override this.AddLookupItems(context, collector) =
-        let qualifierExpr = getQualifierExpr context
-        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr None
+        let refExpr = getRefExpr context
+        let members = FSharpExtensionMemberUtil.getExtensionMembers refExpr None
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 

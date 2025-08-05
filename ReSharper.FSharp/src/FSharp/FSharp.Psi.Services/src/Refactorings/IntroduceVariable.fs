@@ -565,7 +565,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
         let rec isAllowedExpr (expr: IFSharpExpression) =
             if FSharpMethodInvocationUtil.isNamedArgReference expr then false
-            elif isDirectPartOfDotLambda expr then false else
+            elif isNotNull (DotLambdaExprNavigator.GetByQualifier(expr)) then false else
 
             match expr with
             | :? IReferenceExpr as refExpr ->
@@ -628,7 +628,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let aprExpr = PrefixAppExprNavigator.GetByArgumentExpression(expr)
         if isNotNull aprExpr then not aprExpr.IsHighPrecedence else
 
-        not (isDirectPartOfDotLambda expr)
+        isNull (DotLambdaExprNavigator.GetByQualifier(expr))
 
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()

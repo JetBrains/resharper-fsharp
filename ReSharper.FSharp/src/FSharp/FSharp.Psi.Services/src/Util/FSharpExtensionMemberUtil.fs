@@ -240,7 +240,7 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
     |> Seq.filter isApplicable
     |> List :> _
 
-let getExtensionMembers (expr: IFSharpExpression) (nameOpt: string option) =
-    let isStaticContext = FSharpExpressionUtil.isStaticContext expr
-    let fcsType = getFcsType expr
-    getExtensionMembersForType expr fcsType isStaticContext nameOpt
+let getExtensionMembers (refExpr: IReferenceExpr) (nameOpt: string option) : IList<ITypeMember> =
+    let isStaticContext = FSharpExpressionUtil.isStaticContext refExpr.Qualifier
+    let fcsType = getQualifierFcsType refExpr
+    getExtensionMembersForType refExpr fcsType isStaticContext nameOpt

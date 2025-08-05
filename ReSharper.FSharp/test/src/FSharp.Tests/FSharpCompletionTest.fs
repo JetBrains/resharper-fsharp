@@ -51,6 +51,10 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 03``() = x.DoNamedTest() // todo: fix in 233
 
+    [<Test>] member x.``Import - Extension - Dot lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - Dot lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - Dot lambda 03``() = x.DoNamedTest()
+
     [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 01``() = x.DoNamedTest()
     [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 02``() = x.DoNamedTest()
     [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 03``() = x.DoNamedTest()

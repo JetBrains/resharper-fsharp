@@ -80,6 +80,9 @@ type ImportExtensionMemberTest() =
     member x.DoNamedTestFsCs() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
+    [<Test>] member x.``Expr - Dot lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot lambda 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Extension - CSharp - Array 01``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp - Array 02``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
@@ -116,7 +119,6 @@ type ImportExtensionMemberTest() =
     [<Test>] member x.``FSharp - Source 10``() = x.DoNamedTest()
     [<Test>] member x.``FSharp - Source 11``() = x.DoNamedTest()
     [<Test>] member x.``FSharp - Source 12``() = x.DoNamedTest()
-
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
 

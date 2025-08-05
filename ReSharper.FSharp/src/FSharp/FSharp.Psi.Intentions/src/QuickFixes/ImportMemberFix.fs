@@ -122,11 +122,8 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
         let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
         if isNull refExpr then [] else
 
-        let qualifierExpr = refExpr.Qualifier
-        if isNull qualifierExpr then [] else
-
         let name = reference.GetName()
-        FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr (Some name) |> Seq.cast
+        FSharpExtensionMemberUtil.getExtensionMembers refExpr (Some name) |> Seq.cast
 
     override this.CreateAction(typeMember, reference) =
         FSharpImportExtensionMemberAction(typeMember, reference)

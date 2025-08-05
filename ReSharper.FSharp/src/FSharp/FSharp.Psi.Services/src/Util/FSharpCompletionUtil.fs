@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resolve
@@ -62,14 +63,20 @@ let getParametersOwnerPatFromReference (reference: IReference) : IParametersOwne
 
     ParametersOwnerPatNavigator.GetByParameter(parentPat)
 
-let getQualifierExpr (context: FSharpCodeCompletionContext) =
-    let reference = context.ReparsedContext.Reference
-    if isNull reference then null else
+let getRefExpr (context: FSharpCodeCompletionContext) =
+    match context.ReparsedContext.Reference with
+    | null -> null
+    | reference -> reference.GetTreeNode().As<IReferenceExpr>()
 
-    let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+let getQualifierExpr (context: FSharpCodeCompletionContext) =
+    let refExpr = getRefExpr context
     if isNull refExpr then null else
 
     refExpr.Qualifier
+
+let getQualifierType (context: FSharpCodeCompletionContext) =
+    let refExpr = getRefExpr context
+    getQualifierFcsType refExpr
 
 let rec getNs (typeElement: ITypeElement) =
     match typeElement.GetContainingType() with
