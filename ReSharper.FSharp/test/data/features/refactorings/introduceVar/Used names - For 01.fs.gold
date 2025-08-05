@@ -7,6 +7,6 @@ let oneInstance = 1
 do
     for i = 1 to 2 do
         for oneInstance = 1 to 2 do
-            let instance = (getOneInstance ())
+            let instance = getOneInstance ()
             let _ = id instance
             oneInstance

@@ -5,6 +5,6 @@ let getOneInstance () = 1
 let oneInstance = 1
 
 do
-    let instance = (getOneInstance ())
+    let instance = getOneInstance ()
     let _ = id instance
     oneInstance

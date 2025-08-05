@@ -3,5 +3,5 @@ module Module
 
 let f a b = ()
 do
-    let i = (1)
-    f i id
+    let i = 1
+    f(i)id

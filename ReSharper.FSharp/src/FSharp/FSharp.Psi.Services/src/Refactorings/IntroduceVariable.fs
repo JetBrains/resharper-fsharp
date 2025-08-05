@@ -336,7 +336,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         // todo: fix parser recovery in Fcs
         ModificationUtil.ReplaceChild(binding.BindingKeyword, data.Keywords[0].CreateTreeElement()) |> ignore
 
-        binding.SetExpression(sourceExpr) |> ignore
+        let boundExpr = if isInSingleLineContext then sourceExpr else sourceExpr.IgnoreInnerParens()
+        binding.SetExpression(boundExpr) |> ignore
 
         match workflow with
         | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.Mutable ->
@@ -364,7 +365,28 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
                     if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage
 
-                let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
+                let newExpr: IFSharpExpression =
+                    let needsParens =
+                        let isQualifier expr =
+                            isNotNull (QualifiedExprNavigator.GetByQualifier(expr))
+
+                        let isHighPrecedence (expr: IPrefixAppExpr) =
+                            isNotNull expr && expr.IsHighPrecedence
+
+                        isQualifier usage ||
+
+                        let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(usage)
+                        isHighPrecedence appExpr &&
+                        (isQualifier appExpr || isHighPrecedence (PrefixAppExprNavigator.GetByFunctionExpression(appExpr)))
+
+                    if needsParens then
+                        let parenExpr = elementFactory.CreateParenExpr()
+                        parenExpr.SetInnerExpression(refExpr) |> ignore
+                        parenExpr
+                    else
+                        refExpr
+
+                let replacedUsage = ModificationUtil.ReplaceChild(usage, newExpr).IgnoreInnerParens()
 
                 let sourceExpr =
                     if usageIsSourceExpr && contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
