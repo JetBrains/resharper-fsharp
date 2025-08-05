@@ -42,31 +42,11 @@ type ImportExtensionMemberRule() =
 
     override this.AddLookupItems(context, collector) =
         let refExpr = getRefExpr context
-        let members = FSharpExtensionMemberUtil.getExtensionMembers refExpr None
+        let members =
+            FSharpExtensionMemberUtil.getExtensionMembers None refExpr
+            |> FSharpExtensionMemberUtil.groupByNameAndNs
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
-
-        let members =
-            members |> Seq.groupBy (fun typeMember ->
-                Interruption.Current.CheckAndThrow()
-
-                let name =
-                    typeMember.ShortName
-                        .SubstringBeforeLast(".Static")
-                        .SubstringAfterLast(".")
-                        .SubstringAfter("get_")
-                        .SubstringAfter("set_")
-
-                let ns =
-                    match typeMember.ContainingType with
-                    | :? IFSharpModule as fsModule ->
-                        fsModule.QualifiedSourceName
-
-                    | containingType ->
-                        containingType.GetContainingNamespace().QualifiedName
-
-                ns, name
-            )
 
         for (ns, name), typeMembers in members do
             Interruption.Current.CheckAndThrow()

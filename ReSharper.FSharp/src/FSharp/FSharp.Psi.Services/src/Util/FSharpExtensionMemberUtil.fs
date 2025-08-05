@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMembe
 open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Application
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -240,7 +241,31 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
     |> Seq.filter isApplicable
     |> List :> _
 
-let getExtensionMembers (refExpr: IReferenceExpr) (nameOpt: string option) : IList<ITypeMember> =
+let getExtensionMembers (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
+    if isNull refExpr then EmptyList.InstanceList else
+
     let isStaticContext = FSharpExpressionUtil.isStaticContext refExpr.Qualifier
     let fcsType = getQualifierFcsType refExpr
     getExtensionMembersForType refExpr fcsType isStaticContext nameOpt
+
+let groupByNameAndNs members =
+    members |> Seq.groupBy (fun (typeMember: ITypeMember) ->
+        Interruption.Current.CheckAndThrow()
+
+        let name =
+            typeMember.ShortName
+                .SubstringBeforeLast(".Static")
+                .SubstringAfterLast(".")
+                .SubstringAfter("get_")
+                .SubstringAfter("set_")
+
+        let ns =
+            match typeMember.ContainingType with
+            | :? IFSharpModule as fsModule ->
+                fsModule.QualifiedSourceName
+
+            | containingType ->
+                containingType.GetContainingNamespace().QualifiedName
+
+        ns, name
+    )
