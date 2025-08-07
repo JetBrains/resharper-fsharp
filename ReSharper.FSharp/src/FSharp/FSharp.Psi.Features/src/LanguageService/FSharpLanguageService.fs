@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
+open JetBrains.Application.Components
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -27,8 +28,8 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
-        checkerService: FcsCheckerService, formatter: FSharpCodeFormatter) =
-    inherit LanguageService(languageType, constantValueService)
+        checkerService: FcsCheckerService, formatter: ILazy<FSharpCodeFormatter>) =
+    inherit LanguageService(languageType, constantValueService, LazyComponentObject.SimpleCast(formatter))
 
     let lexerFactory = FSharpLexerFactory()
 
@@ -57,7 +58,6 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     override x.TypePresenter = CLRTypePresenter.Instance
     override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
 
-    override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations _ = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
