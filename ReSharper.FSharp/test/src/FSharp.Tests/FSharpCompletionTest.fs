@@ -721,3 +721,17 @@ type FSharpCompletionListTest() =
     [<Test>] member x.``Naming - Pat 02``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Type parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Type parameter 02``() = x.DoNamedTest()
+
+
+
+[<FSharpTest>]
+type FSharpCompletionModernListTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/list"
+
+    override x.TestType = CodeCompletionTestType.ModernList
+
+    // todo: [cc] those two tests are sensitive to `CLRLookupItemRelevance` values compactification
+    [<Test>] member x.``Pattern Name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record Property 01``() = x.DoNamedTest()
