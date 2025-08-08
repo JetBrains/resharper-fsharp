@@ -4,7 +4,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -13,7 +13,7 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Solution("TypeProviderLibrary")
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
 class TypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
@@ -35,7 +35,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
 
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
-  @TestEnvironment(
+  @TestSettings(
     sdkVersion = SdkVersion.LATEST_STABLE,
     buildTool = BuildTool.SDK
   )
@@ -43,7 +43,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun `csvProvider - units of measure`() = doTest("Library")
 
   @Test(description = "RIDER-101544")
-  @TestEnvironment(
+  @TestSettings(
     sdkVersion = SdkVersion.LATEST_STABLE,
     buildTool = BuildTool.SDK
   )

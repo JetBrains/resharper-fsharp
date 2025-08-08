@@ -6,7 +6,7 @@ import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.*
@@ -14,7 +14,7 @@ import org.testng.annotations.Test
 import java.time.Duration
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class TypeProvidersFeaturesTest : EditorTestBase() {
   override val testSolution = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true

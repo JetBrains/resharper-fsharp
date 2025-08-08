@@ -4,7 +4,7 @@ import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
 import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -14,7 +14,7 @@ import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestSettings(sdkVersion = SdkVersion.DOT_NET_6)
 class FantomasTest : EditorTestBase() {
   override val testSolution: String = "FormatCodeApp"
 

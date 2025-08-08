@@ -5,7 +5,7 @@ import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.PlatformType
@@ -19,7 +19,7 @@ import org.testng.annotations.Test
 import java.time.Duration
 
 @Solution("TypeProviderLibrary")
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])

@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -36,7 +36,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6)
   @Solution("SwaggerProviderCSharp")
   fun changeStaticArg() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {

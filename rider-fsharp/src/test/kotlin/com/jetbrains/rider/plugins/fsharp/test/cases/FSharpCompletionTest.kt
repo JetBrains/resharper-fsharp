@@ -1,7 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
@@ -95,18 +95,18 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
 }
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpCompletionTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.LegacyAsyncTyping)
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Sequential)
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative)
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 @Mute("RIDER-116517")
 class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase)

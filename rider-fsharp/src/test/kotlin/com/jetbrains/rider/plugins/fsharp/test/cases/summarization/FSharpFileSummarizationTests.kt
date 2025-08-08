@@ -11,7 +11,7 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.protocol.protocol
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -28,7 +28,7 @@ import kotlin.io.path.name
 
 class FSharpFileSummarizationTests : PerTestSolutionTestBase() {
 
-  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("CoreConsoleApp")
   @Test
   fun testFSharpFileSummarization() = doTest(Path("Program.fs"))

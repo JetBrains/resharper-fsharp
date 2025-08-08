@@ -10,7 +10,7 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.jetbrains.rider.editors.getPsiFile
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -23,7 +23,7 @@ import org.testng.annotations.Test
 
 @Test
 @Solution("CoreConsoleApp")
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class InjectionEscapersTest : PerTestSolutionTestBase() {
   private fun doTest(action: (EditorImpl, EditorImpl) -> Unit) {
     withOpenedEditor("Program.fs", "Program.fs") {

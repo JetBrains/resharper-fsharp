@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
@@ -18,7 +18,7 @@ import java.io.File
 import java.time.Duration
 
 @Solution("CoreConsoleApp")
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FileSystemShimTest : PerTestSolutionTestBase() {
   @Test
   @Mutes([
