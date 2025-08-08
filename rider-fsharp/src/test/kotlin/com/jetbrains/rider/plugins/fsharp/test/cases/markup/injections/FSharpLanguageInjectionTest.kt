@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 import com.intellij.codeInsight.daemon.impl.HighlightInfoType
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.getHighlighters
@@ -24,7 +24,7 @@ private fun BaseTestWithMarkup.doTest() {
 }
 
 
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   @Test
@@ -66,7 +66,7 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 }
 
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("FableApp")
 class FSharpFrontendFrameworksTest : BaseTestWithMarkup() {
   @Test

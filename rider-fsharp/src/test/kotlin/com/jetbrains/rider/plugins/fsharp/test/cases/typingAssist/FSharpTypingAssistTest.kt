@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.TypingAssistTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditor
@@ -8,7 +8,7 @@ import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpTypingAssistTest : TypingAssistTestBase() {
 
   override val testSolution: String = "CoreConsoleApp"

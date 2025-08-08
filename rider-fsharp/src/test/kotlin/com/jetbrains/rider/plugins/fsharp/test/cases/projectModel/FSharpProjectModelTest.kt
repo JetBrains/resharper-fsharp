@@ -53,7 +53,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
@@ -155,7 +155,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
 
   @Test
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_9)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9)
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
@@ -180,7 +180,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
   @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
     doTestDumpProjectsView {
@@ -199,7 +199,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test(description = "RIDER-107198")
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
     doTestDumpProjectsView {

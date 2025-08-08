@@ -4,13 +4,13 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.framework.withCultureInfo
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 @Solution("CoreConsoleApp")
 class FSharpHoverDocTest : DocumentationTestBase() {
   override val checkSolutionLoad = false
@@ -42,12 +42,12 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("SwaggerProviderCSharp")
   fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
   @Solution("SwaggerProviderCSharp")
   fun `provided abbreviation in csharp`() = doTestWithTypeProviders("OpenAPI Provider for")
 

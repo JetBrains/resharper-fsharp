@@ -2,7 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.DebuggerTestBase
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
@@ -10,7 +10,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForPause
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestSettings(sdkVersion = SdkVersion.DOT_NET_6)
 @Solution("AsyncProgram")
 class AsyncDebuggerTest : DebuggerTestBase() {
   override val projectName = "AsyncProgram"
