@@ -106,7 +106,6 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Local val - New line 19``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 20``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Pattern - Field 01``() = x.DoNamedTest()
-    [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried - Tuple 01 - First``() = x.DoNamedTest()
@@ -735,3 +734,5 @@ type FSharpCompletionModernListTest() =
     // todo: [cc] those two tests are sensitive to `CLRLookupItemRelevance` values compactification
     [<Test>] member x.``Pattern Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Record Property 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
