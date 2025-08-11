@@ -1016,11 +1016,15 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
         let offset = textControl.Caret.Offset()
         let lexer = x.GetCachingLexer(textControl)
-        if not (isNotNull lexer && lexer.FindTokenAt(offset)) then false else
+        if not (isNotNull lexer && lexer.FindTokenAt(offset - 1)) then false else
 
-        let prevTokenEnd = advanceToPrevToken lexer
-        let node = getNode textControl (prevTokenEnd - 1)
-        if getTokenType node != FSharpTokenType.ELSE then false else
+        while lexer.TokenType == FSharpTokenType.WHITESPACE || lexer.TokenType == FSharpTokenType.LINE_COMMENT do
+            lexer.Advance(-1)
+
+        if lexer.TokenType != FSharpTokenType.ELSE then false else
+
+        let node = getNode textControl (lexer.TokenEnd - 1)
+        if isNull node then false else
 
         let ifExpr = node.Parent.As<IIfExpr>()
         if isNull ifExpr then false else
