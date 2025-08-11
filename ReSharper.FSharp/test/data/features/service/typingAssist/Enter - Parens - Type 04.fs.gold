@@ -1,0 +1,7 @@
+﻿// ${CHAR:Enter} 
+module Module
+
+type T() =
+    interface
+        {caret}
+    end

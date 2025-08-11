@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+let _ =
+    begin {caret} () end
