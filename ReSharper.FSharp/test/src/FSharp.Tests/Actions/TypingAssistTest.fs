@@ -35,6 +35,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - Else 07``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Else 08``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Else 09``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 10``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 11``() = x.DoNamedTest()
 
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
     [<Test>] member x.``Enter - Empty lambda 01``() = x.DoNamedTest()
