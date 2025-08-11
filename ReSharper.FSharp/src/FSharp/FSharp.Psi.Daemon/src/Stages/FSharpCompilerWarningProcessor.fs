@@ -40,8 +40,11 @@ type FSharpCompilerWarningProcessor() =
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(frameworkId)
 
     interface ICompilerWarningProcessor with
-        member this.ProcessCompilerWarning(file, info, compilerIds, _, _, _): CompilerWarningPreProcessResult =
-            let configuration = getConfiguration file
+        member this.GetCustomFileProperties (psiFile: IFile, sourceFile: IPsiSourceFile) =
+            getConfiguration psiFile
+
+        member this.ProcessCompilerWarning(file, customFileProperties, info, compilerIds, _, _, _): CompilerWarningPreProcessResult =
+            let configuration = customFileProperties :?> IFSharpProjectConfiguration
             if isNull configuration then CompilerWarningPreProcessResult.NoChange else
 
             let props = configuration.PropertiesCollection
