@@ -19,6 +19,13 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
+    [<Test>] member x.``Enter - Parens - Begin 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Begin 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 04``() = x.DoNamedTest()
+
     [<Test>] member x.``Enter - Else 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Else 02``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Else 03``() = x.DoNamedTest()

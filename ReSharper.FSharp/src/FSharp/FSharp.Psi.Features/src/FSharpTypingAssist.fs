@@ -290,7 +290,13 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
            FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
            FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
            FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
-           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
+           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED
+
+           FSharpTokenType.CLASS, FSharpTokenType.END
+           FSharpTokenType.INTERFACE, FSharpTokenType.END
+           FSharpTokenType.STRUCT, FSharpTokenType.END
+
+           FSharpTokenType.BEGIN, FSharpTokenType.END |]
         |> HashSet
 
     static let leftBracketsToAddIndent: HashSet<TokenNodeType> =
@@ -1902,14 +1908,21 @@ type FSharpBracketMatcher private (brackets) =
     inherit BracketMatcher(brackets)
 
     static let matchingBrackets =
-        [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
-           Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
-           Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
-           Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK)
-           Pair.Of(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE)
-           Pair.Of(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK)
-           Pair.Of(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED)
-           Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED) |]
+        [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
+           FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+           FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+           FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE
+           FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED
+
+           FSharpTokenType.CLASS, FSharpTokenType.END
+           FSharpTokenType.INTERFACE, FSharpTokenType.END
+           FSharpTokenType.STRUCT, FSharpTokenType.END
+
+           FSharpTokenType.BEGIN, FSharpTokenType.END |]
+        |> Array.map Pair.Of
 
     new () =
         FSharpBracketMatcher(matchingBrackets)
