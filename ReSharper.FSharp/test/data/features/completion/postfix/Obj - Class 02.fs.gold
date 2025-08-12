@@ -1,6 +1,8 @@
 ﻿// ${COMPLETE_ITEM:new}
 module Module
 
+open System.Text
+
 [<AbstractClass>]
 type Base() =
     abstract M: int -> unit
@@ -8,4 +10,4 @@ type Base() =
 
 { new Base() with
     override this.M(var0: int): unit = failwith "todo"{caret}
-    override this.M(var0: System.Text.StringBuilder): unit = failwith "todo" }
+    override this.M(var0: StringBuilder): unit = failwith "todo" }

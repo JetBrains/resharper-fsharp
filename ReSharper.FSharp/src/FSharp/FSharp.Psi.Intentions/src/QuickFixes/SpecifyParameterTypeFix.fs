@@ -4,6 +4,7 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
@@ -81,7 +82,7 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.SpecifyType(decl, mfv) =
         let decl = decl :?> ILocalReferencePat
-        SpecifyTypes.specifyPatternType mfv.FullType decl
+        TypeAnnotationUtil.specifyPatternType mfv.FullType decl
 
 
 type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =

@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
-open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
 open JetBrains.Annotations
 open JetBrains.Diagnostics
@@ -209,20 +208,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] c
             let source = $"let {patternText} = ()"
             getModuleMember source :?> ILetBindingsDeclaration
 
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
-            let printParam (name, fcsType: FSharpType) =
-                let name = FSharpNamingService.mangleNameIfNecessary name
-                if not addTypes then name else
-
-                let fcsType = fcsType.Format(displayContext)
-                $"{name}: {fcsType}" 
-
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) =
             let parametersSource =
                 curriedParameterNames
                 |> List.map (fun paramNames ->
                     let concatenatedNames =
                         paramNames
-                        |> List.map printParam
+                        |> List.map (fst >> FSharpNamingService.mangleNameIfNecessary)
                         |> String.concat (if isSpaceAfterComma then ", " else ",") 
                     $"({concatenatedNames})"
                 )
@@ -231,7 +223,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] c
             let memberBinding = createMemberDecl false "P" List.empty parametersSource true
             memberBinding.ParametersDeclarations |> Seq.toList
 
-        member x.CreateMemberBindingExpr(isStatic, name, typeParameters, parameters) =
+        member x.CreateMemberDecl(isStatic, name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl isStatic name typeParameters parsedParams false
             
