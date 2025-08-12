@@ -82,7 +82,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
         use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
 
         if isNull binding.ReturnTypeInfo then
-            FSharpTypeUsageUtil.setParametersOwnerReturnType binding
+            FSharpTypeUsageUtil.setFcsParametersOwnerReturnType binding
 
         binding.ReturnTypeInfo.ReturnType
         |> FSharpTypeUsageUtil.skipParameters lambdaParametersCount

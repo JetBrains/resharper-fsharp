@@ -11,8 +11,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -45,9 +47,6 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
 
 let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSharpGeneratorElement) =
     let mfv = element.Mfv
-    let displayContext = element.DisplayContext
-    let addTypes = element.AddTypes
-
     Assertion.Assert(not (mfv.IsNonCliEventProperty()))
 
     let mutable nextUnnamedVariableNumber = 0
@@ -62,7 +61,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
 
     let paramGroups = mfv.CurriedParameterGroups
 
-    let argNameGroups =
+    let paramNameTypeGroups =
         let getParamType (param: FSharpParameter) =
             param.Type.Instantiate(element.Substitution)
 
@@ -91,8 +90,8 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
             |> Seq.toList
 
     let typeParams =
-        if not addTypes then [] else
-        mfv.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
+        if not element.AddTypes then [] else
+        mfv.GenericParameters |> Seq.map _.Name |> Seq.toList
 
     let memberName =
         if isPropertyAccessor then
@@ -112,7 +111,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
 
     let paramGroups =
         if not generateParameters then [] else
-        factory.CreateMemberParamDeclarations(argNameGroups, spaceAfterComma, addTypes, displayContext)
+        factory.CreateMemberParamDeclarations(paramNameTypeGroups, spaceAfterComma)
 
     let isStatic = not mfv.IsInstanceMember
 
@@ -121,7 +120,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
             let accessorName = if isPropertyGetterMethod then "get" else "set"
             factory.CreatePropertyWithAccessor(isStatic, memberName, accessorName, paramGroups)
         else
-            factory.CreateMemberBindingExpr(isStatic, memberName, typeParams, paramGroups)
+            factory.CreateMemberDecl(isStatic, memberName, typeParams, paramGroups)
 
     let shouldCallBase (element: IFSharpGeneratorElement) =
         let fsGeneratorElement = element.As<FSharpGeneratorElement>()
@@ -134,11 +133,11 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
 
     if mayHaveBaseCalls && shouldCallBase element then
         let args =
-            if argNameGroups.IsEmpty || not generateParameters then "" else
+            if paramNameTypeGroups.IsEmpty || not generateParameters then "" else
 
-            let groupCount = argNameGroups.Length
+            let groupCount = paramNameTypeGroups.Length
 
-            argNameGroups
+            paramNameTypeGroups
             |> List.mapi (fun i paramNames ->
                 match paramNames, i with
                 | [head, _], 0 when groupCount > 1 -> $" {head}"
@@ -160,15 +159,13 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
         FSharpAttributesUtil.addOuterAttributeList memberDeclaration
         FSharpAttributesUtil.addAttribute memberDeclaration.AttributeLists[0] attribute |> ignore
 
-    if addTypes then
-        let lastParam = memberDeclaration.ParametersDeclarations.LastOrDefault()
-        if isNull lastParam then () else
+    let types =
+        if not element.AddTypes then None else
 
-        let typeString = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
-        let typeUsage = factory.CreateTypeUsage(typeString.Format(displayContext), TypeUsageContext.TopLevel)
-        ModificationUtil.AddChildAfter(lastParam, factory.CreateReturnTypeInfo(typeUsage)) |> ignore
+        let returnType = mfv.ReturnParameter.Type.Instantiate(element.Substitution)
+        Some(paramNameTypeGroups, returnType)
 
-    memberDeclaration
+    memberDeclaration, types
 
 let noEmptyLineAnchors =
     NodeTypeSet(
@@ -181,19 +178,14 @@ let noEmptyLineAnchors =
 let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
     if isNotNull node && node.IsFiltered() then node.GetPreviousMeaningfulSibling() else node
 
-let getGeneratedSelectionTreeRange (addedMembers: ITreeNode seq) =
-    addedMembers
-    |> Seq.tryPick (fun node ->
-        match node with
-        | :? IMemberDeclaration as memberDecl -> Some(memberDecl)
-        | _ -> None
-    )
-    |> Option.map (fun memberDecl ->
-        match memberDecl.AccessorDeclarationsEnumerable |> Seq.tryHead with
-        | Some accessorDecl -> accessorDecl.Expression.GetTreeTextRange()
-        | _ -> memberDecl.Expression.GetTreeTextRange()
-    )
-    |> Option.defaultValue TreeTextRange.InvalidRange
+let getGeneratedSelectionTreeRange (addedMembers: IMemberDeclaration seq) =
+    match Seq.tryHead addedMembers with
+    | None -> TreeTextRange.InvalidRange
+    | Some memberDecl ->
+
+    match Seq.tryHead memberDecl.AccessorDeclarationsEnumerable with
+    | Some accessorDecl -> accessorDecl.Expression.GetTreeTextRange()
+    | _ -> memberDecl.Expression.GetTreeTextRange()
 
 let private getObjectTypeReprAnchor (objectTypeRepr: IObjectModelTypeRepresentation) (psiView: IPsiView) =
     let node = psiView.GetSelectedTreeNode()
@@ -454,18 +446,38 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
               FSharpGeneratorElement(prop.Setter, { element.MfvInstance with Mfv = mfv.SetterMethod }, element.AddTypes) ]
     )
 
-let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) anchor =
-    let mayHaveBaseCalls = mayHaveBaseCalls typeDecl
-    let addedMembers =
-        inputElements
-        |> Seq.map (generateMember typeDecl mayHaveBaseCalls)
-        |> Seq.cast
-        |> addNodesAfter anchor
-    
-    for addedMember in addedMembers do
-        addedMember.FormatNode(CodeFormatProfile.INDENT)
 
-    addedMembers
+let private annotateParamDecl (paramDecl: IFSharpParameterDeclaration) (_, fcsType) =
+    match paramDecl with
+    | :? IFSharpPattern as fsPat -> specifyPatternType fcsType fsPat
+    | _ -> ()
+
+let bindTypes types (memberDecl: IMemberDeclaration) =
+    match types with
+    | None -> ()
+    | Some(paramTypes, returnType) ->
+
+    (memberDecl.GetParameterDeclarations(), paramTypes)
+    ||> Seq.iter2 (Seq.iter2 annotateParamDecl)
+
+    FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind memberDecl returnType
+    |> Seq.singleton
+    |> bindAnnotations
+
+let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) (anchor: ITreeNode) =
+    let mayHaveBaseCalls = mayHaveBaseCalls typeDecl
+
+    let addedMembers =
+        ((anchor, []), inputElements) ||> Seq.fold (fun (anchor, addedNodes) generatorElement ->
+            let memberDecl, types = generateMember typeDecl mayHaveBaseCalls generatorElement
+            let addedDecl = ModificationUtil.AddChildAfter(anchor, memberDecl)
+            addedDecl.FormatNode(CodeFormatProfile.INDENT)
+            bindTypes types addedDecl
+
+            addedDecl, addedDecl :: addedNodes
+        )
+
+    addedMembers |> snd |> List.rev
 
 let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiModule) (expr: IFSharpExpression) =
     let reference = NewObjPostfixTemplate.getReference expr

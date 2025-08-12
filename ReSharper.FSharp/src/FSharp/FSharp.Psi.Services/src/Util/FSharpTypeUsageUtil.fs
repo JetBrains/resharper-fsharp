@@ -23,7 +23,15 @@ let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
 
     bindAnnotations [ fcsType, typeUsage ]
 
-let setParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
+let setParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) (fcsType: FSharpType) =
+    let factory = decl.CreateElementFactory()
+    let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
+    let anchor = decl.EqualsToken
+
+    let returnTypeInfo = ModificationUtil.AddChildBefore(anchor, factory.CreateReturnTypeInfo(typeUsage))
+    fcsType, returnTypeInfo.ReturnType
+
+let setFcsParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
     let fcsReturnType =
         let fullType = mfv.FullType
         if decl :? IBinding && fullType.IsFunctionType then
@@ -31,16 +39,11 @@ let setParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) 
         else
             mfv.ReturnParameter.Type
 
-    let factory = decl.CreateElementFactory()
-    let typeUsage = factory.CreateTypeUsage(fcsReturnType.Format(), TypeUsageContext.TopLevel)
-    let anchor = decl.EqualsToken
+    setParametersOwnerReturnTypeNoBind decl fcsReturnType
 
-    let returnTypeInfo = ModificationUtil.AddChildBefore(anchor, factory.CreateReturnTypeInfo(typeUsage))
-    fcsReturnType, returnTypeInfo.ReturnType
-
-let setParametersOwnerReturnType (decl: IParameterOwnerMemberDeclaration) =
+let setFcsParametersOwnerReturnType (decl: IParameterOwnerMemberDeclaration) =
     let mfv = decl.GetFcsSymbolUse().Symbol.As<FSharpMemberOrFunctionOrValue>()
-    let fcsReturnType, returnTypeUsage = setParametersOwnerReturnTypeNoBind decl mfv
+    let fcsReturnType, returnTypeUsage = setFcsParametersOwnerReturnTypeNoBind decl mfv
     bindAnnotations [ fcsReturnType, returnTypeUsage ]
 
 

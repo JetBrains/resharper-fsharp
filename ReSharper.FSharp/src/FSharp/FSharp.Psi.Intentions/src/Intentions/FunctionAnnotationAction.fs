@@ -12,15 +12,12 @@ open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -97,57 +94,6 @@ module SpecifyTypes =
         parenPat.SetPattern(pattern) |> ignore
         parenPat :> IFSharpPattern
 
-    let private specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        let pattern = pattern.IgnoreParentParens()
-        let factory = pattern.CreateElementFactory()
-
-        let pattern =
-            match pattern.IgnoreInnerParens() with
-            | :? IAttribPat as attribPat -> attribPat.Pattern
-            | _ -> pattern
-
-        let oldPattern, fcsType =
-            match pattern.IgnoreInnerParens() with
-            | :? IOptionalValPat ->
-                let fcsType = if isOption fcsType then fcsType.GenericArguments[0] else fcsType
-                pattern, fcsType
-
-            | _ ->
-
-            let optionalValPat = OptionalValPatNavigator.GetByPattern(pattern)
-            if isNull optionalValPat then
-                pattern, fcsType
-            else
-                optionalValPat, fcsType.GenericArguments[0]
-
-        let newPattern =
-            match oldPattern.IgnoreInnerParens() with
-            | :? ITuplePat as tuplePat -> addParens factory tuplePat
-            | :? ITypedPat as typedPat -> typedPat.Pattern
-            | pattern -> pattern
-
-        let typedPat =
-            let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
-            factory.CreateTypedPat(newPattern, typeUsage)
-
-        let listConsParenPat = getOutermostListConstPat oldPattern |> _.IgnoreParentParens()
-
-        let typedPat =
-            let pat =
-                ModificationUtil.ReplaceChild(oldPattern, typedPat)
-                |> ParenPatUtil.addParensIfNeeded
-
-            pat.IgnoreInnerParens().As<ITypedPat>()
-
-        // In the case `x :: _: Type` add parens to the whole listConsPat
-        //TODO: improve parens analyzer
-        if isNotNull listConsParenPat && listConsParenPat :? IListConsPat then
-            let listConstPat = (ParenPatUtil.addParens listConsParenPat).As<IListConsPat>()
-            let typedPat = (FSharpPatternUtil.getLastTailPattern listConstPat).As<ITypedPat>()
-            fcsType, typedPat.TypeUsage
-        else
-            fcsType, typedPat.TypeUsage
-
     let private specifyParameterTypes (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
         let rec specifyParameterTypes (fcsParamGroups: 'a seq) (getFcsType: 'a -> FSharpType) (enumerate: 'a -> 'a seq)
                 (parameters: IFSharpPattern seq) acc isTopLevel =
@@ -208,22 +154,18 @@ module SpecifyTypes =
                     yield! specifyParameterTypes declaration symbol
 
                 if availability.CanSpecifyReturnType then
-                    yield FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind declaration symbol
+                    yield FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind declaration symbol
             ]
 
             bindAnnotations annotationsInfo
 
         | _ -> ()
 
-    let specifyPatternType (fcsType: FSharpType) (pattern: IFSharpPattern) =
-        let annotationsInfo = [| specifyPatternTypeImpl fcsType pattern |]
-        bindAnnotations annotationsInfo
-
     let specifyMemberReturnType (decl: IMemberDeclaration) mfv =
         Assertion.Assert(isNull decl.ReturnTypeInfo, "isNull decl.ReturnTypeInfo")
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
-        let annotationsInfo = [| FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind decl mfv |]
+        let annotationsInfo = [| FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind decl mfv |]
         bindAnnotations annotationsInfo
 
 [<AbstractClass>]
