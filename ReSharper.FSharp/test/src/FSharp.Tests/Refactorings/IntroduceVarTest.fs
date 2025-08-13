@@ -128,6 +128,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Expr - Space - Before 05 - Array``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Space - Before 06 - Object expr``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Qualifier 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Qualifier 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Record field binding - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding - Anon 02 - In app``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding 01``() = x.DoNamedTest()

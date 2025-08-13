@@ -7,5 +7,4 @@ do
             1
             1
 
-    [] |> List.map(objectFunc
-              )
+    [] |> List.map objectFunc
