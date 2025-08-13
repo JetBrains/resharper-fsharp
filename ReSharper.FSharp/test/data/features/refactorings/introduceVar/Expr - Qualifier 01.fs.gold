@@ -1,0 +1,6 @@
+﻿Suggested names: s1
+module Module
+
+let s = ""
+let s1 = s
+s1.Length

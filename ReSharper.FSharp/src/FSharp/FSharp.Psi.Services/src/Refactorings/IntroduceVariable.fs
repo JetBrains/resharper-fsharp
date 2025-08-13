@@ -217,7 +217,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
     let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
-        let elementFactory = context.CreateElementFactory()
+        let elementFactory = context.GetContainingFile().CreateElementFactory()
         if isNotNull contextDecl then
             elementFactory.CreateLetModuleDecl(name) :> _
         else
@@ -285,7 +285,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         let contextExpr = data.ContextExpr
         let contextDecl = data.ContextDecl
 
-        let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
+        let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl 
         let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoLikeStatement
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
@@ -336,8 +336,8 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
         // todo: fix parser recovery in Fcs
         ModificationUtil.ReplaceChild(binding.BindingKeyword, data.Keywords[0].CreateTreeElement()) |> ignore
 
-        let boundExpr = if isInSingleLineContext then sourceExpr else sourceExpr.IgnoreInnerParens()
-        binding.SetExpression(boundExpr) |> ignore
+        let boundExpr = if isInSingleLineContext then sourceExpr else sourceExpr
+        binding.SetExpression(boundExpr.IgnoreInnerParens()) |> ignore
 
         match workflow with
         | :? FSharpIntroduceVariableWorkflow as fsWorkflow when fsWorkflow.Mutable ->
@@ -349,6 +349,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let usage = usage.As<IFSharpExpression>()
                 if not (isValid usage) then acc else
 
+                let usage = usage.IgnoreParentParens(includingBeginEndExpr = false)
                 let usageIsSourceExpr = usage == sourceExpr
 
                 if usageIsSourceExpr && (removeSourceExpr || replaceSourceExprNode) then
@@ -357,27 +358,21 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
 
-                let usage =
-                    // remove parens in `not ({selstart}v.M(){selend})`, so it becomes `not x`
-                    let argExpr = usage.IgnoreParentParens(includingBeginEndExpr = false)
-                    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(argExpr)
-                    let funExpr = if isNotNull appExpr then appExpr.FunctionExpression else null
-
-                    if argExpr != usage && isNotNull funExpr && funExpr.NextSibling != argExpr then argExpr else usage
-
                 let newExpr: IFSharpExpression =
                     let needsParens =
+                        isNotNull (NewExprNavigator.GetByArgumentExpression(usage)) ||
+
                         let isQualifier expr =
                             isNotNull (QualifiedExprNavigator.GetByQualifier(expr))
 
                         let isHighPrecedence (expr: IPrefixAppExpr) =
                             isNotNull expr && expr.IsHighPrecedence
 
-                        isQualifier usage ||
-
                         let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(usage)
                         isHighPrecedence appExpr &&
-                        (isQualifier appExpr || isHighPrecedence (PrefixAppExprNavigator.GetByFunctionExpression(appExpr)))
+                        (isQualifier appExpr ||
+                         isHighPrecedence (PrefixAppExprNavigator.GetByFunctionExpression(appExpr)) ||
+                         isNotNull (DotLambdaExprNavigator.GetByExpression(appExpr)))
 
                     if needsParens then
                         let parenExpr = elementFactory.CreateParenExpr()
@@ -394,7 +389,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let replacedUsagePointer = replacedUsage.As<ITreeNode>().CreateTreeElementPointer()
                 replacedUsagePointer :: replacedUsages, sourceExpr) ([], sourceExpr)
 
-        let contextExpr = if contextIsSourceExpr then sourceExpr else contextExpr
+        let contextExpr = if contextIsSourceExpr then sourceExpr.IgnoreParentParens(includingBeginEndExpr = false) else contextExpr
         let replacedUsages = List(Seq.rev replacedUsages)
 
         match moveToNewLineInfo with
@@ -409,7 +404,7 @@ type FSharpIntroduceVariable(workflow: IntroduceLocalWorkflowBase, solution, dri
                 let binding = letBindings.Bindings[0]
                 ModificationUtil.DeleteChildRange(binding.NextSibling, letBindings.LastChild)
             | _ -> ()
-            
+
             match letBindings with
             | :? ILetOrUseExpr when replaceSourceExprNode ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
@@ -667,7 +662,8 @@ type FSharpIntroduceVarHelper() =
 
         // Replace the actual source expression with the outermost expression among usages,
         // since it's needed for calculating a common node to replace.
-        let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
+        let sourceExpr = data.Usages |> Seq.minBy _.GetTreeStartOffset().Offset :?> IFSharpExpression
+        let sourceExpr = sourceExpr.IgnoreParentParens(includingBeginEndExpr = false)
 
         let commonParent = FSharpIntroduceVariable.getCommonParentExpr data sourceExpr
         let safeParentToInsertBefore = FSharpIntroduceVariable.getSafeParentExprToInsertBefore workflow commonParent

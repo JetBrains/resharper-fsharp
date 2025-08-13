@@ -6,4 +6,4 @@ type U =
     static member M(b: bool) = ()
 
 let b = U.A = U.A
-U.M(b)
+U.M b
