@@ -10,6 +10,7 @@ import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
@@ -19,7 +20,7 @@ import org.testng.annotations.Test
 import java.time.Duration
 
 @Solution("TypeProviderLibrary")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])

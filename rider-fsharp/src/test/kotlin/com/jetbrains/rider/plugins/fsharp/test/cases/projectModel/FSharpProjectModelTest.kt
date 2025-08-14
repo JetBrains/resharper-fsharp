@@ -7,6 +7,7 @@ import com.jetbrains.rider.test.annotations.*
 import com.jetbrains.rider.test.annotations.report.Issue
 import com.jetbrains.rider.test.annotations.report.Issues
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
@@ -53,7 +54,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
@@ -155,7 +156,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
 
   @Test
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
@@ -180,7 +181,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
     doTestDumpProjectsView {
@@ -199,7 +200,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test(description = "RIDER-107198")
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
     doTestDumpProjectsView {

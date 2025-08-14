@@ -13,6 +13,7 @@ import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.scriptingApi.*
@@ -21,7 +22,7 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FcsProjectProviderTest : PerTestSolutionTestBase() {
   override val traceCategories
     get() = super.traceCategories.plus("JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider")

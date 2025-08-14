@@ -5,6 +5,7 @@ import com.jetbrains.rider.test.annotations.report.Feature
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.logging.TestLoggerHelper
 import com.jetbrains.rider.test.reporting.SubsystemConstants
@@ -48,7 +49,7 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
 @Test
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
   FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
 
@@ -56,7 +57,7 @@ class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
 @Test
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: String) :
   PatchEngineEditorTestBase(PatchEngineEditorTestMode.SpeculativeRebaseProhibited) {
   override val checkTextControls = false
@@ -115,7 +116,7 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
 @Test
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(IdeActions.ACTION_EDITOR_ENTER) {
   val tests = setOf(
     "Enter - Empty lambda 01",
@@ -278,7 +279,7 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
 @Test
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpBackspaceTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(IdeActions.ACTION_EDITOR_BACKSPACE) {
 
   @DataProvider(name = SUPPORTED_BACKEND_CASES)
