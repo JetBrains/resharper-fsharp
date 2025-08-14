@@ -12,13 +12,14 @@ import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
 import org.testng.annotations.Test
 import java.io.File
 import java.time.Duration
 
 @Solution("CoreConsoleApp")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FileSystemShimTest : PerTestSolutionTestBase() {
   @Test
   @Mutes([
