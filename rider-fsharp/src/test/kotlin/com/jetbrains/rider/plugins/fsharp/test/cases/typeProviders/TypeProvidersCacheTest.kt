@@ -10,6 +10,7 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.disableTimedMarkupSuppression
 import com.jetbrains.rider.test.framework.enableTimedMarkupSuppression
@@ -24,7 +25,7 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Solution("TypeProviderLibrary")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   private val defaultSourceFile = "TypeProviderLibrary/Caches.fs"
 

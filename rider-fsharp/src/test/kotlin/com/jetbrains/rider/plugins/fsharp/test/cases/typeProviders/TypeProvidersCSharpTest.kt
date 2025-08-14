@@ -5,6 +5,7 @@ import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
@@ -36,7 +37,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
   @Solution("SwaggerProviderCSharp")
   fun changeStaticArg() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
