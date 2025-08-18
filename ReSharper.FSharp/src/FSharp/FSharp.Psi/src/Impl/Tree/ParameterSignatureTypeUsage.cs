@@ -1,9 +1,11 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 
-internal partial class ParameterSignatureTypeUsage
+internal partial class ParameterSignatureTypeUsageStub
 {
   public override IFSharpIdentifier NameIdentifier => Identifier;
 
@@ -42,5 +44,17 @@ internal partial class ParameterSignatureTypeUsage
     return MemberSignatureLikeDeclarationNavigator.GetByReturnTypeUsage(typeUsage) != null
       ? new FSharpParameterIndex(groupIndex, isSingleParameterGroup ? null : parameterIndex)
       : null;
+  }
+}
+
+internal class ParameterSignatureTypeUsage : ParameterSignatureTypeUsageStub
+{
+  public override ITypeUsage SetTypeUsage(ITypeUsage typeUsage)
+  {
+    if (TypeUsage != null)
+      return base.SetTypeUsage(typeUsage);
+
+    var colon = ModificationUtil.AddChildAfter(Identifier, FSharpTokenType.COLON.CreateTreeElement());
+    return ModificationUtil.AddChildAfter(colon, typeUsage);
   }
 }

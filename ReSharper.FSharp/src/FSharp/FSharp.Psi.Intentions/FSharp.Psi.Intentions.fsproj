@@ -114,6 +114,7 @@
     <Compile Include="src\QuickFixes\FSharpImportTypeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceReturnTypeFix.fs" />
+    <Compile Include="src\QuickFixes\ChangeTypeFix.fs" />
     <Compile Include="src\QuickFixes\XmlDocFixes.fs" />
     <Compile Include="src\QuickFixes\UpdateParameterNameInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\SignatureFixUtil.fs" />

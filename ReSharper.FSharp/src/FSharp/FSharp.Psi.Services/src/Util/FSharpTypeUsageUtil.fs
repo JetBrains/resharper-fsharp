@@ -23,28 +23,31 @@ let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
 
     bindAnnotations [ fcsType, typeUsage ]
 
-let setParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) (fcsType: FSharpType) =
+let setParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (fcsType: FSharpType) =
     let factory = decl.CreateElementFactory()
     let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
-    let anchor = decl.EqualsToken
+    fcsType, decl.SetTypeUsage(typeUsage)
 
-    let returnTypeInfo = ModificationUtil.AddChildBefore(anchor, factory.CreateReturnTypeInfo(typeUsage))
-    fcsType, returnTypeInfo.ReturnType
-
-let setFcsParametersOwnerReturnTypeNoBind (decl: IParameterOwnerMemberDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
+let setFcsParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =
     let fcsReturnType =
         let fullType = mfv.FullType
-        if decl :? IBinding && fullType.IsFunctionType then
-            skipFunctionParameters fullType decl.ParametersDeclarations.Count
-        else
+        match decl with
+        | :? IBinding as binding when fullType.IsFunctionType ->
+            skipFunctionParameters fullType binding.ParametersDeclarations.Count
+        | _ ->
             mfv.ReturnParameter.Type
 
     setParametersOwnerReturnTypeNoBind decl fcsReturnType
 
-let setFcsParametersOwnerReturnType (decl: IParameterOwnerMemberDeclaration) =
+let setFcsParametersOwnerReturnType (decl: IFSharpTypeOwnerDeclaration) =
     let mfv = decl.GetFcsSymbolUse().Symbol.As<FSharpMemberOrFunctionOrValue>()
     let fcsReturnType, returnTypeUsage = setFcsParametersOwnerReturnTypeNoBind decl mfv
     bindAnnotations [ fcsReturnType, returnTypeUsage ]
+
+let setTypeOwnerType (fcsType: FSharpType) (decl: IFSharpTypeUsageOwnerNode) =
+    let factory = decl.CreateElementFactory()
+    let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel))
+    bindAnnotations [ fcsType, typeUsage ]
 
 
 let rec skipParameters paramsToSkipCount (typeUsage: ITypeUsage) =

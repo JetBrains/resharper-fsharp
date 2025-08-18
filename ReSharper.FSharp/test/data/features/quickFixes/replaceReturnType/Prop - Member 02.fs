@@ -1,0 +1,5 @@
+module Module
+
+type T() =
+    static member P1 = T.P2 + 1
+    static member P2 = ""{caret}

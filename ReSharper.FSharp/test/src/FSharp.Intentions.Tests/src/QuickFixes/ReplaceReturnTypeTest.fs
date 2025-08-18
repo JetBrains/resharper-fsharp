@@ -11,6 +11,15 @@ type ReplaceReturnTypeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceReturnType"
 
+    [<Test>] member x.``Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Infix application``() = x.DoNamedTest()
@@ -60,7 +69,7 @@ type ReplaceReturnTypeTest() =
     [<Test; NotAvailable>] member x.``No highlighting 02``() = x.DoNamedTest()
     [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()
+    [<Test; Explicit "Fix FCS error">] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available 03``() = x.DoNamedTest()
@@ -77,3 +86,61 @@ type ReplaceReturnTypeAvailabilityTest() =
 
     [<Test>] member x.``Availability - Ref pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Availability - Ref pat 02 - Operator``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ChangeElementTypeTest() =
+    inherit FSharpQuickFixTestBase<ChangeTypeFromElementReferenceFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/reference"
+
+    [<Test>] member x.``Field - Record 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Field - Record 02``() = x.DoNamedTest()
+    [<Test; Explicit "Fix wrong FCS diagnostic data">] member x.``Field - Record 03``() = x.DoNamedTest()
+    [<Test; Explicit "Fix wrong FCS diagnostic data">] member x.``Field - Record 04``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Auto 02``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Auto 03``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 02``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 03``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ChangeElementTypeFromSetTest() =
+    inherit FSharpQuickFixTestBase<ChangeTypeFromSetExprFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/set"
+
+    [<Test>] member x.``Field - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record 02``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ChangeElementTypeFromFieldBindingTest() =
+    inherit FSharpQuickFixTestBase<ChangeTypeFromRecordFieldBindingFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/init"
+
+    [<Test>] member x.``Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record 02``() = x.DoNamedTest()
+    [<Test>] member x.``Record 03``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type ChangeParamTypeFromArgTest() =
+    inherit FSharpQuickFixTestBase<ChangeParameterTypeFromArgumentFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/arg"
+
+    [<Test>] member x.``Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Method 03``() = x.DoNamedTest()
+    [<Test>] member x.``Method 04``() = x.DoNamedTest()

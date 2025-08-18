@@ -1,4 +1,4 @@
-module Test
+﻿module Test
 
 let o = obj()
 let _ = |not |o|(1) :? string|(0)
@@ -11,4 +11,5 @@ Add parens to the type test
     'bool'    
 but here has type
     'obj'    
-NO QUICKFIXES
+QUICKFIXES:
+Change type of 'o' to 'bool'

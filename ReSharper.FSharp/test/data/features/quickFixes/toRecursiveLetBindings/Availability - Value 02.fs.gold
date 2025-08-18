@@ -8,6 +8,7 @@ let a, b = |()|(0)
     ''a * 'b'    
 but here has type
     'unit'    
-NO QUICKFIXES
+QUICKFIXES:
+Change typeof binding to 'unit'
 1: The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings
 NO QUICKFIXES

@@ -1,11 +1,11 @@
 ﻿module M =
-    let f a |z|(param #2) =
+    let ||f|(param #0)|(param #1) a |z|(param #2) =
         let x, y = a
         x + y + z
 
 M.f (|1|(arg #0), |2|(arg #1)) |3|(arg #2)
 
 ---------------------------------------------------------
-(arg #0) => <no matching param>
-(arg #1) => <no matching param>
+(arg #0) => ???
+(arg #1) => ???
 (arg #2) => z
