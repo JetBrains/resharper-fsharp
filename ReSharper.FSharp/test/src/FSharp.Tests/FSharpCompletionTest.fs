@@ -724,6 +724,7 @@ type FSharpCompletionListTest() =
 
 
 [<FSharpTest>]
+[<Category("Modern Completion Tests")>]
 type FSharpCompletionModernListTest() =
     inherit CodeCompletionTestBase()
 
