@@ -11,7 +11,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class MemberDeclaration : IFunctionDeclaration
+  internal partial class MemberDeclarationStub : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
@@ -78,5 +78,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
       ParameterPatterns.GetParameterDeclarations();
+  }
+
+  internal class MemberDeclaration : MemberDeclarationStub
+  {
+    public override ITypeUsage SetTypeUsage(ITypeUsage typeUsage)
+    {
+      if (ReturnTypeInfo is { } returnTypeInfo)
+        return returnTypeInfo.SetReturnType(typeUsage);
+
+      var factory = this.CreateElementFactory();
+      return ModificationUtil.AddChildBefore(EqualsToken, factory.CreateReturnTypeInfo(typeUsage)).ReturnType;
+    }
   }
 }

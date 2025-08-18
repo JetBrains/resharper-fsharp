@@ -173,12 +173,13 @@ let getNestedRecordUpdateRange (outer: IRecordFieldBinding) (inner: IRecordField
     getTreeNodesDocumentRange outer.EqualsToken recordExpr.WithKeyword
 
 let getQualifierExprOrThisRange (expr: IFSharpExpression) =
-    let expr =
+    let rec getQualifier (expr: IFSharpExpression) =
         match expr with
         | :? IReferenceExpr as refExpr ->
             match refExpr.Qualifier with
             | null -> expr
-            | qualifier -> qualifier
+            | qualifierExpr -> getQualifier qualifierExpr
         | _ -> expr
 
+    let expr = getQualifier expr
     getDocumentRange expr

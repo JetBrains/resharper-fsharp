@@ -1,4 +1,4 @@
-module Test
+﻿module Test
 
 let o = obj()
 let _ = |not |o|(1) :?> string|(0)
@@ -12,7 +12,8 @@ Add parens to the type cast
     'bool'    
 but here has type
     'obj'    
-NO QUICKFIXES
+QUICKFIXES:
+Change type of 'o' to 'bool'
 2: The type 'string' does not have any proper subtypes and need not be used as the target of a static coercion
 NO QUICKFIXES
 3: Type constraint mismatch. The type 
@@ -22,8 +23,10 @@ is not compatible with type
 
 QUICKFIXES:
 Add parens to the type cast
+Change typeof binding to 'bool'
 4: This expression was expected to have type
     'bool'    
 but here has type
     'obj'    
-NO QUICKFIXES
+QUICKFIXES:
+Change type of 'o' to 'bool'

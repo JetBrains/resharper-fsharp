@@ -154,7 +154,8 @@ module SpecifyTypes =
                     yield! specifyParameterTypes declaration symbol
 
                 if availability.CanSpecifyReturnType then
-                    yield FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind declaration symbol
+                    let decl = declaration :?> IFSharpTypeOwnerDeclaration
+                    yield FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind decl symbol
             ]
 
             bindAnnotations annotationsInfo

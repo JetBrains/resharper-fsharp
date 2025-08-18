@@ -1,0 +1,6 @@
+﻿module Module
+
+type T() =
+    static member P: string = 1
+
+let s: string = T.P{caret}
