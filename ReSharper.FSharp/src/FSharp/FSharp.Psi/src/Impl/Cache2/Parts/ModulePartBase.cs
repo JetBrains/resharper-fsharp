@@ -75,9 +75,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
             {
               if (binding.ParametersDeclarationsEnumerable.IsEmpty())
               {
-                valueNames.Add(name);
                 if (binding.IsLiteral)
                   literalNames.Add(name);
+                else
+                  valueNames.Add(name);
               }
               else
               {

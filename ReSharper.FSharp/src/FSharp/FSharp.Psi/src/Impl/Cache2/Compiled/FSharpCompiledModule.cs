@@ -70,9 +70,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
             }
             else
             {
-              valueNames.Add(name);
               if (value.IsLiteral)
                 literalNames.Add(name);
+              else
+                valueNames.Add(name);
             }
           }
         }

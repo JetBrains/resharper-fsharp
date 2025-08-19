@@ -1,0 +1,6 @@
+﻿module Module
+
+open ModuleMembers.Say
+
+match Say.U.Case1 with
+| Case1{caret} -> ()
