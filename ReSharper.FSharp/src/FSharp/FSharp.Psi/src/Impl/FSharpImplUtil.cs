@@ -345,7 +345,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IList<IUnionCase> GetSourceUnionCases([CanBeNull] this ITypeElement type) =>
       GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
 
-    public static string[] GetUnionCaseNames(this ITypeElement typeElement) =>
+    public static string[] GetUnionCaseNames(this IFSharpTypeElement typeElement) =>
       typeElement is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union repr }
         ? repr.cases
         : GetPart<IUnionPart>(typeElement)?.CaseNames ?? EmptyArray<string>.Instance;

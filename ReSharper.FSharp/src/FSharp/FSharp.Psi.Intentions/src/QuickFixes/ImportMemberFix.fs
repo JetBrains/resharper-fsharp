@@ -152,38 +152,28 @@ type FSharpImportModuleMemberFix(reference: IReference) =
         for typeElement in typeElements do
             Interruption.Current.CheckAndThrow()
 
-            match typeElement with
-            | :? IEnum as enum when enum.HasMemberWithName(name, false) ->
-                result.Add(typeElement) |> ignore
-
-            | _ ->
-
             let names =
                 match typeElement with
-                | :? IFSharpSourceTypeElement as fsTypeElement ->
-                    match fsTypeElement with
-                    | :? IFSharpModule as fsModule ->
-                        match referenceContext.Value with
-                        | FSharpReferenceContext.Expression ->
-                            seq {
-                                fsModule.ValueNames
-                                fsModule.FunctionNames
-                                fsModule.ActivePatternNames
-                            }
+                | :? IFSharpModule as fsModule ->
+                    match referenceContext.Value with
+                    | FSharpReferenceContext.Expression ->
+                        seq {
+                            fsModule.ValueNames
+                            fsModule.LiteralNames
+                            fsModule.FunctionNames
+                            fsModule.ActivePatternNames
+                        }
 
-                        | FSharpReferenceContext.Pattern ->
-                            seq {
-                                fsModule.LiteralNames
-                                fsModule.ActivePatternCaseNames
-                            }
+                    | FSharpReferenceContext.Pattern ->
+                        seq {
+                            fsModule.LiteralNames
+                            fsModule.ActivePatternCaseNames
+                        }
 
-                        | _ -> Seq.empty
+                    | _ -> Seq.empty
 
-                    | _ -> seq { typeElement.GetUnionCaseNames() }
-
-                // todo: unify with IFSharpTypeElement
-                | :? IFSharpCompiledTypeElement as fsCompiledTypeElement ->
-                    seq { fsCompiledTypeElement.GetUnionCaseNames() }
+                | :? IFSharpTypeElement as fsTypeElement ->
+                    fsTypeElement.GetUnionCaseNames() |> Seq.singleton
 
                 | _ -> Seq.empty
 

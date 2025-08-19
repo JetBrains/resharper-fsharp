@@ -799,7 +799,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       else if (tag == 5)
       {
         ReadArray(reader => reader.ReadTypeParameterSpec());
-        ReadType();
+        return ReadType();
       }
 
       else if (tag == 6)
