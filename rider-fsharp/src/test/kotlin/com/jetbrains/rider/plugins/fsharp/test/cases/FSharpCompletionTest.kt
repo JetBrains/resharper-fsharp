@@ -96,10 +96,6 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
 
 @Test
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
-class FSharpCompletionTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.LegacyAsyncTyping)
-
-@Test
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
 class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Sequential)
 
 @Test
