@@ -87,6 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var node = ((IClosedChameleonBody) firstChild).Parse(parser =>
         ((IFSharpParser) parser).ParseExpression(this, FSharpFile.StandaloneDocument));
+      Assertion.AssertNotNull(node);
 
       var oldLength = firstChild.GetTextLength();
       var newLength = node.GetTextLength();
