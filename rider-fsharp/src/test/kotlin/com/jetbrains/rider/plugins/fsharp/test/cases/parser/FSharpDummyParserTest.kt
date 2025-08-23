@@ -19,7 +19,7 @@ abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileT
 
   protected open fun assertFileImpl(file: PsiFile) {}
 
-  override fun parseFile(name: String?, text: String?): PsiFile {
+  override fun parseFile(name: String, text: String): PsiFile {
     val file = super.parseFile(name, text)
     assertFileImpl(file)
     return file
