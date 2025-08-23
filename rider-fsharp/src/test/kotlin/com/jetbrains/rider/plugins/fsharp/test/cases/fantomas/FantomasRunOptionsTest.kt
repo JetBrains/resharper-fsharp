@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
 import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
@@ -10,7 +11,7 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 @Test
-@TestSettings(sdkVersion = SdkVersion.DOT_NET_7)
+@TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
 class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
   @Test
   fun default() {

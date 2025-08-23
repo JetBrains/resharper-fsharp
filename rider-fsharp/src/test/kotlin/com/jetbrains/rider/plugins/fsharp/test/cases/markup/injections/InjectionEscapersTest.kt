@@ -12,6 +12,7 @@ import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -23,7 +24,7 @@ import org.testng.annotations.Test
 
 @Test
 @Solution("CoreConsoleApp")
-@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class InjectionEscapersTest : PerTestSolutionTestBase() {
   private fun doTest(action: (EditorImpl, EditorImpl) -> Unit) {
     withOpenedEditor("Program.fs", "Program.fs") {

@@ -12,6 +12,7 @@ import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.markupAdapter
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
@@ -20,33 +21,33 @@ import org.testng.annotations.Test
 @Solution("CoreTypeProviderLibrary")
 class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   @Test
-  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
   @TestEnvironment(platform = [PlatformType.WINDOWS_ALL])
   @Solution("TypeProviderLibrary")
   fun framework461() = doTest(".NET Framework 4.8")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
   fun core31() = doTest(".NET Core 3.1")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   fun net5() = doTest(".NET 5")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
   fun net6() = doTest(".NET 6")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_7)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
   fun net7() = doTest(".NET 7")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
   fun net9() = doTest(".NET 9")
 
   @Mute("RIDER-103648")
-  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FscTypeProviderLibrary")
   fun fsc() = doTest(".NET Framework 4.8")
 
