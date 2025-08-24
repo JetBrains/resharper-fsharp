@@ -256,7 +256,7 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "21"
     compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
