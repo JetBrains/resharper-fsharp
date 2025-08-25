@@ -1,7 +1,9 @@
 ﻿module M
 
-val v: p: (int * int)
+val v: p: |(|(0)int * int|)|(1)
 val f1: p1: (int * int) -> unit
 val f2: p1: _ -> p2: (int * int) -> p3: _ -> unit
 
 ---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

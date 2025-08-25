@@ -1,4 +1,6 @@
-﻿let f () : int -> int * string =
+﻿module Module
+
+let f () : int -> int * string =
         fun (i: int) ->
     if true then
         1, 1

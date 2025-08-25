@@ -4,8 +4,8 @@ type T =
     abstract A1: (int * int) -> int
     abstract A2: p: (int * int) -> int
 
-    member P1: (int * int)
-    member P2: p: (int * int)
+    member P1: |(|(0)int * int|)|(1)
+    member P2: p: |(|(2)int * int|)|(3)
 
     member M1: (int * int) -> int
     member M2: p: (int * int) -> int
@@ -16,6 +16,12 @@ type T =
     new: (int * int) -> T
 
 val f: p: (int * int) -> int
-val v: p: (int * int)
+val v: p: |(|(4)int * int|)|(5)
 
 ---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses
+(2): ReSharper Dead Code: Redundant parentheses
+(3):<secondary> ReSharper Dead Code: Redundant parentheses
+(4): ReSharper Dead Code: Redundant parentheses
+(5):<secondary> ReSharper Dead Code: Redundant parentheses

@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IBinding : IParameterOwnerMemberDeclaration, IFSharpTypeOwnerDeclaration
+  public partial interface IBinding : IParameterOwnerMemberDeclaration
   {
     bool IsInline { get; }
     void SetIsInline(bool value);

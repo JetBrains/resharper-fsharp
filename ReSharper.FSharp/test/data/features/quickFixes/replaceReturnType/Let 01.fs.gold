@@ -1,1 +1,3 @@
-﻿let a: string = ""{caret}
+﻿module Module
+
+let a: string = ""{caret}

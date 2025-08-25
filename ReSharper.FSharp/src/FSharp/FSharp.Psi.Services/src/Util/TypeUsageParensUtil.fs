@@ -47,10 +47,19 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         let functionTypeUsage = FunctionTypeUsageNavigator.GetByReturnTypeUsage(context)
         let argTypeUsage = getLongestReturnFromArg context
 
-        // todo: rewrite when top-level-types are supported
-        if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) then true else
-        if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(functionTypeUsage)) then true else
-        if isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(argTypeUsage)) then true else
+        let paramSig =
+            let paramSig = ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)
+            if isNotNull paramSig then paramSig else
+
+            let paramSig = ParameterSignatureTypeUsageNavigator.GetByTypeUsage(functionTypeUsage)
+            if isNotNull paramSig then paramSig else
+
+            let paramSig = ParameterSignatureTypeUsageNavigator.GetByTypeUsage(argTypeUsage)
+            if isNotNull paramSig then paramSig else
+
+            null
+
+        if isNotNull paramSig && (isNull (FSharpTypeOwnerDeclarationNavigator.GetByTypeUsage(paramSig))) then true else
 
         let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(argTypeUsage))
         if isInAbbreviation && requiresParensInAbbreviation argTypeUsage then true else
