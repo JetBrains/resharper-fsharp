@@ -3,7 +3,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   [ZoneMarker]
-  public class ZoneMarker : IRequire<IFSharpPluginZone>
-  {
-  }
+  public class ZoneMarker : IRequire<IFSharpPluginZone>;
+}
+
+namespace JetBrains.ReSharper.Plugins.FSharp.Services
+{
+  [ZoneMarker]
+  public class ZoneMarker : IRequire<IFSharpPluginZone>;
 }
