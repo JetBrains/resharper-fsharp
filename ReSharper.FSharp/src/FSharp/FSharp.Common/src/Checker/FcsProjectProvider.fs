@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.IO
-open System.Threading.Tasks
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open JetBrains.Annotations
@@ -19,7 +18,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
-open JetBrains.ProjectModel.Tasks
+open JetBrains.ProjectModel.Tasks.Listeners
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
@@ -615,8 +614,8 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, typeProvidersShim: IProxyExtensionTypingProvider,
         fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>) =
 
-    interface ISolutionLoadTasksStartPsiListener with
-        member this.OnSolutionLoadStartPsiAsync(_, _) =
+    interface ISolutionLoadTasksStartPsiListener2 with
+        member this.OnSolutionLoadStartPsi() =
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
                 // No FCS caches to invalidate.
@@ -636,4 +635,4 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
                     daemon.Invalidate($"Project {project.Name} contains F# generative type providers")
             )
 
-            Task.CompletedTask
+            EmptyList<SolutionLoadTasksListenerExecutionStep>.Enumerable
