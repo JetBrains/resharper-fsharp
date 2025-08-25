@@ -144,10 +144,10 @@ interface moduleMember options { customParseFunction; noInternalParseFunction; }
 letBindingsDeclaration options { stubBase="DummyDeclaration"; }:
   binding<BINDING, Bindings>*;
 
-bindingSignature extras {
+bindingSignature options { customImpl; } extras {
   get { methodName="Attributes" path=<bindingSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<bindingSignature:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  get { methodName="ReturnTypeUsage" path=<bindingSignature:RETURN_INFO/returnTypeInfo:TYPE> };
+  get { methodName="TypeUsage" path=<bindingSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   VAL<VAL, BindingKeyword>
@@ -1353,7 +1353,7 @@ wildSelfId options { stubBase="LocalDeclarationBase"; }:
 
 constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Attributes" path=<constructorSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="ReturnTypeUsage" path=<constructorSignature:RETURN_INFO/returnTypeInfo:TYPE> };
+  get { methodName="TypeUsage" path=<constructorSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1401,10 +1401,10 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; cu
     accessorDecls
   );
 
-memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; customImpl; } extras {
   get { methodName="TypeParameters" path=<memberSignature:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="ReturnTypeUsage" path=<memberSignature:RETURN_INFO/returnTypeInfo:TYPE> };
+  get { methodName="TypeUsage" path=<memberSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1431,7 +1431,7 @@ private memberKeyword{ROLE, Getter}:
 abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractMemberDeclaration:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<abstractMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="ReturnTypeUsage" path=<abstractMemberDeclaration:RETURN_INFO/returnTypeInfo:TYPE> };
+  get { methodName="TypeUsage" path=<abstractMemberDeclaration:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?  

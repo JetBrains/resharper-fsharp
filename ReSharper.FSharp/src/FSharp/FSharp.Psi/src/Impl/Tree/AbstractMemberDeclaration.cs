@@ -91,9 +91,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsStatic => StaticKeyword != null;
     
     public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
-      ReturnTypeUsage.GetParameterDeclaration(index);
+      TypeUsage.GetParameterDeclaration(index);
 
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
-      ReturnTypeUsage.GetParameterDeclarations();
+      TypeUsage.GetParameterDeclarations();
   }
 }

@@ -11,13 +11,13 @@ type ReplaceReturnTypeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceReturnType"
 
-    [<Test>] member x.``Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Let 02``() = x.DoNamedTest()
 
-    [<Test>] member x.``Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
-    [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
-    [<Test>] member x.``Prop - Member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Prop - Member 01``() = x.DoNamedTestWithSignature()
     [<Test; Explicit>] member x.``Prop - Member 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
@@ -47,19 +47,19 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Type - No annotation 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - No annotation 03``() = x.DoNamedTest()
     [<Test>] member x.``Type - No annotation 04``() = x.DoNamedTest()
-    [<Test>] member x.``Type - No annotation 05``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation 05``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type - No annotation - Lambda return 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - No annotation - Lambda return 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - No annotation - Lambda return 02``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type - No annotation - Lambda return 03``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type - Tuple 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type - Tuple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Tuple 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Type - Tuple 02``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type - Tuple 03``() = x.DoNamedTest()
     [<Test>] member x.``Type - Tuple 04``() = x.DoNamedTest()
     [<Test>] member x.``Type - Tuple 05``() = x.DoNamedTest()
     [<Test>] member x.``Type - Tuple 06``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type - Partial 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Partial 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Type - Partial 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - Partial 03``() = x.DoNamedTest()
     [<Test>] member x.``Type - Partial 04``() = x.DoNamedTest()

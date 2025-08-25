@@ -1,4 +1,6 @@
-﻿let f () : int * string =
+﻿module Module
+
+let f () : int * string =
     if true then
         1, 1
     else

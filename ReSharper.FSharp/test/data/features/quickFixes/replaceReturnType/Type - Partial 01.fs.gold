@@ -1,4 +1,6 @@
-﻿let a: string * int =
+﻿module Module
+
+let a: string * int =
     if true then
         1, 1
     else  

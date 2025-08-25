@@ -41,7 +41,7 @@ internal partial class ParameterSignatureTypeUsageStub
     if (groupIndex == -1)
       return null;
 
-    return MemberSignatureLikeDeclarationNavigator.GetByReturnTypeUsage(typeUsage) != null
+    return MemberSignatureLikeDeclarationNavigator.GetByTypeUsage(typeUsage) != null
       ? new FSharpParameterIndex(groupIndex, isSingleParameterGroup ? null : parameterIndex)
       : null;
   }

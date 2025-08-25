@@ -12,7 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class BindingSignature
+  internal partial class BindingSignatureStub
   {
     public bool IsMutable => MutableKeyword != null;
 
@@ -32,10 +32,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
-      ReturnTypeUsage.GetParameterDeclaration(index);
+      TypeUsage.GetParameterDeclaration(index);
 
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
-      ReturnTypeUsage.GetParameterDeclarations();
+      TypeUsage.GetParameterDeclarations();
 
     TreeTextRange IDeclaration.GetNameRange() => TreeTextRange.InvalidRange;
 
@@ -54,5 +54,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     XmlNode IXmlDocOwnerTreeNode.GetXMLDoc(bool inherit) => throw new InvalidOperationException();
     IDeclaredElement IDeclaration.DeclaredElement => throw new InvalidOperationException();
+  }
+
+  internal class BindingSignature : BindingSignatureStub
+  {
+    public override ITypeUsage SetTypeUsage(ITypeUsage typeUsage)
+    {
+      if (TypeUsage != null)
+        return base.SetTypeUsage(typeUsage);
+
+      var colon = ModificationUtil.AddChildAfter(HeadPattern, FSharpTokenType.COLON.CreateTreeElement());
+      return ModificationUtil.AddChildAfter(colon, typeUsage);
+    }
   }
 }

@@ -4,10 +4,11 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class MemberSignature
+  internal partial class MemberSignatureStub
   {
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
@@ -35,9 +36,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsOverride => this.IsOverride();
 
     public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
-      ReturnTypeUsage.GetParameterDeclaration(index);
+      TypeUsage.GetParameterDeclaration(index);
 
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
-      ReturnTypeUsage.GetParameterDeclarations();
+      TypeUsage.GetParameterDeclarations();
+  }
+
+  internal class MemberSignature : MemberSignatureStub
+  {
+    public override ITypeUsage SetTypeUsage(ITypeUsage typeUsage)
+    {
+      if (TypeUsage != null)
+        return base.SetTypeUsage(typeUsage);
+
+      var colon = ModificationUtil.AddChildAfter(Identifier, FSharpTokenType.COLON.CreateTreeElement());
+      return ModificationUtil.AddChildAfter(colon, typeUsage);
+    }
   }
 }

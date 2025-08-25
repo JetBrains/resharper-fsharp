@@ -8,10 +8,17 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit FSharpQuickFixBase()
+
+    let unwrapDecl (decl: IDeclaration) =
+        match decl with
+        | :? IFSharpTypeOwnerDeclaration as typeOwnerDecl -> typeOwnerDecl
+        | :? IReferencePat as refPat -> refPat.Binding
+        | _ -> null
 
     let skipParentLambdaBodies (expr: IFSharpExpression) =
         let rec loop acc (expr: IFSharpExpression) =
@@ -27,7 +34,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
     let expr = expr.GetOutermostParentExpressionFromItsReturn()
     let expr, lambdaParametersCount = skipParentLambdaBodies expr
 
-    let decl: IFSharpTypeOwnerDeclaration = FSharpTypeOwnerDeclarationNavigator.GetByExpression(expr)
+    let decl = FSharpTypeOwnerDeclarationNavigator.GetByExpression(expr)
     let actualFcsType = diagnosticInfo.TypeMismatchData.ActualType
 
     new (error: TypeConstraintMismatchError) =
@@ -68,6 +75,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
         | _ ->
 
         isNotNull decl &&
+        isNotNull decl.DeclaredElement &&
 
         let returnTypeUsage = decl.TypeUsage
         isNull returnTypeUsage || canUpdateReturnType returnTypeUsage
@@ -80,7 +88,22 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
             decl.SetTypeUsage(typeUsage) |> ignore
             FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
 
-        decl.TypeUsage
-        |> FSharpTypeUsageUtil.skipParameters lambdaParametersCount
-        |> FSharpTypeUsageUtil.navigateTuplePath path
-        |> FSharpTypeUsageUtil.updateTypeUsage actualFcsType
+        let paramCount =
+            match decl with
+            | :? IParameterOwnerMemberDeclaration as paramOwnerDecl -> paramOwnerDecl.ParametersDeclarations.Count
+            | _ -> 0
+
+        for decl in decl.DeclaredElement.GetDeclarations() do
+            let decl = unwrapDecl decl
+            if isNull decl then () else
+
+            let paramsToSkip =
+                if decl.IsFSharpSigFile() then
+                    paramCount + lambdaParametersCount
+                else
+                    lambdaParametersCount
+
+            decl.TypeUsage
+            |> FSharpTypeUsageUtil.skipParameters paramsToSkip
+            |> FSharpTypeUsageUtil.navigateTuplePath path
+            |> FSharpTypeUsageUtil.updateTypeUsage actualFcsType

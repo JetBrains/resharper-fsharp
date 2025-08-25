@@ -1,1 +1,3 @@
-﻿let b: string * string * string = "", "", ""{caret}
+﻿module Module
+
+let b: string * string * string = "", "", ""{caret}

@@ -1,3 +1,5 @@
+module Module
+
 let f () =
         fun (i: int) ->
     if true then
