@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public FSharpProjectFilePart(IPsiSourceFile sourceFile, IReader reader, FSharpFileKind fileKind)
-      : base(sourceFile, reader)
+      : base(sourceFile)
     {
       FileKind = fileKind;
 
