@@ -1,4 +1,4 @@
-[In-Process dump]:
+[Solution - In-Process dump]:
 
 Type Providers:
 19 FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
@@ -130,7 +130,7 @@ GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] =
 	TypeProviderLibrary.SwaggerProvider+PetStore+Tag
 	TypeProviderLibrary.SwaggerProvider+PetStore+User
 
-[Out-Process dump]:
+[Solution - Out-Process dump]:
 
 Type Providers:
 36 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
