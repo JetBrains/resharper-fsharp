@@ -233,23 +233,20 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let fsFile = context.File.As<IFSharpFile>()
         if isNull fsFile then null else
 
-        // todo: enable completion on selection to match C# behaviour
         let selectedTreeRange = context.SelectedTreeRange
-        if selectedTreeRange.Length > 0 then null else
-
-        // todo: fix for empty file via reparsed context
-        let treeNode = fsFile.FindNodeAt(selectedTreeRange)
+        let treeNode = fsFile.FindNodeAt(selectedTreeRange) // todo: fix for empty file via reparsed context
         if isNull treeNode then null else
 
         let document = context.Document
         let psiModule = fsFile.GetPsiModule()
-        let caretOffset = context.CaretDocumentOffset
+        let selectionStartOffset = DocumentOffset(document, selectedTreeRange.StartOffset.Offset)
 
-        let tokenAtCaret = fsFile.FindTokenAt(caretOffset)
-        let tokenBeforeCaret = fsFile.FindTokenAt(caretOffset - 1)
+        let tokenBeforeCaret = fsFile.FindTokenAt(selectedTreeRange.StartOffset - 1)
+        let tokenAtCaret = fsFile.FindTokenAt(selectedTreeRange.EndOffset)
 
-        let isIdentifierStart = FSharpCodeCompletionContext.canBeIdentifierStart tokenBeforeCaret
-        let completedRangeStart = if isIdentifierStart then tokenBeforeCaret.GetDocumentStartOffset() else caretOffset
+        let completedRangeStart =
+            let isIdentifierStart = FSharpCodeCompletionContext.canBeIdentifierStart tokenBeforeCaret
+            if isIdentifierStart then tokenBeforeCaret.GetDocumentStartOffset() else selectionStartOffset
 
         let reparsedContext =
             FSharpReparsedCodeCompletionContext(fsFile, selectedTreeRange, FSharpCodeCompletionContext.DummyIdentifier)
@@ -259,14 +256,14 @@ type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
         let isQualified = isNotNull reference && reference.IsQualified
 
         let lookupRanges =
-            let completedRange = DocumentRange(&completedRangeStart, &caretOffset)
+            let completedRange = DocumentRange(&completedRangeStart, &selectionStartOffset)
             let lookupRanges = CodeCompletionContextProviderBase.GetTextLookupRanges(context, completedRange)
             if not (FSharpCodeCompletionContext.canBeIdentifierStart tokenAtCaret) then lookupRanges else
 
             let tokenAtEndOffset = tokenAtCaret.GetDocumentEndOffset()
             lookupRanges.WithReplaceRange(DocumentRange(&completedRangeStart, &tokenAtEndOffset))
 
-        let fcsContext = FSharpCodeCompletionContext.getFcsCompletionContext fsFile document caretOffset
+        let fcsContext = FSharpCodeCompletionContext.getFcsCompletionContext fsFile document selectionStartOffset
 
         FSharpCodeCompletionContext(context, fcsContext, reparsedContext, isQualified, tokenBeforeCaret,
             tokenAtCaret, lookupRanges, psiModule, treeNode, fsXmlDocService) :> _
