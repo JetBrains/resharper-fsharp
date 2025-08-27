@@ -135,7 +135,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.DecorateItems(_, _, _) = ()
 
         member x.GetLookupFocusBehaviour(_, _) = LookupFocusBehaviour.Soft
-        member x.GetAutocompletionBehaviour(_, _) = AutocompletionBehaviour.NoRecommendation
+        member x.GetAutoAcceptBehaviour(_, _) = AutoAcceptBehaviour.NoRecommendation
 
         member x.IsDynamic = false
         member x.IsFinal = false
