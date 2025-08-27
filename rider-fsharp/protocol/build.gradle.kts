@@ -10,6 +10,10 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
   maven("https://cache-redirector.jetbrains.com/maven-central")
   maven("https://cache-redirector.jetbrains.com/plugins.gradle.org")
+  val rd_version: String by project
+  if (rd_version == "SNAPSHOT") {
+    mavenLocal()
+  }
 }
 
 val isMonorepo = rootProject.projectDir != projectDir.parentFile
