@@ -8,7 +8,8 @@ module A1 =
             inherit ResizeArray<int>()
             let x = 4
             new (x: int) = T2()
-            member _.M2 x (y, z) = x(y) + z
+            member _.M2 x (y: 'a when 'a :> System.IDisposable, z) = x(y) + z
+            member val Prop = 5 with get, set
             interface System.IDisposable with
                 member this.Dispose() = ()
 
@@ -30,7 +31,7 @@ module A1 =
             val Y: float
             new(x: float, y: float) = { X = x; Y = y }
         end
-    
+
     type System.Collections.Generic.List<'a> with
         member x.Length = x.Count
 
