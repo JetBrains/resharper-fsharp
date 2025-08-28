@@ -33,7 +33,7 @@ let isEnumMember (field: FSharpField) =
     | _ -> false
 
 //TODO: add names
-let formatMfv (mfv: FSharpMemberOrFunctionOrValue) (displayContext: FSharpDisplayContext) =
+let formatMfv (mfv: FSharpMemberOrFunctionOrValue) (displayContext: FSharpDisplayContext) addParameterNames =
     let append (stringBuilder: StringBuilder) (s: string) =
         stringBuilder.Append(s) |> ignore
 
@@ -54,6 +54,11 @@ let formatMfv (mfv: FSharpMemberOrFunctionOrValue) (displayContext: FSharpDispla
 
         let mutable isFirstParam = true
         for param in group do
+            if addParameterNames && group.Count = 1 then
+                match param.Name with
+                | Some name -> append builder $"{name}: "
+                | _ -> ()
+
             if not isFirstParam then append builder " * "
 
             let fcsType = param.Type

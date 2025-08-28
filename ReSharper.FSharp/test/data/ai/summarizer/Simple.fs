@@ -1,4 +1,4 @@
-namespace N1
+namespace N1.N
 
 module A1 =
     module A2 =
@@ -15,4 +15,20 @@ module A1 =
     exception E1 of string
         with member x.NewMessage = ""
 
-namespace N2
+    type Record = {
+        Field1: int
+        Field2: int
+    }
+
+    type DU =
+        | Case1 of int
+        | Case2
+
+    type Struct =
+        struct
+            val X: float
+            val Y: float
+            new(x: float, y: float) = { X = x; Y = y }
+        end
+
+namespace N2.N

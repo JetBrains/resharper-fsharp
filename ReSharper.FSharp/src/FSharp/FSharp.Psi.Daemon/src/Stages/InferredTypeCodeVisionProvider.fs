@@ -1,7 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
-open System.Text
-open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.Application.Parts
@@ -24,7 +22,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
-open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
@@ -106,7 +103,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv mfv
+            let text = formatMfv mfv emptyDisplayContext false
             x.AddHighlighting(consumer, binding, text)
 
         | :? FSharpField as field ->
@@ -122,6 +119,6 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv mfv emptyDisplayContext
+            let text = formatMfv mfv emptyDisplayContext false
             x.AddHighlighting(consumer, decl, text)
         | _ -> ()

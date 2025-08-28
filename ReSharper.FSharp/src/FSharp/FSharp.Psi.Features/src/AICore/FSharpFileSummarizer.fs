@@ -42,10 +42,10 @@ type private FileSummarizerVisitor() =
     //TODO: common
     static let displayContext = FSharpDisplayContext.Empty.WithShortTypeNames(true)
     // F# field?
-    let formatFcsSymbol (fcsSymbol: FSharpSymbol) =
+    let formatFcsSymbolType (fcsSymbol: FSharpSymbol) =
         match fcsSymbol with
         | :? FSharpEntity as entity -> entity.AsType().Format(displayContext)
-        | :? FSharpMemberOrFunctionOrValue as mfv -> formatMfv mfv displayContext
+        | :? FSharpMemberOrFunctionOrValue as mfv -> formatMfv mfv displayContext true
         | _ -> "_"
 
     override x.VisitNode(node, context) =
@@ -57,7 +57,7 @@ type private FileSummarizerVisitor() =
     //TODO: qualifiers
     override x.VisitNamedNamespaceDeclaration(namespaceDecl, context) =
         // Currently we're not adding namespace to the scope to not duplicate it name in tokens
-        context.AddEntity(namespaceDecl, "namespace " + namespaceDecl.SourceName)
+        context.AddEntity(namespaceDecl, "namespace " + namespaceDecl.QualifiedName)
         x.VisitNode(namespaceDecl, context)
 
     /// module A.B.C
@@ -78,9 +78,9 @@ type private FileSummarizerVisitor() =
     override x.VisitFSharpTypeDeclaration(typeDecl, context) =
         let inheritRepr =
             if isNull typeDecl.TypeInheritMember then "" else
-            " inherit " + formatFcsSymbol (typeDecl.TypeInheritMember.TypeName.Reference.GetFcsSymbol())
+            " inherit " + formatFcsSymbolType (typeDecl.TypeInheritMember.TypeName.Reference.GetFcsSymbol())
 
-        let typeRepr = typeDecl.GetFcsSymbol() |> formatFcsSymbol
+        let typeRepr = typeDecl.GetFcsSymbol() |> formatFcsSymbolType
 
         use _ = context.OpenScope(typeDecl, $" type {typeRepr}", inheritRepr)
         x.VisitNode(typeDecl, context)
@@ -92,14 +92,14 @@ type private FileSummarizerVisitor() =
 
     /// module A.B.C type T<...> with
     override x.VisitTypeExtensionDeclaration(extensionDecl, context) =
-        let extensionRepr = extensionDecl.GetFcsSymbol() |> formatFcsSymbol
+        let extensionRepr = extensionDecl.GetFcsSymbol() |> formatFcsSymbolType
 
         use _ = context.OpenScope(extensionDecl, $" type {extensionRepr}", "with")
         x.VisitNode(extensionDecl, context)
 
     /// module A.B.C type T<...> interface I<...>
     override x.VisitInterfaceImplementation(interfaceImpl, context) =
-        let interfaceRepr = interfaceImpl.FcsEntity |> formatFcsSymbol
+        let interfaceRepr = interfaceImpl.FcsEntity |> formatFcsSymbolType
 
         use _ = context.OpenScope(interfaceImpl, $" interface {interfaceRepr}")
         x.VisitNode(interfaceImpl, context)
@@ -111,25 +111,31 @@ type private FileSummarizerVisitor() =
         if isNull referencePat then () else
 
         let fcsSymbol = referencePat.GetFcsSymbol()
-        let typeRepr = fcsSymbol |> formatFcsSymbol
+        let typeRepr = fcsSymbol |> formatFcsSymbolType
         let representation = $" val {fcsSymbol.DisplayName}: {typeRepr}"
         context.AddEntity(binding, representation)
 
     /// module A.B.C type T<...> member M: ...
     /// module A.B.C type T<...> interface I<...> member M: ...
     override x.VisitMemberDeclaration(memberDecl, context) =
-        let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbol
+        let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType
         let representation = $"member {memberDecl.SourceName}: {typeRepr}"
         context.AddEntity(memberDecl, representation)
 
     override x.VisitAutoPropertyDeclaration(autoPropDecl, context) =
-        let typeRepr = autoPropDecl.GetFcsSymbol() |> formatFcsSymbol
+        let typeRepr = autoPropDecl.GetFcsSymbol() |> formatFcsSymbolType
         let representation = $"member {autoPropDecl.SourceName}: {typeRepr} with get, set"
         context.AddEntity(autoPropDecl, representation)
 
     /// module A.B.C type T<...> new: ...
+    override x.VisitPrimaryConstructorDeclaration(constructor, context) =
+        let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbolType
+        let representation = $"new: {typeRepr}"
+        context.AddEntity(constructor, representation)
+
+    /// module A.B.C type T<...> new: ...
     override x.VisitSecondaryConstructorDeclaration(constructor, context) =
-        let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbol
+        let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbolType
         let representation = $"new: {typeRepr}"
         context.AddEntity(constructor, representation)
 
