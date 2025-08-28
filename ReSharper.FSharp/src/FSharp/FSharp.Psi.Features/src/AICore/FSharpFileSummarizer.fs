@@ -112,7 +112,7 @@ type private FileSummarizerVisitor() =
 
         let fcsSymbol = referencePat.GetFcsSymbol()
         let typeRepr = fcsSymbol |> formatFcsSymbolType
-        let representation = $" val {fcsSymbol.DisplayName}: {typeRepr}"
+        let representation = $"val {fcsSymbol.DisplayName}: {typeRepr}"
         context.AddEntity(binding, representation)
 
     /// module A.B.C type T<...> member M: ...
