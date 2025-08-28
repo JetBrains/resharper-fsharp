@@ -78,7 +78,7 @@ type private FileSummarizerVisitor() =
     override x.VisitFSharpTypeDeclaration(typeDecl, context) =
         let inheritRepr =
             if isNull typeDecl.TypeInheritMember then "" else
-            " inherit " + formatFcsSymbolType (typeDecl.TypeInheritMember.TypeName.Reference.GetFcsSymbol())
+            "inherit " + formatFcsSymbolType (typeDecl.TypeInheritMember.TypeName.Reference.GetFcsSymbol())
 
         let typeRepr = typeDecl.GetFcsSymbol() |> formatFcsSymbolType
 

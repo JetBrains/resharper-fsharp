@@ -30,5 +30,8 @@ module A1 =
             val Y: float
             new(x: float, y: float) = { X = x; Y = y }
         end
+    
+    type System.Collections.Generic.List<'a> with
+        member x.Length = x.Count
 
 namespace N2.N
