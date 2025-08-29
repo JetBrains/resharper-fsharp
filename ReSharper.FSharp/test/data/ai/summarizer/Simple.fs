@@ -15,6 +15,11 @@ module A1 =
             interface System.IDisposable with
                 member this.Dispose() = ()
 
+        [<Interface>]
+        type Interface =
+            inherit System.IDisposable
+            abstract member M: x: int -> unit
+
     exception E1 of string
         with member x.NewMessage = ""
 

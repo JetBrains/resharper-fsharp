@@ -122,6 +122,16 @@ type private FileSummarizerVisitor() =
         let representation = $"member {memberDecl.SourceName}: {typeRepr}"
         context.AddEntity(memberDecl, representation)
 
+    override x.VisitAbstractMemberDeclaration(memberDecl, context) =
+        let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType
+        let representation = $"member {memberDecl.SourceName}: {typeRepr}"
+        context.AddEntity(memberDecl, representation)
+
+    override x.VisitMemberSignature(memberSign, context) =
+        let typeRepr = memberSign.GetFcsSymbol() |> formatFcsSymbolType
+        let representation = $"member {memberSign.SourceName}: {typeRepr}"
+        context.AddEntity(memberSign, representation)
+
     override x.VisitAutoPropertyDeclaration(autoPropDecl, context) =
         let typeRepr = autoPropDecl.GetFcsSymbol() |> formatFcsSymbolType
         let representation = $"member {autoPropDecl.SourceName}: {typeRepr} with get, set"
