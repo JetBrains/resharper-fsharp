@@ -17,6 +17,7 @@ type FSharpFileSummarizerTest() =
     override x.RelativeTestDataPath = "ai/summarizer"
 
     [<Test>] member x.``Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 01``() = x.DoNamedTest()
 
     override x.DoTest(_: Lifetime, project: IProject) =
         let psiServices = x.Solution.GetPsiServices()

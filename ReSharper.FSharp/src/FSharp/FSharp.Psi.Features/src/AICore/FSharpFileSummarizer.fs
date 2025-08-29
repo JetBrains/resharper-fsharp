@@ -62,7 +62,8 @@ type private FileSummarizerVisitor() =
 
     /// module A.B.C
     override x.VisitNamedModuleDeclaration(moduleDecl, context) =
-        use _ = context.OpenScope(moduleDecl, "module " + moduleDecl.SourceName)
+        // Currently we're not adding top-level module to the scope to not duplicate it name in tokens
+        context.AddEntity(moduleDecl, "module " + moduleDecl.ClrName)
         x.VisitNode(moduleDecl, context)
 
     override x.VisitNestedModuleDeclaration(moduleDecl, context) =
