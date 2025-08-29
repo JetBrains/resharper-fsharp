@@ -4,11 +4,13 @@ module A1 =
     module A2 =
         let x = 5
         let f x = 1
+        let (|One|_|) (x: int) = Some(1)
         type T2() =
             inherit ResizeArray<int>()
             let x = 4
             new (x: int) = T2()
             member _.M2 x (y: 'a when 'a :> System.IDisposable, z) = x(y) + z
+            member _.M3 (x, ?y) = y.Value + 1
             member val Prop = 5 with get, set
             interface System.IDisposable with
                 member this.Dispose() = ()

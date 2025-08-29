@@ -54,14 +54,18 @@ let formatMfv (mfv: FSharpMemberOrFunctionOrValue) (displayContext: FSharpDispla
 
         let mutable isFirstParam = true
         for param in group do
-            if addParameterNames && group.Count = 1 then
-                match param.Name with
-                | Some name -> append builder $"{name}: "
-                | _ -> ()
-
             if not isFirstParam then append builder " * "
 
-            let fcsType = param.Type
+            let fcsType =
+                if addParameterNames then
+                    match param.Name with
+                    | Some name ->
+                        let prefix = if param.IsOptionalArg then "?" else ""
+                        append builder (prefix + $"{name}: ")
+                        if param.IsOptionalArg then param.Type.GenericArguments[0] else param.Type
+                    | _ -> param.Type
+                else param.Type
+
             let addParens =
                 fcsType.IsFunctionType ||
                 fcsType.IsTupleType && group.Count > 1
