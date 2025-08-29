@@ -42,6 +42,12 @@ class FSharpBracketMatcher : BracketMatcher(
     Pair(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE),
     Pair(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK),
     Pair(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED),
-    Pair(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
+    Pair(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED),
+
+    Pair(FSharpTokenType.CLASS, FSharpTokenType.END),
+    Pair(FSharpTokenType.INTERFACE, FSharpTokenType.END),
+    Pair(FSharpTokenType.STRUCT, FSharpTokenType.END),
+
+    Pair(FSharpTokenType.BEGIN, FSharpTokenType.END)
   )
 )
