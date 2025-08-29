@@ -5,7 +5,7 @@ module A1 =
         let x = 5
         let f x = 1
         let (|One|_|) (x: int) = Some(1)
-        type T2() =
+        type T2<'t, 'm>() =
             inherit ResizeArray<int>()
             let x = 4
             new (x: int) = T2()
