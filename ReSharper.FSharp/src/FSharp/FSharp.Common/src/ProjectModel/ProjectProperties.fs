@@ -137,17 +137,6 @@ type FSharpProjectApplicableProvider() =
             isFSharpProject projectMark.Location projectMark.TypeGuid
 
 
-[<ShellFeaturePart>]
-[<ZoneMarker(typeof<IHostSolutionZone>)>]
-type FSharpProjectMarkTypeGuidProvider() =
-    inherit ProjectMarkTypeGuidProvider()
-
-    override x.IsApplicable(projectMark) =
-        projectMark.Location.ExtensionNoDot = FsprojExtension
-
-    override x.GetActualTypeGuid _ = fsProjectTypeGuid
-
-
 [<ProjectModelExtension>]
 type FSharpProjectPropertiesFactory() =
     inherit UnknownProjectPropertiesFactory()
