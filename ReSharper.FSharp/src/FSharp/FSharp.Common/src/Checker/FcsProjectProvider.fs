@@ -615,7 +615,7 @@ type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: Outpu
         fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>) =
 
     interface ISolutionLoadTasksStartPsiListener2 with
-        member this.OnSolutionLoadStartPsi() =
+        member this.OnSolutionLoadStartPsi(_: OuterLifetime) =
             // todo: track file system changes instead? This currently may be triggered on a project model change too.
             outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
                 // No FCS caches to invalidate.
