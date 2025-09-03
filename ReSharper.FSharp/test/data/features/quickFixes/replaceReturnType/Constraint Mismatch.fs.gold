@@ -1,4 +1,4 @@
-type Thing() =
+﻿type Thing() =
     class
     end
 
@@ -7,5 +7,7 @@ module A =
         class
         end
 
- 
-let mkBee () : A.B = A.B(){caret}
+
+open A
+
+let mkBee () : B = A.B(){caret}

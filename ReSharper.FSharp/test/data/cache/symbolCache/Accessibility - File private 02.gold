@@ -1,0 +1,10 @@
+﻿Project Files:Accessibility - File private 02.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  TypeAbbreviationOrDeclarationPart:Abbr->M+Abbr
+Accessibility - File private 02.fsi:
+FSharpProjectFilePart:SigFile
+ NamedModulePart:M->M
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [Abbr]: FSharpClassOrProvidedTypeAbbreviation:M+Abbr (file, public, compiled: internal, erased)[TestProject]

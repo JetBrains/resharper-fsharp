@@ -2,7 +2,9 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.MatchExprUtil
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 
@@ -29,3 +31,11 @@ let addIndent (clause: IMatchClause) =
 
         let indentSize = expr.GetIndentSize()
         shiftWithWhitespaceBefore indentSize expr
+
+// todo: check 'with'/'function' instead of expr.StartLine
+let addBarIfNeeded (expr: IMatchLikeExpr) =
+    let firstClause = expr.Clauses.FirstOrDefault()
+    if isNotNull firstClause && isNull firstClause.Bar && firstClause.StartLine <> expr.StartLine then
+        let bar = FSharpTokenType.BAR.CreateLeafElement()
+        addNodeBefore firstClause.FirstChild bar
+        firstClause.FormatNode()

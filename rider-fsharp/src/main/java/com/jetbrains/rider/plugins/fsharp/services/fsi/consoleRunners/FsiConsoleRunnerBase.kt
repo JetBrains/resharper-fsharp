@@ -123,6 +123,8 @@ abstract class FsiConsoleRunnerBase(
     fun isValid() = !processHandler.isProcessTerminated && !processHandler.isProcessTerminating
 
     fun sendText(visibleText: String, fsiText: String, lineStart: Int = 1) {
+        fsiInputOutputProcessor.processAllPendingMessages()
+
         UIUtil.invokeLaterIfNeeded {
             inputSeparatorGutterContentProvider.addLineSeparator(consoleView.historyViewer.document.lineCount)
 

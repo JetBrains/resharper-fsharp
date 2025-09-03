@@ -20,8 +20,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override void ClearCachedData()
     {
-      base.ClearCachedData();
-      myIsMutable = null;
+      lock (this)
+      {
+        base.ClearCachedData();
+        myIsMutable = null;  
+      }
     }
 
     public bool IsMutable

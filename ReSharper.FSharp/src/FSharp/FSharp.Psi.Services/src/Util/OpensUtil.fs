@@ -4,9 +4,10 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -15,7 +16,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -35,7 +38,12 @@ let toQualifiedList (declaredElement: IClrDeclaredElement) =
             | null -> loop acc (typeElement.GetContainingNamespace())
             | containingType -> loop acc containingType
 
-        | _ -> failwithf "Expecting a namespace or a type element"
+        | _ ->
+            let containingType = declaredElement.GetContainingType()
+            if isNull containingType then [] else
+
+            let acc = declaredElement :: acc
+            loop acc containingType
 
     loop [] declaredElement
 
@@ -189,7 +197,6 @@ let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
 
 let removeOpen (openStatement: IOpenStatement) =
     use writeLock = WriteLockCookie.Create(true)
-    use disableFormatter = new DisableCodeFormatter()
 
     removeModuleMember openStatement
 
@@ -206,40 +213,14 @@ let canInsertBefore (openStatement: IOpenStatement) ns =
 
 let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (moduleToImport: ModuleToImport) =
     let elementFactory = fsFile.CreateElementFactory()
-    let lineEnding = fsFile.GetLineEnding()
 
     let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
-        let indent = moduleMember.Indent
+        moduleMember.InnerTokens() |> Seq.iter ignore
+        ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
 
-        addNodesBefore moduleMember [
-            // todo: add setting for adding space before first module member
-            // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
-                NewLine(lineEnding)
-
-            elementFactory.CreateOpenStatement(ns)
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-
-            // Add space after new opens group.
-            if not (moduleMember :? IOpenStatement) then
-                NewLine(lineEnding)
-                if indent > 0 then
-                    Whitespace(indent)
-        ] |> ignore
-
-    let insertAfterAnchor (ns: string) (anchor: ITreeNode) indent =
-        addNodesAfter anchor [
-            if not (anchor :? IOpenStatement) then
-                NewLine(lineEnding)
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-            elementFactory.CreateOpenStatement(ns)
-            if not (anchor :? IOpenStatement) && not (isFollowedByEmptyLineOrComment anchor) then
-                NewLine(lineEnding)
-        ] |> ignore
+    let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
+        anchor.InnerTokens() |> Seq.iter ignore
+        ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let duplicates (ns: string) (openStatement: IOpenStatement) =
         let referenceName = openStatement.ReferenceName
@@ -254,7 +235,7 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
             insertBeforeModuleMember ns openStatement
         else
             match rest with
-            | [] -> insertAfterAnchor ns openStatement openStatement.Indent
+            | [] -> insertAfterAnchor ns openStatement
             | _ -> addOpenToOpensGroup rest ns
 
     let moduleDecl, searchAnchor = findModuleToInsertTo fsFile offset settings moduleToImport
@@ -321,15 +302,13 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
     if firstModuleMember != memberToInsertBefore || moduleDecl :? IAnonModuleDeclaration then
         insertBeforeModuleMember ns memberToInsertBefore else
 
-    let indent = memberToInsertBefore.Indent
-
     let anchor =
         match moduleDecl with
         | :? INestedModuleDeclaration as nestedModule -> nestedModule.EqualsToken :> ITreeNode
         | :? ITopLevelModuleLikeDeclaration as moduleDecl -> moduleDecl.NameIdentifier :> _
         | _ -> failwithf "Unexpected module: %O" moduleDecl
 
-    insertAfterAnchor ns anchor indent
+    insertAfterAnchor ns anchor
 
 let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (moduleToImport: ModuleToImport) =
     let settings = fsFile.GetSettingsStoreWithEditorConfig()
@@ -372,6 +351,8 @@ let getClrName (element: IClrDeclaredElement) =
 [<RequireQualifiedAccess>]
 type OpenScope =
     | Global
+    | OwnNamespace
+    | AssemblyAutoOpen of IPsiModule
     | Range of range: TreeTextRange
 
 [<RequireQualifiedAccess>]
@@ -390,12 +371,14 @@ module OpenScope =
         else
             scopes |> Seq.exists (includesOffset offset)
 
-type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCache) =
+type OpenedModulesProvider(context: ITreeNode) =
     let map = OneToListMap<string, OpenScope>()
 
+    let autoOpenCache = context.GetSolution().GetComponent<FSharpAutoOpenCache>()
+    let fsFile = context.GetContainingFileThroughSandBox() :?> IFSharpFile
     let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
-    // todo: use scope with references?
+
     let symbolScope = getSymbolScope psiModule false
 
     let importQualifiedName scope (qualifiedName: string) =
@@ -426,6 +409,17 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
 
     do
         importElement OpenScope.Global symbolScope.GlobalNamespace
+
+        for referencedModule in getReferencedModules psiModule do
+            let autoOpenedModuleNames = autoOpenCache.GetAutoOpenedModules(referencedModule)
+            if autoOpenedModuleNames.IsEmpty() then () else
+
+            let symbolScope = getModuleOnlySymbolScope psiModule false
+            for autoOpenedModuleName in autoOpenCache.GetAutoOpenedModules(referencedModule) do
+                for autoOpenedModule in symbolScope.GetElementsByQualifiedName(autoOpenedModuleName) do
+                    let scope = OpenScope.AssemblyAutoOpen(referencedModule)
+                    importElement scope autoOpenedModule
+
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelDecl then
@@ -444,6 +438,7 @@ type OpenedModulesProvider(fsFile: IFSharpFile, autoOpenCache: FSharpAutoOpenCac
                 if isNotNull declaredElement then
                     importElement scope declaredElement
 
+    member x.Context = context
     member x.OpenedModuleScopes = map
 
     member this.Contains(declaredElement: IClrDeclaredElement, context: ITreeNode) =

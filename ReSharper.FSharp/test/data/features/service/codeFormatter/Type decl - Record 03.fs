@@ -9,3 +9,8 @@ type R2 =
           F2: int }
 
 type R3 = private { F: int }
+
+
+type R4 =
+    private 
+        { F: int }

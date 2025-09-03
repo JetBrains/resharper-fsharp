@@ -7,13 +7,10 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpFieldBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IField
+  internal abstract class FSharpFieldBase<TDeclaration>([NotNull] TDeclaration declaration)
+    : FSharpTypeMember<TDeclaration>(declaration), IField
     where TDeclaration : IFSharpDeclaration, ITypeMemberDeclaration, IModifiersOwnerDeclaration
   {
-    protected FSharpFieldBase([NotNull] TDeclaration declaration) : base(declaration)
-    {
-    }
-
     [CanBeNull] protected abstract FSharpType FieldType { get; }
 
     public override DeclaredElementType GetElementType() =>
@@ -30,15 +27,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsRequired => false;
     public ReferenceKind ReferenceKind => ReferenceKind.VALUE;
     public int? FixedBufferSize => null;
+    
+    public void SetIsMutable(bool value)
+    {
+      foreach (var decl in GetDeclarations())
+        if (decl is IFSharpMutableModifierOwnerDeclaration mutableModifierOwnerDecl)
+          mutableModifierOwnerDecl.SetIsMutable(value);
+    }
   }
 
-  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner,
-    ITypePrivateMember, ITopLevelPatternDeclaredElement
+  internal class FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration)
+    : FSharpFieldBase<TopPatternDeclarationBase>(declaration), IMutableModifierOwner,
+      ITypePrivateMember, ITopLevelPatternDeclaredElement
   {
-    public FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration) : base(declaration)
-    {
-    }
-
     private FSharpMemberOrFunctionOrValue Field => Symbol as FSharpMemberOrFunctionOrValue;
     protected override FSharpType FieldType => Field?.FullType;
 
@@ -47,13 +48,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsMutable =>
       GetDeclaration() is ITopReferencePat { IsMutable: true };
 
-    public void SetIsMutable(bool value)
-    {
-      foreach (var declaration in GetDeclarations())
-        if (declaration is ITopReferencePat referencePat)
-          referencePat.SetIsMutable(true);
-    }
-
     public bool CanBeMutable =>
       GetDeclaration() is ITopReferencePat { CanBeMutable: true };
 
@@ -61,13 +55,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is { IsStatic: true };
   }
 
-  internal class FSharpValField : FSharpFieldBase<ValFieldDeclaration>
+  internal class FSharpValField([NotNull] ValFieldDeclaration declaration)
+    : FSharpFieldBase<ValFieldDeclaration>(declaration), IMutableModifierOwner
   {
-    public FSharpValField([NotNull] ValFieldDeclaration declaration) : base(declaration)
-    {
-    }
-
     private FSharpField Field => Symbol as FSharpField;
     protected override FSharpType FieldType => Field?.FieldType;
+
+    public bool IsMutable =>
+      GetDeclaration() is { IsMutable: true };
+
+    public bool CanBeMutable => true;
   }
 }

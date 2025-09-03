@@ -14,7 +14,7 @@ IFSharpImplFile
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IHashTypeUsage
-              FSharpToken(type:HASH, text:#)
+              FSharpTokenType+HashTokenElement(type:HASH, text:#)
               IAnonTypeUsage
                 FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

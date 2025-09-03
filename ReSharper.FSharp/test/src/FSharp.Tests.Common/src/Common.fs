@@ -4,12 +4,14 @@ open System
 open System.Collections.Generic
 open System.IO
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
-open JetBrains.Application.platforms
+open JetBrains.Application.Settings.Implementation
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
+open JetBrains.HabitatDetector
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
@@ -20,6 +22,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -34,9 +37,11 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
+open JetBrains.TestFramework.TestCompiler
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
+open NuGet.Frameworks
 
 module FSharpTestUtil =
     let referencedProjectGuid = "C13207C7-045E-485A-BC1A-AFA1472CD8BC"
@@ -57,19 +62,64 @@ module FSharpTestAttribute =
         |> HashSet
 
     let targetFrameworkId =
-        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+        TargetFrameworkId.Create(
+            FallbackFramework(
+                FrameworkConstants.CommonFrameworks.Net80,
+                [NuGetFramework(FrameworkConstants.FrameworkIdentifiers.Net, FrameworkConstants.Version8)]
+            )
+        )
 
 
 [<AutoOpen>]
 module PackageReferences =
-    let [<Literal>] FSharpCorePackage = "FSharp.Core/4.7.2"
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/8.0.101"
     let [<Literal>] JetBrainsAnnotationsPackage = "JetBrains.Annotations/2022.1.0"
-    let [<Literal>] SqlProviderPackage = "SQLProvider/1.1.101"
+    let [<Literal>] FSharpDataTypeProvidersPackage = "FSharp.Data/6.6.0"
     let [<Literal>] FsPickler = "FsPickler/5.3.2"
 
 type ITestAssemblyReaderShim =
     abstract CreateReferencedProjectCookie: IProject -> IDisposable
     abstract Dispose: unit -> unit
+
+
+[<ShellComponent>]
+type TestReferencesCompiler(lifetime: Lifetime) =
+    let compiler = DotNetTestCodeCompiler(lifetime, ContinuousIntegration.External)
+
+    member this.GetReference(testPath: FileSystemPath, projectName: string) =
+        let slnPath = testPath / "TestAssembliesSources" / "TestAssembliesSources.sln"
+
+        let compileResult =
+            compiler.Compile(slnPath, TestTargetFramework.Net80, HabitatInfo.OSArchitecture,
+                compileMode = DotNetTestCodeCompiler.CompileMode.Build
+            ).Result
+
+        let fileName = projectName + ".dll"
+        let dllPath = compileResult.OutputDir / fileName
+        Assertion.Assert(dllPath.ExistsFile)
+        [dllPath.FullPath]
+
+type TestReferenceProjectOutputAttribute(projectName: string) =
+    inherit Attribute()
+
+    interface ITestLibraryReferencesProvider with
+        member this.Inherits = true
+
+        member this.GetReferences(test, _, _) =
+            let testReferencesCompiler = Shell.Instance.GetComponent<TestReferencesCompiler>()
+            testReferencesCompiler.GetReference(test.BaseTestDataPath, projectName)
+
+
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
+type FSharpTestFormatterSettings(settingsSchema, logger: ILogger) =
+    inherit HaveDefaultSettings<FSharpFormatSettingsKey>(settingsSchema, logger)
+
+    override this.Name = "F# formatter default settings"
+
+    override this.InitDefaultSettings(mountPoint) =
+        this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.INDENT_SIZE), 4)
+        this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.USE_INDENT_FROM_VS), false)
+
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()
@@ -81,8 +131,9 @@ type FSharpTestAttribute(extension) =
 
     interface ITestPackagesProvider with
         override this.GetPackages _ =
-            [| if this.ReferenceFSharpCore then
-                TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
+            [| TestPackagesAttribute.ParsePackageName "Microsoft.NETCore.App.Ref/8.0.0"
+               if this.ReferenceFSharpCore then
+                   TestPackagesAttribute.ParsePackageName(FSharpCorePackage) |] :> _
 
         member this.Inherits = false
 
@@ -233,13 +284,14 @@ type AssertCorrectTreeStructureAttribute() =
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFSharpResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks) =
-    inherit FcsResolvedSymbolsCache(lifetime, checkerService, psiModules, fcsProjectProvider, scriptModuleProvider, locks)
+type TestFcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks) =
+    inherit FcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks)
 
     override x.Invalidate _ =
-        x.ProjectSymbolsCaches.Clear()
+        x.ModuleCaches.Clear()
+        x.ScriptCaches.Clear()
 
-    interface IHideImplementation<FcsResolvedSymbolsCache>
+    interface IHideImplementation<FcsCapturedInfoCache>
 
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
@@ -371,9 +423,10 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"
+        member this.IsProjectOutput _ = false
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assemblyInfoShim,
         fsOptionsProvider, symbolCache, solution, locks, logger) =
@@ -432,7 +485,7 @@ module FSharpTestPopup =
         let workflowPopupMenu = solution.GetComponent<TestWorkflowPopupMenu>()
         workflowPopupMenu.SetTestData(lifetime, fun _ occurrences _ _ _ ->
             occurrences
-            |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
+            |> Seq.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
             |> Option.defaultWith (fun _ ->
                 if assertExists then
                     failwithf $"Could not find %s{occurrenceName} occurrence"

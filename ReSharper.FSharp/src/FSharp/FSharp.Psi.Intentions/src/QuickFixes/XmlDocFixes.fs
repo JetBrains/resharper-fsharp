@@ -17,7 +17,6 @@ type ReplaceXmlDocWithLineCommentFix(warning: InvalidXmlDocPositionWarning) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(comment.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         replace comment (FSharpComment.CreateLineComment(comment.CommentText))
 
@@ -32,7 +31,6 @@ type RemoveXmlDocFix(warning: InvalidXmlDocPositionWarning) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(comment.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let firstSpaceBefore = getFirstMatchingNodeBefore isInlineSpace comment
         let firstToDelete = getThisOrPrevNewLine firstSpaceBefore

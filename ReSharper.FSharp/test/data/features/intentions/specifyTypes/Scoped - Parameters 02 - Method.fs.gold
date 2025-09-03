@@ -1,0 +1,5 @@
+﻿// ${RUN:Annotate all parameters}
+module Module
+
+type A() =
+    member _.M(a: 'a) (b: 'b, [<Attr>] ?c: 'c{caret}) = ()

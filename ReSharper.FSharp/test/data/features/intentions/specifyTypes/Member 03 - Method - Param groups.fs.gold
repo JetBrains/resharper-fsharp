@@ -1,0 +1,5 @@
+﻿module Module
+
+type A =
+    member x.M{caret} (a: string * 'a, b: string) (c: string * string seq): string =
+        (a ||> String.concat) + b + (c ||> String.concat)

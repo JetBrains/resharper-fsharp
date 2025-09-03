@@ -3,4 +3,4 @@
 type T1 = int -> int -> int
 
 type T2 = int -> int ->
-            int
+              int

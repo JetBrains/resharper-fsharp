@@ -137,3 +137,4 @@ type public Strings() =
     static member YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage = Strings.ResourceManager.GetString("YieldMayOnlyBeUsedWithinListArrayAndSequenceExpressionsMessage")
     static member NestedRecordUpdateCanBeSimplifiedMessage = Strings.ResourceManager.GetString("NestedRecordUpdateCanBeSimplifiedMessage")
     static member DotLambdaCanBeUsedStringMessage = Strings.ResourceManager.GetString("DotLambdaCanBeUsedStringMessage")
+    static member ValueMustBeMutableMessage = Strings.ResourceManager.GetString("ValueMustBeMutableMessage")

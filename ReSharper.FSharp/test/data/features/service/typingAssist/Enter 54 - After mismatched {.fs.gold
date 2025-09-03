@@ -3,5 +3,5 @@ module Module
 
 let r =
    { Foo = fun q w -> async {
-     {caret}
+       {caret}
    }

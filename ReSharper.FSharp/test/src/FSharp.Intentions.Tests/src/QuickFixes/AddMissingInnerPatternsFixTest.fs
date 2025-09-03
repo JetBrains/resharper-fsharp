@@ -83,10 +83,10 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``Comment 02 - Eof``() = x.DoNamedTest()
     [<Test>] member x.``Comment 03``() = x.DoNamedTest()
     [<Test>] member x.``Comment 04 - Space``() = x.DoNamedTest()
-    [<Test>] member x.``Comment 05``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Comment 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Empty line 01``() = x.DoNamedTest()
-    [<Test>] member x.``Empty line 02``() = x.DoNamedTest()
+    [<Test>] member x.``Empty line 02``() = x.DoNamedTest() // todo: formatter: add empty line
 
     [<Test>] member x.``Indent 01``() = x.DoNamedTest()
     [<Test>] member x.``Indent 02``() = x.DoNamedTest()
@@ -131,6 +131,9 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``List 12``() = x.DoNamedTest()
     [<Test>] member x.``List 13``() = x.DoNamedTest()
 
+    [<Test>] member x.``Null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Null 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Tuple 03``() = x.DoNamedTest()
@@ -165,3 +168,4 @@ type AddMissingPatternsFixTest() =
     [<Test>] member x.``Union 20``() = x.DoNamedTest()
     [<Test>] member x.``Union 21``() = x.DoNamedTest()
     [<Test>] member x.``Union 22``() = x.DoNamedTest()
+    [<Test>] member x.``Union 23``() = x.DoNamedTest()

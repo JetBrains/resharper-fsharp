@@ -30,6 +30,9 @@ type ReplaceLambdaWithDotLambdaTest() =
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
     [<Test; ExecuteScopedActionInFile>] member x.``File scoped - Remove parens`` () = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Test1`` () = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type ReplaceLambdaWithDotLambdaAvailabilityTest() =

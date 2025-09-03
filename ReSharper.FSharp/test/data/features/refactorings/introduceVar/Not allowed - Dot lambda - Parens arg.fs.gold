@@ -1,1 +1,3 @@
-﻿NOT AVAILABLE
+﻿module Module
+
+_.ToString()

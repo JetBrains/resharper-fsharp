@@ -1,0 +1,12 @@
+﻿module Module
+
+type S =
+    struct
+        val Field: string
+    end
+
+let s = S()
+
+let f (p: string) = ()
+
+f s.Field{caret}

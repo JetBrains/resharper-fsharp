@@ -1,6 +1,6 @@
 ﻿## GotoInheritorsProvider activity:
   Immediate result:
-    [*] DEO: Envoy: Class:Module+B, PsiLanguageType:F# as Envoy: Class:Module+B, PsiLanguageType:F# RANGE: (0,0) @ Types 01.fs
+    [*] DEO: Envoy: FSharpClass:Module+B, PsiLanguageType:F# as Envoy: FSharpClass:Module+B, PsiLanguageType:F# RANGE: (0,0) @ Types 01.fs
     Navigation result:
       opened file: Types 01.fs
       ------------------

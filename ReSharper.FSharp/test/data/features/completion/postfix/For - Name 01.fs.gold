@@ -4,6 +4,6 @@ module Module
 let f x =
     x
     |> List.map (fun mice -> 
-      for mouse in mice do
-        {caret})
+        for mouse in mice do
+            {caret})
     |> ignore

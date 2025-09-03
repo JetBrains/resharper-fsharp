@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:Instance2 (in FSharpExtensions)}
+module Module
+
+open System.Threading.Tasks
+open FSharpExtensions
+
+Task.FromResult(1).Instance2{caret}

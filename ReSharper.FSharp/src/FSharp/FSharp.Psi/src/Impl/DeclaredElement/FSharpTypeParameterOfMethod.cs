@@ -15,21 +15,15 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpTypeParameterOfMethod : FSharpDeclaredElementBase, ITypeParameter
+  internal class FSharpTypeParameterOfMethod([NotNull] IFunction method, [NotNull] string name, int index)
+    : FSharpDeclaredElementBase, ITypeParameter
   {
-    [NotNull] public readonly IFunction Method;
-
-    public FSharpTypeParameterOfMethod([NotNull] IFunction method, [NotNull] string name, int index)
-    {
-      Method = method;
-      Index = index;
-      ShortName = name;
-    }
+    [NotNull] public readonly IFunction Method = method;
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.TYPE_PARAMETER;
 
-    public override string ShortName { get; }
+    public override string ShortName { get; } = name;
 
     public override bool IsValid() => Method.IsValid();
     public override IPsiModule Module => Method.Module;
@@ -50,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.NONE;
 
     public INamespace GetContainingNamespace() =>
-      Method.GetContainingType()?.GetContainingNamespace() ??
+      Method.ContainingType?.GetContainingNamespace() ??
       Module.GetSymbolScope(false).GlobalNamespace;
 
     public bool HasMemberWithName(string shortName, bool ignoreCase) => false;
@@ -72,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public TypeParameterNullability GetNullability(ISubstitution explicitInheritorSubstitution) =>
       TypeParameterNullability.Unknown;
 
-    public int Index { get; }
+    public int Index { get; } = index;
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
 
     [CanBeNull]
@@ -81,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!(Method is IFSharpTypeMember {ContainingType: { } typeElement, Symbol: FSharpMemberOrFunctionOrValue mfv})) 
         return null;
 
-      var index = Index + typeElement.TypeParameters.Count;
+      var index = Index + typeElement.TypeParametersCount;
       var mfvTypeParameters = mfv.GenericParameters;
       return mfvTypeParameters.Count > index
         ? mfvTypeParameters[index]
@@ -148,7 +142,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IParametersOwner OwnerFunction => Method;
     public IMethod OwnerMethod => (IMethod) Method;
     public ITypeParametersOwner Owner => Method as ITypeParametersOwner;
-    public ITypeElement OwnerType => Method.GetContainingType();
+    public ITypeElement OwnerType => Method.ContainingType;
 
     public override bool Equals(object obj) =>
       obj is FSharpTypeParameterOfMethod other &&

@@ -1,0 +1,4 @@
+﻿module Module
+
+type T() =
+    static member Prop: string = ""{caret}

@@ -1,58 +1,83 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpExtensionMemberUtil
 
+open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.Application
+open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Psi.Resolve
+open JetBrains.ReSharper.Psi.Resolve.TypeInference
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.Util
+open JetBrains.Util.Extension
 
 type FSharpRequest(psiModule, exprType: IType, name: string option) =
-    static let memberKinds = [ExtensionMemberKind.ExtensionMethod; FSharpExtensionMemberKind.FSharpExtensionMember]
+    static let memberKinds = [ExtensionMemberKind.CLASSIC_METHOD; FSharpExtensionMemberKind.INSTANCE]
 
     let name = Option.toObj name
 
     let baseTypes: IReadOnlyList<IType> =
-        let exprDeclaredType = exprType.As<IDeclaredType>()
+        if isNull exprType then [] else
+
+        let isArray = exprType :? IArrayType
+    
+        let rec removeArrayType (exprType: IType) =
+            match exprType with
+            | :? IArrayType as arrayType -> removeArrayType arrayType.ElementType
+            | _ -> exprType.As<IDeclaredType>()
+    
+        let exprDeclaredType = removeArrayType exprType
         if isNull exprDeclaredType then [] else
 
         let result = List<IType>()
-        result.Add(exprDeclaredType)
+        result.Add(exprType)
+
         for superType in exprDeclaredType.GetAllSuperTypes() do
+            let superType: IType =
+                if isArray then
+                    TypeFactory.CreateArrayType(superType, 1, NullableAnnotation.Unknown)
+                else
+                    superType
+
             result.Add(superType)
+            
+        if isArray then
+            let predefinedType = exprType.Module.GetPredefinedType()
+            result.Add(predefinedType.Array)
+            result.AddRange(predefinedType.Array.GetAllSuperTypes())
 
         result.AsReadOnly()
 
-    interface IRequest with
+    interface IExtensionMembersRequest with
         member this.Name = name
-        member this.BaseExpressionTypes = baseTypes
-        member this.ExpressionType = exprType
-        member this.ForModule = psiModule
+        member this.IsCaseSensitive = true
+
         member this.Kinds = memberKinds
 
-        member this.IsCaseSensitive = true
-        member this.Namespaces = []
-        member this.Types = []
+        member this.ReceiverType = exprType
+        member this.PossibleReceiverTypes = baseTypes
 
-        member this.WithExpressionType _ = failwith "todo"
-        member this.WithModule _ = failwith "todo"
+        member this.ForModule = psiModule
+        member this.ContainingNamespaces = []
+        member this.ContainingTypes = []
+
         member this.WithName _ = failwith "todo"
-        member this.WithNamespaces _ = failwith "todo"
-        member this.WithTypes _ = failwith "todo"
-
-let getQualifierExpr (reference: IReference) =
-    let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
-    if isNull refExpr then Unchecked.defaultof<_> else
-
-    refExpr.Qualifier
+        member this.WithKinds _ = failwith "todo"
+        member this.WithReceiverType _ = failwith "todo"
+        member this.WithModule _ = failwith "todo"
+        member this.WithContainingNamespaces _ = failwith "todo"
+        member this.WithContainingTypes _ = failwith "todo"
 
 [<return: Struct>]
 let (|FSharpSourceExtensionMember|_|) (typeMember: ITypeMember) =
@@ -72,10 +97,8 @@ let (|FSharpCompiledExtensionMember|_|) (typeMember: ITypeMember) =
     | :? IMethod as method ->
         let containingType = method.ContainingType
         if containingType :? IFSharpModule && containingType :? IFSharpCompiledTypeElement then
-            let parameters = method.Parameters
-            if parameters.Count = 0 then ValueNone else
-
-            ValueSome(parameters[0].Type.GetTypeElement())
+            let typeShortName = method.ShortName.SubstringBefore(".", StringComparison.Ordinal)
+            ValueSome(typeShortName)
         else
             ValueNone
 
@@ -88,7 +111,9 @@ let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
     | FSharpCompiledExtensionMember _ -> ValueSome()
     | _ -> ValueNone
 
-let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOpt: string option) =
+let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) isStaticContext (nameOpt: string option) =
+    if isNull fcsType then EmptyList.InstanceList else
+
     let psiModule = context.GetPsiModule()
     let solution = psiModule.GetSolution()
     use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
@@ -98,72 +123,45 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
     let exprTypeElements =
         let typeElements = List()
 
-        let exprTypeElement = exprType.GetTypeElement()
+        let exprTypeElement =
+            if exprType :? IArrayType then
+                exprType.Module.GetPredefinedType().Array.GetTypeElement()
+            else
+                exprType.GetTypeElement()
+
         if isNotNull exprTypeElement then
             typeElements.Add(exprTypeElement)
             typeElements.AddRange(exprTypeElement.GetSuperTypeElements())
 
         typeElements.AsReadOnly()
 
-    let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
-    let openedModulesProvider = OpenedModulesProvider(context.FSharpFile, autoOpenCache)
-    let scopes = openedModulesProvider.OpenedModuleScopes
-    let accessContext = ElementAccessContext(context)
-
-    let isInScope (typeMember: ITypeMember) =
-        let isInScope declaredElement =
-            let name = getQualifiedName declaredElement
-            let scopes = scopes.GetValuesSafe(name)
-            OpenScope.inAnyScope context scopes
-        
-        match typeMember.ContainingType with
-        | :? IFSharpModule as fsModule ->
-            isInScope fsModule
-
-        | containingType ->
-            let ns = containingType.GetContainingNamespace()
-            isInScope ns
+    let openedModulesProvider = OpenedModulesProvider(context)
+    let accessContext = FSharpAccessContext(context)
 
     let matchesType (typeMember: ITypeMember) : bool =
-        let matchesWithoutSubstitution (extendedTypeElement: ITypeElement) =
-            if isNull extendedTypeElement then false else
-
-            // todo: arrays and other non-declared-types?
-            exprTypeElements |> Seq.exists extendedTypeElement.Equals
-
         match typeMember with
         | FSharpSourceExtensionMember mfv ->
             let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
-            matchesWithoutSubstitution extendedTypeElement
+            isNotNull exprTypeElements && exprTypeElements |> Seq.exists extendedTypeElement.Equals
 
-        | FSharpCompiledExtensionMember extendedTypeElement ->
-            matchesWithoutSubstitution extendedTypeElement
+        | FSharpCompiledExtensionMember extendedTypeShortName ->
+            let getFSharpTypeName (typeElement: ITypeElement) =
+                let sourceName = typeElement.GetSourceName()
+                match typeElement.TypeParametersCount with
+                | 0 -> sourceName
+                | count -> $"{sourceName}`{count}"
+
+            exprTypeElements |> Seq.exists (getFSharpTypeName >> (=) extendedTypeShortName)
 
         | :? IMethod as method ->
             let parameters = method.Parameters
             if parameters.Count = 0 then false else
 
-            exprType.IsSubtypeOf(parameters[0].Type)
+            let consumer = RecursiveConsumer(method.TypeParameters.ToIReadOnlyList())
+            let typeInferenceMatcher = CLRTypeInferenceMatcher.Instance
+            typeInferenceMatcher.Match(TypeInferenceKind.LowerBound, exprType, parameters[0].Type, consumer)
 
         | _ -> false
-
-    let matchesName (typeMember: ITypeMember) =
-      match nameOpt with
-      | None -> true
-      | Some name ->
-
-      match typeMember with
-      | FSharpCompiledExtensionMember _ ->
-          let memberName = typeMember.ShortName
-          memberName = name ||
-          memberName = $"get_{name}" ||
-          memberName = $"set_{name}" ||
-
-          memberName.EndsWith($".{name}") ||
-          memberName.EndsWith($".get_{name}") ||
-          memberName.EndsWith($".set_{name}")
-
-      | _ -> typeMember.ShortName = name
 
     let isAccessible (typeMember: ITypeMember) =
         let isTypeAccessible = 
@@ -180,33 +178,78 @@ let getExtensionMembers (context: IFSharpTreeNode) (fcsType: FSharpType) (nameOp
         | _ -> AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let matchesName (typeMember: ITypeMember) =
-      match nameOpt with
-      | None -> true
-      | Some name ->
+        match nameOpt with
+        | None -> true
+        | Some name ->
 
-      match typeMember with
-      | FSharpCompiledExtensionMember _ ->
-          let memberName = typeMember.ShortName
-          memberName = name ||
-          memberName = $"get_{name}" ||
-          memberName = $"set_{name}" ||
+        match typeMember with
+        | FSharpCompiledExtensionMember _ ->
+            let memberName = typeMember.ShortName
+            memberName = name ||
+            memberName = $"get_{name}" ||
+            memberName = $"set_{name}" ||
+  
+            memberName.EndsWith($".{name}") ||
+            memberName.EndsWith($".get_{name}") ||
+            memberName.EndsWith($".set_{name}")
 
-          memberName.EndsWith($".{name}") ||
-          memberName.EndsWith($".get_{name}") ||
-          memberName.EndsWith($".set_{name}")
+        | _ -> typeMember.ShortName = name
 
-      | _ -> typeMember.ShortName = name
+    let resolvesAsExtensionMember (typeMember: ITypeMember) =
+        match typeMember with
+        | :? IFSharpDeclaredElement -> typeMember :? IFSharpMethod || typeMember :? IFSharpProperty
+        | _ -> true
+
+    let matchesCallingConvention (typeMember: ITypeMember) =
+        match typeMember with
+        | FSharpSourceExtensionMember mfv ->
+            mfv.IsInstanceMember <> isStaticContext
+
+        | FSharpCompiledExtensionMember _ ->
+            typeMember.ShortName.EndsWith(".Static", StringComparison.Ordinal) = isStaticContext
+
+        | _ -> not isStaticContext
 
     let isApplicable (typeMember: ITypeMember) =
+        resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
-        not (isInScope typeMember) &&
+        not (FSharpImportUtil.isTypeMemberInScope openedModulesProvider typeMember) &&
         isAccessible typeMember &&
+        matchesCallingConvention typeMember &&
         matchesType typeMember
 
-    let query = ExtensionMethodsQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
-
-    let methods = query.EnumerateMethods()
+    let query = ExtensionMembersQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
+    let methods = query.EnumerateMembers() |> List.ofSeq
 
     methods
     |> Seq.filter isApplicable
-    |> List
+    |> List :> _
+
+let getExtensionMembers (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
+    if isNull refExpr then EmptyList.InstanceList else
+
+    let isStaticContext = FSharpExpressionUtil.isStaticContext refExpr.Qualifier
+    let fcsType = getQualifierFcsType refExpr
+    getExtensionMembersForType refExpr fcsType isStaticContext nameOpt
+
+let groupByNameAndNs members =
+    members |> Seq.groupBy (fun (typeMember: ITypeMember) ->
+        Interruption.Current.CheckAndThrow()
+
+        let name =
+            typeMember.ShortName
+                .SubstringBeforeLast(".Static")
+                .SubstringAfterLast(".")
+                .SubstringAfter("get_")
+                .SubstringAfter("set_")
+
+        let ns =
+            match typeMember.ContainingType with
+            | :? IFSharpModule as fsModule ->
+                fsModule.QualifiedSourceName
+
+            | containingType ->
+                containingType.GetContainingNamespace().QualifiedName
+
+        ns, name
+    )

@@ -9,11 +9,11 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <NoWarn>FS0057</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Util\SequentialExprUtil.fs" />
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>JetResourceGenerator</Generator>
       <LastGenOutput>Strings.Designer.fs</LastGenOutput>
@@ -41,6 +41,8 @@
     <Compile Include="src\Util\FSharpPatternUtil.fs" />
     <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\Util\FSharpBindUtil.fs" />
+    <Compile Include="src\Util\TypeAnnotationUtil.fs" />
+    <Compile Include="src\Util\FSharpTypeUsageUtil.fs" />
     <Compile Include="src\Util\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Util\UnusedOpensUtil.fs" />
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
@@ -53,9 +55,12 @@
     <Compile Include="src\Util\FSharpStringLexer.fs" />
     <Compile Include="src\Util\RecordExprUtil.fs" />
     <Compile Include="src\Util\ObjExprUtil.fs" />
-    <Compile Include="src\Util\FSharpCompletionUtil.fs" />
+    <Compile Include="src\Util\FSharpImportUtil.fs" />
     <Compile Include="src\Util\FSharpExtensionMemberUtil.fs" />
+    <Compile Include="src\Util\FSharpImportStaticMemberUtil.fs" />
     <Compile Include="src\Util\TypeAnnotationsUtil.fs" />
+    <Compile Include="src\Util\FSharpCodeCompletionContext.fs" />
+    <Compile Include="src\Util\FSharpCompletionUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
@@ -82,6 +87,7 @@
     <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\Refactorings\UseNestedRecordFieldSyntax.fs" />
+    <Compile Include="src\Intentions\ISpecifyTypeActionsProvider.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">

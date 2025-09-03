@@ -1,5 +1,98 @@
 # Release notes
 
+## 2025.2
+
+### Import code completion and quick fixes
+
+* Importing static type members is now possible via code completion and a new quick fix
+    * When typing `String.Empty`, the `System` namespace can now be imported automatically. The new quick fix allows importing of members in already typed or pasted code
+* Types: use ReSharper engine for importing types from all referenced assemblies
+    * The ReSharper engine is now used for F# assemblies too, reducing memory footprint and improving the code completion performance
+    * The new F# accessibility check rules were implemented to allow it and are used in other IDE features as well
+    * Importing same named types from different namespaces is possible now, allowing you to choose the namespace
+* Extensions: use better integration with ReSharper extensions analysis
+    * Implement importing for more generic and array types extensions
+    * Allow choosing members when there's more than one is available in the quick fix
+    * Fix finding usages of compiled F# extension properties
+* Union cases: we've significantly improved the performance of getting the available union types, making the code completion faster on bigger F# solutions
+
+### Type hints and type annotation actions
+
+* Annotate actions import necessary types automatically now
+    * When specifying non-imported types, `opens` are added automatically
+* Add 'Add annotation' action for the type hints
+    * The context action allows to put the inferred type to the code easily
+* Allow annotating all function and method parameters
+    * For easier annotation of the parameters, it's now possible to annotate them in one go
+* Support annotating more complex patterns
+    * Less common patterns like optional parameters, patterns with attributes, and named field patterns can now be annotated as well
+* Fix showing the hints for set-only properties
+
+### Code editing and analysis
+
+* Use the new Go to File Member popup in F# script files
+* Code completion: when suggesting type members, emphasize own members
+* Language injections: improve performance and fix injecting in attribute arguments
+    * We've implemented additional checks using ReSharper engine to skip unnecessary work that was done previously
+* Speed up reading F# metadata by using less separate read operations
+    * This reduces the startup times when analyzing referenced F# assemblies
+* Fix parts of the analysis used by various features
+    * Fix type attributes could be ignored when analyzing F# code
+    * Fix type arguments could be lost when analyzing type abbreviations
+    * Fix type shadowing could be ignored and a wrong type could be used
+* The code quick fixes were improved:
+    * Generate missing patterns: fix wrong qualifiers could be added
+    * Generate missing record fields: fix generated fields order
+* Typing assistance has been improved
+    * Implement faster Enter and Backspace handling on the IDE frontend
+    * Implement better Enter handling in multiline strings and single-line `if` expressions
+* ReSharper code formatting engine is now used during code modifications, making features like refactorings easier to implement
+
+### C#/VB in-memory references
+
+* Fix F# could see oudated data after some changes to nested types or type members
+* Fix race that could lead to F# not seeing changes in referenced projects
+
+### F# Interactive and scripts
+
+* Fix analysis of F# script reference directives
+* Fix suggestions of symbols from referenced assemblies in F# scripts
+* F# Interactive: better handling of the interactive startup message
+
+
+## 2025.1
+
+### Code editing and analysis
+
+* Type hints are implemented for patterns in `match` and other expressions
+* Fix `Nullable` flags were not propagated to F# compiler service correctly
+* File structure: fix tuple patterns weren't accessible in the file structure
+* 'Annotate types' intention: improved handling of tuple types
+* 'Generate overrides': fix `static` members generation
+* 'To lambda' intention: support operators
+* Introduce var: fix unexpected `use` suggestions
+* Recursion analyzer: fix wrong tail-position calculation in `if` expressions
+
+### Code completion:
+
+* Code completion popup appears faster due to no more waiting for import items calculcation
+* Presentation: fix description popup for import type suggestions, use short names for return types
+* Import: reimplement type import suggestions using R# engine for non-F# assemblies for reduced memory consumption and better performance
+* Import: better checks for already imported modules and faster RequireQualifiedAccess analysis
+* Import: various fixes for extension members
+* Import: fix unexpected import suggestions in bindings and other declarations
+* Local values: fix escaping names, duplicated items
+* Fix missing type suggestions in patterns
+
+### C#/VB.NET in-memory references:
+
+* Optimize building metadata for referenced projects
+* Fix deadlocks in metadata up-to-date checks
+* Fix possible inconsistent state after changes to C#/VB.NET sources
+* Fix incorrect threading that could lead to exceptions in F# compiler service
+* Fix delayed F# compiler service requests cancellation which could reduce performance
+* Fix incorrect default values metadata for attribute parameters
+
 ## 2024.3
 
 This release adds full support F# 9 and .NET 9. Various features were updated to take the languages changes into account

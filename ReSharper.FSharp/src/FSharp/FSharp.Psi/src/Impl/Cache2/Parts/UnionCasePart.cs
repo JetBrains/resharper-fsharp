@@ -4,16 +4,17 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, IFSharpClassPart,
-    IRepresentationAccessRightsOwner
+    IFSharpRepresentationAccessRightsOwner
   {
     public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration), TreeNodeCollection<ITypeParameterDeclaration>.Empty, 
+      : base(declaration, FSharpModifiersUtil.GetDecoration(declaration), TreeNodeCollection<ITypeParameterDeclaration>.Empty, 
         cacheBuilder, PartKind.Class) =>
       ExtendsListShortNames =
         UnionRepresentationNavigator.GetByUnionCase(declaration) is { } repr &&
@@ -44,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         ? new[] {baseType}
         : EmptyList<IDeclaredType>.InstanceList;
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpUnionCaseClass(this);
 
     public override MemberDecoration Modifiers =>

@@ -10,8 +10,8 @@ open JetBrains.ReSharper.Psi
 
 let clrTypeName name = ClrTypeName(name) :> IClrTypeName
 
-[<CompiledName("SourceNameAttrTypeName")>]
-let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourceNameAttribute"
+[<CompiledName("CompilationSourceNameAttrTypeName")>]
+let compilationSourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourceNameAttribute"
 
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"

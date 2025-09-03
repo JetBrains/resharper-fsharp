@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+type T() =
+    struct {caret}end

@@ -28,15 +28,14 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     declaredElement.Equals(typeElement)
 
 let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified resolveExpr opName =
-    match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
-    | None -> false
-    | Some symbolUse ->
+    reference.ResolveWithFcs(opName, resolveExpr, qualified)
+    |> Seq.exists (fun symbolUse ->
+        let referenceOwner = reference.GetElement()
+        let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
+        if declaredElement.Equals(unqualifiedElement) then true else
 
-    let referenceOwner = reference.GetElement()
-    let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
-    if declaredElement.Equals(unqualifiedElement) then true else
-
-    resolvesToAssociatedModule declaredElement unqualifiedElement reference
+        resolvesToAssociatedModule declaredElement unqualifiedElement reference
+    )
 
 let resolvesToUnqualified (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) resolveExpr opName =
     resolvesTo declaredElement reference false resolveExpr opName
@@ -46,8 +45,8 @@ let resolvesToQualified (declaredElement: IDeclaredElement) (reference: FSharpSy
 
 let resolvesToFcsSymbol (fcsSymbol: FSharpSymbol) (reference: FSharpSymbolReference) qualified resolveExpr opName =
     match reference.ResolveWithFcs(opName, resolveExpr, qualified) with
-    | None -> false
-    | Some symbolUse ->
+    | [] -> false
+    | symbolUse :: _ ->
 
     let resolvedFcsSymbol = symbolUse.Symbol
     if resolvedFcsSymbol.IsEffectivelySameAs(fcsSymbol) then true else
@@ -90,14 +89,14 @@ let mayShadowPartially (newExpr: ITreeNode) (data: ElementProblemAnalyzerData) (
 let resolvesToPredefinedFunction (context: ITreeNode) name opName =
     let checkerService = context.GetContainingFile().As<IFSharpFile>().CheckerService
     match checkerService.ResolveNameAtLocation(context, [name], false, opName) with
-    | Some symbolUse ->
+    | symbolUse :: _ ->
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as symbol ->
             match predefinedFunctionTypes.TryGetValue(name), symbol.DeclaringEntity with
             | (true, typeName), Some entity -> typeName.FullName = entity.FullName
             | _ -> false
         | _ -> false
-    | None -> false
+    | [] -> false
 
 let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
     let referenceOwner = reference.GetElement()
@@ -134,11 +133,11 @@ let findRequiredQualifierForRecordField (fieldBinding: IRecordFieldBinding) =
 
         let qualifiedField = declaringEntity.DisplayName :: qualifiedField
         match context.CheckerService.ResolveNameAtLocation(context, qualifiedField, true, "findRequiredQualifierForRecordField") with
-        | Some x when x.Symbol.IsEffectivelySameAs(field) ->
+        | symbolUse :: _ when symbolUse.Symbol.IsEffectivelySameAs(field) ->
             qualifiedField
             |> List.take (qualifiedField.Length - 1)
             |> Some
-        | _ ->  findRequiredQualifier context declaringEntity.DeclaringEntity field qualifiedField
+        | _ -> findRequiredQualifier context declaringEntity.DeclaringEntity field qualifiedField
 
     let field = fieldBinding.ReferenceName.Reference.GetFcsSymbol().As<FSharpField>()
     findRequiredQualifier fieldBinding field.DeclaringEntity field [field.DisplayName]
@@ -155,7 +154,7 @@ let isRecursiveApplication (declaredElement: IDeclaredElement) (refExpr: IRefere
     let decl = refExpr.GetContainingNode<IParameterOwnerMemberDeclaration>()
     isNotNull decl && declaredElement = decl.DeclaredElement
 
-let isInTailRecursivePosition (expr: IFSharpExpression) =
+let isInTailRecursivePosition (declaredElement: IDeclaredElement) (expr: IFSharpExpression) =
     let outermostExpr =
         let rec loop (expr: IFSharpExpression) =
             let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
@@ -167,7 +166,8 @@ let isInTailRecursivePosition (expr: IFSharpExpression) =
         let expr = expr.GetOutermostParentExpressionFromItsReturn()
         loop expr
 
-    isNotNull (ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens()))
+    let decl = ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens())
+    isNotNull decl && decl.DeclaredElement = declaredElement
 
 let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
     let sourceFile = context.GetSourceFile().NotNull()

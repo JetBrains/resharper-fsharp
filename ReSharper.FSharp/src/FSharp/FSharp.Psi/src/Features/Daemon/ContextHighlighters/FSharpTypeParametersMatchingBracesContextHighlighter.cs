@@ -22,8 +22,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighligh
       [NotNull] HighlightingProlongedLifetime prolongedLifetime)
     {
       var highlighter = new FSharpTypeParametersMatchingBracesContextHighlighter();
+      var matchingBraceConsumerFactory = new MatchingBraceConsumerFactory();
       return highlighter.ProcessDataContextImpl(
-        lifetime, prolongedLifetime, psiDocumentRangeView, invisibleBraceHintManager, matchingBraceSuggester);
+        lifetime, prolongedLifetime, psiDocumentRangeView, invisibleBraceHintManager, matchingBraceSuggester, matchingBraceConsumerFactory);
     }
 
     protected override void CollectHighlightings(IPsiView psiView, MatchingHighlightingsConsumer consumer)

@@ -2,8 +2,10 @@
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
@@ -13,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IEnumerable<IFSharpPattern> GetPartialDeclarations([NotNull] this IFSharpPattern fsPattern)
     {
       if (!(fsPattern is IReferencePat refPat))
-        return new[] { fsPattern };
+        return [fsPattern];
 
       var canBePartial = false;
 
@@ -26,14 +28,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (!canBePartial)
-        return new[] { refPat };
+        return [refPat];
 
       return fsPattern.NestedPatterns.Where(pattern =>
         pattern is IReferencePat nestedRefPat && nestedRefPat.SourceName == refPat.SourceName && pattern.IsDeclaration);
     }
 
     [CanBeNull]
-    public static IBindingLikeDeclaration GetBinding([CanBeNull] this IFSharpPattern pat, bool allowFromParameters, 
+    public static IBindingLikeDeclaration GetBinding([CanBeNull] this IFSharpPattern pat, bool allowFromParameters,
       out bool isFromParameter)
     {
       isFromParameter = false;
@@ -74,10 +76,133 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (fcsSymbol is FSharpMemberOrFunctionOrValue { LiteralValue: { Value: { } mfvValue } } mfv)
         return ConstantValue.Create(mfvValue, mfv.FullType.MapType(pat));
 
-      if (fcsSymbol is FSharpField  { LiteralValue: { Value: { } fieldValue } } field)
+      if (fcsSymbol is FSharpField { LiteralValue.Value: { } fieldValue } field)
         return ConstantValue.Create(fieldValue, field.FieldType.MapType(pat));
-      
+
       return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+    }
+
+    public static IFSharpParameter TryGetDeclaredFSharpParameter(this IFSharpPattern pat) =>
+      TryGetFSharpParameterIndex(pat) is (IDeclaration
+      {
+        DeclaredElement: IFSharpParameterOwner parameterOwner
+      }, var index)
+        ? parameterOwner.GetParameter(index)
+        : null;
+
+    public static (IFSharpParameterOwnerDeclaration, FSharpParameterIndex)? TryGetFSharpParameterIndex(
+      this IFSharpPattern fsPat)
+    {
+      (IFSharpPattern pat, int? index) GetContainingParameterGroupPattern()
+      {
+        if (TuplePatNavigator.GetByPattern(fsPat) is { } tuplePat)
+        {
+          var patternIndex = tuplePat.Patterns.IndexOf(fsPat);
+          if (ParenPatNavigator.GetByPattern(tuplePat) is { } parenPat)
+            return (parenPat, patternIndex);
+        }
+
+        if (ParenPatNavigator.GetByPattern(fsPat) is { } parentPat)
+          return (parentPat, null);
+
+        return (fsPat, null);
+      }
+
+      var (groupPat, paramIndex) = GetContainingParameterGroupPattern();
+
+      if (GetParameterOwnerDeclaration(groupPat) is var (paramOwnerDecl, groupIndex))
+        return (paramOwnerDecl, new FSharpParameterIndex(groupIndex, paramIndex));
+
+      return null;
+    }
+
+    [CanBeNull]
+    public static (IFSharpParameterOwnerDeclaration paramOwnerDecl, int groupIndex)? GetParameterOwnerDeclaration(IFSharpPattern groupPat)
+    {
+      if (ParameterOwnerMemberDeclarationNavigator.GetByParameterPattern(groupPat) is { } parameterOwnerMemberDecl)
+        if (parameterOwnerMemberDecl is IFSharpParameterOwnerDeclaration paramOwnerDecl)
+          return (paramOwnerDecl, parameterOwnerMemberDecl.ParameterPatterns.IndexOf(groupPat));
+
+      if (LambdaExprNavigator.GetByPattern(groupPat) is { } lambdaExpr)
+      {
+        var lambdaParamGroupIndex = lambdaExpr.Patterns.IndexOf(groupPat);
+        var containingDeclParamDeclsCount = 0;
+        while (LambdaExprNavigator.GetByExpression(lambdaExpr.IgnoreParentParens()) is { } containingLambdaExpr)
+        {
+          containingDeclParamDeclsCount += containingLambdaExpr.PatternsEnumerable.Count();
+          lambdaExpr = containingLambdaExpr;
+        }
+
+        if (ParameterOwnerMemberDeclarationNavigator.GetByExpression(lambdaExpr.IgnoreParentParens()) is { } pd)
+          if (pd is IFSharpParameterOwnerDeclaration paramOwnerDecl)
+            return (paramOwnerDecl, containingDeclParamDeclsCount + pd.ParameterPatterns.Count + lambdaParamGroupIndex);
+      }
+
+      return null;
+    }
+
+
+    public static IFSharpParameterDeclaration GetParameterDeclaration(
+      this IList<IFSharpPattern> parameterPatternGroups, FSharpParameterIndex index)
+    {
+      if (parameterPatternGroups.ElementAtOrDefault(index.GroupIndex) is not { } groupPattern)
+        return null;
+
+      if (groupPattern is not IParenPat parenPat)
+        return groupPattern;
+
+      if (index.ParameterIndex is { } paramIndex)
+        return parenPat.Pattern is ITuplePat tuplePat
+          ? tuplePat.PatternsEnumerable.ElementAtOrDefault(paramIndex)
+          : null;
+
+      return parenPat.Pattern;
+    }
+
+    public static bool IsFSharpParameterDeclaration(IFSharpPattern fsPat) =>
+      TryGetFSharpParameterIndex(fsPat) != null;
+
+    [CanBeNull] public static IFSharpParameter TryGetDeclaredFSharpParameter([NotNull] this IReferencePat refPat) =>
+      refPat.TryGetContainingParameterDeclarationPattern().TryGetDeclaredFSharpParameter();
+
+    public static IFSharpPattern TryGetContainingParameterDeclarationPattern(this IReferencePat refPat)
+    {
+      IFSharpPattern TryUnwrap(IFSharpPattern pat)
+      {
+        if (AsPatNavigator.GetByRightPattern(pat) is { } asPat) return asPat;
+        if (AttribPatNavigator.GetByPattern(pat) is { } attribPat) return attribPat;
+        if (OptionalValPatNavigator.GetByPattern(pat) is { } optionalValPat) return optionalValPat;
+        if (ParenPatNavigator.GetByPattern(pat) is { } parenPat) return parenPat;
+        if (TypedPatNavigator.GetByPattern(pat) is { } typedPat) return typedPat;
+
+        return null;
+      }
+
+      var pat = (IFSharpPattern)refPat;
+      while (TryUnwrap(pat) is { } containingPat)
+        pat = containingPat;
+
+      return IsFSharpParameterDeclaration(pat) ? pat : null;
+    }
+
+    public static IReferencePat TryGetNameIdentifierOwner([NotNull] this IFSharpPattern fsPat)
+    {
+      IFSharpPattern TryUnwrap(IFSharpPattern pat) =>
+        pat switch
+        {
+          IAttribPat attribPat => attribPat.Pattern,
+          IAsPat asPat => asPat,
+          IOptionalValPat optionalValPat => optionalValPat.Pattern,
+          IParenPat parenPat => parenPat.Pattern,
+          ITypedPat typedPat => typedPat.Pattern,
+          _ => null
+        };
+
+      var pat = fsPat;
+      while (TryUnwrap(pat) is { } innerPat)
+        pat = innerPat;
+
+      return pat as IReferencePat;
     }
   }
 }

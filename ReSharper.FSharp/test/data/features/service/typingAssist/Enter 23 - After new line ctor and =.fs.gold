@@ -3,4 +3,4 @@ module Module
 
 type Foo
    (param) =
-  {caret}
+    {caret}

@@ -6,13 +6,9 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpPropertyWithExplicitAccessors : FSharpPropertyBase<IMemberSignatureOrDeclaration>,
-    IFSharpProperty
+  internal class FSharpPropertyWithExplicitAccessors(IMemberSignatureOrDeclaration declaration)
+    : FSharpPropertyBase<IMemberSignatureOrDeclaration>(declaration), IFSharpProperty
   {
-    public FSharpPropertyWithExplicitAccessors(IMemberSignatureOrDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsReadable => FSharpExplicitGetters.Any();
     public override bool IsWritable => FSharpExplicitSetters.Any();
 

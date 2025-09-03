@@ -1,3 +1,3 @@
 ﻿Suggested names: b
 do
-  match () with | _ -> let b = true in (b)
+  match () with | _ -> let b = true in b

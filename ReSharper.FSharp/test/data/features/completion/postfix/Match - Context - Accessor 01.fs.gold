@@ -1,7 +1,7 @@
-// ${COMPLETE_ITEM:match}
+﻿// ${COMPLETE_ITEM:match}
 module Module
 
 type T() =
     member this.P with get () = 
-      match 1 with
-      | {caret}
+        match 1 with
+        | {caret}

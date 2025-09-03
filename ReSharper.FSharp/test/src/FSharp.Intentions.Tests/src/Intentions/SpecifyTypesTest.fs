@@ -5,8 +5,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<AssertCorrectTreeStructure>]
 type SpecifyTypesActionTest() =
-    inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
+    inherit FSharpContextActionExecuteTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -35,6 +36,10 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Parameters - Pattern 10 - Nested tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 11 - Active pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Parameters - Pattern 12 - Active pattern 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 13 - With attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 14 - With attribute 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 15 - With attribute 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 16 - With attribute 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Function - Return - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return - Function 02``() = x.DoNamedTest()
@@ -57,9 +62,61 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Recursive - Function 03`` () = x.DoNamedTest()
     [<Test>] member x.``Function - Recursive - Function 04`` () = x.DoNamedTest()
 
+    [<Test>] member x.``Member 01 - Method`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 02 - Property`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 03 - Method - Param groups`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 04 - Extension 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 05 - Extension 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 06 - Optional param`` () = x.DoNamedTest()
+    [<Test>] member x.``Member 07 - Optional param - With attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Member 08 - Optional param - Parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import types - Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Tuple type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Type with null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Type with null 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Type with null 03 - Generics``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Generic type 01 - Suffix``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Generic type 02 - Prefix``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Parens 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Function 02 - Abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Anon record 02 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Anon record 03 - Nested record``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - RQA 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Single open 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Single open 02 - Full signature``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Composite type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Already imported 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Full signature 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 03``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Ambiguous 04 - Generics``() = x.DoNamedTest()
+
+
+// Most tests are in TypeHintContextActionsTests
+[<AssertCorrectTreeStructure>]
+type SpecifyPatternTypeActionTest() =
+    inherit FSharpContextActionExecuteTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes"
+
+    [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern 02 - Optional``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 01 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 02 - Method``() = x.DoNamedTest()
+    [<Test>] member x.``Scoped - Parameters 03 - Constructor``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import types - Generic parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Generic parameter 02 - With constraint``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Flexible type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import types - Flexible type 02``() = x.DoNamedTest()
+
 
 type SpecifyTypesActionAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
+    inherit FSharpContextActionAvailabilityTestBase<MemberAndFunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -71,3 +128,11 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
     [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()
+
+type SpecifyPatternTypeActionAvailabilityTest() =
+    inherit FSharpContextActionAvailabilityTestBase<PatternAnnotationAction>()
+
+    override x.ExtraPath = "specifyTypes"
+
+    [<Test>] member x.``Patterns - 01``() = x.DoNamedTest()
+    [<Test>] member x.``Patterns - 02 - Scoped``() = x.DoNamedTest()

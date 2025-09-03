@@ -1,4 +1,4 @@
-﻿// ${CHAR:TabLeft}
+// ${CHAR:TabLeft}
 module Module
 
 let x =

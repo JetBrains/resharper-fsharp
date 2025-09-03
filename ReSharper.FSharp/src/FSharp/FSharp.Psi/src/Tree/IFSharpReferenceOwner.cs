@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
@@ -34,13 +35,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     IList<string> Names { get; }
     FSharpSymbolReference QualifierReference { get; }
     bool IsQualified { get; }
-    void SetQualifier([NotNull] IClrDeclaredElement declaredElement);
+    void SetQualifier([NotNull] IClrDeclaredElement declaredElement, ITreeNode context = null);
   }
 
   public static class FSharpQualifiableReferenceOwnerExtensions
   {
     public static void SetQualifier([NotNull] this IFSharpQualifiableReferenceOwner referenceOwner,
-      [NotNull] Func<string, IFSharpQualifiableReferenceOwner> factory, [NotNull] IClrDeclaredElement declaredElement)
+      [NotNull] Func<string, IFSharpQualifiableReferenceOwner> factory, [NotNull] IClrDeclaredElement declaredElement,
+      ITreeNode context = null)
     {
       var identifier = referenceOwner.FSharpIdentifier;
       Assertion.Assert(identifier != null, "referenceOwner.FSharpIdentifier != null");
@@ -49,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       var name = FSharpReferenceBindingUtil.SuggestShortReferenceName(declaredElement, referenceOwner.Language);
       var delimiter = ModificationUtil.AddChildBefore(identifier, FSharpTokenType.DOT.CreateLeafElement());
       var qualifier = ModificationUtil.AddChildBefore(delimiter, factory(name));
-      qualifier.Reference.SetRequiredQualifiers(declaredElement, referenceOwner);
+      qualifier.Reference.SetRequiredQualifiers(declaredElement, context ?? referenceOwner);
     }
   }
 }

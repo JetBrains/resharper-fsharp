@@ -1,0 +1,3 @@
+module Top
+
+[||].MethodArray{caret}()

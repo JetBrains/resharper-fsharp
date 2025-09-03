@@ -6,16 +6,14 @@ open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
-open JetBrains.Application.UI.Components
-open JetBrains.Application.UI.PopupLayout
-open JetBrains.Application.UI.Tooltips
 open JetBrains.RdBackend.Common.Platform.CodeInsights
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.RdBackend.Common.Features.Services
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Common.ActionUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -23,7 +21,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
-open JetBrains.TextControl.DocumentMarkup
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
 open JetBrains.Util
@@ -45,8 +42,6 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type InferredTypeCodeVisionProvider() =
-    let typeCopiedTooltipText = Strings.InferredTypeCodeVisionProvider_TypeCopied_TooltipText
-
     interface ICodeInsightsProvider with
         member x.ProviderId = FSharpInferredTypeHighlighting.providerId
         member x.DisplayName = FSharpInferredTypeHighlighting.providerId
@@ -55,29 +50,17 @@ type InferredTypeCodeVisionProvider() =
 
         member x.IsAvailableIn _ = true
 
-        member x.OnClick(highlighting, _) =
+        member x.OnClick(highlighting, _, _) =
             let codeInsightsHighlighting = highlighting.CodeInsightsHighlighting
             let entry = codeInsightsHighlighting.Entry.As<TextCodeVisionEntry>()
             if isNull entry then () else
 
-            let shell = Shell.Instance
-            shell.GetComponent<Clipboard>().SetText(entry.Text)
-            let documentMarkupManager = shell.GetComponent<IDocumentMarkupManager>()
-            shell.GetComponent<ITooltipManager>().Show(typeCopiedTooltipText, PopupWindowContextSource(fun _ ->
-                let documentMarkup = documentMarkupManager.TryGetMarkupModel(codeInsightsHighlighting.Range.Document)
-                if isNull documentMarkup then null else
-
-                documentMarkup.GetFilteredHighlighters(FSharpInferredTypeHighlighting.providerId,
-                    fun h -> highlighting.Equals(h.GetHighlighting()))
-                |> Seq.tryHead
-                |> Option.map RiderEditorOffsetPopupWindowContext
-                |> Option.defaultValue null :> _
-            ))
+            copyToClipboard entry.Text highlighting.Highlighter
 
         member x.OnExtraActionClick(_, _, _) = ()
 
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
     inherit FSharpDaemonStageBase(true, false)
 
@@ -92,8 +75,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         stringBuilder.Append(s) |> ignore
 
     let formatMfv (symbolUse: FSharpSymbolUse) (mfv: FSharpMemberOrFunctionOrValue) =
-        let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-        let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
+        let returnTypeStr = mfv.ReturnParameter.Type.Format()
 
         if mfv.IsPropertyGetterMethod then returnTypeStr else
 
@@ -118,7 +100,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
                     fcsType.IsTupleType && group.Count > 1
 
                 if addParens then append builder "("
-                append builder (fcsType.Format(displayContext))
+                append builder (fcsType.Format())
                 if addParens then append builder ")"
 
                 isFirstParam <- false

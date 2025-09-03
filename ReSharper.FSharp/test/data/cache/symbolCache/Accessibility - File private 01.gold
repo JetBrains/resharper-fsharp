@@ -1,0 +1,16 @@
+﻿Project Files:Accessibility - File private 01.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  RecordPart:PublicR->M+PublicR
+  RecordPart:PrivateR (private)->M+PrivateR
+  RecordPart:FilePrivateR->M+FilePrivateR
+Accessibility - File private 01.fsi:
+FSharpProjectFilePart:SigFile
+ NamedModulePart:M->M
+  RecordPart:PublicR->M+PublicR
+  RecordPart:PrivateR (private)->M+PrivateR
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [FilePrivateR]: FSharpClass:M+FilePrivateR (file, public, compiled: internal)[TestProject]
+  [PrivateR]: FSharpClass:M+PrivateR (private, compiled: internal)[TestProject]
+  [PublicR]: FSharpClass:M+PublicR[TestProject]

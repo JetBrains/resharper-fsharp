@@ -2,4 +2,4 @@
 module Module
 
 { new obj() with
-  {caret} }
+    {caret} }

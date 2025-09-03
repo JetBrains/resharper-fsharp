@@ -45,7 +45,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         project.ProjectProperties.TryGetConfiguration<IFSharpProjectConfiguration>(targetFrameworkId)
 
     let (|Version|) (version: Version) =
-        version.Major, version.Minor
+        version.Major, version.Minor, version.Build
 
     // TODO: more versions
     let getLanguageLevelByToolsetVersion () =
@@ -66,18 +66,19 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
         match fscVersion with
-        | Version (10, 1000) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
-        | Version (11, 0) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.FSharp60)
-        | Version (12, minor) ->
+        | Version (10, 1000, _) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
+        | Version (11, 0, _) -> VersionMapping(FSharpLanguageLevel.FSharp50, FSharpLanguageLevel.FSharp60)
+        | Version (12, minor, build) ->
             if minor < 4 then VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.FSharp70)
             elif minor >= 4 && minor <= 7 then VersionMapping(FSharpLanguageLevel.FSharp70, FSharpLanguageLevel.FSharp80)
-            elif minor = 8 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
+            elif minor = 8 && build < 200 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
+            elif minor = 8 then VersionMapping(FSharpLanguageLevel.FSharp81, FSharpLanguageLevel.FSharp90)
             elif minor >= 9 then VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.Preview)
             else null
         | _ -> null
 
     let getCompilerVersion (fscPath: VirtualFileSystemPath) =
-        let assemblyNameInfo = AssemblyNameReader.GetAssemblyNameRaw(fscPath)
+        let assemblyNameInfo = AssemblyNameReader.TryReadAssemblyNameFromFile(fscPath)
         assemblyNameInfo.Version
 
     let getLanguageLevelByCompilerNoCache (fscPath: VirtualFileSystemPath): VersionMapping =
@@ -105,7 +106,13 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | FSharpLanguageVersion.FSharp50 -> FSharpLanguageLevel.FSharp50
         | FSharpLanguageVersion.FSharp60 -> FSharpLanguageLevel.FSharp60
         | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
-        | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
+        | FSharpLanguageVersion.FSharp80 ->
+            let levelByCompiler = getFscPath configuration |> getLanguageLevelByCompiler
+            if isNull levelByCompiler || levelByCompiler.LatestMinor <= FSharpLanguageLevel.FSharp80 then
+                FSharpLanguageLevel.FSharp80
+            else
+                FSharpLanguageLevel.FSharp81
+
         | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
@@ -175,6 +182,11 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     override this.GetLatestAvailableLanguageLevelImpl(_, _) = failwith "todo"
 
     override this.LanguageLevelComparer = FSharpLanguageLevelComparer.Instance :> _
+
+    interface ISolutionToolsetListener with
+        member this.Changed _ =
+            compilerPathToLanguageLevels.Clear()
+
 
 [<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =

@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System.Collections.Generic
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
@@ -11,7 +12,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type ScriptLoadPathsStage() =
     inherit FSharpDaemonStageBase(true) // todo: should report for closed files
 

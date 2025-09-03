@@ -33,10 +33,13 @@ type FilterFcsPatternRule() =
             let lookupItem = item.As<FcsLookupItem>()
             isNotNull lookupItem &&
 
-            match lookupItem.FcsSymbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                mfv.IsModuleValueOrMember && Option.isNone mfv.LiteralValue
-            | _ -> false
+            lookupItem.AllFcsSymbolUses
+            |> List.forall (fun symbolUse ->
+                match symbolUse.Symbol with
+                | :? FSharpMemberOrFunctionOrValue as mfv ->
+                    mfv.IsModuleValueOrMember && Option.isNone mfv.LiteralValue
+                | _ -> false
+            )
         )
 
 

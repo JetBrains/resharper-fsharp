@@ -1,9 +1,9 @@
 ﻿Provided elements:
  0: P():System.Int32
- 1: ToString():System.String
- 2: Equals(System.Object):System.Boolean
+ 1: Equals(System.Object?):System.Boolean
+ 2: Finalize():System.Void
  3: GetHashCode():System.Int32
- 4: Finalize():System.Void
+ 4: ToString():System.String?
 
 // ${KIND:Overrides}
 // ${SELECT0:P():System.Int32}
@@ -15,5 +15,5 @@ type A() =
 type B() =
     inherit A()
 
-    override this.P = failwith "todo"
-    override this.P with set value = {selstart}failwith "todo"{selend}
+    override this.P = {selstart}failwith "todo"{selend}
+    override this.P with set value = failwith "todo"

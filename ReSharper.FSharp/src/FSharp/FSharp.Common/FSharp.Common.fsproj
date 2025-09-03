@@ -52,10 +52,11 @@
     <Compile Include="src\Util\FSharpExperimentalFeatures.fs" />
     <Compile Include="src\Util\FcsTaggedText.fs" />
     <Compile Include="src\Util\XmlDocUtil.fs" />
+    <Compile Include="src\Util\SettingsStoreUtil.fs" />
+    <Compile Include="src\Checker\FcsProject.fs" />
     <Compile Include="src\Shim\AssemblyReader\IFcsAssemblyReaderShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
     <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
-    <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FcsCheckerService.fs" />
     <Compile Include="src\Checker\ZoneMarker.fs" />

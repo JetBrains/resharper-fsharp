@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
-open JetBrains.Application.Parts
+open JetBrains.Application.Components
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -27,14 +28,16 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
-        checkerService: FcsCheckerService, formatter: FSharpCodeFormatter) =
-    inherit LanguageService(languageType, constantValueService)
+        checkerService: FcsCheckerService, formatter: ILazy<FSharpCodeFormatter>) =
+    inherit LanguageService(languageType, constantValueService, LazyComponentObject.SimpleCast(formatter))
 
     let lexerFactory = FSharpLexerFactory()
 
     let getSymbolsCache (psiModule: IPsiModule) =
         if isNull psiModule then null else
-        psiModule.GetSolution().GetComponent<IFcsResolvedSymbolsCache>()
+        psiModule.GetSolution().GetComponent<IFcsCapturedInfoCache>()
+
+    override this.CreateSourceExtensionMethodsIndex() = FSharpSourceExtensionsMembersIndex()
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
@@ -55,7 +58,6 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     override x.TypePresenter = CLRTypePresenter.Instance
     override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
 
-    override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations _ = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
@@ -113,8 +115,16 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
                 let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
                 FSharpMethodInvocationUtil.isNamedArgSyntactically binaryAppExpr
 
-            if isInstanceFieldOrProperty declaredElement && isNamedArg () then
+            let isFcsProperty =
+                let fcsSymbol = symbolReference.GetFcsSymbol()
+                let mfv = fcsSymbol.As<FSharpMemberOrFunctionOrValue>()
+                isNotNull mfv && mfv.IsProperty
+
+            if (isFcsProperty || isInstanceFieldOrProperty declaredElement) && isNamedArg () then
                 ReferenceAccessType.WRITE else
+
+            if isFcsProperty then
+                ReferenceAccessType.READ else
 
             x.GetDefaultAccessType(declaredElement)
 
@@ -148,5 +158,5 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
             let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
             FSharpParser(lexer, document, sourceFile, checkerService, null, overrideExtension) :> _
 
-        member x.CreateElementFactory(sourceFile, psiModule, [<Optional; DefaultParameterValue(null)>] extension) =
-            FSharpElementFactory(x, sourceFile, psiModule, extension) :> _
+        member x.CreateElementFactory(context, [<Optional; DefaultParameterValue(null)>] extension) =
+            FSharpElementFactory(x, context, extension) :> _

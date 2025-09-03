@@ -1,0 +1,5 @@
+﻿let a: (string * string) * int =
+    if true then
+        1, 1
+    else  
+        ({caret}"", ""), ""

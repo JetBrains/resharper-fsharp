@@ -6,5 +6,5 @@ type I =
 
 type T() =
   interface I with
-    member this.M(var0) = failwith "todo"
-    member this.M(var0, var1) = {selstart}failwith "todo"{selend}
+      member this.M(var0) = {selstart}failwith "todo"{selend}
+      member this.M(var0, var1) = failwith "todo"

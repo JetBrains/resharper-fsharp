@@ -6,6 +6,6 @@ let oneInstance = 1
 
 let f i =
     i
-    let instance = (getOneInstance ())
+    let instance = getOneInstance ()
     let _ = id instance
     oneInstance

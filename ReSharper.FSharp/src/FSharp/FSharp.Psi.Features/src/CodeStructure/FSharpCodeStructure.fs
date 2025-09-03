@@ -28,16 +28,18 @@ open JetBrains.Util
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpExtendedFileStructureLanguage() =
-    let filters : IStructureTreeElementFilter array = [| StructureTreeElementFilter() |]
+    let filters: IStructureTreeElementFilter array = [| StructureTreeElementFilter() |]
+
     interface IExtendedFileStructureLanguage with
         member this.IsValid(languageType) =
             isNotNull languageType && languageType.Is<FSharpLanguage>()
 
         member this.GetFilters() = filters
    
-    type private StructureTreeElementFilter() =
-        interface IStructureTreeElementFilter with
-            member this.IsVisibleInStructureTree(element) = not (element :? IFSharpGeneratedElement)
+type StructureTreeElementFilter() =
+    interface IStructureTreeElementFilter with
+        member this.IsVisibleInStructureTree(element) =
+            not (element :? IFSharpGeneratedElement)
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -101,12 +103,16 @@ type FSharpCodeStructureProvider() =
 
         | :? ILetBindingsDeclaration as letBindings ->
             for binding in Seq.cast<ITopBinding> letBindings.Bindings do
-                FSharpDeclarationCodeStructureElement(binding, parent, null) |> ignore
+                for pat in binding.HeadPattern.Declarations do
+                    match pat with
+                    | :? IReferencePat as refPat ->
+                        FSharpPatternDeclarationCodeStructureElement(refPat, parent, null) |> ignore
+                    | _ -> ()
 
         | :? IBindingSignature as bindingSig ->
             let refPat = bindingSig.HeadPattern.As<IReferencePat>()
             if isNotNull refPat then
-                FSharpDeclarationCodeStructureElement(refPat, parent, null) |> ignore
+                FSharpPatternDeclarationCodeStructureElement(refPat, parent, null) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
             for typeDeclaration in declarationGroup.TypeDeclarations do
@@ -130,7 +136,6 @@ type FSharpCodeStructureProvider() =
 
         member this.SupportsBackgroundUpdate = false
 
-
 type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, parentBlock: ICodeStructureBlockStart) =
     inherit CodeStructureElement(parent)
 
@@ -140,7 +145,6 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 
     let language = declaration.Language
     let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
-    let textRange = declaration.GetDocumentRange()
     let aspects = CodeStructureDeclarationAspects(declaration)
 
     let getDeclaration () = declarationPointer.GetTreeNode()
@@ -148,7 +152,7 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
     override x.Language = language
 
     override x.TreeNode = getDeclaration () :> _
-    override x.GetTextRange() = textRange
+    override x.GetTextRange() = x.TreeNode.GetDocumentRange()
 
     override x.GetFileStructureAspect() = aspects :> _
     override x.GetGotoMemberAspect() = aspects :> _
@@ -173,6 +177,17 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 
             let declaredElement = declaration.DeclaredElement
             if isValid declaredElement then declaredElement else null
+
+
+type FSharpPatternDeclarationCodeStructureElement(pat: IReferencePat, parent, parentBlock: ICodeStructureBlockStart) =
+    inherit FSharpDeclarationCodeStructureElement(pat, parent, parentBlock)
+
+    let patternPointer = pat.GetPsiServices().Pointers.CreateTreeElementPointer(pat)
+
+    override this.GetTextRange() =
+        match patternPointer.GetTreeNode().Binding with
+        | null -> base.GetTextRange()
+        | binding -> binding.GetDocumentRange()
 
 
 type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =

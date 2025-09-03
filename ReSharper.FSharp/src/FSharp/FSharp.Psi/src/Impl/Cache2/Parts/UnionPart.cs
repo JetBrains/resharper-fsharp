@@ -4,6 +4,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
@@ -13,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class UnionPart : UnionPartBase, Class.IClassPart
   {
     public UnionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder, bool hasNestedTypes,
-      bool isSingleCase) : base(declaration, cacheBuilder, hasNestedTypes, isSingleCase, PartKind.Class)
+      string[] caseNames) : base(declaration, cacheBuilder, hasNestedTypes, caseNames, PartKind.Class)
     {
     }
 
@@ -21,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpClass(this);
 
     protected override byte SerializationTag =>
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructUnionPart : UnionPartBase, IFSharpStructPart
   {
     public StructUnionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool isSingleCase) : base(declaration, cacheBuilder, false, isSingleCase, PartKind.Struct)
+      string[] caseNames) : base(declaration, cacheBuilder, false, caseNames, PartKind.Struct)
     {
     }
 
@@ -39,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpStruct(this);
 
     protected override byte SerializationTag =>
@@ -54,21 +55,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class UnionPartBase : StructuralTypePartBase, IUnionPart
   {
     public bool HasNestedTypes { get; }
-    public bool IsSingleCase { get; }
+    public string[] CaseNames { get; }
     public AccessRights RepresentationAccessRights { get; }
 
+    public virtual bool IsSingleCase => CaseNames.Length == 1;
+
     protected UnionPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasNestedTypes, bool isSingleCase, PartKind partKind) : base(declaration, cacheBuilder, partKind)
+      bool hasNestedTypes, string[] caseNames, PartKind partKind) : base(declaration, cacheBuilder, partKind)
     {
       HasNestedTypes = hasNestedTypes;
       RepresentationAccessRights = declaration.GetRepresentationAccessRights();
-      IsSingleCase = isSingleCase;
+      CaseNames = caseNames;
     }
 
     protected UnionPartBase(IReader reader) : base(reader)
     {
       HasNestedTypes = reader.ReadBool();
-      IsSingleCase = reader.ReadBool();
+      CaseNames = reader.ReadStringArray();
       RepresentationAccessRights = (AccessRights) reader.ReadByte();
     }
 
@@ -76,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       base.Write(writer);
       writer.WriteBool(HasNestedTypes);
-      writer.WriteBool(IsSingleCase);
+      writer.WriteStringArray(CaseNames);
       writer.WriteByte((byte) RepresentationAccessRights);
     }
 
@@ -118,15 +121,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
   }
 
-  public interface IRepresentationAccessRightsOwner
+  public interface IFSharpRepresentationAccessRightsOwner
   {
     AccessRights RepresentationAccessRights { get; }
   }
 
-  public interface IUnionPart : IStructuralTypePart, IRepresentationAccessRightsOwner, IFSharpTypePart
+  public interface IUnionPart : IStructuralTypePart, IFSharpRepresentationAccessRightsOwner, IFSharpTypePart
   {
     bool HasNestedTypes { get; }
     bool IsSingleCase { get; }
+    string[] CaseNames { get; }
     IList<IUnionCase> Cases { get; }
     TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations { get; }
   }

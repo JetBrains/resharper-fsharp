@@ -1,0 +1,7 @@
+﻿Project Files:Type def - Interface 04.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  InterfacePart:I->M+I
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [I]: FSharpInterface:M+I[TestProject]

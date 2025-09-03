@@ -1,0 +1,7 @@
+﻿module Module
+
+type T() =
+    abstract M: a: int * b: int -> zzz: int -> unit
+    default this.M(a, b) zzz = a + b + zzz |> ignore
+
+// Named args are supported for a single curried group only

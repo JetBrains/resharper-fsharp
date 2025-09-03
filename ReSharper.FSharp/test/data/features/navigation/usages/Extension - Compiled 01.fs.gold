@@ -1,0 +1,42 @@
+﻿## ShowUsagesProvider activity:
+  Async context menu shown `Usages of 'String.set_P(…)'`:
+    TO: [R] "".|P| RANGE: (84,85) @ Extension - Compiled 01.fs
+    Menu item (enabled) :
+      icon: UsageRead
+      text: Module      <font color="FFD5A286">"".**P</font>**<font color="06C"> (7)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: "".**P**
+    Navigation result:
+      opened file: Extension - Compiled 01.fs
+      ------------------
+      "".ToString(P = 1)
+      let a = "".ToString(P = 1)
+      "".|CARET|P
+
+      ------------------
+
+    TO: [W] "".ToString(|P| = 1) RANGE: (47,48) @ Extension - Compiled 01.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module      <font color="FFD5A286">"".ToString(**P** = 1)</font><font color="06C"> (5)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: "".ToString(**P** = 1)
+    Navigation result:
+      caret did not move
+    TO: [W] let a = "".ToString(|P| = 1) RANGE: (74,75) @ Extension - Compiled 01.fs
+    Menu item (enabled) :
+      icon: UsageWrite
+      text: Module.a      <font color="FFD5A286">let a = "".ToString(**P** = 1)</font><font color="06C"> (6)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let a = "".ToString(**P** = 1)
+    Navigation result:
+      opened file: Extension - Compiled 01.fs
+      ------------------
+
+      "".ToString(P = 1)
+      let a = "".ToString(|CARET|P = 1)
+      "".P
+
+      ------------------
+
+

@@ -13,8 +13,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffset, lineShift) =
-    inherit FSharpTreeBuilderBase(lexer, document, lifetime, path, projectedOffset, lineShift)
+type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, path, projectedOffset, lineShift) =
+    inherit FSharpTreeBuilderBase(lexer, document, warnDirectives, lifetime, path, projectedOffset, lineShift)
 
     /// FCS splits some declarations into separate fake ones:
     ///   * property declaration when both getter and setter bodies are present
@@ -22,8 +22,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
     let mutable isFinishingDeclaration = false
 
-    new (lexer, document, decls, lifetime, path) =
-        FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, 0, 0)
+    new (lexer, document, decls, warnDirectives, lifetime, path) =
+        FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, path, 0, 0)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -212,7 +212,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
 
         let memberType =
             match typeMember with
-            | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
+            | SynMemberDefn.ImplicitInherit(baseType, args, _, _, _) ->
                 x.ProcessTypeAsTypeReferenceName(baseType)
                 x.MarkChameleonExpression(args)
                 ElementType.TYPE_INHERIT
@@ -225,8 +225,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
                 ElementType.INTERFACE_IMPLEMENTATION
 
             | SynMemberDefn.Inherit(baseType, _, _, _) ->
-                try x.ProcessTypeAsTypeReferenceName(baseType)
-                with _ -> () // Getting type range throws an exception if base type lid is empty.
+                match baseType with
+                | Some baseType -> x.ProcessTypeAsTypeReferenceName(baseType)
+                | None -> ()
                 ElementType.INTERFACE_INHERIT
 
             | SynMemberDefn.GetSetMember(getBinding, setBinding, range, trivia) ->
@@ -716,8 +717,8 @@ and IBuilderStepProcessor =
     abstract Process: step: obj * builder: FSharpExpressionTreeBuilder -> unit
 
 
-type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffset, lineShift) =
-    inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, path, projectedOffset, lineShift)
+type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path, projectedOffset, lineShift) =
+    inherit FSharpImplTreeBuilder(lexer, document, [], warnDirectives, lifetime, path, projectedOffset, lineShift)
 
     let nextSteps = Stack<BuilderStep>()
 
@@ -838,7 +839,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                         x.Done(range, mark, ElementType.PAREN_RAT)
 
                 x.AdvanceToTokenOrRangeEnd(FSharpTokenType.SYMBOLIC_OP, overallRange) // advance to ^ or ^-
-                x.AdvanceLexer() // advanve beyond ^ or ^-
+                x.AdvanceLexer() // advance beyond ^ or ^-
                 let ratConstMark = x.Mark()
                 processRatConstCase ratio
                 x.Done(overallRange, ratConstMark, ElementType.RATIONAL_CONST)
@@ -851,26 +852,33 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     x.ProcessNamedTypeReference(longId)
                     x.Done(range, namedTypeMark, ElementType.NAMED_TYPE_USAGE)
                     x.Done(range, namedMark, ElementType.NAMED_MEASURE)
+
                 | SynMeasure.Product(measure1, _, measure2, range) ->
                     let prodMark = x.Mark(range)
                     processMeasure measure1
                     processMeasure measure2
                     x.Done(range, prodMark, ElementType.PRODUCT_MEASURE)
+
                 | SynMeasure.One _ ->
                     () // handled in SynMeasure.Seq to have the range
+
                 | SynMeasure.Seq([SynMeasure.One _], range) ->
                     x.MarkAndDone(range, ElementType.ONE_MEASURE)
+
                 | SynMeasure.Seq(measures = [synMeasure]) ->
                     processMeasure synMeasure
+
                 | SynMeasure.Seq(synMeasures, range) ->
                     let seqMark = x.Mark(range)
                     synMeasures |> List.iter processMeasure
                     x.Done(range, seqMark, ElementType.SEQ_MEASURE)
+
                 | SynMeasure.Divide(measure1, _, measure2, range) ->
                     let divMark = x.Mark(range)
                     measure1 |> Option.iter processMeasure
                     processMeasure measure2
                     x.Done(range, divMark, ElementType.DIVIDE_MEASURE)
+
                 | SynMeasure.Power(measure = synMeasure; power = ratio; range = range) ->
                     let powerMark = x.Mark(range)
                     processMeasure synMeasure
@@ -880,12 +888,15 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
                     processRatio ratio ratioRange
                     
                     x.Done(range, powerMark, ElementType.POWER_MEASURE)
+
                 | SynMeasure.Anon range ->
                     x.MarkAndDone(range, ElementType.ANON_MEASURE)
+
                 | SynMeasure.Paren(synMeasure, range) ->
                     let parenMark = x.Mark(range)
                     processMeasure synMeasure
                     x.Done(range, parenMark, ElementType.PAREN_MEASURE)
+
                 | SynMeasure.Var(synTypar, range) ->
                     let mark = x.Mark(range)
                     x.ProcessTypeParameter(synTypar)
@@ -1397,9 +1408,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
     member x.ProcessRecordFieldBindingList(fields: SynExprRecordField list) =
         let fieldsRange =
             match fields.Head, List.last fields with
-            | SynExprRecordField((lid, _), _, _, _), SynExprRecordField(_, _, Some(fieldValue), _) ->
+            | SynExprRecordField((lid, _), _, _, _, _), SynExprRecordField(_, _, Some(fieldValue), _, _) ->
                 Range.unionRanges lid.Range fieldValue.Range
-            | SynExprRecordField((lid, _), _, _, _), _ -> lid.Range
+            | SynExprRecordField((lid, _), _, _, _, _), _ -> lid.Range
 
         x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
         x.PushStepList(fields, recordFieldBindingListProcessor)
@@ -1419,7 +1430,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, path, projectedOffse
         x.MarkAndDone(lid.Range, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordFieldBinding(SynExprRecordField((lid, _), equalsRange, expr, blockSep)) =
+    member x.ProcessRecordFieldBinding(SynExprRecordField((lid, _), equalsRange, expr, _, blockSep)) =
         let (LidWithTrivia lid) = lid
         match lid, expr with
         | SynIdentWithTriviaRange headRange :: _, Some(ExprRange exprRange as expr) ->
@@ -1661,10 +1672,11 @@ type IndexerArgsProcessor() =
 
     override x.Process(synExpr, builder) =
         match synExpr with
-        | SynExpr.DotIndexedGet(_, args, dotRange, range)
-        | SynExpr.DotIndexedSet(_, args, _, range, dotRange, _) ->
-            let argsListRange = Range.unionRanges dotRange.EndRange range.EndRange
-            builder.PushRange(argsListRange, ElementType.INDEXER_ARG_LIST)
+        | SynExpr.DotIndexedGet(_, (ExprRange argsRange as args), dotRange, range)
+        | SynExpr.DotIndexedSet(_, (ExprRange argsRange as args), _, range, dotRange, _) ->
+            builder.AdvanceToEnd(dotRange)
+            let argListMark = builder.MarkTokenOrRange(FSharpTokenType.LBRACK, argsRange)
+            builder.PushRangeForMark(range, argListMark, ElementType.INDEXER_ARG_LIST)
             builder.PushExpression(args)
 
         | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr

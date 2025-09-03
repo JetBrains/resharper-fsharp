@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Text
 open System.Threading
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Components
 open JetBrains.Application.Parts
 open JetBrains.Lifetimes
 open JetBrains.Metadata.Utils
@@ -26,7 +27,7 @@ open JetBrains.Util
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
-type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider,
+type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: ILazy<FsiDetector>, fsiOptions: FsiOptionsProvider,
         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,
         logger: ILogger, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
 
@@ -39,9 +40,9 @@ type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, 
     let getNewFsiSessionInfo _ =
         let fsi =
             if fsiOptions.AutoDetect.Value then
-                fsiDetector.GetAutodetected(solution)
+                fsiDetector.Value.GetAutodetected(solution)
             else
-                fsiDetector.GetActiveTool(solution, fsiOptions)
+                fsiDetector.Value.GetActiveTool(solution, fsiOptions)
 
         let fsiPath =
             if fsiOptions.IsCustomTool.Value then

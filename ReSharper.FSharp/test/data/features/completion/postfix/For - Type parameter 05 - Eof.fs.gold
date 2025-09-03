@@ -3,5 +3,5 @@ module Module
 
 let f mice =
     for mouse in mice do
-      {caret}
+        {caret}
     ()

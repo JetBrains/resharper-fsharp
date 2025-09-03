@@ -62,6 +62,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (declaredElement is IFSharpAnonRecordFieldProperty fieldProperty)
         return mySearchDomainFactory.CreateSearchDomain(fieldProperty.Module);
 
+      if (declaredElement is IFSharpParameter { ContainingParametersOwner: { } owner })
+        return myClrSearchFactory.GetDeclaredElementSearchDomain(owner);
+
       return EmptySearchDomain.Instance;
     }
 
@@ -77,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (element is IFSharpProperty property)
         return property.GetExplicitAccessors().Select(member => new RelatedDeclaredElement(member));
 
-      if (element is IFSharpTypeElement typeElement && typeElement.IsUnion())
+      if (element is IFSharpSourceTypeElement typeElement && typeElement.IsUnion())
       {
         var result = new List<RelatedDeclaredElement>();
         foreach (var sourceUnionCase in typeElement.GetSourceUnionCases())
@@ -101,11 +104,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         return result;
       }
 
+      if (element is IFSharpParameter fsParameter)
+        return fsParameter.GetParameterOriginElements().Select(paramOrigin => new RelatedDeclaredElement(paramOrigin));
+
+      if (element is IReferencePat refPat && refPat.TryGetDeclaredFSharpParameter() is { } patternFsParam)
+        return [new RelatedDeclaredElement(patternFsParam)];
+
+      if (element is IParameterSignatureTypeUsage { FSharpParameter: { } sigFsParam })
+        return [new RelatedDeclaredElement(sigFsParam)];
+
       return EmptyList<RelatedDeclaredElement>.Instance;
     }
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
+      if (element is IFSharpParameter fsParameter)
+        return new NavigateTargets(fsParameter.GetParameterOriginElements().AsIReadOnlyCollection(), false);
+
       if (element is ISecondaryDeclaredElement { OriginElement: { } origin })
         return new NavigateTargets(origin, false);
 

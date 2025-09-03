@@ -5,6 +5,7 @@ if true then
     let i = 1
     let a =
         i
+
     ()
 else
     ()

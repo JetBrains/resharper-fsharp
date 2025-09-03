@@ -2,38 +2,75 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionA
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.CodeAnnotations
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
-let getAnnotationInfo<'AnnotationProvider, 'TAnnotationInfo
-when 'AnnotationProvider :> ICodeAnnotationInfoProvider<IAttributesOwner, 'TAnnotationInfo>>
-    (attributesOwner: IAttributesOwner) =
-    attributesOwner
-        .GetPsiServices()
-        .GetCodeAnnotationsCache()
-        .GetProvider<'AnnotationProvider>()
-        .GetInfo(attributesOwner)
+let findAttributesOwner (expr: IFSharpExpression) attributeNames =
+    let getAttributesOwner (declaredElement: IDeclaredElement) =
+        match declaredElement with
+        | :? IAccessor as accessor -> accessor.OwnerMember.As<IAttributesOwner>()
+        | _ -> declaredElement.As<IAttributesOwner>()
 
-let getAttributesOwner (expr: IFSharpExpression) =
-    match BinaryAppExprNavigator.GetByRightArgument(expr) with
-    | binaryExpr when isNamedArgSyntactically binaryExpr ->
-        match tryGetNamedArgRefExpr binaryExpr with
-        | null -> null
-        | namedRef ->
-            namedRef.Reference.Resolve().DeclaredElement.As<IAttributesOwner>()
-    | _ ->
+    let psiServices = expr.GetPsiServices()
 
-    let matchingParameter = getMatchingParameter expr
-    if isNotNull matchingParameter then matchingParameter :> IAttributesOwner else
+    let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
+    let isNamedArg = isNotNull binaryExpr && isNamedArgSyntactically binaryExpr
+    let argCandidate: IFSharpExpression = if isNamedArg then binaryExpr else expr
 
-    let declaration: IDeclaration =
+    let argsOwner = getArgsOwner argCandidate
+    let declaration: IFSharpDeclaration =
+        if isNotNull argsOwner then null else
+
         let typeMemberDecl = MemberDeclarationNavigator.GetByExpression(expr)
         if isNotNull typeMemberDecl then typeMemberDecl else
-        TopBindingNavigator.GetByExpression(expr)
+        let topBinding = TopBindingNavigator.GetByExpression(expr)
+        if isNull topBinding then null else topBinding.HeadPattern.As<IFSharpDeclaration>()
 
-    if isNull declaration then null else declaration.DeclaredElement.As<IAttributesOwner>()
+    let namedArgRefExpr = if isNamedArg then tryGetNamedArgRefExpr binaryExpr else null
+
+    let propertySetter =
+        if isNamedArg then
+            let propertyName = namedArgRefExpr.ShortName
+            let hasAttributes =
+                attributeNames
+                |> Seq.exists (fun attributeName ->
+                    psiServices.HasMemberWithAttribute(propertyName, attributeName))
+
+            if hasAttributes then getAttributesOwner (namedArgRefExpr.Reference.Resolve().DeclaredElement)
+            else null
+        else null
+
+    if isNotNull propertySetter then propertySetter else
+
+    let memberName =
+        if isNull argsOwner then
+            if isNamedArg then null else
+            if isNull declaration then null
+            else declaration.SourceName
+
+        else getReferenceName argsOwner
+
+    if isNull memberName then null else
+
+    let hasAttributes =
+        attributeNames
+        |> Seq.exists (fun x -> psiServices.HasMemberWithAttribute(memberName, x))
+
+    if not hasAttributes then null else
+
+    if isNamedArg then
+        if isNull namedArgRefExpr then null else
+        getAttributesOwner (namedArgRefExpr.Reference.Resolve().DeclaredElement)
+
+    else
+        if isNotNull argsOwner then
+            let matchingParameter = getMatchingParameter expr
+            if isNotNull matchingParameter then matchingParameter :> IAttributesOwner else null
+
+        else
+            getAttributesOwner declaration.DeclaredElement
 
 let tryGetTypeProviderName (expr: IConstExpr) =
     let providedTypeName =

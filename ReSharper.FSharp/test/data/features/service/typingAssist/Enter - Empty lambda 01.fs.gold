@@ -4,4 +4,4 @@ module Module
 do
    []
    |> (fun _ ->
-     {caret})
+       {caret})

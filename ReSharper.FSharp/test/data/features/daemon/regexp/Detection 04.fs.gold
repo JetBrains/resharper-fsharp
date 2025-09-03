@@ -1,0 +1,35 @@
+﻿module Test
+
+open System.Diagnostics.CodeAnalysis
+open System.ComponentModel.DataAnnotations
+
+type RegexAttr([<StringSyntax(StringSyntaxAttribute.Regex)>] pattern: string) =
+    inherit System.Attribute()
+
+    new(_: int) = RegexAttr("|\d|(0)")
+    new([<StringSyntax(StringSyntaxAttribute.Regex)>] pattern: string, _: int) = RegexAttr(pattern)
+
+    [<StringSyntax(StringSyntaxAttribute.Regex)>]
+    member val Pattern = "" with get, set
+
+
+[<RegularExpression("|\d|(1)", ErrorMessage = "")>]
+let _ = ""
+
+[<RegexAttr("|\d|(2)", Pattern = "|\d|(3)")>]
+let _ = ""
+
+[<RegexAttr(1, Pattern = "|\d|(4)")>]
+let _ = ""
+
+[<RegexAttr("|\d|(5)", 1, Pattern = "|\d|(6)")>]
+let _ = ""
+
+---------------------------------------------------------
+(0): ReSharper Regex Identifier: 
+(1): ReSharper Regex Identifier: 
+(2): ReSharper Regex Identifier: 
+(3): ReSharper Regex Identifier: 
+(4): ReSharper Regex Identifier: 
+(5): ReSharper Regex Identifier: 
+(6): ReSharper Regex Identifier: 

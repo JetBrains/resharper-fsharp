@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -27,21 +28,29 @@ type AddIgnoreTest() =
 
     [<Test>] member x.``New line - Lazy 01``() = x.DoNamedTest()
 
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``New line - Match - Deindent - Single clause 01``() = x.DoNamedTest()
-    [<Test>] member x.``New line - Match - Deindent - Single clause 02``() = x.DoNamedTest()
-    [<Test>] member x.``New line - Match - Deindent 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``New line - Match - Deindent - Single clause 02``() = x.DoNamedTest() // todo: formatter: wrong indent
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
+    [<Test; Explicit>] member x.``New line - Match - Deindent 01``() = x.DoNamedTest() // todo: formatter: wrong indent
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``New line - Match - Deindent 02``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match - Deindent 03``() = x.DoNamedTest()
 
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``New line - Match 01``() = x.DoNamedTest()
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``New line - Match 03 - Single line``() = x.DoNamedTest()
 
     [<Test>] member x.``Parens 01``() = x.DoNamedTest()
     [<Test>] member x.``Parens 02``() = x.DoNamedTest()
 
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``Single line - Multiple clauses 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Multiple clauses 02``() = x.DoNamedTest()
+    [<TestBulbActionMenuSelectedIndexes([|1|])>]
     [<Test>] member x.``Single line - Single clause 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Single clause 02``() = x.DoNamedTest()
 

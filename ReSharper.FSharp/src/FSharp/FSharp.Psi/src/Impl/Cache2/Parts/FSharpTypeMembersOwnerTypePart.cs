@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeOldDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder, PartKind partKind, string[] implicitExtendShortNames = null)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
+      : base(declaration, FSharpModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
         declaration.TypeParameterDeclarations, cacheBuilder, partKind)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
-    [CanBeNull] internal IClrTypeName[] SuperTypesClrTypeNames;
+    [CanBeNull] internal FcsTypeMappingUtil.FcsTypeClrName[] SuperTypesClrTypeNames;
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
@@ -80,18 +80,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       var psiModule = GetPsiModule();
       if (SuperTypesClrTypeNames != null)
-        return SuperTypesClrTypeNames.ToTypeElements(psiModule);
+      {
+        var result = new List<ITypeElement>(SuperTypesClrTypeNames.Length);
+        foreach (var clrTypeName in SuperTypesClrTypeNames)
+          if (clrTypeName?.GetTypeElement() is { } typeElement)
+            result.Add(typeElement);
 
-      var superTypeNames = new HashSet<IClrTypeName>();
+        return result;
+      }
+
+      var superTypeNames = new HashSet<FcsTypeMappingUtil.FcsTypeClrName>();
       var superTypeElements = new HashSet<ITypeElement>();
 
       foreach (var declaredType in GetSuperTypes())
       {
-        var typeElement = declaredType.GetTypeElement();
-        if (typeElement == null)
+        if (declaredType.GetTypeElement() is not { } typeElement)
           continue;
 
-        superTypeNames.Add(typeElement.GetClrName().GetPersistent());
+        superTypeNames.Add(new FcsTypeMappingUtil.FcsTypeClrName(typeElement, psiModule));
         superTypeElements.Add(typeElement);
       }
 

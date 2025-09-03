@@ -102,4 +102,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsFiltered() => true;
     public override NodeType NodeType => DocCommentBlockNodeType.Instance;
   }
+  
+  public class FSharpWarningDirective : FSharpCompositeElement
+  {
+    public override bool IsFiltered() => true;
+    public override NodeType NodeType => FSharpWarningDirectiveNodeType.Instance;
+  }
 }

@@ -1,7 +1,6 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpErrorUtil
 
-open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -11,13 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
-
-type FSharpDiagnosticTypeInfo =
-    { IsTupleType: bool; TypeString: string } with
-
-    static member Create(fcsType: FSharpType, displayContext: FSharpDisplayContext) =
-        { IsTupleType = fcsType.IsTupleType
-          TypeString = fcsType.Format(displayContext) }
 
 let getDocumentRange (node: #ITreeNode) =
     node.GetHighlightingRange()
@@ -75,7 +67,7 @@ let rec getResultExpr (expr: IFSharpExpression) =
         let lastExpr = seqExpr.Expressions.LastOrDefault()
         if isNotNull lastExpr then getResultExpr lastExpr else expr
 
-    | :? IParenExpr as parenExpr ->
+    | :? IParenOrBeginEndExpr as parenExpr ->
         let innerExpr = parenExpr.InnerExpression
         if isNotNull innerExpr && not parenExpr.IsSingleLine then getResultExpr innerExpr else expr
 
@@ -122,9 +114,9 @@ let getFunctionExpr (appExpr: IAppExpr) =
 let getExprPresentableName (expr: IFSharpExpression) =
     match expr.IgnoreInnerParens() with
     | :? IReferenceExpr as refExpr -> $"'{refExpr.ShortName}'"
-    | :? ILambdaExpr -> "lambda"
-    | :? ITypeTestExpr -> "type test"
-    | :? ICastExpr -> "type cast"
+    | :? ILambdaExpr -> "the lambda"
+    | :? ITypeTestExpr -> "the type test"
+    | :? ICastExpr -> "the type cast"
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
 let rec isSimpleQualifiedName (expr: IReferenceExpr) =
@@ -179,3 +171,15 @@ let getMatchLikeExprIncompleteRange (expr: IMatchLikeExpr) =
 let getNestedRecordUpdateRange (outer: IRecordFieldBinding) (inner: IRecordFieldBinding) =
     let recordExpr = RecordExprNavigator.GetByFieldBinding(inner)
     getTreeNodesDocumentRange outer.EqualsToken recordExpr.WithKeyword
+
+let getQualifierExprOrThisRange (expr: IFSharpExpression) =
+    let rec getQualifier (expr: IFSharpExpression) =
+        match expr with
+        | :? IReferenceExpr as refExpr ->
+            match refExpr.Qualifier with
+            | null -> expr
+            | qualifierExpr -> getQualifier qualifierExpr
+        | _ -> expr
+
+    let expr = getQualifier expr
+    getDocumentRange expr

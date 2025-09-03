@@ -1,67 +1,51 @@
 ﻿## NavigateToBaseProvider activity:
   Show context popup menu `Base types of 'E'`:
-    DEO: Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
-    Menu item (enabled) :
-      icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
-      text: _Exception <font color="FF6D6D6D"> (in System.Runtime.InteropServices)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
-      tail icon: Assembly
-    Navigation result:
-      opened file: _Exception.cs
-      ------------------
-        [InterfaceType(ComInterfaceType.InterfaceIsDual)]
-        [CLSCompliant(false)]
-        public interface |CARET|_Exception
-        {
-          string ToString();
-      ------------------
-
-    [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersPublic)
       text: **Exception** <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Exception.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public class |CARET|Exception : ISerializable, _Exception
-        {
-          [OptionalField]
+      namespace System;
+
+      public class |CARET|Exception : ISerializable
+      {
+        public Exception();
       ------------------
 
-    DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: ISerializable <font color="FF6D6D6D"> (in System.Runtime.Serialization)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: ISerializable.cs
       ------------------
+      namespace System.Runtime.Serialization;
+
+      public interface |CARET|ISerializable
       {
-        [ComVisible(true)]
-        public interface |CARET|ISerializable
-        {
-          [SecurityCritical]
+        [Obsolete("Formatter-based serialization is obsolete and should not be used.", DiagnosticId = "SYSLIB0050", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
       ------------------
 
-    [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: **IStructuralEquatable** <font color="FF6D6D6D"> (in System.Collections)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IStructuralEquatable.cs
       ------------------
+      namespace System.Collections;
+
+      public interface |CARET|IStructuralEquatable
       {
-        [__DynamicallyInvokable]
-        public interface |CARET|IStructuralEquatable
-        {
-          [__DynamicallyInvokable]
+        bool Equals(object? other, IEqualityComparer comparer);
       ------------------
 
 

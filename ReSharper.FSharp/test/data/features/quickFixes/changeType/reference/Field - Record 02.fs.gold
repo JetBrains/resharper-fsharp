@@ -1,0 +1,7 @@
+﻿module Module
+
+type R = { Field: string }
+
+let r: R = { Field = 1 }
+
+let s: string = r.Field{caret}

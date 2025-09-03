@@ -14,13 +14,13 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AssemblyAttributes.g.fs" />
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="ReadLockCookieUtil.fs" />
     <Compile Include="Service\DelegatingFileSystemShimTest.fs" />
     <Compile Include="Service\NameResolutionTest.fs" />
     <Compile Include="Service\StructureTest.fs" />
     <Compile Include="Service\IsFSharpAssemblyTest.fs" />
-    <Compile Include="Service\FSharpElementFactoryTest.fs" />
     <Compile Include="Service\FSharpNamingTest.fs" />
     <Compile Include="Service\FSharpMetadataReaderTest.fs" />
     <Compile Include="Service\FSharpCodeFormatterTest.fs" />

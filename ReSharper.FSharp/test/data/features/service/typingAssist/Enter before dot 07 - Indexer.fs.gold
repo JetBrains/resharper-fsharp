@@ -3,4 +3,4 @@ module Module
 
 do
    foo
-     {caret}.[bar]
+       {caret}.[bar]

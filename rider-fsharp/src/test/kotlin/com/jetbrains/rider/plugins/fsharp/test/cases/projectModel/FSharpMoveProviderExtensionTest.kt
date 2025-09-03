@@ -7,10 +7,11 @@ import com.jetbrains.rider.projectView.solutionName
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelDumpFilesProfile
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.maskAllAccordingDumpFilesProfile
@@ -23,7 +24,7 @@ import org.testng.annotations.Test
 @Test
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution1")
   fun testAllowPaste01_Mix() {
     doTest { provider ->
@@ -44,7 +45,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution2")
   fun testAllowPaste02_DifferentFiles() {
     doTest { provider ->
@@ -105,7 +106,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_CORE_3_1)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution3")
   fun testAllowPaste03_DifferentFilesInFolders() {
     doTest { provider ->

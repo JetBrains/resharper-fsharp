@@ -54,7 +54,7 @@ let createContainer items writer =
             let metadata =
                 match link with
                 | null -> []
-                | _ -> [RdProjectMetadata("Link", link, false)]
+                | _ -> [RdProjectMetadata("Link", link, null, false)]
             RdProjectItem(itemType, evaluatedInclude, String.Empty, Nullable(false), RdThisProjectItemOrigin(), metadata.ToList(id)))
 
     let rdProject = RdProject(List(), rdItems.ToList(id), List(), List(), List(), List(), List())

@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Runtime.InteropServices
-open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
+open JetBrains.Annotations
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,17 +11,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: IPsiSourceFile, psiModule: IPsiModule,
-                          [<Optional; DefaultParameterValue(null)>] extension: string) =
+type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] context: ITreeNode,
+        [<Optional; DefaultParameterValue(null)>] extension: string) =
     let [<Literal>] moniker = "F# element factory"
+
+    let sourceFile = context.GetSourceFile()
+    let psiModule = sourceFile.PsiModule
 
     let getNamingService () =
         NamingManager.GetNamingLanguageService(FSharpLanguage.Instance)
@@ -35,7 +36,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         let parser = languageService.CreateParser(document, sourceFile, extension)
 
         let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
-        SandBox.CreateSandBoxFor(fsFile, psiModule)
+        let context = if context.IsValid() then context else null
+        SandBox.CreateSandBoxWithContextFor(fsFile, psiModule, context)
         fsFile
 
     let createFileWithModule source =
@@ -70,7 +72,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         getExpression source :?> IPrefixAppExpr
 
     let createLetExpr patternText =
-        let newExpr = getExpression $"(let {patternText} = ())"
+        let newExpr = getExpression $"(let {patternText} = () in ())"
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
     let createLetDecl patternText =
@@ -149,11 +151,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             | null -> failwith "Could not get outer appExpr"
             | binaryAppExpr ->
 
+            let lineEnding = expr.GetLineEnding()
             let expr = ModificationUtil.ReplaceChild(binaryAppExpr.LeftArgument, expr.Copy())
 
             if newLine then
                 ModificationUtil.ReplaceChild(expr.NextSibling, Whitespace(indent)) |> ignore
-                ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(expr.GetLineEnding())) |> ignore
+                ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(lineEnding)) |> ignore
 
             binaryAppExpr
 
@@ -205,20 +208,13 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let source = $"let {patternText} = ()"
             getModuleMember source :?> ILetBindingsDeclaration
 
-        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma, addTypes, displayContext) =
-            let printParam (name, fcsType: FSharpType) =
-                let name = FSharpNamingService.mangleNameIfNecessary name
-                if not addTypes then name else
-
-                let fcsType = fcsType.Format(displayContext)
-                $"{name}: {fcsType}" 
-
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) =
             let parametersSource =
                 curriedParameterNames
                 |> List.map (fun paramNames ->
                     let concatenatedNames =
                         paramNames
-                        |> List.map printParam
+                        |> List.map (fst >> FSharpNamingService.mangleNameIfNecessary)
                         |> String.concat (if isSpaceAfterComma then ", " else ",") 
                     $"({concatenatedNames})"
                 )
@@ -227,7 +223,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
             let memberBinding = createMemberDecl false "P" List.empty parametersSource true
             memberBinding.ParametersDeclarations |> Seq.toList
 
-        member x.CreateMemberBindingExpr(isStatic, name, typeParameters, parameters) =
+        member x.CreateMemberDecl(isStatic, name, typeParameters, parameters) =
             let parsedParams = "()" |> List.replicate parameters.Length |> String.concat " "
             let memberDecl = createMemberDecl isStatic name typeParameters parsedParams false
             
@@ -258,22 +254,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, sourceFile: I
         member x.CreateMatchExpr(expr) =
             let source = "match () with | _ -> ()"
 
-            let indent = expr.Indent
-            let newExpr = getExpression source
+            let matchExpr = getExpression source :?> IMatchExpr
+            matchExpr.SetExpression(expr.Copy()) |> ignore
 
-            match newExpr.As<IMatchExpr>() with
-            | null -> failwith "Could not get outer appExpr"
-            | matchExpr ->
-
-            match matchExpr.Clauses[0].As<IMatchClause>() with
-            | null -> failwith "Could not get inner appExpr"
-            | matchClause ->
-
-            let expr = ModificationUtil.ReplaceChild(matchExpr.Expression, expr.Copy())
-
-            let whitespace = ModificationUtil.ReplaceChild(matchClause.PrevSibling, Whitespace(indent))
-            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
-
+            let matchClause = matchExpr.Clauses[0]
+            matchClause.AddLineBreakBefore() |> ignore
             matchExpr
 
         member x.CreateMatchClause() =

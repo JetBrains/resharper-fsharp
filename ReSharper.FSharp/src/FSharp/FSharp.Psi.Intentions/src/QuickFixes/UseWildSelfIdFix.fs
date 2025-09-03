@@ -18,7 +18,6 @@ type UseWildSelfIdFix(warning: UseWildSelfIdWarning) =
 
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(selfId.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let factory = selfId.CreateElementFactory()
         ModificationUtil.ReplaceChild(selfId, factory.CreateSelfId("_")) |> ignore

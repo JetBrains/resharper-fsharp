@@ -1,14 +1,14 @@
 ﻿## GotoDeclarationProvider activity:
   Immediate result:
-    DEO: Envoy: Interface:System.IDisposable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IDisposable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.IDisposable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IDisposable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Navigation result:
       opened file: IDisposable.cs
       ------------------
-        [ComVisible(true)]
-        [__DynamicallyInvokable]
-        public interface |CARET|IDisposable
-        {
-          [__DynamicallyInvokable]
+      namespace System;
+
+      public interface |CARET|IDisposable
+      {
+        void Dispose();
       ------------------
 
 

@@ -25,7 +25,7 @@ type FSharpOptimizeImports() =
 
         member this.Process(sourceFile, _, _, _, _) =
             sourceFile.GetPsiServices().Transactions.Execute("Code cleanup", fun _ ->
-                let unusedOpens = UnusedOpensUtil.getUnusedOpens sourceFile.FSharpFile EmptyAction.Instance
+                let unusedOpens = UnusedOpensUtil.getUnusedOpens sourceFile.FSharpFile
                 Array.iter OpensUtil.removeOpen unusedOpens) |> ignore
 
         member this.SetDefaultSetting(_, _) = ()

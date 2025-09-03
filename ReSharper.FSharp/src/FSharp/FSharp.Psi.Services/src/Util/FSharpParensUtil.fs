@@ -271,7 +271,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
     if escapesTupleAppArg context expr then true else
     if expr :? IParenOrBeginEndExpr then false
 
-    elif expr :? IDotLambdaExpr && not (FSharpLanguageLevel.isFSharp90Supported expr) then true else
+    elif expr :? IDotLambdaExpr && not (FSharpLanguageLevel.isFSharp81Supported expr) then true else
 
     let expr = expr.IgnoreInnerParens()
     if isNull expr|| contextRequiresParens expr context then true else
@@ -433,21 +433,15 @@ let needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     needsParensImpl allowHighPrecedenceAppParens context expr
 
 let addParens (expr: IFSharpExpression) =
-    let exprCopy = expr.Copy()
     let factory = expr.CreateElementFactory()
+    let exprCopy = expr.Copy()
 
     let parenExpr = factory.CreateParenExpr()
     let parenExpr = ModificationUtil.ReplaceChild(expr, parenExpr)
-    let expr = parenExpr.SetInnerExpression(exprCopy)
-
-    shiftNode 1 expr
-    expr
+    parenExpr.SetInnerExpression(exprCopy)
 
 
 let addParensIfNeeded (expr: IFSharpExpression) =
     let context = expr.IgnoreParentParens(includingBeginEndExpr = false)
     if context != expr || not (needsParens context expr) then expr else
     addParens expr
-
-let shouldAddSpaceAfter (prevToken: ITokenNode) = isIdentifierOrKeyword prevToken
-let shouldAddSpaceBefore (nextToken: ITokenNode) = isIdentifierOrKeyword nextToken

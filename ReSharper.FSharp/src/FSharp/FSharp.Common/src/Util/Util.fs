@@ -8,9 +8,11 @@ open FSharp.Compiler.Xml
 open JetBrains.Annotations
 open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Threading
+open JetBrains.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -201,6 +203,11 @@ module rec FcsUtil =
     let inline (|IdentRange|) (id: Ident) = id.idRange
     let inline (|TypeRange|) (typ: SynType) = typ.Range
 
+    let inline (|WarningDirectiveRange|) (directiveTrivia: WarnDirectiveTrivia) =
+        match directiveTrivia with
+        | WarnDirectiveTrivia.Nowarn(range)
+        | WarnDirectiveTrivia.Warnon(range) -> range
+
     let inline (|IdentText|_|) text (id: Ident) =
         if id.idText = text then someUnit else None
 
@@ -283,11 +290,17 @@ module rec FSharpMsBuildUtils =
 [<Extension; AutoOpen>]
 module PsiUtil =
     let private getModuleSymbolScope withReferences (alternativeNames: bool) (psiModule: IPsiModule) =
-        let symbolCache = psiModule.GetPsiServices().Symbols
-        if alternativeNames then
-            symbolCache.GetAlternativeNamesSymbolScope(psiModule, withReferences)
-        else
+        match alternativeNames, withReferences with
+        | true, true ->
+            psiModule.GetCachedAlternativeNameSymbolScopeWithReferences()
+        | true, false ->
+            let symbolCache = psiModule.GetPsiServices().Symbols
+            symbolCache.GetAlternativeNamesSymbolScope(psiModule, false)
+        | false, true ->
             psiModule.GetCachedCaseSensitiveSymbolScopeWithReferences()
+        | false, false ->
+            let symbolCache = psiModule.GetPsiServices().Symbols
+            symbolCache.GetSymbolScope(psiModule, false, true)
 
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) (alternativeNames: bool) =

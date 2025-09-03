@@ -1,4 +1,3 @@
 ﻿do
     let rec f x = (){caret}
-
     f ()

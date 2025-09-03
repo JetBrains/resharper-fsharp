@@ -19,6 +19,25 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
+    [<Test>] member x.``Enter - Parens - Begin 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Begin 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Parens - Type 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter - Else 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 08``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 09``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 10``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Else 11``() = x.DoNamedTest()
+
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
     [<Test>] member x.``Enter - Empty lambda 01``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "MultiLineLambdaClosingNewline", "false")>]
@@ -117,7 +136,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 64 - After rarrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 65 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 66 - After larrow - Comment``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest() // todo: check indent from the <- line, should not add indent
     [<Test>] member x.``Enter 68 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 69 - After parens on new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
@@ -143,6 +162,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - After comment - Line start 05``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Line start 06``() = x.DoNamedTest()
     [<Test>] member x.``Enter - After comment - Line start 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - After comment - Documentation 03 - Spaces``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter - Continue line - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 02``() = x.DoNamedTest()
@@ -154,6 +176,22 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - Continue line - String 08``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 09``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 10``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter - String 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 04``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 05``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 06``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 07``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 08``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 09``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 10``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 11``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 12``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 13``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 14``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - String 15``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
 
@@ -176,6 +214,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 02``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in comment 04 - Documentation 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
@@ -209,7 +248,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 16 - After last infix op token on line``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 17 - Nested pipe``() = x.DoNamedTest()
 
-    [<Test>] member x.``Backspace - Interpolated string - Braces 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace - Simple 02 - Delete selection``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Regular 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Backspace - Interpolated String - Triple quote 02 - Multiline``() = x.DoNamedTest()
@@ -361,7 +401,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 03``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 04``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
-    [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest() // todo: formatter: fix disabling formatter
 
     member x.``Brackets - left angle - disabled``() = x.DoNamedTest()
     member x.``Brackets - quotation - disabled``() = x.DoNamedTest()

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 
@@ -87,5 +89,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
     
     public override bool IsStatic => StaticKeyword != null;
+    
+    public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
+      ReturnTypeUsage.GetParameterDeclaration(index);
+
+    public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
+      ReturnTypeUsage.GetParameterDeclarations();
   }
 }

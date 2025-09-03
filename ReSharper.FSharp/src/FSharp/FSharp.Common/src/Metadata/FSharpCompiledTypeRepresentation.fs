@@ -2,6 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Metadata
 
 open System
 open System.Text
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.Util.Extension
 
 type FSharpMetadataTypeReference =
@@ -47,10 +49,11 @@ type FSharpCompiledTypeRepresentation =
     | Module of nameKind: FSharpMetadataModuleNameKind * values: FSharpMetadataValue[]
     | Union of cases: string[]
     | Other
+    | Erased
 
     member this.HasRepresentation =
         match this with
-        | Other -> false
+        | Other | Erased -> false
         | _ -> true
 
 
@@ -59,23 +62,25 @@ type FSharpMetadataEntity =
       LogicalName: string
       CompiledName: string option
       TypeParameterCount: int
+      AccessRights: AccessRights
       mutable EntityKind: EntityKind
-      mutable CompilationPath: (string * EntityKind)[] option
+      mutable CompilationPath: (string * EntityKind)[]
       mutable Representation: FSharpCompiledTypeRepresentation }
 
 module FSharpMetadataEntity =
-    let create index logicalName compiledName typeParameterCount compilationPath =
+    let create index logicalName compiledName typeParameterCount compilationPath accessRights =
         { Index = index
           LogicalName = logicalName
           CompiledName = compiledName
           TypeParameterCount = typeParameterCount
+          AccessRights = accessRights
           EntityKind = Unchecked.defaultof<_>
           CompilationPath = compilationPath
           Representation = Unchecked.defaultof<_> }
 
     let getEntityQualifiedName (entity: FSharpMetadataEntity) =
         let stringBuilder = StringBuilder()
-        for name, entityKind in entity.CompilationPath |> Option.defaultValue [||] do
+        for name, entityKind in entity.CompilationPath do
             stringBuilder.Append(name) |> ignore
             stringBuilder.Append(if entityKind = EntityKind.Namespace then "." else "+") |> ignore
   
@@ -83,8 +88,14 @@ module FSharpMetadataEntity =
         stringBuilder.ToString()
 
     let getCompiledModuleDeclaredName (entity: FSharpMetadataEntity) =
+        if isNull entity then SingleName(SharedImplUtil.MISSING_DECLARATION_NAME) else
+
         let logicalName = entity.LogicalName.SubstringBefore("`")
 
-        match entity.EntityKind with
-        | EntityKind.ModuleWithSuffix -> AlternativeNames(logicalName.SubstringBeforeLast("Module"), logicalName)
+        match entity.EntityKind, entity.CompiledName with
+        | EntityKind.ModuleWithSuffix, _ -> AlternativeNames(logicalName.SubstringBeforeLast("Module"), logicalName)
+        | _, Some compiledName -> AlternativeNames(logicalName, compiledName)
         | _ -> SingleName(logicalName)
+
+    let getRepresentation (entity: FSharpMetadataEntity) =
+        if isNull entity then FSharpCompiledTypeRepresentation.Erased else entity.Representation

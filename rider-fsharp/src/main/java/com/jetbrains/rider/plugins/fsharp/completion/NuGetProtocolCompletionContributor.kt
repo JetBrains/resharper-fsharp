@@ -10,8 +10,6 @@ import com.jetbrains.rdclient.patches.isTypingSessionEnabled
 import com.jetbrains.rider.completion.FrontendCompletionHost
 import com.jetbrains.rider.completion.ProtocolCompletionContributor
 import com.jetbrains.rider.completion.currentOffsetSafe
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
 
 internal const val KEY_NAME = "NuGet:name"
 internal const val KEY_VERSION = "NuGet:version"
@@ -51,14 +49,13 @@ class NuGetProtocolCompletionContributor : ProtocolCompletionContributor() {
   override val isPreemptive = false
   override fun shouldStopOnPrefix(prefix: String, isAutoPopup: Boolean) = false
   override fun isAvailable(file: PsiFile, offset: Int) =
-    file is FSharpFile && insideReferenceDirective(file, offset) && isTypingSessionEnabled
+    insideReferenceDirective(file, offset) && isTypingSessionEnabled
 
   override fun beforeCompletion(context: CompletionInitializationContext) {
     if (!isTypingSessionEnabled)
       return
 
-    val psiElement = context.file.findElementAt(context.startOffset)?.parent ?: return
-    if (psiElement !is FSharpStringLiteralExpression) return
+    val psiElement = getStringInsideReferenceDirective(context.file, context.startOffset) ?: return
 
     val helper = FrontendCompletionHost.getInstance(context.file.project)
     val stringText = ElementManipulators.getValueText(psiElement)

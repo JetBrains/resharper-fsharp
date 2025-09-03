@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util.DataStructures
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FcsModuleReaderCommonCache(lifetime: Lifetime, changeManager: ChangeManager) =
     inherit AssemblyReaderShimChangeListenerBase(lifetime, changeManager)
 

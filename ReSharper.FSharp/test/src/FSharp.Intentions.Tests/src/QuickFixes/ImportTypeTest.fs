@@ -56,6 +56,20 @@ type ImportTypeTest() =
 
     [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()
 
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 01``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 02``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 03``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 04``() = x.DoNamedTestWithSignatureAndSecondFile()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 05``() = x.DoNamedTestWithSignatureAndSecondFile()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 06``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 07``() = x.DoNamedTest()
+    [<Test>] member x.``Accessibility 08``() = x.DoNamedTestWithTwoFiles()
+    [<NotAvailable>]
+    [<Test>] member x.``Accessibility 09``() = x.DoNamedTestWithTwoFiles()
+
 
 [<FSharpTest>]
 type ImportExtensionMemberTest() =
@@ -66,7 +80,49 @@ type ImportExtensionMemberTest() =
     member x.DoNamedTestFsCs() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
+    [<Test>] member x.``Expr - Dot lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Dot lambda 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Extension - CSharp - Array 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp - Array 02``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Extension - CSharp 01``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 02``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 03``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 04``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 05``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 06``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 07``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 08``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 09``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``Extension - CSharp 10``() = x.DoNamedTestFsCs()
+    
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 01``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 02``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 03``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 04``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 05``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 06``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 07``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 08``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 09``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``FSharp - Compiled 10``() = x.DoNamedTest()
+
+    [<Test>] member x.``FSharp - Source 01``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 02``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 03``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 04``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 05``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 06``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 07``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 08``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 09``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 10``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 11``() = x.DoNamedTest()
+    [<Test>] member x.``FSharp - Source 12``() = x.DoNamedTest()
+
+    [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
+
+    [<Test; NotAvailable>] member x.``Not Available - Type 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -84,7 +140,7 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Expr - Literal 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 04``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Expr - Literal 05``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Literal 05``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Literal 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Union 01``() = x.DoNamedTest()
@@ -109,7 +165,7 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Pattern - Literal 03``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Literal 04``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Literal 05``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Pattern - Literal 06``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Literal 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - Union 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Union 02 - Rqa``() = x.DoNamedTest()
@@ -125,3 +181,14 @@ type FSharpImportModuleMemberTest() =
     [<Test; NotAvailable>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpImporStaticMemberTest() =
+    inherit FSharpQuickFixTestBase<FSharpImportStaticMemberFromQualifierTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/staticMember"
+
+    [<Test>] member x.``Debugger 01``() = x.DoNamedTest()
+    [<Test>] member x.``Debugger 02``() = x.DoNamedTest()
+    [<Test>] member x.``String 01``() = x.DoNamedTest()

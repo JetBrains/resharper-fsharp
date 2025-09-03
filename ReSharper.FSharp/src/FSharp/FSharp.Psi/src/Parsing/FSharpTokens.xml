@@ -142,6 +142,7 @@
         <Token name="EQUALS" representation="=" />
         <Token name="GLOBAL" representation="global" />
         <Token name="GREATER" representation=">" />
+        <Token name="HASH" representation="#"/>
         <Token name="LESS" representation="&lt;" />
         <Token name="LPAREN_STAR_RPAREN" representation="(*)" /> <!--todo: fix text-->
         <Token name="MINUS" representation="-" />
@@ -158,10 +159,10 @@
         <Token name="SYMBOLIC_OP" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />
-        <Token name="HASH" />
         <Token name="TEXT" />
         <Token name="DEAD_CODE" />
 
+<!--        todo: repr-->
         <Token name="IEEE32" />
         <Token name="IEEE64" />
         <Token name="DECIMAL" />

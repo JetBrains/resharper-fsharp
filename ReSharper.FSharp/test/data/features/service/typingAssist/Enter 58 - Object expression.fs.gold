@@ -3,4 +3,4 @@ module Module
 
 let x =
    {new IInterface with
-     {caret}}
+       {caret}}

@@ -2,6 +2,6 @@
 module Module
 
 type T(
-  {caret}) =
+    {caret}) =
    class
    end

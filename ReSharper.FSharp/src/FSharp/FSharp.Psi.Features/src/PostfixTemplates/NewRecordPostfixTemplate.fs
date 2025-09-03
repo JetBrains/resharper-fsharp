@@ -52,7 +52,7 @@ and NewRecordPostfixTemplateBehavior(info) =
         psiServices.Transactions.Execute(this.ExpandCommandName, fun _ ->
             let factory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
+
             let refExpr = this.GetExpression(context) :?> IReferenceExpr
             let typeElement = refExpr.Reference.Resolve().DeclaredElement.As<ITypeElement>()
 

@@ -1,0 +1,6 @@
+﻿// ${COMPLETE_ITEM:Empty (in System.String)}
+module Module
+
+open System
+
+String.Empty{caret}

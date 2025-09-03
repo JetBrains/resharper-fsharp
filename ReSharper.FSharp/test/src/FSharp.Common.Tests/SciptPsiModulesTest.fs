@@ -100,7 +100,7 @@ type MyTestSolutionToolset(lifetime: Lifetime, dotNetCoreInstallationsDetector: 
 
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ICommonTestFSharpPluginZone>)>]
 type FSharpFileServiceStub() =
     interface IFSharpFileService with

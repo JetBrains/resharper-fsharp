@@ -12,40 +12,64 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public class FSharpMethodParameter : FSharpMethodParameterBase
+  public class FSharpMethodParameter([NotNull] IFSharpParameterOwner owner, FSharpParameterIndex index)
+    : FSharpMethodParameterBase(owner, index)
   {
-    public FSharpMethodParameter(FSharpParameter fsParam, [NotNull] IParametersOwner owner,
-      int index, [NotNull] IType type) : base(owner, index, type) =>
-      FSharpSymbol = fsParam;
+    [CanBeNull]
+    public FSharpParameter FcsParameter
+    {
+      get
+      {
+        if (Owner is not IFSharpMember { Mfv.CurriedParameterGroups: var fcsParamGroups })
+          return null;
 
-    public FSharpParameter FSharpSymbol { get; }
+        var paramGroup = fcsParamGroups.ElementAtOrDefault(FSharpIndex.GroupIndex);
+        if (paramGroup == null)
+          return null;
+
+        if (FSharpIndex.ParameterIndex is not { } paramIndex)
+          return paramGroup.Count == 1 ? paramGroup[0] : null;
+
+        return paramGroup.ElementAtOrDefault(paramIndex);
+      }
+    }
+
+    public override IType Type =>
+      Owner is IFSharpTypeParametersOwner fsTypeParamOwner && FcsParameter is { } fcsParam
+        ? fcsParam.Type.MapType(fsTypeParamOwner.AllTypeParameters, Module, true)
+        : TypeFactory.CreateUnknownType(Module);
 
     public override string ShortName =>
-      FSharpSymbol.DisplayName is var name && name.RemoveBackticks().IsEmpty()
-        ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : name;
+      FcsParameter?.DisplayName is { } name && !name.RemoveBackticks().IsEmpty()
+        ? name
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public override string SourceName => ShortName; // todo: calc from decl
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.HasAttributeInstance(clrName.FullName);
+      FcsParameter?.Attributes.HasAttributeInstance(clrName.FullName) ?? false;
 
     public override IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.ToAttributeInstances(Module);
+      FcsParameter?.Attributes.ToAttributeInstances(Module) ?? EmptyList<IAttributeInstance>.Instance;
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName,
       AttributesSource attributesSource) =>
-      FSharpSymbol.Attributes.GetAttributes(clrName.FullName).ToAttributeInstances(Module);
+      FcsParameter?.Attributes.GetAttributes(clrName.FullName).ToAttributeInstances(Module) ??
+      EmptyList<IAttributeInstance>.Instance;
 
     public override DefaultValue GetDefaultValue()
     {
+      bool IsDefaultParamValueAttr(FSharpAttribute a) =>
+        a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName;
+
       try
       {
         // todo: implement DefaultValue in FCS
-        var defaultValueAttr = FSharpSymbol.Attributes.FirstOrDefault(a =>
-            a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName)
-          ?.ConstructorArguments.FirstOrDefault();
-        return defaultValueAttr == null
-          ? new DefaultValue(Type, Type)
-          : new DefaultValue(Type, ConstantValue.Create(defaultValueAttr.Item2, Type));
+        var defaultValueFcsAttr = FcsParameter?.Attributes.FirstOrDefault(IsDefaultParamValueAttr);
+        var defaultValue = defaultValueFcsAttr?.ConstructorArguments.FirstOrDefault();
+        return defaultValue != null
+          ? new DefaultValue(Type, ConstantValue.Create(defaultValue.Item2, Type))
+          : new DefaultValue(Type, Type);
       }
       // todo: change exception in FCS
       catch (Exception)
@@ -54,13 +78,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    public override ParameterKind Kind => FSharpSymbol.MapParameterKind();
+    public override ParameterKind Kind => FcsParameter?.MapParameterKind() ?? ParameterKind.VALUE;
     public override bool IsParams => IsParameterArray;
-    public override bool IsParameterArray => Owner is IFSharpFunction && FSharpSymbol.IsParamArrayArg;
+
+    public override bool IsParameterArray =>
+      Owner is IFSharpFunction && FcsParameter is { IsParamArrayArg: true };
+
     public override bool IsParameterCollection => false;
 
     // todo: implement IsCliOptional in FCS
     public override bool IsOptional =>
-      FSharpSymbol.Attributes.HasAttributeInstance(PredefinedType.OPTIONAL_ATTRIBUTE_CLASS);
+      FcsParameter?.Attributes.HasAttributeInstance(PredefinedType.OPTIONAL_ATTRIBUTE_CLASS) ?? false;
+    
+    public override bool Equals(object obj) =>
+      obj is FSharpMethodParameter fsParam && 
+      FSharpIndex == fsParam.FSharpIndex && Owner.Equals(fsParam.Owner);
+
+    public override int GetHashCode() =>
+      197 * Owner.GetHashCode() + 47 * FSharpIndex.GetHashCode();
   }
 }

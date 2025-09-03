@@ -46,7 +46,6 @@ type ToRecursiveFunctionBehavior(info, offset) =
         |> Option.orElseWith (fun _ -> failwithf "Can't find let bindings")
         |> Option.iter (fun letBindings ->
             use writeCookie = WriteLockCookie.Create(letBindings.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "To recursive")
 

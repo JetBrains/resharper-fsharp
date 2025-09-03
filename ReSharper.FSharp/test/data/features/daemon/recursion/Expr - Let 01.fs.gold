@@ -1,0 +1,8 @@
+﻿module Module
+
+let rec f () =
+    let _ = |f|(0) ()
+    ()
+
+---------------------------------------------------------
+(0): Non-tail recursion: Recursion in non-tail position

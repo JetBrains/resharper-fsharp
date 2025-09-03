@@ -1,9 +1,15 @@
 ﻿module Module
 
 do
-    |use|(0) x = 1 + 1
+    |use|(0) |x|(1) = 1 + 1
 
 ------------------------------------------------
 0: 'use' is missing expression
 QUICKFIXES:
 Replace 'use' with expression
+1: Type constraint mismatch. The type 
+    'int'    
+is not compatible with type
+    'System.IDisposable'    
+
+NO QUICKFIXES

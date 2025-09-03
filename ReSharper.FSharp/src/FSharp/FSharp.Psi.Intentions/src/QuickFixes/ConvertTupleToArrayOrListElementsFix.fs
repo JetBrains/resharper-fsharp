@@ -17,17 +17,16 @@ type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
-    let actualType = warning.ActualType
-    let arrayOrListExpr = ArrayOrListExprNavigator.GetByExpression(expr.IgnoreParentParens())
 
     override x.Text = "Use ';' separators"
 
     override x.IsAvailable _ =
-        isValid expr && isNotNull arrayOrListExpr && actualType.IsTupleType
+        isValid expr &&
+        isNotNull (ArrayOrListExprNavigator.GetByExpression(expr.IgnoreParentParens())) &&
+        warning.DiagnosticInfo.TypeMismatchData.ActualType.IsTupleType
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         match expr with
         | :? ITupleExpr as tuple ->

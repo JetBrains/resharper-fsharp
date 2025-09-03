@@ -1,0 +1,5 @@
+﻿module Module
+
+type T() =
+    static member Method(): string =
+        if true then 1 else ""{caret}

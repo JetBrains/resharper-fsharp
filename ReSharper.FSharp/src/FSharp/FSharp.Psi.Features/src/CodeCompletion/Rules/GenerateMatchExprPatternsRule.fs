@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -27,8 +28,10 @@ module GenerateMatchExprPatternsInfo =
     let [<Literal>] Id = "Match values"
 
 
-type GenerateMatchExprPatternsInfo() =
+type GenerateMatchExprPatternsInfo(context: FSharpCodeCompletionContext) =
     inherit TextualInfo("_ -> ()", GenerateMatchExprPatternsInfo.Id)
+
+    member this.Context = context
 
     override this.IsRiderAsync = false
 
@@ -43,14 +46,14 @@ type GenerateMatchExprPatternsBehavior(info) =
         psiServices.Files.CommitAllDocuments()
 
         use pinCheckResultsCookie =
-            textControl.GetFSharpFile(solution).PinTypeCheckResults(true, GenerateMatchExprPatternsInfo.Id)
+            Assertion.Assert(info.Context.ParseAndCheckResults.IsValueCreated)
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(info.Context.ParseAndCheckResults.Value)
 
         let node = textControl.Document.GetPsiSourceFile(solution).FSharpFile.FindNodeAt(nameRange)
         let matchExpr = node.GetContainingNode<IMatchExpr>()
 
         do
             use writeCookie = WriteLockCookie.Create(matchExpr.IsPhysical())
-            use disableFormatter = new DisableCodeFormatter()
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices,
                     GenerateMatchExprPatternsInfo.Id)
@@ -98,7 +101,7 @@ type GenerateMatchExprPatternsRule() =
         |> Option.exists (fun clause -> isNull clause.WhenExpressionClause && isNull clause.RArrow)
 
     override this.AddLookupItems(context, collector) =
-        let info = GenerateMatchExprPatternsInfo(Ranges = context.Ranges)
+        let info = GenerateMatchExprPatternsInfo(context, Ranges = context.Ranges)
         let item =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextualPresentation(RichText("Match values"), info) :> _)

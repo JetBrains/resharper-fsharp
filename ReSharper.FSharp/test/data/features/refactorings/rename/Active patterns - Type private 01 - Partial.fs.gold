@@ -2,7 +2,7 @@
 module Module
 
 type T() =
-    let (    | Zzz  |    _ | ) x =
+    let (    | Zzz |    _ | ) x =
         if x then Some () else None
 
     let _ = (|Zzz|_|)

@@ -1,0 +1,9 @@
+﻿module Top
+
+module Nested =
+    type System.Array with
+        member this.Method() = ()
+
+open Nested
+
+[|1|].Method{caret}()

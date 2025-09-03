@@ -10,9 +10,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type AddIgnoreFix(expr: IFSharpExpression) =
-    inherit FSharpQuickFixBase()
-
-    let mutable expr = expr
+    inherit FSharpModernQuickFixBase()
 
     let shouldAddNewLine (expr: IFSharpExpression) =
         if expr.IsSingleLine then false else
@@ -39,6 +37,15 @@ type AddIgnoreFix(expr: IFSharpExpression) =
 
         | _ -> None
 
+    let addIgnore (expr: IFSharpExpression) =
+        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+
+        let expr = expr.IgnoreParentParens()
+        let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine expr)
+
+        let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()
+        addParensIfNeeded replaced.LeftArgument |> ignore
+
     new (warning: UnitTypeExpectedWarning) =
         AddIgnoreFix(warning.Expr)
 
@@ -51,25 +58,16 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     override x.Text = "Ignore value"
     override x.IsAvailable _ = isValid expr
 
-    override x.Execute(solution, textControl) =
-        expr <-
-            match suggestInnerExpression expr with
-            | Some(innerExpression, text) when isNotNull innerExpression ->
-                let occurrences =
-                    [| innerExpression, text
-                       expr, "Whole expression" |]
-                x.SelectExpression(occurrences, solution, textControl)
-            | _ -> expr
+    override x.GetCommandSequence() =
+        match suggestInnerExpression expr with
+        | Some(innerExpression, text) when isNotNull innerExpression ->
+            let occurrences =
+                [| innerExpression, text
+                   expr, "Whole expression" |]
+            x.SelectExpression(occurrences, addIgnore)
 
-        if isNotNull expr then
-            base.Execute(solution, textControl)
+        | _ -> base.GetCommandSequence()
 
-    override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
-        let expr = expr.IgnoreParentParens()
-        let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine expr)
-
-        let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()
-        addParensIfNeeded replaced.LeftArgument |> ignore
+    override x.ExecutePsiTransaction(_, _) =
+        addIgnore expr
+        null

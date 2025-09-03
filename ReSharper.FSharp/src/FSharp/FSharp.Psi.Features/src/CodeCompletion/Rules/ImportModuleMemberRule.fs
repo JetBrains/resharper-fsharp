@@ -1,6 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System
+open FSharp.Compiler.EditorServices
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -13,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -37,26 +38,7 @@ type ImportModuleMemberInfo(typeElement: ITypeElement, name: string, context: FS
 
     interface IDescriptionProvidingLookupItem with
         member this.GetDescription() =
-            let typeNames = toSourceNameList typeElement
-            let names = typeNames @ [name]
-            let treeNode = context.NodeInFile.As<IFSharpTreeNode>()
-            if isNull treeNode then null else
-
-            match treeNode.CheckerService.ResolveNameAtLocation(treeNode, names, true, "ImportModuleMemberInfo.GetDescription") with
-            | None -> null
-            | Some fcsSymbolUse ->
-
-            match treeNode.FSharpFile.GetParseAndCheckResults(true, "ImportModuleMemberInfo.GetDescription") with
-            | None -> null
-            | Some { CheckResults = checkResults } ->
-
-            let _, range = treeNode.TryGetFcsRange()
-            let description = checkResults.GetDescription(fcsSymbolUse.Symbol, [], false, range)
-            description
-            |> FcsLookupCandidate.getOverloads
-            |> List.tryHead
-            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule)
-            |> Option.defaultValue null
+            ImportInfo.getDescription context typeElement (Some name) true
 
 type ImportModuleMemberBehavior(info: ImportModuleMemberInfo) =
     inherit TextualBehavior<ImportModuleMemberInfo>(info)
@@ -96,28 +78,31 @@ type ImportModuleMemberRule() =
         context.BasicContext.Solution.GetComponent<IFcsAssemblyReaderShim>().IsEnabled
 
     override this.AddLookupItems(context, collector) =
-        let reference = context.ReparsedContext.Reference :?> FSharpSymbolReference
+        let reparsedContext = context.ReparsedContext
+        let reference = reparsedContext.Reference :?> FSharpSymbolReference
         let referenceOwner = reference.GetElement()
+
+        match reparsedContext.GetFcsContext().CompletionContext with
+        | Some(CompletionContext.Invalid) -> false
+        | _ ->
 
         let referenceContext = referenceOwner.ReferenceContext
         if not referenceContext.HasValue then false else
 
-        let fsFile = referenceOwner.GetContainingFileThroughSandBox().As<IFSharpFile>()
-        if isNull fsFile then false else
-
-        let autoOpenCache = referenceOwner.GetPsiServices().Solution.GetComponent<FSharpAutoOpenCache>()
-        let scopes = OpenedModulesProvider(fsFile, autoOpenCache).OpenedModuleScopes
+        let scopes = OpenedModulesProvider(referenceOwner).OpenedModuleScopes
         let symbolScope = getSymbolScope context.PsiModule false
 
         let values =
             match referenceContext.Value with
             | FSharpReferenceContext.Expression ->
-                let treeNode = context.ReparsedContext.TreeNode
+                let treeNode = reparsedContext.TreeNode
                 context.GetOrCreateDataUnderLock(LocalValuesRule.valuesKey, treeNode, LocalValuesRule.getLocalValues)
 
             | _ -> EmptyDictionary.Instance
 
         for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
+            Interruption.Current.CheckAndThrow()
+
             let fsTypeElement = typeElement.As<IFSharpTypeElement>()
             if isNull fsTypeElement || fsTypeElement.RequiresQualifiedAccess() then () else
 
@@ -170,7 +155,7 @@ type ImportModuleMemberRule() =
                 if values.ContainsKey(name) then () else
 
                 let info = ImportModuleMemberInfo(typeElement, name, context, Ranges = context.Ranges)
-                let item = ImportRule.createItem info name ns icon
+                let item = FSharpImportTypeElementRule.createItem info name ns icon
                 let item =
                     item
                         .WithBehavior(fun _ -> ImportModuleMemberBehavior(info))

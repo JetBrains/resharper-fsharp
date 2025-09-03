@@ -1,0 +1,8 @@
+﻿module Module
+
+type T() =
+    member x.P1 =
+        1
+    override this.ToString() = failwith "todo"
+
+    member x.P2 = 1

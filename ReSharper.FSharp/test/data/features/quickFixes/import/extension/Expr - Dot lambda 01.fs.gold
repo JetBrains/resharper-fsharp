@@ -1,0 +1,8 @@
+﻿module Extensions =
+    type System.String with
+        member this.Ext() = ()
+
+open Extensions
+
+let s = ""
+s |> _.Ext{caret}

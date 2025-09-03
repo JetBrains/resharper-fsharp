@@ -51,14 +51,37 @@ type FSharpCompletionTest() =
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 02 - Escape``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Bind - Qualifier - Enum case 03``() = x.DoNamedTest() // todo: fix in 233
 
-    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method - Generic 01``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method - Generic 02``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Method 01``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Import - Extension - FSharp - Source - Prop 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - Dot lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - Dot lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - Dot lambda 03``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 01``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 02``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 03``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 04``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 05``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 06``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 07``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 08``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 09``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Import - Extension - FSharp - Compiled - Method 10``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method - Generic 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method - Generic 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method 03``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method 04``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Method 05``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Extension - FSharp - Source - Prop 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Extension 01``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 02``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 03``() = x.DoNamedTestFsCs()
     [<Test>] member x.``Import - Extension 04 - Internal type``() = x.DoNamedTestFsCs()
+
+    [<Test>] member x.``Import - Static member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 02``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 03``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Static member 04``() = x.DoNamedTest()
 
     [<Test>] member x.``Local val - Binary op 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Binary op 02``() = x.DoNamedTest()
@@ -82,7 +105,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Local val - New line 18``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 19``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 20``() = x.DoNamedTest()
-    [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Local val - Pattern - Field 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried - Tuple 01 - First``() = x.DoNamedTest()
@@ -220,7 +243,7 @@ type FSharpCompletionTest() =
 
     [<Test; Explicit("243")>] member x.``Import - Same project 01``() = x.DoNamedTest()
 
-    [<TestSetting(typeof<FSharpOptions>, "EnableOutOfScopeCompletion", "false")>]
+    [<Explicit "Reuse the common setting">]
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Same ns 01``() = x.DoTestFiles("File1.fs", "File2.fs")
@@ -228,6 +251,17 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Same ns 03``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test; Explicit("243")>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
+
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 01``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 02``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 03``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 04``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("FSharpClassLib")>]
+    [<Test>] member x.``Import - Compiled - FSharp 05``() = x.DoNamedTest()
 
     [<Test>] member x.``XmlDoc - tags``() = x.DoNamedTest()
 
@@ -412,8 +446,10 @@ type FSharpKeywordCompletionTestBase() =
 
     override x.TestType = CodeCompletionTestType.List
 
-    override this.ItemSelector =
-        Func<_, _>(function :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware | _ -> false)
+    override this.LookupItemFilter(lookupItem) =
+        match lookupItem with
+        | :? FSharpKeywordLookupItem as keyword -> keyword.IsReparseContextAware
+        | _ -> false
 
 type FSharpKeywordCompletionTest() =
     inherit FSharpKeywordCompletionTestBase()
@@ -525,13 +561,11 @@ type FSharpFilteredCompletionTest() =
 
     member val CompleteItem = null with get, set
 
-    override this.ItemSelector =
-        Func<_, _>(fun lookupItem ->
-            isNull this.CompleteItem ||
-
-            match lookupItem with
+    override this.LookupItemFilter(lookupItem) =
+        isNull this.CompleteItem ||
+        match lookupItem with
             | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-            | _ -> lookupItem.DisplayName.Text = this.CompleteItem)
+            | _ -> lookupItem.DisplayName.Text = this.CompleteItem
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
@@ -664,8 +698,8 @@ type FSharpCompletionListTest() =
 
     override x.TestType = CodeCompletionTestType.List
 
-    override this.ItemSelector =
-            Func<_, _>(fun lookupItem -> lookupItem :? IAspectLookupItem<FSharpNameSuggestionInfo>)
+    override this.LookupItemFilter(lookupItem) =
+        lookupItem :? IAspectLookupItem<FSharpNameSuggestionInfo>
 
     [<Test>] member x.``Naming - Pat - As - IsInst 01``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Pat - As - IsInst 02``() = x.DoNamedTest()
@@ -686,3 +720,20 @@ type FSharpCompletionListTest() =
     [<Test>] member x.``Naming - Pat 02``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Type parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Type parameter 02``() = x.DoNamedTest()
+
+
+
+[<FSharpTest>]
+[<Category("Modern Completion Tests")>]
+type FSharpCompletionModernListTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/list"
+
+    override x.TestType = CodeCompletionTestType.ModernList
+
+    // todo: [cc] those two tests are sensitive to `CLRLookupItemRelevance` values compactification
+    [<Test>] member x.``Pattern Name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record Property 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()

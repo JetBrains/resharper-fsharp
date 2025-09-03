@@ -32,7 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled
 
     public string SourceName => ShortName;
     public IClrDeclaredElement OriginElement => Origin;
-    public bool IsReadOnly => false;
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new CompiledActivePatternCasePointer(this, ShortName, Index);

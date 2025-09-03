@@ -1,10 +1,14 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.*
+import com.jetbrains.rider.test.annotations.report.Issue
+import com.jetbrains.rider.test.annotations.report.Issues
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.*
@@ -12,9 +16,12 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
+@Solution("EmptySolution")
 class FSharpProjectModelTest : ProjectModelBaseTest() {
-  override val testSolution: String = "EmptySolution"
-  override val restoreNuGetPackages = true
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    super.modifyOpenSolutionParams(params)
+    params.restoreNuGetPackages = true
+  }
 
   private fun moveItem(from: Array<Array<String>>, to: Array<String>, orderType: RdDndOrderType? = null) {
     // Wait for updating/refreshing items possibly queued by FSharpItemsContainerRefresher.
@@ -47,8 +54,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @Mute("RIDER-110482")
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
@@ -149,14 +155,12 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @Mute("RIDER-110482")
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
-  @TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
   fun testFSharpDirectoryManipulation() {
     doTestDumpProjectsView {
       dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
-        // currently ProjectTemplates.Sdk.Net6 should be used in LATEST_STABLE tests
-        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net6.FSharp.classLibrary, targetFramework = "netstandard2.1")
+        addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net9.FSharp.classLibrary, targetFramework = "netstandard2.1")
       }
       dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
@@ -177,7 +181,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
     doTestDumpProjectsView {
@@ -196,7 +200,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test(description = "RIDER-107198")
-  @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_5)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
     doTestDumpProjectsView {

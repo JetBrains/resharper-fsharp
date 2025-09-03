@@ -1,0 +1,6 @@
+﻿let f () : 'a -> int * string =
+        fun _ ->
+    if true then
+        1, 1
+    else
+        "", ""{caret}

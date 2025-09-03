@@ -5,4 +5,4 @@ type AbstractBaseClass() =
     abstract P: int
 
 { new AbstractBaseClass() with
-  override this.P = {selstart}failwith "todo"{selend} }
+    override this.P = {selstart}failwith "todo"{selend} }

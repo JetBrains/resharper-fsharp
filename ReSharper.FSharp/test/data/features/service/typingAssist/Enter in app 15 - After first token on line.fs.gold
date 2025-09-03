@@ -3,4 +3,4 @@ module Module
 
 let x =
    qwe
-     {caret}bar
+       {caret}bar

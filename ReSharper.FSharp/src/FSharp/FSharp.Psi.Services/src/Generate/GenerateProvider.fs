@@ -11,11 +11,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.DataContext
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -84,78 +83,9 @@ type FSharpOverridingMembersBuilder() =
     let addNewLineBeforeReprIfNeeded (typeDecl: IFSharpTypeDeclaration) (typeRepr: ITypeRepresentation) =
         if isNull typeRepr || typeDecl.Identifier.StartLine <> typeRepr.StartLine then () else
 
-        let indentSize = typeDecl.GetIndentSize()
-        let desiredIndent = typeDecl.Indent + indentSize
-
-        let origTypeReprIndent = typeRepr.Indent
-        addNodesBefore typeRepr [
-            NewLine(typeRepr.GetLineEnding())
-            Whitespace(origTypeReprIndent)
-        ] |> ignore
-
-        let normalizeRepr (objRepr: IObjectModelTypeRepresentation) =
-            if isNull objRepr.BeginKeyword then () else
-
-            let diff =
-                if objRepr.BeginKeyword.Indent > desiredIndent then -(objRepr.BeginKeyword.Indent - desiredIndent)
-                else (desiredIndent - objRepr.BeginKeyword.Indent)
-            shiftWithWhitespaceBefore diff objRepr
-
-        let normalizeReprEnd (beginToken: ITokenNode) (endToken: ITokenNode) =
-            if isNull beginToken || isNull endToken then () else
-
-            if beginToken.Indent > endToken.Indent then
-                let diff = beginToken.Indent - endToken.Indent
-                addNodeBefore endToken (Whitespace(diff))
-
-            elif endToken.Indent > beginToken.Indent && isFirstMeaningfulNodeOnLine endToken then
-                let diff = endToken.Indent - beginToken.Indent
-                shiftWithWhitespaceBefore -diff endToken
-
-        let shiftToNext (token: ITokenNode) =
-            if isNull token then () else
-
-            let next = token.GetNextMeaningfulToken()
-            let diff = if isNull next then 0 else token.Indent - next.Indent
-            if diff > 0 then shiftWithWhitespaceBefore -diff token
-
-        let beginToken, endToken =
-            match typeRepr with
-            | :? IObjectModelTypeRepresentation as objRepr ->
-                // at this point the body of the repr can be before or after the begin keyword
-                shiftToNext objRepr.BeginKeyword
-                normalizeRepr objRepr
-                normalizeReprEnd objRepr.BeginKeyword objRepr.EndKeyword
-                objRepr.BeginKeyword, objRepr.EndKeyword
-
-            | :? IRecordRepresentation as recordRepr ->
-                let diff = origTypeReprIndent - desiredIndent
-                if diff > 0 then shiftWithWhitespaceBefore -diff recordRepr
-                normalizeReprEnd recordRepr.LeftBrace recordRepr.RightBrace
-                recordRepr.LeftBrace, recordRepr.RightBrace
-
-            | :? IUnionRepresentation
-            | :? ITypeAbbreviationRepresentation as typeRepr ->
-                let diff = origTypeReprIndent - desiredIndent
-                if diff > 0 then shiftWithWhitespaceBefore -diff typeRepr
-                null, null
-
-            | _ -> null, null
-
-        let reindentRange additionalIndent (range: TreeRange) =
-            for node in range do
-                if not (isFirstMeaningfulNodeOnLine node) then () else
-
-                let diff =
-                    if node == typeRepr then
-                        origTypeReprIndent - (desiredIndent + additionalIndent)
-                    else
-                        node.Indent - (desiredIndent + additionalIndent)
-                shiftWithWhitespaceBefore -diff node
-
-        reindentRange indentSize (TreeRange(getNextSibling beginToken, getPrevSibling endToken))
-        reindentRange 0 (TreeRange(typeDecl.TypeRepresentation.NextSibling, typeDecl.LastChild))
-
+        typeDecl.EqualsToken.AddLineBreakAfter() |> ignore
+        typeDecl.TypeRepresentation.FormatNode(CodeFormatProfile.INDENT)
+        
     override this.IsAvailable(context: FSharpGeneratorContext): bool =
         let typeDecl = context.TypeDeclaration
         typeDecl :? IObjExpr ||
@@ -164,11 +94,10 @@ type FSharpOverridingMembersBuilder() =
 
     override x.Process(context: FSharpGeneratorContext, _: IProgressIndicator) =
         use writeCookie = WriteLockCookie.Create(true)
-        use disableFormatter = new DisableCodeFormatter()
 
         let typeDecl = context.Root :?> IFSharpTypeElementDeclaration
 
-        let (anchor: ITreeNode), indent =
+        let (anchor: ITreeNode) =
             match typeDecl with
             | :? IFSharpTypeDeclaration as typeDecl ->
                 match typeDecl.TypeRepresentation with
@@ -205,8 +134,12 @@ type FSharpOverridingMembersBuilder() =
                             deleteChildRange prev.NextSibling typeRepr
                             prev
                         else
-                            deleteChildRange equalsAnchor.NextSibling typeRepr
-                            equalsAnchor
+                            if isNull (typeRepr.GetNextMeaningfulSibling()) then
+                                moveCommentsAndWhitespaceInside typeDecl
+
+                            ModificationUtil.DeleteChild(typeRepr)
+
+                            equalsAnchor |> getLastInlineSpaceOrCommentSkipNewLine
 
                     let anchor =
                         let isEmptyClassRepr =
@@ -242,42 +175,27 @@ type FSharpOverridingMembersBuilder() =
 
                 match anchor with
                 | :? IStructRepresentation as structRepr ->
-                    structRepr.BeginKeyword :> _, structRepr.BeginKeyword.Indent + typeDecl.GetIndentSize()
+                    structRepr.BeginKeyword :> _
 
                 | :? ITypeRepresentation as typeRepr ->
-                    typeRepr, typeRepr.Indent
+                    typeRepr
 
                 | treeNode ->
                     let parent =
                         if isNotNull typeRepr && typeRepr.Contains(treeNode) then typeRepr :> ITreeNode else treeNode.Parent
                     match parent with
                     | :? IObjectModelTypeRepresentation as repr when treeNode != repr.EndKeyword ->
-                        let indent =
-                            match repr.TypeMembersEnumerable |> Seq.tryHead with
-                            | Some memberDecl -> memberDecl.Indent
-                            | _ -> repr.BeginKeyword.Indent + typeDecl.GetIndentSize()
-                        let treeNode =
-                            let doOrLastLet =
-                                repr.TypeMembersEnumerable
-                                |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
-                                |> Seq.tryLast
-                            match doOrLastLet with
-                            | Some node -> node :> ITreeNode
-                            | _ -> treeNode
-                        treeNode, indent
+                        let doOrLastLet =
+                            repr.TypeMembersEnumerable
+                            |> Seq.takeWhile (fun x -> x :? ILetBindingsDeclaration || x :? IDoStatement)
+                            |> Seq.tryLast
+
+                        match doOrLastLet with
+                        | Some node -> node :> ITreeNode
+                        | _ -> treeNode
                     | _ ->
 
-                    let indent =
-                        match typeDecl.TypeMembersEnumerable |> Seq.tryHead with
-                        | Some memberDecl -> memberDecl.Indent
-                        | _ ->
-
-                        if isNotNull typeRepr then typeDecl.Indent + typeDecl.GetIndentSize() else
-
-                        let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl).NotNull()
-                        typeDeclarationGroup.Indent + typeDecl.GetIndentSize()
-
-                    anchor, indent
+                    anchor
 
             | :? IObjExpr as objExpr ->
                 if isNull objExpr.WithKeyword then
@@ -292,12 +210,6 @@ type FSharpOverridingMembersBuilder() =
 
                 let memberDeclarations = objExpr.MemberDeclarations
 
-                let indent =
-                    memberDeclarations
-                    |> Seq.tryHead
-                    |> Option.map (fun memberDecl -> memberDecl.Indent)
-                    |> Option.defaultWith (fun _ -> objExpr.Indent + objExpr.GetIndentSize())
-
                 let anchor: ITreeNode =
                     objExpr.InterfaceImplementationsEnumerable
                     |> Seq.cast
@@ -305,22 +217,12 @@ type FSharpOverridingMembersBuilder() =
                     |> Option.orElseWith (fun _ -> memberDeclarations |> Seq.cast |> Seq.tryHead)
                     |> Option.defaultWith (fun _ -> objExpr.WithKeyword)
 
-                anchor, indent
+                anchor
 
             | typeDecl -> failwith $"Unexpected typeDecl: {typeDecl}"
 
-        let anchor =
-            if isAtEmptyLine anchor then
-                let first = getFirstMatchingNodeBefore isInlineSpace anchor |> getThisOrPrevNewLine
-                let last = getLastMatchingNodeAfter isInlineSpace anchor
+        let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment anchor
 
-                let anchor = first.PrevSibling
-                deleteChildRange first last
-                anchor
-            else
-                anchor
-
-        let anchor = GenerateOverrides.addEmptyLineBeforeIfNeeded anchor
         let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
 
         let inputElements =
@@ -330,9 +232,8 @@ type FSharpOverridingMembersBuilder() =
             |> Seq.cast<FSharpGeneratorElement>
             |> GenerateOverrides.sanitizeMembers
 
-        let lastNode = GenerateOverrides.addMembers inputElements typeDecl indent anchor
-        let nodes = anchor.RightSiblings()
-        let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange lastNode nodes
+        let addedMembers = GenerateOverrides.addMembers inputElements typeDecl anchor
+        let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange addedMembers
         context.SetSelectedRange(selectedRange)
 
 

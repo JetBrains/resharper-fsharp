@@ -3,12 +3,13 @@ using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpInterface(IFSharpInterfacePart part)
-    : Interface(part), IFSharpTypeElement, IFSharpTypeParametersOwner
+    : Interface(part), IFSharpSourceTypeElement, IFSharpTypeParametersOwner
   {
     public int MeasureTypeParametersCount { get; } = part.MeasureTypeParametersCount;
 
@@ -34,5 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
 
     public ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.Normal;
+    public ITypeDeclaration DefiningDeclaration => this.GetDefiningDeclaration();
+
+    public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
 }

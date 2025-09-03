@@ -1,9 +1,9 @@
 ﻿Provided elements:
  0: M(System.Int32):System.Void
- 1: ToString():System.String
- 2: Equals(System.Object):System.Boolean
+ 1: Equals(System.Object?):System.Boolean
+ 2: Finalize():System.Void
  3: GetHashCode():System.Int32
- 4: Finalize():System.Void
+ 4: ToString():System.String?
 
 // ${KIND:Overrides}
 // ${SELECT0:M(System.Int32):System.Void}
@@ -12,5 +12,5 @@ type Base() =
     abstract M: ``process``: int -> unit
     default this.M(``process``: int) = ()
 
-{ new Base() with  
-  override this.M(``process``) = {selstart}base.M(``process``){selend} } |> ignore
+{ new Base() with
+    override this.M(``process``) = {selstart}base.M(``process``){selend} } |> ignore

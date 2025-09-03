@@ -5,5 +5,5 @@ type I =
 
 type T() =
   interface I with
-    member this.Item with get (index, foo) = failwith "todo"
-    member this.Item with set (index, foo) value = {selstart}failwith "todo"{selend}
+      member this.Item with get (index, foo) = {selstart}failwith "todo"{selend}
+      member this.Item with set (index, foo) value = failwith "todo"

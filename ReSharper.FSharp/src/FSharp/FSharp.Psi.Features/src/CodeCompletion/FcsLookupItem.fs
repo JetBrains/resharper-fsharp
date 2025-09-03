@@ -3,6 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
@@ -12,13 +13,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
@@ -81,11 +82,16 @@ type IFcsLookupItemInfo =
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
-    let [<Literal>] Id = "FcsLookupItem.OnAfterComplete"
+    let mutable emphasize = false
 
+    member this.AllFcsSymbolUses = items.SymbolUses
     member this.FcsSymbolUse = items.SymbolUses.Head
     member this.FcsSymbol = this.FcsSymbolUse.Symbol
     member this.NamespaceToOpen = items.NamespaceToOpen
+
+    member this.Emphasize() =
+        emphasize <- true
+        this.Invalidate()
 
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = this.FcsSymbol
@@ -96,26 +102,30 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         FcsLookupCandidate.getOverloads items.Description
         |> List.map (fun overload -> FcsLookupCandidate(overload, context.XmlDocService, context.PsiModule) :> ICandidate)
 
+    member x.DisplayName =
+        x.FcsSymbol.DisplayNameCore
+
     override x.Image =
         try getIconId x.FcsSymbol
         with _ -> null
 
     override x.Text =
-        let name = x.FcsSymbol.DisplayNameCore
+        let name = x.DisplayName
         let name = if context.IsInAttributeContext then name.DropAttributeSuffix() else name
         FSharpNamingService.normalizeBackticks name
 
     override x.DisplayTypeName =
         try
             match getReturnType x.FcsSymbol with
-            | Some t -> RichText(t.Format(x.FcsSymbolUse.DisplayContext))
+            | Some t -> RichText(t.Format())
             | _ -> null
         with _ -> null
 
-    override x.DisableFormatter = true
-
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
-        use pinCheckResultsCookie = textControl.GetFSharpFile(solution).PinTypeCheckResults(true, Id)
+        use pinCheckResultsCookie =
+            Assertion.Assert(context.ParseAndCheckResults.IsValueCreated)
+            textControl.GetFSharpFile(solution).PinTypeCheckResults(context.ParseAndCheckResults.Value)
+
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
 
     override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =
@@ -128,7 +138,6 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
         let psiServices = fsFile.GetPsiServices()
 
         use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
 
         let declaredElement = x.FcsSymbol.GetDeclaredElement(context.PsiModule)
@@ -164,11 +173,14 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
             if isNotNull clrDeclaredElement then
                 referenceOwner.Reference.SetRequiredQualifiers(clrDeclaredElement, referenceOwner)
 
-        if ns.IsEmpty() then () else
-        addOpen offset fsFile moduleToImport
+        if not (ns.IsEmpty()) then
+            addOpen offset fsFile moduleToImport
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(items.Name, x.TextColor)
+
+        if emphasize then
+            LookupUtil.AddEmphasize(name, TextRange(0, name.Length))
 
         let ns = items.NamespaceToOpen
         if not (ns.IsEmpty()) then

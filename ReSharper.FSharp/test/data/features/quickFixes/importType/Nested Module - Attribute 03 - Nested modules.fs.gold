@@ -1,7 +1,6 @@
 ﻿namespace Ns
 
 module Module =
-
     open System.Runtime.InteropServices
 
     [<Optional{caret}>]

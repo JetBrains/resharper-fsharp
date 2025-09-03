@@ -1,0 +1,273 @@
+﻿Completion: Basic
+Count: 128
+Focus: Soft
+Range: "|> List.map _.♦"
+
+##### RELEVANCE SORT #####
+
+                            [FieldsAndProperties]
+Chars                       char    <==
+Length                      int
+                            [Methods, MemberOfCurrentType]
+Clone                       obj
+CompareTo                   int
+Contains                    bool
+CopyTo                      unit
+EndsWith                    bool
+EnumerateRunes              StringRuneEnumerator
+Equals                      bool
+GetEnumerator               CharEnumerator
+GetHashCode                 int
+GetPinnableReference        inref<char>
+GetTypeCode                 TypeCode
+IndexOf                     int
+IndexOfAny                  int
+Insert                      string
+IsNormalized                bool
+LastIndexOf                 int
+LastIndexOfAny              int
+Normalize                   string
+PadLeft                     string
+PadRight                    string
+Remove                      string
+Replace                     string
+ReplaceLineEndings          string
+Split                       string array
+StartsWith                  bool
+Substring                   string
+ToCharArray                 char array
+ToLower                     string
+ToLowerInvariant            string
+ToString                    string
+ToUpper                     string
+ToUpperInvariant            string
+Trim                        string
+TrimEnd                     string
+TrimStart                   string
+TryCopyTo                   bool
+                            [Methods, MemberOfObject]
+GetType                     Type
+                            [FromLightAndDynamicEvaluation, ExtensionMethods]
+GetReverseIndex             int
+                            [FromSingleCompletion, ImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+Aggregate |(in System.Linq)    OrderStr=Aggregate
+All |(in System.Linq)       OrderStr=All
+Ancestors |(in System.Xml.Linq)    OrderStr=Ancestors
+AncestorsAndSelf |(in System.Xml.Linq)    OrderStr=AncestorsAndSelf
+Any |(in System.Linq)       OrderStr=Any
+Append |(in System.Linq)    OrderStr=Append
+AsEnumerable |(in System.Linq)    OrderStr=AsEnumerable
+AsMemory |(in System)       OrderStr=AsMemory
+AsParallel |(in System.Linq)    OrderStr=AsParallel
+AsQueryable |(in System.Linq)    OrderStr=AsQueryable
+AsSpan |(in System)         OrderStr=AsSpan
+Attributes |(in System.Xml.Linq)    OrderStr=Attributes
+Average |(in System.Linq)    OrderStr=Average
+Cast |(in System.Linq)      OrderStr=Cast
+Chunk |(in System.Linq)     OrderStr=Chunk
+Concat |(in System.Linq)    OrderStr=Concat
+Contains |(in System.Linq)    OrderStr=Contains
+CopyToDataTable |(in System.Data)    OrderStr=CopyToDataTable
+Count |(in System.Linq)     OrderStr=Count
+DefaultIfEmpty |(in System.Linq)    OrderStr=DefaultIfEmpty
+DescendantNodes |(in System.Xml.Linq)    OrderStr=DescendantNodes
+DescendantNodesAndSelf |(in System.Xml.Linq)    OrderStr=DescendantNodesAndSelf
+Descendants |(in System.Xml.Linq)    OrderStr=Descendants
+DescendantsAndSelf |(in System.Xml.Linq)    OrderStr=DescendantsAndSelf
+Distinct |(in System.Linq)    OrderStr=Distinct
+DistinctBy |(in System.Linq)    OrderStr=DistinctBy
+ElementAt |(in System.Linq)    OrderStr=ElementAt
+ElementAtOrDefault |(in System.Linq)    OrderStr=ElementAtOrDefault
+Elements |(in System.Xml.Linq)    OrderStr=Elements
+Except |(in System.Linq)    OrderStr=Except
+ExceptBy |(in System.Linq)    OrderStr=ExceptBy
+First |(in System.Linq)     OrderStr=First
+FirstOrDefault |(in System.Linq)    OrderStr=FirstOrDefault
+GetReverseIndex |(in Microsoft.FSharp.Core.Operators.ArrayExtensions)    OrderStr=GetReverseIndex
+GroupBy |(in System.Linq)    OrderStr=GroupBy
+GroupJoin |(in System.Linq)    OrderStr=GroupJoin
+InDocumentOrder |(in System.Xml.Linq)    OrderStr=InDocumentOrder
+Intersect |(in System.Linq)    OrderStr=Intersect
+IntersectBy |(in System.Linq)    OrderStr=IntersectBy
+IsNormalized |(in System)    OrderStr=IsNormalized
+Join |(in System.Linq)      OrderStr=Join
+Last |(in System.Linq)      OrderStr=Last
+LastOrDefault |(in System.Linq)    OrderStr=LastOrDefault
+LongCount |(in System.Linq)    OrderStr=LongCount
+Max |(in System.Linq)       OrderStr=Max
+MaxBy |(in System.Linq)     OrderStr=MaxBy
+Min |(in System.Linq)       OrderStr=Min
+MinBy |(in System.Linq)     OrderStr=MinBy
+Nodes |(in System.Xml.Linq)    OrderStr=Nodes
+Normalize |(in System)      OrderStr=Normalize
+OfType |(in System.Linq)    OrderStr=OfType
+Order |(in System.Linq)     OrderStr=Order
+OrderBy |(in System.Linq)    OrderStr=OrderBy
+OrderByDescending |(in System.Linq)    OrderStr=OrderByDescending
+OrderDescending |(in System.Linq)    OrderStr=OrderDescending
+Prepend |(in System.Linq)    OrderStr=Prepend
+Remove |(in System.Xml.Linq)    OrderStr=Remove
+Reverse |(in System.Linq)    OrderStr=Reverse
+Select |(in System.Linq)    OrderStr=Select
+SelectMany |(in System.Linq)    OrderStr=SelectMany
+SequenceEqual |(in System.Linq)    OrderStr=SequenceEqual
+Single |(in System.Linq)    OrderStr=Single
+SingleOrDefault |(in System.Linq)    OrderStr=SingleOrDefault
+Skip |(in System.Linq)      OrderStr=Skip
+SkipLast |(in System.Linq)    OrderStr=SkipLast
+SkipWhile |(in System.Linq)    OrderStr=SkipWhile
+Sum |(in System.Linq)       OrderStr=Sum
+Take |(in System.Linq)      OrderStr=Take
+TakeLast |(in System.Linq)    OrderStr=TakeLast
+TakeWhile |(in System.Linq)    OrderStr=TakeWhile
+ToArray |(in System.Linq)    OrderStr=ToArray
+ToDictionary |(in System.Linq)    OrderStr=ToDictionary
+ToFrozenDictionary |(in System.Collections.Frozen)    OrderStr=ToFrozenDictionary
+ToFrozenSet |(in System.Collections.Frozen)    OrderStr=ToFrozenSet
+ToHashSet |(in System.Linq)    OrderStr=ToHashSet
+ToImmutableArray |(in System.Collections.Immutable)    OrderStr=ToImmutableArray
+ToImmutableDictionary |(in System.Collections.Immutable)    OrderStr=ToImmutableDictionary
+ToImmutableHashSet |(in System.Collections.Immutable)    OrderStr=ToImmutableHashSet
+ToImmutableList |(in System.Collections.Immutable)    OrderStr=ToImmutableList
+ToImmutableSortedDictionary |(in System.Collections.Immutable)    OrderStr=ToImmutableSortedDictionary
+ToImmutableSortedSet |(in System.Collections.Immutable)    OrderStr=ToImmutableSortedSet
+ToList |(in System.Linq)    OrderStr=ToList
+ToLookup |(in System.Linq)    OrderStr=ToLookup
+TryGetNonEnumeratedCount |(in System.Linq)    OrderStr=TryGetNonEnumeratedCount
+Union |(in System.Linq)     OrderStr=Union
+UnionBy |(in System.Linq)    OrderStr=UnionBy
+Where |(in System.Linq)     OrderStr=Where
+Zip |(in System.Linq)       OrderStr=Zip
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Chars                       char    <==
+Clone                       obj
+CompareTo                   int
+Contains                    bool
+CopyTo                      unit
+EndsWith                    bool
+EnumerateRunes              StringRuneEnumerator
+Equals                      bool
+GetEnumerator               CharEnumerator
+GetHashCode                 int
+GetPinnableReference        inref<char>
+GetReverseIndex             int
+GetType                     Type
+GetTypeCode                 TypeCode
+IndexOf                     int
+IndexOfAny                  int
+Insert                      string
+IsNormalized                bool
+LastIndexOf                 int
+LastIndexOfAny              int
+Length                      int
+Normalize                   string
+PadLeft                     string
+PadRight                    string
+Remove                      string
+Replace                     string
+ReplaceLineEndings          string
+Split                       string array
+StartsWith                  bool
+Substring                   string
+ToCharArray                 char array
+ToLower                     string
+ToLowerInvariant            string
+ToString                    string
+ToUpper                     string
+ToUpperInvariant            string
+Trim                        string
+TrimEnd                     string
+TrimStart                   string
+TryCopyTo                   bool
+                            [Full, Generic]
+Aggregate |(in System.Linq)    OrderStr=Aggregate
+All |(in System.Linq)       OrderStr=All
+Ancestors |(in System.Xml.Linq)    OrderStr=Ancestors
+AncestorsAndSelf |(in System.Xml.Linq)    OrderStr=AncestorsAndSelf
+Any |(in System.Linq)       OrderStr=Any
+Append |(in System.Linq)    OrderStr=Append
+AsEnumerable |(in System.Linq)    OrderStr=AsEnumerable
+AsMemory |(in System)       OrderStr=AsMemory
+AsParallel |(in System.Linq)    OrderStr=AsParallel
+AsQueryable |(in System.Linq)    OrderStr=AsQueryable
+AsSpan |(in System)         OrderStr=AsSpan
+Attributes |(in System.Xml.Linq)    OrderStr=Attributes
+Average |(in System.Linq)    OrderStr=Average
+Cast |(in System.Linq)      OrderStr=Cast
+Chunk |(in System.Linq)     OrderStr=Chunk
+Concat |(in System.Linq)    OrderStr=Concat
+Contains |(in System.Linq)    OrderStr=Contains
+CopyToDataTable |(in System.Data)    OrderStr=CopyToDataTable
+Count |(in System.Linq)     OrderStr=Count
+DefaultIfEmpty |(in System.Linq)    OrderStr=DefaultIfEmpty
+DescendantNodes |(in System.Xml.Linq)    OrderStr=DescendantNodes
+DescendantNodesAndSelf |(in System.Xml.Linq)    OrderStr=DescendantNodesAndSelf
+Descendants |(in System.Xml.Linq)    OrderStr=Descendants
+DescendantsAndSelf |(in System.Xml.Linq)    OrderStr=DescendantsAndSelf
+Distinct |(in System.Linq)    OrderStr=Distinct
+DistinctBy |(in System.Linq)    OrderStr=DistinctBy
+ElementAt |(in System.Linq)    OrderStr=ElementAt
+ElementAtOrDefault |(in System.Linq)    OrderStr=ElementAtOrDefault
+Elements |(in System.Xml.Linq)    OrderStr=Elements
+Except |(in System.Linq)    OrderStr=Except
+ExceptBy |(in System.Linq)    OrderStr=ExceptBy
+First |(in System.Linq)     OrderStr=First
+FirstOrDefault |(in System.Linq)    OrderStr=FirstOrDefault
+GetReverseIndex |(in Microsoft.FSharp.Core.Operators.ArrayExtensions)    OrderStr=GetReverseIndex
+GroupBy |(in System.Linq)    OrderStr=GroupBy
+GroupJoin |(in System.Linq)    OrderStr=GroupJoin
+InDocumentOrder |(in System.Xml.Linq)    OrderStr=InDocumentOrder
+Intersect |(in System.Linq)    OrderStr=Intersect
+IntersectBy |(in System.Linq)    OrderStr=IntersectBy
+IsNormalized |(in System)    OrderStr=IsNormalized
+Join |(in System.Linq)      OrderStr=Join
+Last |(in System.Linq)      OrderStr=Last
+LastOrDefault |(in System.Linq)    OrderStr=LastOrDefault
+LongCount |(in System.Linq)    OrderStr=LongCount
+Max |(in System.Linq)       OrderStr=Max
+MaxBy |(in System.Linq)     OrderStr=MaxBy
+Min |(in System.Linq)       OrderStr=Min
+MinBy |(in System.Linq)     OrderStr=MinBy
+Nodes |(in System.Xml.Linq)    OrderStr=Nodes
+Normalize |(in System)      OrderStr=Normalize
+OfType |(in System.Linq)    OrderStr=OfType
+Order |(in System.Linq)     OrderStr=Order
+OrderBy |(in System.Linq)    OrderStr=OrderBy
+OrderByDescending |(in System.Linq)    OrderStr=OrderByDescending
+OrderDescending |(in System.Linq)    OrderStr=OrderDescending
+Prepend |(in System.Linq)    OrderStr=Prepend
+Remove |(in System.Xml.Linq)    OrderStr=Remove
+Reverse |(in System.Linq)    OrderStr=Reverse
+Select |(in System.Linq)    OrderStr=Select
+SelectMany |(in System.Linq)    OrderStr=SelectMany
+SequenceEqual |(in System.Linq)    OrderStr=SequenceEqual
+Single |(in System.Linq)    OrderStr=Single
+SingleOrDefault |(in System.Linq)    OrderStr=SingleOrDefault
+Skip |(in System.Linq)      OrderStr=Skip
+SkipLast |(in System.Linq)    OrderStr=SkipLast
+SkipWhile |(in System.Linq)    OrderStr=SkipWhile
+Sum |(in System.Linq)       OrderStr=Sum
+Take |(in System.Linq)      OrderStr=Take
+TakeLast |(in System.Linq)    OrderStr=TakeLast
+TakeWhile |(in System.Linq)    OrderStr=TakeWhile
+ToArray |(in System.Linq)    OrderStr=ToArray
+ToDictionary |(in System.Linq)    OrderStr=ToDictionary
+ToFrozenDictionary |(in System.Collections.Frozen)    OrderStr=ToFrozenDictionary
+ToFrozenSet |(in System.Collections.Frozen)    OrderStr=ToFrozenSet
+ToHashSet |(in System.Linq)    OrderStr=ToHashSet
+ToImmutableArray |(in System.Collections.Immutable)    OrderStr=ToImmutableArray
+ToImmutableDictionary |(in System.Collections.Immutable)    OrderStr=ToImmutableDictionary
+ToImmutableHashSet |(in System.Collections.Immutable)    OrderStr=ToImmutableHashSet
+ToImmutableList |(in System.Collections.Immutable)    OrderStr=ToImmutableList
+ToImmutableSortedDictionary |(in System.Collections.Immutable)    OrderStr=ToImmutableSortedDictionary
+ToImmutableSortedSet |(in System.Collections.Immutable)    OrderStr=ToImmutableSortedSet
+ToList |(in System.Linq)    OrderStr=ToList
+ToLookup |(in System.Linq)    OrderStr=ToLookup
+TryGetNonEnumeratedCount |(in System.Linq)    OrderStr=TryGetNonEnumeratedCount
+Union |(in System.Linq)     OrderStr=Union
+UnionBy |(in System.Linq)    OrderStr=UnionBy
+Where |(in System.Linq)     OrderStr=Where
+Zip |(in System.Linq)       OrderStr=Zip

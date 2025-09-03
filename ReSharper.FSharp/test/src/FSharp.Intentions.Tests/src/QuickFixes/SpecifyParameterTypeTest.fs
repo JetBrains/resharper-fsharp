@@ -26,6 +26,7 @@ type SpecifyParameterTypeTest() =
 
     [<Test>] member x.``Qualified type 01 - Rqa``() = x.DoNamedTest()
     [<Test>] member x.``Qualified type 02 - Not imported``() = x.DoNamedTest()
+    [<Test>] member x.``Qualified type 03 - Rqa with not imported``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -35,6 +36,7 @@ type SpecifyPropertyTypeTest() =
     override x.RelativeTestDataPath = "features/quickFixes/specifyType"
 
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property 02 - Import type``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -62,3 +64,4 @@ type SpecifyParameterBaseTypeTest() =
     [<Test>] member x.``Param 04 - Base type``() = x.DoNamedTest()
     [<Test>] member x.``Param 05``() = x.DoNamedTest()
     [<Test>] member x.``Param 06``() = x.DoNamedTest()
+    [<Test>] member x.``Param 07 - Import type``() = x.DoNamedTest()

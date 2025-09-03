@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -36,8 +35,8 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``AddressOf 01``() = x.DoNamedTest()
 
-    [<TestReferences("../../../assemblies/ProtectedMembers.dll")>]
+    [<TestReferenceProjectOutput("ProtectedMembers")>]
     [<Test>] member x.``Protected 01``() = x.DoNamedTest()
 
-    [<TestReferences("../../../assemblies/ProtectedMembers.dll")>]
+    [<TestReferenceProjectOutput("ProtectedMembers")>]
     [<Test>] member x.``Base 01``() = x.DoNamedTest()

@@ -79,15 +79,8 @@ type ITreeNode with
     member x.IsChildOf(node: ITreeNode) =
         if isNull node then false else node.Contains(x)
 
-    member x.GetIndent() =
-        let startOffset = x.GetDocumentStartOffset()
-        let startCoords = startOffset.ToDocumentCoords()
-        startOffset - startOffset.Document.GetLineStartDocumentOffset(startCoords.Line)
-
     member x.Indent =
-        match x.GetSourceFile() with
-        | null -> FormatterHelper.CalcNodeIndent(x, x.GetCodeFormatter()).Length
-        | _ -> x.GetIndent()
+        FormatterHelper.CalcNodeIndent(x, x.GetCodeFormatter()).Length
 
     member x.GetStartLine() =
         x.GetDocumentStartOffset().ToDocumentCoords().Line
@@ -384,12 +377,19 @@ module PsiModificationUtil =
     let replaceRangeWithNode first last replaceNode =
         ModificationUtil.ReplaceChildRange(TreeRange(first, last), TreeRange(replaceNode)) |> ignore
 
-    let addNodesAfter anchor (nodes: ITreeNode seq) =
-        nodes |> Seq.fold (fun anchor treeNode ->
-            ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
+    let addNodesAfter (anchor: ITreeNode) (nodes: ITreeNode seq) =
+        let nodes = nodes |> List.ofSeq
+        nodes |> Seq.fold (fun (anchor: ITreeNode, addedNodes) treeNode ->
+            anchor.InnerTokens() |> Seq.iter ignore
+            let addedNode = ModificationUtil.AddChildAfter(anchor, treeNode)
+            addedNode, addedNode :: addedNodes
+        ) (anchor, [])
+        |> snd
+        |> List.rev
 
-    let addNodesBefore anchor (nodes: ITreeNode seq) =
-        nodes |> Seq.rev |> Seq.fold (fun anchor treeNode ->
+    let addNodesBefore (anchor: ITreeNode) (nodes: ITreeNode seq) =
+        nodes |> Seq.rev |> Seq.fold (fun (anchor: ITreeNode) treeNode ->
+            anchor.InnerTokens() |> Seq.iter ignore
             ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
     let addNodeBefore anchor node = ModificationUtil.AddChildBefore(anchor, node) |> ignore
@@ -442,17 +442,6 @@ let rec getQualifiedExprIgnoreParens (expr: IFSharpExpression) =
     | null -> expr.IgnoreParentParens()
     | expr -> getQualifiedExprIgnoreParens expr
 
-let rec getQualifiedExpr (expr: IFSharpExpression) =
-    match QualifiedExprNavigator.GetByQualifier(expr) with
-    | null -> expr
-    | expr -> getQualifiedExprIgnoreParens expr
-
-let isDirectPartOfDotLambda (expr: IFSharpExpression) =
-    let prefixApp = PrefixAppExprNavigator.GetByExpression(expr)
-    let expr = if isNull prefixApp then expr else prefixApp
-    let qualifiedExpr = getQualifiedExpr expr
-    isNotNull (DotLambdaExprNavigator.GetByExpression(qualifiedExpr))
-
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProvider() =
@@ -484,7 +473,7 @@ let shiftWhitespaceBefore shift (whitespace: Whitespace) =
 let shiftNode shift (expr: #ITreeNode) =
     if shift = 0 || isNull expr then () else
 
-    for child in List.ofSeq (expr.Tokens()) do
+    for child in List.ofSeq (expr.EnumerateAllTokensFromFirstIn()) do
         if not (child :? NewLine) then () else
 
         let nextSibling = child.NextSibling
@@ -517,18 +506,19 @@ let shiftWithWhitespaceBefore shift (node: ITreeNode) =
     shiftNode shift node
 
 
-let withNewLineAndIndentBefore (indent: int) (node: IFSharpTreeNode) =
-    [ NewLine(node.GetLineEnding()) :> ITreeNode
-      Whitespace(indent) :> _
-      node :> _ ]
-
-
 [<CanBeNull>]
 let rec getOutermostPrefixAppExpr ([<CanBeNull>] expr: IFSharpExpression) =
     let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
     if isNull prefixAppExpr || isNull prefixAppExpr.ArgumentExpression then expr else
 
     getOutermostPrefixAppExpr prefixAppExpr
+
+[<CanBeNull>]
+let rec getOutermostListConstPat ([<CanBeNull>] pattern: IFSharpPattern) =
+    let listConsPat = ListConsPatNavigator.GetByTailPattern(pattern)
+    if isNull listConsPat then pattern else
+
+    getOutermostListConstPat listConsPat
 
 
 let isIndexerLikeAppExpr (expr: IFSharpExpression) =
@@ -557,12 +547,42 @@ let rec isContextWithoutWildPats (expr: ITreeNode) =
     match expr.Parent with
     | null -> true
     | :? IDotLambdaExpr -> false
+
     | :? ILambdaExpr as lambda ->
         if containsWildPat lambda.Patterns then false
         else isContextWithoutWildPats expr.Parent
+
     | :? IParameterOwnerMemberDeclaration as owner ->
         if containsWildPat owner.ParameterPatterns then false
         else isContextWithoutWildPats expr.Parent
+
     | :? ITypeDeclaration
     | :? IModuleDeclaration -> true
+
     | _ -> isContextWithoutWildPats expr.Parent
+
+
+let findSubsequentComment (node: ITreeNode) =
+    let nextToken = node.GetNextToken()
+    let nodeAfter = skipMatchingNodesAfter isInlineSpace nextToken
+    if getTokenType nodeAfter != FSharpTokenType.LINE_COMMENT then null else nodeAfter
+
+let moveCommentsAndWhitespaceAfterAnchor (anchor: ITreeNode) (node: ITreeNode) =
+    let tokensToMove: ITreeNode array =
+        node.NextTokens()
+        |> Seq.takeWhile isInlineSpaceOrComment
+        |> Seq.cast
+        |> Array.ofSeq
+
+    let canMove =
+        tokensToMove.Length > 0 &&
+
+        match tokensToMove |> Array.last |> _.NextTokens() |> Seq.tryHead with
+        | None -> true
+        | Some token -> isNewLine token
+
+    if canMove then
+        LowLevelModificationUtil.AddChildAfter(anchor, tokensToMove)
+
+let moveCommentsAndWhitespaceInside (node: ITreeNode) =
+    moveCommentsAndWhitespaceAfterAnchor node.LastChild node

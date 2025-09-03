@@ -23,11 +23,17 @@ type FSharpInjectionTargetsFinder() =
         | language -> language
 
     let checkForAttributes (expr: IFSharpExpression) =
-        let attributesOwner = getAttributesOwner expr
+        let cache = expr.GetPsiServices().GetCodeAnnotationsCache()
+        let stringSyntaxAnnotationProvider = cache.GetProvider<StringSyntaxAnnotationProvider>()
+        let languageInjectionAnnotationProvider = cache.GetProvider<LanguageInjectionAnnotationProvider>()
+        let attrNames =
+            Seq.append stringSyntaxAnnotationProvider.AttributeShortNames languageInjectionAnnotationProvider.AttributeShortNames
+
+        let attributesOwner = findAttributesOwner expr attrNames
         if isNull attributesOwner then ValueNone else
-        let info = getAnnotationInfo<StringSyntaxAnnotationProvider, string>(attributesOwner)
+        let info = stringSyntaxAnnotationProvider.GetInfo(attributesOwner)
         if isNotNull info then ValueSome(info, "", "") else
-        let info = getAnnotationInfo<LanguageInjectionAnnotationProvider, InjectionAnnotationInfo>(attributesOwner)
+        let info = languageInjectionAnnotationProvider.GetInfo(attributesOwner)
         if isNotNull info then ValueSome(info.Language, info.Prefix, info.Suffix) else ValueNone
 
     static member val Instance = FSharpInjectionTargetsFinder()

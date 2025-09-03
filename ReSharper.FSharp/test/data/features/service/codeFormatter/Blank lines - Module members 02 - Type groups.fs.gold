@@ -10,14 +10,14 @@ type E1 = int
 type F1 = int
 
 type A2 =
-  int
+    int
 and B2 = int
 and C2 = int
 
 type A3 = int
 and B3 = int
 and C3 =
-  int
+    int
 ================
   BlankLinesAroundMultilineModuleMembers = 1
 module Module
@@ -32,7 +32,7 @@ type E1 = int
 type F1 = int
 
 type A2 =
-  int
+    int
 
 and B2 = int
 and C2 = int
@@ -41,7 +41,7 @@ type A3 = int
 and B3 = int
 
 and C3 =
-  int
+    int
 ================
 BlankLinesAroundSingleLineModuleMember = 1
   unaffected by BlankLinesAroundMultilineModuleMembers
@@ -60,7 +60,7 @@ type E1 = int
 type F1 = int
 
 type A2 =
-  int
+    int
 
 and B2 = int
 
@@ -71,4 +71,4 @@ type A3 = int
 and B3 = int
 
 and C3 =
-  int
+    int

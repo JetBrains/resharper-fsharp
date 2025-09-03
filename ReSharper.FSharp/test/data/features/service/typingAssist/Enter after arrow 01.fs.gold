@@ -5,4 +5,4 @@ do
    match foo with
    | (* comment *) bar when
          true ->
-     {caret}
+       {caret}

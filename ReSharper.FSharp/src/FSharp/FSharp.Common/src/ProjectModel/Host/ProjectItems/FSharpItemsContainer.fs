@@ -133,7 +133,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         let shouldRemoveAssemblyInfo =
             match toolsetVersion with
             | null -> false
-            | version -> version.Major = 8
+            | version -> version.Major = 8 && version.Minor = 0 && version.Patch < 403
 
         for projectPart in msBuildProject.Parts do
             let targetFrameworkId = projectPart.TargetFramework
@@ -848,7 +848,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         writer.Write(projectDirectory)
         writer.Write(projectUniqueName)
         writeTargetFrameworkIds targetFrameworkIds
-        writer.Write(files.Count + folders.AllValues.Count)
+        writer.Write(files.Count + folders.ValuesCount)
 
         let foldersIds = Dictionary<FSharpProjectModelElement, int>()
         let getFolderId el =

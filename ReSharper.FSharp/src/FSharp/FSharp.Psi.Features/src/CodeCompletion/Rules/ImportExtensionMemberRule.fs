@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open FSharp.Compiler.Symbols
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -14,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.UI.RichText
 open JetBrains.Util.Extension
@@ -23,21 +23,16 @@ open JetBrains.Util.Extension
 type ImportExtensionMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let getQualifierExpr (context: FSharpCodeCompletionContext) =
-        FSharpExtensionMemberUtil.getQualifierExpr context.ReparsedContext.Reference
-
-    override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
+    override this.SupportedEvaluationMode = EvaluationMode.Full
 
     override this.IsAvailable(context) =
         context.EnableImportCompletion &&
         context.IsQualified &&
 
-        let qualifierExpr = getQualifierExpr context
-        isNotNull qualifierExpr &&
-
-        let fcsType = qualifierExpr.TryGetFcsType()
+        let fcsType = getQualifierType context
         isNotNull fcsType &&
 
+        let qualifierExpr = getQualifierExpr context
         match qualifierExpr with
         | :? IReferenceExpr as refExpr ->
             match refExpr.Reference.GetFcsSymbol() with
@@ -46,32 +41,20 @@ type ImportExtensionMemberRule() =
         | _ -> true
 
     override this.AddLookupItems(context, collector) =
-        let qualifierExpr = getQualifierExpr context
-        let fcsType = qualifierExpr.TryGetFcsType()
-        let members = FSharpExtensionMemberUtil.getExtensionMembers qualifierExpr fcsType None
+        let refExpr = getRefExpr context
+        let members =
+            FSharpExtensionMemberUtil.getExtensionMembers None refExpr
+            |> FSharpExtensionMemberUtil.groupByNameAndNs
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
 
-        let members =
-            members |> Seq.groupBy (fun typeMember ->
-                let name = typeMember.ShortName.SubstringAfter("get_").SubstringAfter("set_")
-
-                let ns =
-                    match typeMember.ContainingType with
-                    | :? IFSharpModule as fsModule ->
-                        fsModule.QualifiedSourceName
-
-                    | containingType ->
-                        containingType.GetContainingNamespace().QualifiedName
-
-                ns, name
-            )
-
         for (ns, name), typeMembers in members do
+            Interruption.Current.CheckAndThrow()
+
             // todo: use all candidates for signatures
             let typeMember = typeMembers |> Seq.head
 
-            let info = ImportDeclaredElementInfo(typeMember, name, Ranges = context.Ranges)
+            let info = ImportDeclaredElementInfo(typeMember, name, context, Ranges = context.Ranges)
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->

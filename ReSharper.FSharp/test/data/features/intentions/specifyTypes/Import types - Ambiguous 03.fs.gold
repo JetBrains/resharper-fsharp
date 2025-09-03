@@ -1,0 +1,19 @@
+﻿namespace Ns
+
+type Type() = class end
+
+
+namespace Test
+
+open System
+open Ns
+
+module A =
+    open Ns
+
+    let x: Type = Type()
+
+module B =
+    open A
+
+    let y: Type{caret} = x

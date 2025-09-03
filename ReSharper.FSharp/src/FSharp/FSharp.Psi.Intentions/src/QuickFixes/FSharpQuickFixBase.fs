@@ -1,11 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.BulbActions
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands.Menu
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Intentions.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -26,7 +28,6 @@ type FSharpQuickFixBase() =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 
@@ -49,6 +50,28 @@ type FSharpQuickFixBase() =
 
 
 [<AbstractClass>]
+type FSharpModernQuickFixBase() =
+    inherit ModernQuickFixBase()
+
+    member x.SelectExpression(expressions: (IFSharpExpression * string) array, action) =
+        let menuItems =
+            expressions
+            |> Array.map (fun (expr, text) ->
+                let range = expr.GetDocumentRange()
+                BulbActionCommandMenuItem<IFSharpExpression>(Text = text, Data = expr, Range = range)
+            )
+
+        BulbActionCommandSequence.From(
+            BulbActionCommands.ShowMenu(menuItems, fun _ _ selectedExpr ->
+                BulbActionCommands.ExecutePsiTransaction(fun _ _ ->
+                    action selectedExpr
+                    null
+                )
+            )
+        )
+
+
+[<AbstractClass>]
 type FSharpScopedQuickFixBase(contextNode: ITreeNode) =
     inherit ModernScopedQuickFixBase()
 
@@ -56,7 +79,6 @@ type FSharpScopedQuickFixBase(contextNode: ITreeNode) =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 
@@ -70,7 +92,6 @@ type FSharpScopedNonIncrementalQuickFixBase(contextNode: ITreeNode) =
     default x.ExecutePsiTransaction _ = ()
 
     override x.ExecutePsiTransaction(solution, _) =
-        use formatterCookie = FSharpExperimentalFeatureCookie.Create(ExperimentalFeature.Formatter)
         x.ExecutePsiTransaction(solution)
         null
 

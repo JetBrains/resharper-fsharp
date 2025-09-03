@@ -12,7 +12,7 @@ let v3 = |GenericT.|(6)genericModuleValue
 
 open T.NestedModuleType
 let t4 = |T.|(7)NestedModuleType()
-let v4 = ||T.|(9)NestedModuleType.|(8)nestedModuleValue
+let v4 = ||T.|(8)NestedModuleType.|(9)nestedModuleValue
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Qualifier is redundant
@@ -23,5 +23,5 @@ let v4 = ||T.|(9)NestedModuleType.|(8)nestedModuleValue
 (5): ReSharper Dead Code: Qualifier is redundant
 (6): ReSharper Dead Code: Qualifier is redundant
 (7): ReSharper Dead Code: Qualifier is redundant
-(8): ReSharper Dead Code: Qualifier is redundant
-(9):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(8):<overlapped> ReSharper Dead Code: Qualifier is redundant
+(9): ReSharper Dead Code: Qualifier is redundant

@@ -1,10 +1,12 @@
 ﻿// ${COMPLETE_ITEM:new}
 module Module
 
+open System.Text
+
 type IBase =
     abstract M: int -> unit
     abstract M: System.Text.StringBuilder -> unit
 
 { new IBase with
-  member this.M(var0: int): unit = failwith "todo"{caret}
-  member this.M(var0: System.Text.StringBuilder): unit = failwith "todo" }
+    member this.M(var0: int): unit = failwith "todo"{caret}
+    member this.M(var0: StringBuilder): unit = failwith "todo" }

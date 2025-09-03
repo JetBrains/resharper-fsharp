@@ -1,12 +1,13 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.BuildSearchableOptionsTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.pathString
 
 plugins {
   // Version is configured in gradle.properties
@@ -50,14 +51,18 @@ dependencies {
     }
     jetbrainsRuntime()
     bundledModule("intellij.rider")
+    bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
-    bundledPlugin("org.intellij.intelliLang")
+    bundledModule("intellij.platform.langInjection")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
     instrumentationTools()
-    testFramework(TestFrameworkType.Bundled)
+    // TODO: Temporary I hope hope hope
+    bundledLibrary(provider {
+      project.intellijPlatform.platformPath.resolve("lib/testFramework.jar").pathString
+    })
   }
 
   testImplementation("org.opentest4j:opentest4j:1.3.0")
@@ -178,6 +183,9 @@ artifacts {
 }
 
 tasks {
+  instrumentTestCode {
+    enabled = false
+  }
   instrumentCode {
     enabled = false
   }
@@ -248,7 +256,7 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = "21"
     compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
@@ -290,7 +298,7 @@ tasks {
       )
     }
 
-    getByName("buildSearchableOptions") {
+    buildSearchableOptions {
       enabled = buildConfiguration == "Release"
     }
   }

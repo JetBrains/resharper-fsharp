@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -28,13 +27,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
     public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
+    public bool HasAssociatedType => EnumerateParts().Any(part => part is IModulePart { HasAssociatedType: true });
 
     protected override bool AcceptsPart(TypePart part) =>
       part is IModulePart && part.ShortName == ShortName;
 
     public ITypeElement AssociatedTypeElement =>
       EnumerateParts()
-        .Select(part => (part as IModulePart)?.AssociatedTypeElement)
+        .Select(part => part is IModulePart { HasAssociatedType: true } modulePart
+          ? modulePart.AssociatedTypeElement
+          : null)
         .WhereNotNull()
         .FirstOrDefault();
 
@@ -61,30 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public string[] ActivePatternCaseNames => GetNames(part => part.ActivePatternCaseNames);
 
     string IAlternativeNameOwner.AlternativeName => SourceName != ShortName ? SourceName : null;
-  }
 
-  internal static class FSharpModuleUtil
-  {
-    public static string GetQualifiedName(this IFSharpModule fsModule)
-    {
-      var builder = new StringBuilder(fsModule.SourceName);
-
-      var containingType = fsModule.GetContainingType();
-      while (containingType != null)
-      {
-        builder.Prepend(".");
-        builder.Prepend(containingType.GetSourceName());
-        containingType = containingType.GetContainingType();
-      }
-
-      var ns = fsModule.GetContainingNamespace();
-      if (!ns.IsRootNamespace)
-      {
-        builder.Prepend(".");
-        builder.Prepend(ns.QualifiedName);  
-      }
-
-      return builder.ToString();
-    }
+    public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
 }

@@ -2,14 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
 open System.Collections.Generic
-open JetBrains.ProjectModel
+open JetBrains.Application.Parts
 open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -23,7 +22,7 @@ module FSharpErrorsStage =
     let parseAndCheckResultsKey = Key<FSharpParseAndCheckResults option>("ParseAndCheckResultsKey")
 
 
-[<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadUnsafe, StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
 type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 
@@ -41,14 +40,12 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(analyzerData)
 
     do
-        let solution = fsFile.GetSolution()
-        let autoOpenCache = solution.GetComponent<FSharpAutoOpenCache>()
-
         analyzerData.SetDaemonProcess(daemonProcess, processKind);
         analyzerData.PutData(visualElementFactoryKey, VisualElementHighlighter(fsFile.Language, settings))
-        analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile, autoOpenCache))
+        analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 
         let redundantParensAnalysisEnabled =
+            let solution = fsFile.GetSolution()
             let isEnabled = solution.IsFSharpExperimentalFeatureEnabled(ExperimentalFeature.RedundantParenAnalysis)
             if isEnabled then BooleanBoxes.True else BooleanBoxes.False
 
@@ -64,7 +61,7 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
 
         let fibers = daemonProcess.CreateTaskBarrierForStageExecution()
         for node in globalProcessor.MemberDeclarations do
-            fibers.EnqueueJobCaptureCurrentPsiContexts(fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer)))
+            fibers.EnqueueJob(fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer)))
 
         fibers.Dispose()
 

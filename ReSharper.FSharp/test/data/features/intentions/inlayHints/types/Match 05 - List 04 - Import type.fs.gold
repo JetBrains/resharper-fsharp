@@ -1,0 +1,8 @@
+﻿// ${BULB_TEXT:Add type annotation}
+
+module Module
+
+open System
+
+match ["".GetType()] with
+| x :: (_ :: _: Type list{caret}) -> ()

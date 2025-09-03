@@ -1,0 +1,6 @@
+﻿module Module
+
+let f a =
+        (fun b ->
+            fun zzz ->
+    a + b + zzz |> ignore)

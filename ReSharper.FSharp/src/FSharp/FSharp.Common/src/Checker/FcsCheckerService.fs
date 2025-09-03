@@ -2,13 +2,13 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
-open System.IO
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -18,7 +18,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -28,48 +27,6 @@ open JetBrains.Util
 module FcsCheckerService =
     let getSourceText (document: IDocument) =
         SourceText.ofString(document.GetText())
-
-
-type FcsProject =
-    { OutputPath: VirtualFileSystemPath
-      ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      FileIndices: IDictionary<VirtualFileSystemPath, int>
-      ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
-      ReferencedModules: ISet<FcsProjectKey> }
-
-    member x.IsKnownFile(sourceFile: IPsiSourceFile) =
-        let path = sourceFile.GetLocation()
-        x.FileIndices.ContainsKey(path)
-
-    member x.GetIndex(sourceFile: IPsiSourceFile) =
-        let path = sourceFile.GetLocation()
-        tryGetValue path x.FileIndices |> Option.defaultValue -1
-
-    member x.TestDump(writer: TextWriter) =
-        let projectOptions = x.ProjectOptions
-
-        writer.WriteLine($"Project file: {projectOptions.ProjectFileName}")
-        writer.WriteLine($"Stamp: {projectOptions.Stamp}")
-        writer.WriteLine($"Load time: {projectOptions.LoadTime}")
-
-        writer.WriteLine("Source files:")
-        for sourceFile in projectOptions.SourceFiles do
-            writer.WriteLine($"  {sourceFile}")
-
-        writer.WriteLine("Other options:")
-        for option in projectOptions.OtherOptions do
-            writer.WriteLine($"  {option}")
-
-        writer.WriteLine("Referenced projects:")
-        for referencedProject in projectOptions.ReferencedProjects do
-            let stamp =
-                match referencedProject with
-                | FSharpReferencedProject.FSharpReference(_, options) -> $"{options.Stamp}: "
-                | _ -> ""
-            writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
-
-        writer.WriteLine()
 
 
 [<RequireQualifiedAccess>]
@@ -82,23 +39,23 @@ type FcsProjectInvalidationType =
     | Remove
 
 
-[<ShellComponent; AllowNullLiteral>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
         settingsStore: ISettingsStore, locks: IShellLocks) =
 
     let checker =
-        Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-
-        let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-
-        let getSettingProperty name =
-            let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
-            settingsStoreLive.GetValueProperty(lifetime, setting, null)
-
-        let skipImpl = getSettingProperty "SkipImplementationAnalysis"
-        let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
-
         lazy
+            Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
+
+            let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
+            let getSettingProperty name =
+                let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+                settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
+
+            let skipImpl = getSettingProperty "SkipImplementationAnalysis"
+            let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
+
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
@@ -114,7 +71,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                 checker.Value.InvalidateAll())
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
-    member val AssemblyReaderShim = Unchecked.defaultof<IFcsAssemblyReaderShim> with get, set
 
     member x.Checker = checker.Value
 
@@ -177,6 +133,12 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
             new PinTypeCheckResultsCookie(sourceFile, parseAndCheckResults.ParseResults, parseAndCheckResults.CheckResults, prohibitTypeCheck) :> IDisposable
         | _ -> { new IDisposable with member this.Dispose() = () }
 
+    member x.PinCheckResults(results, sourceFile, prohibitTypeCheck) =
+        match results with
+        | Some results ->
+            new PinTypeCheckResultsCookie(sourceFile, results.ParseResults, results.CheckResults, prohibitTypeCheck) :> IDisposable
+        | _ -> { new IDisposable with member this.Dispose() = () }
+
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
         match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
@@ -212,15 +174,19 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
         // todo: different type parameters count
-        x.ParseAndCheckFile(sourceFile, opName, true)
-        |> Option.bind (fun results ->
-            let checkResults = results.CheckResults
-            let fcsPos = getPosFromCoords coords
-            if resolveExpr then
-                checkResults.ResolveNamesAtLocation(fcsPos, names)
-            else
-                let lineText = sourceFile.Document.GetLineText(coords.Line)
-                checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names))
+        match x.ParseAndCheckFile(sourceFile, opName, true) with
+        | None -> []
+        | Some results ->
+
+        let checkResults = results.CheckResults
+        let fcsPos = getPosFromCoords coords
+        if resolveExpr then
+            match checkResults.ResolveNamesAtLocation(fcsPos, names) with
+            | None -> []
+            | Some result -> [result]
+        else
+            let lineText = sourceFile.Document.GetLineText(coords.Line)
+            checkResults.GetSymbolUsesAtLocation(fcsPos.Line, fcsPos.Column, lineText, names)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name: string, coords, resolveExpr, opName) =
@@ -249,6 +215,8 @@ module ReferencedModule =
 type IFcsProjectProvider =
     abstract GetFcsProject: psiModule: IPsiModule -> FcsProject option
     abstract GetPsiModule: outputPath: VirtualFileSystemPath -> IPsiModule option
+
+    abstract IsProjectOutput: outputPath: VirtualFileSystemPath -> bool
 
     abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetProjectOptions: psiModule: IPsiModule -> FSharpProjectOptions option

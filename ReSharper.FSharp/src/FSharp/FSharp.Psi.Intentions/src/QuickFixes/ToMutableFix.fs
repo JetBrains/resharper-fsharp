@@ -15,6 +15,9 @@ type ToMutableFix(refExpr: IReferenceExpr) =
     new (error: ValueNotMutableError) =
         ToMutableFix(error.RefExpr)
 
+    new (error: ValueMustBeMutableError) =
+        ToMutableFix(error.RefExpr.Qualifier.As<IReferenceExpr>())
+
     override x.Text = $"Make '{refExpr.Identifier.GetSourceName()}' mutable"
 
     override x.IsAvailable _ =

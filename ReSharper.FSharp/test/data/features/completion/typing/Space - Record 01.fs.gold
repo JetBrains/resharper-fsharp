@@ -111,6 +111,8 @@ Seq
 Set
 String
 System
+TaskBuilder
+TaskBuilderExtensions
 Unchecked
 ValueOption
 WebExtensions

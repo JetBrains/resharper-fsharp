@@ -1,0 +1,5 @@
+﻿module Module
+
+let f (i: string) = fun (j: int) -> i + j + 1
+
+f ""{caret} 1

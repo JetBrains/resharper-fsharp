@@ -34,6 +34,8 @@ groupBy
 head
 indexed
 init
+insertAt
+insertManyAt
 isEmpty
 item
 iter
@@ -62,6 +64,8 @@ permute
 pick
 reduce
 reduceBack
+removeAt
+removeManyAt
 replicate
 rev
 scan
@@ -97,6 +101,7 @@ tryPick
 unfold
 unzip
 unzip3
+updateAt
 where
 windowed
 zip

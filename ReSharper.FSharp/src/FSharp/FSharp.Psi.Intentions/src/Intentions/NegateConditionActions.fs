@@ -25,7 +25,6 @@ type NegateConditionActionBase<'T when 'T: not struct and 'T :> IConditionOwnerE
     override x.ExecutePsiTransaction(_, _) =
         let expr = x.GetExpression().ConditionExpr
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
 
         let negatedExpr = createLogicallyNegatedExpression expr
         let replacedExpr = ModificationUtil.ReplaceChild(expr, negatedExpr)

@@ -3,6 +3,6 @@ module Module
 
 let f x =
     for a in x do
-      {caret}
+        {caret}
 
     ()

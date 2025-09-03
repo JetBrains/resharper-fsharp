@@ -4,11 +4,11 @@ IFSharpImplFile
     FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    INowarnDirective
-      FSharpTokenType+PpNowarnTokenElement(type:PP_NOWARN, text:#nowarn)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpString(type:STRING, text:"1182")
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+  FSharpWarningDirective
+    FSharpTokenType+PpNowarnTokenElement(type:PP_NOWARN, text:#nowarn)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpString(type:STRING, text:"1182")
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

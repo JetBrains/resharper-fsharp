@@ -9,13 +9,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpTypeParametersOwnerBase<TDeclaration> : FSharpFunctionBase<TDeclaration>
+  internal abstract class FSharpTypeParametersOwnerBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpFunctionBase<TDeclaration>(declaration)
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpTypeParametersOwnerBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     private IList<ITypeParameter> GetTypeParameters()
     {
       var mfvTypeParams = MfvTypeParameters;

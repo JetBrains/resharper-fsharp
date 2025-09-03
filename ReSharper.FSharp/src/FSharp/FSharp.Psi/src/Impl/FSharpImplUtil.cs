@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Metadata;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
@@ -205,7 +206,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetMfvCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
+    public static string GetMfvCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv, ITypeElement typeElement)
     {
       try
       {
@@ -213,7 +214,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
-        return compiledName ?? (IsImplicitAccessor(mfv) ? mfv.DisplayName : mfv.LogicalName); // todo: map to accessor
+
+        if (compiledName != null)
+          return compiledName;
+
+        if (IsImplicitAccessor(mfv))
+          return mfv.DisplayName;
+
+        var isCompiled = typeElement is ICompiledTypeElement;
+        if (isCompiled)
+          return mfv.CompiledName;
+
+        return mfv.LogicalName;
       }
       catch (Exception e)
       {
@@ -308,7 +320,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsException(this ITypeElement typeElement) =>
       typeElement switch
       {
-        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<IExceptionPart>() != null,
+        IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<IExceptionPart>() != null,
         ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledException(),
         _ => false
       };
@@ -316,7 +328,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsUnion([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
-        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<IUnionPart>() != null,
+        IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<IUnionPart>() != null,
         IFSharpCompiledTypeElement fsCompiledTypeElement => fsCompiledTypeElement.Representation.IsUnion,
         _ => false
       };
@@ -324,7 +336,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsUnionCase([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
-        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<UnionCasePart>() != null,
+        IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<UnionCasePart>() != null,
         ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledUnionCase(),
         _ => false
       };
@@ -336,7 +348,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string[] GetUnionCaseNames(this ITypeElement typeElement) =>
       typeElement is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union repr }
         ? repr.cases
-        : typeElement.GetSourceUnionCases().Select(unionCase => unionCase.SourceName).ToArray();
+        : GetPart<IUnionPart>(typeElement)?.CaseNames ?? EmptyArray<string>.Instance;
 
     [CanBeNull]
     public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>
@@ -359,8 +371,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([NotNull] this TypeElement typeElement)
     {
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IFSharpTypePart fsTypePart)
-          return fsTypePart.SourceName;
+        if (part is IFSharpTypePart { SourceName: not SharedImplUtil.MISSING_DECLARATION_NAME and var name })
+          return name;
 
       return typeElement.ShortName;
     }
@@ -399,25 +411,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ChooseType(ns.GetNestedTypeElements(symbolScope));
     }
 
-    public static string GetSourceName([NotNull] this CompiledTypeElement typeElement)
+    [NotNull]
+    private static string GetSourceName([NotNull] this ICompiledElement compiledElement)
     {
-      if (typeElement is FSharpCompiledModule compiledModule)
-        return compiledModule.SourceName;
-
-      if (typeElement.GetFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
+      if (compiledElement.IsFromFSharpAssembly() &&
+          compiledElement.GetFirstArgValue(FSharpPredefinedType.CompilationSourceNameAttrTypeName) is string sourceName &&
           sourceName != SharedImplUtil.MISSING_DECLARATION_NAME)
         return sourceName;
 
-      return typeElement.ShortName;
+      return compiledElement.ShortName;
     }
 
-    public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
+    [NotNull] public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
       declaredElement switch
       {
         IConstructor ctor => ctor.ContainingType?.GetSourceName() ?? ctor.ShortName,
         INamespace ns => ns.IsRootNamespace ? "global" : ns.ShortName,
         IFSharpDeclaredElement fsElement => fsElement.SourceName,
-        CompiledTypeElement compiledTypeElement => GetSourceName(compiledTypeElement),
+        ICompiledElement compiledElement => GetSourceName(compiledElement),
         _ => declaredElement.ShortName
       };
 
@@ -432,7 +443,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return AccessRights.PUBLIC;
 
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IRepresentationAccessRightsOwner accessRightsOwner)
+        if (part is IFSharpRepresentationAccessRightsOwner accessRightsOwner)
           return accessRightsOwner.RepresentationAccessRights;
       return AccessRights.PUBLIC;
     }
@@ -450,7 +461,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               return AccessRights.INTERNAL;
             break;
 
-          case IRepresentationAccessRightsOwner accessRightsOwner:
+          case IFSharpRepresentationAccessRightsOwner accessRightsOwner:
             if (accessRightsOwner.RepresentationAccessRights != AccessRights.PUBLIC)
               return AccessRights.INTERNAL;
             break;
@@ -462,7 +473,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     // todo: hidden by signature in fsi
     public static AccessRights GetRepresentationAccessRights([NotNull] this IFSharpTypeDeclaration declaration) =>
       declaration.TypeRepresentation is ISimpleTypeRepresentation repr
-        ? ModifiersUtil.GetAccessRights(repr.AccessModifier)
+        ? FSharpModifiersUtil.GetAccessRights(repr.AccessModifier)
         : AccessRights.PUBLIC;
 
     public static PartKind GetSimpleTypeKindFromAttributes(this IFSharpTypeDeclaration decl) =>
@@ -593,38 +604,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       name = NamingManager.GetNamingLanguageService(fsIdentifier.Language).MangleNameIfNecessary(name);
       using var _ = WriteLockCookie.Create(fsIdentifier.IsPhysical());
-      LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
+      ModificationUtil.ReplaceChild(token, new FSharpIdentifierToken(name));
     }
 
     public static void AddTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      LowLevelModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
-      LowLevelModificationUtil.AddChildAfter(anchor, new Whitespace());
+      ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
     }
 
     public static void AddTokenBefore([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      LowLevelModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
-      LowLevelModificationUtil.AddChildBefore(anchor, new Whitespace());
-    }
-
-    public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
-    {
-      var result = new List<ITypeElement>(names.Count);
-      foreach (var clrTypeName in names)
-      {
-        var typeElement = clrTypeName?.CreateTypeByClrName(psiModule).GetTypeElement();
-        if (typeElement != null)
-          result.Add(typeElement);
-      }
-
-      return result;
+      ModificationUtil.AddChildBefore(anchor, tokenType.CreateLeafElement());
     }
 
     [CanBeNull]
-    public static IDeclaredElement GetModuleToUpdateName([NotNull] this IFSharpTypeElement fsTypeElement,
+    public static IDeclaredElement GetModuleToUpdateName([NotNull] this IFSharpSourceTypeElement fsTypeElement,
       [CanBeNull] string newName)
     {
       if (!(fsTypeElement is TypeElement typeElement))
@@ -635,10 +631,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         foreach (var child in part.Parent.NotNull().Children())
         {
-          if (!(child is IModulePart && child is TypePart typePart))
+          if (child is not (IModulePart and TypePart typePart))
             continue;
 
-          if (!(typePart.TypeElement is IFSharpTypeElement otherTypeElement))
+          if (typePart.TypeElement is not IFSharpSourceTypeElement otherTypeElement)
             continue;
 
           var sourceName = otherTypeElement.SourceName;
@@ -670,7 +666,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsRecord([CanBeNull] this ITypeElement typeElement) =>
       typeElement switch
       {
-        IFSharpTypeElement fsTypeElement => (fsTypeElement.GetPart<IRecordPart>() != null),
+        IFSharpSourceTypeElement fsTypeElement => (fsTypeElement.GetPart<IRecordPart>() != null),
         ICompiledElement compiledElement when compiledElement.Module.IsFSharpAssembly() =>
           compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType,
         _ => false
@@ -680,7 +676,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       switch (typeElement)
       {
-        case IFSharpTypeElement fsTypeElement:
+        case IFSharpSourceTypeElement fsTypeElement:
           return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsIList() ??
                  EmptyList<string>.InstanceList;
 
@@ -840,9 +836,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       [NotNull] string name)
     {
       if (referenceOwner.FSharpIdentifier?.IdentifierToken is { } id)
-        LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
+        ModificationUtil.ReplaceChild(id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
+    }
+
+    [NotNull]
+    public static string GetQualifiedName(this IClrDeclaredElement typeOrNs)
+    {
+      if (typeOrNs is INamespace ns)
+        return ns.QualifiedName;
+
+      if (typeOrNs is not ITypeElement typeElement)
+        throw new InvalidOperationException($"Unexpected {typeOrNs.GetType()} element");
+
+      var builder = new StringBuilder(typeElement.GetSourceName());
+
+      var containingType = typeOrNs.GetContainingType();
+      while (containingType != null)
+      {
+        builder.Prepend(".");
+        builder.Prepend(containingType.GetSourceName());
+        containingType = containingType.GetContainingType();
+      }
+
+      var containingNs = typeElement.GetContainingNamespace();
+      if (!containingNs.IsRootNamespace)
+      {
+        builder.Prepend(".");
+        builder.Prepend(containingNs.QualifiedName);  
+      }
+
+      return builder.ToString();
     }
 
     [NotNull]
@@ -996,7 +1021,80 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static XmlNode GetXmlDoc(this IFSharpTypeElement typeElement, bool inherit) =>
+    public static XmlNode GetXmlDoc(this IFSharpSourceTypeElement typeElement, bool inherit) =>
       typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(inherit);
+
+    private static string Print(AccessRights accessRights) => accessRights.ToString().ToLowerInvariant();
+
+    internal static string TestToString(this IFSharpSourceTypeElement typeElement, string typeParameterString)
+    {
+      IEnumerable<string> GetModifiers()
+      {
+        var sourceName = typeElement.SourceName;
+        if (sourceName != typeElement.ShortName)
+          yield return sourceName;
+
+        var accessRights = typeElement.GetFSharpAccessRights();
+        if (accessRights is not { IsFilePrivate: false, AccessRights: AccessRights.PUBLIC })
+          yield return $"{accessRights}, compiled: {Print(typeElement.GetAccessRights())}";
+
+        if (typeElement is ILanguageSpecificDeclaredElement { IsErased: true })
+          yield return "erased";
+      }
+
+      var stringBuilder = new StringBuilder();
+      stringBuilder.Append($"{typeElement.GetType().Name}:");
+      stringBuilder.Append(typeElement.IsValid() ? typeElement.GetClrName().FullName : "<Invalid>");
+
+      stringBuilder.Append(typeParameterString);
+
+      var list = GetModifiers().ToList();
+      if (!list.IsEmpty())
+        stringBuilder.Append($" ({list.Join(", ")})");
+
+      return stringBuilder.ToString();
+    }
+
+    internal static IEnumerable<string> GetTestFSharpTypePartModifiers(this IFSharpTypePart typePart)
+    {
+      var sourceName = typePart.SourceName;
+      if (sourceName != typePart.ShortName)
+        yield return sourceName;
+
+      var accessRights = typePart.SourceAccessRights;
+      if (accessRights is not AccessRights.PUBLIC)
+        yield return Print(accessRights);
+    }
+
+    public static ITypeDeclaration GetDefiningDeclaration(this IFSharpSourceTypeElement typeElement)
+    {
+      TypePart currentDefiningPart = null;
+      foreach (var part in typeElement.EnumerateParts())
+      {
+        if (currentDefiningPart == null)
+          currentDefiningPart = part;
+        else
+        {
+          var currentPartFilePart = currentDefiningPart.GetRoot() as FSharpProjectFilePart;
+          var partFilePart = part.GetRoot() as FSharpProjectFilePart;
+
+          if (currentPartFilePart != partFilePart && currentPartFilePart != null && partFilePart != null)
+          {
+            var fcsProjectProvider = typeElement.Module.GetSolution().GetComponent<IFcsProjectProvider>();
+            var currentPartSourceFileIndex = fcsProjectProvider.GetFileIndex(currentPartFilePart.SourceFile);
+            var partSourceFileIndex = fcsProjectProvider.GetFileIndex(partFilePart.SourceFile);
+            if (partSourceFileIndex < currentPartSourceFileIndex)
+              currentDefiningPart = part;
+          }
+          else
+          {
+            if (part.Offset < currentDefiningPart.Offset)
+              currentDefiningPart = part;
+          }
+        }
+      }
+
+      return currentDefiningPart?.GetDeclaration() as ITypeDeclaration;
+    }
   }
 }

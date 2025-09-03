@@ -9,12 +9,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil.ParentTraversal
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -44,6 +45,14 @@ type MatchType =
         | Enum(fcsEntity, _) -> Some(fcsEntity.AsType())
         | _ -> None
 
+    member this.SupportsNullTest: bool =
+        match this with
+        | Other fcsType ->
+            match tryGetAbbreviatedTypeEntity fcsType with
+            | Some fcsEntity -> not fcsEntity.IsFSharp && not fcsEntity.IsValueType
+            | _ -> false
+        | _ -> false
+
 
 [<RequireQualifiedAccess>]
 type MatchTest =
@@ -64,6 +73,7 @@ type MatchTest =
     | As
     | ActivePatternCase of index: int * group: FSharpActivePatternGroup
     | Record
+    | Null
 
 and MatchValue =
     { Type: MatchType
@@ -129,6 +139,8 @@ and MatchNode =
 
         | (MatchTest.Or, [node1; node2]), _ ->
             $"({string node1}) | ({string node2})"
+
+        | (MatchTest.Null, _), _ -> "null"
 
         | _ -> "other case"
 
@@ -274,6 +286,8 @@ module MatchTest =
         | (MatchTest.Record, fields1), (MatchTest.Record, fields2) ->
             List.forall2 matches fields2 fields1
 
+        | (MatchTest.Null, []), (MatchTest.Null, []) -> true
+
         | _ -> false
 
     let rec initialPattern (deconstructions: Deconstructions) (context: ITreeNode) isGenerating (value: MatchValue) =
@@ -381,6 +395,9 @@ module MatchTest =
                 let fieldNodes = makeInitialFieldPatterns recordInstance.Substitution recordPath fields
                 test, fieldNodes
 
+            | MatchType.Other _ as matchType when matchType.SupportsNullTest ->
+                MatchTest.Null, []
+
             | _ ->
                 MatchTest.Named None, []
 
@@ -443,7 +460,9 @@ module MatchNode =
             pat
 
         let createPattern text =
-            context.CachedPatterns.GetOrCreateValue(text, fun text -> context.Factory.CreatePattern(text, false)).Copy()
+            context.CachedPatterns
+                .GetOrCreateValue(text, fun text -> context.Factory.CreatePattern(text, false))
+                .Copy((*context.Context*))
 
         let markSeenType (fcsEntity: FSharpEntity) =
             context.SeenTypes.Add(fcsEntity) |> ignore
@@ -565,6 +584,9 @@ module MatchNode =
                 let fieldPats = recordPat.FieldPatterns |> Seq.map (fun p -> p.As<IFieldPat>().Pattern)
 
                 Seq.iter2 (bind context usedNames) fieldPats fieldNodes
+
+            | MatchTest.Null, [] ->
+                createPattern "null" |> replaceWithPattern oldPat |> ignore
 
             | _ -> ()
 
@@ -829,6 +851,10 @@ module MatchNode =
                     tail.Pattern <- MatchTest.initialPattern deconstructions context isGenerating tail.Value
                 | _ -> ()
 
+            true
+
+        | MatchTest.Null, [] ->
+            node.Pattern <- MatchTest.Named None, []
             true
 
         | nodePattern -> failwith $"Unexpected pattern: {nodePattern}"
@@ -1185,6 +1211,9 @@ let rec getMatchPattern (deconstructions: Deconstructions) (value: MatchValue) s
     | :? IFieldPat as fieldPat, _ ->
         getMatchPattern deconstructions value skipOnNull fieldPat.Pattern
 
+    | :? INullPat, _ ->
+        MatchTest.Null, []
+
     | null, _ when skipOnNull ->
         addDeconstruction value.Path (Deconstruction.Discard true)
         MatchTest.Discard true, []
@@ -1214,30 +1243,12 @@ let ofMatchExpr (matchExpr: IMatchLikeExpr) =
 
     matchValue, matchNodes, deconstructions
 
-let moveSubsequentCommentToMatchClause (matchExpr: IMatchLikeExpr) (matchClause: IMatchClause) =
-    let nextToken = matchExpr.GetNextToken()
-    if not (isInlineSpaceOrComment nextToken) then () else
-
-    let lastWhitespaceOrComment = getLastMatchingNodeAfter isInlineSpaceOrComment nextToken
-    if not (isInlineSpaceOrComment lastWhitespaceOrComment) then () else
-
-    let range = TreeRange(nextToken, lastWhitespaceOrComment)
-    ModificationUtil.AddChildRangeAfter(matchClause, range) |> ignore
-    ModificationUtil.DeleteChildRange(range)
-
 let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
     let factory = matchExpr.CreateElementFactory()
 
     let lineEnding = matchExpr.GetLineEnding()
-    let indent =
-        matchExpr.ClausesEnumerable
-        |> Seq.cast<ITreeNode>
-        |> Seq.tryHead
-        |> Option.defaultValue matchExpr
-        |> _.Indent
-
     let unitExpr = factory.CreateExpr("()")
-    let sandBoxMatchExpr = factory.CreateMatchExpr(unitExpr).Copy()
+    let sandBoxMatchExpr = factory.CreateMatchExpr(unitExpr)
     ModificationUtil.DeleteChildRange(TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild))
 
     let bindContext = MatchNode.BindContext.Create(matchExpr)
@@ -1245,29 +1256,15 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
     let createMatchClause =
         let matchClause = factory.CreateMatchClause()
         fun () ->
-            let file = matchClause.GetContainingFile().Copy()
-            SandBox.CreateSandBoxFor(file, matchExpr.GetPsiModule())
-            file
-                .As<IFSharpFile>()
-                .ModuleDeclarations[0]
-                .Members[0].As<IExpressionStatement>()
-                .Expression.As<IMatchExpr>()
-                .Clauses[0]
+            matchClause.Copy()
 
     let tryAddClause (node: MatchNode) =
-        if nodes |> Seq.exists (MatchTest.matches node) then
-            () else
+        if nodes |> Seq.exists (MatchTest.matches node) then () else
 
-        let matchClause = createMatchClause ()
+        let matchClause = ModificationUtil.AddChildAfter(sandBoxMatchExpr.LastChild, createMatchClause ())
+        matchClause.AddLineBreakBefore() |> ignore
         let usedNames = HashSet()
         MatchNode.bind bindContext usedNames matchClause.Pattern node
-
-        addNodesAfter sandBoxMatchExpr.LastChild [
-            NewLine(lineEnding)
-            if indent > 0 then
-                Whitespace(indent)
-            matchClause
-        ] |> ignore
 
     let matchPattern = MatchTest.initialPattern deconstructions matchExpr true value
     let node = MatchNode.Create(value, matchPattern)
@@ -1277,27 +1274,14 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
 
     lastClause |> Option.iter MatchExprUtil.addIndent
 
-    let addEmptyLineBeforeClauses =
-        match firstClause, lastClause with
-        | Some firstClause, Some lastClause ->
-            if firstClause == lastClause then
-                let pat = lastClause.Pattern
-                let expr = lastClause.Expression
-                isNull pat || isNull expr || pat.EndLine <> expr.StartLine
-            else
-                let prevSibling = lastClause.GetPreviousMeaningfulSibling().NotNull()
-                lastClause.StartLine - prevSibling.EndLine > docLine 1
-
-        | _ -> false
-
-    if addEmptyLineBeforeClauses then
-        addNodeAfter matchExpr.LastChild (NewLine(lineEnding))
-
     tryAddClause node
     while MatchNode.increment deconstructions matchExpr true node do
         tryAddClause node
 
+    moveCommentsAndWhitespaceInside matchExpr
+
     let tempMatchClause = ModificationUtil.AddChild(matchExpr, bindContext.Factory.CreateMatchClause())
+    tempMatchClause.AddLineBreakBefore() |> ignore
 
     for fcsEntity in bindContext.SeenTypes do
         let case: FSharpSymbol option = 
@@ -1317,10 +1301,12 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
             FSharpBindUtil.bindFcsSymbol tempMatchClause.Pattern fcsSymbol "get pattern" |> ignore
         )
 
-    let newClauses = TreeRange(sandBoxMatchExpr.WithKeyword.NextSibling, sandBoxMatchExpr.LastChild) |> Seq.toArray
-    LowLevelModificationUtil.ReplaceChildRange(tempMatchClause, tempMatchClause, newClauses)
+    let templClauseRange = TreeRange(tempMatchClause)
+    for clause in sandBoxMatchExpr.ClausesEnumerable do
+        let matchClause = ModificationUtil.AddChild(matchExpr, clause)
+        matchClause.AddLineBreakBefore() |> ignore
 
-    lastClause |> Option.iter (moveSubsequentCommentToMatchClause matchExpr)
+    ModificationUtil.DeleteChild(tempMatchClause)
 
 
 let markTopLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =

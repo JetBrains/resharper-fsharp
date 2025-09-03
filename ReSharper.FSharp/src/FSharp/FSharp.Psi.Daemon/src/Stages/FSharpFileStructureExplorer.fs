@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 type DisableByNowarnCodeInspectionSection(warningId, range) =
     interface IDisableCodeInspectionSection with
@@ -49,4 +50,5 @@ type FSharpFileStructureExplorer() =
             let fsFile = file.As<IFSharpFile>()
             if isNull fsFile then null else
 
+            PsiFileCachedDataUtil.InvalidateAllData(fsFile)
             FSharpFileStructure(fsFile)

@@ -1,9 +1,10 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rider.plugins.fsharp.test.flushFileChanges
-import com.jetbrains.rider.plugins.fsharp.test.withEditorConfig
-import com.jetbrains.rider.test.annotations.TestEnvironment
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
+import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
+import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
@@ -13,7 +14,7 @@ import org.testng.annotations.Test
 import java.io.File
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_7, reuseSolution = false)
+@TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override val testSolution = "FormatCodeApp"
   override fun beforeDoTestWithDocuments() {

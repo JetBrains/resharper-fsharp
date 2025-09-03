@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (element is IAttributesOwner attrOwner)
       {
-        if (GetFirstArgStringValue(attrOwner, SourceNameAttrTypeName) is { } sourceName)
+        if (GetFirstArgStringValue(attrOwner, CompilationSourceNameAttrTypeName) is { } sourceName)
           names.Add(sourceName);
 
         if (GetFirstArgStringValue(attrOwner, CustomOperationAttrTypeName) is { } customOpName)
@@ -63,7 +63,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
       }
 
+      if (element is ICompiledElement and IMethod method)
+        names.Add(TryRemoveCompiledAccessorPrefix(method.ShortName));
+
       return names;
+    }
+
+    public static string TryRemoveCompiledAccessorPrefix(string shortName)
+    {
+      return shortName.SubstringAfterLast(".").SubstringAfter("get_").SubstringAfter("set_");
     }
 
     private static void GetPossibleSourceNames(ITypeElement type, ISet<string> names)

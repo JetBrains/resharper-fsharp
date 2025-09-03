@@ -1,6 +1,6 @@
-open System
+﻿open System
 
 let f (x: IDisposable) = ()
 let g = (f ({ new IDisposable with
-              member this.Dispose() = ()
-           }){caret})
+                member this.Dispose() = ()
+            }){caret})

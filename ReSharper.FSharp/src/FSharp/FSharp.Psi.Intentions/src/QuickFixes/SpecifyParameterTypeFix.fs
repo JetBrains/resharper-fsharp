@@ -4,6 +4,7 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
@@ -28,7 +29,7 @@ type SpecifyTypeFixBase(refExpr: IQualifiedExpr) =
     abstract IsApplicable: declaredElement: IDeclaredElement -> bool
     abstract IsApplicable: decl: IDeclaration -> bool
 
-    abstract SpecifyType: decl: IDeclaration * mfv: FSharpMemberOrFunctionOrValue * displayContext: FSharpDisplayContext -> unit
+    abstract SpecifyType: decl: IDeclaration * mfv: FSharpMemberOrFunctionOrValue -> unit
 
     override this.IsAvailable _ =
         isValid this.QualifierRefExpr &&
@@ -52,7 +53,7 @@ type SpecifyTypeFixBase(refExpr: IQualifiedExpr) =
         let symbolUse = reference.GetSymbolUse()
         let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
 
-        this.SpecifyType(declaration, mfv, symbolUse.DisplayContext)
+        this.SpecifyType(declaration, mfv)
 
 
 type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
@@ -79,9 +80,9 @@ type SpecifyParameterTypeFix(qualifiedExpr: IQualifiedExpr) =
     override this.IsApplicable(decl: IDeclaration) =
         decl :? ILocalReferencePat
 
-    override this.SpecifyType(decl, mfv, d) =
+    override this.SpecifyType(decl, mfv) =
         let decl = decl :?> ILocalReferencePat
-        SpecifyTypes.specifyParameterType d mfv.FullType decl
+        TypeAnnotationUtil.specifyPatternType mfv.FullType decl
 
 
 type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
@@ -101,11 +102,9 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.IsApplicable(decl: IDeclaration) =
         match decl with
-        | :? IMemberDeclaration as decl ->
-            isNull decl.ReturnTypeInfo &&
-            Seq.isEmpty decl.AccessorDeclarationsEnumerable
+        | :? IMemberDeclaration as decl -> SpecifyTypes.getAvailability decl |> _.CanSpecifyReturnType
         | _ -> false
 
-    override this.SpecifyType(decl, mfv, displayContext) =
+    override this.SpecifyType(decl, mfv) =
         let memberDecl = decl :?> IMemberDeclaration
-        SpecifyTypes.specifyPropertyType displayContext mfv.FullType memberDecl
+        SpecifyTypes.specifyMemberReturnType memberDecl mfv

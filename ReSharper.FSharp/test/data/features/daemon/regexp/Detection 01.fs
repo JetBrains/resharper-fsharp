@@ -10,6 +10,7 @@ type A() =
 
     member x.K = "[123]"
 
+[<CompiledName("compiledName")>]
 let f ([<RegexPattern>] x: string) = ()
 f ("[123]")
 f "[123]"
@@ -18,6 +19,9 @@ let f1 =
     fun _ ->
         fun ([<RegexPattern>] x: string) -> ()
 f1 "[123]" "[123]"
+
+let f2 (x, y) (x1, [<RegexPattern>] y1) = ()
+f2 (1, 2) (3, "[123]")
 
 let g (x: string) = ()
 g ("[123]")
@@ -47,6 +51,8 @@ type F =
                       [<StringSyntax(StringSyntaxAttribute.Regex)>] b: string,
                       ?c: string) = ()
 
+    static member Car(a, b) (c, [<RegexPattern>] d: string) = ()
+
 F.Foo("[123]")
 F.Foo("[123]", "[123]")
 F.Foo("[123]", "[123]", "[123]")
@@ -54,3 +60,5 @@ F.Foo("[123]", "[123]", "[123]")
 F.Bar("[123]")
 F.Bar("[123]", "[123]")
 F.Bar("[123]", "[123]", "[123]")
+
+F.Car (1, 2) (3, "[123]")

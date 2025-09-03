@@ -30,6 +30,7 @@ import com.jetbrains.rider.plugins.fsharp.services.fsi.consoleRunners.FsiScriptP
 import com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConfiguration
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.run.configurations.dotNetExe.DotNetExeConfigurationParameters
+import com.jetbrains.rider.run.configurations.exe.ProcessExecutionDetails
 import com.jetbrains.rider.run.createRunCommandLine
 import com.jetbrains.rider.runtime.DotNetExecutable
 import com.jetbrains.rider.runtime.DotNetRuntime
@@ -99,14 +100,13 @@ suspend fun getFsiRunOptions(
     workingDirectory = workingDirectory,
     envs = configuration?.envs ?: mapOf(),
     isPassParentEnvs = true,
-    useExternalConsole = false,
     executeAsIs = false,
     assemblyToDebug = null,
     runtimeType = runtimeType,
     runtimeArguments = ""
   )
 
-  val dotNetExecutable = parameters.toDotNetExecutable()
+  val dotNetExecutable = parameters.toDotNetExecutableSuspending(ProcessExecutionDetails.Default)
   val dotNetRuntime = DotNetRuntime.detectRuntimeForExeOrThrow(
     project,
     runtimeHost,

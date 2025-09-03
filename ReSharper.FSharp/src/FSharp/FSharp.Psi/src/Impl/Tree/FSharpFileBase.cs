@@ -21,15 +21,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FcsCheckerService FcsCheckerService { get; set; }
     public FcsCheckerService CheckerService => FcsCheckerService;
 
+    public IFcsFileCapturedInfo FcsCapturedInfo =>
+      FcsCapturedInfoCache.GetOrCreateFileCapturedInfo(SourceFile);
+
     // ReSharper disable once NotNullMemberIsNotInitialized
-    public IFcsResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
+    public IFcsCapturedInfoCache FcsCapturedInfoCache { get; set; }
 
     private readonly CachedPsiValue<FSharpOption<FSharpParseFileResults>> myParseResults =
       new FileCachedPsiValue<FSharpOption<FSharpParseFileResults>>();
 
     public FSharpOption<FSharpParseFileResults> ParseResults
     {
-      get => myParseResults.GetValue(this, fsFile => fsFile.FcsCheckerService.ParseFile(fsFile.SourceFile));
+      get => myParseResults.GetValue(this, static fsFile => fsFile.FcsCheckerService.ParseFile(fsFile.SourceFile));
       set => myParseResults.SetValue(this, value);
     }
 
@@ -38,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? FSharpOption<ParsedInput>.Some(parseTree)
         : FSharpOption<ParsedInput>.None;
 
-    PsiLanguageType IFSharpFileCheckInfoOwner.LanguageType { get; set; }/* = FSharpLanguage.Instance;*/
+    PsiLanguageType IFSharpFileCheckInfoOwner.LanguageType { get; set; }
 
     public override PsiLanguageType Language => ((IFSharpFileCheckInfoOwner) this).LanguageType;
 
@@ -48,20 +51,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IDisposable PinTypeCheckResults(bool prohibitTypeCheck, string opName) =>
       CheckerService.PinCheckResults(SourceFile, prohibitTypeCheck, opName);
 
+    public IDisposable PinTypeCheckResults(FSharpOption<FSharpParseAndCheckResults> results) =>
+      CheckerService.PinCheckResults(results, SourceFile, true);
+
     public FSharpSymbol GetSymbol(int offset) =>
-      ResolvedSymbolsCache.GetSymbol(SourceFile, offset);
+      FcsCapturedInfo.GetSymbol(offset);
 
     public IReadOnlyList<FcsResolvedSymbolUse> GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null) =>
-      ResolvedSymbolsCache.GetAllResolvedSymbols(SourceFile);
+      FcsCapturedInfo.GetAllResolvedSymbols();
 
     public IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null) =>
-      ResolvedSymbolsCache.GetAllDeclaredSymbols(SourceFile);
+      FcsCapturedInfo.GetAllDeclaredSymbols();
 
     public FSharpSymbolUse GetSymbolUse(int offset) =>
-      ResolvedSymbolsCache.GetSymbolUse(SourceFile, offset);
+      FcsCapturedInfo.GetSymbolUse(offset);
 
     public FSharpSymbolUse GetSymbolDeclaration(int offset) =>
-      ResolvedSymbolsCache.GetSymbolDeclaration(SourceFile, offset);
+      FcsCapturedInfo.GetSymbolDeclaration(offset);
 
     public IDocument StandaloneDocument { get; set; }
 

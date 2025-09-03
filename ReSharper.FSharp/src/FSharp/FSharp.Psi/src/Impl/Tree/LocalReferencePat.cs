@@ -32,5 +32,6 @@ internal partial class LocalReferencePat
   public IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
   public FSharpSymbolReference Reference => ReferenceName?.Reference;
   public override ConstantValue ConstantValue => this.GetConstantValue();
-  public AccessRights GetAccessRights() => ModifiersUtil.GetAccessRights(AccessModifier);
+  public AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
+  public IFSharpParameter FSharpParameter => this.TryGetDeclaredFSharpParameter();
 }

@@ -1,14 +1,14 @@
 ﻿DeclarationBodyOnTheSameLine = NEVER
   unaffected by KeepExistingLineBreakBeforeDeclarationBody
 module M1 =
-  A
+    A
 
 module M2 =
-  A
+    A
 
 module M3 =
-  A.
-    B
+    A.
+        B
 
 ================
 DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
@@ -16,10 +16,10 @@ DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
 module M1 = A
 
 module M2 =
-  A
+    A
 
 module M3 = A.
-              B
+                B
 
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
@@ -28,8 +28,8 @@ module M1 = A
 module M2 = A
 
 module M3 =
-  A.
-    B
+    A.
+        B
 
 ================
 DeclarationBodyOnTheSameLine = ALWAYS
@@ -37,10 +37,10 @@ DeclarationBodyOnTheSameLine = ALWAYS
 module M1 = A
 
 module M2 =
-  A
+    A
 
 module M3 = A.
-              B
+                B
 
 ================
   KeepExistingLineBreakBeforeDeclarationBody = False
@@ -49,4 +49,4 @@ module M1 = A
 module M2 = A
 
 module M3 = A.
-              B
+                B

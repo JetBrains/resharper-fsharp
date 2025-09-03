@@ -10,14 +10,14 @@ let e1 = ()
 let f1 = ()
 
 let rec a2 =
-  ()
+    ()
 and b2 = ()
 and c2 = ()
 
 let rec a3 = ()
 and b3 = ()
 and c3 =
-  ()
+    ()
 ================
   BlankLinesAroundMultilineModuleMembers = 1
 module Module
@@ -32,7 +32,7 @@ let e1 = ()
 let f1 = ()
 
 let rec a2 =
-  ()
+    ()
 
 and b2 = ()
 and c2 = ()
@@ -41,7 +41,7 @@ let rec a3 = ()
 and b3 = ()
 
 and c3 =
-  ()
+    ()
 ================
 BlankLinesAroundSingleLineModuleMember = 1
   unaffected by BlankLinesAroundMultilineModuleMembers
@@ -60,7 +60,7 @@ let e1 = ()
 let f1 = ()
 
 let rec a2 =
-  ()
+    ()
 
 and b2 = ()
 
@@ -71,4 +71,4 @@ let rec a3 = ()
 and b3 = ()
 
 and c3 =
-  ()
+    ()

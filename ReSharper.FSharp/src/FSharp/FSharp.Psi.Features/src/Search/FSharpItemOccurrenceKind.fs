@@ -44,7 +44,7 @@ module FSharpOccurrenceKinds =
 [<ShellComponent>]
 type FsharpSpecificOccurrenceKindIconsProvider() =
     interface IOccurrenceKindIconProvider with
-        member this.GetImageId(occurrenceKind) =
+        member this.GetImageId(occurrenceKind, occurrence) =
             FSharpOccurrenceKinds.icons.TryGetValue(occurrenceKind)
 
         member this.GetPriority _ =
@@ -174,7 +174,7 @@ type FSharpItemOccurenceKindProvider() =
 
                     | true, true ->
                         let appExpr = getOutermostPrefixAppExpr refExpr
-                        if FSharpResolveUtil.isInTailRecursivePosition appExpr then
+                        if FSharpResolveUtil.isInTailRecursivePosition element appExpr then
                             [| FSharpOccurrenceKinds.recursiveInvocation |] :> _
                         else
                             [| FSharpOccurrenceKinds.nonTailRecursiveInvocation |] :> _

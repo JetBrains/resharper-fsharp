@@ -147,6 +147,7 @@ letBindingsDeclaration options { stubBase="DummyDeclaration"; }:
 bindingSignature extras {
   get { methodName="Attributes" path=<bindingSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<bindingSignature:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="ReturnTypeUsage" path=<bindingSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   VAL<VAL, BindingKeyword>
@@ -172,17 +173,19 @@ interface binding:
   topBinding |
   localBinding;
 
-topBinding extras {
+topBinding options { customImpl; } extras {
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="ParameterPatterns" path=<topBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="TypeUsage" path=<topBinding:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   bindingHeader
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
-localBinding extras {
+localBinding options { customImpl; } extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="ParameterPatterns" path=<localBinding:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="TypeUsage" path=<localBinding:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   bindingHeader
   fSharpExpression<EXPR, Expression>;
@@ -845,7 +848,7 @@ ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   elseClause{ELSE_CLAUSE, ElseExpr}?;
 
 elifExpr options { stubBase="FSharpExpressionBase"; }:
-  ELIF<ELIF, ElifKeyword>
+  ELIF<ELIF, IfKeyword>
   fSharpExpression<IF_EXPR, ConditionExpr>
   THEN<THEN, ThenKeyword>
   fSharpExpression<THEN_EXPR, ThenExpr>
@@ -1350,6 +1353,7 @@ wildSelfId options { stubBase="LocalDeclarationBase"; }:
 
 constructorSignature options { stubBase="ConstructorDeclarationBase"; } extras {
   get { methodName="Attributes" path=<constructorSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ReturnTypeUsage" path=<constructorSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -1371,13 +1375,12 @@ secondaryConstructorDeclaration options { stubBase="ConstructorDeclarationBase";
 
 
 
-// todo: fix properties with explicit setters
-
-memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; customImpl; } extras {
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="ParameterPatterns" path=<memberDeclaration:PARAMETERS_DECL/parametersPatternDeclaration:PATTERN> };
+  get { methodName="TypeUsage" path=<memberDeclaration:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1401,6 +1404,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
 memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<memberSignature:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<memberSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ReturnTypeUsage" path=<memberSignature:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?
@@ -1427,6 +1431,7 @@ private memberKeyword{ROLE, Getter}:
 abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractMemberDeclaration:TYPE_PARAMETER_LIST/postfixTypeParameterDeclarationList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<abstractMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="ReturnTypeUsage" path=<abstractMemberDeclaration:RETURN_INFO/returnTypeInfo:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   STATIC<STATIC, StaticKeyword>?  
@@ -1449,7 +1454,7 @@ valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
   COLON<FSHARP_COLON, Colon>
   typeUsage<TYPE, TypeUsage>;
 
-autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extras {
+autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; customImpl; }  extras {
   get { methodName="Expression" path=<autoPropertyDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   get { methodName="Attributes" path=<autoPropertyDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
@@ -1458,6 +1463,10 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
   memberKeyword{MEMBER, MemberKeyword}
   VAL<VAL, ValKeyword>
   IDENTIFIER<IDENTIFIER, Identifier>
+  (
+    COLON<FSHARP_COLON, Colon>
+    typeUsage<TYPE, TypeUsage>
+  )?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
   accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
@@ -1908,7 +1917,7 @@ parenTypeUsage:
   typeUsage<TYPE, InnerTypeUsage>
   RPAREN<RPAREN, RightParen>;
 
-parameterSignatureTypeUsage:
+parameterSignatureTypeUsage options { stubBase="LocalDeclarationBase"; customImpl; }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   QMARK<QMARK, OptionalMark>?
   (

@@ -9,6 +9,7 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <NoWarn>FS0057</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
@@ -113,6 +114,7 @@
     <Compile Include="src\QuickFixes\FSharpImportTypeFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithTripleQuotedInterpolatedStringFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceReturnTypeFix.fs" />
+    <Compile Include="src\QuickFixes\ChangeTypeFix.fs" />
     <Compile Include="src\QuickFixes\XmlDocFixes.fs" />
     <Compile Include="src\QuickFixes\UpdateParameterNameInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\SignatureFixUtil.fs" />
@@ -125,8 +127,7 @@
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceLambdaWithDotLambdaFix.fs" />
     <Compile Include="src\QuickFixes\ToObjectExpressionFix.fs" />
-    <Compile Include="src\QuickFixes\ImportExtensionMemberFix.fs" />
-    <Compile Include="src\QuickFixes\FSharpImportModuleMemberFix.fs" />
+    <Compile Include="src\QuickFixes\ImportMemberFix.fs" />
     <Compile Include="src\DisableWarning\DisableWarningActionProvider.fs" />
     <Compile Include="src\ZoneMarker.fs" />
     <ErrorsGen Include="..\FSharp.Psi.Services\src\Daemon\Highlightings\Errors.xml">

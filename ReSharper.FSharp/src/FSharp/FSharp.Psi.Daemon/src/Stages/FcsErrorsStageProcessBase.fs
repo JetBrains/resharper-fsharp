@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Diagnostics.ExtendedData
 open FSharp.Compiler.Symbols
@@ -12,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -61,6 +63,7 @@ module FSharpErrors =
     let [<Literal>] MissingErrorNumber = 193
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] ValueMustBeMutable = 256
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldWasPresent = 311
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer = 312
     let [<Literal>] DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified = 313
@@ -110,6 +113,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     let document = daemonProcess.Document
     let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
+    let cachedFcsDiagnostics = Dictionary()
 
     let getDocumentRange (error: FSharpDiagnostic) =
         if error.StartLine = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
@@ -171,6 +175,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | null -> null
         | parent -> highlightingCtor (parent, error.Message) :> _
 
+    let createSetExprTargetHighlighting highlightingCtor (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
+        let setExpr = fsFile.GetNode<ISetExpr>(range)
+        if isNull setExpr then createGenericHighlighting error range else
+
+        let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
+        if isNull refExpr then createGenericHighlighting error range else
+        
+        highlightingCtor refExpr :> _ 
+
     /// Finds the smallest node of the corresponding type at offset.
     let createHighlightingFromNodeAtOffset highlightingCtor offset: IHighlighting =
         match fsFile.FindTokenAt(TreeOffset(offset)) with
@@ -185,48 +198,40 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
         if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
 
+    let createCachedDiagnostic error range =
+        let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, range)
+        cachedFcsDiagnostics[diagnosticInfo.Offset] <- error
+        diagnosticInfo
+
+    let createTypeMismatchHighlighting highlightingCtor range error : IHighlighting =
+        match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+        | null -> null
+        | expr ->
+            let diagnosticInfo = createCachedDiagnostic error range
+            highlightingCtor (diagnosticInfo, expr, error.Message) :> _
+
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation ->
-            let createTypeMismatchHighlighting highlightingCtor expected actual : IHighlighting =
-                match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
-                | null -> null
-                | expr -> highlightingCtor (expected, actual, expr, error.Message) :> _
-
             match error.ExtendedData with
-            | Some(:? TypeMismatchDiagnosticExtendedData as data)
-                when data.ContextInfo = DiagnosticContextInfo.OmittedElseBranch ->
+            | Some(:? TypeMismatchDiagnosticExtendedData as data) when
+                    data.ContextInfo = DiagnosticContextInfo.OmittedElseBranch ->
                 createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
-            | Some(:? TypeMismatchDiagnosticExtendedData as data)
-                // TODO: currently FollowingPatternMatchClause context info can be returned
-                // even if the expression is not returned from the end of the branch
-                when data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
-                let displayContext = data.DisplayContext
-                createTypeMismatchHighlighting
-                    MatchClauseWrongTypeError
-                        (data.ExpectedType.Format(displayContext))
-                        (data.ActualType.Format(displayContext))
+            | Some(:? TypeMismatchDiagnosticExtendedData as data) when
+                    // TODO: currently FollowingPatternMatchClause context info can be returned
+                    // even if the expression is not returned from the end of the branch
+                    data.ContextInfo = DiagnosticContextInfo.FollowingPatternMatchClause ->
+                createTypeMismatchHighlighting MatchClauseWrongTypeError range error
 
             | Some(:? TypeMismatchDiagnosticExtendedData as data) ->
-                let expectedType = data.ExpectedType
-                let actualType = data.ActualType
-                let displayContext = data.DisplayContext
-
-                if expectedType.IsTupleType && actualType.IsTupleType &&
-                   expectedType.GenericArguments.Count <> actualType.GenericArguments.Count then
-                   createTypeMismatchHighlighting
-                       TypeMisMatchTuplesHaveDifferingLengthsError
-                           (expectedType.Format(displayContext))
-                           (actualType.Format(displayContext))
-
+                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> getResultExpr
+                if isNull expr then
+                    null
+                elif isUnit data.ExpectedType then
+                    createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                 else
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                let expr = getResultExpr expr
-
-                if isNull expr then null
-                elif isUnit expectedType then createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-                else TypeEquationError(FSharpDiagnosticTypeInfo.Create(actualType, displayContext), expr, error.Message) :> _
+                    createTypeMismatchHighlighting TypeEquationError range error
 
             | _ -> createGenericHighlighting error range
 
@@ -343,13 +348,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromParentNodeWithMessage EnumMatchIncompleteWarning range error
 
         | ValNotMutable ->
-            let setExpr = fsFile.GetNode<ISetExpr>(range)
-            if isNull setExpr then createGenericHighlighting error range else
-
-            let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
-            if isNull refExpr then createGenericHighlighting error range else
-
-            ValueNotMutableError(refExpr) :> _
+            createSetExprTargetHighlighting ValueNotMutableError error range
 
         | ValueNotContainedMutability ->
             match error.ExtendedData with
@@ -371,6 +370,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             match typeDecl.PrimaryConstructorDeclaration with
             | null -> createGenericHighlighting error range
             | ctorDecl -> OnlyClassCanTakeValueArgumentsError(ctorDecl) :> _
+
+        | ValueMustBeMutable ->
+            createSetExprTargetHighlighting ValueMustBeMutableError error range
 
         | DefinitionsInSigAndImplNotCompatibleFieldWasPresent ->
             createHighlightingFromParentNodeWithMessage DefinitionsInSigAndImplNotCompatibleFieldWasPresentError range error
@@ -555,9 +557,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
             | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
-                if isUnit data.ExpectedType then createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-                if isNotNull expr then TypeConstraintMismatchError(data.ActualType.Format(data.DisplayContext), expr, error.Message) else null
+                if isUnit data.ExpectedType then
+                    createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
+
+                createTypeMismatchHighlighting TypeConstraintMismatchError range error
 
             | _ -> null
 
@@ -569,6 +572,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
 
         | _ -> createGenericHighlighting error range
+
+    abstract CacheDiagnostics: bool
+    default this.CacheDiagnostics = false
 
     abstract ShouldAddDiagnostic: error: FSharpDiagnostic * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpDiagnostic, _) =
@@ -597,5 +603,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     consumer.ConsumeHighlighting(HighlightingInfo(highlighting.CalculateRange(), highlighting))
 
             Interruption.Current.CheckAndThrow()
+
+        if x.CacheDiagnostics then
+            fsFile.FcsCapturedInfo.SetCachedDiagnostics(cachedFcsDiagnostics)
 
         committer.Invoke(DaemonStageResult(consumer.CollectHighlightings()))

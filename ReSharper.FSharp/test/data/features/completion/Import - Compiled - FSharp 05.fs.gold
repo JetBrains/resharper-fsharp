@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:Record (in Ns.ModuleInNs.NestedModule)}
+
+module Module
+
+open Ns.ModuleInNs.NestedModule
+
+Record{caret}

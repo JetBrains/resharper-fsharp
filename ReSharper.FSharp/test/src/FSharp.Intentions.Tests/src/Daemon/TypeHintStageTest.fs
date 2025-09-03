@@ -12,6 +12,7 @@ open NUnit.Framework
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Always)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Always)>]
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowForOtherPatterns", PushToHintMode.Always)>]
 type TypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -21,9 +22,11 @@ type TypeHintStageTest() =
     [<Test>] member x.``Settings 01 - Show all``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Never)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowForOtherPatterns", PushToHintMode.Never)>]
     [<Test>] member x.``Settings 02 - Top level``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowForOtherPatterns", PushToHintMode.Never)>]
     [<Test>] member x.``Settings 03 - Locals``() = x.DoSettingsTest()
 
     [<TestSetting(typeof<GeneralInlayHintsOptions>, "EnableInlayHints", false)>]
@@ -32,9 +35,15 @@ type TypeHintStageTest() =
     [<TestSetting(typeof<GeneralInlayHintsOptions>, "DefaultMode", PushToHintMode.Never)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Default)>]
     [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Default)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowForOtherPatterns", PushToHintMode.Default)>]
     [<Test>] member x.``Settings 05 - Disabled 02 - By mode``() = x.DoSettingsTest()
 
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForTopLevelMembers", PushToHintMode.Never)>]
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowTypeHintsForLocalBindings", PushToHintMode.Never)>]
+    [<Test>] member x.``Settings 06 - Other patterns``() = x.DoSettingsTest()
+
     [<Test>] member x.``Patterns 01``() = x.DoNamedTest()
+    [<Test>] member x.``Patterns 02 - Other``() = x.DoNamedTest()
 
     [<Test>] member x.``Unfinished declarations and expressions 01``() = x.DoNamedTest()
 

@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExpectedTypes
@@ -35,10 +36,9 @@ type NamedUnionCaseFieldsPatRule() =
         let fcsUnionCase = referenceName.Reference.GetFcsSymbol().As<FSharpUnionCase>()
         if isNull fcsUnionCase then None else
 
-        let displayContext = referenceName.Reference.GetSymbolUse().DisplayContext
         let fieldNames =
             fcsUnionCase.Fields
-            |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format(displayContext)))
+            |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format()))
             |> Seq.toArray
 
         if Set.isEmpty filterFields then Some fieldNames else

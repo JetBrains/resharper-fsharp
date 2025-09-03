@@ -1,13 +1,13 @@
 ﻿Provided elements:
- 0: Equals(System.Object):System.Boolean
+ 0: Equals(System.Object?):System.Boolean
  1: GetHashCode():System.Int32
- 2: ToString():System.String
+ 2: ToString():System.String?
  3: Finalize():System.Void
 
 // ${KIND:Overrides}
-// ${SELECT0:ToString():System.String}
+// ${SELECT0:ToString():System.String?}
 
-type C = 
-  struct // some comment
-    override this.ToString() = {selstart}failwith "todo"{selend}
-  end 
+type C =
+    struct // some comment
+        override this.ToString() = {selstart}failwith "todo"{selend}
+    end 

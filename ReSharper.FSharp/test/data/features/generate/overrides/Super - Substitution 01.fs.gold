@@ -1,10 +1,10 @@
 ﻿Provided elements:
  0: M(System.Int32):System.Void
  1: M(T):System.Void
- 2: ToString():System.String
- 3: Equals(System.Object):System.Boolean
+ 2: Equals(System.Object?):System.Boolean
+ 3: Finalize():System.Void
  4: GetHashCode():System.Int32
- 5: Finalize():System.Void
+ 5: ToString():System.String?
 
 // ${KIND:Overrides}
 // ${SELECT0:M(System.Int32):System.Void}
@@ -18,5 +18,5 @@ type A<'T>() =
 type T() =
     inherit A<double>()
 
-    override this.M(var0: int): unit = failwith "todo"
-    override this.M(var0: double): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: int): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: double): unit = failwith "todo"

@@ -29,5 +29,15 @@ type RegexpHighlightingTest() =
 
     [<Test>] member x.``Detection 02 - Regex type provider``() = x.DoNamedTest()
     [<Test>] member x.``Detection 03 - Active pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Detection 04``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Detection - Compiled 01``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Detection - Compiled 02 - Extension``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Detection - Compiled 03 - Extension``() = x.DoNamedTest()
 
     [<Test>] member x.``Injection 01 - Comments``() = x.DoNamedTest()

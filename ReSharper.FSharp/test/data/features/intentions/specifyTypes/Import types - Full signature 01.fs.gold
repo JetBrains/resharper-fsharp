@@ -1,0 +1,16 @@
+﻿namespace Test
+
+open System
+open System.Collections.Generic
+open System.IO
+
+module A =
+    open System.IO
+    open System.Collections.Generic
+
+    let f (x: MemoryStream) (y: Queue<int>) = "".GetType()
+
+module B =
+    open A
+
+    let g{caret} (x: MemoryStream) (y: Queue<int>) : Type = f x y 

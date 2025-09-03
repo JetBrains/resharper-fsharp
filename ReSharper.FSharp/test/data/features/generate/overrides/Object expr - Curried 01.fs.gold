@@ -1,9 +1,9 @@
 ﻿Provided elements:
  0: M(System.Int32,System.Int32,System.Double,System.Double):System.Void
- 1: ToString():System.String
- 2: Equals(System.Object):System.Boolean
+ 1: Equals(System.Object?):System.Boolean
+ 2: Finalize():System.Void
  3: GetHashCode():System.Int32
- 4: Finalize():System.Void
+ 4: ToString():System.String?
 
 // ${KIND:Overrides}
 // ${SELECT0:M(System.Int32,System.Int32,System.Double,System.Double):System.Void}
@@ -12,5 +12,5 @@ type T() =
     abstract M: int * int -> double * double -> unit
     default this.M(i1, i2) (d1, d2) = ()
 
-{ new T() with 
-  override this.M(var0, var1) (var2, var3) = {selstart}base.M(var0, var1) (var2, var3){selend} }
+{ new T() with
+    override this.M(var0, var1) (var2, var3) = {selstart}base.M(var0, var1) (var2, var3){selend} }

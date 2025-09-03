@@ -1,0 +1,7 @@
+﻿Project Files:Type def - Enum 01.fs:
+FSharpProjectFilePart:ImplFile
+ NamedModulePart:M->M
+  EnumPart:E->M+E
+[]: Namespace:
+ [M]: FSharpModule:M[TestProject]
+  [E]: FSharpEnum:M+E[TestProject]

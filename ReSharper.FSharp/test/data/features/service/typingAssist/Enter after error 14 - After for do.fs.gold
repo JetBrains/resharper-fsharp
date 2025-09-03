@@ -4,4 +4,4 @@ module Module
 do
    for i in
             [] do
-     {caret}
+       {caret}

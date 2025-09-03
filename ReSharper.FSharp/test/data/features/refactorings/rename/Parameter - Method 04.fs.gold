@@ -1,0 +1,6 @@
+﻿module Module
+
+type T() =
+    static M(zzz: int, b: int) = zzz |> ignore
+
+T.M(zzz = 1, b = 2)

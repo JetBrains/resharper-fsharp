@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
+open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -10,6 +11,8 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -19,6 +22,9 @@ open JetBrains.Util
 
 type FcsSymbolInfo(text, symbolUse: FSharpSymbolUse) =
     inherit TextualInfo(text, text)
+
+    override this.MakeSafe(text) =
+        FSharpNamingService.mangleNameIfNecessary text
 
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = if isNotNull symbolUse then symbolUse.Symbol else Unchecked.defaultof<_>
@@ -64,6 +70,8 @@ module rec LocalValuesRule =
                 | _ -> ()
 
         for parentNode in context.ContainingNodes() do
+            Interruption.Current.CheckAndThrow()
+
             match parentNode with
             | :? IMatchClause as matchClause ->
                 addPatternValues matchClause.Pattern
@@ -165,7 +173,7 @@ type LocalValuesRule() =
                 if isNull fcsSymbolUse then null else
 
                 match getReturnType fcsSymbolUse.Symbol with
-                | Some t -> RichText(t.Format(fcsSymbolUse.DisplayContext))
+                | Some t -> RichText(t.Format())
                 | _ -> null
 
             collector.Add(item)
@@ -180,5 +188,5 @@ type LocalValuesRule() =
             let fcsLookupItem = item.As<FcsLookupItem>()
             isNotNull fcsLookupItem &&
 
-            values.ContainsKey(fcsLookupItem.Text)
+            values.ContainsKey(fcsLookupItem.DisplayName)
         )

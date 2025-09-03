@@ -4,4 +4,4 @@
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal class 'M1' here
+(0): ReSharper Underlined Error Highlighting: Cannot access public class 'M1' here

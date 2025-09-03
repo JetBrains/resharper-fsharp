@@ -2,5 +2,5 @@
 module Module
 
 if true then 
-  match true with
-  | {caret} 
+    match true with
+    | {caret} 

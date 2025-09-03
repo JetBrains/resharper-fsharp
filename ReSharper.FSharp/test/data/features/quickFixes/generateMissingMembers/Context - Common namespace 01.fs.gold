@@ -9,8 +9,10 @@ type A() =
 
 namespace Ns1.Ns3
 
+open Ns1.Ns2
+
 type B() =
     inherit Ns1.Ns2.A()
 
-    override this.M(var0: int): unit = failwith "todo"
-    override this.M(var0: Ns1.Ns2.T): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: int): unit = {selstart}failwith "todo"{selend}
+    override this.M(var0: T): unit = failwith "todo"

@@ -135,3 +135,9 @@ let (|Int|) (x: MyStruct) : int = Int(x.myInt)
 let (|String|) (x: MyStruct) : string = String(x.myString)
 
 let f1 (x & Int(i) & String(s)) = ()
+
+type B() =
+    member _.P1 with set (_: int) = ()
+    member _.P1 with set (_: string) = ()
+    member _.P2 with get () = 5 
+    member _.P3 with get () = 5 and set (_: int) = () 

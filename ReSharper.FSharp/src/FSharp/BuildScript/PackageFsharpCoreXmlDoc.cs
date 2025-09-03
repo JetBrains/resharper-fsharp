@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 using JetBrains.Application.BuildScript;
 using JetBrains.Application.BuildScript.Compile;
 using JetBrains.Application.BuildScript.Solution;
 using JetBrains.Build;
+using JetBrains.Lifetimes;
 using JetBrains.Util;
 using JetBrains.Util.Special;
 using JetBrains.Util.Storage;
@@ -23,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.BuildScript
     public static readonly string AssemblySimpleName = "FSharp.Core";
 
     [BuildStep]
-    public static ImmutableArray<SubplatformFileForPackaging> Run(AllAssembliesOnEverything allass, RetrievedPackageReferenceArtifact[] retrs)
+    public static async Task<ImmutableArray<SubplatformFileForPackaging>> Run(AllAssembliesOnEverything allass, PackageReferencesBuildHelper references, Lifetime lifetime, ILogger logger)
     {
       if(allass.FindSubplatformByClass<PackageFsharpCoreXmlDoc>() is not SubplatformOnSources subplatform)
         return ImmutableArray<SubplatformFileForPackaging>.Empty;
@@ -31,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.BuildScript
       // Find package
       // * by name
       // * we're referencing
-      IJetNugetPackage nupkg = retrs.Where(retr => string.Equals(retr.Package.Identity.Id, AssemblySimpleName, StringComparison.OrdinalIgnoreCase)).Where(retr => retr.PackageReferences.Any(pkgref => pkgref.ReferencingSubplatformName == subplatform.Name)).OrderBy(retr => retr.Package).SingleOrFirstErr("Cannot find the single referenced package {0} in our subplatform {1}.", AssemblySimpleName.QuoteIfNeeded(), subplatform.QuoteIfNeeded()).Package;
+      IJetNugetPackage nupkg = await references.GetPackageByNameAsync(lifetime, AssemblySimpleName, $"{AssemblySimpleName} reference for F# XmlDoc", logger);
 
       // Doc file
       string nameOfXmlDoc = AssemblySimpleName + ExtensionConstants.Xml;

@@ -1,0 +1,7 @@
+﻿// ${BULB_TEXT:Add type annotation}
+
+module Module
+
+open System.Collections.Generic
+
+let f (KeyValue(x, y) as (z: KeyValuePair<'a,'b>){caret}) = ()

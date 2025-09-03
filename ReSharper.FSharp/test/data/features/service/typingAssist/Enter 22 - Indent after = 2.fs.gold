@@ -3,5 +3,5 @@ module Module
 
 let foo =
     let foo =
-      {caret}
+        {caret}
     ()

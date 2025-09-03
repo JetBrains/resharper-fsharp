@@ -2,4 +2,4 @@
 module Module
 
 ignore (
-  {caret})
+    {caret})

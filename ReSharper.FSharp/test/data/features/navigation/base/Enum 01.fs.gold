@@ -1,83 +1,99 @@
 ﻿## NavigateToBaseProvider activity:
   Show context popup menu `Base types of 'E'`:
-    [*] DEO: Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN as Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    [*] DEO: Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN as Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersAbstract,ModifiersPublic)
       text: **Enum** <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: Enum.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public abstract class |CARET|Enum : ValueType, IComparable, IFormattable, IConvertible
-        {
-          private static readonly char[] enumSeperatorCharArray = new char[1]
+      namespace System;
+
+      public abstract class |CARET|Enum : ValueType, IComparable, IConvertible, ISpanFormattable, IFormattable
+      {
+        public int CompareTo(object? target);
       ------------------
 
-    DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: IComparable <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IComparable.cs
       ------------------
-        [ComVisible(true)]
-        [__DynamicallyInvokable]
-        public interface |CARET|IComparable
-        {
-          [__DynamicallyInvokable]
+      namespace System;
+
+      public interface |CARET|IComparable
+      {
+        int CompareTo(object? obj);
       ------------------
 
-    DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: IConvertible <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IConvertible.cs
       ------------------
-        [CLSCompliant(false)]
-        [__DynamicallyInvokable]
-        public interface |CARET|IConvertible
-        {
-          [__DynamicallyInvokable]
+
+      [CLSCompliant(false)]
+      public interface |CARET|IConvertible
+      {
+        TypeCode GetTypeCode();
       ------------------
 
-    DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
       text: IFormattable <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: IFormattable.cs
       ------------------
-        [ComVisible(true)]
-        [__DynamicallyInvokable]
-        public interface |CARET|IFormattable
-        {
-          [__DynamicallyInvokable]
+      namespace System;
+
+      public interface |CARET|IFormattable
+      {
+        string ToString(string? format, IFormatProvider? formatProvider);
       ------------------
 
-    DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+    DEO: Envoy: Interface:System.ISpanFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.ISpanFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
+    Menu item (enabled) :
+      icon: u(PsiSymbolTypicalSizePlaceholder,Interface,ModifiersPublic)
+      text: ISpanFormattable <font color="FF6D6D6D"> (in System)</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
+      tail icon: Assembly
+    Navigation result:
+      opened file: ISpanFormattable.cs
+      ------------------
+      namespace System;
+
+      public interface |CARET|ISpanFormattable : IFormattable
+      {
+        bool TryFormat(
+      ------------------
+
+    DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ System.Runtime
     Menu item (enabled) :
       icon: u(PsiSymbolTypicalSizePlaceholder,Class,ModifiersAbstract,ModifiersPublic)
       text: ValueType <font color="FF6D6D6D"> (in System)</font>
-      tail: <font color="FF6D6D6D">mscorlib, 4.0.0.0</font>
+      tail: <font color="FF6D6D6D">System.Runtime, 8.0.0.0</font>
       tail icon: Assembly
     Navigation result:
       opened file: ValueType.cs
       ------------------
-        [__DynamicallyInvokable]
-        [Serializable]
-        public abstract class |CARET|ValueType
-        {
-          [SecuritySafeCritical]
+      namespace System;
+
+      public abstract class |CARET|ValueType
+      {
+        public override bool Equals([NotNullWhen(true)] object? obj);
       ------------------
 
 

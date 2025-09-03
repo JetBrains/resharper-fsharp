@@ -133,6 +133,9 @@ type AssemblyReaderCSharpTest() =
 
     [<Test>] member x.``Type def - Namespace 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type def - Nested 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Nested 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type parameter 01``() = x.DoNamedTest()
 
 

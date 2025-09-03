@@ -4,4 +4,4 @@ module Module
 do
    if true &&
        false then
-     {caret}
+       {caret}

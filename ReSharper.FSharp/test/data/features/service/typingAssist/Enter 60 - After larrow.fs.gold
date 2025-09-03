@@ -2,4 +2,4 @@
 module Module
 
 let foo n = n <-
-  {caret}
+    {caret}

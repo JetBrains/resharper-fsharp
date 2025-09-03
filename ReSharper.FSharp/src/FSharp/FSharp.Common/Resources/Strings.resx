@@ -28,4 +28,10 @@
     <data name="FSharpTypeHints_HideSameLinePipe_Description" xml:space="preserve">
         <value>Hide when |&gt; is on same line as argument</value>
     </data>
+    <data name="FSharpTypeHints_OtherPatterns_Description" xml:space="preserve">
+        <value>Type hints for other patterns</value>
+    </data>
+    <data name="FSharpTypeHints_OtherPatternsSettings_Header" xml:space="preserve">
+        <value>Other patterns</value>
+    </data>
 </root>

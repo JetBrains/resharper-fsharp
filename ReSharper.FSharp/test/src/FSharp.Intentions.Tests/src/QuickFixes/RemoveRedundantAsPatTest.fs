@@ -10,3 +10,5 @@ type RemoveRedundantAsPatTest() =
 
     [<Test>] member x.``Redundant as pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Redundant as pat 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Redundant as pat 03``() = x.DoNamedTest()
+    [<Test>] member x.``Redundant as pat 04``() = x.DoNamedTest()

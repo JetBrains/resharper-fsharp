@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
+open JetBrains.ReSharper.Intentions.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
@@ -43,3 +44,10 @@ and FSharpRefactoringsHelper() =
 
     override this.IsValidIntroduceInnerExpression(expr) =
         FSharpIntroduceVariable.IsValidInnerExpression(expr)
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpEncapsulateFieldActionHelper() =
+    inherit EncapsulateFieldAction.DefaultHelper()
+
+    override this.TryGetSelectedFieldLikeDeclaration(_, _) = null

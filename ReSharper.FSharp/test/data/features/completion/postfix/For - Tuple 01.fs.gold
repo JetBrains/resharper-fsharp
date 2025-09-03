@@ -3,4 +3,4 @@
 module Module
 
 for i, s in [1, ""] do
-  {caret}
+    {caret}

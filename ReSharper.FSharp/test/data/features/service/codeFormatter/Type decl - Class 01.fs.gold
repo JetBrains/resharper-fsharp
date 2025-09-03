@@ -3,25 +3,25 @@
 namespace Namespace
 
 type T1() =
-  class end
+    class end
 
 type T2() =
-  class
-  end
+    class
+    end
 
 type T3() =
-  class end
+    class end
 ================
 DeclarationBodyOnTheSameLine = IF_OWNER_IS_SINGLE_LINE
   KeepExistingLineBreakBeforeDeclarationBody = True
 namespace Namespace
 
 type T1() =
-  class end
+    class end
 
 type T2() =
-  class
-  end
+    class
+    end
 
 type T3() = class end
 ================
@@ -31,8 +31,8 @@ namespace Namespace
 type T1() = class end
 
 type T2() =
-  class
-  end
+    class
+    end
 
 type T3() = class end
 ================
@@ -41,11 +41,11 @@ DeclarationBodyOnTheSameLine = ALWAYS
 namespace Namespace
 
 type T1() =
-  class end
+    class end
 
 type T2() =
-  class
-  end
+    class
+    end
 
 type T3() = class end
 ================
@@ -55,6 +55,6 @@ namespace Namespace
 type T1() = class end
 
 type T2() = class
-  end
+    end
 
 type T3() = class end

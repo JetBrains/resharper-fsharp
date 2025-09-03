@@ -45,3 +45,5 @@ and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
             logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typeCheck:" + errors)
 
         x.Execute(fileErrors, committer)
+
+    override this.CacheDiagnostics = true

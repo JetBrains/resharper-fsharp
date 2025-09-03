@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Syntax;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -14,8 +15,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
   public class FSharpCompiledModule : FSharpCompiledClassBase, IFSharpModule
   {
-    public ModuleMembersAccessKind AccessKind { get; }
-
     public string[] LiteralNames { get; }
     public string[] ValueNames { get; }
     public string[] FunctionNames { get; }
@@ -27,8 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
     public override ICollection<ICompiledExtensionMemberProxy> ExtensionMembers =>
       ArrayModule.Append(base.ExtensionMembers.AsArray(), myExtensionMemberInfos);
 
-    public FSharpCompiledModule(FSharpCompiledTypeRepresentation.Module repr,
-      FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
+    public FSharpCompiledModule([NotNull] FSharpCompiledTypeRepresentation.Module repr,
+      [NotNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(entity, parent, builder, info)
     {
       AccessKind = GetModuleMembersAccessKind(info);
@@ -125,13 +124,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
       }
     }
 
+    public override ModuleMembersAccessKind AccessKind { get; }
+
     public bool IsAnonymous =>
       Representation is FSharpCompiledTypeRepresentation.Module module && module.nameKind.IsAnon;
 
+    public bool HasModuleSuffix =>
+      Representation is FSharpCompiledTypeRepresentation.Module module && module.nameKind.IsHasModuleSuffix;
+
     public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
     public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
+    public bool HasAssociatedType => AssociatedTypeElement != null;
 
-    public ITypeElement AssociatedTypeElement => null; // todo
+    public ITypeElement AssociatedTypeElement => TryGetAssociatedTypeElement(); // todo: cache
     public string QualifiedSourceName => this.GetQualifiedName();
 
     private static ModuleMembersAccessKind GetModuleMembersAccessKind(IMetadataTypeInfo info)
@@ -143,6 +148,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
         return ModuleMembersAccessKind.RequiresQualifiedAccess;
 
       return ModuleMembersAccessKind.Normal;
+    }
+
+    private ITypeElement TryGetAssociatedTypeElement()
+    {
+      if (!HasModuleSuffix)
+        return null;
+
+      var sourceName = SourceName;
+
+      var symbolScope = Module.GetModuleOnlySymbolScope(true);
+      if (GetContainingType() is { } containingType)
+        return containingType.NestedTypes.FirstOrDefault(HasSameName);
+
+      var containingNamespace = GetContainingNamespace();
+      return containingNamespace.GetNestedTypeElements(symbolScope).FirstOrDefault(HasSameName);
+
+      bool HasSameName(ITypeElement typeElement) =>
+        !Equals(typeElement) && typeElement.TypeParametersCount == 0 && typeElement.GetSourceName() == sourceName;
     }
   }
 }

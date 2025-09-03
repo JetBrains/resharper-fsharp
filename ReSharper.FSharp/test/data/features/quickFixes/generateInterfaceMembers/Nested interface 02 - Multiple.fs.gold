@@ -13,6 +13,6 @@ type C =
 
 type T() =
   interface C with
-    member this.P1 = failwith "todo"
-    member this.P2 = failwith "todo"
-    member this.P3 = {selstart}failwith "todo"{selend}
+      member this.P1 = {selstart}failwith "todo"{selend}
+      member this.P2 = failwith "todo"
+      member this.P3 = failwith "todo"

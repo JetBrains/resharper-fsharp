@@ -14,5 +14,4 @@ type RemoveInlineFix(error: LocalClassBindingsCannotBeInlineError) =
         isValid binding && binding.IsInline
 
     override x.ExecutePsiTransaction _ =
-        use disableFormatter = new DisableCodeFormatter()
         binding.SetIsInline(false)

@@ -22,9 +22,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     public override void LoadAssembly(IMetadataAssembly assembly, IAssemblyPsiModule containingModule)
     {
-      FSharpMetadata = FSharpMetadataReader.ReadMetadata(containingModule, assembly);
-      base.LoadAssembly(assembly, containingModule);
-      FSharpMetadata = null;
+      try
+      {
+        FSharpMetadata = FSharpMetadataReader.ReadMetadata(containingModule, assembly);
+        base.LoadAssembly(assembly, containingModule);
+      }
+      finally
+      {
+        FSharpMetadata = null;
+      }
     }
 
     protected override ReflectionElementPropertiesProvider CreateReflectionElementPropertiesProvider() =>

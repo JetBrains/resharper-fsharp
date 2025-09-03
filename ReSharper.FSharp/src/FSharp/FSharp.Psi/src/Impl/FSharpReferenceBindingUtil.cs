@@ -66,6 +66,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static void SetRequiredQualifiers([NotNull] this FSharpSymbolReference reference,
       [NotNull] IClrDeclaredElement declaredElement, [NotNull] ITreeNode context)
     {
+      if (reference.IsQualified)
+        return;
+
       var containingType = declaredElement.GetContainingType();
       if (containingType == null)
       {
@@ -97,7 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (containingType.Equals(typeDecl.DeclaredElement))
           return;
 
-      reference.SetQualifier(containingType);
+      reference.SetQualifier(containingType, context);
     }
   }
 }

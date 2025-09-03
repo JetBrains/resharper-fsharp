@@ -1,0 +1,4 @@
+﻿module Module
+
+type T() =
+    static M(zzz: int) = zzz |> ignore

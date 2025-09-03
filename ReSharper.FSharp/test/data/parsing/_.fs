@@ -1,10 +1,7 @@
-namespace global
+module Module
 
-type T() =
-  member _.Item
-    with get (_: int) = 0
-    and set (_: int) (_: int) = ()
+[<CompiledName("InterfaceDataVersionAttrConcatTypeName")>]
+let interfaceDataVersionAttrConcatTypeName =
+    StringDotConcat("Microsoft.FSharp.Core", "FSharpInterfaceDataVersionAttribute");
 
-  member _.Item
-    with get (_: string) = 0
-    and set (_: int) (_: int) = ()
+let isFSharpAssemblyKey = Key("IsFSharpAssembly")

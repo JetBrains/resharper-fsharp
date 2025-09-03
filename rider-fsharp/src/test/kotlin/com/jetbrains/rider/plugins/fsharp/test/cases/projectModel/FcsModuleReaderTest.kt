@@ -5,20 +5,22 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
-import com.jetbrains.rdclient.testFramework.executeWithGold
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
-import com.jetbrains.rider.plugins.fsharp.test.fcsHost
-import com.jetbrains.rider.plugins.fsharp.test.withNonFSharpProjectReferences
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.withNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
@@ -30,14 +32,18 @@ import java.io.PrintStream
 import java.time.Duration
 
 @Test
-@TestEnvironment(sdkVersion = SdkVersion.LATEST_STABLE)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+@Solution("EmptySolution")
 class FcsModuleReaderTest : ProjectModelBaseTest() {
   companion object {
     private var launchCounter = 0
   }
 
-  override val testSolution: String = "EmptySolution"
-  override val restoreNuGetPackages = true
+  override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
+    super.modifyOpenSolutionParams(params)
+    params.restoreNuGetPackages = true
+    params.backendLoadedTimeout = Duration.ofMinutes(20)
+  }
 
   @AfterMethod(alwaysRun = true)
   fun tearDownTestCase() {
@@ -235,9 +241,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
       }
     }
   }
-
-  override val backendLoadedTimeout: Duration
-    get() = Duration.ofMinutes(20)
 
   @Solution("ProjectReferencesCSharp2")
   @Test

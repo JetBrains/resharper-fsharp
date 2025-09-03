@@ -1,12 +1,12 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 
+open System.Linq
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 let tryGetNamedArgRefExpr (expr: IFSharpExpression) =
     let binaryAppExpr = expr.As<IBinaryAppExpr>()
@@ -55,6 +55,19 @@ let getArgsOwner (expr: IFSharpExpression) =
     let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
     FSharpArgumentOwnerNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
 
+let getReferenceName (fsArgsOwner: IFSharpArgumentsOwner) =
+    let identifier =
+        match fsArgsOwner with
+        | :? IFSharpReferenceOwner as refOwner -> refOwner.FSharpIdentifier
+
+        | :? IPrefixAppExpr as prefixAppExpr ->
+            let invokedRefExpr = prefixAppExpr.InvokedReferenceExpression
+            if isNull invokedRefExpr then null else invokedRefExpr.Identifier
+
+        | _ -> null
+
+    if isNull identifier then null else identifier.Name
+
 let getReference (fsArgsOwner: IFSharpArgumentsOwner) =
     match fsArgsOwner with
     | :? IFSharpReferenceOwner as refOwner -> refOwner.Reference
@@ -83,17 +96,17 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else
 
-    let param =
-        let parameters = paramOwner.Parameters
-        if isNotNull namedArgRefExpr then
-            // If this is a named argument, but FCS couldn't match it, try matching ourselves by name
-            paramOwner.Parameters
-            |> Seq.tryFind (fun param -> param.ShortName = namedArgRefExpr.Reference.GetName())
-        else
-            match Seq.tryFindIndex expr.Equals argsOwner.ParameterArguments with
-            | None -> None
-            | Some paramIndex ->
+    if isNotNull namedArgRefExpr then
+        // If this is a named argument, but FCS couldn't match it, try matching ourselves by name
+        paramOwner.Parameters
+        |> Seq.tryFind (fun param -> param.ShortName = namedArgRefExpr.Reference.GetName())
+        |> Option.defaultValue null
+    else
+        match Seq.tryFindIndex expr.Equals argsOwner.ParameterArguments with
+        | None -> null
+        | Some argIndex ->
 
+        let paramIndex =
             let invokingExtensionMethod =
                 match fcsSymbol with
                 | :? FSharpMemberOrFunctionOrValue as mfv ->
@@ -101,16 +114,9 @@ let getMatchingParameter (expr: IFSharpExpression) =
                 | _ -> false
 
             let offset = if invokingExtensionMethod then 1 else 0
-            let paramIndex = paramIndex + offset
-            if paramIndex < parameters.Count then
-                Some(parameters[paramIndex])
-            else
-                None
+            argIndex + offset
 
-    // Skip unnamed parameters
-    match param with
-    | Some param when param.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> param
-    | _ -> null
+        paramOwner.Parameters.ElementAtOrDefault(paramIndex)
 
 let getFunExprAndPosition (expr: IFSharpExpression) =
     let expr = expr.NotNull().IgnoreParentParens()

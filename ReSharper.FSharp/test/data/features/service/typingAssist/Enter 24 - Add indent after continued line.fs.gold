@@ -4,4 +4,4 @@ module Module
 let x =
     foo (
             ) (fun _ ->
-      {caret})
+        {caret})

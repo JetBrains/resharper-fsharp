@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
+open JetBrains.Application.Parts
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -26,7 +27,7 @@ type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
 
         committer.Invoke(DaemonStageResult(highlightings))
 
-[<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<UnusedOpensStage> |])>]
+[<DaemonStage(Instantiation.DemandAnyThreadSafe, StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<UnusedOpensStage> |])>]
 type FormatSpecifiersStage() =
     inherit FSharpDaemonStageBase(true)
 

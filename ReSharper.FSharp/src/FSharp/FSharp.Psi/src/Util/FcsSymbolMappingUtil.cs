@@ -55,10 +55,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (typeElements.Length == 1)
           return typeElements[0];
 
-        // If there are multiple entities with given FQN, try to choose one based on assembly name or entity kind.
-        var fcsAssemblySimpleName = entity.Assembly?.SimpleName;
-        if (fcsAssemblySimpleName == null)
-          return null;
+        // If there are multiple entities with a given FQN, try to choose one based on the assembly name or entity kind.
+        var fcsAssemblySimpleName = entity.Assembly.SimpleName;
 
         var isModule = entity.IsFSharpModule;
         return typeElements.FirstOrDefault(typeElement =>
@@ -67,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
             return false;
 
           // Happens when there are an exception and a module with the same name.
-          // It's now allowed, but we want keep resolve working where possible.
+          // It's now allowed, but we want to keep resolve working where possible.
           if (typeElement is IFSharpDeclaredElement)
             return isModule == typeElement is IFSharpModule;
 
@@ -78,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var symbolScope = psiModule.GetSymbolScope(false);
       while (entity.IsFSharpAbbreviation)
       {
-        // FCS returns Clr names for non-abbreviated types only, using fullname
+        // FCS returns Clr names for non-abbreviated types only, using the fullname
         var typeElement = TryFindByNames(GetPossibleNames(entity), symbolScope);
         if (typeElement != null)
           return typeElement;
@@ -167,11 +165,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
               ? GetDeclaredElement(fieldUnionCase, psiModule, true) as ITypeElement
               : GetTypeElement(unionEntity, psiModule);
 
-          return fieldOwnerTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
+          return fieldOwnerTypeElement?.EnumerateOwnMembersWithName(field.Name, true).FirstOrDefault();
         }
 
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is { } fieldEntity)
-          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
+          return GetTypeElement(fieldEntity, psiModule)?.EnumerateOwnMembersWithName(field.Name, true).FirstOrDefault();
       }
 
       if (symbol is FSharpActivePatternCase patternCase)
@@ -238,15 +236,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (entity.IsProvided)
         return typeElement;
 
-      return typeElement is IFSharpTypeElement fsTypeElement and not ICompiledElement && !mfv.IsConstructor
+      return typeElement is IFSharpSourceTypeElement fsTypeElement && !mfv.IsConstructor
         ? GetFSharpSourceTypeMember(mfv, fsTypeElement)
         : GetTypeMember(mfv, typeElement);
     }
 
     private static IDeclaredElement GetFSharpSourceTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
-      [NotNull] IFSharpTypeElement fsTypeElement)
+      [NotNull] IFSharpSourceTypeElement fsTypeElement)
     {
-      var name = mfv.GetMfvCompiledName();
+      var name = mfv.GetMfvCompiledName(fsTypeElement);
 
       var symbolTableCache = fsTypeElement.GetPsiServices().Caches.GetPsiCache<SymbolTableCache>();
       var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);
@@ -304,10 +302,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] ITypeElement typeElement)
     {
-      var compiledName = mfv.GetMfvCompiledName();
+      var compiledName = mfv.GetMfvCompiledName(typeElement);
       var members = mfv.IsConstructor
         ? typeElement.Constructors.AsList<ITypeMember>()
-        : typeElement.EnumerateMembers(compiledName, true).AsList();
+        : typeElement.EnumerateOwnMembersWithName(compiledName, true).AsList();
 
       return ChooseTypeMember(mfv, members);
     }
@@ -366,7 +364,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var patternMfv = entity.MembersFunctionsAndValues.FirstOrDefault(mfv => mfv.LogicalName == patternName);
       var patternCompiledName = patternMfv?.CompiledName ?? patternCase.Name;
-      if (typeElement.EnumerateMembers(patternCompiledName, true).FirstOrDefault() is IMethod method)
+      if (typeElement.EnumerateOwnMembersWithName(patternCompiledName, true).FirstOrDefault() is IMethod method)
         return new CompiledActivePatternCase(method, patternCase.Name, patternCase.Index);
 
       return null;
@@ -401,7 +399,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         var patternName = activePattern.PatternName();
         var typeElement = GetTypeElement(declaringEntity, psiModule);
-        var patternElement = typeElement.EnumerateMembers(patternName, true).FirstOrDefault();
+        var patternElement = typeElement.EnumerateOwnMembersWithName(patternName, true).FirstOrDefault();
         return patternElement?.GetDeclarations().FirstOrDefault() as IFSharpDeclaration;
       }
 
@@ -458,7 +456,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
-      where T : IParametersOwner, IFSharpTypeParametersOwner
+      where T : IFSharpParameterOwner, IFSharpTypeParametersOwner
     {
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
@@ -474,29 +472,57 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (paramsCount == 0)
         return EmptyList<IParameter>.Instance;
 
-      var typeParameters = function.AllTypeParameters;
-      var methodParams = new List<IParameter>(paramsCount);
+      var result = new List<IParameter>(paramsCount);
+
       if (isFsExtension && mfv.IsInstanceMember)
-      {
-        var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(function.Module);
-
-        var type =
-          typeElement != null
-            ? TypeFactory.CreateType(typeElement)
-            : TypeFactory.CreateUnknownType(function.Module);
-
-        methodParams.Add(new FSharpExtensionMemberParameter(function, type));
-      }
+        result.Add(new FSharpExtensionMemberThisParameter(function));
 
       if (isVoidReturn)
-        return methodParams;
+        return result;
 
-      foreach (var paramsGroup in paramGroups)
-      foreach (var param in paramsGroup)
-        methodParams.Add(new FSharpMethodParameter(param, function, methodParams.Count,
-          param.Type.MapType(typeParameters, function.Module, true)));
+      foreach (var parameterGroup in function.FSharpParameterGroups)
+        result.AddRange(parameterGroup);
 
-      return methodParams;
+      return result;
+    }
+
+    public static IList<IList<IFSharpParameter>> GetFSharpParameterGroups<T>(this T function)
+      where T : IFSharpParameterOwner
+    {
+      var mfv = function.Mfv;
+      if (mfv == null)
+        return EmptyList<IList<IFSharpParameter>>.Instance;
+
+      var fcsParamGroups = mfv.CurriedParameterGroups;
+      var result = new List<IList<IFSharpParameter>>(fcsParamGroups.Count);
+      for (var groupIndex = 0; groupIndex < fcsParamGroups.Count; groupIndex++)
+      {
+        var fcsParamGroup = fcsParamGroups[groupIndex];
+        var isSingleParamGroup = fcsParamGroup.Count == 1;
+        var paramGroup = new List<IFSharpParameter>(fcsParamGroup.Count);
+        result.Add(paramGroup);
+
+        for (var paramIndex = 0; paramIndex < fcsParamGroup.Count; paramIndex++)
+        {
+          var index = new FSharpParameterIndex(groupIndex, isSingleParamGroup ? null : paramIndex);
+          paramGroup.Add(new FSharpMethodParameter(function, index));
+        }
+      }
+
+      return result;
+    }
+
+    public static IFSharpParameter GetFSharpParameter<T>(this T function, FSharpParameterIndex index)
+      where T : IFSharpParameterOwner
+    {
+      var parameterGroup = function.FSharpParameterGroups.ElementAtOrDefault(index.GroupIndex);
+      if (parameterGroup == null)
+        return null;
+
+      if (index.ParameterIndex is not { } paramIndex)
+        return parameterGroup.Count == 1 ? parameterGroup[0] : null;
+
+      return parameterGroup.ElementAtOrDefault(paramIndex);
     }
   }
 }

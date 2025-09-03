@@ -1,0 +1,3 @@
+module Top
+
+[||].MethodIList{caret}()

@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using FSharp.Compiler.CodeAnalysis;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -13,7 +17,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopBinding : IFunctionDeclaration
+  internal partial class TopBindingStub : IFunctionDeclaration
   {
     /// A workaround for getting a declared element for binding in features like Find Usages results and
     /// file member navigation where we're looking for containing type member.
@@ -23,6 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       HeadPattern?.NestedPatterns.FirstOrDefault() as ITypeMemberDeclaration;
 
     public ITypeMember DeclaredElement => FirstDeclaration?.DeclaredElement;
+    public FSharpSymbolUse GetFcsSymbolUse() => (FirstDeclaration as IFSharpDeclaration)?.GetFcsSymbolUse();
+
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
 
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -65,11 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         throw new NotImplementedException();
 
       using var _ = WriteLockCookie.Create(IsPhysical());
-      var inlineKeyword = InlineKeyword;
-      if (inlineKeyword.PrevSibling is Whitespace whitespace)
-        ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
-      else
-        ModificationUtil.DeleteChild(inlineKeyword);
+      ModificationUtil.DeleteChild(InlineKeyword);
     }
 
     public bool IsMutable => MutableKeyword != null;
@@ -84,10 +86,43 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool HasParameters => !ParametersDeclarationsEnumerable.IsEmpty();
     public bool IsLiteral => Attributes.HasAttribute("Literal"); // todo: cache
+    public bool IsComputed => false;
+
+    [CanBeNull] private IReferencePat HeadReferencePat => HeadPattern as IReferencePat;
 
     IDeclaredElement IParameterOwnerMemberDeclaration.DeclaredElement =>
-      HeadPattern is IReferencePat rp
-        ? rp.DeclaredElement
-        : null;
+      HeadReferencePat?.DeclaredElement;
+
+    string IFSharpDeclaration.SourceName =>
+      HeadReferencePat?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    IFSharpParameterDeclaration IFSharpParameterOwnerDeclaration.GetParameterDeclaration(FSharpParameterIndex index) =>
+      this.GetBindingParameterPatterns().GetParameterDeclaration(index);
+
+    IList<IList<IFSharpParameterDeclaration>> IFSharpParameterOwnerDeclaration.GetParameterDeclarations() =>
+      this.GetBindingParameterDeclarations();
+
+    IFSharpIdentifier INameIdentifierOwner.NameIdentifier => null;
+
+    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => throw new InvalidOperationException();
+    string IFSharpDeclaration.CompiledName => throw new InvalidOperationException();
+    void IFSharpDeclaration.SetName(string name, ChangeNameKind changeNameKind) => throw new InvalidOperationException();
+    TreeTextRange IFSharpDeclaration.GetNameIdentifierRange() => throw new InvalidOperationException();
+    XmlDocBlock IFSharpDeclaration.XmlDocBlock => throw new InvalidOperationException();
+  }
+
+  internal class TopBinding : TopBindingStub
+  {
+    public override ITypeUsage SetTypeUsage(ITypeUsage typeUsage)
+    {
+      if (TypeUsage != null)
+        return base.SetTypeUsage(typeUsage);
+
+      var anchor = (ITreeNode)ParametersDeclarationsEnumerable.LastOrDefault() ?? HeadPattern;
+
+      var factory = this.CreateElementFactory();
+      var returnTypeInfo = ModificationUtil.AddChildAfter(anchor, factory.CreateReturnTypeInfo(typeUsage));
+      return returnTypeInfo.ReturnType;
+    }
   }
 }

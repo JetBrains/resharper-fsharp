@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -12,19 +15,14 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public abstract class FSharpMethodParameterBase : IParameter
+  public abstract class FSharpMethodParameterBase([NotNull] IParametersOwner owner, FSharpParameterIndex index)
+    : IFSharpParameter
   {
-    public readonly IParametersOwner Owner;
-    public readonly int Index;
+    public abstract IType Type { get; }
 
-    protected FSharpMethodParameterBase([NotNull] IParametersOwner owner, int index, [NotNull] IType type)
-    {
-      Type = type;
-      Owner = owner;
-      Index = index;
-    }
+    public readonly IParametersOwner Owner = owner;
 
-    public IType Type { get; }
+    public FSharpParameterIndex FSharpIndex => index;
 
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
@@ -49,6 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
     public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
     public abstract string ShortName { get; }
+    public abstract string SourceName { get; }
     public ITypeElement GetContainingType() => Owner.GetContainingType();
     public ITypeMember GetContainingTypeMember() => (ITypeMember) Owner;
 
@@ -56,27 +55,44 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract ParameterKind Kind { get; }
     public virtual bool IsVarArg => false;
 
-    public override bool Equals(object obj)
-    {
-      if (!(obj is FSharpMethodParameterBase parameter)) return false;
-
-      return Owner.Equals(parameter.Owner) &&
-             Index == parameter.Index;
-    }
-
-    public override int GetHashCode()
-    {
-      unchecked
-      {
-        return 197 * Owner.GetHashCode() + 47 * Index;
-      }
-    }
-
     public abstract IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource);
 
     public abstract IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName,
       AttributesSource attributesSource);
 
     public abstract bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource);
+
+    public IEnumerable<IFSharpParameterDeclaration> GetParameterOriginDeclarations()
+    {
+      if (ContainingParametersOwner is not { } owner)
+        return EmptyList<IFSharpParameterDeclaration>.Instance;
+
+      var result = new List<IFSharpParameterDeclaration>();
+      foreach (var ownerDecl in owner.GetDeclarations())
+      {
+        if (GetParameterOwnerDeclaration(ownerDecl) is not { } parameterOwnerDecl)
+          continue;
+
+        var paramDecl = parameterOwnerDecl.GetParameterDeclaration(index);
+        if (paramDecl is IFSharpPattern pat && pat.TryGetNameIdentifierOwner() is IFSharpParameterDeclaration paramPatternDecl)
+          result.Add(paramPatternDecl);
+        if (paramDecl is IParameterSignatureTypeUsage paramSigTypeUsage)
+          result.Add(paramSigTypeUsage);
+      }
+
+      return result;
+    }
+
+    [CanBeNull]
+    private static IFSharpParameterOwnerDeclaration GetParameterOwnerDeclaration(IDeclaration decl) =>
+      decl switch
+      {
+        IReferencePat refPat => refPat.Binding,
+        IFSharpParameterOwnerDeclaration paramOwnerDecl => paramOwnerDecl,
+        _ => null
+      };
+
+    public IEnumerable<ILocalVariable> GetParameterOriginElements() =>
+      GetParameterOriginDeclarations().OfType<ILocalVariable>();
   }
 }

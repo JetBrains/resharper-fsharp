@@ -3,4 +3,4 @@ module Module
 
 if true &&
         true then
-  {caret}5
+    {caret}5

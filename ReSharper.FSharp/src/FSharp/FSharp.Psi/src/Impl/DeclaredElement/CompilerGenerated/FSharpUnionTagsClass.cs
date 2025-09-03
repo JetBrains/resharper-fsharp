@@ -12,14 +12,11 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpUnionTagsClass : FSharpGeneratedMemberBase, IClass
+  public class FSharpUnionTagsClass([CanBeNull] TypeElement typeElement) : FSharpGeneratedMemberBase, IClass
   {
     private const string TagsClassName = "Tags";
 
-    public readonly TypeElement Union;
-
-    internal FSharpUnionTagsClass([CanBeNull] TypeElement typeElement) =>
-      Union = typeElement;
+    public readonly TypeElement Union = typeElement;
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CLASS;

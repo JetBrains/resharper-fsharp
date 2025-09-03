@@ -2,4 +2,4 @@
 module Module
 
 let foo = System.String(' ', 1)
-            {caret}.ToString()
+              {caret}.ToString()

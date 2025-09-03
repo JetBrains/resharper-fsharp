@@ -7,9 +7,9 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -17,7 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class ModulePartBase<T> : FSharpTypePart<T>, IModulePart
     where T : class, IModuleDeclaration
   {
-    private ExtensionMemberInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<ExtensionMemberInfo>.Instance;
+    private SourceExtensionMemberInfo[] FSharpExtensionMemberInfos { get; } = EmptyArray<SourceExtensionMemberInfo>.Instance;
+    public bool HasAssociatedType { get; }
 
     public string[] ValueNames { get; }
     public string[] FunctionNames { get; }
@@ -29,14 +30,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, shortName, memberDecoration, 0, cacheBuilder)
     {
-      var extensionMemberInfos = new LocalList<ExtensionMemberInfo>();
+      var extensionMemberInfos = new LocalList<SourceExtensionMemberInfo>();
 
       foreach (var fsDecl in EnumerateExtensionMembers(declaration))
       {
         // todo: use candidate type
-        var offset = fsDecl.GetTreeStartOffset().Offset;
         var sourceName = fsDecl.SourceName;
-        var extensionMemberInfo = new ExtensionMemberInfo(AnyCandidateType.INSTANCE, offset, sourceName, FSharpExtensionMemberKind.FSharpExtensionMember, this);
+        var extensionMemberInfo = new SourceExtensionMemberInfo(TypeDescriptor.ANY, fsDecl.GetTreeStartOffset(), sourceName, FSharpExtensionMemberKind.INSTANCE, this);
         extensionMemberInfos.Add(extensionMemberInfo);
       }
 
@@ -93,6 +93,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       LiteralNames = literalNames.ToArray();
       ActivePatternNames = activePatternNames.ToArray();
       ActivePatternCaseNames = activePatternCaseNames.ToArray();
+
+      HasAssociatedType =
+        declaration is INestedModuleDeclaration nestedModuleDecl &&
+        nestedModuleDecl.GetAssociatedTypeDeclaration(out _) != null;
     }
 
     private static IEnumerable<IFSharpDeclaration> EnumerateExtensionMembers(T declaration)
@@ -131,6 +135,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteStringArray(LiteralNames);
       writer.WriteStringArray(ActivePatternNames);
       writer.WriteStringArray(ActivePatternCaseNames);
+
+      writer.WriteBool(HasAssociatedType);
     }
 
     protected ModulePartBase(IReader reader) : base(reader)
@@ -138,9 +144,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       var extensionMemberCount = reader.ReadOftenSmallPositiveInt();
       if (extensionMemberCount != 0)
       {
-        var methods = new ExtensionMemberInfo[extensionMemberCount];
+        var methods = new SourceExtensionMemberInfo[extensionMemberCount];
         for (var i = 0; i < extensionMemberCount; i++)
-          methods[i] = new ExtensionMemberInfo(reader, FSharpExtensionMemberKind.FSharpExtensionMember, this);
+          methods[i] = new SourceExtensionMemberInfo(reader, FSharpExtensionMemberKind.INSTANCE, this);
         FSharpExtensionMemberInfos = methods;
       }
 
@@ -149,19 +155,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       LiteralNames = reader.ReadStringArray();
       ActivePatternNames = reader.ReadStringArray();
       ActivePatternCaseNames = reader.ReadStringArray();
+
+      HasAssociatedType = reader.ReadBool();
     }
 
-    public override HybridCollection<ITypeMember> FindExtensionMethod(ExtensionMemberInfo info)
+    public override ITypeMember FindExtensionMember(SourceExtensionMemberInfo info)
     {
       if (FSharpExtensionMemberInfos.Length > 0 && GetDeclaration() is { } decl)
         foreach (var fsDecl in EnumerateExtensionMembers(decl))
-          if (fsDecl.GetTreeStartOffset().Offset == info.Hash && fsDecl.DeclaredElement is ITypeMember typeMember)
-            return new HybridCollection<ITypeMember>(typeMember);
+          if (fsDecl.GetTreeStartOffset() == info.StartOffset)
+            return fsDecl.DeclaredElement as ITypeMember;
 
-      return base.FindExtensionMethod(info);
+      return base.FindExtensionMember(info);
     }
 
-    public override TypeElement CreateTypeElement() =>
+    public override TypeElement CreateTypeElement(IPsiModule module) =>
       new FSharpModule(this);
 
     public IEnumerable<ITypeMember> GetTypeMembers() =>
@@ -174,7 +182,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.NONE;
 
-    public override ExtensionMemberInfo[] ExtensionMemberInfos =>
+    public override SourceExtensionMemberInfo[] ExtensionMemberInfos =>
       ArrayModule.Append(CSharpExtensionMemberInfos, FSharpExtensionMemberInfos);
 
     public override MemberDecoration Modifiers

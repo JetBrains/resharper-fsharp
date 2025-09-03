@@ -2,7 +2,7 @@
 
     <dependencies>
         <plugin id="com.intellij.ml.llm"/>
-        <plugin id="org.intellij.intelliLang"/>
+        <module name="intellij.platform.langInjection"/>
     </dependencies>
 
     <extensions defaultExtensionNs="org.intellij.intelliLang">

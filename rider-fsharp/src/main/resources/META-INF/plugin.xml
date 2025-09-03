@@ -7,6 +7,7 @@
 
   <depends>com.intellij.modules.rider</depends>
   <depends>rider.intellij.plugin.appender</depends>
+  <depends>com.intellij.rider.rdclient.spellchecker</depends>
 
   <content>
     <module name="intellij.rider.plugins.fsharp/injections" />
@@ -21,6 +22,10 @@
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
+    <enterHandlerDelegate implementation="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpEnterHandlerDelegate"
+                          order="before EnterInLineCommentHandler, before EnterBetweenBracesHandler"/>
+    <editorActionHandler action="EditorBackSpace" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpBackspaceHandlerDelegate"
+                         id="fsharp.backspace.lang" order="before backspace.lang"/>
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <callHierarchyProvider language="F#" implementationClass="com.jetbrains.rider.inspections.callHierarchy.RiderCallHierarchyProvider"/>
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
@@ -47,10 +52,10 @@
     <programRunner order="first" implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptFsiRunner" />
     <projectModelViewExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpProjectModelViewExtensions"/>
     <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
-    <rdclient.codeStructureTextAttributeProvider filetype="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
+    <rdclient.codeStructureTextAttributeProvider language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <rider.debuggerSupportPolicy language="F#" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
-    <rider.extendedCodeStructure filetype="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
+    <rider.extendedCodeStructure language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.fileStructure.FSharpExtendedFileStructureSupport"/>
     <rider.run.dotNetProfileConsoleViewProvider implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpScriptConsoleViewProvider"/>
     <runConfigurationProducer implementation="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptConfigurationProducer"/>
     <runLineMarkerContributor language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.fsi.runScript.FSharpRunScriptMarkerContributor"/>

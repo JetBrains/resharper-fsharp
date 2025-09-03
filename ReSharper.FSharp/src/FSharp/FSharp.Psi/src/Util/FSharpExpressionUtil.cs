@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -10,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpExpressionUtil
   {
-    private static readonly NodeTypeSet SimpleValueExpressionNodeTypes =
+    private static readonly NodeTypeSet ourSimpleValueExpressionNodeTypes =
       new(
         ElementType.LITERAL_EXPR,
         ElementType.UNIT_EXPR,
@@ -29,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ElementType.WHILE_EXPR);
 
     public static bool IsSimpleValueExpression([CanBeNull] this IFSharpExpression fsExpr) =>
-      fsExpr.IgnoreInnerParens() is { } expr && SimpleValueExpressionNodeTypes[expr.NodeType];
+      fsExpr.IgnoreInnerParens() is { } expr && ourSimpleValueExpressionNodeTypes[expr.NodeType];
 
     public static bool IsLiteralExpression([CanBeNull] this IFSharpExpression fsExpr) =>
       fsExpr.IgnoreInnerParens() is ILiteralExpr literalExpr && literalExpr.IsConstantValue();
@@ -42,7 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static readonly Func<IFSharpExpression, bool> IsLambdaExpressionFunc = IsLambdaExpression;
 
     // TODO: change name
-    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn(this IFSharpExpression expression)
+    [CanBeNull]
+    public static IFSharpExpression GetOutermostParentExpressionFromItsReturn([NotNull] this IFSharpExpression expression, bool allowFromLambdaReturn = false)
     {
       var currentExpr = expression;
       while (true)
@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           continue;
         }
 
-        if (LambdaExprNavigator.GetByExpression(currentExpr) is LambdaExpr lambdaExpr)
+        if (allowFromLambdaReturn && LambdaExprNavigator.GetByExpression(currentExpr) is LambdaExpr lambdaExpr)
         {
           currentExpr = lambdaExpr;
           continue;

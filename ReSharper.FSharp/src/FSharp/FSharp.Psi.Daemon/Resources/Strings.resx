@@ -23,7 +23,7 @@
         <value>Copy inferred type</value>
     </data>
     <data name="InferredTypeCodeVisionProvider_TypeCopied_TooltipText" xml:space="preserve">
-        <value>Inferred type copied to clipboard</value>
+        <value>Inferred type copied to the clipboard</value>
     </data>
     <data name="FSharpTypeHints_TopLevelMembersSettings_Header" xml:space="preserve">
         <value>Top-level bindings and type members </value>
@@ -38,15 +38,18 @@
         <value>Local bindings</value>
     </data>
     <data name="FSharpTypeHints_TopLevelMembersSettings_Comment" xml:space="preserve">
-        <value>if the 'Never Show' option is selected, Code Vision inferred types will be shown</value>
+        <value>If 'Never Show' is selected, types inferred by Code Vision will be shown</value>
     </data>
     <data name="FSharpTypeHints_ShowPipeReturnTypes_Description" xml:space="preserve">
         <value>Show return type hints in |&gt; chains</value>
     </data>
     <data name="FSharpTypeHints_HideSameLinePipe_Description" xml:space="preserve">
-        <value>Hide when |&gt; is on same line as argument</value>
+        <value>Hide when |&gt; is on the same line as the argument</value>
     </data>
     <data name="FSharpTypeHints_PipesSettings_Header" xml:space="preserve">
         <value>Pipe operators</value>
+    </data>
+    <data name="FSharpTypeHints_OtherPatternsSettings_Header" xml:space="preserve">
+        <value>Other patterns</value>
     </data>
 </root>

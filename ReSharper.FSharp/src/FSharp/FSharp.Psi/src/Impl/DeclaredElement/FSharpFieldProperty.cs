@@ -86,10 +86,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType().GetRepresentationAccessRights();
 
     public virtual IParameter GetGeneratedParameter() =>
-      new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this, false);
+      GetContainingType().GetGeneratedConstructor() is IConstructor constructor
+        ? new FSharpGeneratedParameter(constructor, this, false)
+        : null;
   }
 
-  public interface IRecordField : IProperty, IRepresentationAccessRightsOwner, IMutableModifierOwner
+  public interface IRecordField : IProperty, IFSharpRepresentationAccessRightsOwner, IMutableModifierOwner
   {
   }
 }

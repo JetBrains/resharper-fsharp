@@ -10,7 +10,7 @@
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.7
+      FSharp.Core/9.0.100
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -30,7 +30,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -47,13 +47,13 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 
 ===================
@@ -68,7 +68,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.7
+      FSharp.Core/9.0.100
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -90,7 +90,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -107,14 +107,14 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 3:NewFolder[1]
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 
 ===================
@@ -129,7 +129,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.7
+      FSharp.Core/9.0.100
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -154,7 +154,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -171,15 +171,15 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 3:NewFolder[1]
   1:NewSub[1]
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 
 ===================
@@ -194,7 +194,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.7
+      FSharp.Core/9.0.100
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -218,7 +218,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -235,15 +235,15 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 3:NewSub[1]
 4:NewFolder[1]
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 
 ===================
@@ -258,7 +258,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/6.0.7
+      FSharp.Core/9.0.100
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -280,7 +280,7 @@ Project [Name:ClassLibrary, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -297,13 +297,13 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 3:NewFolder[1]
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/ClassLibrary.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 

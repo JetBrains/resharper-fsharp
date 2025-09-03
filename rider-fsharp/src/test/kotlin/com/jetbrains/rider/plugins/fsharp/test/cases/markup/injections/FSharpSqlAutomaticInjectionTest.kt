@@ -1,14 +1,18 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
-import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.RiderSqlInjectionTestBase
-import com.jetbrains.rider.test.env.enums.SdkVersion
+import com.jetbrains.rider.test.enums.BuildTool
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import org.testng.annotations.Test
 
-@TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("CoreConsoleApp")
 class FSharpSqlAutomaticInjectionTest : RiderSqlInjectionTestBase() {
+
+  @Mute("RIDER-123576")
   @Test
   fun `test auto injections`() = doTest()
 

@@ -1,4 +1,4 @@
 ﻿// ${CHAR:]}
 module Module
 
-let foo = [1{caret}]
+let foo = [ 1{caret} ]

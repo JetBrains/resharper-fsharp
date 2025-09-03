@@ -6,8 +6,8 @@ open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -32,7 +32,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
 
           refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
 
-    let mutable baseType: (FSharpType * FSharpDisplayContext) option = None
+    let mutable baseType: FSharpType option = None
 
     let getFcsEntity (typeUsage: ITypeUsage) =
         let namedTypeUsage = typeUsage.As<INamedTypeUsage>()
@@ -75,6 +75,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                     if not fcsEntity.IsInterface then acc else
 
                     pat.CheckerService.ResolveNameAtLocation(pat, ["obj"], false, "SpecifyParameterBaseTypeFix.getSuperTypes")
+                    |> List.tryHead
                     |> Option.map (fun symbolUse ->
                         match symbolUse.Symbol with
                         | :? FSharpEntity as fcsEntity -> loop (types, level + 1) (fcsEntity.AsType())
@@ -121,8 +122,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
 
-        let baseType, displayContext = baseType.Value
-        SpecifyTypes.specifyParameterType displayContext baseType pat
+        TypeAnnotationUtil.specifyPatternType baseType.Value pat
 
     override this.Execute(solution, textControl) =
         let fcsEntity, displayContext = getFcsEntity typeUsage |> Option.get
@@ -150,7 +150,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                 let richText = RichText(fcsType.Format(displayContext))
                 if isImmediateSuperType then
                     richText.SetStyle(JetFontStyles.Bold, 0, richText.Length) |> ignore
-                WorkflowPopupMenuOccurrence(richText, RichText.Empty, (fcsType, displayContext), icon))
+                WorkflowPopupMenuOccurrence(richText, RichText.Empty, fcsType, icon))
             |> List.toArray
 
         let occurrence =

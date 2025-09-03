@@ -54,8 +54,8 @@ module Util =
             x.Model :?> FSharpCustomRenameModel
 
 
-type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKind: ChangeNameKind) =
-    inherit ClrCustomRenameModel(declaredElement, reference, lifetime)
+type FSharpCustomRenameModel(declaredElement, reference, changeNameKind: ChangeNameKind) =
+    inherit ClrCustomRenameModel(declaredElement, reference)
 
     member x.ChangeNameKind = changeNameKind
 
@@ -68,6 +68,17 @@ type FSharpAnonRecordFieldAtomicRename(declaredElement, newName) =
         fieldProperty.SetName(newName) :> _
 
     override x.CompareReferencesOnMemberDeclarations(_, _) = 0
+
+type FSharpParameterAtomicRename(fsParam, newName, doNotAddBindingConflicts) =
+    inherit AtomicRename(fsParam, newName, doNotAddBindingConflicts)
+
+    override this.GetUpdatedPrimaryElement() = fsParam
+
+    override this.GetDeclarations(element) =
+        match element with
+        | :? IFSharpParameter as fsParam ->
+            fsParam.GetParameterOriginDeclarations().OfType<IDeclaration>().AsIList()
+        | _ -> EmptyList.Instance
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -113,15 +124,21 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
-        | :? IFSharpTypeElement as fsTypeElement ->
+        | :? IFSharpSourceTypeElement as fsTypeElement ->
             match fsTypeElement.GetModuleToUpdateName(newName) with
             | null -> EmptyArray.Instance :> _
             | fsModule -> [| fsModule |] :> _
 
+        | :? IFSharpParameter as fsParam ->
+            fsParam.GetParameterOriginElements() |> Seq.cast
+
         | _ -> EmptyArray.Instance :> _
 
-    override x.GetOptionsModel(declaredElement, reference, lifetime) =
-        FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
+    override this.UpdateSecondaryElement(element, newDeclaredElement) =
+        base.UpdateSecondaryElement(element, newDeclaredElement)
+
+    override x.GetOptionsModel(declaredElement, reference, _) =
+        FSharpCustomRenameModel(declaredElement, reference, (* todo *) ChangeNameKind.SourceName) :> _
 
     override x.IsValidName(decl: IDeclaration, _: DeclaredElementType, name: string) =
         namingService.IsValidName(decl.DeclaredElement, name)
@@ -214,25 +231,32 @@ type FSharpAtomicRenamesFactory() =
 
     override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
         match declaredElement with
-        | :? IFSharpAnonRecordFieldProperty ->
-            [| FSharpAnonRecordFieldAtomicRename(declaredElement, newName) :> AtomicRenameBase |] :> _
-        | _ ->
-            [| AtomicRename(declaredElement, newName, doNotAddBindingConflicts) |]
+        | :? IFSharpParameter -> [| FSharpParameterAtomicRename(declaredElement, newName, doNotAddBindingConflicts) |]
+        | :? IFSharpAnonRecordFieldProperty -> [| FSharpAnonRecordFieldAtomicRename(declaredElement, newName) |]
+        | _ -> [| AtomicRename(declaredElement, newName, doNotAddBindingConflicts) |]
 
 
 [<RenamePart>]
 type FSharpDeclaredElementForRenameProvider() =
+    let (|SecondaryElementOrigin|_|) (element: IDeclaredElement) =
+        match element with
+        | :? ISecondaryDeclaredElement as sde -> sde.OriginElement |> Option.ofObj
+        | _ -> None
+
+    let (|FSharpParameter|_|) (element: IDeclaredElement) =
+        match element with
+        | :? IReferencePat as refPat -> refPat.TryGetDeclaredFSharpParameter() |> Option.ofObj
+        | :? IParameterSignatureTypeUsage as paramSigTypeUsage -> paramSigTypeUsage.FSharpParameter |> Option.ofObj
+        | _ -> None
+
     interface IPrimaryDeclaredElementForRenameProvider with
         member x.GetPrimaryDeclaredElement(element, _) =
-            if element :? IDotLambdaId then null else
-            match element.As<ISecondaryDeclaredElement>() with
-            | null -> element
-            | generated when generated.IsReadOnly -> element
-            | generated ->
-
-            match generated.OriginElement with
-            | null -> element
-            | origin -> origin :> _
+            match element with
+            | :? IDotLambdaId
+            | :? IProvidedSecondaryDeclaredElement -> null
+            | SecondaryElementOrigin origin -> origin
+            | FSharpParameter fsParam -> fsParam
+            | _ -> element
 
 
 [<DerivedRenamesEvaluator>]
@@ -302,6 +326,6 @@ type AssociatedTypeRenameEvaluator() =
 type FSharpSuspiciousReferenceSearchService(searchFilter: FSharpSearchFilter) =
     inherit SuspiciousReferencesSearchService()
 
-    override this.TryGetKey(declaredElement, newName) = searchFilter.TryGetKey(declaredElement)
+    override this.TryGetKey(declaredElement, _) = searchFilter.TryGetKey(declaredElement)
     override this.CanContainSuspiciousReferences(sourceFile, key) = searchFilter.CanContainReferences(sourceFile, key)
 
