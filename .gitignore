@@ -2,3 +2,4 @@
 NuGet.Config
 .gradle/
 .idea
+*.user
