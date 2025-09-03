@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 type AddMissingSeqFix(expr: IComputationExpr) =
     inherit FSharpQuickFixBase()
@@ -28,8 +29,11 @@ type AddMissingSeqFix(expr: IComputationExpr) =
         use disableFormatter = new DisableCodeFormatter()
         
         let factory = expr.Expression.CreateElementFactory()
-        let seqExpr = factory.CreateExpr("seq")
-        let newAppExpr = factory.CreateAppExpr(seqExpr, expr, true)
+        let seqRef = factory.CreateReferenceExpr("seq") :> IFSharpExpression
+        let newAppExpr = factory.CreateAppExpr(seqRef, expr, true)
         
-        ModificationUtil.ReplaceChild(expr, newAppExpr) |> ignore  
+        let inserted = ModificationUtil.ReplaceChild(expr, newAppExpr)
+        
+        // Add parentheses only when required by the surrounding context (e.g., application or member access)
+        addParensIfNeeded inserted |> ignore  
         
