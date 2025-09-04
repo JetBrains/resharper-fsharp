@@ -172,10 +172,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     [NotNull]
-    public static string GetTypeParameterName([CanBeNull] this IIdentifier identifier)
+    public static string GetTypeParameterOrSourceName([CanBeNull] this IIdentifier identifier)
     {
       if (identifier == null) return SharedImplUtil.MISSING_DECLARATION_NAME;
-      return identifier.PrevSibling?.GetTokenType() == FSharpTokenType.QUOTE ? "'" + identifier.Name : identifier.Name;
+      return identifier is ITypeParameterId || identifier.PrevSibling?.GetTokenType() == FSharpTokenType.QUOTE
+        ? "'" + identifier.Name
+        : identifier.Name;
     }
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier) =>
