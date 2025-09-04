@@ -171,6 +171,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
+    [NotNull]
+    public static string GetTypeParameterName([CanBeNull] this IIdentifier identifier)
+    {
+      if (identifier == null) return SharedImplUtil.MISSING_DECLARATION_NAME;
+      return identifier.PrevSibling?.GetTokenType() == FSharpTokenType.QUOTE ? "'" + identifier.Name : identifier.Name;
+    }
+
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier) =>
       // todo: fix navigating inside escaped names
       identifier?.NameRange ?? TreeTextRange.InvalidRange;
