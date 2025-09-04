@@ -42,6 +42,7 @@
     <Compile Include="Refactorings\IntroduceVarTest.fs" />
     <Compile Include="Refactorings\InlineVarTest.fs" />
     <Compile Include="TypeProviders\PrimitiveTypesBoxerTest.fs" />
+    <Compile Include="AICore\FSharpFileSummarizerTest.fs" />
     <Compile Include="FSharpTodoTest.fs" />
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />

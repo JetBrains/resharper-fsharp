@@ -1,0 +1,6 @@
+﻿type Class1 inherit ResizeArray<int> (3-4)
+type Class1 new: unit -> Class1 (3-3)
+type Class2 inherit ResizeArray<int> (6-9)
+type Class2 new: unit -> Class2 (6-6)
+type Interface1 inherit IList<int> (11-14)
+type Interface2 inherit IList<int> (16-18)
