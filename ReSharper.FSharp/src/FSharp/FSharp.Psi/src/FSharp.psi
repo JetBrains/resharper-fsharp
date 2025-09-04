@@ -1667,13 +1667,13 @@ typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; } ext
   get { methodName="Attributes" path=<typeParameterOfTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; } extras {
   get { methodName="Attributes" path=<typeParameterOfMethodDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 
 typeConstraintsClause:
