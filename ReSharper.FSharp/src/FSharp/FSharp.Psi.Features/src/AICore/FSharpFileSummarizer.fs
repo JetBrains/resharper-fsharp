@@ -86,7 +86,7 @@ type private FileSummarizerVisitor() =
         | _ -> ""
 
     and formatTypeReferenceName (typeName: ITypeReferenceName) =
-        let name = typeName.ShortName
+        let name = typeName.Identifier.GetTypeParameterOrSourceName()
         let typeArgs = typeName.TypeArgumentList
         if isNull typeArgs then name else
         let typeUsages = typeArgs.TypeUsages
@@ -110,7 +110,7 @@ type private FileSummarizerVisitor() =
 
         let typeArgsRepresentation =
             typeParams
-            |> Seq.map _.NameIdentifier.GetTypeParameterName()
+            |> Seq.map _.NameIdentifier.GetTypeParameterOrSourceName()
             |> String.concat ", "
 
         match typeArgs with
