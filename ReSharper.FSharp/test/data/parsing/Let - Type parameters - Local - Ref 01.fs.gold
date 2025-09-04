@@ -16,8 +16,9 @@ IFSharpImplFile
             IPostfixTypeParameterDeclarationList
               FSharpTokenType+LessTokenElement(type:LESS, text:<)
               ITypeParameterOfMethodDeclaration
-                FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-                FSharpIdentifierToken(type:IDENTIFIER, text:T)
+                ITypeParameterId
+                  FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                  FSharpIdentifierToken(type:IDENTIFIER, text:T)
               FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

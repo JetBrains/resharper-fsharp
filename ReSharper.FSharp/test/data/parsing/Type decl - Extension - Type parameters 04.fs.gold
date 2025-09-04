@@ -9,13 +9,15 @@ IFSharpImplFile
         IPostfixTypeParameterDeclarationList
           FSharpTokenType+LessTokenElement(type:LESS, text:<)
           ITypeParameterOfTypeDeclaration
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:T1)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T1)
           FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeParameterOfTypeDeclaration
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:T2)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T2)
           FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+WithTokenElement(type:WITH, text:with)

@@ -368,13 +368,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
             x.ProcessTypeConstraint(typeConstraint)
         x.Done(mark, ElementType.TYPE_CONSTRAINTS_CLAUSE)
 
-    member x.ProcessTypeParameter(SynTyparDecl(attrs, SynTypar(IdentRange range, _, _), _, _), elementType) = // todo: constraints
+    member x.ProcessTypeParameter(SynTyparDecl(attrs, SynTypar(IdentRange identRange, _, _), _, _), elementType) = // todo: constraints
         let range = 
             match attrs with
-            | [] -> range
-            | attrList :: _ -> Range.unionRanges attrList.Range range
+            | [] -> identRange
+            | attrList :: _ -> Range.unionRanges attrList.Range identRange
 
         let mark = x.MarkAndProcessIntro(attrs, XmlDoc.Empty, null, range)
+        x.MarkAndDone(identRange, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, elementType)
 
     member x.ProcessUnionCaseType(caseType, fieldElementType) =

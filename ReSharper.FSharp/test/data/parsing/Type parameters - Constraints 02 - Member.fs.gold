@@ -10,8 +10,9 @@ IFSharpImplFile
           FSharpTokenType+LessTokenElement(type:LESS, text:<)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeParameterOfTypeDeclaration
-            FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            ITypeParameterId
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+              FSharpIdentifierToken(type:IDENTIFIER, text:T)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeConstraintsClause
             FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
