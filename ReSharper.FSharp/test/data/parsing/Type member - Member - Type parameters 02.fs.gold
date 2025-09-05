@@ -24,8 +24,9 @@ IFSharpImplFile
           IPostfixTypeParameterDeclarationList
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
             ITypeParameterOfMethodDeclaration
-              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-              FSharpIdentifierToken(type:IDENTIFIER, text:T)
+              ITypeParameterId
+                FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+                FSharpIdentifierToken(type:IDENTIFIER, text:T)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ITypeConstraintsClause
               FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
