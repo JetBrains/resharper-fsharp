@@ -121,6 +121,7 @@
     <Compile Include="src\QuickFixes\UpdateRecordFieldsInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\UpdateRecordFieldTypeInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\RemovePatternArgumentFix.fs" />
+    <Compile Include="src\QuickFixes\AddMissingSeqFix.fs" />
     <Compile Include="src\QuickFixes\AddSetterFix.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFix.fs" />
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxFix.fs" />
