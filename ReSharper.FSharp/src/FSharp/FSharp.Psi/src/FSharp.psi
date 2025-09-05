@@ -1595,7 +1595,7 @@ dotLambdaId options { stubBase="LocalDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
 typeParameterId:
-  QUOTE
+  QUOTE<QUOTE, Quote>
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 interface fSharpIdentifier:
