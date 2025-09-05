@@ -58,6 +58,8 @@ module M1 =
         interface System.Collections.Generic.IList<string> with
             member this.Add(item) = failwith "todo"
 
+        interface IEvent<'t> with
+
     module NestedModule =
         let x = 5
 

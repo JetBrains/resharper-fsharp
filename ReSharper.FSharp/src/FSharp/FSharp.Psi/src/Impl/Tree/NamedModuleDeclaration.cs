@@ -34,7 +34,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public string NamespaceName =>
-      QualifierReferenceName?.QualifiedName ?? 
+      QualifierReferenceName?.QualifiedName ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public string QualifiedName
+    {
+      get
+      {
+        var ns = NamespaceName;
+        if (!ns.IsEmpty() && ns != SharedImplUtil.MISSING_DECLARATION_NAME)
+          return ns + "." + SourceName;
+
+        return CompiledName;
+      }
+    }
   }
 }

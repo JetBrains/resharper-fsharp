@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.AICore
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.AI
 
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
