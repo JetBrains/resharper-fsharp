@@ -81,6 +81,7 @@ module FSharpErrors =
     let [<Literal>] InstanceMemberRequiresTarget = 673
     let [<Literal>] UnionCaseDoesNotTakeArguments = 725
     let [<Literal>] UnionCaseExpectsTupledArguments = 727
+    let [<Literal>] InvalidRecordSequenceOrComputationExpression = 740
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
@@ -102,7 +103,6 @@ module FSharpErrors =
     let [<Literal>] XmlDocSignatureCheckFailed = 3390
     let [<Literal>] InvalidXmlDocPosition = 3520
     let [<Literal>] ConstructDeprecatedSequenceExpressionsInvalidForm = 3873
-    let [<Literal>] InvalidRecordSequenceOrComputationExpression = 740
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -530,14 +530,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnionCaseDoesNotTakeArguments ->
             createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
 
-        | InvalidRecordSequenceOrComputationExpression ->
-            createHighlightingFromNode InvalidRecordSequenceOrComputationExpressionError range
-
         | ConstructDeprecatedSequenceExpressionsInvalidForm ->
             createHighlightingFromNode ConstructDeprecatedSequenceExpressionsInvalidFormError range
 
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
+
+        | InvalidRecordSequenceOrComputationExpression ->
+            createHighlightingFromNode InvalidRecordSequenceOrComputationExpressionError range
 
         | ConstructRequiresListArrayOrSequence ->
             createHighlightingFromParentNode YieldRequiresSeqExpressionError range
