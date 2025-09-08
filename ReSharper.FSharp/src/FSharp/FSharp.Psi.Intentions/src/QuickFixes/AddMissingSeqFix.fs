@@ -25,9 +25,6 @@ type AddMissingSeqFix(expr: IComputationExpr) =
         isValid expr
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-        
         let factory = expr.Expression.CreateElementFactory()
         let seqRef = factory.CreateReferenceExpr("seq") :> IFSharpExpression
         let newAppExpr = factory.CreateAppExpr(seqRef, expr, true)
