@@ -32,7 +32,7 @@ let isEnumMember (field: FSharpField) =
     | Some entity -> entity.IsEnum
     | _ -> false
 
-let formatMfv (mfv: FSharpMemberOrFunctionOrValue) (displayContext: FSharpDisplayContext) addParameterNames =
+let formatMfv addParameterNames (displayContext: FSharpDisplayContext) (mfv: FSharpMemberOrFunctionOrValue) =
     let append (stringBuilder: StringBuilder) (s: string) =
         stringBuilder.Append(s) |> ignore
 

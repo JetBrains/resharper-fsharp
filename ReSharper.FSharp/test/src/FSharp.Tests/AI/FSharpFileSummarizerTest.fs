@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.AICore
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.AI
 
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -16,14 +16,24 @@ type FSharpFileSummarizerTest() =
 
     override x.RelativeTestDataPath = "ai/summarizer"
 
-    [<Test>] member x.``Implementation file 01``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 02 - Top level module``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 03 - Unresolved type``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 04 - Type parameters``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 05 - Type parameters``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 06 - Inherit``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Implementation file 07 - Syntax error``() = x.DoNamedTestWithFs()
-    [<Test>] member x.``Signature file 01``() = x.DoNamedTestWithFsi()
+    [<Test>] member x.``Namespaces 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Modules 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Modules 02 - Top-level``() = x.DoNamedTestWithFs()
+
+    [<Test>] member x.``Let bindings 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Let bindings 02 - Signatures``() = x.DoNamedTestWithFsi()
+
+    [<Test>] member x.``Types 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Inherit 01``() = x.DoNamedTestWithFs()
+
+    [<Test>] member x.``Members 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Members 02 - Interface impls``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Members 03 - Signatures``() = x.DoNamedTestWithFsi()
+
+    [<Test>] member x.``Nested scopes 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Unresolved type 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Type parameters 01``() = x.DoNamedTestWithFs()
+    [<Test>] member x.``Syntax error 01``() = x.DoNamedTestWithFs()
 
     override x.DoTest(_: Lifetime, project: IProject) =
         let psiServices = x.Solution.GetPsiServices()
