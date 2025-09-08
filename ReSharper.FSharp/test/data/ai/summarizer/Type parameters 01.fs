@@ -1,7 +1,7 @@
 open System.Collections.Generic
 
 [<Interface>]
-type A<'t> =
+type A<'a, 'b when 'b :> IDisposable> =
     inherit IList<IList<string>>
     inherit IList<string list>
     inherit IList<(int * int) * int>

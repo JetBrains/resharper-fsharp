@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.Text
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -50,74 +49,21 @@ type private FileSummarizerVisitor() =
 
     static let displayContext = emptyDisplayContext
 
-    static let formatFcsSymbolType (fcsSymbol: FSharpSymbol) =
+    let formatFcsSymbolType (fcsSymbol: FSharpSymbol) =
         match fcsSymbol with
-        | :? FSharpEntity as entity -> entity.AsType().Format(displayContext)
-        | :? FSharpMemberOrFunctionOrValue as mfv -> formatMfv mfv displayContext true
+        | :? FSharpEntity as entity ->
+            let typars =
+                entity.GenericArguments
+                |> Seq.zip entity.GenericParameters
+                |> Seq.toList
+            entity.AsType().Instantiate(typars).Format(displayContext)
+
+        | :? FSharpMemberOrFunctionOrValue as mfv ->
+            formatMfv true displayContext mfv
+
         | _ -> "_"
 
-    static let rec formatTypeUsage (typeUsage: ITypeUsage) =
-        match typeUsage with
-        | :? INamedTypeUsage as typeUsage ->
-            formatTypeReferenceName typeUsage.ReferenceName
-
-        | :? ITupleTypeUsage as typeUsage ->
-            typeUsage.Items |> Seq.map formatTypeUsage |> String.concat " * "
-
-        | :? IParenTypeUsage as typeUsage ->
-            $"({formatTypeUsage typeUsage.InnerTypeUsage})"
-
-        | :? IFunctionTypeUsage as typeUsage ->
-            $"{formatTypeUsage typeUsage.ArgumentTypeUsage} -> {formatTypeUsage typeUsage.ReturnTypeUsage}"
-
-        | :? IArrayTypeUsage as typeUsage ->
-            $"{formatTypeUsage typeUsage.TypeUsage}[]"
-
-        | :? IAnonRecordTypeUsage as typeUsage ->
-           let fields =
-               typeUsage.Fields
-               |> Seq.map (fun field -> $"{field.ReferenceName.ShortName}: {formatTypeUsage field.TypeUsage}")
-               |> String.concat "; "
-           $"{{|{fields}|}}"
-
-        | :? IWithNullTypeUsage as typeUsage ->
-            $"{formatTypeUsage typeUsage.TypeUsage} | null"
-
-        | _ -> ""
-
-    and formatTypeReferenceName (typeName: ITypeReferenceName) =
-        let name = typeName.Identifier.GetTypeParameterOrSourceName()
-        let typeArgs = typeName.TypeArgumentList
-        if isNull typeArgs then name else
-        let typeUsages = typeArgs.TypeUsages
-        if Seq.isEmpty typeUsages then name else
-
-        let typeArgsRepresentation =
-            typeUsages
-            |> Seq.map formatTypeUsage
-            |> String.concat ", "
-
-        match typeArgs with
-        | :? IPrefixAppTypeArgumentList -> $"{name}<{typeArgsRepresentation}>"
-        | _ -> $"{typeArgsRepresentation} {name}"
-
-    let formatTypeOrExtDeclaration (typeDecl: IFSharpTypeOrExtensionDeclaration) =
-        let name = typeDecl.SourceName
-        let typeArgs = typeDecl.TypeParameterDeclarationList
-        if isNull typeArgs then name else
-        let typeParams = typeArgs.TypeParameters
-        if Seq.isEmpty typeParams then name else
-
-        let typeArgsRepresentation =
-            typeParams
-            |> Seq.map _.NameIdentifier.GetTypeParameterOrSourceName()
-            |> String.concat ", "
-
-        match typeArgs with
-        | :? IPostfixTypeParameterDeclarationList ->  $"{name}<{typeArgsRepresentation}>"
-        | _ -> $"{typeArgsRepresentation} {name}"
-
-    static let addBinding (binding: IBindingLikeDeclaration) (context: SummarizerContext) =
+    let addBinding (binding: IBindingLikeDeclaration) (context: SummarizerContext) =
         let referencePat = binding.HeadPattern.As<IReferencePat>()
         if isNull referencePat then () else
 
@@ -125,12 +71,12 @@ type private FileSummarizerVisitor() =
         let representation = $"val {referencePat.GetFcsSymbol().DisplayName}: {typeRepr}"
         context.AddEntity(binding, representation)
 
-    static let addConstructor (constructor: IConstructorSignatureOrDeclaration) (context: SummarizerContext) =
+    let addConstructor (constructor: IConstructorSignatureOrDeclaration) (context: SummarizerContext) =
         let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbolType
         let representation = $"new: {typeRepr}"
         context.AddEntity(constructor, representation)
 
-    static let addMember (memberDecl: IOverridableMemberDeclaration) (context: SummarizerContext) =
+    let addMember (memberDecl: IOverridableMemberDeclaration) (context: SummarizerContext) =
         let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType
         let accessorNames =
             match memberDecl with
@@ -173,7 +119,7 @@ type private FileSummarizerVisitor() =
 
     override x.VisitNamedModuleDeclaration(moduleDecl, context) =
         // Currently, we're not adding a top-level module to the scope to not duplicate its name in tokens
-        context.AddEntity(moduleDecl, "module " + moduleDecl.ClrName)
+        context.AddEntity(moduleDecl, "module " + moduleDecl.QualifiedName)
         x.VisitNode(moduleDecl, context)
 
     override x.VisitNestedModuleDeclaration(moduleDecl, context) =
@@ -185,19 +131,25 @@ type private FileSummarizerVisitor() =
         use _ = context.OpenScope(moduleDecl, scopeRepr)
         x.VisitNode(moduleDecl, context)
 
-    override x.VisitFSharpTypeDeclaration(typeDecl: IFSharpTypeDeclaration, context) =
-        let inheritMembers = typeDecl.TypeOrInterfaceInheritMembers
-        let inheritsRepr =
-            if Seq.isEmpty inheritMembers then "" else
-            let inherits =
-                inheritMembers
-                |> Seq.map _.TypeName
-                |> Seq.filter isNotNull
-                |> Seq.map formatTypeReferenceName
-                |> String.concat ", "
-            if inherits = "" then "" else $"inherit {inherits}"
+    override x.VisitFSharpTypeDeclaration(typeDecl, context) =
+        let inheritMembers =
+            typeDecl.TypeOrInterfaceInheritMembers
+            |> Seq.map _.TypeName
+            |> Seq.filter isNotNull
+            |> Seq.map (fun x -> formatFcsSymbolType (x.Reference.GetFcsSymbol()))
+            |> String.concat ", "
 
-        let typeRepr = formatTypeOrExtDeclaration typeDecl
+        let inheritsRepr =
+            if inheritMembers = "" then "" else $"inherit {inheritMembers}"
+
+        let typeRepr =
+            let name = typeDecl.SourceName
+            let typars =
+                typeDecl.TypeParameterDeclarations
+                |> Seq.map (fun x -> "'" + x.SourceName)
+                |> String.concat ", "
+
+            if typars = "" then name else $"{name}<{typars}>"
 
         use _ = context.OpenScope(typeDecl, $"type {typeRepr}", inheritsRepr)
         x.VisitNode(typeDecl, context)
@@ -206,8 +158,8 @@ type private FileSummarizerVisitor() =
         use _ = context.OpenScope(exceptionDecl, $"exception {exceptionDecl.SourceName}")
         x.VisitNode(exceptionDecl, context)
 
-    override x.VisitTypeExtensionDeclaration(extensionDecl: ITypeExtensionDeclaration, context) =
-        let extensionRepr = formatTypeOrExtDeclaration extensionDecl
+    override x.VisitTypeExtensionDeclaration(extensionDecl, context) =
+        let extensionRepr = extensionDecl.GetFcsSymbol() |> formatFcsSymbolType
 
         use _ = context.OpenScope(extensionDecl, $"type {extensionRepr}", "with")
         x.VisitNode(extensionDecl, context)
@@ -216,7 +168,7 @@ type private FileSummarizerVisitor() =
         let typeName = interfaceImpl.TypeName
         if isNull typeName then () else
 
-        let interfaceRepr = formatTypeReferenceName typeName
+        let interfaceRepr = typeName.Reference.GetFcsSymbol() |> formatFcsSymbolType
 
         use _ = context.OpenScope(interfaceImpl, $"interface {interfaceRepr}")
         x.VisitNode(interfaceImpl, context)

@@ -103,7 +103,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv mfv emptyDisplayContext false
+            let text = formatMfv false emptyDisplayContext mfv
             x.AddHighlighting(consumer, binding, text)
 
         | :? FSharpField as field ->
@@ -119,6 +119,6 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv mfv emptyDisplayContext false
+            let text = formatMfv false emptyDisplayContext mfv
             x.AddHighlighting(consumer, decl, text)
         | _ -> ()

@@ -1,0 +1,6 @@
+﻿namespace N.N1 (1-9)
+module M1 (5-9)
+module M1.M2 (6-9)
+module M1.M2 type T (7-9)
+module M1.M2 type T interface IDisposable (8-9)
+module M1.M2 type T interface IDisposable member Dispose: unit -> unit (9-9)

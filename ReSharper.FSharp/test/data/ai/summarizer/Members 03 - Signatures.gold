@@ -1,0 +1,6 @@
+﻿module Module (1-9)
+type Type inherit ResizeArray<int> (3-9)
+type Type interface IEnumerable<string> (5-5)
+type Type new: unit -> Type (7-7)
+type Type member Method: x: int * y: int * int -> unit (8-8)
+type Type member Prop: int (9-9)
