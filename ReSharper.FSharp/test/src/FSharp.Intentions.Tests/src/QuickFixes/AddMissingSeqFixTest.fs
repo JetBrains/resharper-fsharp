@@ -10,7 +10,9 @@ type AddMissingSeqFixTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/addMissingSeqFix"
 
-    [<Test>] member x.``FS0740 Adds missing seq before sequential`` () = x.DoNamedTest()
+    [<Test>] member x.``FS0740 Adds missing seq before ce sequential`` () = x.DoNamedTest()
+    [<Test>] member x.``FS0740 Adds missing seq before foreach sequential`` () = x.DoNamedTest()
+    [<Test>] member x.``FS0740 Adds missing seq before let ce sequential`` () = x.DoNamedTest()
     [<Test>] member x.``FS0740 Adds parens when needed app`` () = x.DoNamedTest()
     [<Test>] member x.``FS0740 Adds parens when needed dot`` () = x.DoNamedTest()
     [<Test>] member x.``FS0740 Adds parens when needed multiline`` () = x.DoNamedTest()
