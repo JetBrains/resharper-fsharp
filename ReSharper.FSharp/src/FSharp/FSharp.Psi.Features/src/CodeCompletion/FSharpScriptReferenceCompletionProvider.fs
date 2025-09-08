@@ -98,7 +98,7 @@ type FSharpScriptReferenceCompletionContextProvider() =
         let document = context.Document
         let insertRange = DocumentRange(document, TextRange(rangesStart, caretOffset))
         let replaceRange = DocumentRange(document, TextRange(rangesStart, replaceRangeEnd))
-        let ranges = TextLookupRanges(insertRange, replaceRange)
+        let ranges = TextLookupRanges(insertRange, replaceRange, true)
 
         let completedPath = VirtualFileSystemPath.TryParse(argValue.Substring(0, prevSeparatorValueOffset + 1), InteractionContext.SolutionContext)
         FSharpScriptReferenceCompletionContext(context, token, completedPath, ranges, supportsNuget) :> _
