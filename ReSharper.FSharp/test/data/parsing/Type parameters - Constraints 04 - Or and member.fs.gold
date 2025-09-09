@@ -10,13 +10,15 @@ IFSharpImplFile
           FSharpTokenType+LessTokenElement(type:LESS, text:<)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeParameterOfTypeDeclaration
-            FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-            FSharpIdentifierToken(type:IDENTIFIER, text:T1)
+            ITypeParameterId
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+              FSharpIdentifierToken(type:IDENTIFIER, text:T1)
           FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeParameterOfTypeDeclaration
-            FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
-            FSharpIdentifierToken(type:IDENTIFIER, text:T2)
+            ITypeParameterId
+              FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
+              FSharpIdentifierToken(type:IDENTIFIER, text:T2)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeConstraintsClause
             FSharpTokenType+WhenTokenElement(type:WHEN, text:when)

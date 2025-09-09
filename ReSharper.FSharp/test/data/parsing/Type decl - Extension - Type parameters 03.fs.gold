@@ -7,8 +7,9 @@ IFSharpImplFile
       ITypeExtensionDeclaration
         IPrefixTypeParameterDeclarationList
           ITypeParameterOfTypeDeclaration
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:A)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

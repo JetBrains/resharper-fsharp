@@ -14,8 +14,9 @@ IFSharpSigFile
         IPostfixTypeParameterDeclarationList
           FSharpTokenType+LessTokenElement(type:LESS, text:<)
           ITypeParameterOfTypeDeclaration
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:a)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeConstraintsClause
             FSharpTokenType+WhenTokenElement(type:WHEN, text:when)

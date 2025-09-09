@@ -20,10 +20,10 @@ fun HighlighterIterator.asTokenIterator(): TokenIterator = object : TokenIterato
     get() = this@asTokenIterator.tokenTypeSafe
 
   override val tokenStart: Int
-    get() = this@HighlighterIterator.start
+    get() = this@asTokenIterator.start
 
-  override fun advance() = this@HighlighterIterator.advance()
-  override fun retreat() = this@HighlighterIterator.retreat()
+  override fun advance() = this@asTokenIterator.advance()
+  override fun retreat() = this@asTokenIterator.retreat()
 }
 
 fun getIndentSettings(editor: Editor) =

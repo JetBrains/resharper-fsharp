@@ -8,8 +8,9 @@ IFSharpImplFile
         IPrefixTypeParameterDeclarationList
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           ITypeParameterOfTypeDeclaration
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:A)

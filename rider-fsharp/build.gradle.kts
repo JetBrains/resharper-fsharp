@@ -1,10 +1,10 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
-import org.jetbrains.intellij.platform.gradle.tasks.BuildSearchableOptionsTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.pathString
@@ -256,9 +256,12 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "21"
-    compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
+  }
+
+  named<KotlinCompile>("compileTestKotlin") {
+    compilerOptions.freeCompilerArgs.add("-Xcontext-parameters")
   }
 
   val parserTest by register<Test>("parserTest") {
