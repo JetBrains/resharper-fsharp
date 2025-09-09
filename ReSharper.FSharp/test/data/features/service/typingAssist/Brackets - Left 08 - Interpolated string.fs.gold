@@ -1,4 +1,4 @@
-// ${CHAR:{}
+﻿// ${CHAR:{}
 module Module
 
-$" {{caret}id} "
+$" {id}{caret} "
