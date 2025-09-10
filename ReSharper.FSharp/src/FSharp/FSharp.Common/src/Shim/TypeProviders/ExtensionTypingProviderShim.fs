@@ -48,7 +48,7 @@ type TypeProvidersShim(solution: ISolution, toolset: ISolutionToolset,
 
     let getSolutionTypeProvidersClient () =
         let client = clients.GetValueSafe(TypeProvidersHostingScope.Solution)
-        if isNull client then null.As<ITypeProvidersClient>() else client.Value
+        if isNull client then Unchecked.defaultof<_> else client.Value
 
     let terminateConnections () =
         for client in clients.Values do
