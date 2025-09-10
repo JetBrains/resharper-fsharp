@@ -530,9 +530,6 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnionCaseDoesNotTakeArguments ->
             createHighlightingFromNode UnionCaseDoesNotTakeArgumentsError range
 
-        | ConstructDeprecatedSequenceExpressionsInvalidForm ->
-            createHighlightingFromNode ConstructDeprecatedSequenceExpressionsInvalidFormError range
-
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
 
@@ -570,6 +567,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             let expr = fsFile.GetNode<IDoLikeStatement>(range)
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
+
+        | ConstructDeprecatedSequenceExpressionsInvalidForm ->
+            createHighlightingFromNode ConstructDeprecatedSequenceExpressionsInvalidFormError range
 
         | _ -> createGenericHighlighting error range
 
