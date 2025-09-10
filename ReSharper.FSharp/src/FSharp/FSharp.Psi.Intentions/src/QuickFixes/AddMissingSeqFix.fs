@@ -28,8 +28,8 @@ type AddMissingSeqFix(expr: IComputationExpr) =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         
         let factory = expr.Expression.CreateElementFactory()
-        let seqRef = factory.CreateReferenceExpr("seq") :> IFSharpExpression
-        let newAppExpr = factory.CreateAppExpr(seqRef, expr, true)
+        let seqRefExpr = factory.CreateReferenceExpr("seq") :> IFSharpExpression
+        let newAppExpr = factory.CreateAppExpr(seqRefExpr, expr, true)
         
         let inserted = ModificationUtil.ReplaceChild(expr, newAppExpr)
         
