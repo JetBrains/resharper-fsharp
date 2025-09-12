@@ -81,6 +81,7 @@ module FSharpErrors =
     let [<Literal>] InstanceMemberRequiresTarget = 673
     let [<Literal>] UnionCaseDoesNotTakeArguments = 725
     let [<Literal>] UnionCaseExpectsTupledArguments = 727
+    let [<Literal>] InvalidRecordSequenceOrComputationExpression = 740
     let [<Literal>] ConstructRequiresListArrayOrSequence = 747
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
@@ -101,6 +102,7 @@ module FSharpErrors =
     let [<Literal>] SingleQuoteInSingleQuote = 3373
     let [<Literal>] XmlDocSignatureCheckFailed = 3390
     let [<Literal>] InvalidXmlDocPosition = 3520
+    let [<Literal>] ConstructDeprecatedSequenceExpressionsInvalidForm = 3873
 
     let isDirectiveSyntaxError number =
         number >= 232 && number <= 235
@@ -531,6 +533,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnionCaseExpectsTupledArguments ->
             createHighlightingFromNodeWithMessage UnionCaseExpectsTupledArgumentsError range error
 
+        | InvalidRecordSequenceOrComputationExpression ->
+            createHighlightingFromNode InvalidRecordSequenceOrComputationExpressionError range
+
         | ConstructRequiresListArrayOrSequence ->
             createHighlightingFromParentNode YieldRequiresSeqExpressionError range
 
@@ -562,6 +567,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             let expr = fsFile.GetNode<IDoLikeStatement>(range)
             if isNotNull expr then NamespaceCannotContainExpressionsError(expr) :> _ else null
+
+        | ConstructDeprecatedSequenceExpressionsInvalidForm ->
+            createHighlightingFromNode ConstructDeprecatedSequenceExpressionsInvalidFormError range
 
         | _ -> createGenericHighlighting error range
 
