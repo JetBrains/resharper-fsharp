@@ -1,0 +1,2 @@
+match x with
+| { F1 = f1{caret}; F3 = f3 } -> ()

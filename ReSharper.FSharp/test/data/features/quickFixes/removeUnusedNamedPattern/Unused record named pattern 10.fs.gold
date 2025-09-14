@@ -1,0 +1,3 @@
+match x with
+| { F1 = f1 // I'm a comment{caret}
+    F3 = f3 } -> ()
