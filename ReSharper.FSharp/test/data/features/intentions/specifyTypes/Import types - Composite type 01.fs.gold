@@ -18,4 +18,4 @@ module A =
 module B =
     open A
 
-    let y: Queue<(MemoryStream * BitArray | null -> (Type list -> {| A: int; B: Expression |}) -> unit)>{caret} = x
+    let y: Queue<(MemoryStream * (BitArray | null) -> (Type list -> {| A: int; B: Expression |}) -> unit)>{caret} = x

@@ -359,7 +359,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (!treeNode.TryGetFcsRange(documentRange, out var range)) return null;
 
       var checkResults = treeNode.GetCheckResults(nameof(TryGetFcsType));
-      return checkResults?.GetTypeOfExpression(range)?.Value;
+      return checkResults?.TryGetCapturedType(range)?.Value;
     }
 
     [CanBeNull]
@@ -369,7 +369,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (checkResults == null) return null;
 
       return treeNode.TryGetFcsRange(out var range)
-        ? checkResults.GetExpressionDisplayContext(range)?.Value
+        ? checkResults.TryGetCapturedDisplayContext(range)?.Value
         : null;
     }
 

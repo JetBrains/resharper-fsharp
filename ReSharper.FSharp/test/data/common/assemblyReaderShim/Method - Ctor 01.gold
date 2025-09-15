@@ -25,7 +25,7 @@ let _: ExplicitCtorPrivate = |ExplicitCtorPrivate|(2)()
 let _: ExplicitCtorPrivate = |new ExplicitCtorPrivate()|(3)
 
 type T4() =
-    |inherit ExplicitCtorPrivate()|(4)
+    inherit |ExplicitCtorPrivate()|(4)
 
 
 let _: ExplicitCtorParam = ExplicitCtorParam(1)
