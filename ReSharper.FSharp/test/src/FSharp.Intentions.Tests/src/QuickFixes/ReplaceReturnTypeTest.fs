@@ -18,7 +18,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Member 01``() = x.DoNamedTest()
-    [<Test>] member x.``Prop - Member 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Prop - Member 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()

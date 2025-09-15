@@ -5,5 +5,5 @@ type C() =
     class end
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
+(0): ReSharper Underlined Error Highlighting: This attribute cannot be applied to class, struct, enum, interface, delegate. Valid targets are: method
 (1): ReSharper Warning: This type does not inherit Attribute, it will not work correctly with other .NET languages.
