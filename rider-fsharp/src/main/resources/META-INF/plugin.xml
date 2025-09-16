@@ -17,6 +17,7 @@
     <fileType name="F#" language="F#" extensions="fs;ml" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType" fieldName="INSTANCE"/>
     <fileType name="F# Signature" language="F#" extensions="fsi;mli" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpSignatureFileType" fieldName="INSTANCE"/>
     <fileType name="F# Script" language="F#" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" fieldName="INSTANCE"/>
+    <rd.languageAssociation backendLanguage="F#" frontendLanguage="F#" />
 
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
