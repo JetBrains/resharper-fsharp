@@ -1,7 +1,6 @@
 <idea-plugin package="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections">
 
     <dependencies>
-        <plugin id="com.intellij.ml.llm"/>
         <module name="intellij.platform.langInjection"/>
     </dependencies>
 
