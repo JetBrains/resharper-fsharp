@@ -53,8 +53,9 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   private fun withDotnetToolsUpdate(function: () -> Unit) {
     dotnetToolsInvalidated = false
-    function()
-    flushFileChanges(project)
+    flushFileChanges(project) {
+      function()
+    }
     waitAndPump(Duration.ofSeconds(15), { dotnetToolsInvalidated == true }, { "Dotnet tools wasn't changed." })
   }
 
@@ -129,14 +130,14 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
     val dotnetCliHome = getDotnetCliHome()
     if (!dotnetCliHome.exists()){
-      dotnetCliHome.createDirectory()
-      flushFileChanges(project)
+      flushFileChanges(project) {
+        dotnetCliHome.createDirectory()
+      }
     }
     else if (dotnetCliHome.listDirectoryEntries().any { it.name != ".nuget" }) {
       withDotnetToolsUpdate {
         dotnetCliHome.delete(true)
         dotnetCliHome.createDirectory()
-        flushFileChanges(project)
       }
     }
   }

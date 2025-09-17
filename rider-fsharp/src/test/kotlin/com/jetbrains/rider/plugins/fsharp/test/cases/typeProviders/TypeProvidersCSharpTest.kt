@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -9,8 +8,6 @@ import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
-import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import org.testng.annotations.Test
 import java.io.File
 
@@ -88,13 +85,11 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     }
   }
 
-  @Mute("RIDER-117704")
   @Test
   @Solution("YamlProviderCSharp")
   fun `provided type abbreviation completion`() =
     doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
-  @Mute("RIDER-117704")
   @Test
   @Solution("YamlProviderCSharp")
   fun `provided nested type completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
