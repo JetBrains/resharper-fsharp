@@ -1,9 +1,9 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 
-import com.jetbrains.rider.ideaInterop.fileTypes.RiderLanguageBase
+import com.intellij.lang.Language
 
-abstract class FSharpLanguageBase internal constructor(name: String) : RiderLanguageBase(name, name) {
-  override fun isCaseSensitive() = true
+abstract class FSharpLanguageBase internal constructor(name: String) : Language(name) {
+  override fun isCaseSensitive(): Boolean = true
 }
 
 object FSharpLanguage : FSharpLanguageBase("F#")
