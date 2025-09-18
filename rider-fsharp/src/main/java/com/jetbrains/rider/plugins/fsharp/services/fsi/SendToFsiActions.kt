@@ -10,7 +10,7 @@ import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import icons.ReSharperIcons
 import javax.swing.Icon
@@ -58,7 +58,7 @@ open class SendToFsiActionBase(
     }
     val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)
     val editor = CommonDataKeys.EDITOR.getData(e.dataContext)
-    if (file?.language !is FSharpLanguageBase || editor?.caretModel?.caretCount != 1) {
+    if (file?.language !is FSharpLanguage || editor?.caretModel?.caretCount != 1) {
       e.presentation.isEnabled = false
       return
     }
@@ -97,7 +97,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
     isAvailable && editor.caretModel.caretCount == 1
 
-  override fun checkFile(file: PsiFile) = file.language is FSharpLanguageBase
+  override fun checkFile(file: PsiFile) = file.language is FSharpLanguage
 
   override fun invoke(project: Project, editor: Editor, element: PsiElement) {
     FsiHost.getInstance(project).sendToFsi(editor, element.containingFile, debug)
