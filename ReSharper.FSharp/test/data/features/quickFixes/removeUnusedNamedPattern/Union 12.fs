@@ -1,4 +1,4 @@
 match x with
-| U(a = a{caret}
+| U(a = {caret}a
     b = b // b is unused
     c = c) -> ()

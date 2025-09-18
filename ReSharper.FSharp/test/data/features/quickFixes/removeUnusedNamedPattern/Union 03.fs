@@ -1,2 +1,2 @@
 match x with
-| U(a = a; b = b{caret}; c = c) -> ()
+| U(a = a; b = {caret}b; c = c) -> ()

@@ -1,4 +1,4 @@
 match x with
 | U(a = a // I'm a comment
-    b = b{caret}
+    b = {caret}b
     c = c) -> ()

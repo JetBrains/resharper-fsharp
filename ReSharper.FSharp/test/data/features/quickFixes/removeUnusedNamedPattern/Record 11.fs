@@ -1,3 +1,3 @@
 match x with
-| { F1 = f1; F2 = f2{caret}
+| { F1 = f1; F2 = {caret}f2
     F3 = f3; F4 = f4 } -> ()
