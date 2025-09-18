@@ -58,6 +58,7 @@ dependencies {
     bundledModule("intellij.platform.langInjection")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
+    bundledModule("intellij.resharper.assist")
     instrumentationTools()
     // TODO: Temporary I hope hope hope
     bundledLibrary(provider {
@@ -121,13 +122,13 @@ val typeProvidersFiles = listOf(
 )
 
 val fantomasHostFiles = listOf(
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.deps.json",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Core.dll",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.FCS.dll",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.win.runtimeconfig.json",
-  "FSharp.Fantomas.Host/bin/$buildConfiguration/net6.0/Fantomas.Host.unix.runtimeconfig.json"
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.dll",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.pdb",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host.deps.json",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/Fantomas.Core.dll",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/Fantomas.FCS.dll",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/Fantomas.Host.win.runtimeconfig.json",
+  "FSharp.Fantomas.Host/bin/$buildConfiguration/net8.0/Fantomas.Host.unix.runtimeconfig.json"
 )
 
 val externalAnnotationsDirectory = "$resharperPluginPath/src/FSharp/annotations"

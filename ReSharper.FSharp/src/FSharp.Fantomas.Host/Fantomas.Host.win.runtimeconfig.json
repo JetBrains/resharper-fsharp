@@ -4,11 +4,11 @@
       "System.GC.Server": true,
       "System.GC.NoAffinitize": true
     },
-    "tfm": "net6",
+    "tfm": "net8",
     "rollForward": "Major",
     "framework": {
       "name": "Microsoft.WindowsDesktop.App",
-      "version": "6.0.0"
+      "version": "8.0.0"
     }
   }
 }

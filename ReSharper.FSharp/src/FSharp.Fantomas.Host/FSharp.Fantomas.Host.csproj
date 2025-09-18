@@ -14,9 +14,9 @@
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
     <OutputType>Exe</OutputType>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host</RootNamespace>
-    <SdkTargetFrameworkOverride>.NETCoreApp,Version=v6.0</SdkTargetFrameworkOverride>
+    <SdkTargetFrameworkOverride>net8.0</SdkTargetFrameworkOverride>
     <SignAssembly>false</SignAssembly>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />

@@ -3,24 +3,19 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
 import com.jetbrains.rider.test.annotations.Mute
-import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeTrue
-import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.Mono
+import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.disableTimedMarkupSuppression
 import com.jetbrains.rider.test.framework.enableTimedMarkupSuppression
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
-import com.jetbrains.rider.test.scriptingApi.typeWithLatency
-import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
-import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
-import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.io.File
 
@@ -53,8 +48,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]),
-         Mute("RIDER-121793")])
+  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun invalidation() {
     val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
 
@@ -62,7 +56,9 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
       disableTimedMarkupSuppression()
       waitForDaemon()
 
-      testDirectory.deleteRecursively().shouldBeTrue()
+      flushFileChanges(project!!) {
+        testDirectory.deleteRecursively().shouldBeTrue()
+      }
       typeWithLatency("//")
       waitForNextDaemon()
 
@@ -70,7 +66,9 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
         dumpTypeProviders(it)
       }
 
-      testDirectory.mkdir().shouldBeTrue()
+      flushFileChanges(project!!) {
+        testDirectory.mkdir().shouldBeTrue()
+      }
       typeWithLatency(" ")
       waitForNextDaemon()
 
