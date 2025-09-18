@@ -101,7 +101,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     override x.Text = "Remove unused named pattern"
 
     override x.IsAvailable _ =
-       listPat.FieldPatterns.Count > 1
+       isNotNull fieldPat && isNotNull listPat && listPat.FieldPatterns.Count > 1
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
