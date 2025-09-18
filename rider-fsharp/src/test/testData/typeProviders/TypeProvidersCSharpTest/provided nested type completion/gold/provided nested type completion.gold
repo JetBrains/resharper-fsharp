@@ -1,6 +1,6 @@
-LookupElementPresentation{itemText='Level13', tail=null, typeText='IList<Level13_Item_Type>'}
-LookupElementPresentation{itemText='Equals', tail=null, typeText='bool'}
-LookupElementPresentation{itemText='GetHashCode', tail=null, typeText='int'}
-LookupElementPresentation{itemText='GetType', tail=null, typeText='Type'}
-LookupElementPresentation{itemText='ToString', tail=null, typeText='string'}
-LookupElementPresentation{itemText='Changed', tail=null, typeText='EventHandler'}
+LookupElementPresentation{itemText='Level13', tail=null, typeText='null'}
+LookupElementPresentation{itemText='Equals', tail=null, typeText='null'}
+LookupElementPresentation{itemText='GetHashCode', tail=null, typeText='null'}
+LookupElementPresentation{itemText='GetType', tail=null, typeText='null'}
+LookupElementPresentation{itemText='ToString', tail=null, typeText='null'}
+LookupElementPresentation{itemText='Changed', tail=null, typeText='null'}
