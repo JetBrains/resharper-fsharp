@@ -22,8 +22,9 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
 
     val sourceEditorConfigFile = File(testCaseSourceDirectory, ".editorconfig")
     val slnEditorConfigFile = File(testWorkDirectory, ".editorconfig")
-    sourceEditorConfigFile.copyTo(slnEditorConfigFile, true)
-    flushFileChanges(project)
+    flushFileChanges(project) {
+      sourceEditorConfigFile.copyTo(slnEditorConfigFile, true)
+    }
   }
 
   private fun doEditorConfigTestWithVersion(fantomasVersion: String) {

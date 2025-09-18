@@ -1,13 +1,13 @@
 // language=json
-var s1 = $"[ ]"
+let s1 = $"[ ]"
 
 // language=json
-var s2 = $"[ {{ \"key\": \"{42}\" }} ]"
+let s2 = $"[ {{ \"key\": \"{42}\" }} ]"
 
-var s3 = (*language=xml*) $"<tag1><tag2 attr=\"{s1}\"/></tag1>"
+let s3 = (*language=xml*) $"<tag1><tag2 attr=\"{s1}\"/></tag1>"
 
 // language=sql
-var s4 = $" {5} select *"
+let s4 = $" {5} select *"
 
 // language=css
-var s5 = $".unfinished {
+let s5 = $".unfinished {

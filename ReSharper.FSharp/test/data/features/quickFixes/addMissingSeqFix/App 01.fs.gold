@@ -1,2 +1,1 @@
-let _ =
-    seq {caret}{ 1; 2 }
+id (seq {caret}{ 1;10 })
