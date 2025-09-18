@@ -13,17 +13,18 @@ import com.intellij.psi.PsiFile
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import icons.ReSharperIcons
+import org.jetbrains.annotations.Nls
 import javax.swing.Icon
 
 object Fsi {
-  const val sendToFsiActionId = "Rider.Plugins.FSharp.SendToFsi"
-  const val debugInFsiActionId = "Rider.Plugins.FSharp.DebugInFsi"
+  const val sendToFsiActionId: String = "Rider.Plugins.FSharp.SendToFsi"
+  const val debugInFsiActionId: String = "Rider.Plugins.FSharp.DebugInFsi"
 
-  val sendLineText = FSharpBundle.message("Fsi.actions.send.line.text")
-  val debugLineText = FSharpBundle.message("Fsi.actions.debug.line.text")
+  val sendLineText: String = FSharpBundle.message("Fsi.actions.send.line.text")
+  val debugLineText: String = FSharpBundle.message("Fsi.actions.debug.line.text")
 
-  val sendSelectionText = FSharpBundle.message("Fsi.actions.send.selection.text")
-  val debugSelectionText = FSharpBundle.message("Fsi.actions.debug.selection.text")
+  val sendSelectionText: String = FSharpBundle.message("Fsi.actions.send.selection.text")
+  val debugSelectionText: String = FSharpBundle.message("Fsi.actions.debug.selection.text")
 }
 
 class StartFsiAction : AnAction() {
@@ -37,10 +38,10 @@ class StartFsiAction : AnAction() {
 class SendToFsiAction : SendToFsiActionBase(false, Fsi.sendLineText, Fsi.sendSelectionText)
 
 open class SendToFsiActionBase(
-  private val debug: Boolean, private val sendLineText: String,
-  private val sendSelectionText: String
+  private val debug: Boolean, private val sendLineText: @Nls String,
+  private val sendSelectionText: @Nls String
 ) : AnAction(), DumbAware {
-  override fun getActionUpdateThread() = ActionUpdateThread.BGT
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
@@ -73,17 +74,17 @@ class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi
 class SendSelectionToFsiIntentionAction :
   SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText, Fsi.sendToFsiActionId), HighPriorityAction
 
-open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) :
+open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: @Nls String, actionId: String) :
   BaseSendToFsiIntentionAction(debug, actionId) {
-  override fun getText() = titleText
-  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+  override fun getText(): String = titleText
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement): Boolean =
     super.isAvailable(project, editor, file) && !editor.selectionModel.hasSelection()
 }
 
-open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) :
+open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: @Nls String, actionId: String) :
   BaseSendToFsiIntentionAction(debug, actionId) {
-  override fun getText() = titleText
-  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+  override fun getText(): String = titleText
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement): Boolean =
     super.isAvailable(project, editor, file) && editor.selectionModel.hasSelection()
 }
 
@@ -92,12 +93,12 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
   private val isAvailable = !debug || SystemInfo.isWindows
 
   override fun getFamilyName(): String = FSharpBundle.message("Fsi.actions.send.to.fsi.intention.action.text")
-  override fun startInWriteAction() = false
+  override fun startInWriteAction(): Boolean = false
 
-  override fun isAvailable(project: Project, editor: Editor, file: PsiElement) =
+  override fun isAvailable(project: Project, editor: Editor, file: PsiElement): Boolean =
     isAvailable && editor.caretModel.caretCount == 1
 
-  override fun checkFile(file: PsiFile) = file.language is FSharpLanguage
+  override fun checkFile(file: PsiFile): Boolean = file.language is FSharpLanguage
 
   override fun invoke(project: Project, editor: Editor, element: PsiElement) {
     FsiHost.getInstance(project).sendToFsi(editor, element.containingFile, debug)
@@ -105,6 +106,6 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
 
   override fun getIcon(flags: Int): Icon = ReSharperIcons.Bulb.GhostBulb
 
-  override fun getShortcut() =
+  override fun getShortcut(): ShortcutSet? =
     ActionManager.getInstance().getAction(actionId)?.shortcutSet
 }
