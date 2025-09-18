@@ -1,24 +1,17 @@
+##### Imports
+(none)
 
-module Program
-
-[<Literal>]
-val bar: int = 123
-
-val foo: unit -> int
-
-val baz: qux: 'a -> qaz: 'b -> string
-
-type MyMegaType =
-  interface System.IDisposable
-  
-  new: foo: string * bar: int -> MyMegaType
-  
-  static member Frob: unit -> unit
-  
-  member FooMember: unit -> int
-  
-  member BarMember: int
-
-[<Struct>]
-type MyMegaStruct =
-  struct end
+##### Structure
+module Program (1-21)
+val bar (2-2)
+val foo (3-3)
+val baz (5-5)
+type MyMegaType (7-18)
+MyMegaType member .ctor (7-7)
+MyMegaType member letMember (8-8)
+MyMegaType member funcMember (10-10)
+MyMegaType member FooMember (12-12)
+MyMegaType member BarMember (13-13)
+MyMegaType member Dispose (16-16)
+MyMegaType member Frob (18-18)
+type MyMegaStruct (20-20)
