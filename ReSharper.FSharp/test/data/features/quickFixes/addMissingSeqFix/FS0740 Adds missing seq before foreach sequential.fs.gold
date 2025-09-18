@@ -1,2 +1,0 @@
-for _ in seq {caret}{1; 2} do
-    ()

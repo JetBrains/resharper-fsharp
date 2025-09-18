@@ -1,2 +1,0 @@
-let _ =
-    seq {caret}{ 1; 2 }
