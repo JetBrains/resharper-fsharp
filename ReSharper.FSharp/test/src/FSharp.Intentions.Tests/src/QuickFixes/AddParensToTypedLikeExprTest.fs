@@ -22,10 +22,6 @@ type AddParensToTypedLikeExprAvailabilityTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/addParensToTypedLikeExpr"
 
-    [<Test>] member x.``Text - Type test``() = x.DoNamedTest() // todo: 253: fix after FCS update
-    [<Test>] member x.``Text - Type cast 01``() = x.DoNamedTest()
-    [<Test>] member x.``Text - Type cast 02``() = x.DoNamedTest()
-
     [<Test>] member x.``Availability 01 - Not available``() = x.DoNamedTest()
     [<Test>] member x.``Availability 02``() = x.DoNamedTest()
     [<Test>] member x.``Availability 03``() = x.DoNamedTest()
