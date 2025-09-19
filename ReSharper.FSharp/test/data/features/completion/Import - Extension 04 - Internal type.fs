@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:M (in CSharpLib)}
+// ${ABSENT_ITEM:M (in CSharpLib)}
 module Module
 
 

@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:A}
+// ${ABSENT_ITEM:A}
 module Module
 
 [<RequireQualifiedAccess>]

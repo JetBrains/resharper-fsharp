@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:Static1 (in FSharpExtensions)}
+// ${ABSENT_ITEM:Static1 (in FSharpExtensions)}
 module Module
 
 open System.Threading.Tasks
