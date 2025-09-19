@@ -63,7 +63,7 @@ type ImportStaticMemberRule() =
             for typeMember in typeElement.GetMembers() do
                 if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
                     let name = typeMember.GetSourceName()
-                    let info = ImportDeclaredElementInfo(typeMember, name, context, Ranges = context.Ranges)
+                    let info = ImportDeclaredElementInfo(typeMember, name, qualifiedName, context, Ranges = context.Ranges)
                     let item =
                         LookupItemFactory.CreateLookupItem(info)
                             .WithPresentation(fun _ ->
