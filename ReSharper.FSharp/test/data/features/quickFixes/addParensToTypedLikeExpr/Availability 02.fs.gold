@@ -1,11 +1,7 @@
 ﻿module Test
 
-type A() =
-  class end
-
-[<Sealed>]
-type B() =
-  inherit A()
+type A() = class end
+type [<Sealed>] B() = inherit A()
   
 let a = A()
 
