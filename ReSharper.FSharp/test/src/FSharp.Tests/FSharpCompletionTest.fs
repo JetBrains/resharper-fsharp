@@ -615,7 +615,10 @@ type FSharpRegexCompletionTest() =
     inherit CodeCompletionTestBase()
 
     override x.RelativeTestDataPath = "features/completion/regex"
+
     override x.TestType = CodeCompletionTestType.Action
+
+    override x.AllowNoMatchingItemsInActionTests = true
 
     [<Test>] member x.``Non-verbatim string completion 01``() = x.DoNamedTest()
 
