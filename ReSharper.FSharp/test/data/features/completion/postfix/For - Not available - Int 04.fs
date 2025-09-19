@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:for}
+﻿// ${ABSENT_ITEM:for}
 module Module
 
 1.ma{caret}
