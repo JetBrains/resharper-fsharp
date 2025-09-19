@@ -6,7 +6,7 @@ type A() =
 [<Sealed>]
 type B() =
   inherit A()
-  
-let a = A()
 
-let _ = not a :? B
+let b = B()
+
+let _ = not b :> A

@@ -1,0 +1,21 @@
+﻿module Test
+
+let o = obj()
+let _ = ||not |o|(1)|(2) :> string|(0)
+
+------------------------------------------------
+0: The type 'string' does not have any proper subtypes and need not be used as the target of a static coercion
+NO QUICKFIXES
+1: Type constraint mismatch. The type 
+    'bool'    
+is not compatible with type
+    'string'    
+
+QUICKFIXES:
+Add parens to the type cast
+2: This expression was expected to have type
+    'bool'    
+but here has type
+    'obj'    
+QUICKFIXES:
+Change type of 'o' to 'bool'
