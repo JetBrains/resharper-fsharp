@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 open System
 open System.Collections.Generic
 open System.Linq
+open System.Text
 open FSharp.Compiler.EditorServices
 open JetBrains.Application
 open JetBrains.ProjectModel
@@ -67,12 +68,12 @@ module ImportInfo =
         |> Option.defaultValue null
 
 
-type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text, context: FSharpCodeCompletionContext) =
+type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<IClrDeclaredElement>, text, ns, context: FSharpCodeCompletionContext) =
     inherit TextualInfo(text, text)
 
-    new (declaredElement: IClrDeclaredElement, text, context: FSharpCodeCompletionContext) =
+    new (declaredElement: IClrDeclaredElement, text, ns, context: FSharpCodeCompletionContext) =
         let elementPointer = declaredElement.CreateElementPointer()
-        ImportDeclaredElementInfo(elementPointer, text, context)
+        ImportDeclaredElementInfo(elementPointer, text, ns, context)
 
     member this.DeclaredElement =
         declaredElementPointer.FindDeclaredElement()
@@ -86,7 +87,9 @@ type ImportDeclaredElementInfo(declaredElementPointer: IDeclaredElementPointer<I
             if isNull typeElement then null else
 
             ImportInfo.getDescription context typeElement None false
-
+            
+    interface ILookupItemInfoWithDelayedOrderString with
+        member this.DelayedOrderString = $" (in {ns})"            
 
 type ImportDeclaredElementBehavior(info: ImportDeclaredElementInfo) =
     inherit TextualBehavior<ImportDeclaredElementInfo>(info)
@@ -206,7 +209,7 @@ type FSharpImportTypeElementRule() =
 
         let addItems () =
             let addItem (struct (typeElement: ITypeElement, ns: string)) =
-                let info = ImportDeclaredElementInfo(typeElement, name, context, Ranges = context.Ranges)
+                let info = ImportDeclaredElementInfo(typeElement, name, ns, context, Ranges = context.Ranges)
                 let item =
                     let icon = iconManager.GetImage(typeElement, language, PsiIconRequestOptions.FastProvidersOnly)
                     let item = FSharpImportTypeElementRule.createItem info name ns icon
