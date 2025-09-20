@@ -1,7 +1,11 @@
 ﻿module Test
 
-let o = obj()
-let _ = |not |o|(1) :? string|(0)
+type A() = class end
+type [<Sealed>] B() = inherit A()
+
+let b = B()
+
+let _ = |not |b|(1) :? A|(0)
 
 ------------------------------------------------
 0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
@@ -10,6 +14,6 @@ Add parens to the type test
 1: This expression was expected to have type
     'bool'    
 but here has type
-    'obj'    
+    'B'    
 QUICKFIXES:
-Change type of 'o' to 'bool'
+Change type of 'b' to 'bool'

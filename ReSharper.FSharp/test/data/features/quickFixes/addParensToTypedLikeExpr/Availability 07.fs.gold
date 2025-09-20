@@ -2,18 +2,18 @@
 
 type A() = class end
 type [<Sealed>] B() = inherit A()
-  
-let a = A()
 
-let _ = |not |a|(1) :? B|(0)
+let b = B()
+
+let _ = |not |b|(1) :?> A|(0)
 
 ------------------------------------------------
 0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to the type test
+Add parens to the type cast
 1: This expression was expected to have type
     'bool'    
 but here has type
-    'A'    
+    'B'    
 QUICKFIXES:
-Change type of 'a' to 'bool'
+Change type of 'b' to 'bool'

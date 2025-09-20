@@ -5,12 +5,12 @@ type [<Sealed>] B() = inherit A()
   
 let a = A()
 
-let _ = |not |a|(1) :? B|(0)
+let _ = |not |a|(1) :?> B|(0)
 
 ------------------------------------------------
 0: The type 'bool' does not have any proper subtypes and cannot be used as the source of a type test or runtime coercion.
 QUICKFIXES:
-Add parens to the type test
+Add parens to the type cast
 1: This expression was expected to have type
     'bool'    
 but here has type

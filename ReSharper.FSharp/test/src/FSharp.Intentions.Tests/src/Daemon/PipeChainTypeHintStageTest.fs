@@ -29,8 +29,9 @@ type PipeChainTypeHintStageTest() =
     [<TestSettings("{HideSameLine:All}")>]
     [<Test>] member x.``Multi line 03 - Same line``() = x.DoNamedTest()
 
-    [<Test; Explicit>] member x.``Multi line 04 - Last pipe``() = x.DoNamedTest()
-    [<Test>] member x.``Multi line 05``() = x.DoNamedTest()
+    [<Test>] member x.``Multi line 04``() = x.DoNamedTest()
+    [<Test>] member x.``Multi line 05 - Last pipe 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multi line 06 - Last pipe 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
     [<Test>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()

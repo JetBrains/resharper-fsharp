@@ -5,4 +5,4 @@ type [<Sealed>] B() = inherit A()
   
 let a = A()
 
-let _ = not a :? B
+let _ = not a :?> B

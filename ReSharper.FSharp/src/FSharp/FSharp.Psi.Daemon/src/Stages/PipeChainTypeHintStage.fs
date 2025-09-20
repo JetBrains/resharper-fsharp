@@ -95,8 +95,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
         if isNull exprType then false else
 
         match expr with
-        // TODO: TryGetFcsType returns type of DotLambda return type
-        | :? IDotLambdaExpr -> exprType = pipeResultType
+        | :? IDotLambdaExpr -> skipFunArgs exprType = pipeResultType
         | _ ->
         if not exprType.IsFunctionType || exprType.GenericArguments[1] <> pipeResultType then false else
         if not (isUnit pipeResultType) then true else
