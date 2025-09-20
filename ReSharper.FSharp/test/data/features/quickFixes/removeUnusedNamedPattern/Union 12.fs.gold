@@ -1,0 +1,3 @@
+match x with
+| U(b = b // b is unused
+    c = c) -> ()

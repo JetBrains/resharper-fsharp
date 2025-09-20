@@ -1,0 +1,3 @@
+match x with
+| { F2 = f2 // F2 is unused
+    F3 = f3 } -> ()
