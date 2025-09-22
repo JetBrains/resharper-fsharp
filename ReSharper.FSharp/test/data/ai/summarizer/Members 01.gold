@@ -1,4 +1,5 @@
-﻿module Module (1-11)
+﻿##### Structure
+module Module (1-11)
 type Type (3-11)
 type Type new: unit -> Type (3-3)
 type Type val x: int (4-4)

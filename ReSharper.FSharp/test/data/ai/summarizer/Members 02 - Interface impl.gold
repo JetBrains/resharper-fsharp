@@ -1,6 +1,0 @@
-﻿module Module (1-8)
-type Type (3-8)
-type Type interface IList<int> (4-5)
-type Type interface IList<int> member Add: x: int -> unit (5-5)
-type Type interface IDisposable (7-8)
-type Type interface IDisposable member Dispose: unit -> unit (8-8)

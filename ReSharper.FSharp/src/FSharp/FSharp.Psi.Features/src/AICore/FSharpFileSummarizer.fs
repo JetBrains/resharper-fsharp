@@ -18,16 +18,15 @@ type private SummarizerContext() =
     let scopes =  Stack<string>()
     let summary = StringBuilder()
 
+    do summary.AppendLine("##### Structure") |> ignore
+
     member x.CurrentScope = scopes.TryPeek()
     member x.Summary = summary.ToString()
 
     member x.AddEntity(node: ITreeNode, representation: string) =
-        let range = node.GetDocumentRange()
-        let startLine, endLine =
-            range.StartOffset.ToDocumentCoords().Line.Plus1(),
-            range.EndOffset.ToDocumentCoords().Line.Plus1()
+        let range = node.GetDocumentRange() |> FileSummarizer.PresentInJunieFlavor
 
-        [x.CurrentScope; representation; $"({startLine}-{endLine})"]
+        [x.CurrentScope; representation; $"({range})"]
         |> Seq.filter _.IsNotEmpty()
         |> String.concat " "
         |> summary.AppendLine
@@ -211,13 +210,7 @@ type FSharpFileSummarizer() =
     let processFile(file: IPsiSourceFile): string =
         let psiFile = file.GetPrimaryPsiFile()
         match psiFile with
-        | :? IFSharpFile as fsharpFile -> summarizeStructure fsharpFile
-        | _ -> ""
-
-    let processImports(file: IPsiSourceFile, language: FSharpLanguage): string =
-        let psiFile = file.GetPrimaryPsiFile()
-        match psiFile with
-        | :? IFSharpFile as fsharpFile -> getImportsFromFSharpFile fsharpFile
+        | :? IFSharpFile as fsharpFile -> summarizeFSharpFile fsharpFile
         | _ -> ""
 
     interface IRiderFileSummarizer with
@@ -226,13 +219,4 @@ type FSharpFileSummarizer() =
             let fsharpLang = FSharpLanguage.Instance
             match fsharpLang with
             | null -> ""
-            | _ ->
-                let imports = processImports(file, language)
-                let structure = processFile(file)
-                let sb = StringBuilder()
-                sb.AppendLine("##### Imports") |> ignore
-                if imports = "" then sb.AppendLine("(none)") |> ignore else sb.AppendLine(imports) |> ignore
-                sb.AppendLine() |> ignore
-                sb.AppendLine("##### Structure") |> ignore
-                sb.Append(structure) |> ignore
-                sb.ToString()
+            | _ -> processFile(file)

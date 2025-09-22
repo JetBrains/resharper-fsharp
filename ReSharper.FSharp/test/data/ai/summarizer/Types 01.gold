@@ -1,4 +1,5 @@
-﻿module Module (1-27)
+﻿##### Structure
+module Module (1-27)
 type Interface (3-5)
 type Interface member M: x: int -> unit (5-5)
 exception E1 (7-8)

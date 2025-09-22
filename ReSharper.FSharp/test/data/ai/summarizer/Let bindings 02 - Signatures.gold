@@ -1,4 +1,5 @@
-﻿module Module (1-6)
+﻿##### Structure
+module Module (1-6)
 val x: int (3-3)
 val f: x: 'a -> 'a (4-4)
 val (+): a: int -> b: int -> int (5-5)

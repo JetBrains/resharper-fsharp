@@ -1,4 +1,5 @@
-﻿type Class1 inherit List<int> (4-5)
+﻿##### Structure
+type Class1 inherit List<int> (4-5)
 type Class1 new: unit -> Class1 (4-4)
 type Class2 inherit List<int> (7-10)
 type Class2 new: unit -> Class2 (7-7)

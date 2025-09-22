@@ -1,4 +1,5 @@
-﻿namespace N.N1 (1-9)
+﻿##### Structure
+namespace N.N1 (1-9)
 module M1 (5-9)
 module M1.M2 (6-9)
 module M1.M2 type T (7-9)

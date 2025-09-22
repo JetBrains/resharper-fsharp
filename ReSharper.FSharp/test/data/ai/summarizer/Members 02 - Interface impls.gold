@@ -1,4 +1,5 @@
-﻿module Module (1-8)
+﻿##### Structure
+module Module (1-8)
 type Type (3-8)
 type Type interface IList<int> (4-5)
 type Type interface IList<int> member Add: x: int -> unit (5-5)
