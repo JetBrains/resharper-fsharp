@@ -25,3 +25,8 @@ let getFunctionTypeArgs includeReturnType fcsType =
                 acc
 
     loop fcsType [] |> List.rev
+
+
+let emptyDisplayContext =
+    FSharpDisplayContext.Empty.WithShortTypeNames(true)
+

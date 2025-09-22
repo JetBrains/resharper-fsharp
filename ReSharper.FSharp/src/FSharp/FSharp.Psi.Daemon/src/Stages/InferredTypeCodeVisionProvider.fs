@@ -1,7 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
-open System.Text
-open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.Application.Parts
@@ -13,16 +11,17 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Common.ActionUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.TextControl.DocumentMarkup.Adornments.IntraTextAdornments
-open JetBrains.Util
 
 module FSharpInferredTypeHighlighting =
     let [<Literal>] Id = "CodeInsights"
@@ -70,47 +69,6 @@ type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
 and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider: ICodeInsightsProvider) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let append (stringBuilder: StringBuilder) (s: string) =
-        stringBuilder.Append(s) |> ignore
-
-    let formatMfv (symbolUse: FSharpSymbolUse) (mfv: FSharpMemberOrFunctionOrValue) =
-        let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-        let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
-
-        if mfv.IsPropertyGetterMethod then returnTypeStr else
-
-        let paramGroups = mfv.CurriedParameterGroups
-        if paramGroups.IsEmpty() then returnTypeStr else
-        if paramGroups.Count = 1 && paramGroups[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
-
-        let builder = StringBuilder()
-        let isSingleGroup = paramGroups.Count = 1
-
-        for group in paramGroups do
-            let addTupleParens = not isSingleGroup && group.Count > 1
-            if addTupleParens then append builder "("
-
-            let mutable isFirstParam = true
-            for param in group do
-                if not isFirstParam then append builder " * "
-
-                let fcsType = param.Type
-                let addParens =
-                    fcsType.IsFunctionType ||
-                    fcsType.IsTupleType && group.Count > 1
-
-                if addParens then append builder "("
-                append builder (fcsType.Format(displayContext))
-                if addParens then append builder ")"
-
-                isFirstParam <- false
-
-            if addTupleParens then append builder ")"
-            append builder " -> "
-
-        append builder returnTypeStr
-        builder.ToString()
-
     member private x.AddHighlighting(consumer: IHighlightingConsumer, node: ITreeNode, text) =
         let range = node.GetNavigationRange()
         consumer.AddHighlighting(FSharpInferredTypeHighlighting(range, text, provider))
@@ -145,7 +103,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv symbolUse mfv
+            let text = formatMfv false emptyDisplayContext mfv
             x.AddHighlighting(consumer, binding, text)
 
         | :? FSharpField as field ->
@@ -161,6 +119,6 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
 
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let text = formatMfv symbolUse mfv
+            let text = formatMfv false emptyDisplayContext mfv
             x.AddHighlighting(consumer, decl, text)
         | _ -> ()

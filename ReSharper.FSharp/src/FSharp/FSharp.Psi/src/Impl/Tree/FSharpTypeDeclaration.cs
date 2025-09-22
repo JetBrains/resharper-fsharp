@@ -47,5 +47,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         };
       }
     }
+
+    public IEnumerable<IInheritMember> TypeOrInterfaceInheritMembers
+    {
+      get
+      {
+        var members = TypeRepresentation switch
+        {
+          null => TypeMembersEnumerable,
+          IClassRepresentation classRepr => classRepr.TypeMembersEnumerable,
+          IInterfaceRepresentation interfaceRepr => interfaceRepr.TypeMembersEnumerable,
+          _ => TreeNodeEnumerable<ITypeBodyMemberDeclaration>.Empty
+        };
+
+        return members.OfType<IInheritMember>();
+      }
+    }
   }
 }
