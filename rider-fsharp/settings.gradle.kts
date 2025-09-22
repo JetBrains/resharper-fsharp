@@ -21,6 +21,7 @@ pluginManagement {
     id("com.jetbrains.rdgen") version rdVersion
     id("org.jetbrains.kotlin.jvm") version rdKotlinVersion
     id("org.jetbrains.intellij.platform") version intellijPlatformGradlePluginVersion
+    id("org.jetbrains.intellij.platform.module") version intellijPlatformGradlePluginVersion
     id("org.jetbrains.grammarkit") version grammarKitVersion
     id("me.filippov.gradle.jvm.wrapper") version gradleJvmWrapperVersion
   }
@@ -43,5 +44,6 @@ dependencyResolutionManagement {
   }
 }
 
+include(":parserTest")
 include(":protocol")
 include(":lexer")
