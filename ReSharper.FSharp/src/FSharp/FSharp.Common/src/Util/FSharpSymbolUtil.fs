@@ -1,12 +1,14 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
+open System.Text
 open FSharp.Compiler.Symbols
 open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.UI.Icons
+open JetBrains.Util
 open JetBrains.Util.Logging
 
 [<Extension; CompiledName("IsRefCell")>]
@@ -29,6 +31,55 @@ let isEnumMember (field: FSharpField) =
     match field.DeclaringEntity with
     | Some entity -> entity.IsEnum
     | _ -> false
+
+let formatMfv addParameterNames (displayContext: FSharpDisplayContext) (mfv: FSharpMemberOrFunctionOrValue) =
+    let append (stringBuilder: StringBuilder) (s: string) =
+        stringBuilder.Append(s) |> ignore
+
+    let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
+
+    if mfv.IsPropertyGetterMethod then returnTypeStr else
+
+    let paramGroups = mfv.CurriedParameterGroups
+    if paramGroups.IsEmpty() then returnTypeStr else
+    if paramGroups.Count = 1 && paramGroups[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
+
+    let builder = StringBuilder()
+    let isSingleGroup = paramGroups.Count = 1
+
+    for group in paramGroups do
+        let addTupleParens = not isSingleGroup && group.Count > 1
+        if addTupleParens then append builder "("
+
+        let mutable isFirstParam = true
+        for param in group do
+            if not isFirstParam then append builder " * "
+
+            let fcsType =
+                if addParameterNames then
+                    match param.Name with
+                    | Some name ->
+                        let prefix = if param.IsOptionalArg then "?" else ""
+                        append builder (prefix + $"{name}: ")
+                        if param.IsOptionalArg then param.Type.GenericArguments[0] else param.Type
+                    | _ -> param.Type
+                else param.Type
+
+            let addParens =
+                fcsType.IsFunctionType ||
+                fcsType.IsTupleType && group.Count > 1
+
+            if addParens then append builder "("
+            append builder (fcsType.Format(displayContext))
+            if addParens then append builder ")"
+
+            isFirstParam <- false
+
+        if addTupleParens then append builder ")"
+        append builder " -> "
+
+    append builder returnTypeStr
+    builder.ToString()
 
 [<CompiledName("GetReturnType")>]
 let getReturnType (symbol: FSharpSymbol) =
