@@ -1,0 +1,12 @@
+﻿##### Structure
+module Module (1-27)
+type Interface (3-5)
+type Interface member M: x: int -> unit (5-5)
+exception E1 (7-8)
+exception E1 member NewMessage: string (8-8)
+type Record (10-13)
+type DU (15-17)
+type Struct (19-24)
+type Struct new: x: float * y: float -> Struct (23-23)
+type List<'a> with (26-27)
+type List<'a> member Length: int (27-27)

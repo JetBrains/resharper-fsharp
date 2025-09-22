@@ -1,0 +1,2 @@
+﻿##### Structure
+type A<'a, 'b> inherit IList<IList<string>>, IList<string list>, IList<(int * int) * int>, IList<string | null>, IList<'a>, IList<(int -> int)>, IList<{| Kek: int; Lol: string |}> (3-12)

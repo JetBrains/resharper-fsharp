@@ -31,7 +31,7 @@ let getFunctionTypeArgs includeReturnType fcsType =
     loop fcsType [] |> List.rev
 
 
-let private emptyDisplayContext =
+let emptyDisplayContext =
     FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
 

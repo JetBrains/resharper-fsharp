@@ -5,5 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public partial interface INamedModuleDeclaration
   {
     [NotNull] public string NamespaceName { get; }
+    [NotNull] public string QualifiedName { get; }
   }
 }

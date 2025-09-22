@@ -1,0 +1,5 @@
+﻿##### Structure
+module Module1 (1-2)
+module Module1 type Type1 (2-2)
+module Module2 (4-5)
+module Module2 type Type2 (5-5)
