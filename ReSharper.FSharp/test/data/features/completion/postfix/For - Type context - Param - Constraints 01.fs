@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:for}
+﻿// ${ABSENT_ITEM:for}
 module Module
 
 open System

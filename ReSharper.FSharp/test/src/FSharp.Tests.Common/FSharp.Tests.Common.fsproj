@@ -18,6 +18,7 @@
     <Compile Include="src\Common.fs" />
     <Compile Include="src\Stubs.fs" />
     <Compile Include="src\TestWithTwoProjectsBase.fs" />
+    <Compile Include="src\ZoneActivator.fs" />
   </ItemGroup>
   <ItemGroup Label="PackageReference">
     <PackageReference Include="FSharp.Core" />

@@ -1,0 +1,23 @@
+﻿module Test
+
+type A() = class end
+type [<Sealed>] B() = inherit A()
+
+let b = B()
+
+let _ = |not |b|(0)|(1) :> A
+
+------------------------------------------------
+0: Type constraint mismatch. The type 
+    'bool'    
+is not compatible with type
+    'A'    
+
+QUICKFIXES:
+Add parens to the type cast
+1: This expression was expected to have type
+    'bool'    
+but here has type
+    'B'    
+QUICKFIXES:
+Change type of 'b' to 'bool'

@@ -1,4 +1,4 @@
-﻿Suggested names: s
+﻿Suggested names: func
 module Module
 
-let s = _.ToString()
+let func = _.ToString()

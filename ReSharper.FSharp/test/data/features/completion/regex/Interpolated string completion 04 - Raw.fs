@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:\b - Word boundary}
+// ${ABSENT_ITEM:\b - Word boundary}
 module Module =
 
 open System.Text.RegularExpressions

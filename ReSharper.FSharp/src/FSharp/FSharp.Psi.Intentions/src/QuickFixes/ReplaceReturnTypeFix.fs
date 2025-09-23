@@ -49,7 +49,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
         else
             let nameSubstring =
                 match decl.SourceName with
-                | SharedImplUtil.MISSING_DECLARATION_NAME -> "of binding"
+                | SharedImplUtil.MISSING_DECLARATION_NAME -> " of binding"
                 | name -> $" of '{name}'"
 
             $"Change type{nameSubstring} to '{actualFcsType.Format()}'"

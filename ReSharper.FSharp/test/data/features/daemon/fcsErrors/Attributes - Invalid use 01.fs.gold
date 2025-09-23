@@ -4,4 +4,4 @@
 ()
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: This attribute is not valid for use on this language element
+(0): ReSharper Underlined Error Highlighting: This attribute cannot be applied to assembly, module, method. Valid targets are: class
