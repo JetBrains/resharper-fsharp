@@ -7,4 +7,4 @@ module A =
 module B =
     open A
 
-    let y: List<int * List<int> | null> | null{caret} = x
+    let y: List<int * (List<int> | null)> | null{caret} = x

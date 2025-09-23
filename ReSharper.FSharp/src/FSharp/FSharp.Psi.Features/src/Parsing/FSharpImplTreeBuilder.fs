@@ -536,15 +536,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
                 x.ProcessPat(pat, isLocal, false)
                 ElementType.PAREN_PAT
 
-            | SynPat.Record(pats, _) ->
-                for (lid, IdentRange range), _, pat in pats do
+            | SynPat.Record(patFields, _) ->
+                for NamePatPairField(lid, _, _, (PatRange range as pat), _) in patFields do
                     let fieldMark =
-                        match lid with
+                        match lid.LongIdent with
                         | IdentRange headRange :: _ ->
                             let fieldMark = x.Mark(headRange)
-                            let referenceNameMark = x.Mark()
-                            x.ProcessReferenceName(lid)
-                            x.Done(range, referenceNameMark, ElementType.EXPRESSION_REFERENCE_NAME)
+                            x.ProcessReferenceName(lid.LongIdent)
                             fieldMark
 
                         | _ ->
@@ -608,9 +606,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
         | SynArgPats.NamePatPairs(idsAndPats, argsRange, _) ->
             let argsMark = x.MarkTokenOrRange(FSharpTokenType.LPAREN, argsRange)
 
-            for IdentRange range, _, pat in idsAndPats do
+            for NamePatPairField(lid, _, range, pat, _) in idsAndPats do
                 let mark = x.Mark(range)
-                x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
+                x.MarkAndDone(lid.Range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
@@ -1070,7 +1068,7 @@ type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path
             x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
 
-        | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _, _) ->
+        | SynExpr.LetOrUse(_, _, _, _, bindings, bodyExpr, _, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(bodyExpr)
             x.ProcessBindings(bindings)
@@ -1197,15 +1195,6 @@ type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path
 
         | SynExpr.YieldOrReturnFrom(_, expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
-
-        | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range, _) ->
-            x.PushRange(range, ElementType.LET_OR_USE_EXPR)
-            x.PushExpression(inExpr)
-            x.PushStepList(ands, andLocalBindingListProcessor)
-            let exprWithPatRange = Range.unionRanges expr.Range pat.Range
-            x.PushRangeForMark(exprWithPatRange, x.Mark(), ElementType.LOCAL_BINDING)
-            x.ProcessPat(pat, true, false)
-            x.ProcessExpression(expr)
 
         | SynExpr.MatchBang(_, expr, clauses, _, _) ->
             x.MarkMatchExpr(range, expr, clauses)
@@ -1619,13 +1608,6 @@ type SecondaryBindingListProcessor() =
         builder.ProcessLocalBinding(binding, true)
 
 
-type AndLocalBindingListProcessor() =
-    inherit StepListProcessorBase<SynExprAndBang>()
-
-    override x.Process(SynExprAndBang(_, _, _, pat, expr, range, _), builder) =
-        builder.ProcessAndBangLocalBinding(pat, expr, range)
-
-
 type RecordFieldBindingListProcessor() =
     inherit StepListProcessorBase<SynExprRecordField>()
 
@@ -1710,7 +1692,6 @@ module BuilderStepProcessors =
 
     let expressionListProcessor = ExpressionListProcessor()
     let secondaryBindingListProcessor = SecondaryBindingListProcessor()
-    let andLocalBindingListProcessor = AndLocalBindingListProcessor()
     let recordFieldBindingListProcessor = RecordFieldBindingListProcessor()
     let anonRecordFieldBindingListProcessor = AnonRecordFieldBindingListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()

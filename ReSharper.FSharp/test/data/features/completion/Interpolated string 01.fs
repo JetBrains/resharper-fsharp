@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:false}
+// ${ABSENT_ITEM:false}
 namespace Ns
 
 let _ = $"[{caret}123]"

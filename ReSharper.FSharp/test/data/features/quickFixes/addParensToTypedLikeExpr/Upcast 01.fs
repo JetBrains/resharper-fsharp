@@ -1,2 +1,2 @@
 let o = obj()
-not o :>{caret} string
+not o{caret} :> string

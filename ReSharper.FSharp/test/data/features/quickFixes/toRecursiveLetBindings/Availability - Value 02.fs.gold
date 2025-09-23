@@ -9,6 +9,6 @@ let a, b = |()|(0)
 but here has type
     'unit'    
 QUICKFIXES:
-Change typeof binding to 'unit'
+Change type of binding to 'unit'
 1: The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings
 NO QUICKFIXES

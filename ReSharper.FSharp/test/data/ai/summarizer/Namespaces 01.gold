@@ -1,0 +1,7 @@
+﻿##### Structure
+namespace global (1-3)
+type GlobalType (3-3)
+namespace Namespace.One (5-7)
+type Type1 (7-7)
+namespace Namespace.Two (9-11)
+type Type2 (11-11)

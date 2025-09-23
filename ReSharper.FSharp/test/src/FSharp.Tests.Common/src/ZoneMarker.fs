@@ -17,7 +17,6 @@ type ITestFSharpPluginZone =
     inherit IRequire<IFSharpPluginZone>
     inherit IRequire<PsiFeatureTestZone>
     
-[<ZoneActivator>]
-[<ZoneMarker(typeof<IFSharpTestsEnvZone>)>]
-type FSharpTestZoneActivator() =
-    interface IActivate<ITestFSharpPluginZone>
+[<ZoneMarker>]
+type ZoneMarker() =
+    interface IRequire<ITestFSharpPluginZone>

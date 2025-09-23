@@ -1,24 +1,14 @@
-
-module Program
-
-[<Literal>]
-val bar: int = 123
-
-val foo: unit -> int
-
-val baz: qux: 'a -> qaz: 'b -> string
-
-type MyMegaType =
-  interface System.IDisposable
-  
-  new: foo: string * bar: int -> MyMegaType
-  
-  static member Frob: unit -> unit
-  
-  member FooMember: unit -> int
-  
-  member BarMember: int
-
-[<Struct>]
-type MyMegaStruct =
-  struct end
+##### Structure
+val bar: int (1-2)
+val foo: unit -> int (3-3)
+val baz: qux: 'a -> qaz: 'b -> string (5-5)
+type MyMegaType (7-18)
+type MyMegaType new: foo: string * bar: int -> MyMegaType (7-7)
+type MyMegaType val letMember: int (8-8)
+type MyMegaType val funcMember: unit -> int (10-10)
+type MyMegaType member FooMember: unit -> int (12-12)
+type MyMegaType member BarMember: int (13-13)
+type MyMegaType interface IDisposable (15-16)
+type MyMegaType interface IDisposable member Dispose: unit -> unit (16-16)
+type MyMegaType member Frob: unit -> unit (18-18)
+type MyMegaStruct (20-20)
