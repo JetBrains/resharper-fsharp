@@ -48,7 +48,7 @@ and RecordCtorReferenceSearcher(recordTypeElements, findCandidates) =
 
     interface IDomainSpecificSearcher with
         member x.ProcessProjectItem(sourceFile, consumer) =
-            sourceFile.GetPsiFiles<FSharpLanguage>()
+            sourceFile.GetPsiFiles<FSharpLanguage>(PsiLanguageCategories.Dominant)
             |> Seq.exists (fun file -> x.ProcessElement(file, consumer))
 
         member x.ProcessElement(treeNode, consumer) =

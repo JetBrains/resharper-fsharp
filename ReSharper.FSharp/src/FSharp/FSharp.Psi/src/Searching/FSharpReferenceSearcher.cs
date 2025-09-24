@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public bool ProcessProjectItem<TResult>(IPsiSourceFile sourceFile, IFindResultConsumer<TResult> consumer)
     {
-      return sourceFile.GetPsiFiles<FSharpLanguage>().Any(file => ProcessElement(file, consumer));
+      return sourceFile.GetPsiFiles<FSharpLanguage>(PsiLanguageCategories.Dominant).Any(file => ProcessElement(file, consumer));
     }
 
     public bool ProcessElement<TResult>(ITreeNode element, IFindResultConsumer<TResult> consumer)
