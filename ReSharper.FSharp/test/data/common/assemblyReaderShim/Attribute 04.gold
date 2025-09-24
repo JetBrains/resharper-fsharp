@@ -1,9 +1,10 @@
 ﻿module Module
 
-[<||CustomClass|(0)|(1)>]
+[<|||CustomClass|(0)|(1)|(2)>]
 type C() =
     class end
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: This attribute cannot be applied to class, struct, enum, interface, delegate. Valid targets are: method
-(1): ReSharper Warning: This type does not inherit Attribute, it will not work correctly with other .NET languages.
+(1): ReSharper Underlined Error Highlighting: This attribute cannot be applied to class. Valid targets are: method
+(2): ReSharper Warning: This type does not inherit Attribute, it will not work correctly with other .NET languages.

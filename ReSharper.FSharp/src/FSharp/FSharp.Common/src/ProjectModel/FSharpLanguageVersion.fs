@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
+open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -37,9 +38,11 @@ type FSharpLanguageLevel =
     /// Nullness
     | FSharp90 = 90
 
-    | Latest = 90
+    | FSharp100 = 100
 
-    | Preview = 2147483646 // Int32.MaxValue - 1
+    | Latest = 100
+
+    | Preview = (Int32.MaxValue - 1)
 
 
 type FSharpLanguageVersion =
@@ -51,12 +54,13 @@ type FSharpLanguageVersion =
     | FSharp70 = 70
     | FSharp80 = 80
     | FSharp90 = 90
-    | LatestMajor = 2147483644 // Int32.MaxValue - 3
-    | Latest = 2147483645 // Int32.MaxValue - 2
-    | Preview = 2147483646 // Int32.MaxValue - 1
+    | FSharp100 = 100 
+    | LatestMajor = (Int32.MaxValue - 3)
+    | Latest = (Int32.MaxValue - 2)
+    | Preview = (Int32.MaxValue - 1)
 
 
-[<Extension; RequireQualifiedAccess>]
+[<RequireQualifiedAccess>]
 module FSharpLanguageLevel =
     let toLanguageVersion (level: FSharpLanguageLevel) =
         match level with
@@ -68,6 +72,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp80
         | FSharpLanguageLevel.FSharp81 -> FSharpLanguageVersion.FSharp80
         | FSharpLanguageLevel.FSharp90 -> FSharpLanguageVersion.FSharp90
+        | FSharpLanguageLevel.FSharp100 -> FSharpLanguageVersion.FSharp100
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
@@ -80,6 +85,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageVersion.FSharp70 -> FSharpLanguageLevel.FSharp70
         | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
         | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
+        | FSharpLanguageVersion.FSharp100 -> FSharpLanguageLevel.FSharp100
         | FSharpLanguageVersion.Preview -> FSharpLanguageLevel.Preview
         | _ -> FSharpLanguageLevel.Latest
 
@@ -127,6 +133,11 @@ module FSharpLanguageLevel =
     let isFSharp90Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp90
 
+    [<Extension; CompiledName("IsFSharp100Supported")>]
+    let isFSharp100Supported (treeNode: ITreeNode) =
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp100
+
+
 [<RequireQualifiedAccess>]
 module FSharpLanguageVersion =
     let tryParseCompilationOption (emptyVersion: FSharpLanguageVersion) (langVersion: string): FSharpLanguageVersion option =
@@ -145,6 +156,7 @@ module FSharpLanguageVersion =
         | "7" | "7.0" -> Some(FSharpLanguageVersion.FSharp70)
         | "8" | "8.0" -> Some(FSharpLanguageVersion.FSharp80)
         | "9" | "9.0" -> Some(FSharpLanguageVersion.FSharp90)
+        | "10" | "10.0" -> Some(FSharpLanguageVersion.FSharp100)
 
         | _ -> None
 
@@ -162,10 +174,11 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp70 -> "F# 7.0"
         | FSharpLanguageVersion.FSharp80 -> "F# 8.0"
         | FSharpLanguageVersion.FSharp90 -> "F# 9.0"
+        | FSharpLanguageVersion.FSharp100 -> "F# 10.0"
         | FSharpLanguageVersion.LatestMajor -> "Latest major"
         | FSharpLanguageVersion.Latest -> "Latest"
         | FSharpLanguageVersion.Preview -> "Preview"
-        | _ -> failwithf "Unexpected language version: %A" version
+        | _ -> failwithf $"Unexpected language version: {version}"
 
     let toCompilerOptionValue (version: FSharpLanguageVersion) =
         match version with
@@ -177,10 +190,11 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp70 -> "7.0"
         | FSharpLanguageVersion.FSharp80 -> "8.0"
         | FSharpLanguageVersion.FSharp90 -> "9.0"
+        | FSharpLanguageVersion.FSharp100 -> "10.0"
         | FSharpLanguageVersion.LatestMajor -> "latestmajor"
         | FSharpLanguageVersion.Latest -> "latest"
         | FSharpLanguageVersion.Preview -> "preview"
-        | _ -> failwithf "Unexpected language version: %A" version
+        | _ -> failwithf $"Unexpected language version: {version}"
 
     let toCompilerArg =
         toCompilerOptionValue >> sprintf "--langversion:%s"
