@@ -59,49 +59,22 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
             let comment = findSubsequentComment node
             if isNotNull comment && comment.EndLine = node.EndLine then comment else null
 
-        let movedByBlock =
-            let inlineComment = inlineCommentOnSameLine prevFieldNode
-            if isNull inlineComment && isLastMeaningfulNodeOnLine prevFieldPat then
-                let anchor = getThisOrPrevNewLine prevFieldPat
-                if isNotNull anchor then
-                    moveCommentsAndWhitespaceAfterAnchor anchor prevFieldNode
-                    true
-                else false
-            else false
-        
-        /// Attempts to move the node to a new line using resilient line ending/indent fallbacks.
-        let tryMoveToNewLine (node: ITreeNode) =
-            let lineEnding =
-                try
-                    node.GetLineEnding()
-                with _ ->
-                    "\n"
-            let indent =
-                try node.Indent with _ ->
-                    match node.PrevSibling with
-                    | :? Whitespace as ws -> ws.GetTextLength()
-                    | _ -> 0
-            try
-                moveToNewLine lineEnding indent node
-            with _ -> ()
-
-        if not movedByBlock then
-            let inlineCommentPrev = inlineCommentOnSameLine prevFieldNode
-            if isNotNull inlineCommentPrev then
-                addNodeBefore prevFieldPat inlineCommentPrev
-                tryMoveToNewLine prevFieldPat
+        let inlineComment = inlineCommentOnSameLine prevFieldNode
 
         let lastWithTrivia =
             lastFieldPat
             |> skipSemicolonsAndWhiteSpacesAfter
             |> getThisOrNextNewLine // keep the next line intact if any
 
-        deleteChildRange prevFieldPat.NextSibling lastWithTrivia
+        let startOfDeletion =
+            if isNotNull inlineComment then inlineComment.NextSibling else prevFieldPat.NextSibling
+
+        deleteChildRange startOfDeletion lastWithTrivia
 
     override x.Text = "Remove unused named pattern"
 
     override x.IsAvailable _ =
-       isNotNull fieldPat && isNotNull listPat && listPat.FieldPatterns.Count > 1
+       isNotNull listPat && listPat.FieldPatterns.Count > 1
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
