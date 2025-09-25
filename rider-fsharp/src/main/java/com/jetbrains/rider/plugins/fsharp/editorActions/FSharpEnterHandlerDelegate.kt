@@ -92,6 +92,13 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     FSharpTokenType.END
   )
 
+  private val bracketsAllowingDeindent: TokenSet = TokenSet.create(
+    FSharpTokenType.LBRACE,
+    FSharpTokenType.LBRACK,
+    FSharpTokenType.LBRACK_BAR,
+    FSharpTokenType.LPAREN
+  )
+
   private val emptyBracketsToAddSpace = setOf(
     Pair(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
     Pair(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK),
@@ -108,7 +115,13 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     FSharpTokenType.LBRACK_BAR,
     FSharpTokenType.LBRACK_LESS,
     FSharpTokenType.LQUOTE_TYPED,
-    FSharpTokenType.LQUOTE_UNTYPED
+    FSharpTokenType.LQUOTE_UNTYPED,
+
+    FSharpTokenType.CLASS,
+    FSharpTokenType.INTERFACE,
+    FSharpTokenType.STRUCT,
+
+    FSharpTokenType.BEGIN
   )
 
   private val rightBracketsToAddSpace = emptyBracketsToAddSpace.map { it.second }.toSet()
@@ -621,6 +634,8 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     val document = editor.document
     val line = document.getLineNumber(tokenStart)
 
+    if (handleEnterInsideSingleLineBrackets(editor, iterator, line)) return true
+
     if (leftBracketsToAddIndent.contains(tokenType) &&
       !isSingleLineBrackets(editor, tokenStart) &&
       !isLastTokenOnLine(editor, tokenStart) &&
@@ -702,6 +717,71 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
 
     val (_, lineIndent) = nestedIndentBelow
     insertNewLineAt(editor, lineIndent.indent, caretOffset, false)
+    return true
+  }
+
+  fun handleEnterInsideSingleLineBrackets(editor: Editor, iterator: HighlighterIterator, line: Int): Boolean {
+    val document = editor.document
+    val iterator = editor.highlighter.createIterator(iterator.start)
+
+    val tokenType = iterator.tokenType
+    val leftBracketStartOffset = iterator.start
+    val leftBracketEndOffset = iterator.end
+    val leftBracketLine = document.getLineNumber(leftBracketStartOffset)
+
+    if (!findRightBracket(iterator)) return false
+    if (document.getLineNumber(iterator.start) != leftBracketLine) return false
+
+    val rightBracketStartOffset = iterator.start
+
+    iterator.retreat()
+    while (iterator.tokenTypeSafe == FSharpTokenType.WHITESPACE)
+        iterator.retreat()
+
+    val lastElementEndOffset = iterator.end
+
+    val deindentIter = editor.highlighter.createIterator(leftBracketStartOffset - 1)
+    while (!deindentIter.atEnd() && isIgnored(iterator.tokenType))
+        deindentIter.retreat()
+
+    val shouldDeindent =
+        bracketsAllowingDeindent.contains(tokenType) && deindentIter.tokenType != FSharpTokenType.NEW_LINE
+
+    val baseIndentLength =
+        if (!shouldDeindent)
+            getOffsetInLine(document, line, leftBracketStartOffset)
+        else {
+            val line = getContinuedIndentLine(editor, leftBracketStartOffset, true)
+            getLineWhitespaceIndent(editor, line)
+        }
+
+    val indent = getIndentSettings(editor).indentSize
+    val baseIndentString = "\n" + " ".repeat(baseIndentLength)
+    val indentString = baseIndentString + " ".repeat(indent)
+
+    if (lastElementEndOffset == leftBracketEndOffset) {
+      val newText = if (tokenType == FSharpTokenType.LPAREN) {
+        indentString
+      } else {
+        indentString + baseIndentString
+      }
+      document.replaceString(lastElementEndOffset, rightBracketStartOffset, newText)
+    } else {
+      val firstElementIter = editor.highlighter.createIterator(leftBracketEndOffset)
+
+      while (!firstElementIter.atEnd() && isIgnored(firstElementIter.tokenTypeSafe))
+          firstElementIter.advance()
+
+      val firstElementStartOffset = firstElementIter.start
+
+      if (tokenType != FSharpTokenType.LPAREN) {
+        document.replaceString(lastElementEndOffset, rightBracketStartOffset, baseIndentString)
+      }
+      document.replaceString(leftBracketEndOffset, firstElementStartOffset, indentString)
+    }
+
+    editor.caretModel.moveToOffset(leftBracketEndOffset + indentString.length)
+    editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     return true
   }
 
