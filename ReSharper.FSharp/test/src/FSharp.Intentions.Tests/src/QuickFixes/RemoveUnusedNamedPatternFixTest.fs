@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest; AssertCorrectTreeStructure>]
+[<AssertCorrectTreeStructure>]
 type RemoveUnusedNamedPatternFixTest() =
     inherit FSharpQuickFixTestBase<RemoveUnusedNamedPatternFix>()
 
