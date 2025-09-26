@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) => false;
 
     public override IType Type =>
-      Owner is IFSharpMember { Mfv.ApparentEnclosingEntity: { } fcsEntity } &&
+      Owner is IFSharpMember { Mfv.ApparentEnclosingEntity.Value: var fcsEntity } &&
       fcsEntity.GetTypeElement(Module) is { } typeElement
         ? TypeFactory.CreateType(typeElement)
         : TypeFactory.CreateUnknownType(Module);
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsParameterArray => false;
     public override bool IsParameterCollection => false;
     public override bool IsOptional => false;
-    
+
     public override bool Equals(object obj) =>
       obj is FSharpExtensionMemberThisParameter fsThisParam && Owner.Equals(fsThisParam.Owner);
 

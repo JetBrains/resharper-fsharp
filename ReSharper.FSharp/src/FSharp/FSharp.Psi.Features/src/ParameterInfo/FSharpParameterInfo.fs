@@ -131,7 +131,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
     abstract IsOptionalParam: 'TParameter -> bool
     default this.IsOptionalParam _ = false
 
-    abstract ExtendedType: FSharpEntity option
+    abstract ExtendedType: FSharpType option
     default this.ExtendedType = None
 
     abstract ReturnType: FSharpType option
@@ -264,9 +264,9 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                     text.Append(" ", TextStyle.Default) |> ignore
 
                     match this.ExtendedType with
-                    | Some entity ->
+                    | Some extendedType ->
                         // todo: type arg is not provided by FCS, add it to the symbols API
-                        text.Append(entity.AsType().FormatLayout(displayContext) |> richText) |> ignore
+                        text.Append(extendedType.FormatLayout(displayContext) |> richText) |> ignore
                         if paramGroup.Count > 0 then
                             text.Append(", ", TextStyle.Default) |> ignore
                     | _ -> ()
@@ -360,7 +360,7 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
 
     let isCustomOp = mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.customOperationAttrTypeName)
 
-    override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingEntity else None
+    override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingType else None
     override val ReturnType = if mfv.IsConstructor then None else Some mfv.ReturnParameter.Type
     override val XmlDoc = mfv.XmlDoc
 

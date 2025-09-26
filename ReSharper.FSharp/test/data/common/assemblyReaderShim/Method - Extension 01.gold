@@ -29,17 +29,17 @@ Class.StringSeqExt([|1|(3)])
 (0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'int list'    
 is not compatible with type
-    'IEnumerable<obj>'    
+    'obj seq'    
 
 (1): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'string list'    
 is not compatible with type
-    'IEnumerable<int>'    
+    'int seq'    
 
 (2): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'int list'    
 is not compatible with type
-    'IEnumerable<string>'    
+    'string seq'    
 
 (3): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'string'    
@@ -48,5 +48,5 @@ but here has type
 (4): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'int list'    
 is not compatible with type
-    'IEnumerable<string>'    
+    'string seq'    
 

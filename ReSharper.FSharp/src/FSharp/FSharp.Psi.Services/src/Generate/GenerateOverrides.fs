@@ -271,7 +271,7 @@ let private getOverridableMemberIds typeElement (fcsEntity: FSharpEntity) psiMod
 let private getFcsEntity (fcsSymbolUse: FSharpSymbolUse) =
     match fcsSymbolUse.Symbol with
     | :? FSharpEntity as fcsEntity -> fcsEntity
-    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity
+    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity.Value
     | _ -> Unchecked.defaultof<_>
 
 let private getFcsTypeArgs (fcsEntity: FSharpEntity) (fcsSymbolUse: FSharpSymbolUse) =
