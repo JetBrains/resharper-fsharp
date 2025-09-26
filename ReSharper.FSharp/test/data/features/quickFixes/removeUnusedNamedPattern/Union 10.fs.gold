@@ -3,4 +3,4 @@ type U =
 
 match U(a = 1, b = 2, c = 3) with
 | U(a = a // I'm a comment
-    {caret}c = c) -> ()
+    {caret} c = c) -> ()

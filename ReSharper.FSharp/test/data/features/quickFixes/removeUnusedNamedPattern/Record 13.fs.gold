@@ -1,4 +1,4 @@
 type R = { A: int }
 
 match { A = 1 } with
-| {caret}_ -> ()
+| _{caret} -> ()

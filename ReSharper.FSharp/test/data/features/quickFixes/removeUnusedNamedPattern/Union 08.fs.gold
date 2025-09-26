@@ -4,4 +4,4 @@ type U =
 match U(a = 1, b = 2, c = 3) with
 | U(a = a
     b = b // I'm a comment
-    {caret}) -> ()
+       {caret}) -> ()

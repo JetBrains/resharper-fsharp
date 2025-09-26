@@ -3,4 +3,5 @@ type U =
 
 match U(a = 1, b = 2, c = 3) with
 | U(a = a
-    b = b{caret}) -> ()
+    b = b
+       {caret}) -> ()
