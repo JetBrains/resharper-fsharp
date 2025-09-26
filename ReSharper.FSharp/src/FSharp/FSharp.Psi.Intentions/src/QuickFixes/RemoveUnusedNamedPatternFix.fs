@@ -9,6 +9,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
     
     let fieldPat = FieldPatNavigator.GetByPattern(warning.Pat)
+    let listPat = NamedPatternsListPatNavigator.GetByFieldPattern(fieldPat)
     
     /// Remove the middle field and keep separators/comments stable.
     let deleteMiddleFieldPreservingTrailingComment (prevFieldPat: IFieldPat) (fieldPat: IFieldPat) (nextFieldPat: IFieldPat) =
@@ -67,28 +68,27 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
 
         deleteChildRange startOfDeletion lastWithTrivia
 
-    override x.Text = "Remove unused named pattern"
+    override x.Text = $"Remove unused pattern"
 
-    override x.IsAvailable _ = isNotNull fieldPat
+    override x.IsAvailable _ = isNotNull listPat
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
 
-        let listPat = NamedPatternsListPatNavigator.GetByFieldPattern(fieldPat)
         let fieldPatterns = listPat.FieldPatterns
 
         // If there is only a single named field, and it is unused, collapse the whole pattern:
         // - For records: replace the record pattern with '_'
         // - For unions with named fields: replace the field list with a single '_'
         let collapseSingleNamedField (lp: INamedPatternsListPat) =
-            match lp with
-            | :? IRecordPat as recordPat ->
-                let factory = recordPat.CreateElementFactory()
-                replace recordPat (factory.CreateWildPat())
-            | :? INamedUnionCaseFieldsPat as namedFields ->
-                let factory = namedFields.CreateElementFactory()
-                replace namedFields (factory.CreateWildPat())
-            | _ -> ()
+            let patToReplace: IFSharpTreeNode =
+                match lp with
+                | :? IRecordPat
+                | :? INamedUnionCaseFieldsPat as pat -> pat
+                | _ -> failwith "Unexpected named pattern list"
+            
+            let factory = patToReplace.CreateElementFactory()
+            replace patToReplace (factory.CreateWildPat())
             
         if fieldPatterns.Count = 1 then
             collapseSingleNamedField listPat
