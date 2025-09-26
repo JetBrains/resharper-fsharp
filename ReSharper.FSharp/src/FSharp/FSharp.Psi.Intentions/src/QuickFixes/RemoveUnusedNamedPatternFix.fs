@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
@@ -11,8 +10,6 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
     
     let fieldPat = FieldPatNavigator.GetByPattern(warning.Pat)
     
-    let listPat = NamedPatternsListPatNavigator.GetByFieldPattern(fieldPat)
-
     /// Remove the middle field and keep separators/comments stable.
     let deleteMiddleFieldPreservingTrailingComment (prevFieldPat: IFieldPat) (fieldPat: IFieldPat) (nextFieldPat: IFieldPat) =
         let fieldPatNode = fieldPat.Pattern
@@ -33,7 +30,7 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
         // If there is an inline comment on the same line, stop before it; otherwise stop before the newline
         // preceding the next field to keep the next line and its indentation intact.
         let rangeEnd =
-            if not (isNull trailingComment) then trailingComment.PrevSibling
+            if isNotNull trailingComment then trailingComment.PrevSibling
             else
                 if fieldPat.EndLine < nextFieldPat.StartLine then
                     let beforeNext = getFirstMatchingNodeBefore isInlineSpaceOrComment nextFieldPat
@@ -72,19 +69,36 @@ type RemoveUnusedNamedPatternFix(warning: UnusedValueWarning) =
 
     override x.Text = "Remove unused named pattern"
 
-    override x.IsAvailable _ =
-       isNotNull listPat && listPat.FieldPatterns.Count > 1
+    override x.IsAvailable _ = isNotNull fieldPat
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(fieldPat.IsPhysical())
 
+        let listPat = NamedPatternsListPatNavigator.GetByFieldPattern(fieldPat)
         let fieldPatterns = listPat.FieldPatterns
-        let indexPat = fieldPatterns.IndexOf(fieldPat) // index of the unused field
-        let isLast = indexPat = fieldPatterns.Count - 1 // is the unused field the last one?
 
-        if not isLast then
-            let prevPat = if indexPat > 0 then fieldPatterns[indexPat - 1] else null
-            deleteMiddleFieldPreservingTrailingComment prevPat fieldPat fieldPatterns[indexPat + 1]
+        // If there is only a single named field, and it is unused, collapse the whole pattern:
+        // - For records: replace the record pattern with '_'
+        // - For unions with named fields: replace the field list with a single '_'
+        let collapseSingleNamedField (lp: INamedPatternsListPat) =
+            match lp with
+            | :? IRecordPat as recordPat ->
+                let factory = recordPat.CreateElementFactory()
+                replace recordPat (factory.CreateWildPat())
+            | :? INamedUnionCaseFieldsPat as namedFields ->
+                let factory = namedFields.CreateElementFactory()
+                replace namedFields (factory.CreateWildPat())
+            | _ -> ()
+            
+        if fieldPatterns.Count = 1 then
+            collapseSingleNamedField listPat
         else
-            liftPrevInlineCommentThenRemoveLast fieldPatterns[indexPat - 1] fieldPat
+            let indexPat = fieldPatterns.IndexOf(fieldPat) // index of the unused field
+            let isLast = indexPat = fieldPatterns.Count - 1 // is the unused field the last one?
+
+            if not isLast then
+                let prevPat = if indexPat > 0 then fieldPatterns[indexPat - 1] else null
+                deleteMiddleFieldPreservingTrailingComment prevPat fieldPat fieldPatterns[indexPat + 1]
+            else
+                liftPrevInlineCommentThenRemoveLast fieldPatterns[indexPat - 1] fieldPat
 
