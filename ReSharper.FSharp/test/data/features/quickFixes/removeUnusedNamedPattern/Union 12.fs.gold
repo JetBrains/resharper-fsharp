@@ -1,3 +1,3 @@
 match x with
-| U(b = b // b is unused
+| U({caret}b = b // b is unused
     c = c) -> ()
