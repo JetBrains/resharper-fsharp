@@ -2,27 +2,19 @@ using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+
+public class TypeReference([NotNull] IFSharpReferenceOwner owner) : FSharpSymbolReference(owner)
 {
-  public class TypeReference : FSharpSymbolReference
+  public override FSharpSymbol GetFcsSymbol()
   {
-    public TypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
+    var symbol = base.GetFcsSymbol();
+    return symbol switch
     {
-    }
-
-    public override FSharpSymbol GetFcsSymbol()
-    {
-      var symbol = base.GetFcsSymbol();
-      if (symbol is FSharpEntity || symbol is FSharpGenericParameter)
-        return symbol;
-
-      if (symbol is FSharpMemberOrFunctionOrValue mfv)
-      {
-        if (mfv.IsConstructor) return mfv.ApparentEnclosingEntity;
-        if (mfv.LiteralValue != null) return mfv;
-      }
-
-      return null;
-    }
+      FSharpEntity or FSharpGenericParameter => symbol,
+      FSharpMemberOrFunctionOrValue { IsConstructor: true, ApparentEnclosingEntity.Value: { } entity } => entity,
+      FSharpMemberOrFunctionOrValue { LiteralValue: not null } mfv => mfv,
+      _ => null
+    };
   }
 }

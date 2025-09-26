@@ -262,7 +262,7 @@ let rec isStaticContext (expr: IFSharpExpression) =
 let private getFcsEntity (fsReference: FSharpSymbolReference) =
     match fsReference.GetFcsSymbol() with
     | :? FSharpEntity as fcsEntity -> fcsEntity
-    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity
+    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor -> mfv.ApparentEnclosingEntity.Value
     | _ -> Unchecked.defaultof<_>
 
 let getFcsType (expr: IFSharpExpression) =

@@ -5,12 +5,10 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Application
 open JetBrains.Metadata.Reader.API
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -141,7 +139,10 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
     let matchesType (typeMember: ITypeMember) : bool =
         match typeMember with
         | FSharpSourceExtensionMember mfv ->
-            let extendedTypeElement = mfv.ApparentEnclosingEntity.GetTypeElement(typeMember.Module)
+            let apparentEnclosingEntity = mfv.ApparentEnclosingEntity
+            apparentEnclosingEntity.IsSome &&
+
+            let extendedTypeElement = apparentEnclosingEntity.Value.GetTypeElement(typeMember.Module)
             isNotNull exprTypeElements && exprTypeElements |> Seq.exists extendedTypeElement.Equals
 
         | FSharpCompiledExtensionMember extendedTypeShortName ->

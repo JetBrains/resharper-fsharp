@@ -110,7 +110,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
             let invokingExtensionMethod =
                 match fcsSymbol with
                 | :? FSharpMemberOrFunctionOrValue as mfv ->
-                    mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
+                    mfv.IsExtensionMember && mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
                 | _ -> false
 
             let offset = if invokingExtensionMethod then 1 else 0
