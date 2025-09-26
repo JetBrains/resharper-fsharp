@@ -1,3 +1,6 @@
-match x with
+type U =
+    | U of a:int * b:int
+
+match U(a = 1, b = 2) with
 | U(a = a
     b = {caret}b) -> ()

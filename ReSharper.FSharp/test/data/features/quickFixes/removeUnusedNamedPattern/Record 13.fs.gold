@@ -1,2 +1,4 @@
-match x with
+type R = { A: int }
+
+match { A = 1 } with
 | {caret}_ -> ()
