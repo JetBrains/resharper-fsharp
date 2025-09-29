@@ -6,7 +6,6 @@ using FSharp.Compiler.Symbols;
 using FSharp.Compiler.Text;
 using JetBrains.Annotations;
 using JetBrains.Application;
-using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -21,7 +20,6 @@ using JetBrains.Text;
 using JetBrains.Util;
 using JetBrains.Util.Concurrency.Threading;
 using JetBrains.Util.DataStructures;
-using JetBrains.Util.dataStructures.TypedIntrinsics;
 using PrettyNaming = FSharp.Compiler.Syntax.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -29,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   public class FcsFileCapturedInfo([NotNull] IPsiSourceFile sourceFile) : IFcsFileCapturedInfo
   {
     private ResolvedSymbols mySymbols;
-    private IDictionary<int, FSharpDiagnostic> myDiagnostics;
+    private IDictionary<Position, FSharpDiagnostic> myDiagnostics;
     private readonly object myLock = new();
 
     [NotNull] public IPsiSourceFile SourceFile { get; } = sourceFile;
@@ -40,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return mySymbols ??= CreateFileResolvedSymbols();
     }
 
-    private IDictionary<int, FSharpDiagnostic> GetCachedDiagnostics()
+    private IDictionary<Position, FSharpDiagnostic> GetCachedDiagnostics()
     {
       using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
       return myDiagnostics ??= CreateDiagnostics();
@@ -80,34 +78,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpSymbol GetSymbol(int offset) =>
       GetSymbolDeclaration(offset)?.Symbol ?? GetSymbolUse(offset)?.Symbol;
 
-    public FSharpDiagnostic GetDiagnostic(int offset) =>
-      GetCachedDiagnostics().TryGetValue(offset);
+    public FSharpDiagnostic GetDiagnostic(Position pos) =>
+      GetCachedDiagnostics().TryGetValue(pos);
 
-    public void SetCachedDiagnostics(IDictionary<int, FSharpDiagnostic> diagnostics)
+    public void SetCachedDiagnostics(IDictionary<Position, FSharpDiagnostic> diagnostics)
     {
       using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
       myDiagnostics ??= diagnostics;
     }
 
     [NotNull]
-    private IDictionary<int, FSharpDiagnostic> CreateDiagnostics()
+    private IDictionary<Position, FSharpDiagnostic> CreateDiagnostics()
     {
       const string opName = "FcsFileCapturedInfo.CreateDiagnostics";
 
       var fsFile = SourceFile.GetPrimaryPsiFile() as IFSharpFile;
       var checkResults = fsFile?.GetParseAndCheckResults(false, opName)?.Value.CheckResults;
       if (checkResults == null)
-        return EmptyDictionary<int, FSharpDiagnostic>.Instance;
+        return EmptyDictionary<Position, FSharpDiagnostic>.Instance;
 
-      var result = new Dictionary<int, FSharpDiagnostic>();
+      var result = new Dictionary<Position, FSharpDiagnostic>();
       foreach (var diagnostic in checkResults.Diagnostics)
       {
         if (!FcsCachedDiagnosticInfo.CanBeCached(diagnostic))
           continue;
 
-        var coords = new DocumentCoords((Int32<DocLine>)diagnostic.StartLine, (Int32<DocColumn>)diagnostic.StartColumn);
-        var startOffset = SourceFile.Document.GetDocumentOffset(coords).Offset;
-        result[startOffset] = diagnostic;
+        var pos = PositionModule.mkPos(diagnostic.StartLine, diagnostic.StartColumn);
+        result[pos] = diagnostic;
       }
 
       return result;

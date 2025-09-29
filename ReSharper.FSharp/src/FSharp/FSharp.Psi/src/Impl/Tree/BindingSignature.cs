@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -31,6 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         headPat.AddTokenBefore(FSharpTokenType.MUTABLE);
     }
 
+    [CanBeNull] private IReferencePat HeadReferencePat => HeadPattern as IReferencePat;
+
     public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
       TypeUsage.GetParameterDeclaration(index);
 
@@ -39,8 +42,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     TreeTextRange IDeclaration.GetNameRange() => TreeTextRange.InvalidRange;
 
-    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => throw new InvalidOperationException();
-    FSharpSymbolUse IFSharpDeclaration.GetFcsSymbolUse() => throw new InvalidOperationException();
+    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => HeadReferencePat?.GetFcsSymbol();
+    FSharpSymbolUse IFSharpDeclaration.GetFcsSymbolUse() => HeadReferencePat?.GetFcsSymbolUse();
     string IDeclaration.DeclaredName => throw new InvalidOperationException();
     void IDeclaration.SetName(string name) => throw new InvalidOperationException();
     bool IDeclaration.IsSynthetic() => throw new InvalidOperationException();

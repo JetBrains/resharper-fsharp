@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       var result = new List<IFSharpParameterDeclaration>();
       foreach (var ownerDecl in owner.GetDeclarations())
       {
-        if (GetParameterOwnerDeclaration(ownerDecl) is not { } parameterOwnerDecl)
+        if (FSharpParameterOwnerDeclarationNavigator.Unwrap(ownerDecl) is not { } parameterOwnerDecl)
           continue;
 
         var paramDecl = parameterOwnerDecl.GetParameterDeclaration(index);
@@ -82,15 +82,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
       return result;
     }
-
-    [CanBeNull]
-    private static IFSharpParameterOwnerDeclaration GetParameterOwnerDeclaration(IDeclaration decl) =>
-      decl switch
-      {
-        IReferencePat refPat => refPat.Binding,
-        IFSharpParameterOwnerDeclaration paramOwnerDecl => paramOwnerDecl,
-        _ => null
-      };
 
     public IEnumerable<ILocalVariable> GetParameterOriginElements() =>
       GetParameterOriginDeclarations().OfType<ILocalVariable>();

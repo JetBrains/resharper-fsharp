@@ -34,7 +34,7 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
     let expr = expr.GetOutermostParentExpressionFromItsReturn()
     let expr, lambdaParametersCount = skipParentLambdaBodies expr
 
-    let decl = FSharpTypeOwnerDeclarationNavigator.GetByExpression(expr)
+    let decl: IFSharpTypeOwnerDeclaration = FSharpTypeOwnerDeclarationNavigator.GetByExpression(expr)
     let actualFcsType = diagnosticInfo.TypeMismatchData.ActualType
 
     new (error: TypeConstraintMismatchError) =
@@ -83,11 +83,6 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
     override this.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(decl.IsPhysical())
 
-        if isNull decl.TypeUsage then
-            let typeUsage = decl.CreateElementFactory().CreateTypeUsage("_", TypeUsageContext.TopLevel)
-            decl.SetTypeUsage(typeUsage) |> ignore
-            FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
-
         let paramCount =
             match decl with
             | :? IParameterOwnerMemberDeclaration as paramOwnerDecl -> paramOwnerDecl.ParametersDeclarations.Count
@@ -102,6 +97,9 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
                     paramCount + lambdaParametersCount
                 else
                     lambdaParametersCount
+
+            if isNull decl.TypeUsage then
+                FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
 
             decl.TypeUsage
             |> FSharpTypeUsageUtil.skipParameters paramsToSkip

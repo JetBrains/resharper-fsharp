@@ -12,14 +12,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   {
     private readonly IPsiSourceFile mySourceFile;
     private readonly IDisposable myProhibitTypeCheckCookie;
+    private readonly bool myPinnedByThisInstance;
 
     public PinTypeCheckResultsCookie(IPsiSourceFile sourceFile, FSharpParseFileResults parseResults,
       FSharpCheckFileResults checkResults, bool prohibitTypeCheck)
     {
-      mySourceFile = sourceFile;
-      PinnedResults = Tuple.Create(parseResults, checkResults);
       if (prohibitTypeCheck)
         myProhibitTypeCheckCookie = ProhibitTypeCheckCookie.Create();
+
+      myPinnedByThisInstance = PinnedResults == null;
+      if (!myPinnedByThisInstance)
+        return;
+
+      mySourceFile = sourceFile;
+      PinnedResults = Tuple.Create(parseResults, checkResults);
+      
     }
 
     [field: ThreadStatic]
@@ -31,13 +38,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
     public void Dispose()
     {
-      Assertion.Assert(PinnedResults != null, "PinnedResults == null");
-
-      PinnedResults = null;
       myProhibitTypeCheckCookie?.Dispose();
 
-      using var cookie = WriteLockCookie.Create(true);
-      mySourceFile.GetPsiServices().Files.IncrementModificationTimestamp(null);
+      if (!myPinnedByThisInstance)
+        return;
+
+      Assertion.Assert(PinnedResults != null, "PinnedResults == null");
+      PinnedResults = null;
+
+      if (mySourceFile.GetPsiServices().Locks.ContentModelLocks.IsWriteAccessAllowed)
+      {
+        using var cookie = WriteLockCookie.Create(true);
+        mySourceFile.GetPsiServices().Files.IncrementModificationTimestamp(null);
+      }
     }
   }
 }

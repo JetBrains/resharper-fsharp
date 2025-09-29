@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Diagnostics;
 using FSharp.Compiler.Symbols;
+using FSharp.Compiler.Text;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -24,9 +25,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       EmptyList<FcsResolvedSymbolUse>.Instance;
 
     public FSharpSymbol GetSymbol(int offset) => null;
-    public FSharpDiagnostic GetDiagnostic(int offset) => null;
+    public FSharpDiagnostic GetDiagnostic(Position offset) => null;
 
-    public void SetCachedDiagnostics(IDictionary<int, FSharpDiagnostic> diagnostics)
+    public void SetCachedDiagnostics(IDictionary<Position, FSharpDiagnostic> diagnostics)
     {
     }
   }

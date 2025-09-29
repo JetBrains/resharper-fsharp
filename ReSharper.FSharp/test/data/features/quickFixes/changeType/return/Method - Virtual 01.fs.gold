@@ -1,0 +1,8 @@
+﻿module Module
+
+type T() =
+    abstract M: unit -> string
+    default this.M(): string = 1
+
+let t = T()
+let s: string = t.M(){caret}

@@ -14,7 +14,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -449,7 +448,7 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
 
 let private annotateParamDecl (paramDecl: IFSharpParameterDeclaration) (_, fcsType) =
     match paramDecl with
-    | :? IFSharpPattern as fsPat -> specifyPatternType fcsType fsPat
+    | :? IFSharpPattern as fsPat -> TypeAnnotationUtil.specifyPatternType fcsType fsPat
     | _ -> ()
 
 let bindTypes types (memberDecl: IMemberDeclaration) =
@@ -462,7 +461,7 @@ let bindTypes types (memberDecl: IMemberDeclaration) =
 
     FSharpTypeUsageUtil.setParametersOwnerReturnTypeNoBind memberDecl returnType
     |> Seq.singleton
-    |> bindAnnotations
+    |> TypeAnnotationUtil.bindAnnotations
 
 let addMembers inputElements (typeDecl: IFSharpTypeElementDeclaration) (anchor: ITreeNode) =
     let mayHaveBaseCalls = mayHaveBaseCalls typeDecl

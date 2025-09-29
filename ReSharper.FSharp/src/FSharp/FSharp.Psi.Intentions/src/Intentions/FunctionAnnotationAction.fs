@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Tree
@@ -106,7 +105,7 @@ module SpecifyTypes =
                     specifyParameterTypes fcsTypes getFcsType enumerate pat.Patterns acc false
                 | pattern ->
                     let fcsType = getFcsType fcsParamGroup
-                    specifyPatternTypeImpl fcsType pattern :: acc
+                    TypeAnnotationUtil.specifyPatternTypeImpl fcsType pattern :: acc
             ) acc
 
         let parameters = decl.ParametersDeclarations |> Seq.map _.Pattern
@@ -135,13 +134,13 @@ module SpecifyTypes =
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
                 let fcsType = mfv.FullType
 
-                let annotationInfo = [| specifyPatternTypeImpl fcsType pattern |]
-                bindAnnotations annotationInfo
+                let annotationInfo = [| TypeAnnotationUtil.specifyPatternTypeImpl fcsType pattern |]
+                TypeAnnotationUtil.bindAnnotations annotationInfo
 
             | pattern ->
                 let patType = pattern.TryGetFcsType()
-                let annotationInfo = [| specifyPatternTypeImpl patType pattern |]
-                bindAnnotations annotationInfo
+                let annotationInfo = [| TypeAnnotationUtil.specifyPatternTypeImpl patType pattern |]
+                TypeAnnotationUtil.bindAnnotations annotationInfo
 
         | :? IParameterOwnerMemberDeclaration as declaration ->
             let symbolUse = declaration.GetFcsSymbolUse()
@@ -158,7 +157,7 @@ module SpecifyTypes =
                     yield FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind decl symbol
             ]
 
-            bindAnnotations annotationsInfo
+            TypeAnnotationUtil.bindAnnotations annotationsInfo
 
         | _ -> ()
 
@@ -167,7 +166,7 @@ module SpecifyTypes =
         Assertion.Assert(decl.AccessorDeclarationsEnumerable.IsEmpty(), "decl.AccessorDeclarationsEnumerable.IsEmpty()")
 
         let annotationsInfo = [| FSharpTypeUsageUtil.setFcsParametersOwnerReturnTypeNoBind decl mfv |]
-        bindAnnotations annotationsInfo
+        TypeAnnotationUtil.bindAnnotations annotationsInfo
 
 [<AbstractClass>]
 type AnnotationActionBase<'a when 'a: not struct and 'a :> ITreeNode>(dataProvider: FSharpContextActionDataProvider) =

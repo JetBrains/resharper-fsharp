@@ -69,8 +69,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IDeclaredElement IDeclaration.DeclaredElement => null;
     TreeTextRange IDeclaration.GetNameRange() => TreeTextRange.InvalidRange;
 
-    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => throw new InvalidOperationException();
-    FSharpSymbolUse IFSharpDeclaration.GetFcsSymbolUse() => throw new InvalidOperationException();
+    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => HeadReferencePat?.GetFcsSymbol();
+    FSharpSymbolUse IFSharpDeclaration.GetFcsSymbolUse() => HeadReferencePat?.GetFcsSymbolUse();
     string IDeclaration.DeclaredName => throw new InvalidOperationException();
     void IDeclaration.SetName(string name) => throw new InvalidOperationException();
     bool IDeclaration.IsSynthetic() => throw new InvalidOperationException();

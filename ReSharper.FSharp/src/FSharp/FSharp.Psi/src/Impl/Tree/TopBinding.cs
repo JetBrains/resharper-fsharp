@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     IFSharpIdentifier INameIdentifierOwner.NameIdentifier => null;
 
-    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => throw new InvalidOperationException();
+    FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => HeadReferencePat?.GetFcsSymbol();
     string IFSharpDeclaration.CompiledName => throw new InvalidOperationException();
     void IFSharpDeclaration.SetName(string name, ChangeNameKind changeNameKind) => throw new InvalidOperationException();
     TreeTextRange IFSharpDeclaration.GetNameIdentifierRange() => throw new InvalidOperationException();
