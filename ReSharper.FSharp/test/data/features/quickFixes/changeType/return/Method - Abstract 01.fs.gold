@@ -1,0 +1,7 @@
+﻿module Module
+
+type I =
+    abstract M: unit -> string
+
+let i: I = Unchecked.defaultof<_>
+let s: string = i.M(){caret}

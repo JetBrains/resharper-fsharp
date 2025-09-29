@@ -5,6 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Diagnostics.ExtendedData
 open FSharp.Compiler.Symbols
+open FSharp.Compiler.Text
 open JetBrains.Application
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -198,9 +199,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
         if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
 
-    let createCachedDiagnostic error range =
-        let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, range)
-        cachedFcsDiagnostics[diagnosticInfo.Offset] <- error
+    let createCachedDiagnostic (error: FSharpDiagnostic) range =
+        let pos = Position.mkPos error.StartLine error.StartColumn
+        let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, pos)
+        cachedFcsDiagnostics[pos] <- error
         diagnosticInfo
 
     let createTypeMismatchHighlighting highlightingCtor range error : IHighlighting =

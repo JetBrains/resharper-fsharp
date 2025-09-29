@@ -1,0 +1,5 @@
+﻿module Module
+
+let f: unit -> string = fun () -> 1
+
+let s: string = f (){caret}

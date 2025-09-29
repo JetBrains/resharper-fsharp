@@ -30,6 +30,7 @@
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
     <QuickFix>ChangeParameterTypeFromArgumentFix</QuickFix>
+    <QuickFix>ChangeReturnTypeFromInvocationFix</QuickFix>
     <QuickFix>ChangeLocalType</QuickFix>
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>
@@ -310,6 +311,7 @@
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
     <QuickFix>ChangeParameterTypeFromArgumentFix</QuickFix>
+    <QuickFix>ChangeReturnTypeFromInvocationFix</QuickFix>
     <QuickFix>ChangeLocalType</QuickFix>
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>

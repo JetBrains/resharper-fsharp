@@ -18,7 +18,7 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Prop - Member 01``() = x.DoNamedTestWithSignature()
-    [<Test; Explicit>] member x.``Prop - Member 02``() = x.DoNamedTest()
+    [<Test>] member x.``Prop - Member 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
@@ -96,8 +96,7 @@ type ChangeElementTypeTest() =
 
     [<Test>] member x.``Field - Record 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Field - Record 02``() = x.DoNamedTest()
-    [<Test; Explicit "Fix wrong FCS diagnostic data">] member x.``Field - Record 03``() = x.DoNamedTest()
-    [<Test; Explicit "Fix wrong FCS diagnostic data">] member x.``Field - Record 04``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Record 03``() = x.DoNamedTest()
     [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
@@ -144,3 +143,20 @@ type ChangeParamTypeFromArgTest() =
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Method 03``() = x.DoNamedTest()
     [<Test>] member x.``Method 04``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ChangeReturnTypeFromInvocationTest() =
+    inherit FSharpQuickFixTestBase<ChangeReturnTypeFromInvocationFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/return"
+
+    [<Test>] member x.``Function - Lambda 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Function - Lambda 02``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Function 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Function 02``() = x.DoNamedTestWithSignature()
+
+    [<Test>] member x.``Method - Abstract 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Method - Virtual 01``() = x.DoNamedTestWithSignature() // todo: don't add the empty line in the formatter
+    [<Test>] member x.``Method 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Method 02``() = x.DoNamedTestWithSignature()

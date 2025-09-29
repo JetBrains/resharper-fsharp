@@ -5,7 +5,6 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
@@ -21,7 +20,7 @@ let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
         else
             newTypeUsage
 
-    bindAnnotations [ fcsType, typeUsage ]
+    TypeAnnotationUtil.bindAnnotations [ fcsType, typeUsage ]
 
 let setParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (fcsType: FSharpType) =
     let factory = decl.CreateElementFactory()
@@ -42,12 +41,12 @@ let setFcsParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (m
 let setFcsParametersOwnerReturnType (decl: IFSharpTypeOwnerDeclaration) =
     let mfv = decl.GetFcsSymbolUse().Symbol.As<FSharpMemberOrFunctionOrValue>()
     let fcsReturnType, returnTypeUsage = setFcsParametersOwnerReturnTypeNoBind decl mfv
-    bindAnnotations [ fcsReturnType, returnTypeUsage ]
+    TypeAnnotationUtil.bindAnnotations [ fcsReturnType, returnTypeUsage ]
 
 let setTypeOwnerType (fcsType: FSharpType) (decl: IFSharpTypeUsageOwnerNode) =
     let factory = decl.CreateElementFactory()
     let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel))
-    bindAnnotations [ fcsType, typeUsage ]
+    TypeAnnotationUtil.bindAnnotations [ fcsType, typeUsage ]
 
 
 let rec skipParameters paramsToSkipCount (typeUsage: ITypeUsage) =

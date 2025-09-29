@@ -1,3 +1,4 @@
+[<RequireQualifiedAccess>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 
 open FSharp.Compiler.Symbols
