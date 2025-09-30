@@ -1,9 +1,8 @@
 ﻿type Foo () =
     static member F (|first|(param #0): int, |second|(param #1), third) = first + second + third
 
-Foo.F (|first=15|(arg #0), |second=23|(arg #1), |what=56|(arg #2))
+Foo.F (|first=15|(arg #0), |second=23|(arg #1), what=56)
 
 ---------------------------------------------------------
 (arg #0) => first
 (arg #1) => second
-(arg #2) => <no matching param>
