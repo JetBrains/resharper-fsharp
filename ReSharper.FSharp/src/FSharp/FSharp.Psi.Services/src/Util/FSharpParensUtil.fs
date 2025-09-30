@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -245,19 +246,19 @@ let escapesRefExprAtNamedArgPosition (context: IFSharpExpression) (expr: IFSharp
     isNotNull refExpr && refExpr.IsSimpleName &&
 
     let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(context)
-    isNotNull binaryAppExpr && FSharpMethodInvocationUtil.isTopLevelArg binaryAppExpr
+    isNotNull binaryAppExpr && FSharpArgumentsUtil.IsTopLevelArg binaryAppExpr
 
 let escapesAppAtNamedArgPosition (parenExpr: IParenExpr) =
     match parenExpr.InnerExpression with
     | :? IParenExpr as innerParenExpr ->
         match innerParenExpr.InnerExpression with
         | :? IBinaryAppExpr as binaryAppExpr ->
-            FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
+            FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr) &&
             isNotNull (FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr.IgnoreParentParens()))
         | _ -> false
     | :? IBinaryAppExpr as binaryAppExpr ->
-        FSharpMethodInvocationUtil.hasNamedArgStructure binaryAppExpr &&
-        FSharpMethodInvocationUtil.isTopLevelArg parenExpr
+        FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr) &&
+        FSharpArgumentsUtil.IsTopLevelArg(parenExpr)
     | _ -> false
 
 let escapesEnumFieldLiteral (parenExpr: IParenExpr) =

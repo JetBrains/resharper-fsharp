@@ -1,0 +1,7 @@
+﻿module Test
+
+open System.Diagnostics.CodeAnalysis
+
+let f ([<StringSyntax(StringSyntaxAttribute.Regex)>] x) = ()
+
+f ("\d", "\d")

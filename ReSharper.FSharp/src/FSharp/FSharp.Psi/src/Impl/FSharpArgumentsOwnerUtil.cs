@@ -2,6 +2,7 @@
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -48,11 +49,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           if (paramGroup.Count == 0)
             return EmptyList<IArgument>.Instance;
 
-          // RIDER-125426
-          // argExpr could be a tuple with a corresponding single param group parameter
-          // if it additionally contains property initializers
-          if (paramGroup.Count == 1 && argExpr is not ITupleExpr)
-            return new[] {argExpr as IArgument};
+          if (paramGroup.Count == 1)
+          {
+            // RIDER-125426
+            // argExpr could be a tuple with a corresponding single param group parameter
+            // if it additionally contains property initializers
+            var hasNamedArgInTuple =
+              mfv.IsMember &&
+              argExpr is ITupleExpr tupleExpr &&
+              ParenExprNavigator.GetByInnerExpression(ParenExprNavigator.GetByInnerExpression(tupleExpr)) == null &&
+              tupleExpr.ExpressionsEnumerable.Any(arg =>
+                arg is IBinaryAppExpr binaryAppExpr && FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr));
+
+            if (!hasNamedArgInTuple) return [argExpr as IArgument];
+          }
 
           var tupleExprs =
             argExpr switch
@@ -67,8 +77,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
+          IReadOnlyList<IFSharpExpression> actualArgs;
+
+          if (mfv.IsMember)
+          {
+            var paramNames = paramGroup
+              .Select(x => x.Name?.Value)
+              .Where(x => x != null)
+              .ToJetHashSet();
+
+            actualArgs = tupleExprs
+              .OrderBy(x =>
+              {
+                // Explicit args M(1, 2, 3)
+                if (FSharpArgumentsUtil.TryGetNamedArgRefExpr(x) is not
+                    { IsSimpleName: true, ShortName: { } name })
+                  return 0;
+
+                return paramNames.Contains(name)
+                  // Existing named arguments 
+                  ? 1
+                  // Property setters and other named args
+                  : 2;
+              })
+              .ToList();
+          }
+          else actualArgs = tupleExprs;
+
           return Enumerable.Range(0, paramGroup.Count)
-            .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
+            .Select(i => i < actualArgs.Count ? actualArgs[i] as IArgument : null);
         }).ToList();
     }
   }

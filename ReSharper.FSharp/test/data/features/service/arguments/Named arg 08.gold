@@ -1,0 +1,10 @@
+﻿type A(|x|(param #0), ?|y|(param #1), ?|z|(param #2)) =
+    member val Prop1 = 1 with get, set
+    member val Prop2 = 1 with get, set
+
+A(|1|(arg #0), Prop1 = 2, |y = 1|(arg #1), Prop2 = 1, |z = 1|(arg #2))
+
+---------------------------------------------------------
+(arg #0) => x
+(arg #1) => y
+(arg #2) => z
