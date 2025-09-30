@@ -44,6 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         .SelectMany(pair =>
         {
           var (paramGroup, argExpr) = pair;
+          var canHaveNamedArgs = mfv.IsMember;
 
           // e.g. F# extension methods with 0 parameters
           if (paramGroup.Count == 0)
@@ -55,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             // argExpr could be a tuple with a corresponding single param group parameter
             // if it additionally contains property initializers
             var hasNamedArgInTuple =
-              mfv.IsMember &&
+              canHaveNamedArgs &&
               argExpr is ITupleExpr tupleExpr &&
               ParenExprNavigator.GetByInnerExpression(ParenExprNavigator.GetByInnerExpression(tupleExpr)) == null &&
               tupleExpr.ExpressionsEnumerable.Any(arg =>
@@ -77,17 +78,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
-          if (!mfv.IsMember)
-            return Enumerable
-              .Range(0, paramGroup.Count)
-              .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
-
           var unnamedArgs = new Queue<IArgument>();
           var namedLikeArgs = new Dictionary<string, IArgument>();
 
           foreach (var expr in tupleExprs)
           {
-            if (FSharpArgumentsUtil.IsTopLevelArg(expr) &&
+            if (canHaveNamedArgs &&
+                FSharpArgumentsUtil.IsTopLevelArg(expr) &&
                 FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
               namedLikeArgs.TryAdd(name, expr as IArgument);
 
