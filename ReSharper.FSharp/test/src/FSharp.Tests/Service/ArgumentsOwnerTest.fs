@@ -147,6 +147,7 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Named arg 08 - Explicit, setters and optional``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 09 - Explicit, setter, optional, wrong name``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 10 - Setter for a return type``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 11 - Multiple args for a single param``() = x.DoNamedTest()
 
     [<Test>] member x.``Non IArgument 01 - Obj expression``() = x.DoNamedTest()
 
