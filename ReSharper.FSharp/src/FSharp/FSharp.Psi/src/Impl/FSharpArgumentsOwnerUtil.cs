@@ -82,8 +82,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           if (mfv.IsMember)
           {
             var paramNames = paramGroup
-              .Select(x => x.Name?.Value)
-              .Where(x => x != null)
+              .SelectNotNull(x => x.Name?.Value)
               .ToJetHashSet();
 
             actualArgs = tupleExprs
