@@ -57,16 +57,12 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let fcsSymbol = symbolReference.GetFcsSymbol()
     if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
 
-    let canHaveNamedArgs =
-        match fcsSymbol with
-        | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsMember
-        | _ -> false
-    
     let namedArgRefExpr =
-        if canHaveNamedArgs && FSharpArgumentsUtil.IsTopLevelArg(expr) then
+        match fcsSymbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv when
+            mfv.IsMember && FSharpArgumentsUtil.IsTopLevelArg(expr) ->
             FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr)
-        else
-            null
+        | _ -> null
 
     let namedParam =
         match namedArgRefExpr with
