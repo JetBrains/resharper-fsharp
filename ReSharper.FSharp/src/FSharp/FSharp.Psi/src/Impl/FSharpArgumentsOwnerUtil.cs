@@ -77,24 +77,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
-          IReadOnlyList<IFSharpExpression> actualArgs;
+          if (!mfv.IsMember)
+            return Enumerable
+              .Range(0, paramGroup.Count)
+              .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
 
-          if (mfv.IsMember)
+          var unnamedArgs = new Queue<IArgument>();
+          var namedLikeArgs = new Dictionary<string, IArgument>();
+
+          foreach (var expr in tupleExprs)
           {
-            var paramNames = paramGroup
-              .SelectNotNull(x => x.Name?.Value)
-              .ToHashSet();
+            if (FSharpArgumentsUtil.IsTopLevelArg(expr) &&
+                FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
+              namedLikeArgs.TryAdd(name, expr as IArgument);
 
-            actualArgs = tupleExprs
-              .Where(x =>
-                FSharpArgumentsUtil.TryGetNamedArgRefExpr(x) is not { ShortName: { } name }
-                || paramNames.Contains(name))
-              .ToList();
+            else unnamedArgs.Enqueue(expr as IArgument);
           }
-          else actualArgs = tupleExprs;
 
-          return Enumerable.Range(0, paramGroup.Count)
-            .Select(i => i < actualArgs.Count ? actualArgs[i] as IArgument : null);
+          return paramGroup.Select(x =>
+          {
+            if (unnamedArgs.Count > 0) return unnamedArgs.Dequeue();
+            if (x.Name?.Value is { } paramName) return namedLikeArgs.GetValueSafe(paramName);
+            return null;
+          });
         }).ToList();
     }
   }

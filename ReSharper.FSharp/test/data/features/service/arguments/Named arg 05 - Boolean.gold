@@ -1,10 +1,10 @@
 ﻿type Foo () =
-    static member F (|first|(param #0): bool, |second|(param #2), |third|(param #1)) = second + third
+    static member F (|first|(param #0): bool, |second|(param #1), |third|(param #2)) = second + third
 
 let someInt = 15
-Foo.F (|(someInt=15)|(arg #0), |third=56|(arg #1), |second=23|(arg #2))
+Foo.F (|(someInt=15)|(arg #0), |third=56|(arg #2), |second=23|(arg #1))
 
 ---------------------------------------------------------
 (arg #0) => first
-(arg #1) => third
-(arg #2) => second
+(arg #1) => second
+(arg #2) => third
