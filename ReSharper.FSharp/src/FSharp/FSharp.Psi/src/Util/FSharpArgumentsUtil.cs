@@ -9,7 +9,9 @@ public static class FSharpArgumentsUtil
     app is { ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } };
 
   public static IReferenceExpr TryGetNamedArgRefExpr(IFSharpExpression expr) =>
-    expr is IBinaryAppExpr { ShortName: "=", LeftArgument: IReferenceExpr refExpr } ? refExpr : null;
+    expr is IBinaryAppExpr { ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } refExpr }
+      ? refExpr
+      : null;
 
   public static bool IsTopLevelArg(IFSharpExpression expr)
   {

@@ -1,0 +1,6 @@
+﻿type A =
+    static member M() = ResizeArray()
+
+A.M(Capacity = 1)
+
+---------------------------------------------------------

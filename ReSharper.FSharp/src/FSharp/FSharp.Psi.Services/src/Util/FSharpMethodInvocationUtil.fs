@@ -51,7 +51,22 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let argsOwner = getArgsOwner expr
     if isNull argsOwner then null else
 
-    let namedArgRefExpr = FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr)
+    let symbolReference = getReference argsOwner
+    if isNull symbolReference then null else
+
+    let fcsSymbol = symbolReference.GetFcsSymbol()
+    if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
+
+    let canHaveNamedArgs =
+        match fcsSymbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsMember
+        | _ -> false
+    
+    let namedArgRefExpr =
+        if canHaveNamedArgs && FSharpArgumentsUtil.IsTopLevelArg(expr) then
+            FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr)
+        else
+            null
 
     let namedParam =
         match namedArgRefExpr with
@@ -59,12 +74,6 @@ let getMatchingParameter (expr: IFSharpExpression) =
         | namedRef -> namedRef.Reference.Resolve().DeclaredElement.As<IParameter>()
 
     if isNotNull namedParam then namedParam else
-
-    let symbolReference = getReference argsOwner
-    if isNull symbolReference then null else
-
-    let fcsSymbol = symbolReference.GetFcsSymbol()
-    if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else

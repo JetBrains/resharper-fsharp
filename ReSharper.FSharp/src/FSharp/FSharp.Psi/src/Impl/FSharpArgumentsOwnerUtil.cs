@@ -83,22 +83,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           {
             var paramNames = paramGroup
               .SelectNotNull(x => x.Name?.Value)
-              .ToJetHashSet();
+              .ToHashSet();
 
             actualArgs = tupleExprs
-              .OrderBy(x =>
-              {
-                // Explicit args M(1, 2, 3)
-                if (FSharpArgumentsUtil.TryGetNamedArgRefExpr(x) is not
-                    { IsSimpleName: true, ShortName: { } name })
-                  return 0;
-
-                return paramNames.Contains(name)
-                  // Existing named arguments 
-                  ? 1
-                  // Property setters and other named args
-                  : 2;
-              })
+              .Where(x =>
+                FSharpArgumentsUtil.TryGetNamedArgRefExpr(x) is not { ShortName: { } name }
+                || paramNames.Contains(name))
               .ToList();
           }
           else actualArgs = tupleExprs;
