@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           var tupleExprs =
             argExpr switch
             {
-              ITupleExpr tupleExpr => (IReadOnlyList<IFSharpExpression>)tupleExpr.Expressions,
+              ITupleExpr tupleExpr => (IList<IFSharpExpression>)tupleExpr.Expressions,
               // if the second parameter is optional (and hence all subsequent ones)
               // then F# allows one argument to be passed
               //
@@ -78,22 +78,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
-          var unnamedArgs = new Queue<IArgument>();
+          IList<IFSharpExpression> unnamedArgs = new List<IFSharpExpression>();
           var namedLikeArgs = new Dictionary<string, IArgument>();
 
-          foreach (var expr in tupleExprs)
-          {
-            if (canHaveNamedArgs &&
-                FSharpArgumentsUtil.IsTopLevelArg(expr) &&
-                FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
-              namedLikeArgs.TryAdd(name, expr as IArgument);
+          if (canHaveNamedArgs)
+            foreach (var expr in tupleExprs)
+            {
+              if (FSharpArgumentsUtil.IsTopLevelArg(expr) &&
+                  FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
+                namedLikeArgs.TryAdd(name, expr as IArgument);
 
-            else unnamedArgs.Enqueue(expr as IArgument);
-          }
+              else unnamedArgs.Add(expr);
+            }
+          else unnamedArgs = tupleExprs;
 
-          return paramGroup.Select(x =>
+          return paramGroup.Select((x, i) =>
           {
-            if (unnamedArgs.Count > 0) return unnamedArgs.Dequeue();
+            if (i < unnamedArgs.Count) return unnamedArgs[i] as IArgument;
             if (x.Name?.Value is { } paramName) return namedLikeArgs.GetValueSafe(paramName);
             return null;
           });
