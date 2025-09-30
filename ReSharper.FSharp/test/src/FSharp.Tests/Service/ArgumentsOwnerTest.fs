@@ -162,8 +162,10 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Tuple param 07 - Function - Not deconstructed, named-like arg``() = x.DoNamedTest()
     [<Test>] member x.``Tuple param 08 - Function - Deconstructed, arg with multiple parens``() = x.DoNamedTest()
     [<Test>] member x.``Tuple param 09 - Function - Not deconstructed, arg with multiple parens``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 10  - Method - In parens, named-like arg``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 11 - Function - Named-like args``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 10 - Function - Named-like args``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 11 - Method - In parens, named-like arg``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 12 - Method - Deconstructed, in multiple parens, named-like arg``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 13 - Method - Not deconstructed, in multiple parens, named-like arg``() = x.DoNamedTest()
 
     [<Test>] member x.``Unit 01 - Named``() = x.DoNamedTest()
     [<Test>] member x.``Unit 02 - Unnamed``() = x.DoNamedTest()
