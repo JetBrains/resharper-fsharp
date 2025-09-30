@@ -6,19 +6,11 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
-let tryGetNamedArgRefExpr (expr: IFSharpExpression) =
-    let binaryAppExpr = expr.As<IBinaryAppExpr>()
-    if isNull binaryAppExpr then null else
-
-    if binaryAppExpr.ShortName <> "=" then null else
-
-    binaryAppExpr.LeftArgument.As<IReferenceExpr>()
-
-
 let isNamedArgReference (expr: IFSharpExpression) =
-    let refExpr = tryGetNamedArgRefExpr expr
+    let refExpr = FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr)
     if isNull refExpr then false else
 
     match refExpr.Reference.GetFcsSymbol() with
@@ -26,27 +18,8 @@ let isNamedArgReference (expr: IFSharpExpression) =
     | :? FSharpField as fsField -> fsField.IsUnionCaseField
     | _ -> false
 
-/// Has the 'name = expr' form
-let hasNamedArgStructure (app: IBinaryAppExpr) =
-    isNotNull app && app.ShortName = "=" &&
-
-    let refExpr = app.LeftArgument.As<IReferenceExpr>()
-    isNotNull refExpr && refExpr.IsSimpleName
-
-let isTopLevelArg (expr: IFSharpExpression) =
-    let tupleExpr = TupleExprNavigator.GetByExpression(expr)
-    let argExpr = if isNull tupleExpr then expr else tupleExpr
-
-    let parenExpr = ParenExprNavigator.GetByInnerExpression(argExpr)
-    let argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(parenExpr)
-    isNotNull argOwner
-
-/// IBinaryAppExpr used exactly as a named argument (without taking into account resolve)
-let inline isNamedArgSyntactically (app: IBinaryAppExpr) =
-    hasNamedArgStructure app && isTopLevelArg app
-
 let tryGetNamedArg (expr: IFSharpExpression) =
-    match tryGetNamedArgRefExpr expr with
+    match FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) with
     | null -> null
     | refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
@@ -78,7 +51,18 @@ let getMatchingParameter (expr: IFSharpExpression) =
     let argsOwner = getArgsOwner expr
     if isNull argsOwner then null else
 
-    let namedArgRefExpr = tryGetNamedArgRefExpr expr
+    let symbolReference = getReference argsOwner
+    if isNull symbolReference then null else
+
+    let fcsSymbol = symbolReference.GetFcsSymbol()
+    if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
+
+    let namedArgRefExpr =
+        match fcsSymbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv when
+            mfv.IsMember && FSharpArgumentsUtil.IsTopLevelArg(expr) ->
+            FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr)
+        | _ -> null
 
     let namedParam =
         match namedArgRefExpr with
@@ -86,12 +70,6 @@ let getMatchingParameter (expr: IFSharpExpression) =
         | namedRef -> namedRef.Reference.Resolve().DeclaredElement.As<IParameter>()
 
     if isNotNull namedParam then namedParam else
-
-    let symbolReference = getReference argsOwner
-    if isNull symbolReference then null else
-
-    let fcsSymbol = symbolReference.GetFcsSymbol()
-    if not (fcsSymbol :? FSharpMemberOrFunctionOrValue) && not (fcsSymbol :? FSharpUnionCase) then null else
 
     let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
     if isNull paramOwner then null else

@@ -1,8 +1,8 @@
 ﻿open System.Drawing
 
-Color.FromArgb(|120|(arg #0), |blue=60|(arg #1), |green=70|(arg #2))
+Color.FromArgb(|120|(arg #0), |blue=60|(arg #2), |green=70|(arg #1))
 
 ---------------------------------------------------------
 (arg #0) => red
-(arg #1) => blue
-(arg #2) => green
+(arg #1) => green
+(arg #2) => blue

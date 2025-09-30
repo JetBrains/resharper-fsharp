@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.CodeAnnotations
@@ -16,7 +17,7 @@ let findAttributesOwner (expr: IFSharpExpression) attributeNames =
     let psiServices = expr.GetPsiServices()
 
     let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
-    let isNamedArg = isNotNull binaryExpr && isNamedArgSyntactically binaryExpr
+    let isNamedArg = isNotNull binaryExpr && FSharpArgumentsUtil.IsNamedArgSyntactically(binaryExpr)
     let argCandidate: IFSharpExpression = if isNamedArg then binaryExpr else expr
 
     let argsOwner = getArgsOwner argCandidate
@@ -28,7 +29,7 @@ let findAttributesOwner (expr: IFSharpExpression) attributeNames =
         let topBinding = TopBindingNavigator.GetByExpression(expr)
         if isNull topBinding then null else topBinding.HeadPattern.As<IFSharpDeclaration>()
 
-    let namedArgRefExpr = if isNamedArg then tryGetNamedArgRefExpr binaryExpr else null
+    let namedArgRefExpr = if isNamedArg then FSharpArgumentsUtil.TryGetNamedArgRefExpr(binaryExpr) else null
 
     let propertySetter =
         if isNamedArg then

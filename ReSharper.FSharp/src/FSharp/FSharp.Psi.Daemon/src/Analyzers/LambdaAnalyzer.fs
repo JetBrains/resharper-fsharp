@@ -138,7 +138,7 @@ type LambdaAnalyzer() =
         let reference = getReference app
         if not (app :? IPrefixAppExpr) || isNull reference then true else
 
-        if isNotNull binaryExpr && not (isNamedArgSyntactically binaryExpr) then true else
+        if isNotNull binaryExpr && not (FSharpArgumentsUtil.IsNamedArgSyntactically(binaryExpr)) then true else
 
         match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->

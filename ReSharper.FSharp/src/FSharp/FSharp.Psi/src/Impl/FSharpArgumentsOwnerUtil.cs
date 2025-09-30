@@ -2,6 +2,7 @@
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -43,21 +44,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         .SelectMany(pair =>
         {
           var (paramGroup, argExpr) = pair;
+          var canHaveNamedArgs = mfv.IsMember;
 
           // e.g. F# extension methods with 0 parameters
           if (paramGroup.Count == 0)
             return EmptyList<IArgument>.Instance;
 
-          // RIDER-125426
-          // argExpr could be a tuple with a corresponding single param group parameter
-          // if it additionally contains property initializers
-          if (paramGroup.Count == 1 && argExpr is not ITupleExpr)
-            return new[] {argExpr as IArgument};
+          if (paramGroup.Count == 1)
+          {
+            // RIDER-125426
+            // argExpr could be a tuple with a corresponding single param group parameter
+            // if it additionally contains property initializers
+            var hasNamedArgInTuple =
+              canHaveNamedArgs &&
+              argExpr is ITupleExpr tupleExpr &&
+              ParenExprNavigator.GetByInnerExpression(ParenExprNavigator.GetByInnerExpression(tupleExpr)) == null &&
+              tupleExpr.ExpressionsEnumerable.Any(arg =>
+                arg is IBinaryAppExpr binaryAppExpr && FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr));
+
+            if (!hasNamedArgInTuple) return [argExpr as IArgument];
+          }
 
           var tupleExprs =
             argExpr switch
             {
-              ITupleExpr tupleExpr => (IReadOnlyList<IFSharpExpression>)tupleExpr.Expressions,
+              ITupleExpr tupleExpr => (IList<IFSharpExpression>)tupleExpr.Expressions,
               // if the second parameter is optional (and hence all subsequent ones)
               // then F# allows one argument to be passed
               //
@@ -67,8 +78,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
-          return Enumerable.Range(0, paramGroup.Count)
-            .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
+          IList<IFSharpExpression> unnamedArgs = new List<IFSharpExpression>();
+          var namedLikeArgs = new Dictionary<string, IArgument>();
+
+          if (canHaveNamedArgs)
+            foreach (var expr in tupleExprs)
+            {
+              if (FSharpArgumentsUtil.IsTopLevelArg(expr) &&
+                  FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
+                namedLikeArgs.TryAdd(name, expr as IArgument);
+
+              else unnamedArgs.Add(expr);
+            }
+          else unnamedArgs = tupleExprs;
+
+          return paramGroup.Select((x, i) =>
+          {
+            if (i < unnamedArgs.Count) return unnamedArgs[i] as IArgument;
+            if (x.Name?.Value is { } paramName) return namedLikeArgs.GetValueSafe(paramName);
+            return null;
+          });
         }).ToList();
     }
   }

@@ -9,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
@@ -17,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
@@ -113,7 +113,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
             let isNamedArg () =
                 let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(referenceExpr)
-                FSharpMethodInvocationUtil.isNamedArgSyntactically binaryAppExpr
+                FSharpArgumentsUtil.IsNamedArgSyntactically(binaryAppExpr)
 
             let isFcsProperty =
                 let fcsSymbol = symbolReference.GetFcsSymbol()
