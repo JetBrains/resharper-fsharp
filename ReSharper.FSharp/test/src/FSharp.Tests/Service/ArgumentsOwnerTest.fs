@@ -144,7 +144,7 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Named arg 05 - Boolean``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 06 - Single parameter``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 07 - Setter and optional parameter``() = x.DoNamedTest()
-    [<Test>] member x.``Named arg 08``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 08 - Explicit, setters and optional``() = x.DoNamedTest()
 
     [<Test>] member x.``Non IArgument 01 - Obj expression``() = x.DoNamedTest()
 
@@ -158,12 +158,12 @@ type ArgumentsOwnerTest() =
 
     [<Test>] member x.``Tuple param 04 - Mismatch - too few``() = x.DoNamedTest()
     [<Test>] member x.``Tuple param 05 - Mismatch - too many``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 06``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 07``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 08``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 09``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 10``() = x.DoNamedTest()
-    [<Test>] member x.``Tuple param 11 - Looks like a named but is not``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 06 - Function - Not deconstructed``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 07 - Function - Not deconstructed, named-like arg``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 08 - Function - Deconstructed, arg with multiple parens``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 09 - Function - Not deconstructed, arg with multiple parens``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 10  - Method - In parens, named-like arg``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 11 - Function - Named-like args``() = x.DoNamedTest()
 
     [<Test>] member x.``Unit 01 - Named``() = x.DoNamedTest()
     [<Test>] member x.``Unit 02 - Unnamed``() = x.DoNamedTest()
