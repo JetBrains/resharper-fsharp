@@ -1,0 +1,8 @@
+﻿type A(|x|(param #0), ?|y|(param #1)) =
+    member val Prop = 1 with get, set
+
+A(|1|(arg #0), Prop = 2, what = 4, |y = 3|(arg #1))
+
+---------------------------------------------------------
+(arg #0) => x
+(arg #1) => y
