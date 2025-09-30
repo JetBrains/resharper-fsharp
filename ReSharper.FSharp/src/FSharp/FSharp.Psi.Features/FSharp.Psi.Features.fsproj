@@ -116,12 +116,12 @@
     <Compile Include="src\Injected\FSharpRegexNodeProvider.fs" />
     <Compile Include="src\Injected\FSharpInjectionTargetsFinderFactory.fs" />
     <Compile Include="src\Injected\ZoneMarker.fs" />
-    <Compile Include="src\AI\FSharpLanguageOrTechnologyChatContextProvider.fs" />
     <Compile Include="src\AI\ZoneMarker.fs" />
     <Compile Include="src\AI\FSharpDocGenSupportProvider.fs" />
     <Compile Include="src\AI\FSharpCodeSetNodesFactory.fs" />
     <Compile Include="src\AICore\FSharpBackendSyntaxErrorChecker.fs" />
     <Compile Include="src\AICore\FSharpFileSummarizer.fs" />
+    <Compile Include="src\AICore\FSharpLanguageOrTechnologyChatContextProvider.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
