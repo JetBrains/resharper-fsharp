@@ -6,7 +6,7 @@ public static class FSharpArgumentsUtil
 {
   /// Has the 'name = expr' form
   public static bool HasNamedArgStructure(IBinaryAppExpr app) =>
-    app is { ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } };
+    TryGetNamedArgRefExpr(app) != null;
 
   public static IReferenceExpr TryGetNamedArgRefExpr(IFSharpExpression expr) =>
     expr is IBinaryAppExpr { ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } refExpr }
