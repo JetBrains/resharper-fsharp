@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -99,6 +100,14 @@ public static class FSharpParameterDeclarationUtil
     return GetParameterSigTypeUsage(groupTypeUsage, index.ParameterIndex);
   }
 
+  public static void SetParameterFcsType([CanBeNull] this ITypeUsage typeUsage, FSharpParameterIndex index, FSharpType fcsType)
+  {
+    if (typeUsage == null)
+      return;
+
+    var typeUsageOwnerNode = typeUsage.GetParameterDeclaration(index) as IFSharpTypeUsageOwnerNode;
+    typeUsage.GetFSharpTypeAnnotationUtil().SetTypeOwnerFcsType(typeUsageOwnerNode, fcsType);
+  }
 
   [NotNull]
   public static IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations(

@@ -17,8 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IFSharpIdentifier FSharpIdentifier => ReferenceName?.Identifier;
 
-    public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this, expr =>
-      expr.CalculateParameterArguments(new[] { expr.ArgExpression?.Expression }));
+    public IList<IArgument> ParameterArguments => 
+      myParameterArguments.GetValue(this, static expr => expr.CalculateParameterArguments([expr.Expression]));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }

@@ -51,6 +51,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IFSharpParameterDeclaration GetParameterDeclaration(FSharpParameterIndex index) =>
       ParameterPatterns.GetParameterDeclaration(index);
 
+    public void SetParameterFcsType(FSharpParameterIndex index, FSharpType fcsType) =>
+      ParameterPatterns.SetParameterFcsType(this, index, fcsType);
+
     public override void SetOverride(bool value)
     {
       if (value == IsOverride)

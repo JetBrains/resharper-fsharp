@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.TypeAnnotationUtil
 
 open FSharp.Compiler.Symbols
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpPatternUtil
@@ -78,6 +79,25 @@ let private addParens (factory: IFSharpElementFactory) (pattern: IFSharpPattern)
     parenPat.SetPattern(pattern) |> ignore
     parenPat :> IFSharpPattern
 
+let setPatternTypeUsage (pattern: IFSharpPattern) (typeUsage: ITypeUsage) =
+    Assertion.Assert(pattern.IsPhysical())
+
+    let factory = pattern.CreateElementFactory()
+
+    let newPattern =
+        match pattern.IgnoreInnerParens() with
+        | :? ITuplePat as tuplePat -> addParens factory tuplePat
+        | :? ITypedPat as typedPat -> typedPat.Pattern
+        | pattern -> pattern
+
+    let typedPat = factory.CreateTypedPat(newPattern, typeUsage)
+
+    let pat =
+        ModificationUtil.ReplaceChild(pattern, typedPat)
+        |> ParenPatUtil.addParensIfNeeded
+
+    pat.IgnoreInnerParens().As<ITypedPat>()
+
 let specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
     let pattern = pattern.IgnoreParentParens()
     let factory = pattern.CreateElementFactory()
@@ -101,24 +121,11 @@ let specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
         else
             optionalValPat, fcsType.GenericArguments[0]
 
-    let newPattern =
-        match oldPattern.IgnoreInnerParens() with
-        | :? ITuplePat as tuplePat -> addParens factory tuplePat
-        | :? ITypedPat as typedPat -> typedPat.Pattern
-        | pattern -> pattern
-
-    let typedPat =
-        let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
-        factory.CreateTypedPat(newPattern, typeUsage)
-
     let listConsParenPat = getOutermostListConstPat oldPattern |> _.IgnoreParentParens()
 
     let typedPat =
-        let pat =
-            ModificationUtil.ReplaceChild(oldPattern, typedPat)
-            |> ParenPatUtil.addParensIfNeeded
-
-        pat.IgnoreInnerParens().As<ITypedPat>()
+        let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
+        setPatternTypeUsage oldPattern typeUsage
 
     // In the case `x :: _: Type` add parens to the whole listConsPat
     //TODO: improve parens analyzer
@@ -132,3 +139,8 @@ let specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
 let specifyPatternType (fcsType: FSharpType) (pattern: IFSharpPattern) =
     let annotationsInfo = [| specifyPatternTypeImpl fcsType pattern |]
     bindAnnotations annotationsInfo
+
+let setTypeOwnerType (fcsType: FSharpType) (decl: IFSharpTypeUsageOwnerNode) =
+    let factory = decl.CreateElementFactory()
+    let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel))
+    bindAnnotations [ fcsType, typeUsage ]

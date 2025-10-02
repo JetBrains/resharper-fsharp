@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Type;
 
     public IList<IArgument> ParameterArguments =>
-      myParameterArguments.GetValue(this, expr => expr.CalculateParameterArguments(new[] { expr.ArgumentExpression }));
+      myParameterArguments.GetValue(this, static expr => expr.CalculateParameterArguments([expr.ArgumentExpression]));
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }

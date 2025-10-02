@@ -61,6 +61,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IList<IList<IFSharpParameterDeclaration>> IFSharpParameterOwnerDeclaration.GetParameterDeclarations() =>
       this.GetBindingParameterDeclarations();
 
+    public void SetParameterFcsType(FSharpParameterIndex index, FSharpType fcsType) =>
+      this.GetBindingParameterPatterns().SetParameterFcsType(this, index, fcsType);
+
     [CanBeNull] private IReferencePat HeadReferencePat => HeadPattern as IReferencePat;
 
     string IFSharpDeclaration.SourceName =>

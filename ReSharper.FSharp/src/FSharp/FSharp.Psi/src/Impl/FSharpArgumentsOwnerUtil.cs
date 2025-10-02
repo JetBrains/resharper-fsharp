@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -99,6 +100,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             return null;
           });
         }).ToList();
+    }
+
+    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpExpression expr)
+    {
+      // todo: named args
+      // todo: return property setters
+      
+      var tupleItemExpr = expr.IgnoreParentParens();
+      var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
+      var parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
+
+      var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
+      var argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
+      if (argOwner == null)
+        return null;
+
+      if (argOwner is IAttribute or INewExpr)
+        return new FSharpParameterIndex(0, parameterIndex);
+
+      var paramGroupIndex = 0;
+      while (argOwner is IPrefixAppExpr prefixAppExpr)
+      {
+        if (prefixAppExpr.FunctionExpression is IPrefixAppExpr funPrefixAppExpr)
+        {
+          argOwner = funPrefixAppExpr;
+          paramGroupIndex++;
+        }
+        else
+          break;
+      }
+
+      return new FSharpParameterIndex(paramGroupIndex, parameterIndex);
     }
   }
 }

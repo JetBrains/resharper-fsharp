@@ -6,11 +6,17 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
 let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
     let factory = typeUsage.CreateElementFactory()
-    let newTypeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
+    let context =
+        match typeUsage with
+        | :? IParameterSignatureTypeUsage -> TypeUsageContext.ParameterSignature
+        | _ -> TypeUsageContext.TopLevel
+
+    let newTypeUsage = factory.CreateTypeUsage(fcsType.Format(), context)
     let newTypeUsage = ModificationUtil.ReplaceChild(typeUsage, newTypeUsage)
     let typeUsage =
         if RedundantParenTypeUsageAnalyzer.needsParens newTypeUsage newTypeUsage then
@@ -43,11 +49,6 @@ let setFcsParametersOwnerReturnType (decl: IFSharpTypeOwnerDeclaration) =
     let fcsReturnType, returnTypeUsage = setFcsParametersOwnerReturnTypeNoBind decl mfv
     TypeAnnotationUtil.bindAnnotations [ fcsReturnType, returnTypeUsage ]
 
-let setTypeOwnerType (fcsType: FSharpType) (decl: IFSharpTypeUsageOwnerNode) =
-    let factory = decl.CreateElementFactory()
-    let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel))
-    TypeAnnotationUtil.bindAnnotations [ fcsType, typeUsage ]
-
 
 let rec skipParameters paramsToSkipCount (typeUsage: ITypeUsage) =
     if paramsToSkipCount = 0 then typeUsage else
@@ -79,3 +80,19 @@ let rec navigateTuplePath path (typeUsage: ITypeUsage) : ITypeUsage =
     | _, _ :: _ -> null
 
     | typeUsage, _ -> typeUsage.IgnoreParentParens()
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpTypeAnnotationUtil() =
+    interface IFSharpTypeAnnotationUtil with
+        member this.SetPatternFcsType(pattern, fcsType) =
+            TypeAnnotationUtil.specifyPatternType fcsType pattern
+
+        member this.SetTypeOwnerFcsType(typeUsageOwnerNode, fcsType) =
+            TypeAnnotationUtil.setTypeOwnerType fcsType typeUsageOwnerNode
+
+        member this.ReplaceWithFcsType(typeUsage, fcsType) =
+            updateTypeUsage fcsType typeUsage
+
+        member this.SetPatternTypeUsage(pattern, typeUsage) =
+            TypeAnnotationUtil.setPatternTypeUsage pattern typeUsage

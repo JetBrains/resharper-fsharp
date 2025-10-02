@@ -512,7 +512,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return result;
     }
 
-    public static IFSharpParameter GetFSharpParameter<T>(this T function, FSharpParameterIndex index)
+    public static IFSharpParameter GetFSharpParameter<T>([NotNull] this T function, FSharpParameterIndex index)
       where T : IFSharpParameterOwner
     {
       var parameterGroup = function.FSharpParameterGroups.ElementAtOrDefault(index.GroupIndex);

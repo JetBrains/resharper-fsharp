@@ -32,7 +32,7 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
     abstract DeclaredElement: IDeclaredElement
     abstract GetTargetFcsType: TypeMismatchDiagnosticExtendedData -> FSharpType 
 
-    abstract GetDeclarations: unit -> (ITreeNode * FSharpSymbol)[]
+    abstract GetDeclarations: unit -> (IFSharpDeclaration * FSharpSymbol)[]
     default this.GetDeclarations() =
         match this.DeclaredElement with
         | null -> EmptyArray.Instance
@@ -41,20 +41,20 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
             |> Seq.map (fun decl ->
                 let fsDecl = decl :?> IFSharpDeclaration
                 let fcsSymbol = fsDecl.GetFcsSymbol()
-                fsDecl :> ITreeNode, fcsSymbol
+                fsDecl, fcsSymbol
             )
             |> Array.ofSeq
 
     // todo: use IDeclaration
-    abstract SetType: declTreeNode: ITreeNode * FSharpSymbol * FSharpType -> unit
-    default this.SetType(declTreeNode: ITreeNode, _, fcsType) =
-        match declTreeNode with
+    abstract SetType: declTreeNode: IFSharpDeclaration * FSharpSymbol * FSharpType -> unit
+    default this.SetType(decl, _, fcsType) =
+        match decl with
         | :? IReferencePat as refPat ->
             let paramDecl = refPat.TryGetContainingParameterDeclarationPattern()
             TypeAnnotationUtil.specifyPatternType fcsType paramDecl
 
         | :? IFSharpTypeUsageOwnerNode as typeOwnerDecl ->
-            FSharpTypeUsageUtil.setTypeOwnerType fcsType typeOwnerDecl
+            TypeAnnotationUtil.setTypeOwnerType fcsType typeOwnerDecl
 
         | _ -> ()
 
@@ -70,7 +70,7 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
 
     override this.ExecutePsiTransaction _ =
         let decls = this.GetDeclarations()
-        let firstDecl = Array.head decls |> fst :?> IFSharpTreeNode
+        let firstDecl = Array.head decls |> fst
         use writeCookie = WriteLockCookie.Create(firstDecl.IsPhysical())
 
         let targetFcsType =
@@ -85,6 +85,8 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
 type ChangeParameterTypeFromArgumentFix(expr, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
 
+    let fsParamIndex = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(expr)
+
     new (error: TypeEquationError) =
         ChangeParameterTypeFromArgumentFix(error.Expr, error.DiagnosticInfo)
 
@@ -98,17 +100,19 @@ type ChangeParameterTypeFromArgumentFix(expr, fcsDiagnosticInfo: FcsCachedDiagno
         data.ActualType
 
     override this.DeclaredElement =
-        let param = getMatchingParameter expr
-        param.As<IFSharpParameter>()
+        if not fsParamIndex.HasValue then null else
 
-    // todo: test signatures, virtual/abstract members
-    override this.GetDeclarations() =
-        match this.DeclaredElement with
-        | :? IFSharpParameter as fsParam ->
-            fsParam.GetParameterOriginDeclarations()
-            |> Seq.map (fun decl -> decl :> ITreeNode, Unchecked.defaultof<FSharpSymbol>)
-            |> Seq.toArray
-        | _ -> EmptyArray.Instance
+        let argsOwner = getArgsOwner expr
+        if isNull argsOwner then null else
+
+        let symbolReference = getReference argsOwner
+        if isNull symbolReference then null else
+
+        symbolReference.Resolve().DeclaredElement.As<IFSharpParameterOwner>()
+
+    override this.SetType(decl, _, fcsType) =
+        let decl = FSharpParameterOwnerDeclarationNavigator.Unwrap(decl)
+        decl.SetParameterFcsType(fsParamIndex.Value, fcsType)
 
 
 type ChangeLocalType(expr, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =

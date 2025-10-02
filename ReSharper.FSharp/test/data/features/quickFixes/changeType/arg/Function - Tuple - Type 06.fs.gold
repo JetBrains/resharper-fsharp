@@ -1,0 +1,5 @@
+﻿module Module
+
+let f (i: ('a -> 'a) * int) = ()
+
+f (id{caret}, 1)

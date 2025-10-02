@@ -1,0 +1,5 @@
+﻿module Module
+
+let f (i: int * int) = i + 1
+
+f (1, 2{caret})

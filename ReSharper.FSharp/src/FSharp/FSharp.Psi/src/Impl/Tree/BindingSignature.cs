@@ -40,6 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
       TypeUsage.GetParameterDeclarations();
 
+    public void SetParameterFcsType(FSharpParameterIndex index, FSharpType fcsType) =>
+      TypeUsage.SetParameterFcsType(index, fcsType);
+
     TreeTextRange IDeclaration.GetNameRange() => TreeTextRange.InvalidRange;
 
     FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => HeadReferencePat?.GetFcsSymbol();
