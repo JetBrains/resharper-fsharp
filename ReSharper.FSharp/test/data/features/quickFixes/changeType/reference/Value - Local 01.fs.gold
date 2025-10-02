@@ -1,0 +1,5 @@
+﻿module Module
+
+do
+    let i: string = 1
+    let s: string = i{caret}
