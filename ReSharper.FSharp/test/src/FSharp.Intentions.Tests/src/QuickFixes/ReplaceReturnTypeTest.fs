@@ -106,6 +106,12 @@ type ChangeElementTypeTest() =
     [<Test>] member x.``Prop - Member 02``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Member 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Value - Local 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Param - Local - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Param - Local 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Param - Local 02``() = x.DoNamedTest()
+    [<Test>] member x.``Value - Pattern - Match 01``() = x.DoNamedTest()
+
 
 [<AssertCorrectTreeStructure>]
 type ChangeElementTypeFromSetTest() =

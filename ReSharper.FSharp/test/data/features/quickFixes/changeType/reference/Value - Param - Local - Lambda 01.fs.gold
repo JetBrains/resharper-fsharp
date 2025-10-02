@@ -1,0 +1,7 @@
+﻿module Module
+
+[1]
+|> Seq.map (fun (i: string) ->
+    let s: string = i{caret}
+    ()
+)

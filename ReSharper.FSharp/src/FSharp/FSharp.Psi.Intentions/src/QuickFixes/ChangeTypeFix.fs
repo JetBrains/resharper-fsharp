@@ -50,8 +50,14 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
     default this.SetType(decl, _, fcsType) =
         match decl with
         | :? IReferencePat as refPat ->
+            let binding = BindingNavigator.GetByHeadPattern(refPat)
+            if isNotNull binding then
+                TypeAnnotationUtil.setTypeOwnerType fcsType binding else
+
             let paramDecl = refPat.TryGetContainingParameterDeclarationPattern()
-            TypeAnnotationUtil.specifyPatternType fcsType paramDecl
+            let pat = if isNotNull paramDecl then paramDecl else refPat
+
+            TypeAnnotationUtil.specifyPatternType fcsType pat
 
         | :? IFSharpTypeUsageOwnerNode as typeOwnerDecl ->
             TypeAnnotationUtil.setTypeOwnerType fcsType typeOwnerDecl
@@ -73,9 +79,7 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
         let firstDecl = Array.head decls |> fst
         use writeCookie = WriteLockCookie.Create(firstDecl.IsPhysical())
 
-        let targetFcsType =
-            use pinCheckResultsCookie = firstDecl.FSharpFile.PinTypeCheckResults(true, "ChangeTypeFixBase")
-            this.GetTargetFcsType(fcsDiagnosticInfo.TypeMismatchData)
+        let targetFcsType = this.GetTargetFcsType(fcsDiagnosticInfo.TypeMismatchData)
 
         for decl, fcsSymbol in decls do
             this.SetType(decl, fcsSymbol, targetFcsType)
@@ -113,36 +117,6 @@ type ChangeParameterTypeFromArgumentFix(expr, fcsDiagnosticInfo: FcsCachedDiagno
     override this.SetType(decl, _, fcsType) =
         let decl = FSharpParameterOwnerDeclarationNavigator.Unwrap(decl)
         decl.SetParameterFcsType(fsParamIndex.Value, fcsType)
-
-
-type ChangeLocalType(expr, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
-    inherit FSharpQuickFixBase()
-
-    let expectedFcsType = fcsDiagnosticInfo.TypeMismatchData.ExpectedType
-
-    let getLocalValueDecl (expr: IFSharpExpression) : IReferencePat =
-        match expr with
-        | :? IReferenceExpr as refExpr -> refExpr.Reference.Resolve().DeclaredElement.As()
-        | _ -> null
-
-    let refPat = getLocalValueDecl expr
-
-    new (error: TypeEquationError) =
-        ChangeLocalType(error.Expr, error.DiagnosticInfo)
-
-    new (error: TypeConstraintMismatchError) =
-        ChangeLocalType(error.Expr, error.DiagnosticInfo)
-
-
-    override this.Text =
-        $"Change type of '{refPat.SourceName}' to '{expectedFcsType.Format()}'"
-
-    override this.IsAvailable _ = isNotNull refPat
-
-    override this.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-
-        TypeAnnotationUtil.specifyPatternType expectedFcsType refPat
 
 
 type ChangeTypeFromElementReferenceFix(expr, fcsDiagnosticInfo) =

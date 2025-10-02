@@ -31,7 +31,6 @@
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
     <QuickFix>ChangeParameterTypeFromArgumentFix</QuickFix>
     <QuickFix>ChangeReturnTypeFromInvocationFix</QuickFix>
-    <QuickFix>ChangeLocalType</QuickFix>
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>
     <QuickFix>ChangeTypeFromSetExprFix</QuickFix>
@@ -312,7 +311,6 @@
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
     <QuickFix>ChangeParameterTypeFromArgumentFix</QuickFix>
     <QuickFix>ChangeReturnTypeFromInvocationFix</QuickFix>
-    <QuickFix>ChangeLocalType</QuickFix>
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>
     <QuickFix>ChangeTypeFromSetExprFix</QuickFix>

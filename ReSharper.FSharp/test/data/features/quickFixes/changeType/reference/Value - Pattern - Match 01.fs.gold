@@ -1,0 +1,7 @@
+﻿module Module
+
+do
+    match 1 with
+    | (i: string) ->
+        let s: string = i{caret}
+        ()
