@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     string IFSharpDeclaration.CompiledName => throw new InvalidOperationException();
     void IFSharpDeclaration.SetName(string name, ChangeNameKind changeNameKind) => throw new InvalidOperationException();
     TreeTextRange IFSharpDeclaration.GetNameIdentifierRange() => throw new InvalidOperationException();
-    XmlDocBlock IFSharpDeclaration.XmlDocBlock => throw new InvalidOperationException();
+    XmlDocBlock IFSharpDeclaration.XmlDocBlock => FirstChild as XmlDocBlock;
     IFSharpIdentifier INameIdentifierOwner.NameIdentifier => throw new InvalidOperationException();
 
     XmlNode IXmlDocOwnerTreeNode.GetXMLDoc(bool inherit) => throw new InvalidOperationException();
