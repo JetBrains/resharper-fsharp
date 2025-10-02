@@ -102,6 +102,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IList<IList<IFSharpParameterDeclaration>> IFSharpParameterOwnerDeclaration.GetParameterDeclarations() =>
       this.GetBindingParameterDeclarations();
 
+    public void SetParameterFcsType(FSharpParameterIndex index, FSharpType fcsType) =>
+      this.GetBindingParameterPatterns().SetParameterFcsType(this, index, fcsType);
+
     IFSharpIdentifier INameIdentifierOwner.NameIdentifier => null;
 
     FSharpSymbol IFSharpDeclaration.GetFcsSymbol() => HeadReferencePat?.GetFcsSymbol();

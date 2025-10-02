@@ -1,0 +1,6 @@
+﻿module Module
+
+let f (i: string) = i + 1
+
+f 1
+f ""{caret}

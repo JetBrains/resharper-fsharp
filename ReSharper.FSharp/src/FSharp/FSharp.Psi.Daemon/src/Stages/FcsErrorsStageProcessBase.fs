@@ -200,7 +200,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
 
     let createCachedDiagnostic (error: FSharpDiagnostic) range =
-        let pos = Position.mkPos error.StartLine error.StartColumn
+        let pos = error.Range.Start
         let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, pos)
         cachedFcsDiagnostics[pos] <- error
         diagnosticInfo

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -27,5 +28,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IList<IList<IFSharpParameterDeclaration>> GetParameterDeclarations() =>
       ((IParameterOwnerMemberDeclaration)this).ParameterPatterns.GetParameterDeclarations();
+
+    public void SetParameterFcsType(FSharpParameterIndex index, FSharpType fcsType) =>
+      ((IParameterOwnerMemberDeclaration)this).ParameterPatterns.SetParameterFcsType(this, index, fcsType);
   }
 }

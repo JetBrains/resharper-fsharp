@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -17,5 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     public static bool IsFSharpSigFile([NotNull] this ITreeNode treeNode) =>
       treeNode.GetContainingFile() is IFSharpSigFile;
+
+    public static IFSharpTypeAnnotationUtil GetFSharpTypeAnnotationUtil([NotNull] this ITreeNode node) =>
+      node.GetSolution().GetComponent<LanguageManager>().GetService<IFSharpTypeAnnotationUtil>(node.Language);
   }
 }

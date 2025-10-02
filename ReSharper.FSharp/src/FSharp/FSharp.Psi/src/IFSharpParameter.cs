@@ -4,6 +4,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi;
 
+// todo: FcsType, FCS param
 public interface IFSharpParameter : IFSharpDeclaredElement, IParameter
 {
   FSharpParameterIndex FSharpIndex { get; }

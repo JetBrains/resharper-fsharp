@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ReplaceReturnTypeTest() =
     inherit FSharpQuickFixTestBase<ReplaceReturnTypeFix>()
 
@@ -88,7 +88,7 @@ type ReplaceReturnTypeAvailabilityTest() =
     [<Test>] member x.``Availability - Ref pat 02 - Operator``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ChangeElementTypeTest() =
     inherit FSharpQuickFixTestBase<ChangeTypeFromElementReferenceFix>()
 
@@ -107,7 +107,7 @@ type ChangeElementTypeTest() =
     [<Test>] member x.``Prop - Member 03``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ChangeElementTypeFromSetTest() =
     inherit FSharpQuickFixTestBase<ChangeTypeFromSetExprFix>()
 
@@ -118,7 +118,7 @@ type ChangeElementTypeFromSetTest() =
     [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ChangeElementTypeFromFieldBindingTest() =
     inherit FSharpQuickFixTestBase<ChangeTypeFromRecordFieldBindingFix>()
 
@@ -128,16 +128,30 @@ type ChangeElementTypeFromFieldBindingTest() =
     [<Test>] member x.``Record 02``() = x.DoNamedTest()
     [<Test>] member x.``Record 03``() = x.DoNamedTest()
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ChangeParamTypeFromArgTest() =
     inherit FSharpQuickFixTestBase<ChangeParameterTypeFromArgumentFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/changeType/arg"
 
+    [<Test>] member x.``Function - Tuple - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 03``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 04``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 05``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 06``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 07``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple - Type 08``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function 02``() = x.DoNamedTest()
     [<Test>] member x.``Function 03``() = x.DoNamedTest()
     [<Test>] member x.``Function 04``() = x.DoNamedTest()
+    [<Test>] member x.``Function 05``() = x.DoNamedTest()
+    [<Test>] member x.``Function 06``() = x.DoNamedTest()
+    [<Test>] member x.``Function 07``() = x.DoNamedTest()
+    [<Test>] member x.``Function 08``() = x.DoNamedTest()
 
     [<Test>] member x.``Method 01``() = x.DoNamedTest()
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
@@ -145,7 +159,7 @@ type ChangeParamTypeFromArgTest() =
     [<Test>] member x.``Method 04``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
+[<AssertCorrectTreeStructure>]
 type ChangeReturnTypeFromInvocationTest() =
     inherit FSharpQuickFixTestBase<ChangeReturnTypeFromInvocationFix>()
 

@@ -1,0 +1,6 @@
+﻿module Module
+
+let f<'T> (_: string) = ()
+
+f 1
+f ""{caret}

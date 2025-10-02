@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
@@ -148,15 +149,74 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (parameterPatternGroups.ElementAtOrDefault(index.GroupIndex) is not { } groupPattern)
         return null;
 
-      if (groupPattern is not IParenPat parenPat)
+      if (index.ParameterIndex is not { } paramIndex)
         return groupPattern;
 
-      if (index.ParameterIndex is { } paramIndex)
-        return parenPat.Pattern is ITuplePat tuplePat
-          ? tuplePat.PatternsEnumerable.ElementAtOrDefault(paramIndex)
-          : null;
+      if (groupPattern is not IParenPat parenPat)
+        return null;
 
-      return parenPat.Pattern;
+      return parenPat.Pattern is ITuplePat tuplePat
+        ? tuplePat.PatternsEnumerable.ElementAtOrDefault(paramIndex)
+        : null;
+
+    }
+
+    private static int GetFcsGroupParameterCount([NotNull] IList<FSharpParameter> fcsParameterGroup) =>
+      fcsParameterGroup.SingleItem() is { Type: { IsTupleType: true } fcsType }
+        ? fcsType.GenericArguments.Count
+        : fcsParameterGroup.Count;
+
+    public static void SetParameterFcsType(this IList<IFSharpPattern> parameterPatternGroups,
+      [NotNull] IFSharpParameterOwnerDeclaration paramOwnerDecl, FSharpParameterIndex index, FSharpType fcsType)
+    {
+      var typeAnnotationUtil = paramOwnerDecl.GetFSharpTypeAnnotationUtil();
+
+      if (parameterPatternGroups.GetParameterDeclaration(index) is IReferencePat refPat)
+      {
+        var declPat = refPat.TryGetContainingParameterDeclarationPattern();
+        typeAnnotationUtil.SetPatternFcsType(declPat, fcsType);
+        return;
+      }
+
+      if (parameterPatternGroups.ElementAtOrDefault(index.GroupIndex) is not { } groupPattern)
+        return;
+
+      if (index.ParameterIndex is { } parameterIndex)
+      {
+        if (groupPattern.IgnoreInnerParens() is ITypedPat { TypeUsage: ITupleTypeUsage tupleTypeUsage })
+        {
+          if (tupleTypeUsage.Items.ElementAtOrDefault(parameterIndex) is { } paramTypeUsage)
+            typeAnnotationUtil.ReplaceWithFcsType(paramTypeUsage, fcsType);
+        }
+        else
+        {
+          // todo: union case
+          if (paramOwnerDecl.GetFcsSymbol() is not FSharpMemberOrFunctionOrValue mfv)
+            return;
+
+          var fcsParamGroup = mfv.CurriedParameterGroups.ElementAtOrDefault(index.GroupIndex);
+          if (fcsParamGroup == null)
+            return;
+
+          var fcsGroupParameterCount = GetFcsGroupParameterCount(fcsParamGroup);
+          if (fcsGroupParameterCount == 1)
+          {
+            typeAnnotationUtil.SetPatternFcsType(groupPattern, fcsType);
+            return;
+          }
+
+          var factory = paramOwnerDecl.CreateElementFactory();
+          var tupleTypeString = Enumerable.Repeat("_", fcsGroupParameterCount).Join(" * ");
+          var newTypeUsage = factory.CreateTypeUsage(tupleTypeString, TypeUsageContext.TopLevel);
+          var typeUsage = (ITupleTypeUsage)typeAnnotationUtil.SetPatternTypeUsage(groupPattern, newTypeUsage).TypeUsage;
+          if (typeUsage.Items.ElementAtOrDefault(parameterIndex) is { } paramTypeUsage)
+            typeAnnotationUtil.ReplaceWithFcsType(paramTypeUsage, fcsType);
+        }
+      }
+      else
+      {
+        typeAnnotationUtil.SetPatternFcsType(groupPattern, fcsType);
+      }
     }
 
     public static bool IsFSharpParameterDeclaration(IFSharpPattern fsPat) =>

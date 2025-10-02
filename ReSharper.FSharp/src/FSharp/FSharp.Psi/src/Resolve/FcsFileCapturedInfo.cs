@@ -100,11 +100,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var result = new Dictionary<Position, FSharpDiagnostic>();
       foreach (var diagnostic in checkResults.Diagnostics)
       {
-        if (!FcsCachedDiagnosticInfo.CanBeCached(diagnostic))
-          continue;
-
-        var pos = PositionModule.mkPos(diagnostic.StartLine, diagnostic.StartColumn);
-        result[pos] = diagnostic;
+        if (FcsCachedDiagnosticInfo.CanBeCached(diagnostic))
+          result[diagnostic.Range.Start] = diagnostic;
       }
 
       return result;
