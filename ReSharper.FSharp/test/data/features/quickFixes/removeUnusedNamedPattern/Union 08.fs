@@ -1,0 +1,7 @@
+type U =
+    | U of a:int * b:int * c:int
+
+match U(a = 1, b = 2, c = 3) with
+| U(a = a
+    b = b // I'm a comment
+    c = {caret}c) -> ()
