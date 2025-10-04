@@ -26,7 +26,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
 type FsiHost(lifetime: Lifetime, solution: ISolution, fsiDetector: ILazy<FsiDetector>, fsiOptions: FsiOptionsProvider,
         projectModelViewHost: ProjectModelViewHost, psiModules: IPsiModules, modulePathProvider: ModulePathProvider,
         logger: ILogger, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
