@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Rider.Backend.Env
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
-[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IRiderBackendFeatureEnvironmentZone>, typeof<IRiderFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>, typeof<IRiderBackendFullFeatureZone>, typeof<IRiderFullFeatureZone>)>]
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation, fileExtensions: IProjectFileExtensions) =
     let scratchesDir =
         // Parameters are arbitrary, they aren't currently used inside this override.

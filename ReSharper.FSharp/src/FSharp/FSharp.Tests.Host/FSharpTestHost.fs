@@ -28,7 +28,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IFSharpPluginZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>, typeof<IFSharpPluginZone>)>]
 type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer,
         fantomasHost: FantomasHost, dotnetToolsTracker: SolutionDotnetToolsTracker, notifications: UserNotifications,
         assemblyReaderShim: IFcsAssemblyReaderShim, projectProvider: IFcsProjectProvider,

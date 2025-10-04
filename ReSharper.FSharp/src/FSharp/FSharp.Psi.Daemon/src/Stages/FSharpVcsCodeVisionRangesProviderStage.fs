@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.RdBackend.Common.Env
 
 [<DaemonStage(Instantiation.DemandAnyThreadSafe)>]
-[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
 type FSharpVcsCodeVisionRangesProviderStage() =
     inherit CodeInsightsVcsRangesStageBase<FSharpLanguage>()
 
