@@ -174,7 +174,7 @@ type MonoFsiProvider() =
                         yield fsiTool
 
                 let monoRuntimeDetector = Shell.Instance.GetComponent<MonoRuntimeDetector>()
-                for runtime in monoRuntimeDetector.DetectMonoRuntimes() do
+                for runtime in monoRuntimeDetector.DetectMonoRuntimes(InteractionContext.Local) do
                     let fsiPath = runtime.RootPath / fsiRelativePath
                     if fsiPath.ExistsFile then
                         let fsiTool = FsiTool.Create(sprintf "Mono %s" runtime.RootPath.Name, fsiPath.Directory)
