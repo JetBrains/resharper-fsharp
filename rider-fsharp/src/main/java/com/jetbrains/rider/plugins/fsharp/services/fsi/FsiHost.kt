@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
+import kotlin.io.path.pathString
 
 suspend fun getFsiRunOptions(
   project: Project,
@@ -56,11 +57,11 @@ suspend fun getFsiRunOptions(
   val runtimeHost = RiderDotNetActiveRuntimeHost.getInstance(project)
 
   val exePath = when (sessionInfo.runtime) {
-    RdFsiRuntime.Core -> runtimeHost.dotNetCoreRuntime.value?.cliExePath
+    RdFsiRuntime.Core -> runtimeHost.dotNetCoreRuntime.value?.cliExePath?.pathString
     RdFsiRuntime.NetFramework -> sessionInfo.fsiPath
     RdFsiRuntime.Mono -> {
       val runtime = runtimeHost.getCurrentClassicNetRuntime(false).runtime as MonoRuntime
-      runtime.getMonoExe().path
+      runtime.getMonoExe().pathString
     }
   }
 
