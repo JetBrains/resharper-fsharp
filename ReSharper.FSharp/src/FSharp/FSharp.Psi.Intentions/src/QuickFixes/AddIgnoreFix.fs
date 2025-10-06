@@ -6,11 +6,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type AddIgnoreFix(expr: IFSharpExpression) =
+type AddIgnoreFix(node: IFSharpTypeOwnerNode) =
     inherit FSharpModernQuickFixBase()
+
+    let expr = node.As<IFSharpExpression>()
 
     let shouldAddNewLine (expr: IFSharpExpression) =
         if expr.IsSingleLine then false else
@@ -47,13 +48,13 @@ type AddIgnoreFix(expr: IFSharpExpression) =
         addParensIfNeeded replaced.LeftArgument |> ignore
 
     new (warning: UnitTypeExpectedWarning) =
-        AddIgnoreFix(warning.Expr)
+        AddIgnoreFix(warning.Node)
 
     new (warning: FunctionValueUnexpectedWarning) =
-        AddIgnoreFix(warning.Expr)
+        AddIgnoreFix(warning.Node)
 
     new (error: UnitTypeExpectedError) =
-        AddIgnoreFix(error.Expr)
+        AddIgnoreFix(error.Node)
 
     override x.Text = "Ignore value"
     override x.IsAvailable _ = isValid expr

@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
 
-    public override IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
+    public override IFSharpIdentifier NameIdentifier => TypeName?.Identifier;
 
     protected override FSharpSymbolReference CreateReference() =>
       new CtorReference(this);

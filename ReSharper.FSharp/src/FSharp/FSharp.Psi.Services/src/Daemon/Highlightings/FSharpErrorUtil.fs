@@ -57,21 +57,25 @@ let getRefExprNameRange (refExpr: IReferenceExpr) =
     | null -> refExpr.GetHighlightingRange()
     | identifier -> identifier.GetHighlightingRange()
 
-let rec getResultExpr (expr: IFSharpExpression) =
-    match expr with
-    | :? ILetOrUseExpr as letExpr ->
-        let inExpr = letExpr.InExpression
-        if isNotNull inExpr then getResultExpr inExpr else expr
+let rec getResultNode (node: IFSharpTypeOwnerNode) : IFSharpTypeOwnerNode =
+    match node with
+    | :? IFSharpExpression as expr ->
+        match expr with
+        | :? ILetOrUseExpr as letExpr ->
+            let inExpr = letExpr.InExpression
+            if isNotNull inExpr then getResultNode inExpr else expr
 
-    | :? ISequentialExpr as seqExpr ->
-        let lastExpr = seqExpr.Expressions.LastOrDefault()
-        if isNotNull lastExpr then getResultExpr lastExpr else expr
+        | :? ISequentialExpr as seqExpr ->
+            let lastExpr = seqExpr.Expressions.LastOrDefault()
+            if isNotNull lastExpr then getResultNode lastExpr else expr
 
-    | :? IParenOrBeginEndExpr as parenExpr ->
-        let innerExpr = parenExpr.InnerExpression
-        if isNotNull innerExpr && not parenExpr.IsSingleLine then getResultExpr innerExpr else expr
+        | :? IParenOrBeginEndExpr as parenExpr ->
+            let innerExpr = parenExpr.InnerExpression
+            if isNotNull innerExpr && not parenExpr.IsSingleLine then getResultNode innerExpr else expr
 
-    | _ -> expr
+        | _ -> expr
+
+    | _ -> node
 
 let getAttributeSuffixRange (attribute: IAttribute) =
     let referenceName = attribute.ReferenceName
