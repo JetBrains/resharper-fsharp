@@ -22,7 +22,7 @@ let isGlobal (fcsReference: FSharpSymbolReference) =
     not fcsReference.IsQualified &&
 
     let referenceOwner = fcsReference.GetElement()
-    isNotNull referenceOwner && getTokenType referenceOwner.FSharpIdentifier == FSharpTokenType.GLOBAL
+    isNotNull referenceOwner && getTokenType referenceOwner.NameIdentifier == FSharpTokenType.GLOBAL
 
 let isModuleOrNamespace (fcsReference: FSharpSymbolReference) =
     let entity = fcsReference.GetFcsSymbol().As<FSharpEntity>()

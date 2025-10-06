@@ -20,12 +20,12 @@
 
   <Error staticGroup="FSharpErrors" name="TypeEquation" ID="FS0001: Type equation error">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
-    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IFSharpTypeOwnerNode" name="node"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
@@ -37,12 +37,12 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
-    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IFSharpTypeOwnerNode" name="node"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -119,12 +119,12 @@
   </Error>
 
   <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0020: 'unit' type expected">
-    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IFSharpTypeOwnerNode" name="node"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -192,7 +192,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
-    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
@@ -241,7 +241,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
-    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix arguments="h.Reference">FSharpImportModuleMemberFix</QuickFix>
   </Warning>
@@ -286,12 +286,12 @@
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="FunctionValueUnexpected" ID="FS0193: Function type expected">
-    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IFSharpTypeOwnerNode" name="node"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -300,12 +300,12 @@
 
   <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch" ID="FS0193: Type constraint mismatch">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
-    <Parameter type="IFSharpExpression" name="expr"/>
+    <Parameter type="IFSharpTypeOwnerNode" name="node"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message resourceName="Message" resourceType="Strings">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetHighlightingRange()</Range>
+    <Range>node.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
@@ -610,7 +610,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
-    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
+    <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>

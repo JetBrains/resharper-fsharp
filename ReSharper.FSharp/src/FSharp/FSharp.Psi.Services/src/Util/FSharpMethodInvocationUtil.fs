@@ -31,7 +31,7 @@ let getArgsOwner (expr: IFSharpExpression) =
 let getReferenceName (fsArgsOwner: IFSharpArgumentsOwner) =
     let identifier =
         match fsArgsOwner with
-        | :? IFSharpReferenceOwner as refOwner -> refOwner.FSharpIdentifier
+        | :? IFSharpReferenceOwner as refOwner -> refOwner.NameIdentifier
 
         | :? IPrefixAppExpr as prefixAppExpr ->
             let invokedRefExpr = prefixAppExpr.InvokedReferenceExpression

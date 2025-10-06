@@ -4,19 +4,20 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
-type RemoveSubsequentFix(expr: IFSharpExpression) =
+type RemoveSubsequentFix(node: IFSharpTypeOwnerNode) =
     inherit FSharpQuickFixBase()
 
+    let expr = node.As<IFSharpExpression>()
+
     new (warning: UnitTypeExpectedWarning) =
-        RemoveSubsequentFix(warning.Expr)
+        RemoveSubsequentFix(warning.Node)
 
     new (warning: FunctionValueUnexpectedWarning) =
-        RemoveSubsequentFix(warning.Expr)
+        RemoveSubsequentFix(warning.Node)
 
     override x.Text = "Remove subsequent expressions"
 
