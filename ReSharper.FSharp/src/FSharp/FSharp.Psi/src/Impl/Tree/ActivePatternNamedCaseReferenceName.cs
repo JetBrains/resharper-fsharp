@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ActivePatternNamedCaseReferenceName
   {
-    public override IFSharpIdentifier FSharpIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => Identifier;
     public override FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Pattern;
 
     protected override FSharpSymbolReference CreateReference() =>

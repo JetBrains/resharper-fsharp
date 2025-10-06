@@ -18,11 +18,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     Type
   }
 
-  public interface IFSharpReferenceOwner : IFSharpTreeNode
+  public interface IFSharpReferenceOwner : INameIdentifierOwner
   {
     [NotNull] FSharpSymbolReference Reference { get; }
-
-    [CanBeNull] IFSharpIdentifier FSharpIdentifier { get; }
 
     [NotNull]
     IFSharpReferenceOwner SetName([NotNull] string name);
@@ -44,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       [NotNull] Func<string, IFSharpQualifiableReferenceOwner> factory, [NotNull] IClrDeclaredElement declaredElement,
       ITreeNode context = null)
     {
-      var identifier = referenceOwner.FSharpIdentifier;
+      var identifier = referenceOwner.NameIdentifier;
       Assertion.Assert(identifier != null, "referenceOwner.FSharpIdentifier != null");
 
       // todo: type args

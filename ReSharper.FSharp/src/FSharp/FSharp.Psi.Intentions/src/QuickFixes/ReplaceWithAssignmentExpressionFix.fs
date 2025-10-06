@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Resources.Shell
 
@@ -14,10 +13,10 @@ type ReplaceWithAssignmentExpressionFix(expr: IBinaryAppExpr) =
     inherit FSharpQuickFixBase()
 
     new (error: UnitTypeExpectedError) =
-        ReplaceWithAssignmentExpressionFix(error.Expr.As<IBinaryAppExpr>())
+        ReplaceWithAssignmentExpressionFix(error.Node.As<IBinaryAppExpr>())
 
     new (warning: UnitTypeExpectedWarning) =
-        ReplaceWithAssignmentExpressionFix(warning.Expr.As<IBinaryAppExpr>())
+        ReplaceWithAssignmentExpressionFix(warning.Node.As<IBinaryAppExpr>())
 
     override x.IsAvailable _ =
         if not (isValid expr && isPredefinedFunctionRef "=" expr.Operator) then false else

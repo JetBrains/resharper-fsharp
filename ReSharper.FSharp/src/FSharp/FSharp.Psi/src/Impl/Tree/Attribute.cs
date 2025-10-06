@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override FSharpSymbolReference CreateReference() =>
       new CtorReference(this);
 
-    public override IFSharpIdentifier FSharpIdentifier => ReferenceName?.Identifier;
+    public override IFSharpIdentifier NameIdentifier => ReferenceName?.Identifier;
 
     public IList<IArgument> ParameterArguments => 
       myParameterArguments.GetValue(this, static expr => expr.CalculateParameterArguments([expr.Expression]));

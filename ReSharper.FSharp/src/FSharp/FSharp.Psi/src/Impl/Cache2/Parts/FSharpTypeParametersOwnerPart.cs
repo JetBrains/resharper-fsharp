@@ -117,7 +117,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       foreach (var typeConstraint in GetAllTypeParameterConstraints())
       foreach (var referenceName in typeConstraint.ReferenceNames)
       {
-        if (referenceName.FSharpIdentifier.GetSourceName() == name)
+        if (referenceName.NameIdentifier.GetSourceName() == name)
           yield return typeConstraint;
       }
     }
@@ -162,7 +162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       {
         foreach (var referenceName in typeConstraint.ReferenceNames)
         {
-          if (referenceName.FSharpIdentifier.GetSourceName() == typeParamName)
+          if (referenceName.NameIdentifier.GetSourceName() == typeParamName)
             flags |= GetTypeConstraintFlags(typeParamName, typeConstraint);
         }
       }

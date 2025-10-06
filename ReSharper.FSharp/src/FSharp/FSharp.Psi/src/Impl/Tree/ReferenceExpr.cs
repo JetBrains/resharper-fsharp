@@ -117,6 +117,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override bool IsConstantValue() => !ConstantValue.IsErrorOrNonCompileTimeConstantValue();
+
+    public IFSharpIdentifier NameIdentifier => Identifier;
   }
 
   public class ReferenceExpressionTypeReference : FSharpSymbolReference

@@ -102,36 +102,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         }).ToList();
     }
 
-    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpExpression expr)
+    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpTypeOwnerNode node)
     {
-      // todo: named args
-      // todo: return property setters
-      
-      var tupleItemExpr = expr.IgnoreParentParens();
-      var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
-      var parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
-
-      var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
-      var argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
-      if (argOwner == null)
-        return null;
-
-      if (argOwner is IAttribute or INewExpr)
-        return new FSharpParameterIndex(0, parameterIndex);
-
-      var paramGroupIndex = 0;
-      while (argOwner is IPrefixAppExpr prefixAppExpr)
+      if (node is IFSharpExpression expr)
       {
-        if (prefixAppExpr.FunctionExpression is IPrefixAppExpr funPrefixAppExpr)
+        // todo: named args
+        // todo: return property setters
+
+        var tupleItemExpr = expr.IgnoreParentParens();
+        var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
+        var parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
+
+        var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
+        var argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
+        if (argOwner == null)
+          return null;
+
+        if (argOwner is IAttribute or INewExpr)
+          return new FSharpParameterIndex(0, parameterIndex);
+
+        var paramGroupIndex = 0;
+        while (argOwner is IPrefixAppExpr prefixAppExpr)
         {
-          argOwner = funPrefixAppExpr;
-          paramGroupIndex++;
+          if (prefixAppExpr.FunctionExpression is IPrefixAppExpr funPrefixAppExpr)
+          {
+            argOwner = funPrefixAppExpr;
+            paramGroupIndex++;
+          }
+          else
+            break;
         }
-        else
-          break;
+
+        return new FSharpParameterIndex(paramGroupIndex, parameterIndex);
       }
 
-      return new FSharpParameterIndex(paramGroupIndex, parameterIndex);
+      if (node is IFSharpPattern pat)
+      {
+      }
+
+      return null;
     }
   }
 }

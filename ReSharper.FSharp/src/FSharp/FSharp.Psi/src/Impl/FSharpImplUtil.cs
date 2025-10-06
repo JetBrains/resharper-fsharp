@@ -835,7 +835,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner,
       [NotNull] string name)
     {
-      if (referenceOwner.FSharpIdentifier?.IdentifierToken is { } id)
+      if (referenceOwner.NameIdentifier?.IdentifierToken is { } id)
         ModificationUtil.ReplaceChild(id, new FSharpIdentifierToken(name));
 
       return referenceOwner;

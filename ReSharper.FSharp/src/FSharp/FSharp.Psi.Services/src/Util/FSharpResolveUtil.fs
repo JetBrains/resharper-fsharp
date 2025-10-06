@@ -109,7 +109,7 @@ let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
         | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
         | _ -> [reference.GetName()]
 
-    let identifier = referenceOwner.FSharpIdentifier
+    let identifier = referenceOwner.NameIdentifier
     if isNull identifier then None else
 
     let endCoords = identifier.GetDocumentEndOffset().ToDocumentCoords()
