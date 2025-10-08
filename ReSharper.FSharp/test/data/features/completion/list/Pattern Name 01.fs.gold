@@ -7,7 +7,7 @@ Range: "| Some(♦)"
 
                             [ExpectedTypeMatchLambda]
 value                       <==
-                            [ExpectedTypeMatch]
+                            [ExpectedTypeMatch^]
 Value| |=                   'T              OrderStr=Value
                             [FieldsAndProperties]
 Value                       'T
@@ -260,7 +260,7 @@ unativeint
 unit
 voidptr
 voption
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, NormalSelectionPriority, Other]
+                            [FromSingleCompletion^, FromLightAndDynamicEvaluation^, NormalSelectionPriority^, Other^]
 #I
 #else
 #endif

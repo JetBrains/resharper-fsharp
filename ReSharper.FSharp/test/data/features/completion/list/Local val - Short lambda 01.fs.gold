@@ -8,7 +8,7 @@ Range: "|> List.map _.♦"
                             [FieldsAndProperties]
 Chars                       char    <==
 Length                      int
-                            [Methods, MemberOfCurrentType]
+                            [Methods, MemberOfCurrentType^]
 Clone                       obj
 CompareTo                   int
 Contains                    bool
@@ -47,9 +47,9 @@ TrimStart                   string
 TryCopyTo                   bool
                             [Methods, MemberOfObject]
 GetType                     Type
-                            [FromLightAndDynamicEvaluation, ExtensionMethods]
+                            [FromLightAndDynamicEvaluation^, ExtensionMethods]
 GetReverseIndex             int
-                            [FromSingleCompletion, ImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+                            [Other^, ImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
 Aggregate |(in System.Linq)
 All |(in System.Linq)
 Ancestors |(in System.Xml.Linq)
