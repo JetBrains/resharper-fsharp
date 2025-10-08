@@ -335,7 +335,8 @@ tasks {
     dependsOn(prepare)
 
     executable = "dotnet"
-    args("build", "-consoleloggerparameters:ErrorsOnly", "$resharperPluginPath/ReSharper.FSharp.sln")
+    workingDir(resharperPluginPath)
+    args("build", "-consoleloggerparameters:ErrorsOnly", "ReSharper.FSharp.sln")
   }
 
   wrapper {
