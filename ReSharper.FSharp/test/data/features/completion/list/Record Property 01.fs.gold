@@ -7,7 +7,7 @@ Range: "{ F1 = 1; F2 = 2; ♦ }"
 
                             [ExpectedTypeMatch, ExpectedTypeMatchInitializer]
 F3                          int    <==
-                            [FieldsAndProperties]
+                            [FieldsAndProperties^]
 contents                    'T
                             [Methods, Keywords]
 false
@@ -115,7 +115,7 @@ TaskBuilderExtensions
 Unchecked
 ValueOption
 WebExtensions
-                            [FromLightAndDynamicEvaluation]
+                            [FromLightAndDynamicEvaluation^]
 #I
 #else
 #endif
@@ -124,7 +124,7 @@ WebExtensions
 #nowarn
 #r
 #time
-                            [FromSingleCompletion, TypesAndNamespaces, NotImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+                            [Other^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
 AbandonedMutexException |(in System.Threading)
