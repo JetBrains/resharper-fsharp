@@ -670,6 +670,7 @@
     <Range>pat.GetNavigationRange()</Range>
     <SecondaryRanges>pat.GetPartialDeclarations() |> Seq.filter ((!=) pat) |> getNodeRanges</SecondaryRanges>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedNamedPatternFix</QuickFix>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
