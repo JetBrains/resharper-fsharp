@@ -10,10 +10,10 @@ module IntroduceVarFix =
     let [<Literal>] introduceVarText = "Introduce 'let' binding"
     let [<Literal>] introduceVarOutsideLambdaText = "Introduce 'let' binding outside lambda"
 
-type IntroduceVarFix(expr: IFSharpExpression, removeExpr, escapeLambdas, addMutable, text) =
+type IntroduceVarFix(node: IFSharpTypeOwnerNode, removeExpr, escapeLambdas, addMutable, text) =
     inherit FSharpQuickFixBase()
 
-    let mutable expr = expr
+    let mutable expr = node.As<IFSharpExpression>()
 
     let suggestInnerExpression (expr: IFSharpExpression) =
         let binaryAppExpr = expr.As<IBinaryAppExpr>()
@@ -23,13 +23,13 @@ type IntroduceVarFix(expr: IFSharpExpression, removeExpr, escapeLambdas, addMuta
             null
 
     new (warning: UnitTypeExpectedWarning) =
-        IntroduceVarFix(warning.Expr, true, false, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(warning.Node, true, false, false, IntroduceVarFix.introduceVarText)
 
     new (warning: FunctionValueUnexpectedWarning) =
-        IntroduceVarFix(warning.Expr, true, false, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(warning.Node, true, false, false, IntroduceVarFix.introduceVarText)
 
     new (error: UnitTypeExpectedError) =
-        IntroduceVarFix(error.Expr, true, false, false, IntroduceVarFix.introduceVarText)
+        IntroduceVarFix(error.Node, true, false, false, IntroduceVarFix.introduceVarText)
 
     new (error: CantTakeAddressOfExpressionError) =
         IntroduceVarFix(error.Expr.Expression, false, false, true, IntroduceVarFix.introduceVarText)

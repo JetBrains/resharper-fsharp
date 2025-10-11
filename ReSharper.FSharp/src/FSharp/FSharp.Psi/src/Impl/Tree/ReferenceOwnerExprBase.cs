@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public abstract IFSharpIdentifier FSharpIdentifier { get; }
+    public abstract IFSharpIdentifier NameIdentifier { get; }
 
     protected abstract FSharpSymbolReference CreateReference();
 

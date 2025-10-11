@@ -16,7 +16,7 @@ open JetBrains.Util
 type ConvertTupleToArrayOrListElementsFix(warning: TypeEquationError) =
     inherit FSharpQuickFixBase()
 
-    let expr = warning.Expr
+    let expr = warning.Node.As<IFSharpExpression>()
 
     override x.Text = "Use ';' separators"
 

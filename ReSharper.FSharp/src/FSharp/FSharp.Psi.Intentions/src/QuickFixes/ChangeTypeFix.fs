@@ -18,7 +18,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<AbstractClass>]
-type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
+type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit FSharpQuickFixBase()
 
     let canUpdateType (decl: ITreeNode) =
@@ -26,7 +26,7 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
         decl :? IFSharpParameterDeclaration
 
     member this.TargetFcsType =
-        use pinCheckResultsCookie = expr.FSharpFile.PinTypeCheckResults(true, "ChangeTypeFixBase")
+        use pinCheckResultsCookie = node.FSharpFile.PinTypeCheckResults(true, "ChangeTypeFixBase")
         this.GetTargetFcsType(fcsDiagnosticInfo.TypeMismatchData)
 
     abstract DeclaredElement: IDeclaredElement
@@ -86,16 +86,18 @@ type ChangeTypeFixBase(expr: IFSharpExpression, fcsDiagnosticInfo: FcsCachedDiag
 
 
 // todo: test signatures, virtual/abstract members
-type ChangeParameterTypeFromArgumentFix(expr, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
-    inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
+type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
+    inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
 
-    let fsParamIndex = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(expr)
+    let expr = node.As<IFSharpExpression>()
+
+    let fsParamIndex = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(node)
 
     new (error: TypeEquationError) =
-        ChangeParameterTypeFromArgumentFix(error.Expr, error.DiagnosticInfo)
+        ChangeParameterTypeFromArgumentFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeConstraintMismatchError) =
-        ChangeParameterTypeFromArgumentFix(error.Expr, error.DiagnosticInfo)
+        ChangeParameterTypeFromArgumentFix(error.Node, error.DiagnosticInfo)
 
     override this.Text =
         $"Change type of parameter to '{this.TargetFcsType.Format()}'"
@@ -119,39 +121,39 @@ type ChangeParameterTypeFromArgumentFix(expr, fcsDiagnosticInfo: FcsCachedDiagno
         decl.SetParameterFcsType(fsParamIndex.Value, fcsType)
 
 
-type ChangeTypeFromElementReferenceFix(expr, fcsDiagnosticInfo) =
-    inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
+type ChangeTypeFromElementReferenceFix(node, fcsDiagnosticInfo) =
+    inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
 
     new (error: TypeEquationError) =
-        ChangeTypeFromElementReferenceFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromElementReferenceFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeConstraintMismatchError) =
-        ChangeTypeFromElementReferenceFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromElementReferenceFix(error.Node, error.DiagnosticInfo)
 
     override this.GetTargetFcsType(data) =
         data.ExpectedType
 
     override this.DeclaredElement =
-        let refExpr = expr.As<IReferenceExpr>()
-        if isNull refExpr then null else
+        let referenceOwner = node.As<IFSharpReferenceOwner>()
+        if isNull referenceOwner then null else
 
-        refExpr.Reference.Resolve().DeclaredElement
+        referenceOwner.Reference.Resolve().DeclaredElement
 
 
-type ChangeReturnTypeFromInvocationFix(expr: IFSharpExpression, fcsDiagnosticInfo) =
-    inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
+type ChangeReturnTypeFromInvocationFix(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo) =
+    inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
 
     new (error: TypeEquationError) =
-        ChangeReturnTypeFromInvocationFix(error.Expr, error.DiagnosticInfo)
+        ChangeReturnTypeFromInvocationFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeConstraintMismatchError) =
-        ChangeReturnTypeFromInvocationFix(error.Expr, error.DiagnosticInfo)
+        ChangeReturnTypeFromInvocationFix(error.Node, error.DiagnosticInfo)
 
     override this.GetTargetFcsType(data) =
         data.ExpectedType
 
     override this.DeclaredElement =
-        let appExpr = expr.As<IPrefixAppExpr>()
+        let appExpr = node.As<IPrefixAppExpr>()
         if isNull appExpr then null else
 
         let reference = appExpr.InvokedFunctionReference
@@ -185,33 +187,47 @@ type ChangeReturnTypeFromInvocationFix(expr: IFSharpExpression, fcsDiagnosticInf
         |> FSharpTypeUsageUtil.updateTypeUsage fcsType
 
 
-type ChangeTypeFromRecordFieldBindingFix(expr, fcsDiagnosticInfo) =
-    inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
+type ChangeTypeFromRecordFieldBindingFix(node, fcsDiagnosticInfo) =
+    inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
+
+    let tryGetFieldReferenceOwner (node: IFSharpTypeOwnerNode) : IFSharpReferenceOwner =
+        match node with
+        | :? IFSharpExpression as expr ->
+            let fieldBinding = RecordFieldBindingNavigator.GetByExpression(expr.IgnoreParentParens())
+            if isNotNull fieldBinding then fieldBinding.ReferenceName else null
+
+        | :? IFSharpPattern as pat ->
+            let fieldPat = FieldPatNavigator.GetByPattern(pat.IgnoreParentParens())
+            if isNotNull fieldPat then fieldPat.ReferenceName else null
+        
+        | _ -> null
 
     new (error: TypeEquationError) =
-        ChangeTypeFromRecordFieldBindingFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromRecordFieldBindingFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeConstraintMismatchError) =
-        ChangeTypeFromRecordFieldBindingFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromRecordFieldBindingFix(error.Node, error.DiagnosticInfo)
 
     override this.GetTargetFcsType(data) =
         data.ActualType
 
     override this.DeclaredElement =
-        let binding = RecordFieldBindingNavigator.GetByExpression(expr.IgnoreParentParens())
-        if isNull binding then null else
+        let referenceOwner = tryGetFieldReferenceOwner node
+        if isNull referenceOwner then null else
 
-        binding.ReferenceName.Reference.Resolve().DeclaredElement
+        referenceOwner.Reference.Resolve().DeclaredElement
 
 
-type ChangeTypeFromSetExprFix(expr, fcsDiagnosticInfo) =
-    inherit ChangeTypeFixBase(expr, fcsDiagnosticInfo)
+type ChangeTypeFromSetExprFix(node, fcsDiagnosticInfo) =
+    inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
+
+    let expr = node.As<IFSharpExpression>()
 
     new (error: TypeEquationError) =
-        ChangeTypeFromSetExprFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromSetExprFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeConstraintMismatchError) =
-        ChangeTypeFromSetExprFix(error.Expr, error.DiagnosticInfo)
+        ChangeTypeFromSetExprFix(error.Node, error.DiagnosticInfo)
 
     override this.GetTargetFcsType(data) =
         data.ActualType

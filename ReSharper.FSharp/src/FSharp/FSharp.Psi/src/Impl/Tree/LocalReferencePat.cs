@@ -30,7 +30,11 @@ internal partial class LocalReferencePat
   public bool CanBeMutable => Binding != null;
 
   public IBindingLikeDeclaration Binding => this.GetBindingFromHeadPattern();
-  public FSharpSymbolReference Reference => ReferenceName?.Reference;
+  public FSharpSymbolReference Reference => ReferenceName.Reference;
+
+  IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) => FSharpImplUtil.SetName(this, name);
+  public FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Pattern;
+
   public override ConstantValue ConstantValue => this.GetConstantValue();
   public AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
   public IFSharpParameter FSharpParameter => this.TryGetDeclaredFSharpParameter();

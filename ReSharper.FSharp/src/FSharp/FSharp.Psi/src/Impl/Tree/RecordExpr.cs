@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class RecordExpr
   {
-    public override IFSharpIdentifier FSharpIdentifier => null;
+    public override IFSharpIdentifier NameIdentifier => null;
 
     public override IFSharpReferenceOwner SetName(string name) => this;
     public override FSharpReferenceContext? ReferenceContext => null;

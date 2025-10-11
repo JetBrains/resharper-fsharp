@@ -1,0 +1,5 @@
+﻿module Module
+
+let [<Literal>] I: string = 1
+
+let s: string = I{caret}

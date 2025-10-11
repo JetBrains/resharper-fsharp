@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
       get
       {
-        if (myOwner.FSharpIdentifier is { } fsIdentifier)
+        if (myOwner.NameIdentifier is { } fsIdentifier)
           return fsIdentifier.NodeType == FSharpTokenType.LPAREN_STAR_RPAREN
             ? fsIdentifier.GetTreeStartOffset()
             : fsIdentifier.NameRange.StartOffset;
@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override string GetName() =>
-      myOwner.FSharpIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      myOwner.NameIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool HasMultipleNames =>
       AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;
@@ -103,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override TreeTextRange GetTreeTextRange() =>
-      myOwner.FSharpIdentifier?.NameRange ?? TreeTextRange.InvalidRange;
+      myOwner.NameIdentifier?.NameRange ?? TreeTextRange.InvalidRange;
 
     public override IAccessContext GetAccessContext() =>
       new DefaultAccessContext(myOwner);
@@ -160,7 +160,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : new[] {GetName()};
 
       var symbolUses =
-        checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, resolveExpr, opName);
+        checkerService.ResolveNameAtLocation(referenceOwner.NameIdentifier, names, resolveExpr, opName);
 
       return FilterSymbols(symbolUses);
     }

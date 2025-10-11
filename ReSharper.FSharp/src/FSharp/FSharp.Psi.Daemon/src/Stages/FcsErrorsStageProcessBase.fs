@@ -197,7 +197,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     let createHighlightingFromMappedExpression mapping highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
-        if isNotNull expr then highlightingCtor(expr, error.Message) :> _ else null
+        if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else null
 
     let createCachedDiagnostic (error: FSharpDiagnostic) range =
         let pos = error.Range.Start
@@ -227,8 +227,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createTypeMismatchHighlighting MatchClauseWrongTypeError range error
 
             | Some(:? TypeMismatchDiagnosticExtendedData as data) ->
-                let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> getResultExpr
-                if isNull expr then
+                let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> getResultNode
+                if isNull node then
                     null
                 elif isUnit data.ExpectedType then
                     createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
@@ -359,7 +359,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ -> createGenericHighlighting error range
         
         | UnitTypeExpected ->
-            createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedWarning range error
+            createHighlightingFromMappedExpression getResultNode UnitTypeExpectedWarning range error
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
@@ -550,14 +550,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | MissingErrorNumber ->
             match error.ExtendedData with
             | Some (:? ExpressionIsAFunctionExtendedData) ->
-                createHighlightingFromMappedExpression getResultExpr FunctionValueUnexpectedWarning range error
+                createHighlightingFromMappedExpression getResultNode FunctionValueUnexpectedWarning range error
 
             | Some (:? FieldNotContainedDiagnosticExtendedData) ->
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
             | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
                 if isUnit data.ExpectedType then
-                    createHighlightingFromMappedExpression getResultExpr UnitTypeExpectedError range error else
+                    createHighlightingFromMappedExpression getResultNode UnitTypeExpectedError range error else
 
                 createTypeMismatchHighlighting TypeConstraintMismatchError range error
 

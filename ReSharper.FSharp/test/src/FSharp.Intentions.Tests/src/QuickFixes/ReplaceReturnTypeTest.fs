@@ -99,6 +99,9 @@ type ChangeElementTypeTest() =
     [<Test>] member x.``Field - Record 03``() = x.DoNamedTest()
     [<Test>] member x.``Field - Struct 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Literal - Expr 01``() = x.DoNamedTest()
+    [<Test; Explicit "Fix recovery in FCS">] member x.``Literal - Pattern 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Prop - Auto 01``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Auto 02``() = x.DoNamedTest()
     [<Test>] member x.``Prop - Auto 03``() = x.DoNamedTest()
@@ -130,6 +133,7 @@ type ChangeElementTypeFromFieldBindingTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/changeType/init"
 
+    [<Test>] member x.``Record - Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Record 02``() = x.DoNamedTest()
     [<Test>] member x.``Record 03``() = x.DoNamedTest()

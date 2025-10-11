@@ -11,8 +11,10 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiagnosticInfo) =
+type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit FSharpQuickFixBase()
+
+    let expr = node.As<IFSharpExpression>()
 
     let unwrapDecl (decl: IDeclaration) =
         match decl with
@@ -39,11 +41,11 @@ type ReplaceReturnTypeFix(expr: IFSharpExpression, diagnosticInfo: FcsCachedDiag
 
     new (error: TypeConstraintMismatchError) =
         // error FS0193: Type constraint mismatch. The type 'A.B' is not compatible with type 'Thing'
-        ReplaceReturnTypeFix(error.Expr, error.DiagnosticInfo)
+        ReplaceReturnTypeFix(error.Node, error.DiagnosticInfo)
 
     new (error: TypeEquationError) =
         // error FS0001: This expression was expected to have type 'int' but here has type 'string'
-        ReplaceReturnTypeFix(error.Expr, error.DiagnosticInfo)
+        ReplaceReturnTypeFix(error.Node, error.DiagnosticInfo)
 
     new (error: MatchClauseWrongTypeError) =
         // All branches of a pattern match expression must return values implicitly convertible to the type of the first branch, which here is 'int'.

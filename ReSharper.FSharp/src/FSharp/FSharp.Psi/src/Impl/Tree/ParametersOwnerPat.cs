@@ -10,5 +10,8 @@ internal partial class ParametersOwnerPat
   public override IEnumerable<IFSharpPattern> NestedPatterns =>
     Parameters.SelectMany(param => param.NestedPatterns);
 
-  public FSharpSymbolReference Reference => ReferenceName?.Reference;
+  public FSharpSymbolReference Reference => ReferenceName.Reference;
+
+  public IFSharpReferenceOwner SetName(string name) => FSharpImplUtil.SetName(this, name);
+  public FSharpReferenceContext? ReferenceContext => FSharpReferenceContext.Pattern;
 }

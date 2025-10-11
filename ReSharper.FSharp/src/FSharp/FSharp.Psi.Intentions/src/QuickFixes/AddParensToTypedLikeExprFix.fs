@@ -17,7 +17,7 @@ type AddParensToTypedLikeExprFix(typedLikeExpr: ITypedLikeExpr) =
         AddParensToTypedLikeExprFix(error.Expr)
 
     new (error: TypeConstraintMismatchError) =
-        let typedLikeExpr = TypedLikeExprNavigator.GetByExpression(error.Expr)
+        let typedLikeExpr = TypedLikeExprNavigator.GetByExpression(error.Node.As())
         AddParensToTypedLikeExprFix typedLikeExpr
 
     override x.Text =
