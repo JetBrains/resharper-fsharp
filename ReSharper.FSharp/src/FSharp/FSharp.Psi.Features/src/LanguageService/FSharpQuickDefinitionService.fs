@@ -10,7 +10,7 @@ open JetBrains.Rider.Backend.Features.QuickDefinition
 open JetBrains.Rider.Backend.Product
 
 [<Language(typeof<FSharpLanguage>)>]
-[<ZoneMarker(typeof<IRiderProductFullEnvironmentZone>, typeof<IRiderFullFeatureZone>)>]
+[<ZoneMarker(typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpQuickDefinitionService() =
     inherit DefaultQuickDefinitionLanguageService()
 

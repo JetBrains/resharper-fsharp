@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsCont
 open JetBrains.Rider.Model
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
     interface IProjectStructureProvider with
         member x.Priority = 10
@@ -50,7 +50,7 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
 
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer,
         presenter: ProjectModelViewPresenter) =
 

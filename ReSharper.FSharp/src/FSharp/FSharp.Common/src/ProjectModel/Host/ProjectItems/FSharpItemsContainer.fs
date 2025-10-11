@@ -1193,7 +1193,7 @@ type IFSharpItemsContainerRefresher =
 
 
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
 
     let tryGetProject projectMark =
@@ -1314,7 +1314,7 @@ type FSharpViewFolderIdentity =
 
 
 [<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<IReSharperHostNetFullFeatureZone>)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
     inherit OrderingContextProvider()
 
