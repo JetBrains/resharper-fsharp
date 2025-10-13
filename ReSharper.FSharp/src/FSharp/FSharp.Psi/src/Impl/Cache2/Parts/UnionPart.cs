@@ -83,16 +83,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       writer.WriteByte((byte) RepresentationAccessRights);
     }
 
-    public IList<IUnionCase> Cases
+    public IList<IFSharpUnionCase> Cases
     {
       get
       {
         if (!(GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IUnionRepresentation repr }))
-          return EmptyList<IUnionCase>.Instance;
+          return EmptyList<IFSharpUnionCase>.Instance;
 
-        var result = new LocalList<IUnionCase>();
+        var result = new LocalList<IFSharpUnionCase>();
         foreach (var memberDeclaration in repr.UnionCases)
-          if (((ITypeMemberDeclaration) memberDeclaration).DeclaredElement is IUnionCase unionCase)
+          if (((ITypeMemberDeclaration) memberDeclaration).DeclaredElement is IFSharpUnionCase unionCase)
             result.Add(unionCase);
 
         return result.ResultingList();
@@ -121,17 +121,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
   }
 
-  public interface IFSharpRepresentationAccessRightsOwner
-  {
-    AccessRights RepresentationAccessRights { get; }
-  }
 
-  public interface IUnionPart : IStructuralTypePart, IFSharpRepresentationAccessRightsOwner, IFSharpTypePart
+  public interface IUnionPart : IFSharpStructuralTypePart, IFSharpRepresentationAccessRightsOwner, IFSharpTypePart
   {
     bool HasNestedTypes { get; }
     bool IsSingleCase { get; }
     string[] CaseNames { get; }
-    IList<IUnionCase> Cases { get; }
+    IList<IFSharpUnionCase> Cases { get; }
     TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations { get; }
   }
 

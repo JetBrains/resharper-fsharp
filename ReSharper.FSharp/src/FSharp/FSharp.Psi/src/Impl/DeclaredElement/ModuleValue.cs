@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IMutableModifierOwner,
+  internal class ModuleValue : FSharpPropertyBase<TopPatternDeclarationBase>, IFSharpMutableModifierOwner,
     ITopLevelPatternDeclaredElement
   {
     public ModuleValue([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
@@ -12,17 +12,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool IsMutable =>
-      GetDeclaration() is IMutableModifierOwner { IsMutable: true };
+      GetDeclaration() is IFSharpMutableModifierOwner { IsMutable: true };
 
     public void SetIsMutable(bool value)
     {
       foreach (var declaration in GetDeclarations())
-        if (declaration is IMutableModifierOwner mutableModifierOwner)
+        if (declaration is IFSharpMutableModifierOwner mutableModifierOwner)
           mutableModifierOwner.SetIsMutable(true);
     }
 
     public bool CanBeMutable =>
-      GetDeclaration() is IMutableModifierOwner { CanBeMutable: true };
+      GetDeclaration() is IFSharpMutableModifierOwner { CanBeMutable: true };
 
     public override bool IsStatic => true;
 

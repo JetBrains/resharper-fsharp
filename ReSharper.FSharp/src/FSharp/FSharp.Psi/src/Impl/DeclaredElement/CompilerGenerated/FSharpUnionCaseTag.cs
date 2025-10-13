@@ -5,10 +5,10 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpUnionCaseTag(IUnionCase unionCase)
+  public class FSharpUnionCaseTag(IFSharpUnionCase unionCase)
     : FSharpGeneratedMemberBase, IFSharpGeneratedFromUnionCase, IField
   {
-    private IUnionCase UnionCase { get; } = unionCase;
+    private IFSharpUnionCase UnionCase { get; } = unionCase;
 
     public override string ShortName => UnionCase.ShortName;
 

@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi;
 
-public interface IFSharpParameterOwner : IFSharpMember, IParametersOwner
+public interface IFSharpParameterOwner : IFSharpDeclaredElement, IParametersOwner
 {
   IList<IList<IFSharpParameter>> FSharpParameterGroups { get; }
   [CanBeNull] IFSharpParameter GetParameter(FSharpParameterIndex index);

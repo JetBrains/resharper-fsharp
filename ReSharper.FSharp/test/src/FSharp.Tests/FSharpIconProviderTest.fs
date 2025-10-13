@@ -28,7 +28,7 @@ type FSharpIconProviderTest() =
 
         let declaredElement =
             match declaredElement with
-            | :? IUnionCase as u when isNotNull u.NestedType -> u.NestedType :> IDeclaredElement
+            | :? IFSharpUnionCase as u when isNotNull u.NestedType -> u.NestedType :> IDeclaredElement
             | _ -> declaredElement
 
         let iconProvider = FSharpDeclaredElementIconProvider() :> IDeclaredElementIconProvider

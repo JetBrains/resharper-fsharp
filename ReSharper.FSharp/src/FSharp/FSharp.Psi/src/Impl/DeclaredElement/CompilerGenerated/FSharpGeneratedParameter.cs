@@ -7,12 +7,12 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpGeneratedParameter([NotNull] IParametersOwner owner, [NotNull] ITypeOwner origin, bool addPrefix)
-    : FSharpGeneratedElementBase, IParameter, IFSharpGeneratedFromOtherElement
+  public class FSharpGeneratedParameter([NotNull] IFSharpParameterOwner owner, [NotNull] IFSharpFunctionalTypeField origin, bool addPrefix)
+    : FSharpGeneratedElementBase, IFSharpGeneratedFromOtherElement, IFSharpParameter
   {
     [NotNull] protected IParametersOwner Owner { get; } = owner;
 
-    [NotNull] internal ITypeOwner Origin { get; } = origin;
+    [NotNull] internal IFSharpFunctionalTypeField Origin { get; } = origin;
 
     public override string ShortName
     {
@@ -54,7 +54,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override int GetHashCode() => ShortName.GetHashCode();
     public IClrDeclaredElement OriginElement => Origin;
 
-    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
+    public virtual IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new FSharpGeneratedParameterPointer(this, addPrefix);
+
+    public FSharpParameterIndex FSharpIndex => new(0, Origin.Index);
   }
 }

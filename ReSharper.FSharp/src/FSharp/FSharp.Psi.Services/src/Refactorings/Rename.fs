@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -76,7 +77,7 @@ type FSharpParameterAtomicRename(fsParam, newName, doNotAddBindingConflicts) =
 
     override this.GetDeclarations(element) =
         match element with
-        | :? IFSharpParameter as fsParam ->
+        | :? IFSharpGeneratedParameterFromPattern as fsParam ->
             fsParam.GetParameterOriginDeclarations().OfType<IDeclaration>().AsIList()
         | _ -> EmptyList.Instance
 
@@ -111,10 +112,10 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             |> Seq.cast<IDeclaredElement>
             |> Seq.filter (fun decl -> decl != localRefPat)
 
-        | :? IUnionCase as unionCase ->
+        | :? IFSharpUnionCase as unionCase ->
             unionCase.GetGeneratedMembers()
 
-        | :? IGeneratedConstructorParameterOwner as parameterOwner ->
+        | :? IFSharpGeneratedConstructorParameterOwner as parameterOwner ->
             match parameterOwner.GetGeneratedParameter() with
             | null -> EmptyArray.Instance :> _
             | parameter -> [| parameter :> IDeclaredElement |] :> _
@@ -124,12 +125,17 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 
+        | :? IFSharpSourceTypeElement as fsTypeElement when fsTypeElement.IsFSharpException() ->
+            match fsTypeElement.GetPart<IFSharpExceptionPart>().GetConstructor() with
+            | null -> [||]
+            | ctor -> [| ctor |]
+
         | :? IFSharpSourceTypeElement as fsTypeElement ->
             match fsTypeElement.GetModuleToUpdateName(newName) with
             | null -> EmptyArray.Instance :> _
             | fsModule -> [| fsModule |] :> _
 
-        | :? IFSharpParameter as fsParam ->
+        | :? IFSharpGeneratedParameterFromPattern as fsParam ->
             fsParam.GetParameterOriginElements() |> Seq.cast
 
         | _ -> EmptyArray.Instance :> _
@@ -261,6 +267,15 @@ type FSharpDeclaredElementForRenameProvider() =
 
 [<DerivedRenamesEvaluator>]
 type SingleUnionCaseRenameEvaluator() =
+    let (|UnionCase|_|) (element: IDeclaredElement) =
+        match element with
+        | :? IFSharpUnionCase as fsUnionCase -> Some fsUnionCase
+        | :? IFSharpGeneratedFromUnionCase as generatedFromUnionCase ->
+            match generatedFromUnionCase.OriginElement with
+            | :? IFSharpUnionCase as fsUnionCase -> Some fsUnionCase
+            | _ -> None
+        | _ -> None
+    
     interface IDerivedRenamesEvaluator with
         member x.SuggestedElementsHaveDerivedName = false
         member x.CreateFromReference(_, _, _) = EmptyList.Instance :> _
@@ -279,7 +294,7 @@ type SingleUnionCaseRenameEvaluator() =
             | :? ITypeElement as typeElement when isApplicable typeElement ->
                 [| typeElement.GetSourceUnionCases().[0] :> IDeclaredElement |] :> _
 
-            | :? IUnionCase as unionCase ->
+            | UnionCase unionCase ->
                 let containingType = unionCase.GetContainingType().NotNull()
                 if not (isApplicable containingType) then [] :> _ else
                 [| containingType :> IDeclaredElement |] :> _

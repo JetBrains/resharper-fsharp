@@ -1,6 +1,5 @@
 ﻿using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -9,10 +8,6 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public interface IUnionCaseField : IProperty
-  {
-  }
-
   /// Union case or exception field compiled to a property.
   internal class FSharpUnionCaseField<T> : FSharpFieldProperty<T>, IUnionCaseField
     where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ICaseFieldDeclaration, ITypeMemberDeclaration
@@ -36,16 +31,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (decl == null)
         return null;
 
-      var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IUnionCase;
+      var caseWithFields = decl.GetContainingNode<IDeclaration>()?.DeclaredElement as IFSharpUnionCase;
       var constructor = caseWithFields?.GetConstructor();
       return constructor != null
-        ? new FSharpGeneratedParameter(constructor, this, true)
+        ? new FSharpGeneratedParameterFromUnionCaseField(constructor, this, Index)
         : null;
     }
+
+    public int Index => GetDeclaration()?.Index ?? -1;
   }
 
   /// Record field compiled to a property.
-  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IRecordField
+  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IFSharpRecordField
   {
     internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration) : base(declaration)
     {
@@ -86,12 +83,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType().GetRepresentationAccessRights();
 
     public virtual IParameter GetGeneratedParameter() =>
-      GetContainingType().GetGeneratedConstructor() is IConstructor constructor
+      GetContainingType().GetGeneratedConstructor() is { } constructor
         ? new FSharpGeneratedParameter(constructor, this, false)
         : null;
-  }
 
-  public interface IRecordField : IProperty, IFSharpRepresentationAccessRightsOwner, IMutableModifierOwner
-  {
+    public int Index => throw new System.NotImplementedException();
   }
 }
