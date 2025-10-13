@@ -66,6 +66,7 @@ public static class FSharpParameterDeclarationUtil
     }
   }
 
+  // todo: named arg
   [CanBeNull]
   [SuppressMessage("ReSharper", "VariableHidesOuterVariable")]
   public static IFSharpParameterDeclaration GetParameterDeclaration([CanBeNull] this ITypeUsage typeUsage,

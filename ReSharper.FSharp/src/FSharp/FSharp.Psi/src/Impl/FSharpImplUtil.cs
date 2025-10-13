@@ -317,10 +317,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static TypePart GetFirstTypePart([CanBeNull] this ITypeElement typeElement) =>
       typeElement.GetPart<IFSharpTypePart>()?.GetFirstPart();
 
-    public static bool IsException(this ITypeElement typeElement) =>
+    public static bool IsFSharpException(this ITypeElement typeElement) =>
       typeElement switch
       {
-        IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<IExceptionPart>() != null,
+        IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<IFSharpExceptionPart>() != null,
         ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledException(),
         _ => false
       };
@@ -342,8 +342,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       };
 
     [NotNull]
-    public static IList<IUnionCase> GetSourceUnionCases([CanBeNull] this ITypeElement type) =>
-      GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
+    public static IList<IFSharpUnionCase> GetSourceUnionCases([CanBeNull] this ITypeElement type) =>
+      GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IFSharpUnionCase>.Instance;
 
     public static string[] GetUnionCaseNames(this IFSharpTypeElement typeElement) =>
       typeElement is IFSharpCompiledTypeElement { Representation: FSharpCompiledTypeRepresentation.Union repr }
@@ -356,13 +356,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ? new FSharpUnionTagsClass(unionPart.TypeElement)
         : null;
 
-    public static IParametersOwner GetGeneratedConstructor(this ITypeElement type)
+    public static IFSharpParameterOwner GetGeneratedConstructor(this ITypeElement type)
     {
       if (!(type is TypeElement typeElement))
         return null;
 
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IGeneratedConstructorOwner constructorOwnerPart)
+        if (part is IFSharpGeneratedConstructorOwnerPart constructorOwnerPart)
           return constructorOwnerPart.GetConstructor();
 
       return null;

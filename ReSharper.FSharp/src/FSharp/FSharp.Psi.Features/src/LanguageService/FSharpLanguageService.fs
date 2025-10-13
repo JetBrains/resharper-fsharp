@@ -71,7 +71,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
     member x.GetDefaultAccessType(declaredElement: IDeclaredElement) =
         // todo: invocations, partial applications
         match declaredElement with
-        | :? IUnionCase ->
+        | :? IFSharpUnionCase ->
             ReferenceAccessType.OTHER
 
         | :? IField

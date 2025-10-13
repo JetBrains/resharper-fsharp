@@ -2,7 +2,7 @@
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
   NestedModulePart:E->Ns.E
-  ExceptionPart:E->Ns.E
+  FSharpExceptionPart:E->Ns.E
 []: Namespace:
  [Ns]: Namespace:Ns
   [E]: FSharpClass:Ns.E[TestProject], FSharpModule:Ns.E[TestProject]

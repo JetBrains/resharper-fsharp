@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         FSharpPartKind.NamedModule => new NamedModulePart(reader),
         FSharpPartKind.NestedModule => new NestedModulePart(reader),
         FSharpPartKind.AnonModule => new AnonModulePart(reader),
-        FSharpPartKind.Exception => new ExceptionPart(reader),
+        FSharpPartKind.Exception => new FSharpExceptionPart(reader),
         FSharpPartKind.Enum => new EnumPart(reader),
         FSharpPartKind.Record => new RecordPart(reader),
         FSharpPartKind.Union => new UnionPart(reader),

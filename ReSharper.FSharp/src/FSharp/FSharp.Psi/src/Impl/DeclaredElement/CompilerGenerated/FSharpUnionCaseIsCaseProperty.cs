@@ -8,9 +8,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 {
   public class FSharpUnionCaseIsCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromUnionCase
   {
-    [NotNull] internal IUnionCase UnionCase { get; }
+    [NotNull] internal IFSharpUnionCase UnionCase { get; }
 
-    internal FSharpUnionCaseIsCaseProperty([NotNull] IUnionCase unionCase) =>
+    internal FSharpUnionCaseIsCaseProperty([NotNull] IFSharpUnionCase unionCase) =>
       UnionCase = unionCase;
 
     public override ITypeElement GetContainingType() => UnionCase.ContainingType;
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       new FSharpUnionCaseIsCasePropertyPointer(this);
 
     public override string ShortName =>
-      OriginElement is IUnionCase unionCase
+      OriginElement is IFSharpUnionCase unionCase
         ? "Is" + unionCase.ShortName
         : SharedImplUtil.MISSING_DECLARATION_NAME;
 

@@ -102,24 +102,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         }).ToList();
     }
 
-    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpTypeOwnerNode node)
+    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpTypeOwnerNode node,
+      out IFSharpArgumentsOwner argOwner)
     {
+      argOwner = null;
+
       if (node is IFSharpExpression expr)
       {
-        // todo: named args
-        // todo: return property setters
-
-        var tupleItemExpr = expr.IgnoreParentParens();
-        var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
-        var parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
-
-        var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
-        var argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
+        var argGroupExpr = GetArgGroupExpr(out var parameterIndex, out var namedArg);
+        argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
         if (argOwner == null)
           return null;
 
         if (argOwner is IAttribute or INewExpr)
-          return new FSharpParameterIndex(0, parameterIndex);
+          return new FSharpParameterIndex(0, parameterIndex, namedArg);
 
         var paramGroupIndex = 0;
         while (argOwner is IPrefixAppExpr prefixAppExpr)
@@ -133,14 +129,64 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             break;
         }
 
-        return new FSharpParameterIndex(paramGroupIndex, parameterIndex);
+        return new FSharpParameterIndex(paramGroupIndex, parameterIndex, namedArg);
       }
 
       if (node is IFSharpPattern pat)
       {
+        var argPat = GetArgGroupPat(out var parameterIndex, out var namedArg);
+        if (ParametersOwnerPatNavigator.GetByParameter(argPat) is { } parametersOwnerPat)
+        {
+          argOwner = parametersOwnerPat;
+          return new FSharpParameterIndex(0, parameterIndex, namedArg);
+        }
       }
 
       return null;
+
+      IFSharpPattern GetArgGroupPat(out int? parameterIndex, out string namedArg)
+      {
+        parameterIndex = null;
+        namedArg = null;
+
+        if (FieldPatNavigator.GetByPattern(pat) is { } fieldPat)
+        {
+          namedArg = fieldPat.ShortName;
+          return NamedUnionCaseFieldsPatNavigator.GetByFieldPattern(fieldPat);
+        }
+        else
+        {
+          var tupleItemPat = pat.IgnoreParentParens();
+          var tuplePat = TuplePatNavigator.GetByPattern(tupleItemPat);
+          parameterIndex = tuplePat?.Patterns.IndexOf(tupleItemPat);
+
+          return tuplePat.IgnoreParentParens() ?? tupleItemPat;
+        }
+      }
+
+      IFSharpExpression GetArgGroupExpr(out int? parameterIndex, out string namedArg)
+      {
+        parameterIndex = null;
+        namedArg = null;
+
+        var binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr);
+        if (binaryAppExpr is { Operator.ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } refExpr })
+        {
+          namedArg = refExpr.ShortName;
+          var tupleExpr = TupleExprNavigator.GetByExpression(binaryAppExpr);
+          var parenExpr = ParenExprNavigator.GetByInnerExpression((IFSharpExpression)tupleExpr ?? binaryAppExpr);
+          return parenExpr;
+        }
+        else
+        {
+          var tupleItemExpr = expr.IgnoreParentParens();
+          var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
+          parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
+
+          var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
+          return argGroupExpr;
+        }
+      }
     }
   }
 }
