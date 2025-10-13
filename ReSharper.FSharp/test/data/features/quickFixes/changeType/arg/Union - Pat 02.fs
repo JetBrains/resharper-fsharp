@@ -1,0 +1,7 @@
+module Module
+
+type U =
+    | A of int * int
+
+match A(1, 2) with
+| A(""{caret}, _) -> ()

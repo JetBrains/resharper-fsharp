@@ -70,10 +70,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
     {
-      if (element is IUnionCase unionCase)
+      if (element is IFSharpUnionCase unionCase)
         return unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
-      if (element is IGeneratedConstructorParameterOwner parameterOwner &&
+      if (element is IFSharpGeneratedConstructorParameterOwner parameterOwner &&
           parameterOwner.GetGeneratedParameter() is { } parameter)
         return new[] {new RelatedDeclaredElement(parameter)};
 
@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         return result;
       }
 
-      if (element is IFSharpParameter fsParameter)
+      if (element is IFSharpGeneratedParameterFromPattern fsParameter)
         return fsParameter.GetParameterOriginElements().Select(paramOrigin => new RelatedDeclaredElement(paramOrigin));
 
       if (element is IReferencePat refPat && refPat.TryGetDeclaredFSharpParameter() is { } patternFsParam)
@@ -118,7 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
-      if (element is IFSharpParameter fsParameter)
+      if (element is IFSharpGeneratedParameterFromPattern fsParameter)
         return new NavigateTargets(fsParameter.GetParameterOriginElements().AsIReadOnlyCollection(), false);
 
       if (element is ISecondaryDeclaredElement { OriginElement: { } origin })

@@ -23,7 +23,8 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
 
     let canUpdateType (decl: ITreeNode) =
         decl :? IFSharpTypeUsageOwnerNode ||
-        decl :? IFSharpParameterDeclaration
+        decl :? IFSharpParameterDeclaration ||
+        decl :? IUnionCaseLikeDeclaration
 
     member this.TargetFcsType =
         use pinCheckResultsCookie = node.FSharpFile.PinTypeCheckResults(true, "ChangeTypeFixBase")
@@ -34,7 +35,15 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
 
     abstract GetDeclarations: unit -> (IFSharpDeclaration * FSharpSymbol)[]
     default this.GetDeclarations() =
-        match this.DeclaredElement with
+        let declaredElement: IDeclaredElement =
+            match this.DeclaredElement with
+            | :? IFSharpGeneratedFromOtherElement as generatedFromOtherElement ->
+                match generatedFromOtherElement.OriginElement with
+                | :? ITypeElement as typeElement when typeElement.IsFSharpException() -> typeElement
+                | _ -> generatedFromOtherElement
+            | declaredElement -> declaredElement
+
+        match declaredElement with
         | null -> EmptyArray.Instance
         | declaredElement ->
             declaredElement.GetDeclarations()
@@ -89,9 +98,7 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
 type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
 
-    let expr = node.As<IFSharpExpression>()
-
-    let fsParamIndex = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(node)
+    let fsParamIndex, argsOwner = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(node)
 
     new (error: TypeEquationError) =
         ChangeParameterTypeFromArgumentFix(error.Node, error.DiagnosticInfo)
@@ -106,15 +113,19 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
         data.ActualType
 
     override this.DeclaredElement =
-        if not fsParamIndex.HasValue then null else
-
-        let argsOwner = getArgsOwner expr
-        if isNull argsOwner then null else
+        if not fsParamIndex.HasValue || isNull argsOwner then null else
 
         let symbolReference = getReference argsOwner
         if isNull symbolReference then null else
 
-        symbolReference.Resolve().DeclaredElement.As<IFSharpParameterOwner>()
+        match symbolReference.Resolve().DeclaredElement with
+        | :? IFSharpGeneratedFromUnionCase as generatedFromUnionCase ->
+            match generatedFromUnionCase.OriginElement with
+            | :? IFSharpUnionCase as fsUnionCase -> fsUnionCase
+            | _ -> null
+
+        | declaredElement -> declaredElement.As<IFSharpParameterOwner>()
+        
 
     override this.SetType(decl, _, fcsType) =
         let decl = FSharpParameterOwnerDeclarationNavigator.Unwrap(decl)
@@ -198,7 +209,8 @@ type ChangeTypeFromRecordFieldBindingFix(node, fcsDiagnosticInfo) =
 
         | :? IFSharpPattern as pat ->
             let fieldPat = FieldPatNavigator.GetByPattern(pat.IgnoreParentParens())
-            if isNotNull fieldPat then fieldPat.ReferenceName else null
+            let recordPat = RecordPatNavigator.GetByFieldPattern(fieldPat)
+            if isNotNull recordPat then fieldPat.ReferenceName else null
         
         | _ -> null
 

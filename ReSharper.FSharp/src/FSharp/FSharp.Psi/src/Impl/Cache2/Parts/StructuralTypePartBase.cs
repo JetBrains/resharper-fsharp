@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class StructuralTypePartBase : FSharpTypeMembersOwnerTypePart, IStructuralTypePart
+  internal abstract class StructuralTypePartBase : FSharpTypeMembersOwnerTypePart, IFSharpStructuralTypePart
   {
     protected StructuralTypePartBase([NotNull] IFSharpTypeOrExtensionDeclaration declaration,
       [NotNull] ICacheBuilder cacheBuilder, PartKind partKind) : base(declaration, cacheBuilder, partKind, 
@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool HasCompareTo => true;
   }
 
-  public interface IStructuralTypePart : ClassLikeTypeElement.IClassLikePart
+  public interface IFSharpStructuralTypePart : IFSharpTypePart, ClassLikeTypeElement.IClassLikePart
   {
     bool OverridesToString { get; }
     bool HasCompareTo { get; }

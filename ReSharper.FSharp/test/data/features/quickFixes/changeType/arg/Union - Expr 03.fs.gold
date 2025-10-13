@@ -1,0 +1,6 @@
+﻿module Module
+
+type U =
+    | A of named: string
+
+let a = A(named = ""{caret})

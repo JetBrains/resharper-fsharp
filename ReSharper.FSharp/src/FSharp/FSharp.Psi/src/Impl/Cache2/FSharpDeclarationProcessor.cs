@@ -193,7 +193,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {
-      Builder.StartPart(new ExceptionPart(decl, Builder));
+      Builder.StartPart(new FSharpExceptionPart(decl, Builder));
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }

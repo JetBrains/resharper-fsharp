@@ -3,13 +3,13 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenera
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
 {
   public class
-    FSharpUnionCaseIsCasePropertyPointer : FSharpGeneratedElementPointerBase<FSharpUnionCaseIsCaseProperty, IUnionCase>
+    FSharpUnionCaseIsCasePropertyPointer : FSharpGeneratedElementPointerBase<FSharpUnionCaseIsCaseProperty, IFSharpUnionCase>
   {
     public FSharpUnionCaseIsCasePropertyPointer(FSharpUnionCaseIsCaseProperty isUnionCaseProperty)
       : base(isUnionCaseProperty)
     {
     }
 
-    public override FSharpUnionCaseIsCaseProperty CreateGenerated(IUnionCase unionCase) => new(unionCase);
+    public override FSharpUnionCaseIsCaseProperty CreateGenerated(IFSharpUnionCase unionCase) => new(unionCase);
   }
 }

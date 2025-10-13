@@ -22,8 +22,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public const string ObjParameterName = "obj";
     public const string CompParameterName = "comp";
-    public const string InfoParameterName = "info";
-    public const string ContextParameterName = "context";
   }
 
   #region CompareToObjectWithComparerMethod
@@ -213,26 +211,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override IList<IParameter> Parameters =>
       new IParameter[] {new Parameter(this, 0, ParameterKind.VALUE, FirstParamType, FirstParamName)};
-  }
-
-  #endregion
-
-  #region ExceptionConstructor
-
-  public class ExceptionConstructor : FSharpGeneratedConstructor
-  {
-    public ExceptionConstructor(TypePart typePart) : base(typePart)
-    {
-    }
-
-    public override IList<IParameter> Parameters =>
-      new IParameter[]
-      {
-        new Parameter(this, 0, ParameterKind.VALUE, PredefinedType.SerializationInfo, InfoParameterName),
-        new Parameter(this, 1, ParameterKind.VALUE, PredefinedType.StreamingContext, ContextParameterName)
-      };
-
-    public override AccessRights GetAccessRights() => AccessRights.PROTECTED;
   }
 
   #endregion

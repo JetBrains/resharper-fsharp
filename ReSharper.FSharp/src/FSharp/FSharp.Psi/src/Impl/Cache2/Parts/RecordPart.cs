@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsByRefLike => false;
   }
 
-  internal abstract class RecordPartBase : StructuralTypePartBase, IRecordPart, IGeneratedConstructorOwner
+  internal abstract class RecordPartBase : StructuralTypePartBase, IRecordPart, IFSharpGeneratedConstructorOwnerPart
   {
     public bool CliMutable { get; }
     public AccessRights RepresentationAccessRights { get; }
@@ -103,22 +103,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         ? base.GetMemberPresenceFlag() | MemberPresenceFlag.PUBLIC_DEFAULT_CTOR
         : base.GetMemberPresenceFlag();
 
-    public IList<ITypeOwner> Fields =>
+    public IList<IFSharpFunctionalTypeField> Fields =>
       GetDeclaration() is IFSharpTypeDeclaration { TypeRepresentation: IRecordRepresentation repr }
         ? repr.GetFields()
-        : EmptyList<ITypeOwner>.Instance;
+        : EmptyList<IFSharpFunctionalTypeField>.Instance;
 
-    public IParametersOwner GetConstructor() =>
+    public IFSharpParameterOwner GetConstructor() =>
       new FSharpGeneratedConstructorFromFields(this);
   }
 
-  public interface IRecordPart : IFieldsOwnerPart, IFSharpRepresentationAccessRightsOwner, IFSharpTypePart
+  public interface IRecordPart : IFSharpFieldsOwnerPart, IFSharpRepresentationAccessRightsOwner, IFSharpStructuralTypePart
   {
     bool CliMutable { get; }
   }
 
-  public interface IFieldsOwnerPart : IStructuralTypePart
+  public interface IFSharpFieldsOwnerPart
   {
-    IList<ITypeOwner> Fields { get; }
+    IList<IFSharpFunctionalTypeField> Fields { get; }
   }
+  
+  public interface IUnionCasePart : IFSharpClassPart, IFSharpFieldsOwnerPart
+  {
+    [CanBeNull] IFSharpUnionCase UnionCase { get; }
+  }
+
 }

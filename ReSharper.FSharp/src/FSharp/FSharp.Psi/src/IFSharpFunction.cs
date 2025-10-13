@@ -2,7 +2,5 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpFunction : IFSharpParameterOwner, IFunction
-  {
-  }
+  public interface IFSharpFunction : IFSharpParameterOwnerMember, IFunction;
 }

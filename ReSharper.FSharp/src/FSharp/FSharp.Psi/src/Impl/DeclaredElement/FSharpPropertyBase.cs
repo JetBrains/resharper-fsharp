@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   }
 
   internal abstract class FSharpPropertyBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
-    : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwner, IProperty
+    : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwnerMember, IProperty
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
