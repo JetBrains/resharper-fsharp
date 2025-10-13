@@ -26,11 +26,11 @@ type ToMutableFix(refExpr: IReferenceExpr) =
         let name = refExpr.Identifier.GetSourceName()
         name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
 
-        let mutableModifierOwner = refExpr.Reference.Resolve().DeclaredElement.As<IMutableModifierOwner>()
+        let mutableModifierOwner = refExpr.Reference.Resolve().DeclaredElement.As<IFSharpMutableModifierOwner>()
         isNotNull mutableModifierOwner &&
 
         mutableModifierOwner.CanBeMutable && not mutableModifierOwner.IsMutable
 
     override x.ExecutePsiTransaction _ =
-        let element = refExpr.Reference.Resolve().DeclaredElement.As<IMutableModifierOwner>()
+        let element = refExpr.Reference.Resolve().DeclaredElement.As<IFSharpMutableModifierOwner>()
         element.SetIsMutable(true)

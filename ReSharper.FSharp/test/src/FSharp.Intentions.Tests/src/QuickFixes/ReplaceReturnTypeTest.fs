@@ -144,6 +144,11 @@ type ChangeParamTypeFromArgTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/changeType/arg"
 
+    [<Test>] member x.``Exception - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Exception - Expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Exception - Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Exception - Pattern 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Function - Tuple - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Tuple - Type 02``() = x.DoNamedTest()
     [<Test>] member x.``Function - Tuple - Type 03``() = x.DoNamedTest()
@@ -167,6 +172,17 @@ type ChangeParamTypeFromArgTest() =
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Method 03``() = x.DoNamedTest()
     [<Test>] member x.``Method 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Pat 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Pat 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Pat 03``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Pat 04``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Pat 05``() = x.DoNamedTest()
 
 
 [<AssertCorrectTreeStructure>]

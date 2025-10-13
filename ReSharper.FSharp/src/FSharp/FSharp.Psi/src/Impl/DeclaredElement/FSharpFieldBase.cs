@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   }
 
   internal class FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration)
-    : FSharpFieldBase<TopPatternDeclarationBase>(declaration), IMutableModifierOwner,
+    : FSharpFieldBase<TopPatternDeclarationBase>(declaration), IFSharpMutableModifierOwner,
       ITypePrivateMember, ITopLevelPatternDeclaredElement
   {
     private FSharpMemberOrFunctionOrValue Field => Symbol as FSharpMemberOrFunctionOrValue;
@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   }
 
   internal class FSharpValField([NotNull] ValFieldDeclaration declaration)
-    : FSharpFieldBase<ValFieldDeclaration>(declaration), IMutableModifierOwner
+    : FSharpFieldBase<ValFieldDeclaration>(declaration), IFSharpMutableModifierOwner
   {
     private FSharpField Field => Symbol as FSharpField;
     protected override FSharpType FieldType => Field?.FieldType;

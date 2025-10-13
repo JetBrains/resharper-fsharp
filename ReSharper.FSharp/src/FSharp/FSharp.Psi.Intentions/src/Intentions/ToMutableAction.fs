@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -16,14 +16,14 @@ type ToMutableAction(dataProvider: FSharpContextActionDataProvider) =
         let decl = dataProvider.GetSelectedElement<IRecordFieldDeclaration>()
         if not (isValid decl && decl.GetNameRange().Contains(dataProvider.SelectedTreeRange)) then false else
 
-        let field = decl.DeclaredElement.As<IRecordField>()
+        let field = decl.DeclaredElement.As<IFSharpRecordField>()
         isValid field && field.CanBeMutable && not field.IsMutable
 
     override x.ExecutePsiTransaction _ =
         let fieldDecl = dataProvider.GetSelectedElement<IRecordFieldDeclaration>()
         use writeCookie = WriteLockCookie.Create(fieldDecl.IsPhysical())
 
-        let declaredElement = fieldDecl.DeclaredElement :?> IRecordField
+        let declaredElement = fieldDecl.DeclaredElement :?> IFSharpRecordField
         declaredElement.SetIsMutable(true)
 
 
@@ -42,12 +42,12 @@ type ToImmutableFieldAction(dataProvider: FSharpContextActionDataProvider) =
         let selectedRange = dataProvider.SelectedTreeRange
         if not (nameRange.Contains(selectedRange) || mutableRange.Contains(selectedRange)) then false else
 
-        let field = decl.DeclaredElement.As<IRecordField>()
+        let field = decl.DeclaredElement.As<IFSharpRecordField>()
         isValid field && field.IsMutable
 
     override x.ExecutePsiTransaction _ =
         let fieldDecl = dataProvider.GetSelectedElement<IRecordFieldDeclaration>()
         use writeCookie = WriteLockCookie.Create(fieldDecl.IsPhysical())
 
-        let declaredElement = fieldDecl.DeclaredElement :?> IRecordField
+        let declaredElement = fieldDecl.DeclaredElement :?> IFSharpRecordField
         declaredElement.SetIsMutable(false)

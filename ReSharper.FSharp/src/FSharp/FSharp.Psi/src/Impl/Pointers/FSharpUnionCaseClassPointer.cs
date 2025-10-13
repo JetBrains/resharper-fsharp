@@ -2,13 +2,13 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers
 {
-  public class FSharpUnionCaseClassPointer : FSharpGeneratedElementPointerBase<FSharpUnionCaseClass, IUnionCase>
+  public class FSharpUnionCaseClassPointer : FSharpGeneratedElementPointerBase<FSharpUnionCaseClass, IFSharpUnionCase>
   {
     public FSharpUnionCaseClassPointer(FSharpUnionCaseClass nestedType) : base(nestedType)
     {
     }
 
-    public override FSharpUnionCaseClass CreateGenerated(IUnionCase unionCase) =>
+    public override FSharpUnionCaseClass CreateGenerated(IFSharpUnionCase unionCase) =>
       unionCase.NestedType;
   }
 }

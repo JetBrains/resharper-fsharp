@@ -36,14 +36,14 @@ type FSharpDeclaredElementIconProvider() =
             match declaredElement with
             | :? IFSharpModule -> FSharpIcons.FSharpModule.Id
 
-            | :? IUnionCase as unionCase ->
+            | :? IFSharpUnionCase as unionCase ->
                 canApplyExtensions <- false
                 match unionCase.RepresentationAccessRights with
                 | AccessRights.PRIVATE -> privateCase
                 | AccessRights.INTERNAL -> internalCase
                 | _ -> PsiSymbolsThemedIcons.EnumMember.Id
 
-            | :? IRecordField as field ->
+            | :? IFSharpRecordField as field ->
                 canApplyExtensions <- false
                 if field.IsMutable then
                     match field.RepresentationAccessRights with

@@ -53,6 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         {
           FSharpMemberOrFunctionOrValue mfv => mfv.CurriedParameterGroups.Count >= AppliedExpressions.Count,
           FSharpUnionCase unionCase => unionCase.HasFields && AppliedExpressions.Count <= 1,
+          FSharpEntity fcsEntity => fcsEntity.IsFSharpExceptionDeclaration,
           _ => false
         };
 

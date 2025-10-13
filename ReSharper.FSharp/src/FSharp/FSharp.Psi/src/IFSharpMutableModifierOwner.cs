@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IMutableModifierOwner
+  public interface IFSharpMutableModifierOwner
   {
     bool IsMutable { get; }
     void SetIsMutable(bool value);

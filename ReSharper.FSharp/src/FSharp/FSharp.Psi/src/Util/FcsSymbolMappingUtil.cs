@@ -7,6 +7,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -15,6 +16,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Resolve;
 using JetBrains.ReSharper.Psi.Modules;
@@ -124,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     [CanBeNull]
     public static IDeclaredElement GetDeclaredElement([CanBeNull] this FSharpSymbol symbol,
-      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceExpression = null)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceOwner = null)
     {
       if (symbol == null)
         return null;
@@ -137,6 +139,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (entity.IsNamespace)
           return GetDeclaredNamespace(entity, psiModule);
 
+        if (entity.IsFSharpExceptionDeclaration && referenceOwner != null)
+          return GetFSharpException(entity, psiModule, referenceOwner);
+
         return GetTypeElement(entity, psiModule);
       }
 
@@ -146,7 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
         return mfv.IsModuleValueOrMember
           ? GetTypeMember(mfv, psiModule)
-          : GetLocalValueDeclaredElement(mfv, referenceExpression);
+          : GetLocalValueDeclaredElement(mfv, referenceOwner);
       }
 
       if (symbol is FSharpUnionCase unionCase)
@@ -154,8 +159,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (symbol is FSharpField field)
       {
-        if (field.IsAnonRecordField && referenceExpression != null)
-          return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
+        if (field.IsAnonRecordField && referenceOwner != null)
+          return new FSharpAnonRecordFieldProperty(referenceOwner.Reference);
 
         if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is { } fieldUnionCase)
         {
@@ -173,15 +178,39 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpActivePatternCase patternCase)
-        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
+        return GetActivePatternCaseElement(patternCase, psiModule, referenceOwner);
 
       if (symbol is FSharpGenericParameter genericParameter)
-        return GetTypeParameter(genericParameter, referenceExpression);
+        return GetTypeParameter(genericParameter, referenceOwner);
 
-      if (symbol is FSharpParameter parameter && referenceExpression != null)
-        return parameter.GetOwner(referenceExpression.Reference); // todo: map to parameter
+      if (symbol is FSharpParameter parameter && referenceOwner != null)
+        return parameter.GetOwner(referenceOwner.Reference); // todo: map to parameter
 
       return null;
+    }
+
+    private static IDeclaredElement GetFSharpException([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule,
+      IFSharpReferenceOwner referenceOwner)
+    {
+      bool ResolvesToConstructor() =>
+        referenceOwner switch
+        {
+          IReferenceExpr refExpr => QualifiedExprNavigator.GetByQualifier(refExpr) == null,
+          IExpressionReferenceName => true,
+          _ => false
+        };
+
+      var exnTypeElement = GetTypeElement(entity, psiModule);
+      if (exnTypeElement is IFSharpSourceTypeElement typeElement && typeElement.IsFSharpException())
+      {
+        if (ResolvesToConstructor())
+        {
+          var exceptionPart = typeElement.GetPart<IFSharpExceptionPart>();
+          return (IDeclaredElement)exceptionPart?.GetConstructor() ?? typeElement;
+        }
+      }
+
+      return exnTypeElement;
     }
 
     [CanBeNull]
@@ -198,6 +227,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
       if (unionTypeElement == null) return null;
+
+      // todo: remove preferType param, get the field through the union case
+      if (!preferType && unionTypeElement is IFSharpSourceTypeElement sourceTypeElement && sourceTypeElement.IsUnion())
+      {
+        var sourceUnionCase = sourceTypeElement.GetSourceUnionCases()
+          .FirstOrDefault(sourceUnionCase => sourceUnionCase.ShortName == unionCase.Name);
+
+        return (IDeclaredElement)sourceUnionCase?.GetConstructor() ?? sourceUnionCase;
+      }
 
       var caseCompiledName = unionCase.CompiledName;
       var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
@@ -456,7 +494,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IList<IParameter> GetParameters<T>(this T function, FSharpMemberOrFunctionOrValue mfv)
-      where T : IFSharpParameterOwner, IFSharpTypeParametersOwner
+      where T : IFSharpParameterOwnerMember, IFSharpTypeParametersOwner
     {
       if (mfv == null)
         return EmptyList<IParameter>.Instance;
@@ -487,7 +525,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IList<IList<IFSharpParameter>> GetFSharpParameterGroups<T>(this T function)
-      where T : IFSharpParameterOwner
+      where T : IFSharpParameterOwnerMember
     {
       var mfv = function.Mfv;
       if (mfv == null)
@@ -519,10 +557,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (parameterGroup == null)
         return null;
 
-      if (index.ParameterIndex is not { } paramIndex)
-        return parameterGroup.Count == 1 ? parameterGroup[0] : null;
+      if (index.NamedArg is { } namedArg)
+        return namedArg == SharedImplUtil.MISSING_DECLARATION_NAME
+          ? null
+          : parameterGroup.FirstOrDefault(p => p.SourceName == namedArg);
 
-      return parameterGroup.ElementAtOrDefault(paramIndex);
+      if (index.ParameterIndex is { } paramIndex)
+        return parameterGroup.ElementAtOrDefault(paramIndex);
+
+      return parameterGroup.Count == 1 ? parameterGroup[0] : null;
     }
   }
 }

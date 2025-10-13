@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpUnionCaseProperty : FSharpCompiledPropertyBase<IUnionCaseLikeDeclaration>, IUnionCase
+  internal class FSharpUnionCaseProperty : FSharpCompiledPropertyBase<IUnionCaseLikeDeclaration>, IFSharpUnionCase
   {
     internal FSharpUnionCaseProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public FSharpUnionCaseClass NestedType =>
       GetDeclaration()?.NestedType;
 
-    public IParametersOwner GetConstructor() =>
+    public IFSharpParameterOwner GetConstructor() =>
       HasFields ? new FSharpUnionCaseNewMethod(this) : null;
 
     public override bool IsStatic => true;

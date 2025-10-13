@@ -16,7 +16,7 @@ using JetBrains.Util.DataStructures;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   public abstract class FSharpMethodParameterBase([NotNull] IParametersOwner owner, FSharpParameterIndex index)
-    : IFSharpParameter
+    : IFSharpGeneratedParameterFromPattern
   {
     public abstract IType Type { get; }
 

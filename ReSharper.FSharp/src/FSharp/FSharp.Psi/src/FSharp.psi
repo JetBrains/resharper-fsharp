@@ -1180,11 +1180,17 @@ interface caseFieldDeclaration:
   exceptionFieldDeclaration;
 
 unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>?
+  (
+    IDENTIFIER<IDENTIFIER, Identifier>
+    COLON<FSHARP_COLON, Colon>
+  )?
   typeUsage<TYPE, TypeUsage>;
 
 exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>?
+  (
+    IDENTIFIER<IDENTIFIER, Identifier>
+    COLON<FSHARP_COLON, Colon>
+  )?
   typeUsage<TYPE, TypeUsage>;
 
 

@@ -66,5 +66,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ModificationUtil.DeleteChild(mutableKeyword);
       }
     }
+
+    public int Index =>
+      RecordFieldDeclarationListNavigator.GetByFieldDeclaration(this)?.FieldDeclarationsEnumerable.IndexOf(this) ?? -1;
   }
 }

@@ -13,17 +13,17 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, IExceptionPart, IGeneratedConstructorOwner
+  internal class FSharpExceptionPart : FSharpTypeMembersOwnerTypePart, IFSharpExceptionPart
   {
     public static readonly string[] ExceptionExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
     public bool HasFields { get; }
 
-    public ExceptionPart([NotNull] IExceptionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public FSharpExceptionPart([NotNull] IExceptionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder, PartKind.Class, ExceptionExtendsListShortNames) =>
       HasFields = !declaration.Fields.IsEmpty;
 
-    public ExceptionPart(IReader reader) : base(reader) =>
+    public FSharpExceptionPart(IReader reader) : base(reader) =>
       HasFields = reader.ReadBool();
 
     protected override void Write(IWriter writer)
@@ -51,12 +51,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override IEnumerable<ITypeMember> GetTypeMembers() =>
       this.GetGeneratedMembers().Prepend(base.GetTypeMembers());
 
-    public IList<ITypeOwner> Fields
+    public IList<IFSharpFunctionalTypeField> Fields
     {
       get
       {
         // todo: add field list tree node
-        var fields = new LocalList<ITypeOwner>();
+        var fields = new LocalList<IFSharpFunctionalTypeField>();
         foreach (var typeMember in base.GetTypeMembers())
           if (typeMember is FSharpUnionCaseField<ExceptionFieldDeclaration> fieldProperty)
             fields.Add(fieldProperty);
@@ -68,11 +68,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool HasCompareTo => false;
     public bool ReportCtor => true;
 
-    public IParametersOwner GetConstructor() =>
+    public IFSharpParameterOwner GetConstructor() =>
       new FSharpGeneratedConstructorFromFields(this);
   }
 
-  public interface IExceptionPart : Class.IClassPart, IFieldsOwnerPart, IFSharpTypePart
+  public interface IFSharpExceptionPart : IFSharpFieldsOwnerPart, IFSharpStructuralTypePart, 
+    IFSharpGeneratedConstructorOwnerPart, Class.IClassPart
   {
     bool HasFields { get; }
   }

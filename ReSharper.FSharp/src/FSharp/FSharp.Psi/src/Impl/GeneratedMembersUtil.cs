@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         new GetHashCodeWithComparerMethod(typeElement),
       });
 
-      if (typePart is IStructuralTypePart simpleTypePart)
+      if (typePart is IFSharpStructuralTypePart simpleTypePart)
       {
         if (simpleTypePart.OverridesToString)
           result.Add(new ToStringMethod(typeElement));
@@ -49,8 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             result.Add(new DefaultConstructor(typeElement));
           break;
 
-        case IExceptionPart exceptionPart:
-          result.Add(new ExceptionConstructor(typePart));
+        case IFSharpExceptionPart exceptionPart:
+          result.Add(new FSharpGeneratedExceptionDefaultConstructor(typePart));
           if (exceptionPart.HasFields)
             result.Add(new FSharpGeneratedConstructorFromFields(typePart));
           break;
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result.ResultingList();
     }
 
-    public static IEnumerable<IDeclaredElement> GetGeneratedMembers([NotNull] this IUnionCase unionCase)
+    public static IEnumerable<IDeclaredElement> GetGeneratedMembers([NotNull] this IFSharpUnionCase unionCase)
     {
       if (unionCase.ContainingType.GetPart<IUnionPart>() is not { } unionPart)
         return EmptyList<IDeclaredElement>.Instance;

@@ -429,16 +429,16 @@ type FSharpNamingService(language: FSharpLanguage) =
             Char.IsUpper(char) && not (Char.IsLower(char))
 
         let isTypeLike (element: IDeclaredElement) =
-            element :? ITypeElement || element :? IUnionCase || element :? INamespace
+            element :? ITypeElement || element :? IFSharpUnionCase || element :? INamespace
 
         let requiresUppercaseStart (element: IDeclaredElement) =
             match element with
-            | :? IUnionCase as uc ->
+            | :? IFSharpUnionCase as uc ->
                 FSharpLanguageLevel.ofPsiModuleNoCache uc.Module < FSharpLanguageLevel.FSharp70 ||
                 not (hasRequireQualifiedAccessAttribute uc.ContainingType)
 
             | :? IActivePatternCase -> true
-            | :? ITypeElement as typeElement -> typeElement.IsException()
+            | :? ITypeElement as typeElement -> typeElement.IsFSharpException()
             | _ -> false
 
         let name = name.RemoveBackticks()
