@@ -152,15 +152,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             if cfg.TreatWarningsAsErrors then
                 otherOptions.Add("--warnaserror")
 
-            let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
-            let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
-            let langVersionArg =
-                languageLevel
-                |> FSharpLanguageLevel.toLanguageVersion
-                |> FSharpLanguageVersion.toCompilerArg
-
-            otherOptions.Add(langVersionArg)
-
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then otherOptions.Add("--doc:" + doc)
 
@@ -172,9 +163,21 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + compilerArg + ":" + f v)
                 | _ -> None
 
-            [ FSharpProperties.TargetProfile, None; FSharpProperties.LangVersion, None ]
+            [ FSharpProperties.TargetProfile, None ]
             |> List.choose (getOption id)
             |> otherOptions.AddRange
+
+            let langVersion =
+                match getOption id (FSharpProperties.LangVersion, None) with
+                | Some langVersion -> langVersion
+                | None ->
+
+                psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
+                |> FSharpLanguageLevel.ofPsiModuleNoCache
+                |> FSharpLanguageLevel.toLanguageVersion
+                |> FSharpLanguageVersion.toCompilerArg
+
+            otherOptions.Add(langVersion)
 
             [ FSharpProperties.NoWarn, None
               MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror")
