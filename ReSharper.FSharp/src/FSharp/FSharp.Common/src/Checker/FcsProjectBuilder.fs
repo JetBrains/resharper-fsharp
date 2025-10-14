@@ -62,7 +62,8 @@ module FcsProjectBuilder =
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =
+        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules,
+        languageLevelProjectProperty: FSharpLanguageLevelProjectProperty) =
 
     let defaultOptions =
         [| "--noframework"
@@ -170,8 +171,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 | Some langVersion -> langVersion
                 | None ->
 
-                psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
-                |> FSharpLanguageLevel.ofPsiModuleNoCache
+                languageLevelProjectProperty.GetDefaultLanguageLevel(project, targetFrameworkId)
                 |> FSharpLanguageLevel.toLanguageVersion
                 |> FSharpLanguageVersion.toCompilerArg
 
