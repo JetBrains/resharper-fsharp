@@ -296,8 +296,22 @@ type TestFcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
-type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, psiModules) =
-    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger, psiModules)
+type TestFSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset, psiModules: IPsiModules) =
+    inherit FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset)
+
+    override x.GetLanguageVersion(project, targetFrameworkId) =
+        psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
+        |> FSharpLanguageLevel.ofPsiModuleNoCache
+        |> FSharpLanguageLevel.toLanguageVersion
+
+    interface IHideImplementation<FSharpLanguageLevelProjectProperty>
+
+
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
+type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, languageLevelProjectProperty) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, modulePathProvider, logger,
+                              languageLevelProjectProperty)
 
     override x.GetProjectItemsPaths(project, targetFrameworkId) =
         project.GetAllProjectFiles()
