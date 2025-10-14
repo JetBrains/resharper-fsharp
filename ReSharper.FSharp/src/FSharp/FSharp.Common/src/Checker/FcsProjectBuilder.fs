@@ -161,9 +161,8 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + compilerArg + ":" + f v)
                 | _ -> None
 
-            [ FSharpProperties.TargetProfile, None ]
-            |> List.choose (getOption id)
-            |> otherOptions.AddRange
+            getOption id (FSharpProperties.TargetProfile, None)
+            |> Option.iter otherOptions.Add
 
             let langVersion =
                 let langVersion = languageLevelProjectProperty.GetLanguageVersion(project, targetFrameworkId)
