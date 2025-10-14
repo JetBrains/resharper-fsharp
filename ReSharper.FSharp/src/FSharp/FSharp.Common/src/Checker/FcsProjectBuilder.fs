@@ -167,12 +167,9 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             |> otherOptions.AddRange
 
             let langVersion =
-                match getOption id (FSharpProperties.LangVersion, None) with
-                | Some langVersion -> langVersion
-                | None ->
-
-                languageLevelProjectProperty.GetDefaultLanguageLevel(project, targetFrameworkId)
-                |> FSharpLanguageLevel.toLanguageVersion
+                let langVersion = languageLevelProjectProperty.GetLanguageVersion(project, targetFrameworkId)
+                languageLevelProjectProperty.ConvertToLanguageLevel(langVersion, project, targetFrameworkId)
+                |> languageLevelProjectProperty.ConvertToLanguageVersion
                 |> FSharpLanguageVersion.toCompilerArg
 
             otherOptions.Add(langVersion)
