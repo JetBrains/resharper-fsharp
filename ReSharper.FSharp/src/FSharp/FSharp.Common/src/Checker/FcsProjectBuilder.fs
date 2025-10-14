@@ -152,15 +152,14 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             if cfg.TreatWarningsAsErrors then
                 otherOptions.Add("--warnaserror")
 
-            if Shell.Instance.IsTestShell then
-                let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
-                let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
-                let langVersionArg =
-                    languageLevel
-                    |> FSharpLanguageLevel.toLanguageVersion
-                    |> FSharpLanguageVersion.toCompilerArg
+            let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
+            let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
+            let langVersionArg =
+                languageLevel
+                |> FSharpLanguageLevel.toLanguageVersion
+                |> FSharpLanguageVersion.toCompilerArg
 
-                otherOptions.Add(langVersionArg)
+            otherOptions.Add(langVersionArg)
 
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then otherOptions.Add("--doc:" + doc)

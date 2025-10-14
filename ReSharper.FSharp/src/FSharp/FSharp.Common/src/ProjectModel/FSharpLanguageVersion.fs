@@ -74,7 +74,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp90 -> FSharpLanguageVersion.FSharp90
         | FSharpLanguageLevel.FSharp100 -> FSharpLanguageVersion.FSharp100
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
-        | _ -> failwithf $"Unexpected language level: {level}"
+        | _ -> FSharpLanguageVersion.Default
 
     let ofLanguageVersion (version: FSharpLanguageVersion) =
         match version with
