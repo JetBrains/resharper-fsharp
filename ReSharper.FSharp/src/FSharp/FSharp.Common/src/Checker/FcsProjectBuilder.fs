@@ -13,10 +13,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -64,7 +61,8 @@ module FcsProjectBuilder =
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
-        modulePathProvider: ModulePathProvider, logger: ILogger, psiModules: IPsiModules) =
+        modulePathProvider: ModulePathProvider, logger: ILogger,
+        languageLevelProjectProperty: FSharpLanguageLevelProjectProperty) =
 
     let defaultOptions =
         [| "--noframework"
@@ -152,16 +150,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
             if cfg.TreatWarningsAsErrors then
                 otherOptions.Add("--warnaserror")
 
-            if Shell.Instance.IsTestShell then
-                let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
-                let languageLevel = FSharpLanguageLevel.ofPsiModuleNoCache psiModule
-                let langVersionArg =
-                    languageLevel
-                    |> FSharpLanguageLevel.toLanguageVersion
-                    |> FSharpLanguageVersion.toCompilerArg
-
-                otherOptions.Add(langVersionArg)
-
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then otherOptions.Add("--doc:" + doc)
 
@@ -173,9 +161,16 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + compilerArg + ":" + f v)
                 | _ -> None
 
-            [ FSharpProperties.TargetProfile, None; FSharpProperties.LangVersion, None ]
-            |> List.choose (getOption id)
-            |> otherOptions.AddRange
+            getOption id (FSharpProperties.TargetProfile, None)
+            |> Option.iter otherOptions.Add
+
+            let langVersion =
+                let langVersion = languageLevelProjectProperty.GetLanguageVersion(project, targetFrameworkId)
+                languageLevelProjectProperty.ConvertToLanguageLevel(langVersion, project, targetFrameworkId)
+                |> languageLevelProjectProperty.ConvertToLanguageVersion
+                |> FSharpLanguageVersion.toCompilerArg
+
+            otherOptions.Add(langVersion)
 
             [ FSharpProperties.NoWarn, None
               MSBuildProjectUtil.WarningsAsErrorsProperty, Some("warnaserror")
