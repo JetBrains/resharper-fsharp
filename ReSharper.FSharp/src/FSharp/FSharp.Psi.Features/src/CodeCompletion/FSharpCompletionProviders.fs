@@ -148,5 +148,4 @@ type FSharpRangesProvider() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override x.GetDefaultRanges(context) = context.Ranges
-    override x.SupportedCompletionMode = CompletionMode.All
     override x.SupportedEvaluationMode = EvaluationMode.Full
