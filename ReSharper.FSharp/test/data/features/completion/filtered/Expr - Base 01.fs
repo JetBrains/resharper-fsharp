@@ -1,4 +1,3 @@
-// ${COMPLETE_ITEM:``base``}
 module Module
 
 type T() =

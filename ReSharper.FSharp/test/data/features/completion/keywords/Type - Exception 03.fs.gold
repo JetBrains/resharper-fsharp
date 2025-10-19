@@ -1,3 +1,14 @@
-﻿# 1 ITEM #
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Range: "exception E of ♦"
 
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+void

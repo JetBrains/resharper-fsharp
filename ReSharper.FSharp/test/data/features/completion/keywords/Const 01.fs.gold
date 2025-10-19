@@ -1,3 +1,14 @@
-﻿# 1 ITEM #
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Range: "T<♦"
 
-+ const
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+const
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+const

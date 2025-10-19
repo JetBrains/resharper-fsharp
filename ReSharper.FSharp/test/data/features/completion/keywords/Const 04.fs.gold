@@ -1,4 +1,16 @@
-﻿# 2 ITEMS #
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Range: "type T = T<x,♦>"
 
-+ const
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+const
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+const
+void

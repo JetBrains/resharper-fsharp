@@ -1,4 +1,17 @@
-﻿# 2 ITEMS #
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Range: "open ♦Ns"
+              △△
 
-+ global
-+ type
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+global                      <==
+type
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+global                      <==
+type
