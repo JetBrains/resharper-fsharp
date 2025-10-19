@@ -1,10 +1,28 @@
-﻿# 8 ITEMS #
+﻿Completion: Basic
+Count: 8 (filtered)
+Focus: Soft
+Range: "♦"
 
-+ abstract
-+ default
-+ inherit
-+ member
-+ override
-+ static
-+ val
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+abstract
+default
+inherit
+member
+override
+static
+val
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+abstract
+default
+inherit
+member
+override
+static
+val
+void

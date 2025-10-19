@@ -1,6 +1,4 @@
-﻿// ${COMPLETE_ITEM:yield!}
-
-seq {
+﻿seq {
     use! a = ()
     {caret} x :: []
 }

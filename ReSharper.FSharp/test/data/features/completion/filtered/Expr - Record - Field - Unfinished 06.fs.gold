@@ -1,3 +1,14 @@
-﻿# 1 ITEM #
+﻿Completion: Basic
+Count: 1
+Focus: Soft
+Range: "{ x with b.♦ }"
 
-+ a    string
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, FieldsAndProperties, NormalSelectionPriority, Other]
+a                           string    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+a                           string    <==

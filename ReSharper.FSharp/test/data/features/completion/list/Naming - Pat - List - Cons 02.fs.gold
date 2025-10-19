@@ -1,7 +1,22 @@
-﻿# 5 ITEMS #
+﻿Completion: Basic
+Count: 5 (filtered)
+Focus: Soft
+Range: "| ♦"
 
-+ builder
-+ builders
-+ l
-+ stringBuilder
-+ stringBuilders
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+builder
+builders
+l
+stringBuilder
+stringBuilders
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+builder
+builders
+l
+stringBuilder
+stringBuilders

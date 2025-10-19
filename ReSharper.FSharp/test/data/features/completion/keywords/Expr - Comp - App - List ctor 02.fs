@@ -1,5 +1,3 @@
-﻿// ${COMPLETE_ITEM:yield!}
-
-seq {
+﻿seq {
     {caret} x :: []
 }
