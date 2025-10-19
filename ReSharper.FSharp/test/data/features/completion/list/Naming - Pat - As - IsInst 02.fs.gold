@@ -1,4 +1,16 @@
-﻿# 2 ITEMS #
+﻿Completion: Basic
+Count: 2
+Focus: Soft
+Range: "| :? StringBuilder as ♦"
 
-+ builder
-+ stringBuilder
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+builder                     <==
+stringBuilder
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+builder                     <==
+stringBuilder

@@ -1,5 +1,18 @@
-﻿# 3 ITEMS #
+﻿Completion: Basic
+Count: 3 (filtered)
+Focus: Soft
+Range: "| [♦]"
 
-+ i
-+ int32s
-+ l
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+i                           <==
+int32s
+l
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+i                           <==
+int32s
+l

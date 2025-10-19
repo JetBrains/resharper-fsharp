@@ -1,8 +1,24 @@
-﻿# 6 ITEMS #
+﻿Completion: Basic
+Count: 6 (filtered)
+Focus: Soft
+Range: "♦"
 
-+ exception
-+ extern
-+ module
-+ open
-+ type
-+ val
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+exception
+extern
+module
+open
+type
+val
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+exception
+extern
+module
+open
+type
+val

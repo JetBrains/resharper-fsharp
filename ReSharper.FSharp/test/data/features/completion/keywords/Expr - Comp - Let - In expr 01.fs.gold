@@ -1,9 +1,26 @@
-﻿# 7 ITEMS #
+﻿Completion: Basic
+Count: 7 (filtered)
+Focus: Soft
+Range: "♦"
 
-+ and!
-+ do!
-+ let!
-+ match!
-+ return!
-+ use!
-+ yield!
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+and!
+do!
+let!
+match!
+return!
+use!
+yield!
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+and!
+do!
+let!
+match!
+return!
+use!
+yield!
