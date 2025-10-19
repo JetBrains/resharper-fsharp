@@ -1,16 +1,40 @@
-﻿# 14 ITEMS #
+﻿Completion: Basic
+Count: 14 (filtered)
+Focus: Soft
+Range: "♦"
 
-+ abstract
-+ default
-+ exception
-+ extern
-+ inherit
-+ member
-+ module
-+ open
-+ override
-+ static
-+ type
-+ val
-+ val
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+abstract
+default
+exception
+extern
+inherit
+member
+module
+open
+override
+static
+type
+val
+val
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+abstract
+default
+exception
+extern
+inherit
+member
+module
+open
+override
+static
+type
+val
+val
+void

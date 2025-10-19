@@ -1,3 +1,14 @@
-﻿# 1 ITEM #
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Range: "| ♦"
 
-+ disposable
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+disposable
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+disposable

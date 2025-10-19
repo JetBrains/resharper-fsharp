@@ -1,3 +1,14 @@
-# 1 ITEM #
+﻿Completion: Basic
+Count: 1
+Focus: Soft
+Range: "| B2(U1.♦) -> ()"
 
-+ A1    U1
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Methods, NormalSelectionPriority, Other]
+A1                          U1    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+A1                          U1    <==

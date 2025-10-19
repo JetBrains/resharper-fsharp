@@ -1,11 +1,30 @@
-﻿# 9 ITEMS #
+﻿Completion: Basic
+Count: 9 (filtered)
+Focus: Soft
+Range: "type D = delegate ♦"
 
-+ abstract
-+ default
-+ inherit
-+ member
-+ of
-+ override
-+ static
-+ val
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+abstract
+default
+inherit
+member
+of
+override
+static
+val
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+abstract
+default
+inherit
+member
+of
+override
+static
+val
+void

@@ -1,4 +1,16 @@
-﻿# 2 ITEMS #
+﻿Completion: Basic
+Count: 2
+Focus: Soft
+Range: "| Bar(apple = a; ♦) -> ()"
 
-+ banana =    string
-+ citrus =    float
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
+banana| |=                  string          OrderStr=banana    <==
+citrus| |=                  float           OrderStr=citrus
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+banana| |=                  string          OrderStr=banana    <==
+citrus| |=                  float           OrderStr=citrus

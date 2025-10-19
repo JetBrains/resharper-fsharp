@@ -1,4 +1,16 @@
-﻿# 2 ITEMS #
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Range: "type U = A ♦"
 
-+ of
-+ void
+##### RELEVANCE SORT #####
+
+                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+of
+void
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+of
+void
