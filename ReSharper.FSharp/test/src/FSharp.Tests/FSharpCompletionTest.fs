@@ -300,10 +300,10 @@ type FSharpPostfixCompletionTest() =
 
     override x.TestType = CodeCompletionTestType.Action
 
-    override this.ExecuteCodeCompletion(suffix, textControl, intellisenseManager, automatic, settingsStore) =
+    override this.ExecuteCodeCompletion(suffix, completionType, textControl, intellisenseManager, automatic, settingsStore) =
         let occurrenceName = BaseTestWithTextControl.GetSetting(textControl, FSharpTestPopup.OccurrenceName)
         FSharpTestPopup.setOccurrence occurrenceName false this.Solution this.TestLifetime
-        base.ExecuteCodeCompletion(suffix, textControl, intellisenseManager, automatic, settingsStore)
+        base.ExecuteCodeCompletion(suffix, completionType, textControl, intellisenseManager, automatic, settingsStore)
 
     [<Test>] member x.``For - App 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``For - App 02``() = x.DoNamedTest()
