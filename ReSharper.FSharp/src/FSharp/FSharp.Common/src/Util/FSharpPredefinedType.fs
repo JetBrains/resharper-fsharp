@@ -1,9 +1,7 @@
-[<AutoOpen; Extension>]
+[<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
-open System
 open System.Collections.Generic
-open FSharp.Compiler.Symbols
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Reader.Impl
 open JetBrains.ReSharper.Psi
@@ -132,41 +130,3 @@ let predefinedAbbreviations =
 [<Extension; CompiledName("TryGetPredefinedAbbreviations")>]
 let tryGetPredefinedAbbreviations(clrTypeName: IClrTypeName, names: outref<string[]>) =
     predefinedAbbreviations.TryGetValue(clrTypeName, &names)
-
-
-let isOption (fcsType: FSharpType) =
-    fcsType.ErasedType.BasicQualifiedName = fsOptionTypeName.FullName
-
-let isValueOption (fcsType: FSharpType) =
-    fcsType.ErasedType.BasicQualifiedName = fsValueOptionTypeName.FullName
-
-let isChoice (fcsType: FSharpType) =
-    fcsType.ErasedType.BasicQualifiedName.StartsWith("Microsoft.FSharp.Core.FSharpChoice`", StringComparison.Ordinal)
-
-[<Extension; CompiledName("IsUnit")>]
-let isUnit (fcsType: FSharpType) =
-    try fcsType.ErasedType.BasicQualifiedName = unitTypeName.FullName
-    with _ -> false
-
-let isFSharpList (fcsType: FSharpType) =
-    if isNull fcsType then false else
-
-    let erasedType = fcsType.ErasedType
-    if not erasedType.HasTypeDefinition then false else
-
-    let fcsEntity = erasedType.TypeDefinition
-    if fcsEntity.IsArrayType then false else
-
-    fcsEntity.BasicQualifiedName = "Microsoft.FSharp.Collections.FSharpList`1"
-
-[<Extension; CompiledName("IsNativePtr")>]
-let isNativePtr (fcsType: FSharpType) =
-    try fcsType.ErasedType.BasicQualifiedName = StandardTypeNames.IntPtr
-    with _ -> false
-
-let isReadOnly (fcsType: FSharpType) =
-    if fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsArrayType then false else
-
-    let name = fcsType.ErasedType.BasicQualifiedName
-    startsWith "Microsoft.FSharp.Collections.FSharpList`" name ||
-    startsWith "System.String" name

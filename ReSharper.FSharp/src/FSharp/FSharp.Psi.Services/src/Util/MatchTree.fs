@@ -188,13 +188,8 @@ module MatchType =
 
         if fcsEntity.IsArrayType then MatchType.Other fcsType else
 
-        // todo: list
-        let entityFqn = fcsEntity.BasicQualifiedName
-        match entityFqn with
-        | "System.Boolean" -> MatchType.Bool fcsType
-        | "Microsoft.FSharp.Collections.FSharpList`1" -> MatchType.List fcsType
-        | _ ->
-
+        if fcsType.IsFSharpList then MatchType.List fcsType else
+        if fcsType.IsBooleanType then MatchType.Bool fcsType else
         if fcsEntity.IsFSharpUnion then MatchType.Union(FcsEntityInstance.create fcsType) else
         if fcsEntity.IsFSharpRecord then MatchType.Record(FcsEntityInstance.create fcsType) else
 

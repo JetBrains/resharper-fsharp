@@ -16,7 +16,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -151,7 +150,7 @@ type NameSuggestionFromTypeRule() =
             | valueType -> Option.toList valueType.FcsType
 
         let tryReplaceWithParameterBaseTypes (fcsType: FSharpType) =
-            if isUnit fcsType then [] else
+            if fcsType.IsUnitType then [] else
             if not fcsType.IsGenericParameter then [fcsType] else
 
             match fcsType.BaseType with

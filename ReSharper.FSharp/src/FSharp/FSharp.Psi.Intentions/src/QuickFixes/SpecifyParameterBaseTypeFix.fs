@@ -64,7 +64,7 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                 match fcsType.BaseType with
                 | Some baseType ->
                     let acc =
-                        if fcsEntity.IsInterface && baseType.ErasedType.BasicQualifiedName = "System.Object" then
+                        if fcsEntity.IsInterface && baseType.IsObjectType then
                             types, level + 1
                         else
                             acc

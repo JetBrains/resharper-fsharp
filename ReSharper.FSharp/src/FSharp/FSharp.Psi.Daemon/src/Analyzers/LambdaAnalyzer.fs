@@ -13,7 +13,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -225,7 +224,7 @@ type LambdaAnalyzer() =
 
         let typeIsReadOnly (expr: IFSharpExpression) =
             let fcsType = expr.TryGetFcsType()
-            isNotNull fcsType && isReadOnly fcsType
+            isNotNull fcsType && (fcsType.IsFSharpList || fcsType.IsStringType)
 
         let processor =
             { new IRecursiveElementProcessor with
