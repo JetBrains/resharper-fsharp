@@ -110,7 +110,7 @@ let specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
     let oldPattern, fcsType =
         match pattern.IgnoreInnerParens() with
         | :? IOptionalValPat ->
-            let fcsType = if isOption fcsType then fcsType.GenericArguments[0] else fcsType
+            let fcsType = if fcsType.IsFSharpOption then fcsType.GenericArguments[0] else fcsType
             pattern, fcsType
 
         | _ ->

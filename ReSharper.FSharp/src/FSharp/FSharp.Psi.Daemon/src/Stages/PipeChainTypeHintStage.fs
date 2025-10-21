@@ -17,8 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
 
 [<RequireQualifiedAccess>]
@@ -98,7 +97,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
         | :? IDotLambdaExpr -> skipFunArgs exprType = pipeResultType
         | _ ->
         if not exprType.IsFunctionType || exprType.GenericArguments[1] <> pipeResultType then false else
-        if not (isUnit pipeResultType) then true else
+        if not (pipeResultType.IsUnitType) then true else
 
         let invokedRefExpr =
             match expr with
@@ -114,9 +113,8 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
         | Some t ->
             // We know that the result of the pipe is unit.
             // We want to get the very last returned value and make sure that it is not generic, but strictly unit.
-            skipFunArgs t
-            |> isUnit
-            |> not
+            let t = skipFunArgs t
+            not t.IsUnitType
         | None -> false
 
     let adornExprs (exprs : (IReferenceExpr * ITreeNode * bool) ICollection) =

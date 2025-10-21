@@ -297,12 +297,12 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                         let fcsParameterType = this.GetParamType(fcsParameter)
                         if not (this.IsOptionalParam(fcsParameter)) then fcsParameterType else
 
-                        match tryGetAbbreviatedTypeEntity fcsParameterType with
-                        | Some entity when entity.BasicQualifiedName = FSharpPredefinedType.fsOptionTypeName.FullName ->
+                        if fcsParameterType.IsFSharpOption then
                             fcsParameterType.GenericArguments
                             |> Seq.tryExactlyOne
                             |> Option.defaultValue fcsParameterType
-                        | _ -> fcsParameterType
+                        else
+                            fcsParameterType
 
                     text.Append(fcsParameterType.FormatLayout(displayContext) |> richText) |> ignore
 
@@ -444,16 +444,16 @@ type FcsActivePatternMfvParameterInfoCandidate(apc: FSharpActivePatternCase, mfv
             match activePatternGroup.IsTotal with
             | true when
                     names.Count > 1 && apc.Index < names.Count &&
-                    apc.Index < mfvReturnType.GenericArguments.Count && FSharpPredefinedType.isChoice mfvReturnType ->
+                    apc.Index < mfvReturnType.GenericArguments.Count && mfvReturnType.IsFSharpChoice ->
                 Some mfvReturnType.GenericArguments[apc.Index]
 
             | false when
-                    FSharpPredefinedType.isOption mfvReturnType ||
+                    mfvReturnType.IsFSharpOption ||
 
-                    FSharpPredefinedType.isValueOption mfvReturnType &&
+                    mfvReturnType.IsFSharpValueOption &&
                     mfv.ReturnParameter.Attributes.HasAttributeInstance(FSharpPredefinedType.structAttrTypeName) ->
                 let optionArgType = mfvReturnType.GenericArguments[0]
-                if FSharpPredefinedType.isUnit optionArgType.ErasedType then None else Some optionArgType
+                if optionArgType.IsUnitType then None else Some optionArgType
 
             | _ -> Some mfvReturnType
 
