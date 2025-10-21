@@ -3,7 +3,6 @@ using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
@@ -13,7 +12,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
-using JetBrains.Util.DataStructures;
 using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -165,7 +163,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var result = new FrugalLocalList<IAttributeInstance>();
       foreach (var fcsAttribute in entityAttrs)
-        if (clrName == null || new ClrTypeName(fcsAttribute.AttributeType.BasicQualifiedName).Equals(clrName))
+        if (clrName == null || fcsAttribute.GetClrName().Equals(clrName))
           result.Add(new FSharpAttributeInstance(fcsAttribute, psiModule));
 
       return result.ResultingList();

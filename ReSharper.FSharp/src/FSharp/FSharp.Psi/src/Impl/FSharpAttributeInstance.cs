@@ -24,12 +24,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Module = module;
     }
 
-    public IClrTypeName GetClrName() => new ClrTypeName(Attr.GetClrName());
+    public IClrTypeName GetClrName() => new ClrTypeName(Attr.GetClrNameFullName());
 
     public string GetAttributeShortName() => Attr.AttributeType.DisplayName;
 
     // todo: containing type type parameters?
-    public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(Attr.GetClrName(), Module, true);
+    public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(Attr.GetClrNameFullName(), Module, true);
 
     private AttributeValue GetArgValue(Tuple<FSharpType, object> arg) =>
       new(ConstantValue.Create(arg.Item2, arg.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));

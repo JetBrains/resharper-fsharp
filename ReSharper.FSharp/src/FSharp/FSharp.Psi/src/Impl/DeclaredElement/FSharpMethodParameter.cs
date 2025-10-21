@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override DefaultValue GetDefaultValue()
     {
       bool IsDefaultParamValueAttr(FSharpAttribute a) =>
-        a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName;
+        a.GetClrNameFullName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName;
 
       try
       {
