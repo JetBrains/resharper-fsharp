@@ -501,7 +501,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var paramGroups = mfv.CurriedParameterGroups;
       var isFsExtension = mfv.IsExtensionMember;
-      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit();
+      var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnitType;
 
       if (!isFsExtension && isVoidReturn)
         return EmptyArray<IParameter>.Instance;

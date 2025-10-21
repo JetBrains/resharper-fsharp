@@ -30,7 +30,7 @@ open JetBrains.Util
 
 module ForPostfixTemplate =
     let tryGetEnumerableTypeArg (contextExpr: IFSharpExpression) (fcsType: FSharpType) : FSharpType option =
-        let seenTypes = HashSet()
+        let seenTypes = HashSet<string>()
 
         let rec loop (fcsType: FSharpType) =
             let fcsType = FSharpSymbolUtil.getAbbreviatedType fcsType
@@ -44,7 +44,8 @@ module ForPostfixTemplate =
             let entity = fcsType.TypeDefinition
             if entity.IsArrayType then Some fcsType.GenericArguments[0] else
 
-            if not (seenTypes.Add(entity.BasicQualifiedName)) then None else
+            let qualifiedName = Option.defaultValue SharedImplUtil.MISSING_DECLARATION_NAME entity.BasicQualifiedName
+            if not (seenTypes.Add(qualifiedName)) then None else
 
             fcsType.BaseType
             |> Option.bind loop

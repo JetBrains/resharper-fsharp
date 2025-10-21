@@ -230,7 +230,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let node = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> getResultNode
                 if isNull node then
                     null
-                elif isUnit data.ExpectedType then
+                elif data.ExpectedType.IsUnitType then
                     createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
                 else
                     createTypeMismatchHighlighting TypeEquationError range error
@@ -556,7 +556,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
             
             | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
-                if isUnit data.ExpectedType then
+                if data.ExpectedType.IsUnitType then
                     createHighlightingFromMappedExpression getResultNode UnitTypeExpectedError range error else
 
                 createTypeMismatchHighlighting TypeConstraintMismatchError range error

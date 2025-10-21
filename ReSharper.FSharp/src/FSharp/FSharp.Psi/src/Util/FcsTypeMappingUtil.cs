@@ -16,6 +16,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Impl.Types;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -65,7 +66,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       try
       {
         // `Replace` workarounds fix for https://github.com/dotnet/fsharp/issues/9.
-        return new ClrTypeName(entity.BasicQualifiedName.Replace(@"\,", ","));
+        var fullName = entity.BasicQualifiedName?.Value.Replace(@"\,", ",") ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+        return new ClrTypeName(fullName);
       }
       catch (Exception e)
       {
@@ -114,7 +116,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       try
       {
         // todo: check type vs fcsType
-        if (isFromMethod && type.IsNativePtr() && !HasGenericTypeParams(fcsType))
+        if (isFromMethod && type.IsNativePointerType && !HasGenericTypeParams(fcsType))
         {
           var argType = GetSingleTypeArgument(fcsType, typeParams, psiModule, true);
           return TypeFactory.CreatePointerType(argType);
@@ -126,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         Logger.LogExceptionSilently(e);
       }
 
-      if (isFromReturn && type.IsUnit())
+      if (isFromReturn && type.IsUnitType)
         return psiModule.GetPredefinedType().Void;
 
       if (type.IsGenericParameter)

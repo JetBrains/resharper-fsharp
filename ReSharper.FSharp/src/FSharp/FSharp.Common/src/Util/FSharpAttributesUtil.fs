@@ -3,25 +3,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Util
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.Metadata.Reader.API
+open JetBrains.Metadata.Reader.Impl
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.Util
 
-[<Extension; Sealed; AbstractClass>]
+[<Sealed; AbstractClass>]
 type FcsAttributeUtil =
     [<Extension>]
-    static member GetClrName(attr: FSharpAttribute) = attr.AttributeType.BasicQualifiedName
+    static member GetClrNameFullName(attr: FSharpAttribute) =
+        attr.AttributeType.BasicQualifiedName
+        |> Option.defaultValue SharedImplUtil.MISSING_DECLARATION_NAME
+
+    [<Extension>]
+    static member GetClrName(attr: FSharpAttribute) =
+        ClrTypeName(attr.GetClrNameFullName())
 
     [<Extension>]
     static member HasAttributeInstance(attrs: IList<FSharpAttribute>, clrName: string) =
-        attrs |> Seq.exists (fun a -> a.GetClrName() = clrName)
+        attrs |> Seq.exists (fun a -> a.GetClrNameFullName() = clrName)
 
     [<Extension>]
     static member GetAttributes(attrs: IList<FSharpAttribute>, clrName: string) =
-        let filteredAttributes = attrs |> Seq.filter (fun a -> a.GetClrName() = clrName)
+        let filteredAttributes = attrs |> Seq.filter (fun a -> a.GetClrNameFullName() = clrName)
         filteredAttributes.AsIList()
 
     [<Extension>]
     static member TryFindAttribute(attrs: IList<FSharpAttribute>, clrName: string) =
-        attrs |> Seq.tryFind (fun a -> a.GetClrName() = clrName)
+        attrs |> Seq.tryFind (fun a -> a.GetClrNameFullName() = clrName)
 
     [<Extension>]
     static member HasAttributeInstance(attrs: IList<FSharpAttribute>, clrTypeName: IClrTypeName) =
