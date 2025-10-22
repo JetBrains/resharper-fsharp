@@ -226,6 +226,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull] public static IFSharpParameter TryGetDeclaredFSharpParameter([NotNull] this IReferencePat refPat) =>
       refPat.TryGetContainingParameterDeclarationPattern().TryGetDeclaredFSharpParameter();
 
+    [CanBeNull]
+    public static ITypeUsage TryGetExistingTypeAnnotationToUpdate([CanBeNull] this IFSharpPattern pat)
+    {
+      if (pat.TryGetContainingPatternForTypeAnnotation() is ITypedPat typedPat)
+        return typedPat.TypeUsage;
+
+      return null;
+    }
+
+    // todo: go through tuples, record the path. If found annotated binding, use the path to update the type usage
+    [CanBeNull]
+    public static IFSharpPattern TryGetContainingPatternForTypeAnnotation([CanBeNull] this IFSharpPattern pat)
+    {
+      while (TypedPatNavigator.GetByPattern(pat.IgnoreParentParens()) is { } typedPat)
+        pat = typedPat;
+
+      return pat;
+    }
+
     public static IFSharpPattern TryGetContainingParameterDeclarationPattern(this IReferencePat refPat)
     {
       IFSharpPattern TryUnwrap(IFSharpPattern pat)

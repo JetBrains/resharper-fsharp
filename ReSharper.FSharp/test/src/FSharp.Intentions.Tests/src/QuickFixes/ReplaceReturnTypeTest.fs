@@ -1,6 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
+open JetBrains.ReSharper.Intentions.CSharp.QuickFixes
+open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework

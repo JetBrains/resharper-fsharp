@@ -34,6 +34,7 @@
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>
     <QuickFix>ChangeTypeFromSetExprFix</QuickFix>
+    <QuickFix>ChangeNonFSharpTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
@@ -314,6 +315,7 @@
     <QuickFix>ChangeTypeFromElementReferenceFix</QuickFix>
     <QuickFix>ChangeTypeFromRecordFieldBindingFix</QuickFix>
     <QuickFix>ChangeTypeFromSetExprFix</QuickFix>
+    <QuickFix>ChangeNonFSharpTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="FieldNotContainedTypesDiffer" ID="FS0193: The module contains the field but its signature specifies The types differ">
