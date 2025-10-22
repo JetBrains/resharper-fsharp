@@ -90,8 +90,8 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
             | :? IParameterOwnerMemberDeclaration as paramOwnerDecl -> paramOwnerDecl.ParametersDeclarations.Count
             | _ -> 0
 
-        for decl in decl.DeclaredElement.GetDeclarations() do
-            let decl = unwrapDecl decl
+        for originalDecl in decl.DeclaredElement.GetDeclarations() do
+            let decl = unwrapDecl originalDecl
             if isNull decl then () else
 
             let paramsToSkip =
@@ -103,7 +103,14 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
             if isNull decl.TypeUsage then
                 FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
 
-            decl.TypeUsage
-            |> FSharpTypeUsageUtil.skipParameters paramsToSkip
-            |> FSharpTypeUsageUtil.navigateTuplePath path
+            let typeUsage =
+                let pat = originalDecl.As<IReferencePat>()
+                let typeUsage = pat.TryGetExistingTypeAnnotationToUpdate()
+                if isNotNull typeUsage then typeUsage else
+
+                decl.TypeUsage
+                |> FSharpTypeUsageUtil.skipParameters paramsToSkip
+                |> FSharpTypeUsageUtil.navigateTuplePath path
+
+            typeUsage
             |> FSharpTypeUsageUtil.updateTypeUsage actualFcsType
