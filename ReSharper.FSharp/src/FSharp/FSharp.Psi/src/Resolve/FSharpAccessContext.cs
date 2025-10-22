@@ -8,8 +8,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 public class FSharpAccessContext([NotNull] ITreeNode element)
   : ElementAccessContext(element), ILanguageSpecificAccessContext
 {
-  public ITreeNode TreeNode => Element;
-
   bool ILanguageSpecificAccessContext.IsAccessible(ILanguageSpecificDeclaredElement declaredElement) =>
     declaredElement is IFSharpDeclaredElement;
 }
