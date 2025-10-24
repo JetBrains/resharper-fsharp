@@ -9,7 +9,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Fantomas.Server;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Reflection;
 using FSharpType = Microsoft.FSharp.Reflection.FSharpType;
 
@@ -130,7 +129,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
     private static readonly MethodInfo SourceOriginConstructor = GetSourceOriginStringConstructor();
 
     private static readonly MethodInfo CreateOptionMethod =
-      typeof(FSharpOption<>)
+      typeof(FSharpValue).Assembly.GetType("Microsoft.FSharp.Core.FSharpOption`1")
+        .NotNull("FSharpOption")
         .MakeGenericType(FormatConfigType)
         .GetMethod("Some")
         .NotNull("FSharpOption.Some");
@@ -244,7 +244,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       yield return DefaultDiagnosticOptions;
       if (CurrentVersion >= Version46) yield return options.LangVersion;
       yield return false; // isInteractive
-      yield return options.LightSyntax ?? FSharpOption<bool>.None;
+      yield return null; // LightSyntax;
       yield return false; // compilingFsLib
       yield return options.IsExe;
     }
@@ -283,7 +283,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
       var camelCaseSetting = StringUtil.MakeUpperCamelCaseName(userValue);
 
       return FormatConfigDUs.TryGetValue(camelCaseSetting, out var unionCase)
-        ? FSharpValue.MakeUnion(unionCase, null, FSharpOption<BindingFlags>.None)
+        ? FSharpValue.MakeUnion(unionCase, null, null)
         : defaultValue;
     }
   }
