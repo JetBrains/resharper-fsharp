@@ -31,7 +31,6 @@
     <PackageReference Include="Microsoft.NETCore.Platforms" />
     <PackageReference Include="Microsoft.NETCore.Targets" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" />
-    <PackageReference Include="System.Memory" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
     <PackageReference Include="System.Runtime.Loader" />
   </ItemGroup>

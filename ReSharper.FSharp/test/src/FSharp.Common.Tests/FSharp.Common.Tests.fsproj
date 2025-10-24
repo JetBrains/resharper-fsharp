@@ -32,6 +32,9 @@
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <Import Project="$(PlatformSdkSubplatform)" Condition="Exists('$(PlatformSdkSubplatform)')" />
   <Import Project="$(PsiFeaturesTestSubplatform)" Condition="Exists('$(PsiFeaturesTestSubplatform)')" />
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
