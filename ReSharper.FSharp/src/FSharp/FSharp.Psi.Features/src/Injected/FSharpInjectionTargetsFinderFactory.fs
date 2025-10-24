@@ -20,6 +20,7 @@ type FSharpInjectionTargetsFinder() =
         | "js" -> "javascript"
         | "jsx" -> "ECMAScript 6"
         | "tsx" -> "TypeScript JSX"
+        | "fsharp" -> "F#"
         | language -> language
 
     let checkForAttributes (expr: IFSharpExpression) =
