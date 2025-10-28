@@ -6,4 +6,4 @@ open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpDocCommentElementsItemsProvider() =
-    inherit DocCommentElementsItemsProvider()
+    inherit DocCommentElementsItemsProviderBase()
