@@ -1385,7 +1385,8 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
             (context,
              (fun _ -> x.TrySurroundWithBraces(context, context.Char, false, rightToLeftBracket)),
              (fun tokenType -> tokenType == FSharpTokenType.WHITESPACE),
-             (fun lexer -> x.NeedSkipCloseBracket(context.TextControl, lexer, context.Char)))
+             (fun lexer -> x.NeedSkipCloseBracket(context.TextControl, lexer, context.Char)),
+             (fun _ -> match context.Char with | ')' -> '(' | ']' -> '[' | _ -> '{'))
 
     member x.NeedSkipCloseBracket(textControl, lexer, charTyped) =
         x.NeedSkipCloseBracket(textControl, lexer, charTyped, bracketTypesForRightBracketChar,
