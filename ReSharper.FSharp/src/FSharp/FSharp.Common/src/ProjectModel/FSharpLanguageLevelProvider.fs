@@ -63,7 +63,6 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         let languageLevel = getLanguageLevelByToolsetVersion ()
         VersionMapping(languageLevel, FSharpLanguageLevel.Preview)
 
-    // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
         match fscVersion with
         | Version (10, 1000, _) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
@@ -71,10 +70,12 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | Version (12, minor, build) ->
             if minor < 4 then VersionMapping(FSharpLanguageLevel.FSharp60, FSharpLanguageLevel.FSharp70)
             elif minor >= 4 && minor <= 7 then VersionMapping(FSharpLanguageLevel.FSharp70, FSharpLanguageLevel.FSharp80)
-            elif minor = 8 && build < 200 then VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
-            elif minor = 8 then VersionMapping(FSharpLanguageLevel.FSharp81, FSharpLanguageLevel.FSharp90)
-            elif minor >= 9 then VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.Preview)
-            else null
+            else
+                match minor with
+                | 8 when build < 200 -> VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
+                | 8 -> VersionMapping(FSharpLanguageLevel.FSharp81, FSharpLanguageLevel.FSharp90)
+                | 9 -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
+                | _ -> VersionMapping(FSharpLanguageLevel.FSharp100, FSharpLanguageLevel.Preview)
         | _ -> null
 
     let getCompilerVersion (fscPath: VirtualFileSystemPath) =
@@ -114,6 +115,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
                 FSharpLanguageLevel.FSharp81
 
         | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
+        | FSharpLanguageVersion.FSharp100 -> FSharpLanguageLevel.FSharp100
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
         | FSharpLanguageVersion.Latest -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMinor
