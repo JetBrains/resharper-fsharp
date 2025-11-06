@@ -1055,6 +1055,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
             | "l" | "load" -> ElementType.LOAD_DIRECTIVE
             | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
             | "nowarn" -> ElementType.NOWARN_DIRECTIVE
+            | "warnon" -> ElementType.WARNON_DIRECTIVE
             | "I" -> ElementType.I_DIRECTIVE
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)

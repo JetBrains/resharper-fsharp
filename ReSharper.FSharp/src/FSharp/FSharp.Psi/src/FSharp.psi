@@ -1513,6 +1513,7 @@ interface hashDirective:
   referenceDirective |
   iDirective |
   nowarnDirective |
+  warnonDirective |
   otherDirective;
 
 lineDirective:
@@ -1533,6 +1534,10 @@ iDirective:
 
 nowarnDirective:
   PP_NOWARN<PP_NOWARN, HashToken>
+  STRING<STRING, Args>*;
+
+warnonDirective:
+  PP_NOWARN<PP_WARNON, HashToken>
   STRING<STRING, Args>*;
 
 otherDirective:
