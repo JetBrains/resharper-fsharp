@@ -1,7 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 
+open System.Collections.Generic
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -21,23 +24,46 @@ type DisableByNowarnCodeInspectionSection(warningId, range) =
 type FSharpFileStructure(fsFile: IFSharpFile) =
     inherit FileStructureBase(fsFile)
 
+    let getCompilerIds (directive: IHashDirective) =
+        directive.ArgsEnumerable
+        |> Seq.collect (fun argToken -> 
+            let fsString = argToken.As<FSharpString>()
+            if isNull fsString then []: IReadOnlyCollection<_> else
+
+            // todo: define common helper for extracting string token values
+            let text = fsString.GetText()
+            let text = text.Substring(1, text.Length - 2)
+
+            FSharpCompilerWarningProcessor.parseCompilerIds text)
+
     do
+        let inline makeNowarnRange (startRange: DocumentRange) offset = startRange.SetEndTo(&offset)
+        let fileRange = fsFile.GetDocumentRange()
+        let isFSharp10Supported = FSharpLanguageLevel.isFSharp100Supported fsFile
+        let openedNowarns = Dictionary()
+
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             for moduleMember in moduleDecl.MembersEnumerable do
-                let nowarnDirective = moduleMember.As<INowarnDirective>()
-                if isNull nowarnDirective then () else
+                match moduleMember with
+                | :? INowarnDirective as nowarnDirective ->
+                    let compilerIds = getCompilerIds nowarnDirective
+                    for id in compilerIds do openedNowarns.TryAdd(id, fileRange) |> ignore
 
-                for argToken in nowarnDirective.ArgsEnumerable do
-                    let fsString = argToken.As<FSharpString>()
-                    if isNull fsString then () else
-
-                    // todo: define common helper for extracting string token values
-                    let text = fsString.GetText()
-                    let text = text.Substring(1, text.Length - 2)
-
-                    let range = fsFile.GetDocumentRange()
-                    for id in FSharpCompilerWarningProcessor.parseCompilerIds text do
-                        base.WarningDisableRange.AddValue(id, DisableByNowarnCodeInspectionSection(id, range))
+                | :? IWarnonDirective as warnonDirective when isFSharp10Supported ->
+                    let compilerIds = getCompilerIds warnonDirective
+                    for id in compilerIds do
+                        match openedNowarns.TryGetValue(id) with
+                        | true, nowarnRange ->
+                            openedNowarns.Remove(id) |> ignore
+                            let range = makeNowarnRange nowarnRange (warnonDirective.GetDocumentStartOffset())
+                            base.WarningDisableRange.AddValue(id, DisableByNowarnCodeInspectionSection(id, range))
+                        | _ -> ()
+                
+                | _ -> ()
+        
+        for KeyValue(id, nowarnRange) in openedNowarns do
+            let range = makeNowarnRange nowarnRange fileRange.EndOffset
+            base.WarningDisableRange.AddValue(id, DisableByNowarnCodeInspectionSection(id, range))
 
         for comment in fsFile.Descendants<FSharpComment>() do base.ProcessComment(comment, comment.CommentText)
         base.CloseAllRanges(fsFile)
