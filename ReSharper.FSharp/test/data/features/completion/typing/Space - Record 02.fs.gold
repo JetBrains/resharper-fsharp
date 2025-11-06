@@ -123,4 +123,5 @@ WebExtensions
 #nowarn
 #r
 #time
+#warnon
 ================
