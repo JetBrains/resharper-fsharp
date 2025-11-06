@@ -302,7 +302,7 @@ type FSharpKeywordsRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let hashDirectives =
-        [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
+        [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#warnon"; "#time" |]
            KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
         |> Array.map (fun (suffix, directives) -> directives |> Array.map (fun d -> d, suffix))
         |> Array.concat
