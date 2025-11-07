@@ -13,6 +13,7 @@
     <PackageLock Include="JetBrains.NuGet.Versioning" Version="7.0.20251002.162" />
     <PackageLock Include="JetBrains.RdFramework" Version="2025.3.1" />
     <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.16.1" />
+    <PackageLock Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageLock Include="NVelocity" Version="1.0.3" />
     <PackageLock Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageLock Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
