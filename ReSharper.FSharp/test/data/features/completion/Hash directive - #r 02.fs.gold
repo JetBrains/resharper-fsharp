@@ -1,0 +1,2 @@
+﻿// ${COMPLETE_ITEM:#r}
+#r "{caret}"
