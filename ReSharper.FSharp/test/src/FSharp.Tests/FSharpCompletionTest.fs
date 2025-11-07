@@ -294,14 +294,17 @@ type FSharpCompletionTest() =
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #nowarn 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Hash directive - #nowarn 02``() = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #time 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Hash directive - #time 02``() = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #r 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Hash directive - #r 02``() = x.DoNamedTest()
 
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
