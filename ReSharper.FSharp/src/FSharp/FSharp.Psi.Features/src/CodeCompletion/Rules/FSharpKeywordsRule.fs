@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.RdBackend.Common.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -301,11 +302,12 @@ module FSharpKeywordsProvider =
 type FSharpKeywordsRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let hashDirectives =
-        [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
+    let hashDirectives isFSharp9Supported =
+        let spaceOrQuotesSuffix = if isFSharp9Supported then KeywordSuffix.Space else KeywordSuffix.Quotes
+
+        [| spaceOrQuotesSuffix, [| "#nowarn"; "#time" |]
+           KeywordSuffix.Quotes, [| "#load"; "#r"; "#I" |]
            KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
-        |> Array.map (fun (suffix, directives) -> directives |> Array.map (fun d -> d, suffix))
-        |> Array.concat
 
     let scriptKeywords =
         [| "__SOURCE_DIRECTORY__"
@@ -374,10 +376,12 @@ type FSharpKeywordsRule() =
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 collector.Add(item)
 
-        for keyword, suffix in hashDirectives do
-            let item = FSharpHashDirectiveLookupItem(keyword, suffix)
-            item.InitializeRanges(context.Ranges, context.BasicContext)
-            collector.Add(item)
+        let isFSharp9Supported = FSharpLanguageLevel.isFSharp90Supported context.BasicContext.File
+        for suffix, keywords in hashDirectives isFSharp9Supported do
+            for keyword in keywords do
+                let item = FSharpHashDirectiveLookupItem(keyword, suffix)
+                item.InitializeRanges(context.Ranges, context.BasicContext)
+                collector.Add(item)
 
         true
 

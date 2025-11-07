@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -291,6 +292,20 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member 08`` () = x.DoNamedTest()
     [<Test>] member x.``Override member 09`` () = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Hash directive - #nowarn 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Hash directive - #nowarn 02``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Hash directive - #time 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Hash directive - #time 02``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Hash directive - #r 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Hash directive - #r 02``() = x.DoNamedTest()
 
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
