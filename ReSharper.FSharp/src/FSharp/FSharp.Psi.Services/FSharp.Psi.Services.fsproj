@@ -62,6 +62,7 @@
     <Compile Include="src\Util\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\Util\FSharpCompletionUtil.fs" />
     <Compile Include="src\Util\FSharpChangeTypeHelper.fs" />
+    <Compile Include="src\Util\LocalValuesUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">

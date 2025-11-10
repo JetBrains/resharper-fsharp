@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -96,7 +97,7 @@ type ImportModuleMemberRule() =
             match referenceContext.Value with
             | FSharpReferenceContext.Expression ->
                 let treeNode = reparsedContext.TreeNode
-                context.GetOrCreateDataUnderLock(LocalValuesRule.valuesKey, treeNode, LocalValuesRule.getLocalValues)
+                context.GetOrCreateDataUnderLock(LocalValuesUtil.valuesKey, treeNode, LocalValuesUtil.getLocalValues)
 
             | _ -> EmptyDictionary.Instance
 
