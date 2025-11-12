@@ -1,5 +1,36 @@
 # Release notes
 
+## 2025.3
+
+2025.3
+
+Quick fixes:
+* Change type:
+    * The new quick fix allows changing declarations to fix type mismatch errors. It allows changing types of parameters, function return, fields, properties and so on. It integrates into the common logic R#, so changing types is also possible between the languages.
+
+* Import:
+    * Module values and functions from compiled F# code can now be imported
+    * Static F# extension members can now be imported in code completion and quick fix
+    * Extension members can now be imported on F# short lambdas
+    * Extensions members are grouped by namespace, it's possible to choose which one to import
+
+* Generate overrides: import parameter types when needed
+* To mutable: implemented for structs and their fields
+
+Better AI support
+We've reimplemented context collection for Junie, so it can analyze F# code significantly better
+
+Analisys:
+* Update F# compiler service for F# 10 features
+* Infer the maximum supported language version in the used compiler and use it inside IDE
+
+Misc:
+* Improved support for F# short lambdas in refactorings like 'Introduce variable' and quick fixes
+* Typing assists: better 'Enter' implementation  for single-line type declarations and `if` expressions
+* Language injections: fix reading annotations in compiled F# properties, allow injecting F# with `fsharp` alias
+* Update Fantomas to 7.0.3
+
+
 ## 2025.2
 
 ### Import code completion and quick fixes
