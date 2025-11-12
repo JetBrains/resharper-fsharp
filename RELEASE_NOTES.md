@@ -6,7 +6,7 @@
 
 Quick fixes:
 * Change type:
-    * The new quick fix allows changing declarations to fix type mismatch errors. It allows changing types of parameters, function return, fields, properties and so on. It integrates into the common logic R#, so changing types is also possible between the languages.
+    * The new quick fix allows changing declarations to fix type mismatch errors. It allows changing types of parameters, function return, fields, properties and so on. It integrates into the common logic in R#, so changing types is also possible between the languages.
 
 * Import:
     * Module values and functions from compiled F# code can now be imported
