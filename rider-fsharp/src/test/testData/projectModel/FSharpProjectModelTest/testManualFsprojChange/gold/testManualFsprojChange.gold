@@ -32,7 +32,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
           Child items:
             Folder [Name:net5.0, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -50,14 +50,14 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:net5.0[1]
-      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 2:File1.fs
 3:File2.fs
 
 net5.0
-obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 File1.fs
 File2.fs
 
@@ -95,7 +95,7 @@ Project [Name:ClassLibrary1, GUID:GUID]
           Child items:
             Folder [Name:net5.0, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -113,14 +113,14 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:net5.0[1]
-      1:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs (CompileBefore)
-      2:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 2:File2.fs
 3:File1.fs
 
 net5.0
-obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
 File2.fs
 File1.fs
 

@@ -27,25 +27,18 @@ class TypeProvidersRuntimeTest : BaseTypeProvidersTest() {
   fun framework461() = doTest(".NET Framework 4.8")
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
-  fun core31() = doTest(".NET Core 3.1")
-
-  @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
-  fun net5() = doTest(".NET 5")
-
-  @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
-  fun net6() = doTest(".NET 6")
-
-  @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
-  fun net7() = doTest(".NET 7")
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
+  fun net8() = doTest(".NET 8")
 
   @Test
   @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
   fun net9() = doTest(".NET 9")
 
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+  fun net10() = doTest(".NET 10")
+
+  @Test
   @Mute("RIDER-103648")
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FscTypeProviderLibrary")

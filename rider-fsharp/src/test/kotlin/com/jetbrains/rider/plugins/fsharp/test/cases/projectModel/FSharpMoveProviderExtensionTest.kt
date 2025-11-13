@@ -21,10 +21,9 @@ import com.jetbrains.rider.test.scriptingApi.prepareProjectView
 import org.testng.Assert
 import org.testng.annotations.Test
 
-@Test
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution1")
   fun testAllowPaste01_Mix() {
     doTest { provider ->
@@ -45,7 +44,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution2")
   fun testAllowPaste02_DifferentFiles() {
     doTest { provider ->
@@ -106,7 +105,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_CORE_3_1, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution3")
   fun testAllowPaste03_DifferentFilesInFolders() {
     doTest { provider ->

@@ -15,7 +15,6 @@ import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 import java.io.File
 
-@Test
 @Solution("EmptySolution")
 class FSharpProjectModelTest : ProjectModelBaseTest() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
@@ -54,7 +53,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
     doTestDumpProjectsView {
@@ -181,7 +180,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
     doTestDumpProjectsView {
@@ -200,7 +199,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   }
 
   @Test(description = "RIDER-107198")
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_5, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
     doTestDumpProjectsView {
