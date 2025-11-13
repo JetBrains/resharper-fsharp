@@ -7,7 +7,7 @@
       -Implicit
        ...
      -Packages
-      FSharp.Core/4.7.2
+      FSharp.Core/8.0.403
      -Frameworks
       Microsoft.NETCore.App
    CompileBeforeFile.fs [CompileBefore]

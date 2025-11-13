@@ -10,7 +10,7 @@ Init
       -Implicit
        ...
      -Packages
-      FSharp.Core/5.0.0
+      FSharp.Core/8.0.403
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -32,7 +32,7 @@ Project [Name:Library, GUID:GUID]
           Child items:
             Folder [Name:netstandard2.1, IsHidden:true]
               Child items:
-                ProjectFileImpl(Path : Library.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
+                ProjectFileImpl(Path : Library.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -50,14 +50,14 @@ Content roots:
 1:obj[1]
   1:Debug[1]
     1:netstandard2.1[1]
-      1:.NETStandard,Version=v2.1.AssemblyAttributes.fs (CompileBefore)
-      2:Library.AssemblyInfo.fs (CompileBefore)
+      1:Library.AssemblyInfo.fs
+      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
 2:Library.fs
 3:host.json (None)
 
 .NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 obj/Debug/netstandard2.1/Library.AssemblyInfo.fs
+obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
 Library.fs
 host.json
 
