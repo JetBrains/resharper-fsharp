@@ -198,6 +198,7 @@ type CSharpResolveFromSignatures() =
 
     [<Test>] member x.``Type Extension 01 - Struct - Signature``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Class - Signature``() = x.DoNamedTest()
+    [<Test>] member x.``Class - Ctors 01 - Modifiers - Signature``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

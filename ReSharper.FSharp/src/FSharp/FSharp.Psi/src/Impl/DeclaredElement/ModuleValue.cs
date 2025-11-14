@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public InvocableSignature GetSignature(ISubstitution substitution) => new(this, substitution);
 
     public override bool Equals(object obj) =>
-      obj is IProperty && base.Equals(obj);
+      obj is ModuleValue && base.Equals(obj);
 
     public override int GetHashCode() =>
       ShortName.GetHashCode();

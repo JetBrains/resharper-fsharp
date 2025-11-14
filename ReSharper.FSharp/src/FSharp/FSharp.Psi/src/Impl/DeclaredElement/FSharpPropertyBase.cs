@@ -129,7 +129,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract bool IsReadable { get; }
     public abstract bool IsWritable { get; }
     public bool IsRequired => false;
-    public bool IsAuto => GetDeclaration() is IAutoPropertyDeclaration;
+    public bool IsAuto => false;
     public virtual bool IsDefault => false;
 
     public override bool Equals(object obj) =>
