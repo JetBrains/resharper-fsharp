@@ -951,9 +951,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         let mark = x.Mark()
         x.Done(accessorNameRange, mark, ElementType.ACCESSOR_DECLARATION)
 
-    member x.ProcessAccessorsNamesClause(withKeyword, getSetKeywords) =
-        match withKeyword, getSetKeywords with
-        | Some _, Some getSetKeywords ->
+    member x.ProcessAccessorsNamesClause(getSetKeywords) =
+        match getSetKeywords with
+        | Some getSetKeywords ->
             match getSetKeywords with
             | GetSetKeywords.GetSet(getKeywordRange, setKeywordRange) ->
                 x.ProcessAccessorNameWithModifiers(getKeywordRange)
@@ -968,12 +968,12 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, trivia), flags, range, memberTrivia) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range, memberTrivia) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
-                    x.ProcessAccessorsNamesClause(trivia.WithKeyword, memberTrivia.GetSetKeywords)
+                    x.ProcessAccessorsNamesClause(memberTrivia.GetSetKeywords)
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with
