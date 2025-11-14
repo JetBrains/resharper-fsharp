@@ -1,0 +1,15 @@
+﻿public class Class1
+{
+    public Class1()
+    {
+        var t = new T();
+        var _ = t.|A|(0);
+        t.|A|(1) = 1;
+    }
+}
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private property 'A' here
+(1): ReSharper Underlined Error Highlighting: Cannot access private property 'A' here
+M:T.#ctor
+P:T.A
+P:T.A
