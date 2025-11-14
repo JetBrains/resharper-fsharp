@@ -956,9 +956,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         | Some getSetKeywords ->
             match getSetKeywords with
             | GetSetKeywords.GetSet(getKeywordRange, setKeywordRange) ->
-                x.ProcessAccessorNameWithModifiers(getKeywordRange)
-                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.COMMA, setKeywordRange)
-                x.ProcessAccessorNameWithModifiers(setKeywordRange)
+                let accessor1, accessor2 =
+                    if Range.rangeBeforePos getKeywordRange setKeywordRange.Start then
+                        getKeywordRange, setKeywordRange
+                    else setKeywordRange, getKeywordRange
+
+                x.ProcessAccessorNameWithModifiers(accessor1)
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.COMMA, accessor2)
+                x.ProcessAccessorNameWithModifiers(accessor2)
 
             | GetSetKeywords.Get(accessorsKeywordRange)
             | GetSetKeywords.Set(accessorsKeywordRange) ->

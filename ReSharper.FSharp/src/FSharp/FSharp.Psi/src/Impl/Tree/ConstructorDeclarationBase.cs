@@ -16,5 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IFSharpIdentifier NameIdentifier => null;
     public override TreeTextRange GetNameIdentifierRange() => GetNameRange();
+
+    public override AccessRights GetAccessRights() =>
+      FSharpModifiersUtil.GetAccessRights((this as IConstructorSignatureOrDeclaration)!.AccessModifier);
   }
 }

@@ -15,10 +15,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     // CompiledName is ignored for accessors.
-    protected override string DeclaredElementName => NameIdentifier.GetSourceName() + "_" + OwnerMember.SourceName;
+    protected override string DeclaredElementName => AccessorName + "_" + OwnerMember.SourceName;
 
     public override string CompiledName => DeclaredElementName;
     public override string SourceName => DeclaredElementName;
+    public string AccessorName => NameIdentifier.GetSourceName();
 
     public override FSharpSymbol GetFcsSymbol()
     {
@@ -63,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override AccessRights GetAccessRights() => FSharpModifiersUtil.GetAccessRights(AccessModifier);
 
     public AccessorKind Kind =>
-      NameIdentifier?.Name switch
+      AccessorName switch
       {
         "get" => AccessorKind.GETTER,
         "set" => AccessorKind.SETTER,
