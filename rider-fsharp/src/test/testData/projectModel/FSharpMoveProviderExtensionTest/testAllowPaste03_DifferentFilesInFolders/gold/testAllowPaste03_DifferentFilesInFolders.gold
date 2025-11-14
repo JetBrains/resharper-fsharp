@@ -2,7 +2,10 @@
  -MoveProviderSolution3 * 2 projects
   -SourceProject
    -Dependencies
-    -.NETCoreApp 3.1
+    -.NET 8.0
+     -Assemblies
+      -Implicit
+       ...
      -Packages
       FSharp.Core/8.0.403
      -Frameworks
@@ -12,7 +15,7 @@
    CompileAfterFile.fs [CompileAfter]
   -TargetProject
    -Dependencies
-    -.NETCoreApp 3.1
+    -.NET 8.0
      -Assemblies
       -Implicit
        ...
