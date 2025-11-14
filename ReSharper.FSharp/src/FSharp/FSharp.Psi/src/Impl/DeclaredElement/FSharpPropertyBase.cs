@@ -12,7 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpPropertyMemberBase<TDeclaration> : FSharpPropertyBase<TDeclaration>
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration, IAccessorOwnerDeclaration
+    where TDeclaration : IOverridableMemberDeclaration
   {
     protected FSharpPropertyMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
   internal abstract class FSharpPropertyBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
     : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwnerMember, IProperty
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration, IAccessorOwnerDeclaration
+    where TDeclaration : IOverridableMemberDeclaration
   {
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
     {
