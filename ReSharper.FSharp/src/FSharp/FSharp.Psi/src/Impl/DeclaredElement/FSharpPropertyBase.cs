@@ -123,14 +123,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public string GetDefaultPropertyMetadataName() => ShortName;
 
-    private IAccessor GetAccessor(AccessorKind kind) =>
-      GetDeclaration() is { } accessorOwner &&
-      accessorOwner.AccessorDeclarationsEnumerable.FirstOrDefault(x => x.Kind == kind) is var accessor
-        ? new FSharpPropertyImplicitAccessor(this, kind, FSharpModifiersUtil.GetAccessRights(accessor?.AccessModifier))
-        : null;
-
-    public IAccessor Getter => IsReadable ? GetAccessor(AccessorKind.GETTER) : null;
-    public IAccessor Setter => IsWritable ? GetAccessor(AccessorKind.SETTER) : null;
+    public IAccessor Getter => IsReadable ? new FSharpPropertyImplicitAccessor(this, AccessorKind.GETTER) : null;
+    public IAccessor Setter => IsWritable ? new FSharpPropertyImplicitAccessor(this, AccessorKind.SETTER) : null;
 
     public abstract bool IsReadable { get; }
     public abstract bool IsWritable { get; }

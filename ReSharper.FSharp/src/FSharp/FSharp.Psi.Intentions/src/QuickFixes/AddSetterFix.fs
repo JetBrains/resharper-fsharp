@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -41,7 +42,8 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         use writeCookie = WriteLockCookie.Create(refExpr.IsPhysical())
 
         let factory = refExpr.CreateElementFactory()
-        let autoProperty = factory.CreateAutoPropertyDeclaration(isNull (declaration.Getter()), true)
+        let createGetter = isNull (declaration.GetAccessor(AccessorKind.GETTER))
+        let autoProperty = factory.CreateAutoPropertyDeclaration(createGetter, true)
         let accessors = autoProperty.AccessorDeclarationsEnumerable |> Seq.toList
 
         addNodesAfter declaration.LastChild
