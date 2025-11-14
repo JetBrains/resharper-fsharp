@@ -2,7 +2,7 @@
  -MoveProviderSolution1 * 1 project
   -Project
    -Dependencies
-    -.NETCoreApp 3.1
+    -.NET 8.0
      -Assemblies
       -Implicit
        ...
