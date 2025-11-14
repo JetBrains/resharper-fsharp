@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type AddSetterFix(error: PropertyCannotBeSetError) =
@@ -13,6 +14,12 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
 
     let refExpr = error.RefExpr
     let mutable declaration: IOverridableMemberDeclaration = null
+
+    let setterNodes setter: ITreeNode list =
+        [ FSharpTokenType.COMMA.CreateLeafElement(); setter ]
+
+    let getSetNodes getter setter: ITreeNode list =
+        [ FSharpTokenType.WITH.CreateLeafElement(); getter ] @ setterNodes setter
 
     override this.IsAvailable _ =
         isValid refExpr &&
@@ -46,17 +53,10 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         let autoProperty = factory.CreateAutoPropertyDeclaration(createGetter, true)
         let accessors = autoProperty.AccessorDeclarationsEnumerable |> Seq.toList
 
-        addNodesAfter declaration.LastChild
-            [ match accessors with
-              | [getter; setter] ->
-                  FSharpTokenType.WITH.CreateLeafElement()
-                  getter
-                  FSharpTokenType.COMMA.CreateLeafElement()
-                  setter
+        let nodesToAdd =
+            match accessors with
+            | [getter; setter] -> getSetNodes getter setter
+            | [setter] -> setterNodes setter
+            | _ -> []
 
-              | [setter] ->
-                  FSharpTokenType.COMMA.CreateLeafElement()
-                  setter
-
-              | _ -> () ]
-        |> ignore
+        addNodesAfter declaration.LastChild nodesToAdd |> ignore
