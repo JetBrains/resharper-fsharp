@@ -403,14 +403,14 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] c
 
             typeDeclaration.TypeParameterDeclarationList
 
-        member this.CreateAccessorsNamesClause(withGetter, withSetter) =
+        member this.CreateAutoPropertyDeclaration(withGetter, withSetter) =
             let accessors = [|
                 if withGetter then "get"
                 if withSetter then "set" |] |> String.concat ", "
 
             let source = $"member val P = 3 with {accessors}"
             let t = getTypeDecl source
-            t.MemberDeclarations[0].As<IAutoPropertyDeclaration>().AccessorsClause
+            t.MemberDeclarations[0].As<IAutoPropertyDeclaration>()
 
         member this.CreateEmptyFile() = createFile ""
 

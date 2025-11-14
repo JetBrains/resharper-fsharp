@@ -28,9 +28,9 @@ IFSharpImplFile
             ILiteralExpr
               FSharpToken(type:INT32, text:1)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAccessorsNamesClause
-            FSharpTokenType+WithTokenElement(type:WITH, text:with)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+WithTokenElement(type:WITH, text:with)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAccessorDeclaration
             FSharpIdentifierToken(type:IDENTIFIER, text:set)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -6,14 +6,13 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpPropertyMemberBase<TDeclaration> : FSharpPropertyBase<TDeclaration>
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration, IAccessorOwnerDeclaration
   {
     protected FSharpPropertyMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
@@ -82,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
   internal abstract class FSharpPropertyBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
     : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwnerMember, IProperty
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration, IAccessorOwnerDeclaration
   {
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
     {
@@ -124,13 +123,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public string GetDefaultPropertyMetadataName() => ShortName;
 
-    public IAccessor Getter => IsReadable ? new ImplicitAccessor(this, AccessorKind.GETTER) : null;
-    public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
+    private IAccessor GetAccessor(AccessorKind kind) =>
+      GetDeclaration() is { } accessorOwner &&
+      accessorOwner.AccessorDeclarationsEnumerable.FirstOrDefault(x => x.Kind == kind) is var accessor
+        ? new FSharpPropertyImplicitAccessor(this, kind, FSharpModifiersUtil.GetAccessRights(accessor?.AccessModifier))
+        : null;
+
+    public IAccessor Getter => IsReadable ? GetAccessor(AccessorKind.GETTER) : null;
+    public IAccessor Setter => IsWritable ? GetAccessor(AccessorKind.SETTER) : null;
 
     public abstract bool IsReadable { get; }
     public abstract bool IsWritable { get; }
     public bool IsRequired => false;
-    public bool IsAuto => false;
+    public bool IsAuto => GetDeclaration() is IAutoPropertyDeclaration;
     public virtual bool IsDefault => false;
 
     public override bool Equals(object obj) =>

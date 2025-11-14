@@ -255,13 +255,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range, None)
 
-            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; trivia = trivia), _, range, _) ->
+            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; trivia = trivia), _, range, memberTrivia) ->
                 match typeParams with
                 | SynValTyparDecls(Some(typeParams), _) ->
                     x.ProcessTypeParameters(typeParams, false)
                 | _ -> ()
                 x.ProcessReturnTypeInfo(arity, synType)
-                x.ProcessAccessorsNamesClause(trivia, range)
+                x.ProcessAccessorsNamesClause(trivia.WithKeyword, memberTrivia.GetSetKeywords)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(SynField(fieldType = synType), _) ->
@@ -272,16 +272,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
                 match synTypeOpt with
                 | Some synType -> x.ProcessType(synType)
                 | _ -> ()
+
                 x.MarkChameleonExpression(expr)
-
-                match accessorClause.WithKeyword, accessorClause.GetSetKeywords with
-                | Some withKeyword, None ->
-                    x.MarkAndDone(withKeyword, ElementType.ACCESSORS_NAMES_CLAUSE)
-                | Some withKeyword, Some getSetKeywords ->
-                    let range = Range.unionRanges withKeyword getSetKeywords.Range
-                    x.MarkAndDone(range, ElementType.ACCESSORS_NAMES_CLAUSE)
-                | _ -> ()
-
+                x.ProcessAccessorsNamesClause(accessorClause.WithKeyword, accessorClause.GetSetKeywords)
                 ElementType.AUTO_PROPERTY_DECLARATION
 
             | _ -> failwithf "Unexpected type member: %A" typeMember
