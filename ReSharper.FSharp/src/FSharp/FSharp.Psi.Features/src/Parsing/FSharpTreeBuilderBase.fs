@@ -147,6 +147,11 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         while x.CurrentOffset < maxOffset && x.TokenType != tokenType && not x.Eof do
             x.AdvanceLexer()
 
+    member x.AdvanceToAnyInTokenSetOrPos(tokenTypes: NodeTypeSet, pos: pos) =
+        let maxOffset = x.GetOffset(pos)
+        while x.CurrentOffset < maxOffset && not (tokenTypes.Contains(x.TokenType)) && not x.Eof do
+            x.AdvanceLexer()
+
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
         let mark = x.MarkTokenOrRange(expectedType, declarationRange)
         if xmlDoc.HasDeclaration then
@@ -941,22 +946,39 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
 
-    member x.ProcessAccessorsNamesClause(trivia: SynValSigTrivia, memberRange) =
-        match trivia.WithKeyword with
-        | None -> ()
-        | Some withRange ->
+    member x.ProcessAccessorNameWithModifiers(accessorNameRange: range) =
+        x.AdvanceToAnyInTokenSetOrPos(FSharpTokenType.AccessModifiers, accessorNameRange.Start)
+        let mark = x.Mark()
+        x.Done(accessorNameRange, mark, ElementType.ACCESSOR_DECLARATION)
 
-        let accessorsMark = x.Mark(withRange)
-        x.Done(memberRange, accessorsMark, ElementType.ACCESSORS_NAMES_CLAUSE)
+    member x.ProcessAccessorsNamesClause(getSetKeywords) =
+        match getSetKeywords with
+        | Some getSetKeywords ->
+            match getSetKeywords with
+            | GetSetKeywords.GetSet(getKeywordRange, setKeywordRange) ->
+                let accessor1, accessor2 =
+                    if Range.rangeBeforePos getKeywordRange setKeywordRange.Start then
+                        getKeywordRange, setKeywordRange
+                    else setKeywordRange, getKeywordRange
+
+                x.ProcessAccessorNameWithModifiers(accessor1)
+                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.COMMA, accessor2)
+                x.ProcessAccessorNameWithModifiers(accessor2)
+
+            | GetSetKeywords.Get(accessorsKeywordRange)
+            | GetSetKeywords.Set(accessorsKeywordRange) ->
+                x.ProcessAccessorNameWithModifiers(accessorsKeywordRange)
+
+        | _ -> ()
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, trivia), flags, range, _) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range, memberTrivia) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
-                    x.ProcessAccessorsNamesClause(trivia, range)
+                    x.ProcessAccessorsNamesClause(memberTrivia.GetSetKeywords)
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with

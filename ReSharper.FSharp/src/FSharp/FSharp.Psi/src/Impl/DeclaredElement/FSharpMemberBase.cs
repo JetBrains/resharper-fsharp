@@ -56,23 +56,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (IsExplicitImplementation)
         return AccessRights.PRIVATE;
 
+      var declaration = GetDeclaration();
+
       // Workaround to hide extension methods from resolve in C#.
       // todo: calc compiled names for extension members (it'll hide needed ones properly)
       // todo: implement F# declared element presenter to hide compiled names in features/ui
-      if (IsFSharpExtensionMember && GetDeclaration() is IMemberSignatureOrDeclaration memberDeclaration)
+      if (IsFSharpExtensionMember && declaration is IMemberSignatureOrDeclaration memberDeclaration)
         if (!(this is IMethod && memberDeclaration.Attributes.GetCompiledName(out _)))
           return AccessRights.INTERNAL;
 
-      var mfv = Mfv;
-      if (mfv == null)
-        return AccessRights.NONE;
-
-      var accessibility = mfv.Accessibility;
-      if (accessibility.IsInternal)
-        return AccessRights.INTERNAL;
-      if (accessibility.IsPrivate)
-        return AccessRights.PRIVATE;
-      return AccessRights.PUBLIC;
+      return declaration?.GetAccessRights() ?? AccessRights.NONE;
     }
 
     public override bool IsStatic => !Mfv?.IsInstanceMember ?? false;

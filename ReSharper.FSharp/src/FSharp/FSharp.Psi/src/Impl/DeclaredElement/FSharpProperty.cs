@@ -9,7 +9,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpProperty<TDeclaration> : FSharpPropertyMemberBase<TDeclaration>, IFSharpProperty
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IOverridableMemberDeclaration
   {
     public FSharpProperty([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
