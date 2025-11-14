@@ -10,7 +10,7 @@
       -Implicit
        ...
      -Packages
-      FSharp.Core/9.0.100
+      FSharp.Core/9.0.303
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -68,7 +68,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/9.0.100
+      FSharp.Core/9.0.303
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -129,7 +129,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/9.0.100
+      FSharp.Core/9.0.303
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -194,7 +194,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/9.0.100
+      FSharp.Core/9.0.303
      -Frameworks
       NETStandard.Library
    Library.fs
@@ -258,7 +258,7 @@ Library.fs
       -Implicit
        ...
      -Packages
-      FSharp.Core/9.0.100
+      FSharp.Core/9.0.303
      -Frameworks
       NETStandard.Library
    Library.fs

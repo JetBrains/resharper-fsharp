@@ -1342,6 +1342,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         timestamp <- DateTime.UtcNow
         shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
+    member this.GetFcsIlType(t: IType) =
+        mkType t
+
     interface IProjectFcsModuleReader with
         member this.ILModuleDef =
             FSharpAsyncUtil.CheckAndThrow()

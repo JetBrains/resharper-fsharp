@@ -69,5 +69,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public int Index =>
       RecordFieldDeclarationListNavigator.GetByFieldDeclaration(this)?.FieldDeclarationsEnumerable.IndexOf(this) ?? -1;
+
+    public void SetType(IType type)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public IType Type => throw new System.NotImplementedException();
   }
 }

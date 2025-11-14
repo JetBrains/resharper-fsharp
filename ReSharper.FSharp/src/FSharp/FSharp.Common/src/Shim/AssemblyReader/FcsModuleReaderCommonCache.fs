@@ -16,6 +16,7 @@ open JetBrains.Util.DataStructures
 type FcsModuleReaderCommonCache(lifetime: Lifetime, changeManager: ChangeManager) =
     inherit AssemblyReaderShimChangeListenerBase(lifetime, changeManager)
 
+    // todo: is it ever cleared?
     let assemblyTypeRefs = ConcurrentDictionary<IPsiModule, ConcurrentDictionary<IClrTypeName, ILTypeRef>>()
 
     member this.GetOrCreateAssemblyTypeRefCache(targetModule: IPsiModule) =

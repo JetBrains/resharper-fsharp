@@ -83,7 +83,11 @@ type FSharpScriptReferenceCompletionContextProvider() =
         let caretValueOffset = caretOffset - argOffset - startQuoteLength
         let prefixValue = argValue.Substring(0, caretValueOffset)
         let supportsNuget =
-            match hashDirective.HashToken.GetText() with
+            match hashDirective.HashToken with
+            | null -> false
+            | hashToken ->
+
+            match hashToken.GetText() with
             | "#r" | "#reference" -> "nuget:".StartsWith(prefixValue.TrimStart([|' '|]))
             | _ -> false
 

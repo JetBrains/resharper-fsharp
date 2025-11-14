@@ -2,6 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Diagnostics.ExtendedData
+open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Intentions.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -16,6 +18,25 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+
+type FSharpChangeTypeAction(declaredElement, targetType) =
+    inherit ChangeTypeAction(declaredElement, targetType, FSharpLanguage.Instance)
+
+module FSharpChangeType =
+    let createActions (sources: (FSharpType * IClrDeclaredElement) list) =
+        sources
+        |> List.choose (fun (targetType, declaredElement) ->
+            let language = declaredElement.PresentationLanguage
+            let helper = LanguageManager.Instance.TryGetService<IChangeTypeHelper>(language)
+            match helper with
+            | null -> None
+            | helper ->
+
+            let targetType = targetType.MapType([||], declaredElement.Module)
+            if not (helper.IsAvailable(targetType, declaredElement)) then None else
+
+            Some(FSharpChangeTypeAction(declaredElement, targetType))
+        )
 
 [<AbstractClass>]
 type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
@@ -43,7 +64,8 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
                 | _ -> generatedFromOtherElement
             | declaredElement -> declaredElement
 
-        match declaredElement with
+        let fsDeclaredElement = declaredElement.As<IFSharpDeclaredElement>()
+        match fsDeclaredElement with
         | null -> EmptyArray.Instance
         | declaredElement ->
             declaredElement.GetDeclarations()
@@ -77,21 +99,35 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
         $"Change type of '{this.DeclaredElement.GetSourceName()}' to '{this.TargetFcsType.Format()}'"
 
     override this.IsAvailable _ =
-        let decls = this.GetDeclarations()
-        decls |> Array.isEmpty |> not &&
+        let declaredElement = this.DeclaredElement.As<IClrDeclaredElement>()
+        if isNotNull declaredElement && not (declaredElement :? IFSharpDeclaredElement) then
+            let language = declaredElement.PresentationLanguage
+            let changeTypeHelper = LanguageManager.Instance.TryGetService<IChangeTypeHelper>(language)
+            isNotNull changeTypeHelper &&
 
-        let fcsType = this.TargetFcsType
-        decls |> Array.forall (fun (decl, _) -> canUpdateType decl && isFcsTypeAccessible decl fcsType)
+            changeTypeHelper.IsAvailable(this.TargetFcsType.MapType(node), declaredElement)
+        else
+            let decls = this.GetDeclarations()
+            decls |> Array.isEmpty |> not &&
+
+            let fcsType = this.TargetFcsType
+            decls |> Array.forall (fun (decl, _) -> canUpdateType decl && isFcsTypeAccessible decl fcsType)
 
     override this.ExecutePsiTransaction _ =
-        let decls = this.GetDeclarations()
-        let firstDecl = Array.head decls |> fst
-        use writeCookie = WriteLockCookie.Create(firstDecl.IsPhysical())
+        let declaredElement = this.DeclaredElement.As<IClrDeclaredElement>()
+        if isNotNull declaredElement && not (declaredElement :? IFSharpDeclaredElement) then
+            let language = declaredElement.PresentationLanguage
+            let changeTypeHelper = LanguageManager.Instance.GetService<IChangeTypeHelper>(language)
+            changeTypeHelper.ChangeType(this.TargetFcsType.MapType(node), declaredElement)
+        else
+            let decls = this.GetDeclarations()
+            let firstDecl = Array.head decls |> fst
+            use writeCookie = WriteLockCookie.Create(firstDecl.IsPhysical())
 
-        let targetFcsType = this.GetTargetFcsType(fcsDiagnosticInfo.TypeMismatchData)
+            let targetFcsType = this.GetTargetFcsType(fcsDiagnosticInfo.TypeMismatchData)
 
-        for decl, fcsSymbol in decls do
-            this.SetType(decl, fcsSymbol, targetFcsType)
+            for decl, fcsSymbol in decls do
+                this.SetType(decl, fcsSymbol, targetFcsType)
 
 
 // todo: test signatures, virtual/abstract members
@@ -118,13 +154,28 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
         let symbolReference = getReference argsOwner
         if isNull symbolReference then null else
 
-        match symbolReference.Resolve().DeclaredElement with
+        let declaredElement = symbolReference.Resolve().DeclaredElement
+        match declaredElement with
+        | :? IParametersOwner as parametersOwner when not (declaredElement :? IFSharpDeclaredElement) ->
+            let index = fsParamIndex.Value
+            if index.GroupIndex <> 0 then null else
+
+            let parameters = parametersOwner.Parameters
+
+            let namedArg = index.NamedArg
+            if isNotNull namedArg then
+                parameters |> Seq.tryFind (_.ShortName >> (=) namedArg) |> Option.defaultValue null :> _
+            else
+                let parameterIndex = index.ParameterIndex
+                let index = if parameterIndex.HasValue then parameterIndex.Value else 0 
+                parameters[index]
+    
         | :? IFSharpGeneratedFromUnionCase as generatedFromUnionCase ->
             match generatedFromUnionCase.OriginElement with
             | :? IFSharpUnionCase as fsUnionCase -> fsUnionCase
             | _ -> null
 
-        | declaredElement -> declaredElement.As<IFSharpParameterOwner>()
+        | declaredElement -> declaredElement.As<IParametersOwner>()
         
 
     override this.SetType(decl, _, fcsType) =

@@ -3,5 +3,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IRecordFieldDeclaration : IFSharpFunctionalTypeFieldDeclaration,
-    IFSharpMutableModifierOwnerDeclaration, ITypeMemberDeclaration, IAttributesOwnerDeclaration;
+    IFSharpMutableModifierOwnerDeclaration, ITypeMemberDeclaration, IAttributesOwnerDeclaration, IFSharpTypeOwnerDeclaration2;
 }
