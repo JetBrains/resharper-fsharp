@@ -255,13 +255,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range, None)
 
-            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; trivia = trivia), _, range, memberTrivia) ->
+            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity), _, _, memberTrivia) ->
                 match typeParams with
                 | SynValTyparDecls(Some(typeParams), _) ->
                     x.ProcessTypeParameters(typeParams, false)
                 | _ -> ()
                 x.ProcessReturnTypeInfo(arity, synType)
-                x.ProcessAccessorsNamesClause(trivia.WithKeyword, memberTrivia.GetSetKeywords)
+                x.ProcessAccessorsNamesClause(memberTrivia.GetSetKeywords)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(SynField(fieldType = synType), _) ->
@@ -274,7 +274,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
                 | _ -> ()
 
                 x.MarkChameleonExpression(expr)
-                x.ProcessAccessorsNamesClause(accessorClause.WithKeyword, accessorClause.GetSetKeywords)
+                x.ProcessAccessorsNamesClause(accessorClause.GetSetKeywords)
                 ElementType.AUTO_PROPERTY_DECLARATION
 
             | _ -> failwithf "Unexpected type member: %A" typeMember
