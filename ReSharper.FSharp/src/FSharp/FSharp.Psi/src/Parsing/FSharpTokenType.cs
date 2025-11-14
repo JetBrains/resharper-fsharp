@@ -164,6 +164,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Strings;
     public static readonly NodeTypeSet Literals;
     public static readonly NodeTypeSet CreateIdentifierTokenTypes;
+    public static readonly NodeTypeSet AccessModifiers;
 
     static FSharpTokenType()
     {
@@ -372,6 +373,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         QMARK_QMARK,
         STAR,
         SYMBOLIC_OP);
+
+      AccessModifiers = new NodeTypeSet(
+        PRIVATE,
+        PUBLIC,
+        INTERNAL
+      );
     }
   }
 }

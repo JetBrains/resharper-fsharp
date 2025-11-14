@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     [NotNull] ITypeMemberDeclaration declaration,
     [NotNull] FSharpMemberOrFunctionOrValue mfv)
     : FSharpPropertyMemberBase<TDeclaration>(declaration, mfv), IFSharpProperty
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration, IAccessorOwnerDeclaration
   {
     public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
 
