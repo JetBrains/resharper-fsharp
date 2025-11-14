@@ -12,9 +12,6 @@ public interface IAccessorOwnerDeclaration
 
 public static class AccessorOwnerExtensions
 {
-  public static IAccessorDeclaration Getter(this IAccessorOwnerDeclaration owner) =>
-    owner.AccessorDeclarationsEnumerable.FirstOrDefault(x => x.Kind == AccessorKind.GETTER);
-
-  public static IAccessorDeclaration Setter(this IAccessorOwnerDeclaration owner) =>
-    owner.AccessorDeclarationsEnumerable.FirstOrDefault(x => x.Kind == AccessorKind.SETTER);
+  public static IAccessorDeclaration GetAccessor(this IAccessorOwnerDeclaration owner, AccessorKind kind) =>
+    owner.AccessorDeclarationsEnumerable.FirstOrDefault(x => x.Kind == kind);
 }
