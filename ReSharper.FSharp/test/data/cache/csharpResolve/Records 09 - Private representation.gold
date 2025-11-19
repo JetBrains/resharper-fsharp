@@ -2,12 +2,13 @@
 {
   public Class1()
   {
-    var r = new Module.R(1);
-    var field = r.|Field|(0);
+    Module.R r = new Module.|R|(0)(1);
+    var field = r.|Field|(1);
   }
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access internal property 'Field' here
+(0): ReSharper Underlined Error Highlighting: Cannot access internal constructor 'R(int)' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal property 'Field' here
 M:Module.R.#ctor(System.Int32)
 P:Module.R.Field
