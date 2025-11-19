@@ -20,6 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override IType ReturnType => PredefinedType.Void;
 
+    public override AccessRights GetAccessRights() =>
+      ContainingType.GetRepresentationAccessRights();
 
     public bool IsDefault => false;
     public bool IsParameterless => false;
