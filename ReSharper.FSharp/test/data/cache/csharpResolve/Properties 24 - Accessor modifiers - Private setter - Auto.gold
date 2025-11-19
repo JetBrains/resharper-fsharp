@@ -7,6 +7,7 @@
         t.|A|(0) = 1;
     }
 }
+
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: The property 'T.A' cannot be used in this context because the 'set' accessor is inaccessible
 M:T.#ctor
