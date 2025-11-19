@@ -2,7 +2,7 @@
 {
   public Class1()
   {
-    var r = new Module.|R|(0)(1);
+    Module.R r = new Module.|R|(0)(1);
     var field = r.|Field|(1);
   }
 }
