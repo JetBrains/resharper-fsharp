@@ -1,0 +1,15 @@
+﻿public class Class1
+{
+    public Class1()
+    {
+        var t = new T();
+        var _ = t.|A|(0);
+        t.A = 1;
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The property 'T.A' cannot be used in this context because the 'get' accessor is inaccessible
+M:T.#ctor
+P:T.A
+P:T.A

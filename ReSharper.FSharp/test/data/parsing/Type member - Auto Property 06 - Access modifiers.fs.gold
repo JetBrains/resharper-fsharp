@@ -11,11 +11,6 @@ IFSharpImplFile
         FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
-        IPrimaryConstructorDeclaration
-          IParametersPatternDeclaration
-            IUnitPat
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
@@ -24,8 +19,6 @@ IFSharpImplFile
           FSharpTokenType+MemberTokenElement(type:MEMBER, text:member)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+ValTokenElement(type:VAL, text:val)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:P)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -37,11 +30,26 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WithTokenElement(type:WITH, text:with)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAccessorDeclaration
-            FSharpIdentifierToken(type:IDENTIFIER, text:get)
-          FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+          FSharpComment(type:BLOCK_COMMENT, text:(*_*))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IAccessorDeclaration
+            FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpComment(type:BLOCK_COMMENT, text:(*_*))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpIdentifierToken(type:IDENTIFIER, text:get)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpComment(type:BLOCK_COMMENT, text:(*_*))
+          FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+          FSharpComment(type:BLOCK_COMMENT, text:(*_*))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAccessorDeclaration
+            FSharpTokenType+PrivateTokenElement(type:PRIVATE, text:private)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpComment(type:BLOCK_COMMENT, text:(*_*))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpIdentifierToken(type:IDENTIFIER, text:set)
+  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+  FSharpComment(type:BLOCK_COMMENT, text:(*_*))
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
