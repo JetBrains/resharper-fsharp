@@ -9,6 +9,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     string AccessorName { get; }
     AccessorKind Kind { get; }
     bool IsIndexerLike { get; }
-    bool IsAutoPropertyAccessor { get; }
+    bool IsImplicit { get; }
   }
 }

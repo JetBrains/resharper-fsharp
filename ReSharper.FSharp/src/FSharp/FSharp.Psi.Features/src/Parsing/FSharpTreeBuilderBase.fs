@@ -946,39 +946,47 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
         x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
 
-    member x.ProcessAccessorNameWithModifiers(accessorNameRange: range) =
-        x.AdvanceToAnyInTokenSetOrPos(FSharpTokenType.AccessModifiers, accessorNameRange.Start)
-        let mark = x.Mark()
-        x.Done(accessorNameRange, mark, ElementType.ACCESSOR_DECLARATION)
+    member x.ProcessImplicitAccessors(getSetKeywords, accessibility) =
+        let processAccessor (access, nameRange: range) =
+            let mark =
+                match access with
+                | Some (access: SynAccess) -> x.Mark(access.Range)
+                | None -> x.Mark(nameRange)
 
-    member x.ProcessAccessorsNamesClause(getSetKeywords) =
+            x.Done(nameRange, mark, ElementType.ACCESSOR_DECLARATION)
+
+        let getAccess, setAccess =
+            match accessibility with
+            | SynValSigAccess.GetSet(_, getAccess, setAccess) -> getAccess, setAccess
+            | _ -> None, None
+
         match getSetKeywords with
+        | None -> ()
         | Some getSetKeywords ->
-            match getSetKeywords with
-            | GetSetKeywords.GetSet(getKeywordRange, setKeywordRange) ->
-                let accessor1, accessor2 =
-                    if Range.rangeBeforePos getKeywordRange setKeywordRange.Start then
-                        getKeywordRange, setKeywordRange
-                    else setKeywordRange, getKeywordRange
 
-                x.ProcessAccessorNameWithModifiers(accessor1)
-                x.AdvanceToTokenOrRangeEnd(FSharpTokenType.COMMA, accessor2)
-                x.ProcessAccessorNameWithModifiers(accessor2)
+        match getSetKeywords with
+        | GetSetKeywords.GetSet(getKeyword, setKeyword) ->
+            let getter = getAccess, getKeyword
+            let setter = setAccess, setKeyword
 
-            | GetSetKeywords.Get(accessorsKeywordRange)
-            | GetSetKeywords.Set(accessorsKeywordRange) ->
-                x.ProcessAccessorNameWithModifiers(accessorsKeywordRange)
+            let accessor1, accessor2 =
+                if Range.rangeBeforePos getKeyword setKeyword.Start then getter, setter
+                else setter, getter
 
-        | _ -> ()
+            processAccessor accessor1
+            processAccessor accessor2
+
+        | GetSetKeywords.Get(get) -> processAccessor (getAccess, get)
+        | GetSetKeywords.Set(set) -> processAccessor (setAccess, set)
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, _, _, _, _), flags, range, memberTrivia) ->
+        | SynMemberSig.Member(SynValSig(attrs, _, _, synType, arity, _, _, XmlDoc xmlDoc, accessibility, _, _, _), flags, range, memberTrivia) ->
             let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
             x.ProcessReturnTypeInfo(arity, synType)
             let elementType =
                 if flags.IsDispatchSlot then
-                    x.ProcessAccessorsNamesClause(memberTrivia.GetSetKeywords)
+                    x.ProcessImplicitAccessors(memberTrivia.GetSetKeywords, accessibility)
                     ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with

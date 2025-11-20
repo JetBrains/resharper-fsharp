@@ -41,7 +41,7 @@ type AddSetterFix(error: PropertyCannotBeSetError) =
         isNotNull declaration &&
 
         let accessors = declaration.AccessorDeclarations
-        accessors.All _.IsAutoPropertyAccessor
+        accessors.All _.IsImplicit
 
     override this.Text = $"Add setter to '{refExpr.ShortName}'"
 
