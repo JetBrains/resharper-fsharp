@@ -75,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Kind == AccessorKind.GETTER && !(ParameterPatternsEnumerable.SingleItem.IgnoreInnerParens() is IUnitPat) ||
       Kind == AccessorKind.SETTER && ParameterPatternsEnumerable.Count() > 1;
 
-    public bool IsAutoPropertyAccessor => 
+    public bool IsImplicit => 
       ParametersDeclarationsEnumerable.IsEmpty() && EqualsToken == null;
   }
 }

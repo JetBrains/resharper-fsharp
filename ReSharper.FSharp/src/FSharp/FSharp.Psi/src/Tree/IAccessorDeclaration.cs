@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     /// Means the accessor has a C#-incompatible signature. todo: find a better name
     bool IsExplicit { get; }
-    bool IsAutoPropertyAccessor { get; }
+    bool IsImplicit { get; }
   }
 }
