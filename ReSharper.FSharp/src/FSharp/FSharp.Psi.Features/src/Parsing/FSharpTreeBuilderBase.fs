@@ -147,11 +147,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
         while x.CurrentOffset < maxOffset && x.TokenType != tokenType && not x.Eof do
             x.AdvanceLexer()
 
-    member x.AdvanceToAnyInTokenSetOrPos(tokenTypes: NodeTypeSet, pos: pos) =
-        let maxOffset = x.GetOffset(pos)
-        while x.CurrentOffset < maxOffset && not (tokenTypes.Contains(x.TokenType)) && not x.Eof do
-            x.AdvanceLexer()
-
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
         let mark = x.MarkTokenOrRange(expectedType, declarationRange)
         if xmlDoc.HasDeclaration then
