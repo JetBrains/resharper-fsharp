@@ -1,11 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
+open System.Linq
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
@@ -76,7 +76,7 @@ type DisableWarningOnceAction(highlightingRanges, file, severityId) =
     override this.Text = Strings.FSharpDisableOnceWithComment_Text
 
     override this.DisableNode =
-        FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisableOncePrefix} {severityId}")
+        FSharpComment.CreateLineComment($" {ReSharperControlConstruct.DisableOncePrefix} {severityId}")
 
     override this.RestoreNode = null
 
@@ -86,10 +86,10 @@ type DisableAndRestoreWarningAction(highlightingRanges, file, severityId) =
     override this.Text = Strings.FSharpDisableAndRestoreWithComments_Text
 
     override this.DisableNode =
-        FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisablePrefix} {severityId}")
+        FSharpComment.CreateLineComment($" {ReSharperControlConstruct.DisablePrefix} {severityId}")
 
     override this.RestoreNode =
-        FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.RestorePrefix} {severityId}")
+        FSharpComment.CreateLineComment($" {ReSharperControlConstruct.RestorePrefix} {severityId}")
 
 
 type DisableWarningInFileAction(file: IFSharpFile, severityId) =
@@ -123,6 +123,33 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
         let lastNode, needsAdditionalNewLine = findLastNode firstNode firstNode severityId
         firstNode, lastNode, needsAdditionalNewLine
 
+    let cleanupExistingComments (file: IFSharpFile) =
+        let candidatesToRemove = ResizeArray()
+
+        for comment in file.Descendants<FSharpComment>() do
+            let info = ReSharperControlConstruct.ParseCommentText(comment.CommentText)
+            if info.IsRecognized then candidatesToRemove.Add(comment, info)
+
+        for comment, info in candidatesToRemove do
+            if disableAll then deleteChild comment else
+            let diagnosticIds = info.GetControlIds() |> Seq.toArray
+
+            match diagnosticIds with
+            | [| diagnosticId |] when diagnosticId = severityId -> deleteChild comment
+            | diagnosticIds ->
+
+            if diagnosticIds.Contains(severityId) then
+                let prefix =
+                    match info.Kind with
+                    | ReSharperControlConstruct.Kind.Disable -> ReSharperControlConstruct.DisablePrefix
+                    | ReSharperControlConstruct.Kind.DisableOnce -> ReSharperControlConstruct.DisablePrefix
+                    | ReSharperControlConstruct.Kind.Restore -> ReSharperControlConstruct.RestorePrefix
+                    | _ -> failwithf $"Unexpected control construct kind: %A{info.Kind}"
+                
+                let diagnosticIds = diagnosticIds |> Array.except [| severityId |] |> String.concat ", "
+                let newComment = FSharpComment.CreateLineComment($" {prefix} {diagnosticIds}")
+                replace comment newComment
+
     override this.Text =
         if disableAll then Strings.FSharpDisableAllInspectionsInFile_Text
         else Strings.FSharpDisableInFileWithComment_Text
@@ -132,10 +159,11 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(file.IsPhysical())
 
+        cleanupExistingComments file
         let firstNode, lastNode, needsAdditionalNewLine = findInsertRange file severityId
 
         let commentNode =
-            FSharpComment(FSharpTokenType.LINE_COMMENT, $"// {ReSharperControlConstruct.DisablePrefix} {severityId}")
+            FSharpComment.CreateLineComment($" {ReSharperControlConstruct.DisablePrefix} {severityId}")
 
         if firstNode == lastNode then
             let commentNode = ModificationUtil.AddChildBefore(firstNode, commentNode)
