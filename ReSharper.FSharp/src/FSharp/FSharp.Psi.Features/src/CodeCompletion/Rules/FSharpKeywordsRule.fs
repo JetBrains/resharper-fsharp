@@ -305,7 +305,7 @@ type FSharpKeywordsRule() =
     let hashDirectives isFSharp9Supported =
         let spaceOrQuotesSuffix = if isFSharp9Supported then KeywordSuffix.Space else KeywordSuffix.Quotes
 
-        [| spaceOrQuotesSuffix, [| "#nowarn"; "#time" |]
+        [| spaceOrQuotesSuffix, [| "#nowarn"; "#warnon"; "#time" |]
            KeywordSuffix.Quotes, [| "#load"; "#r"; "#I" |]
            KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
 
