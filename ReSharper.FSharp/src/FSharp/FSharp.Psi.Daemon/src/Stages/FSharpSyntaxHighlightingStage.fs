@@ -48,4 +48,4 @@ type FSharpSyntaxHighlightingProcessor() =
 type FSharpSyntaxHighlightingManager() =
     inherit SyntaxHighlightingManager()
 
-    override x.CreateProcessor() = FSharpSyntaxHighlightingProcessor() :> _
+    override this.CreateProcessor(_, _) = FSharpSyntaxHighlightingProcessor() :> _
