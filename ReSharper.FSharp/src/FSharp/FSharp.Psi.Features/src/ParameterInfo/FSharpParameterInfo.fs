@@ -556,6 +556,9 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
         member this.Range =
             context.GetDocumentRange()
 
+        member val ShouldSuggestSuppress = false with get, set
+        member val IsForced = false with get, set
+            
         member this.GetArgument(candidate) =
             let candidate = candidate :?> IFcsParameterInfoCandidate
             let parameterGroups = candidate.ParameterGroupCounts
@@ -785,6 +788,7 @@ type FSharpPatternParameterInfoContext(caretOffset, pat: IFSharpPattern, referen
 [<ParameterInfoContextFactory(typeof<FSharpLanguage>)>]
 type FSharpParameterInfoContextFactory() =
     let popupChars = [| ' '; '('; ',' |]
+    let mutable shouldSuggestSuppress_Value = false
 
     let checkNodeBeforeNodeTypes =
         NodeTypeSet(
@@ -1154,7 +1158,7 @@ type FSharpParameterInfoContextFactory() =
                 let context = this.CreateContextImpl(solution, caretOffset, true)
                 isNotNull context && context.ExpectingMoreArgs(caretOffset, false)
 
-        member this.CreateContext(solution, caretOffset, _, char, _) =
+        member this.CreateContext(solution, caretOffset, _, char, _, _) =
             let isAutoPopup = char <> '\000'
             let context = this.CreateContextImpl(solution, caretOffset, isAutoPopup)
             // todo: platform: ask if typing should close existing session (space/rparen after last expected arg)
