@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
     public FSharpCompiledTypeRepresentation Representation { get; }
     public FSharpAccessRights FSharpAccessRights { get; }
 
-    public CacheTrieNode AlternativeNameTrieNode { get; set; }
+    public ICacheTrieNode AlternativeNameTrieNode { get; set; }
 
     public FSharpCompiledStruct([CanBeNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
       [NotNull] IReflectionBuilder builder, [NotNull] IMetadataTypeInfo info) : base(parent, builder, info)
