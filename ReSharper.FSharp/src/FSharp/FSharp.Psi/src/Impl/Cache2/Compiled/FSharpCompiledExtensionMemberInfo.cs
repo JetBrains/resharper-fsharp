@@ -88,6 +88,8 @@ internal class FSharpCompiledExtensionMemberInfo([NotNull] FSharpMetadataValue v
 
 public class FSharpSourceExtensionsMembersIndex : SourceExtensionMembersIndex
 {
+  public FSharpSourceExtensionsMembersIndex() { }
+  public FSharpSourceExtensionsMembersIndex(FSharpSourceExtensionsMembersIndex prototype) : base(prototype) { }
   protected override void CollectPossibleNames(ITypeElement typeElement, List<string> consumer)
   {
     var shortName = typeElement.ShortName;
@@ -96,4 +98,6 @@ public class FSharpSourceExtensionsMembersIndex : SourceExtensionMembersIndex
     if (typeElement.GetSourceName() is { } sourceName && sourceName != shortName)
       consumer.Add(sourceName);
   }
+
+  public override SourceExtensionMembersIndex Clone() => new FSharpSourceExtensionsMembersIndex(this);
 }

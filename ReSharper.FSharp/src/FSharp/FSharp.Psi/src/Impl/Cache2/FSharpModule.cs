@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   internal class FSharpModule([NotNull] IModulePart part)
     : FSharpClass(part), IFSharpModule, IAlternativeNameCacheTrieNodeOwner
   {
-    public CacheTrieNode AlternativeNameTrieNode { get; set; }
+    public ICacheTrieNode AlternativeNameTrieNode { get; set; }
 
     protected override LocalList<IDeclaredType> CalcSuperTypes() =>
       new([Module.GetPredefinedType().Object]);
