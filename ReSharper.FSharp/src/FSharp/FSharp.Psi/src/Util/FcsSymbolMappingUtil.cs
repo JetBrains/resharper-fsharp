@@ -44,7 +44,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (clrTypeName == null)
           return null;
 
-        var typeElements = psiModule.GetSymbolScope(false).GetTypeElementsByCLRName(clrTypeName);
+        var context = CompilationContextCookie.GetContext();
+        var scopePsiModule = context.GetPsiModule() ?? psiModule;
+        var scope = scopePsiModule.GetCachedCaseSensitiveSymbolScopeWithReferences();
+        var typeElements = scope.GetTypeElementsByCLRName(clrTypeName);
+
         if (typeElements.IsEmpty())
         {
           if (entity.IsProvidedAndGenerated &&
