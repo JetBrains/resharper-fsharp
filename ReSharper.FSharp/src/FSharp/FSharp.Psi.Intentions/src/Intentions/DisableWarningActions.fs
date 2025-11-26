@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System.Linq
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -12,6 +11,7 @@ open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 [<AbstractClass>]
 type DisableWarningActionBase(highlightingRanges: DocumentRange[], file: IFSharpFile) =
@@ -123,30 +123,30 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
         let lastNode, needsAdditionalNewLine = findLastNode firstNode firstNode severityId
         firstNode, lastNode, needsAdditionalNewLine
 
-    let cleanupExistingComments (file: IFSharpFile) =
+    let removeExistingComments (file: IFSharpFile) =
         let candidatesToRemove = ResizeArray()
 
         for comment in file.Descendants<FSharpComment>() do
             let info = ReSharperControlConstruct.ParseCommentText(comment.CommentText)
-            if info.IsRecognized then candidatesToRemove.Add(comment, info)
+            if info.IsRecognized then candidatesToRemove.Add((comment, info))
 
         for comment, info in candidatesToRemove do
             if disableAll then deleteChild comment else
-            let diagnosticIds = info.GetControlIds() |> Seq.toArray
 
-            match diagnosticIds with
-            | [| diagnosticId |] when diagnosticId = severityId -> deleteChild comment
-            | diagnosticIds ->
-
+            let diagnosticIds = info.GetControlIds() |> LocalList
             if diagnosticIds.Contains(severityId) then
+                if diagnosticIds.Count = 1 then deleteChild comment else
+
                 let prefix =
+                    //TODO: move to the platform util
                     match info.Kind with
                     | ReSharperControlConstruct.Kind.Disable -> ReSharperControlConstruct.DisablePrefix
                     | ReSharperControlConstruct.Kind.DisableOnce -> ReSharperControlConstruct.DisablePrefix
                     | ReSharperControlConstruct.Kind.Restore -> ReSharperControlConstruct.RestorePrefix
                     | _ -> failwithf $"Unexpected control construct kind: %A{info.Kind}"
-                
-                let diagnosticIds = diagnosticIds |> Array.except [| severityId |] |> String.concat ", "
+
+                diagnosticIds.Remove(severityId) |> ignore
+                let diagnosticIds = diagnosticIds.ToArray() |> String.concat ", "
                 let newComment = FSharpComment.CreateLineComment($" {prefix} {diagnosticIds}")
                 replace comment newComment
 
@@ -159,22 +159,17 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(file.IsPhysical())
 
-        cleanupExistingComments file
+        removeExistingComments file
         let firstNode, lastNode, needsAdditionalNewLine = findInsertRange file severityId
 
         let commentNode =
             FSharpComment.CreateLineComment($" {ReSharperControlConstruct.DisablePrefix} {severityId}")
 
-        if firstNode == lastNode then
-            let commentNode = ModificationUtil.AddChildBefore(firstNode, commentNode)
-            if needsAdditionalNewLine then
-                commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
-        else
-            let commentNode = ModificationUtil.AddChildAfter(lastNode, commentNode)
-            if needsAdditionalNewLine then
-                commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
+        let commentNode =
+            if firstNode == lastNode then ModificationUtil.AddChildBefore(firstNode, commentNode)
+            else ModificationUtil.AddChildAfter(lastNode, commentNode)
 
-            if disableAll then
-                deleteChildRange firstNode lastNode
+        if needsAdditionalNewLine then
+            commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
 
         null
