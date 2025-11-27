@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     [CanBeNull]
     public TypeProvidersExternalProcess Create(Lifetime lifetime,
-      [CanBeNull] string requestingProjectOutputPath, bool isInternalMode)
+      [CanBeNull] string requestingProjectOutputPath, bool isInternalMode, string logPrefix)
     {
       var toolset = myToolset.GetDotNetCoreToolset();
       var buildTool = myToolset.GetBuildTool();
@@ -89,7 +89,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
         runtimeRequest,
         toolset,
         isInternalMode,
-        myLoggerModel);
+        myLoggerModel,
+        logPrefix);
     }
   }
 }
