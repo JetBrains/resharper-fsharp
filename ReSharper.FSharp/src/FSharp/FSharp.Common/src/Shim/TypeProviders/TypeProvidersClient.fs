@@ -6,6 +6,7 @@ open System.Collections.Generic
 open FSharp.Compiler.TypeProviders
 open FSharp.Compiler.Text
 open FSharp.Core.CompilerServices
+open JetBrains.Core
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -86,9 +87,10 @@ type ITypeProvidersClient =
         compilerToolsPath: string list *
         m: range -> ITypeProvider list
 
+    abstract member Scope: TypeProvidersHostingScope
     abstract member Context: TypeProvidersContext
     abstract member IsActive: bool
-    abstract member Execute: (TypeProvidersConnection -> 'a) -> 'a
+    abstract member RuntimeVersion: string
     abstract member Terminate: unit -> unit
     abstract member Dump: unit -> string
 
@@ -121,6 +123,7 @@ type internal TypeProvidersClientBase(lifetimeDef: LifetimeDefinition, connectio
     member this.Lifetime = lifetime
     member this.DisposeTypeProviders(path: string) = disposeTypeProviders path
     abstract member CreateTypeProviders: RdTypeProvider[] * TypeProvidersContext * ResolutionEnvironment -> IProxyTypeProvider list
+    abstract member Scope: TypeProvidersHostingScope
 
     interface ITypeProvidersClient with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
@@ -152,13 +155,27 @@ type internal TypeProvidersClientBase(lifetimeDef: LifetimeDefinition, connectio
 
             typeProviderProxies
 
+        member this.Scope = this.Scope
         member this.Context = tpContext
         member this.IsActive = connection.IsActive
-        member this.Execute(action) = connection.Execute(fun _ -> action(connection))
         member this.Terminate() = lifetimeDef.Terminate()
 
         member this.Dump() =
-            $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
+            let this = this :> ITypeProvidersClient
+            let scope = this.Scope
+
+            if not this.IsActive then $"{scope}: Out-of-process disabled" else
+
+            let inProcessDump =
+                $"[{scope} - In-Process dump]:\n\n" + $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
+
+            let outOfProcessDump =
+                $"[{scope} - Out-Process dump]:\n\n{connection.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance)}"
+
+            $"{inProcessDump}\n\n{outOfProcessDump}"
+
+        member this.RuntimeVersion =
+            connection.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance)
 
 
 type internal SolutionTypeProvidersClient(lifetimeDef: LifetimeDefinition,
@@ -188,6 +205,8 @@ type internal SolutionTypeProvidersClient(lifetimeDef: LifetimeDefinition,
             use lock = lock.Push()
             projectsWithGenerativeProviders.Add(project.GetPersistentID()) |> ignore
 
+    override this.Scope = TypeProvidersHostingScope.Solution
+
     override this.CreateTypeProviders(tps, context, resolutionEnv) =
         let psiModule =
             resolutionEnv.OutputFile
@@ -215,6 +234,8 @@ type internal ScriptTypeProvidersClient(lifetimeDef: LifetimeDefinition, connect
     do
         scriptPsiModulesProvider.ModuleInvalidated.Advise(this.Lifetime, fun psiModule ->
             this.DisposeTypeProviders(psiModule.Path.FullPath))
+
+    override this.Scope = TypeProvidersHostingScope.Scripts
 
     override this.CreateTypeProviders(tps, context, _) =
         [ for tp in tps -> new ProxyTypeProvider(tp, context, null) ]
