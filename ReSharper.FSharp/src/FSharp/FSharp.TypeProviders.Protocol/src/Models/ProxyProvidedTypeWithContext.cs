@@ -188,7 +188,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public IClrTypeName GetClrName() => myClrTypeName ??= ProxyProvidedType switch
     {
       IProxyProvidedType { IsCreatedByProvider: true } =>
-        new ClrTypeName(Context.TryGetILTypeRef(this).Value.BasicQualifiedName),
+        Context.TryGetILTypeRef(this) is { Value: { } ilTypeRef }
+          ? new ClrTypeName(ilTypeRef.BasicQualifiedName)
+          : EmptyClrTypeName.Instance,
+
       IProxyProvidedType type => type.GetClrName()
     };
 
