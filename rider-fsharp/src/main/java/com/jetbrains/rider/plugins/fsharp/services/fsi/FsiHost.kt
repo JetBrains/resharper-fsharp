@@ -240,7 +240,7 @@ class FsiHost(val project: Project, val coroutineScope: CoroutineScope) : Lifeti
     return session
   }
 
-  suspend fun createConsoleRunner(
+  internal suspend fun createConsoleRunner(
     title: String,
     project: Project,
     executor: Executor,

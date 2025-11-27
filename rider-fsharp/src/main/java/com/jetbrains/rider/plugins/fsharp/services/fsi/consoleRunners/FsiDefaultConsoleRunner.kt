@@ -9,7 +9,7 @@ import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.plugins.fsharp.services.fsi.CommandHistoryAction
 import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost
 
-class FsiDefaultConsoleRunner(commandLine: GeneralCommandLine, fsiHost: FsiHost) :
+internal class FsiDefaultConsoleRunner(commandLine: GeneralCommandLine, fsiHost: FsiHost) :
   FsiConsoleRunnerBase(fsiHost.project, fsiTitle, commandLine) {
 
   companion object {
