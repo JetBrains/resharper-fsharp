@@ -10,7 +10,6 @@ open JetBrains
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Parts
-open JetBrains.Core
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
@@ -48,7 +47,7 @@ type TypeProvidersShim(solution: ISolution, toolset: ISolutionToolset,
 
     let getSolutionTypeProvidersClient () =
         let client = clients.GetValueSafe(TypeProvidersHostingScope.Solution)
-        if isNull client then null.As<ITypeProvidersClient>() else client.Value
+        if isNull client then Unchecked.defaultof<_> else client.Value
 
     let terminateConnections () =
         for client in clients.Values do
@@ -144,36 +143,22 @@ type TypeProvidersShim(solution: ISolution, toolset: ISolutionToolset,
 
         member this.RuntimeVersion() =
             let client = getSolutionTypeProvidersClient()
-            if isNull client || not client.IsActive then null else
-
-            client.Execute(_.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance))
+            if isNull client then null else client.RuntimeVersion
 
         member this.DumpTypeProvidersProcess() =
             clients
-            |> Seq.map (fun (KeyValue(scope, client)) ->
-                let client = client.Value
-
-                if not client.IsActive then $"{scope}: Out-of-process disabled" else
-
-                let inProcessDump =
-                    $"[{scope} - In-Process dump]:\n\n{client.Dump()}"
-
-                let outOfProcessDump =
-                    $"[{scope} - Out-Process dump]:\n\n{client.Execute( _.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance))}"
-
-                $"{inProcessDump}\n\n{outOfProcessDump}"
-            )
+            |> Seq.map (fun (KeyValue(_, client)) -> client.Value.Dump())
             |> String.concat "\n\n-----------------------------------------------------\n\n"
 
+        member this.SolutionTypeProvidersClient = getSolutionTypeProvidersClient ()
+
         member this.HasGenerativeTypeProviders(project) =
-            let client = getSolutionTypeProvidersClient()
+            let client = getSolutionTypeProvidersClient ()
             // We can determine which projects contain generative provided types
             // only from type providers hosted out-of-process
             isNotNull client &&
             client.IsActive &&
             client.As<SolutionTypeProvidersClient>().HasGenerativeTypeProviders(project)
-
-        member this.SolutionTypeProvidersClient = getSolutionTypeProvidersClient ()
 
     interface IDisposable with
         member this.Dispose() = terminateConnections ()
