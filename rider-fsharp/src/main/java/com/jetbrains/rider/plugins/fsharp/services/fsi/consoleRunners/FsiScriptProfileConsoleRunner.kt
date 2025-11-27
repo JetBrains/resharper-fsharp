@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.NlsSafe
 import com.jetbrains.rider.plugins.fsharp.services.fsi.CommandHistoryAction
 
-class FsiScriptProfileConsoleRunner(
+internal class FsiScriptProfileConsoleRunner(
   @NlsSafe consoleName: String,
   project: Project,
   private val executor: Executor,
