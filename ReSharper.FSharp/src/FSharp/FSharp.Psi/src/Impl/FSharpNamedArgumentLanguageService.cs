@@ -26,54 +26,53 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       for (lexer.Start(); lexer.TokenType != null; lexer.Advance())
       {
-        if (lexer.TokenType.IsWhitespace || lexer.TokenType.IsComment) continue;
-
-        if (lexer.TokenType == FSharpTokenType.COMMA || lexer.TokenType == FSharpTokenType.LPAREN)
-        {
-          state = 1;
-          continue;
-        }
-
-        switch (state)
-        {
-          case 0:
+          if (lexer.TokenType.IsComment)
+              continue;
+      
+          if (lexer.TokenType == FSharpTokenType.COMMA || lexer.TokenType == FSharpTokenType.LPAREN)
           {
-            continue;
+              state = 1;
+              continue;
           }
-
-          case 1:
+      
+          switch (state)
           {
-            if (lexer.TokenType == FSharpTokenType.IDENTIFIER)
-            {
-              identifierRange = new TextRange(lexer.TokenStart, lexer.TokenEnd);
-              state = 2;
-            }
-            else
-            {
-              state = 0;
-            }
-
-            continue;
+              case 0:
+                  continue;
+      
+              case 1:
+                  if (lexer.TokenType.IsWhitespace)
+                      continue;
+      
+                  if (lexer.TokenType == FSharpTokenType.IDENTIFIER)
+                  {
+                      identifierRange = new TextRange(lexer.TokenStart, lexer.TokenEnd);
+                      state = 2;
+                  }
+                  else
+                  {
+                      state = 0;
+                  }
+      
+                  continue;
+      
+              case 2:
+                  if (lexer.TokenType.IsWhitespace)
+                      continue;
+      
+                  if (lexer.TokenType == FSharpTokenType.EQUALS)
+                  {
+                      names.Add(lexer.Buffer.GetText(identifierRange).RemoveBackticks());
+                  }
+      
+                  state = 0;
+                  continue;
+      
+              default:
+                  throw new InvalidOperationException("bad state:" + state);
           }
-
-          case 2:
-          {
-            if (lexer.TokenType == FSharpTokenType.EQUALS)
-            {
-              names.Add(lexer.Buffer.GetText(identifierRange).RemoveBackticks());
-            }
-
-            state = 0;
-            continue;
-          }
-
-          // ReSharper disable once UnreachableSwitchCaseDueToIntegerAnalysis
-          default:
-          {
-            throw new InvalidOperationException("bad state:" + state);
-          }
-        }
       }
+
 
       return names.ToArray();
     }
