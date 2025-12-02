@@ -17,7 +17,7 @@
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" />
     <PackageReference Include="JetBrains.Lifetimes" />
-    <PackageReference Include="JetBrains.NuGet.Versioning" />
+    <PackageReference Include="JetBrains.NuGet.Versioning" Version="7.0.20251126.165" />
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
   </ItemGroup>
