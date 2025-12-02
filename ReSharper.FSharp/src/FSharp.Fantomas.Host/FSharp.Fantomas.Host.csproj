@@ -26,7 +26,7 @@
     <PackageReference Include="Fantomas.FCS" />
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.Lifetimes" />
-    <PackageReference Include="JetBrains.NuGet.Versioning" />
+    <PackageReference Include="JetBrains.NuGet.Versioning" Version="7.0.20251126.165" />
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="Microsoft.NETCore.Platforms" />
     <PackageReference Include="Microsoft.NETCore.Targets" />
