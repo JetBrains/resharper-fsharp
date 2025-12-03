@@ -162,8 +162,7 @@ type DisableWarningInFileAction(file: IFSharpFile, severityId) =
         removeExistingComments file
         let nodeToInsertBefore, needsAdditionalNewLine = findPlaceToInsert file severityId
 
-        let commentNode =
-            FSharpComment.CreateLineComment($" {ReSharperControlConstruct.DisablePrefix} {severityId}")
+        let commentNode = createLineComment $"{ReSharperControlConstruct.DisablePrefix} {severityId}"
 
         let commentNode = ModificationUtil.AddChildBefore(nodeToInsertBefore, commentNode)
         if needsAdditionalNewLine then commentNode.AddLineBreakAfter(minLineBreaks = 2) |> ignore
