@@ -1446,7 +1446,7 @@ abstractMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationB
   identOrOpName{IDENTIFIER, Identifier}
   postfixTypeParameterDeclarationList<TYPE_PARAMETER_LIST, TypeParameterList>?
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
-  accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
+  accessorDecls?;
 
 valFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1475,17 +1475,7 @@ autoPropertyDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBas
   )?
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
-  accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
-
-accessorsNamesClause:
-  WITH
-  (
-    fSharpIdentifier<ACESSOR, AccessorsNames>
-  |
-    fSharpIdentifier<ACESSOR, AccessorsNames>
-    COMMA<FSHARP_COMMA, Comma>
-    fSharpIdentifier<ACESSOR, AccessorsNames>
-  );
+  accessorDecls?;
 
 accessorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Expression" path=<accessorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
