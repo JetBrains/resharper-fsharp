@@ -21,10 +21,18 @@ type DisableWarningTest() =
     [<Test; Explicit>] member x.``Disable and restore 04 - Indent``() = x.DoNamedTest() // todo: formatter: fix modifications
     [<Test>] member x.``Disable and restore 05``() = x.DoNamedTest()
 
-    [<Test; Explicit>] member x.``Disable in file 01``() = x.DoNamedTest() // todo: formatter: fix modifications
-    [<Test; Explicit>] member x.``Disable in file 02``() = x.DoNamedTest() // todo: formatter: fix modifications
+    [<Test>] member x.``Disable in file 01``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file 02``() = x.DoNamedTest()
     [<Test>] member x.``Disable in file 03``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Disable in file - Header 01``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file - Header 02``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file - Header 03``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file - Header 04``() = x.DoNamedTest()
+    [<Test>] member x.``Disable in file - Header 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Disable all 01``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 02``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 03``() = x.DoNamedTest()
+    [<Test>] member x.``Disable all 04``() = x.DoNamedTest()

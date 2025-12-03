@@ -1,6 +1,7 @@
 ﻿// ReSharper disable A
 // ReSharper disable B    
 // ReSharper disable FSharpRedundantApplication
+
 // Comment
 /// It's m
 module M
