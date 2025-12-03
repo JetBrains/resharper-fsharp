@@ -31,7 +31,6 @@ import org.testng.annotations.Test
 import java.io.PrintStream
 import java.time.Duration
 
-@Test
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("EmptySolution")
 class FcsModuleReaderTest : ProjectModelBaseTest() {
@@ -142,7 +141,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-  @Mute("Temporary because of RIDER-20984")
+  @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testTypeInsideClassUnloadReload() {
@@ -196,7 +195,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-  @Mute
+    @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testTypeOutsideClassUnloadReload() {
