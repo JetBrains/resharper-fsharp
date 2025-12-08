@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open System
 open System.Collections.Generic
+open System.Linq
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
@@ -147,7 +148,7 @@ type FSharpProjectPropertiesFactory() =
     override x.FactoryGuid = factoryGuid
 
     override x.IsApplicable(parameters) =
-        isFSharpProject parameters.ProjectFilePath parameters.ProjectTypeGuid
+        parameters.ProjectTypeGuids |> Seq.exists (isFSharpProject parameters.ProjectFilePath)
 
     override x.IsKnownProjectTypeGuid(projectTypeGuid) =
         FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid(projectTypeGuid)
