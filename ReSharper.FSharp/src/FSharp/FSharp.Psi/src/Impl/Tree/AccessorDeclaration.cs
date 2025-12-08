@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement([CanBeNull] FSharpSymbol fcsSymbol) =>
       fcsSymbol is FSharpMemberOrFunctionOrValue mfv && (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-        ? new FSharpPropertyAccessor(this)
+        ? new FSharpIndexedAccessor(this)
         : null;
 
     public IMemberSignatureOrDeclaration OwnerMember =>
@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         _ => AccessorKind.UNKNOWN
       };
 
-    public bool IsExplicit =>
+    public bool IsIndexerLike =>
       Kind == AccessorKind.GETTER && !(ParameterPatternsEnumerable.SingleItem.IgnoreInnerParens() is IUnitPat) ||
       Kind == AccessorKind.SETTER && ParameterPatternsEnumerable.Count() > 1;
   }

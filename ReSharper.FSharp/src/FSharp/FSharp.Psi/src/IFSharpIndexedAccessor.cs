@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpExplicitAccessor : IMethod, IFSharpParameterOwner, ISecondaryDeclaredElement
+  public interface IFSharpIndexedAccessor : IMethod, IFSharpParameterOwner, ISecondaryDeclaredElement
   {
     AccessorKind Kind { get; }
   }

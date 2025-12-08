@@ -98,7 +98,7 @@ type SpecifyPropertyTypeFix(qualifiedExpr: IQualifiedExpr) =
 
     override this.IsApplicable(declaredElement: IDeclaredElement) =
         let fsProperty = declaredElement.As<IFSharpProperty>()
-        isNotNull fsProperty && fsProperty.Getter :? ImplicitAccessor && not fsProperty.HasExplicitAccessors
+        isNotNull fsProperty && fsProperty.Getter :? ImplicitAccessor && not fsProperty.IsIndexerLike
 
     override this.IsApplicable(decl: IDeclaration) =
         match decl with

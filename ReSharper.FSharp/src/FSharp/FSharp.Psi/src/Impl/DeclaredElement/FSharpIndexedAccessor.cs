@@ -5,8 +5,8 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpPropertyAccessor(ITypeMemberDeclaration declaration)
-    : FSharpMethodBase<AccessorDeclaration>(declaration), IFSharpExplicitAccessor
+  internal class FSharpIndexedAccessor(ITypeMemberDeclaration declaration)
+    : FSharpMethodBase<AccessorDeclaration>(declaration), IFSharpIndexedAccessor
   {
     public IClrDeclaredElement OriginElement => GetDeclaration()?.OwnerMember.DeclaredElement;
     public AccessorKind Kind => GetDeclaration()?.Kind ?? AccessorKind.UNKNOWN;
@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IList<IDeclaration> GetDeclarations() => [GetDeclaration()];
 
     public override bool Equals(object obj) =>
-      obj is FSharpPropertyAccessor accessor && base.Equals(accessor);
+      obj is FSharpIndexedAccessor accessor && base.Equals(accessor);
 
     public override int GetHashCode() => ShortName.GetHashCode();
   }

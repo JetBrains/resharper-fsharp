@@ -1004,10 +1004,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       FSharpMemberOrFunctionOrValue mfv)
     {
       foreach (var accessor in decl.AccessorDeclarationsEnumerable)
-        if (accessor.IsExplicit)
+        if (accessor.IsIndexerLike)
           return decl.IsIndexer
             ? new FSharpIndexerProperty(decl)
-            : new FSharpPropertyWithExplicitAccessors(decl);
+            : new FSharpIndexerLikeProperty(decl);
 
       return new FSharpProperty<IMemberSignatureOrDeclaration>(decl, mfv);
     }

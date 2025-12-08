@@ -78,7 +78,7 @@ type FSharpDeclaredElementIconProvider() =
             | :? IActivePatternCase ->
                 PsiSymbolsThemedIcons.EnumMember.Id
 
-            | :? IFSharpProperty as property when property.HasExplicitAccessors ->
+            | :? IFSharpProperty as property when property.IsIndexerLike ->
                 canApplyExtensions <- false
 
                 let icon = PsiSymbolsThemedIcons.Property.Id

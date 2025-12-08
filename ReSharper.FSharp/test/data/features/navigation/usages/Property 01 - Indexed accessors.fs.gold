@@ -1,13 +1,13 @@
 ﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'A'`:
-    TO: [I] T.|set_A|(0, 0); RANGE: (134,139) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0); RANGE: (134,139) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0);</font><font color="06C"> (8)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
           var __ = T.get_A(0, 0);
           var ___ = T.get_A(0, 0, 0);
@@ -16,14 +16,14 @@
           T.set_A(0, 0, 0, 0, 0);
       ------------------
 
-    TO: [I] T.|set_A|(0, 0, 0); RANGE: (153,158) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0, 0); RANGE: (153,158) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0, 0);</font><font color="06C"> (9)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0, 0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
           var ___ = T.get_A(0, 0, 0);
           T.set_A(0, 0);
@@ -32,14 +32,14 @@
         }
       ------------------
 
-    TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (175,180) @ Property 01 - Explicit accessors.cs
+    TO: [I] T.|set_A|(0, 0, 0, 0, 0); RANGE: (175,180) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">T.**set_A**(0, 0, 0, 0, 0);</font><font color="06C"> (10)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: T.**set_A**(0, 0, 0, 0, 0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
           T.set_A(0, 0);
           T.set_A(0, 0, 0);
@@ -48,14 +48,14 @@
       }
       ------------------
 
-    TO: [I] var _ = T.|get_A|(0); RANGE: (58,63) @ Property 01 - Explicit accessors.cs
+    TO: [I] var _ = T.|get_A|(0); RANGE: (58,63) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var _ = T.**get_A**(0);</font><font color="06C"> (5)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var _ = T.**get_A**(0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
         public Class1()
         {
@@ -64,14 +64,14 @@
           var ___ = T.get_A(0, 0, 0);
       ------------------
 
-    TO: [I] var __ = T.|get_A|(0, 0); RANGE: (83,88) @ Property 01 - Explicit accessors.cs
+    TO: [I] var __ = T.|get_A|(0, 0); RANGE: (83,88) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var __ = T.**get_A**(0, 0);</font><font color="06C"> (6)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var __ = T.**get_A**(0, 0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
         {
           var _ = T.get_A(0);
@@ -80,14 +80,14 @@
           T.set_A(0, 0);
       ------------------
 
-    TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (112,117) @ Property 01 - Explicit accessors.cs
+    TO: [I] var ___ = T.|get_A|(0, 0, 0); RANGE: (112,117) @ Property 01 - Indexed accessors.cs
     Menu item (enabled) :
       icon: UsageInvocation
       text: Class1.Class1      <font color="FFD5A286">var ___ = T.**get_A**(0, 0, 0);</font><font color="06C"> (7)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: var ___ = T.**get_A**(0, 0, 0);
     Navigation result:
-      opened file: Property 01 - Explicit accessors.cs
+      opened file: Property 01 - Indexed accessors.cs
       ------------------
           var _ = T.get_A(0);
           var __ = T.get_A(0, 0);
@@ -96,14 +96,14 @@
           T.set_A(0, 0, 0);
       ------------------
 
-    TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (216,217) @ Property 01 - Explicit accessors.fs
+    TO: [W] static member A with set (_: int, _: int) (_: int) = T.|A|(0) <- 0 RANGE: (216,217) @ Property 01 - Indexed accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: T.set_A      <font color="FFD5A286">... int, _: int) (_: int) = T.**A**(0) <- 0</font><font color="06C"> (9)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: ... int, _: int) (_: int) = T.**A**(0) <- 0
     Navigation result:
-      opened file: Property 01 - Explicit accessors.fs
+      opened file: Property 01 - Indexed accessors.fs
       ------------------
 
         static member A with get (_: int, _: int) = 0
@@ -112,14 +112,14 @@
         static member A with get (_: int, _: int, _: int) = 0
       ------------------
 
-    TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (357,358) @ Property 01 - Explicit accessors.fs
+    TO: [W] static member A with set (_: int, _: int, _: int, _: int) (_: int) = T.|A|(0, 0) <- 0 RANGE: (357,358) @ Property 01 - Indexed accessors.fs
     Menu item (enabled) :
       icon: UsageWrite
       text: T.set_A      <font color="FFD5A286">... int, _: int) (_: int) = T.**A**(0, 0) <- 0</font><font color="06C"> (13)</font>
       tail: <font color="FF6D6D6D">in <Root Namespace></font>
       tooltip: ... int, _: int) (_: int) = T.**A**(0, 0) <- 0
     Navigation result:
-      opened file: Property 01 - Explicit accessors.fs
+      opened file: Property 01 - Indexed accessors.fs
       ------------------
         static member A with get (_: int, _: int, _: int) = 0
 
