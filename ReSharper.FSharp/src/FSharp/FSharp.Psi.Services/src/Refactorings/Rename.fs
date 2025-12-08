@@ -120,8 +120,8 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             | null -> EmptyArray.Instance :> _
             | parameter -> [| parameter :> IDeclaredElement |] :> _
 
-        | :? IFSharpProperty as property ->
-            property.GetExplicitAccessors() |> Seq.cast
+        | :? IFSharpProperty as property when property.IsIndexerLike ->
+            property.Accessors |> Seq.cast
 
         | :? IFSharpModule -> EmptyArray.Instance :> _
 

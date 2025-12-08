@@ -5,12 +5,9 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpIndexerProperty : FSharpPropertyWithExplicitAccessors
+  internal class FSharpIndexerProperty(IMemberSignatureOrDeclaration declaration)
+    : FSharpIndexerLikeProperty(declaration)
   {
-    public FSharpIndexerProperty(IMemberSignatureOrDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsReadable => HasPublicAccessor(AccessorKind.GETTER);
     public override bool IsWritable => HasPublicAccessor(AccessorKind.SETTER);
     public override bool IsDefault => true;

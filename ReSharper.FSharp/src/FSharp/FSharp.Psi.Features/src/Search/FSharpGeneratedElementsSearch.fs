@@ -17,7 +17,7 @@ type FSharpGeneratedElementsSearch() =
         match dataContext.GetData(PsiDataConstants.DECLARED_ELEMENTS) with
         | null -> false
         | elements ->
-            elements |> Seq.forall (fun el -> el :? IFSharpGeneratedFromUnionCase || el :? IFSharpExplicitAccessor)
+            elements |> Seq.forall (fun el -> el :? IFSharpGeneratedFromUnionCase || el :? IFSharpIndexedAccessor)
 
     override x.GetElementCandidates(context: IDataContext, _, _) =
         match context.GetData(PsiDataConstants.DECLARED_ELEMENTS) with
@@ -29,7 +29,7 @@ type FSharpGeneratedElementsSearch() =
             let originElement =
                 match element with
                 | :? IFSharpGeneratedFromUnionCase as case -> case.OriginElement
-                | :? IFSharpExplicitAccessor as accessor -> accessor.OriginElement
+                | :? IFSharpIndexedAccessor as accessor -> accessor.OriginElement
                 | _ -> null
 
             if isNotNull originElement then

@@ -68,7 +68,7 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Union case - Field 02 - Single case``() = x.DoNamedTestWithCSharp()
     [<Test>] member x.``Union case - Field 03 - Struct``() = x.DoNamedTestWithCSharp()
 
-    [<Test>] member x.``Property 01 - Explicit accessors``() = x.DoNamedTestWithCSharp()
+    [<Test>] member x.``Property 01 - Indexed accessors``() = x.DoNamedTestWithCSharp()
 
     [<Test>] member x.``Type private function - Generic 01``() = x.DoNamedTest()
 

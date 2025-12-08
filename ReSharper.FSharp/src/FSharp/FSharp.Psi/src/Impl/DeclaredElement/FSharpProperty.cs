@@ -4,26 +4,28 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpProperty<TDeclaration> : FSharpPropertyMemberBase<TDeclaration>, IFSharpProperty
+  internal class FSharpProperty<TDeclaration>(
+    [NotNull] ITypeMemberDeclaration declaration,
+    [NotNull] FSharpMemberOrFunctionOrValue mfv)
+    : FSharpPropertyMemberBase<TDeclaration>(declaration, mfv), IFSharpProperty
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    public FSharpProperty([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
-    {
-    }
-
     public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
 
     public AccessRights RepresentationAccessRights => GetAccessRights();
 
-    public bool HasExplicitAccessors => false;
-    public IEnumerable<IFSharpExplicitAccessor> GetExplicitAccessors() => EmptyList<IFSharpExplicitAccessor>.Instance;
+    public bool IsIndexerLike => false;
 
-    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitGetters => EmptyList<IFSharpExplicitAccessor>.Instance;
-    public IEnumerable<IFSharpExplicitAccessor> FSharpExplicitSetters => EmptyList<IFSharpExplicitAccessor>.Instance;
+    public IEnumerable<IMethod> Accessors
+    {
+      get
+      {
+        if (Getter is {} getter) yield return getter;
+        if (Setter is {} setter) yield return setter;
+      }
+    }
   }
 }

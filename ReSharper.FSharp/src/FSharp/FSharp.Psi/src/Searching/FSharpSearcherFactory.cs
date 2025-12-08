@@ -77,8 +77,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           parameterOwner.GetGeneratedParameter() is { } parameter)
         return new[] {new RelatedDeclaredElement(parameter)};
 
-      if (element is IFSharpProperty property)
-        return property.GetExplicitAccessors().Select(member => new RelatedDeclaredElement(member));
+      if (element is IFSharpProperty { IsIndexerLike: true } property)
+        return property.Accessors.Select(member => new RelatedDeclaredElement(member));
 
       if (element is IFSharpSourceTypeElement typeElement && typeElement.IsUnion())
       {

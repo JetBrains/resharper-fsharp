@@ -74,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           if (child is IMemberSignatureOrDeclaration {IsIndexer: false} memberDeclaration)
             foreach (var accessor in memberDeclaration.AccessorDeclarations)
-              if (accessor.IsExplicit)
+              if (accessor.IsIndexerLike)
                 result.Add(accessor);
 
           if (child is ILetBindingsDeclaration @let)
