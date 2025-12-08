@@ -7,6 +7,7 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.logging.TestLoggerHelper
 import com.jetbrains.rider.test.reporting.SubsystemConstants
 import com.jetbrains.rider.test.scriptingApi.changeFileContent

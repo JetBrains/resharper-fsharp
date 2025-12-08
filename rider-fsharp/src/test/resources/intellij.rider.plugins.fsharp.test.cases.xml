@@ -2,6 +2,7 @@
     <dependencies>
         <plugin id="com.jetbrains.rider.fsharp"/>
         <module name="intellij.rider.test.framework"/>
+        <module name="intellij.rider.test.framework.integration.testng"/>
         <module name="intellij.rider.test.framework._test"/>
         <module name="intellij.rider.test.framework.core"/>
         <module name="intellij.rider.test.framework.testng"/>
