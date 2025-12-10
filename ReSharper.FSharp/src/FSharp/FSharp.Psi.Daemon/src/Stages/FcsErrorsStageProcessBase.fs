@@ -342,7 +342,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | MatchIncomplete ->
             let fsPattern = fsFile.GetNode<IFSharpPattern>(range)
-            if isNotNull fsPattern then createGenericHighlighting error range else
+            if isNotNull fsPattern then PatternMatchIncompleteWarning(fsPattern, error.Message) else
 
             createHighlightingFromParentNodeWithMessage MatchIncompleteWarning range error
 

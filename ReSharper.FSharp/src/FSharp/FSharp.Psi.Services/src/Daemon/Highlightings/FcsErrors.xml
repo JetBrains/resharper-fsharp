@@ -145,6 +145,16 @@
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
 
+  <Warning compilerGroup="FSharpErrors" name="PatternMatchIncomplete" ID="FS0025: Incomplete pattern match">
+    <Parameter type="IFSharpPattern" name="pattern"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message resourceName="Message" resourceType="Strings">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>pattern.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+  </Warning>
+
   <Warning compilerGroup="FSharpErrors" name="RuleNeverMatched" ID="FS0026: Rule never matched">
     <Parameter type="IMatchClause" name="matchClause"/>
     <Message resourceName="ThisRuleWillNeverBeMatchedMessage" resourceType="Strings"/>
