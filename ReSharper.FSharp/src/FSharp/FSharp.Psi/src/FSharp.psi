@@ -1422,7 +1422,7 @@ memberSignature  options { stubBase="FSharpProperTypeMemberDeclarationBase"; cus
   accessorDecls?;
 
 private accessorDecls:
-  WITH
+  WITH<WITH, WithKeyword>
   accessorDeclaration<ACCESSOR_DECLARATION, AccessorDeclarations>
   (
     AND
