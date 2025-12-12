@@ -1,0 +1,15 @@
+﻿using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    T1 t1 = new T1();
+    T2 t2 = new |T2|(0)();
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private constructor 'T2()' here
+M:Module.T1.#ctor
+M:Module.T2.#ctor

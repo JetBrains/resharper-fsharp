@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
     ITypeParameterDeclarationList CreateTypeParameterOfTypeList(FSharpList<string> names);
 
-    IAccessorsNamesClause CreateAccessorsNamesClause(bool withGetter, bool withSetter);
+    IAutoPropertyDeclaration CreateAutoPropertyDeclaration(bool withGetter, bool withSetter);
 
     IFSharpFile CreateEmptyFile();
     INamedModuleDeclaration CreateModule(string name);

@@ -1,0 +1,5 @@
+﻿type T() =
+    member val P = 42 with get, set
+
+    // commennt
+    member x.M() = x.P{caret} <- 23

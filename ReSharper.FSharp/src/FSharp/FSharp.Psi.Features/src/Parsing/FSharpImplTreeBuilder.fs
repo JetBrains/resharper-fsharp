@@ -255,33 +255,26 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range, None)
 
-            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; trivia = trivia), _, range, _) ->
+            | SynMemberDefn.AbstractSlot(SynValSig(explicitTypeParams = typeParams; synType = synType; arity = arity; accessibility = accessibility), _, _, memberTrivia) ->
                 match typeParams with
                 | SynValTyparDecls(Some(typeParams), _) ->
                     x.ProcessTypeParameters(typeParams, false)
                 | _ -> ()
                 x.ProcessReturnTypeInfo(arity, synType)
-                x.ProcessAccessorsNamesClause(trivia, range)
+                x.ProcessImplicitAccessors(memberTrivia.GetSetKeywords, accessibility)
                 ElementType.ABSTRACT_MEMBER_DECLARATION
 
             | SynMemberDefn.ValField(SynField(fieldType = synType), _) ->
                 x.ProcessType(synType)
                 ElementType.VAL_FIELD_DECLARATION
 
-            | SynMemberDefn.AutoProperty(_, _, _, synTypeOpt, _, _, _, _, _, expr, _, accessorClause) ->
+            | SynMemberDefn.AutoProperty(_, _, _, synTypeOpt, _, _, _, _, accessibility, expr, _, accessorClause) ->
                 match synTypeOpt with
                 | Some synType -> x.ProcessType(synType)
                 | _ -> ()
+
                 x.MarkChameleonExpression(expr)
-
-                match accessorClause.WithKeyword, accessorClause.GetSetKeywords with
-                | Some withKeyword, None ->
-                    x.MarkAndDone(withKeyword, ElementType.ACCESSORS_NAMES_CLAUSE)
-                | Some withKeyword, Some getSetKeywords ->
-                    let range = Range.unionRanges withKeyword getSetKeywords.Range
-                    x.MarkAndDone(range, ElementType.ACCESSORS_NAMES_CLAUSE)
-                | _ -> ()
-
+                x.ProcessImplicitAccessors(accessorClause.GetSetKeywords, accessibility)
                 ElementType.AUTO_PROPERTY_DECLARATION
 
             | _ -> failwithf "Unexpected type member: %A" typeMember

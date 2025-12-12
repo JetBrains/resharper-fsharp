@@ -105,6 +105,10 @@ type CSharpResolveTest() =
     [<Test>] member x.``Properties 19 - Simple property with getter``() = x.DoNamedTest()
     [<Test>] member x.``Properties 20 - Simple property with accessors``() = x.DoNamedTest()
     [<Test>] member x.``Properties 21 - static val``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 22 - Accessor modifiers - Private getter - Auto``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 23 - Accessor modifiers - Private getter``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 24 - Accessor modifiers - Private setter - Auto``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 25 - Accessor modifiers - Private setter``() = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>]
     [<Test>] member x.``Module bindings - Extension 01 - F# 7``() = x.DoNamedTest()
@@ -194,6 +198,7 @@ type CSharpResolveFromSignatures() =
 
     [<Test>] member x.``Type Extension 01 - Struct - Signature``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 02 - Class - Signature``() = x.DoNamedTest()
+    [<Test>] member x.``Class - Ctors 01 - Modifiers - Signature``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

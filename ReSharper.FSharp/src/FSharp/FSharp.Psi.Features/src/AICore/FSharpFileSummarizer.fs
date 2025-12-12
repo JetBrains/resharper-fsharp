@@ -78,16 +78,7 @@ type private FileSummarizerVisitor() =
     let addMember (memberDecl: IOverridableMemberDeclaration) (context: SummarizerContext) =
         let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType
         let accessorNames =
-            match memberDecl with
-            | :? IAccessorsNamesClauseOwner as prop ->
-                match prop.AccessorsClause with
-                | null -> Seq.empty
-                | clause -> clause.AccessorsNamesEnumerable |> Seq.map _.Name
-
-            | :? IMemberSignatureOrDeclaration as memberDecl ->
-                memberDecl.AccessorDeclarationsEnumerable |> Seq.map _.NameIdentifier.Name
-
-            | _ -> Seq.empty
+            memberDecl.AccessorDeclarations |> Seq.map _.AccessorName
 
         let accessors =
             if Seq.isEmpty accessorNames then "" else

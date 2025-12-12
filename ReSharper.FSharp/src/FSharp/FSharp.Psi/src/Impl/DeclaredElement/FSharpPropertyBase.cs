@@ -6,14 +6,13 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpPropertyMemberBase<TDeclaration> : FSharpPropertyBase<TDeclaration>
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IOverridableMemberDeclaration
   {
     protected FSharpPropertyMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
@@ -82,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
   internal abstract class FSharpPropertyBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
     : FSharpMemberBase<TDeclaration>(declaration), IFSharpParameterOwnerMember, IProperty
-    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+    where TDeclaration : IOverridableMemberDeclaration
   {
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)
     {
@@ -124,8 +123,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public string GetDefaultPropertyMetadataName() => ShortName;
 
-    public IAccessor Getter => IsReadable ? new ImplicitAccessor(this, AccessorKind.GETTER) : null;
-    public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
+    public IAccessor Getter => IsReadable ? new FSharpPropertyImplicitAccessor(this, AccessorKind.GETTER) : null;
+    public IAccessor Setter => IsWritable ? new FSharpPropertyImplicitAccessor(this, AccessorKind.SETTER) : null;
 
     public abstract bool IsReadable { get; }
     public abstract bool IsWritable { get; }
