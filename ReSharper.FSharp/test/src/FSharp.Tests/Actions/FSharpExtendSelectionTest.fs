@@ -98,3 +98,10 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Strings - Interpolated - Triple quoted 03 - Complex insertion``() = x.DoNamedTest()
 
     [<Test>] member x.``Strings - Injections 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Accessors clause 01 - Implicit``() = x.DoNamedTest()
+    [<Test>] member x.``Accessors clause 02 - Explicit``() = x.DoNamedTest()
+    [<Test>] member x.``Accessors clause 03 - Between``() = x.DoNamedTest()
+    [<Test>] member x.``Accessors clause 04 - With``() = x.DoNamedTest()
+    [<Test>] member x.``Accessors clause 05 - No accessors``() = x.DoNamedTest()
+    [<Test>] member x.``Accessors clause 06 - Abstract``() = x.DoNamedTest()

@@ -99,6 +99,18 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             let parentExpr = node.Parent :?> IInterpolatedStringExpr
             if parentExpr.Literals.Count < 2 then null else
             FSharpInterpolatedStringExpressionSelection(fsFile, node.Parent :?> IInterpolatedStringExpr) :> _
+        
+        | node ->
+
+        match node.Parent with
+        | :? IOverridableMemberDeclaration as parent ->
+            let withKeyword = parent.WithKeyword
+            if isNull withKeyword then null else
+
+            if node.GetTreeStartOffset().Offset >= withKeyword.GetTreeStartOffset().Offset then
+                FSharpTreeRangeSelection(fsFile, parent.WithKeyword, parent.LastChild) :> _ else
+
+            null
 
         | _ -> null
 
