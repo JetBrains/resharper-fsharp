@@ -5,6 +5,11 @@
   <description>F# language support plugin for JetBrains Rider.</description>
   <category>Languages</category>
 
+  <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
+  <dependencies>
+    <module name="intellij.rd.client"/>
+  </dependencies>
+  <!-- endregion -->
   <depends>com.intellij.modules.rider</depends>
   <depends>rider.intellij.plugin.appender</depends>
   <depends>com.intellij.rider.rdclient.spellchecker</depends>
