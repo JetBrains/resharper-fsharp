@@ -1,0 +1,14 @@
+--> Program.fs:5(40,51) // let t = T()
+$Program.main@() in <StartupCode$SteppingTests>, SteppingTests.dll
+
+--> Program.fs:3(26,28) // ()
+new Program.T() in SteppingTests.dll
+    +this = Program.T
+
+--> Program.fs:3(32,38) // ignore
+new Program.T() in SteppingTests.dll
+    +this = Program.T
+
+--> Program.fs:5(40,51) // let t = T()
+$Program.main@() in <StartupCode$SteppingTests>, SteppingTests.dll
+
