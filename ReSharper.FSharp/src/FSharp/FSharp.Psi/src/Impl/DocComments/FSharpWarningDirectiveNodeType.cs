@@ -8,7 +8,7 @@ public class FSharpWarningDirectiveNodeType : FSharpCompositeNodeType
 {
   public static readonly CompositeNodeType Instance = new FSharpWarningDirectiveNodeType();
     
-  private FSharpWarningDirectiveNodeType() : base("WARNING_DIRECTIVE", 1901)
+  private FSharpWarningDirectiveNodeType() : base("WARNING_DIRECTIVE", 1901, NodeTypeFlags.None)
   {
   }
 
