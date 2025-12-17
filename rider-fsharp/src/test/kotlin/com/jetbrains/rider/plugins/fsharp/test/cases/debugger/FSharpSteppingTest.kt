@@ -25,16 +25,16 @@ class FSharpSteppingTest : DebuggerTestBase() {
             toggleBreakpoint("Program.fs", 5)
         }, {
             waitForPause()
-            dumpFullCurrentData()
+            dumpFullCurrentData(message = "Stopped at 'let")
 
             stepInto()
-            dumpFullCurrentData()
+            dumpFullCurrentData(message = "Stepped into T constructor")
 
             stepOver()
-            dumpFullCurrentData()
+            dumpFullCurrentData(message = "Stepped over ()")
 
             stepOver()
-            dumpFullCurrentData()
+            dumpFullCurrentData(message = "Stepped out")
 
             resumeSession()
         }, true)

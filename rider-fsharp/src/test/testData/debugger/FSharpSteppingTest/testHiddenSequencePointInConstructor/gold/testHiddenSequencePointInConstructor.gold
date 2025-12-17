@@ -1,14 +1,18 @@
+Stopped at 'let:
 --> Program.fs:5(40,51) // let t = T()
 $Program.main@() in <StartupCode$SteppingTests>, SteppingTests.dll
 
+Stepped into T constructor:
 --> Program.fs:3(26,28) // ()
 new Program.T() in SteppingTests.dll
     +this = Program.T
 
+Stepped over ():
 --> Program.fs:3(32,38) // ignore
 new Program.T() in SteppingTests.dll
     +this = Program.T
 
+Stepped out:
 --> Program.fs:5(40,51) // let t = T()
 $Program.main@() in <StartupCode$SteppingTests>, SteppingTests.dll
 
