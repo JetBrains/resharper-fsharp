@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
   {
     public static readonly CompositeNodeType Instance = new DocCommentBlockNodeType();
 
-    private DocCommentBlockNodeType() : base("XML_DOC_BLOCK", 1900)
+    private DocCommentBlockNodeType() : base("XML_DOC_BLOCK", 1900, NodeTypeFlags.None)
     {
     }
 
