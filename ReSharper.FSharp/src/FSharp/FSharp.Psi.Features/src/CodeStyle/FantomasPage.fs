@@ -152,8 +152,8 @@ type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifica
         | FantomasLocation.Bundled ->
             goToYouTrack
         | FantomasLocation.LocalDotnetTool ->
-            let manifestPath = dotnetToolsTracker.GetToolsManifestPath()
-            if isNotNull manifestPath && manifestPath.ExistsFile then
+            let manifestPath = dotnetToolsTracker.GetActiveToolsManifestPath()
+            if isNotNull manifestPath then
                 openDotnetToolsOrGoToSettings manifestPath.FullPath
             else goToSettings
         | _ -> goToSettings
