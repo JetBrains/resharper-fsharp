@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -100,12 +100,39 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   public partial class XmlDocBlock : FSharpCompositeElement
   {
     public override bool IsFiltered() => true;
-    public override NodeType NodeType => DocCommentBlockNodeType.Instance;
+    public override NodeType NodeType => ElementType.DOC_COMMENT_BLOCK;
   }
   
   public class FSharpWarningDirective : FSharpCompositeElement
   {
     public override bool IsFiltered() => true;
-    public override NodeType NodeType => FSharpWarningDirectiveNodeType.Instance;
+    public override NodeType NodeType => ElementType.WARNING_DIRECTIVE;
+  }
+
+  partial class ElementType
+  {
+    public static readonly CompositeNodeType DOC_COMMENT_BLOCK = new DocCommentBlockNodeType();
+    public const int DOC_COMMENT_BLOCK_INDEX = 1900;
+
+    private sealed class DocCommentBlockNodeType : FSharpCompositeNodeType
+    {
+      public DocCommentBlockNodeType() : base("XML_DOC_BLOCK", DOC_COMMENT_BLOCK_INDEX, typeof(DocCommentBlockNodeType))
+      {
+      }
+
+      public override CompositeElement Create() => new XmlDocBlock();
+    }
+
+    public static readonly CompositeNodeType WARNING_DIRECTIVE = new FSharpWarningDirectiveNodeType();
+    public const int WARNING_DIRECTIVE_INDEX = 1901;
+
+    private sealed class FSharpWarningDirectiveNodeType : FSharpCompositeNodeType
+    {
+      public FSharpWarningDirectiveNodeType() : base("WARNING_DIRECTIVE", WARNING_DIRECTIVE_INDEX, typeof(FSharpWarningDirective))
+      {
+      }
+
+      public override CompositeElement Create() => new FSharpWarningDirective();
+    }
   }
 }

@@ -180,7 +180,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
             let mark =
                 if xmlDoc.HasDeclaration then
                     let mark = x.Mark(xmlDoc.Range)
-                    x.MarkAndDone(xmlDoc.Range, DocCommentBlockNodeType.Instance)
+                    x.MarkAndDone(xmlDoc.Range, ElementType.DOC_COMMENT_BLOCK)
                     mark
                 else x.Mark()
 
