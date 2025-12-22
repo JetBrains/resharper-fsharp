@@ -73,7 +73,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
 
             let mark = x.Mark()
             x.AdvanceToEnd(directiveRange)
-            x.Done(directiveRange, mark, FSharpWarningDirectiveNodeType.Instance)
+            x.Done(directiveRange, mark, ElementType.WARNING_DIRECTIVE)
 
         x.Builder.AdvanceLexer() |> ignore
 
@@ -150,7 +150,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
     member x.MarkXmlDocOwner(xmlDoc: XmlDoc, expectedType: TokenNodeType, declarationRange: range) =
         let mark = x.MarkTokenOrRange(expectedType, declarationRange)
         if xmlDoc.HasDeclaration then
-            x.MarkAndDone(xmlDoc.Range, DocCommentBlockNodeType.Instance)
+            x.MarkAndDone(xmlDoc.Range, ElementType.DOC_COMMENT_BLOCK)
         mark
 
     member x.ProcessReferenceName(lid: Ident list) =

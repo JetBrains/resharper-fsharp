@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public static readonly NodeType Instance = new ChameleonExpressionNodeType();
 
-    private ChameleonExpressionNodeType() : base("F# Chameleon Expression Node Type", NodeIndex)
+    private ChameleonExpressionNodeType() : base("F# Chameleon Expression Node Type", NodeIndex, typeof(ChameleonExpression))
     {
     }
 

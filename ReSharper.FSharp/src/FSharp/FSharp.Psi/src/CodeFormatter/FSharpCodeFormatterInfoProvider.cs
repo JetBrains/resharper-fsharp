@@ -355,7 +355,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndent")
         .Where(Node().In(continuousIndentNodes.Except(ElementType.MEMBER_DECLARATION)).Satisfies((node, _) => !(IsNestedRefOrAppExpr(node.NodeOrNull))))
-        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, DocCommentBlockNodeType.Instance))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, ElementType.DOC_COMMENT_BLOCK))
         .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, _) =>
           !node.HasNewLineBefore()))
         .Build();
@@ -363,7 +363,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       Describe<ContinuousIndentRule>()
         .Name("ContinuousIndentDouble").DefaultMultiplier(1) // use 2 // use multiplier setting instead of default multiplier
         .Where(Node().In(ElementType.MEMBER_DECLARATION))
-        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, DocCommentBlockNodeType.Instance))
+        .AddException(Node().In(ElementType.ATTRIBUTE_LIST, ElementType.DOC_COMMENT_BLOCK))
         .AddException(Node().In(ElementType.CHAMELEON_EXPRESSION))
         .Build();
 
