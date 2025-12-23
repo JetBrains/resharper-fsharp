@@ -17,8 +17,8 @@ type AddUnderscorePrefixFixTest() =
     [<Test>] member x.``Partial pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial pattern 02``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Partial pattern - Escaped 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Partial pattern - Escaped 02``() = x.DoNamedTest()
+    [<Test>] member x.``Partial pattern - Escaped 01``() = x.DoNamedTest()
+    [<Test>] member x.``Partial pattern - Escaped 02``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

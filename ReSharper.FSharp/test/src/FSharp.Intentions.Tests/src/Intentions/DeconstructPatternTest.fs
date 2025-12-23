@@ -88,6 +88,6 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Union case fields 04 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Union case fields 05 - Parens``() = x.DoNamedTest()
 
-    [<Test; ActionNotAvailable>] member x.``Not available - Constructor param 01``() = x.DoNamedTest()
-    [<Test; ActionNotAvailable>] member x.``Not available - Type 01``() = x.DoNamedTest()
-    [<Test; ActionNotAvailable>] member x.``Not available - Union case - Single no fields``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Constructor param 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Union case - Single no fields``() = x.DoNamedTest()

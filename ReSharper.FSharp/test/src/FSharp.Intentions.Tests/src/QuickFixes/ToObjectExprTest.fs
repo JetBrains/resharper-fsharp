@@ -13,4 +13,4 @@ type ToObjectExprTest() =
     [<Test>] member x.``Class 01`` () = x.DoNamedTest()
     [<Test>] member x.``Class 02`` () = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available 01 - No arg``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01 - No arg``() = x.DoNamedTest()

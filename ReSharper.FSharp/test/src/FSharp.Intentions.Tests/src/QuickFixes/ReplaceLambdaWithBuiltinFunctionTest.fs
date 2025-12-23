@@ -18,9 +18,9 @@ type ReplaceLambdaWithBuiltinFunctionTest() =
 
     [<Test>] member x.``Snd``() = x.DoNamedTest()
 
-    [<Test; NoHighlightingFound>] member x.``Id - Names collision - not available``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Fst - Names collision - not available``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Snd - Names collision - not available``() = x.DoNamedTest()
+    [<Test>] member x.``Id - Names collision - not available``() = x.DoNamedTest()
+    [<Test>] member x.``Fst - Names collision - not available``() = x.DoNamedTest()
+    [<Test>] member x.``Snd - Names collision - not available``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

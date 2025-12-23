@@ -19,5 +19,5 @@ type AddSetterFixTest() =
     [<Test>] member x.``Auto property 06 - Comment``() = x.DoNamedTest()
     [<Test>] member x.``Auto property 07 - Comment``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available 01 - Virtual``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 02 - Signature``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Not available 01 - Virtual``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 02 - Signature``() = x.DoNamedTestWithSignature()

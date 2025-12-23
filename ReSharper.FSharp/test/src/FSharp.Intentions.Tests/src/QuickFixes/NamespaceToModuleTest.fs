@@ -19,5 +19,5 @@ type NamespaceToModuleTest() =
     [<Test>] member x.``Expression 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression 02 - do``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Global namespace``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Two namespaces``() = x.DoNamedTest()
+    [<Test>] member x.``Global namespace``() = x.DoNamedTest()
+    [<Test>] member x.``Two namespaces``() = x.DoNamedTest()

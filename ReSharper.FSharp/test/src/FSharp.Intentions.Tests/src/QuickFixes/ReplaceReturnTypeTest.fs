@@ -1,10 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
-open JetBrains.ReSharper.Intentions.CSharp.QuickFixes
-open JetBrains.ReSharper.Intentions.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
@@ -26,7 +22,7 @@ type ReplaceReturnTypeTest() =
 
     [<Test>] member x.``Array 01``() = x.DoNamedTest()
     [<Test>] member x.``Constraint Mismatch``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Infix application``() = x.DoNamedTest()
+    [<Test>] member x.``Infix application``() = x.DoNamedTest()
     [<Test>] member x.Sequential() = x.DoNamedTest()
 
     [<Test>] member x.``Match clause 01``() = x.DoNamedTest()
@@ -36,7 +32,7 @@ type ReplaceReturnTypeTest() =
 
     [<Test>] member x.``Return type with attribute``() = x.DoNamedTest()
     [<Test>] member x.TryWith() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.MatchLambda() = x.DoNamedTest()
+    [<Test>] member x.MatchLambda() = x.DoNamedTest()
     [<Test>] member x.LetOrUse() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - If``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse - Else``() = x.DoNamedTest()
@@ -69,17 +65,17 @@ type ReplaceReturnTypeTest() =
     [<Test>] member x.``Type - Partial 04``() = x.DoNamedTest()
     [<Test>] member x.``Type - Partial 05``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``No highlighting 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``No highlighting 02``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``No highlighting 03``() = x.DoNamedTest()
+    [<Test>] member x.``No highlighting 01``() = x.DoNamedTest()
+    [<Test>] member x.``No highlighting 02``() = x.DoNamedTest()
+    [<Test>] member x.``No highlighting 03``() = x.DoNamedTest()
 
     [<Test; Explicit "Fix FCS error">] member x.``Not available - Pattern - Tuple 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 02``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 03``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 04``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 05``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available 06``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 03``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 04``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 05``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 06``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

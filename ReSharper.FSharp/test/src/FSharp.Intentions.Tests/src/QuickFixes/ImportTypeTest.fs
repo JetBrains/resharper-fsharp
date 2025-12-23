@@ -54,20 +54,16 @@ type ImportTypeTest() =
 
     [<Test>] member x.``Qualifiers - Namespace 01``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01 - Open``() = x.DoNamedTest()
 
-    [<NotAvailable>]
     [<Test>] member x.``Accessibility 01``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 02``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 03``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 04``() = x.DoNamedTestWithSignatureAndSecondFile()
-    [<NotAvailable>]
     [<Test>] member x.``Accessibility 05``() = x.DoNamedTestWithSignatureAndSecondFile()
-    [<NotAvailable>]
     [<Test>] member x.``Accessibility 06``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 07``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 08``() = x.DoNamedTestWithTwoFiles()
-    [<NotAvailable>]
     [<Test>] member x.``Accessibility 09``() = x.DoNamedTestWithTwoFiles()
 
 
@@ -122,7 +118,7 @@ type ImportExtensionMemberTest() =
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not Available - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not Available - Type 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
@@ -185,14 +181,14 @@ type FSharpImportModuleMemberTest() =
     [<Test; Explicit>] member x.``Not available - Internal 02 - Value``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Not available - Internal 03 - Function``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available - Unreachable 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Unreachable 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
-type FSharpImporStaticMemberTest() =
+type FSharpImportStaticMemberTest() =
     inherit FSharpQuickFixTestBase<FSharpImportStaticMemberFromQualifierTypeFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/import/staticMember"

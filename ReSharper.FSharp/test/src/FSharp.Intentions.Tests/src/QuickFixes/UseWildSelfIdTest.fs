@@ -14,5 +14,5 @@ type UseWildSelfIdTest() =
     [<Test>] member x.``Object expression 01``() = x.DoNamedTest()
     [<Test>] member x.``Used name 01``() = x.DoNamedTest()
 
-    [<Test; NoHighlightingFound>] member x.``Not available - Used name 01``() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Not available - Used name 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Used name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Used name 02``() = x.DoNamedTest()

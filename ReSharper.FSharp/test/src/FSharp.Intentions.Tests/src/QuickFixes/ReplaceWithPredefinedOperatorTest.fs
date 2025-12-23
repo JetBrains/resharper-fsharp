@@ -13,7 +13,7 @@ type ReplaceWithPredefinedOperatorTest() =
 
     [<Test>] member x.Equality() = x.DoNamedTest()
     [<Test>] member x.Inequality() = x.DoNamedTest()
-    [<Test; NoHighlightingFound>] member x.``Prefix form``() = x.DoNamedTest()
+    [<Test>] member x.``Prefix form``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
