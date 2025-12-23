@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
-import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.io.path.absolutePathString
@@ -38,6 +37,7 @@ version = "$riderBaseVersion.$buildCounter"
 
 dependencies {
   testImplementation(libs.junit)
+  testImplementation(libs.testng)
   intellijPlatform {
     val dir = file("build/rider")
     if (dir.exists()) {
