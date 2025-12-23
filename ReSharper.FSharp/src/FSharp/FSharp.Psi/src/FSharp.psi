@@ -1,6 +1,7 @@
 options {
   parserPackage="JetBrains.ReSharper.Plugins.FSharp.Psi.Gen";
   parserClassName="FSharpParserGenerated";
+  languageType="JetBrains.ReSharper.Plugins.FSharp.Psi.FSharpLanguage";
   psiInterfacePackageName="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree";
   psiStubsPackageName="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree";
   psiStubsBaseClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.FSharpCompositeElement";

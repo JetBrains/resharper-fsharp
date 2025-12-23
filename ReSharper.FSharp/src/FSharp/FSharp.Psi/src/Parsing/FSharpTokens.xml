@@ -1,6 +1,7 @@
 <FSharpTokens>
     <TokenTypeClass>FSharpTokenType</TokenTypeClass>
     <TokenTypeNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing</TokenTypeNamespace>
+    <LanguageType>JetBrains.ReSharper.Plugins.FSharp.Psi.FSharpLanguage</LanguageType>
 
     <Tokens NodeType="FixedTokenNodeType" TokenElement="FixedTokenNodeElement">
         <Token name="ABSTRACT" representation="abstract" />
