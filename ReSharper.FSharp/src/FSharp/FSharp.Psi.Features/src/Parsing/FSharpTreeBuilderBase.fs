@@ -1071,7 +1071,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
 
         let lineStart = lineOffsets[exprRange.StartLine - 1]
         let data = expr, exprWarningDirectives, startOffset, lineStart
-        x.Done(exprRange, mark, ChameleonExpressionNodeType.Instance, data)
+        x.Done(exprRange, mark, ElementType.CHAMELEON_EXPRESSION_WITH_ARG, data)
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)
