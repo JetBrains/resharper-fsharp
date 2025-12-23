@@ -19,7 +19,7 @@ type ReplaceLetWithExpressionTest() =
     [<Test>] member x.``In 02 - Inline``() = x.DoNamedTest()
     [<Test>] member x.``In 03 - Before other``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function 01``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceLetWithExpressionAvailabilityTest() =

@@ -28,7 +28,7 @@ type ToMutableFixTest() =
     [<Test>] member x.TopAsPat() = x.DoNamedTest()
     [<Test>] member x.LocalAsPat() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``LocalAsPat - Pattern matching, not available``() = x.DoNamedTest()
+    [<Test>] member x.``LocalAsPat - Pattern matching, not available``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

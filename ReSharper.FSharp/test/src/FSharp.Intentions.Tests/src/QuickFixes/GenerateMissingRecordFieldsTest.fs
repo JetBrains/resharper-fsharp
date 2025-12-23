@@ -43,4 +43,4 @@ type GenerateMissingRecordFieldsTest() =
 
     // The quickfix should apply if the empty record is the final statement of a function binding, as that's what the
     // annotated return type pertains to.
-    [<Test; NotAvailable>] member x.``Empty function statement no-op``() = x.DoNamedTest()
+    [<Test>] member x.``Empty function statement no-op``() = x.DoNamedTest()

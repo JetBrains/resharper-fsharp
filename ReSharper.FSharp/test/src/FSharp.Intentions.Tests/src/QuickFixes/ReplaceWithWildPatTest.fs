@@ -40,13 +40,13 @@ type ReplaceWithWildPatTest() =
 
     [<Test; ExecuteScopedActionInFile>] member x.``Whole file``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available - As 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Member - Optional 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - As 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Member - Optional 01``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceWithWildPatAvailabilityTest() =

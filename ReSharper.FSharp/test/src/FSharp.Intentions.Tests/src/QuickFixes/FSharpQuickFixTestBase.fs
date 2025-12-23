@@ -1,26 +1,14 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
 open System
-open System.IO
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.TestFramework
-open NUnit.Framework
-
-type NoHighlightingFoundAttribute() =
-    inherit ExpectedExceptionInsideSolutionAttribute(ExpectedMessage = ErrorText.NoHighlightingsFoundError)
-
-type NotAvailableAttribute() =
-    inherit ExpectedExceptionInsideSolutionAttribute(ExpectedMessage = ErrorText.NotAvailable)
-
-type ActionNotAvailableAttribute() =
-    inherit ExpectedExceptionInsideSolutionAttribute(ExpectedMessage = ErrorText.ActionNotAvailable)
 
 type DumpPsiTreeAttribute() =
     inherit Attribute()
@@ -29,16 +17,14 @@ type DumpPsiTreeAttribute() =
 type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
     inherit QuickFixTestBase<'T>()
 
-    override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable)
-
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let occurrenceName = BaseTestWithTextControl.GetSetting(textControl, FSharpTestPopup.OccurrenceName)
         FSharpTestPopup.setOccurrence occurrenceName true x.Solution x.TestLifetime
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
 
-    override this.DumpTextControl(textControl, writer) =
-        base.DumpTextControl(textControl, writer)
+    override this.DumpTextControl(textControl, writer, markers) =
+        base.DumpTextControl(textControl, writer, markers)
         
         if this.GetAttributes<DumpPsiTreeAttribute>() |> Seq.isEmpty then () else
 
@@ -52,6 +38,8 @@ type FSharpQuickFixTestBase<'T when 'T :> IQuickFix>() =
         |> Option.iter (fun psiFile -> DebugUtil.DumpPsi(writer, psiFile))
 
     override this.CheckAllFiles = true
+
+    override this.AllowNotFoundHighlightings = true
 
     member this.DoNamedTestWithSignature() =
         let testName = this.TestMethodName

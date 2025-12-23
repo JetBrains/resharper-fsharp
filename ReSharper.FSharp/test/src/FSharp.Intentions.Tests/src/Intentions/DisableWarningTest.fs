@@ -9,6 +9,7 @@ type DisableWarningTest() =
     inherit DisableWarningActionTestBase()
 
     override x.RelativeTestDataPath = "features/intentions/disableWarning"
+    override x.AllowNotFoundHighlightings = true
 
     [<Test>] member x.``Disable once 01``() = x.DoNamedTest()
     [<Test>] member x.``Disable once 02 - Compiler warning``() = x.DoNamedTest()

@@ -13,4 +13,4 @@ type ToStaticMemberTest() =
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available 01 - Override``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01 - Override``() = x.DoNamedTest()

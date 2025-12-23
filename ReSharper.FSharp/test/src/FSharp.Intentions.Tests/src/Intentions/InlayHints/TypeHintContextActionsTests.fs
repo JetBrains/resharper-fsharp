@@ -1,16 +1,14 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.InlayHints
 
-open JetBrains.Diagnostics
+open System.Linq
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
+open JetBrains.ReSharper.TestRunner.Abstractions.Extensions
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open NUnit.Framework
-
-type ActionNotAvailable() =
-    inherit ExpectedExceptionInsideSolutionAttribute(ExpectedMessage = nameof(ActionNotAvailable))
 
 [<FSharpTest; AssertCorrectTreeStructure>]
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
@@ -21,6 +19,7 @@ type TypeHintContextActionsTests() =
     inherit InlayHintContextMenuTestBase<TypeHintHighlighting>()
 
     override x.RelativeTestDataPath = "features/intentions/inlayHints/types"
+    override x.AllowNotFoundHighlightings = true
 
     [<Test>] member x.``Parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Parameter 02 - Optional``() = x.DoNamedTest()
@@ -55,8 +54,9 @@ type TypeHintContextActionsTests() =
     [<Test>] member x.``Match 04 - List 03``() = x.DoNamedTest()
     [<Test>] member x.``Match 05 - List 04 - Import type``() = x.DoNamedTest()
 
-    [<Test; ActionNotAvailable>] member x.``Not available 01 - Let bang``() = x.DoNamedTest()
-    [<Test; ActionNotAvailable>] member x.``Not available 02 - Property with accessors``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01 - Let bang``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 02 - Property with accessors``() = x.DoNamedTest()
 
-    override x.IsAvailable(item) = item.RichText.Text = "Add type annotation"
-    override x.OnQuickFixNotAvailable(_, _) = Assertion.Fail(nameof(ActionNotAvailable))
+    override x.CreateBulbAction(_, dataModel) =
+        dataModel.ContextMenuItems.NotNull()
+            .FirstOrDefault(fun item -> item.RichText.Text = "Add type annotation")
