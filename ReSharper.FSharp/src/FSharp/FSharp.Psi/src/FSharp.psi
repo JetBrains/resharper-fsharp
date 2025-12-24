@@ -51,14 +51,14 @@ interface fSharpFile options { customParseFunction; noInternalParseFunction; }:
   fSharpImplFile |
   fSharpSigFile;
 
-fSharpImplFile options { customParseFunction; noInternalParseFunction; stubBase="FSharpFileBase"; elementTypeFlags="File"; }:
+fSharpImplFile options { customParseFunction; noInternalParseFunction; stubBase="FSharpFileBase"; }:
   (
     topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>*
   |
     anonModuleDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>
   );
 
-fSharpSigFile options { stubBase="FSharpFileBase"; elementTypeFlags="File"; }:
+fSharpSigFile options { stubBase="FSharpFileBase"; }:
   topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>*;
 
 
