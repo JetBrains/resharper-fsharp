@@ -4,7 +4,7 @@ type T() =
     inherit Class()
 
     member x.P =
-        let thisProtectedProp = x.ProtectedProp
+        let thisProtectedProp = x.ProtectedProp{caret}
         fun _ ->
-            {selstart}thisProtectedProp{selend}
+            {spotstart#1}thisProtectedProp{spotend#1}
         |> ignore

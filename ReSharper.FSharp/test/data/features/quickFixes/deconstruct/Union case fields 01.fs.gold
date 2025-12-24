@@ -3,4 +3,4 @@
     | B of int * int
 
 match A with
-| B({selstart}i{selend}, i1) -> ()
+| B({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) -> ()

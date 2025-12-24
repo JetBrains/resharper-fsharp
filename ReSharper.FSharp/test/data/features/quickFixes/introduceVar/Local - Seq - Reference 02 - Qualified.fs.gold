@@ -1,5 +1,5 @@
 ﻿let name = ""
 
 do
-    let {selstart}nameLength{selend} = name.Length
+    let {spotstart#1}nameLength{spotend#1} = name.Length{caret}
     ()

@@ -1,5 +1,5 @@
 ﻿type R = { A: int; B: int; C: int }
 
-let r = { A = {selstart}failwith "todo"{selend}
+let r = { A = {spotstart#1}failwith "todo"{spotend#1}
           B = 2
-          C = failwith "todo" }
+          C = {spotstart#2}failwith "todo"{spotend#2} }{caret}
