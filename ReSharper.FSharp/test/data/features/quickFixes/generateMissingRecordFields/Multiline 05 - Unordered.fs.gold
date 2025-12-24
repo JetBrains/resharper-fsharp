@@ -2,4 +2,4 @@
 
 let r = { C = 3
           B = 2
-          A = {selstart}failwith "todo"{selend} }
+          A = {spotstart#1}failwith "todo"{spotend#1} }{caret}

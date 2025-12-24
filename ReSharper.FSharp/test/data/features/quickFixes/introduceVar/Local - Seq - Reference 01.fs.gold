@@ -1,5 +1,5 @@
 ﻿let name = ""
 
 do
-    let {selstart}name{selend} = name
+    let {spotstart#1}name{spotend#1} = name{caret}
     ()

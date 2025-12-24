@@ -1,1 +1,1 @@
-﻿let {selstart}identity{selend} = id
+﻿let {spotstart#1}identity{spotend#1} = id{caret}

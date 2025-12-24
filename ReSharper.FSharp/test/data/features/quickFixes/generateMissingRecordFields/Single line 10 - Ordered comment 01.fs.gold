@@ -1,2 +1,2 @@
 ﻿type R = { A: int; B: int; C: int }
-let r = { A = 1; B = {selstart}failwith "todo"{selend}; (* Comment *) C = 3 }
+let r = { A = 1; B = {spotstart#1}failwith "todo"{spotend#1}; (* Comment *) C = 3 }{caret}

@@ -1,2 +1,2 @@
 ﻿if true then
-    let {selstart}i{selend} = 123
+    let {spotstart#1}i{spotend#1} = 123{caret}

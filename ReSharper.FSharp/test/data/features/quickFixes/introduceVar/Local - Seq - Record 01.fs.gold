@@ -2,5 +2,5 @@
     { Field: int }
 
 do
-    let {selstart}roar{selend} = { Field = 123 }
+    let {spotstart#1}roar{spotend#1} = { Field = 123 }{caret}
     ()

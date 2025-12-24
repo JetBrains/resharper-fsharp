@@ -1,5 +1,5 @@
 ﻿module Module
 
 async {
-    let {selstart}objectFunc{selend} = id
+    let {spotstart#1}objectFunc{spotend#1} = id{caret}
 }

@@ -3,6 +3,6 @@
 let r =
     {
         A = 1
-        B = {selstart}failwith "todo"{selend}
-        C = failwith "todo"
-    }
+        B = {spotstart#1}failwith "todo"{spotend#1}
+        C = {spotstart#2}failwith "todo"{spotend#2}
+    }{caret}

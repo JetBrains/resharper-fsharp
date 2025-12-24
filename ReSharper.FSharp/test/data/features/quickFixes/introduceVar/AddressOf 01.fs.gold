@@ -1,4 +1,4 @@
 ﻿module Module
 
-let mutable s = "".ToString()
-&{selstart}s{selend}
+let mutable s = "".ToString(){caret}
+&{spotstart#1}s{spotend#1}
