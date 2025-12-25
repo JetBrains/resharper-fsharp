@@ -1,4 +1,4 @@
 ﻿module Module
 
 let f i =
-    fun i1 -> {caret}i + i1
+    fun {spotstart#1}i1{spotend#1} -> {caret}i + i1

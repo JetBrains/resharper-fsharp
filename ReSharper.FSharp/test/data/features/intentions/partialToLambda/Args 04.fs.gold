@@ -2,6 +2,6 @@
 
 let f a b = a + b
 
-do fun o ->
+do fun {spotstart#1}o{spotend#1} ->
     {caret}f
         a o

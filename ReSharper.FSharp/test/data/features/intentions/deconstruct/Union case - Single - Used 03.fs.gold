@@ -1,5 +1,5 @@
 ﻿type U =
     | A of int * int
 
-let _, (A(i, i1{caret}) as a) = (), A (1, 2)
+let _, (A({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) as a) = (), A (1, 2)
 let b = a

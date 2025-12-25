@@ -1,5 +1,5 @@
 ﻿module Module
 
-let f s x{caret} =
+let f s {spotstart#1}x{spotend#1}{caret} =
     match x with
     | "" -> ()

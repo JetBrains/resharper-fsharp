@@ -1,5 +1,5 @@
 ﻿type U =
     | A of int
 
-let A i{caret} as a = A 1
+let A {spotstart#1}i{spotend#1}{caret} as a = A 1
 let b = a

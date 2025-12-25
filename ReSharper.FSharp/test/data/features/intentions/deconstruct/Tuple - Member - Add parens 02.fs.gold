@@ -3,4 +3,4 @@
 
 type T1() =
     interface I<int * int> with
-        member this.M((i, i1{caret})) = failwith "todo"
+        member this.M(({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret})) = failwith "todo"

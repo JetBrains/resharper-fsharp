@@ -1,2 +1,2 @@
-﻿let f (((i1, i2{caret}), i): (int * int) * int) =
+﻿let f ((({spotstart#1}i1{spotend#1}, {spotstart#2}i2{spotend#2}{caret}), i): (int * int) * int) =
     ()

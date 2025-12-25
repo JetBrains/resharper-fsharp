@@ -6,4 +6,4 @@ type U =
     | A of int
 
 match A 1 with
-| Id(A i{caret}) -> ()
+| Id(A {spotstart#1}i{spotend#1}{caret}) -> ()

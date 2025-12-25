@@ -1,6 +1,6 @@
 ﻿let i = 0
 
-(1, "") |> (fun (i1, s{caret}) ->
+(1, "") |> (fun ({spotstart#1}i1{spotend#1}, {spotstart#2}s{spotend#2}{caret}) ->
     let _ = i
     ()
 )

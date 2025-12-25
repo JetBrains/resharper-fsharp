@@ -1,3 +1,3 @@
 ﻿do
-    let i, i1, i2{caret} = 1, 2, 3
+    let {spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}, {spotstart#3}i2{spotend#3}{caret} = 1, 2, 3
     ()

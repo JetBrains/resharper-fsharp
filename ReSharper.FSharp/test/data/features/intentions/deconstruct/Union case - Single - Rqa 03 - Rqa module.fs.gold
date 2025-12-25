@@ -12,4 +12,4 @@ namespace Ns2
 open Ns1.Nested1
 
 module Nested3 =
-    let (Nested2.U.A field{caret}) = Ns1.Nested1.Nested2.U.A 1
+    let (Nested2.U.A {spotstart#1}field{spotend#1}{caret}) = Ns1.Nested1.Nested2.U.A 1

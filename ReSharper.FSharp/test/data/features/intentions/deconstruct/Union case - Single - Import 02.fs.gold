@@ -6,4 +6,4 @@ module Module1 =
         | A of int
 
 module Module2 =
-    let (Module1.A i{caret}) = Module1.A 1
+    let (Module1.A {spotstart#1}i{spotend#1}{caret}) = Module1.A 1

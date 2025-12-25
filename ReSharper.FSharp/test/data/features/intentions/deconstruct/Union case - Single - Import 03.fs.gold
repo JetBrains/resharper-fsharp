@@ -10,4 +10,4 @@ namespace Ns2
 open Ns1
 
 module Module2 =
-    let (Module.A i{caret}) = Ns1.Module.A 1
+    let (Module.A {spotstart#1}i{spotend#1}{caret}) = Ns1.Module.A 1

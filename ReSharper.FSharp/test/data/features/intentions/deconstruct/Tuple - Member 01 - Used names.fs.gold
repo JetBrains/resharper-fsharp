@@ -1,6 +1,6 @@
 ﻿type T() =
     let i = 0
 
-    member this.M((i1, b{caret}): int * bool) =
+    member this.M(({spotstart#1}i1{spotend#1}, {spotstart#2}b{spotend#2}{caret}): int * bool) =
         let _ = i
         ()

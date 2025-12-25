@@ -1,4 +1,4 @@
 ﻿type U =
     | A of field: int
 
-let (A field{caret}) = A 1
+let (A {spotstart#1}field{spotend#1}{caret}) = A 1

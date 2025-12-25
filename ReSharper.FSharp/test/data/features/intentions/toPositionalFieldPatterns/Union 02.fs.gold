@@ -5,5 +5,5 @@ type U =
     | B of hello: int * foo: int option * world: string
 
 match A with
-| B(Some 1, int32Option, world{caret}) -> ()
+| B(Some 1, {spotstart#1}int32Option{spotend#1}, {spotstart#2}world{spotend#2}{caret}) -> ()
 | _ -> ()

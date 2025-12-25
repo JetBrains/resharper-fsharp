@@ -2,4 +2,4 @@
     | ``A B`` of field: int
 
 match ``A B`` 1 with
-| ``A B`` field{caret} -> ()
+| ``A B`` {spotstart#1}field{spotend#1}{caret} -> ()

@@ -2,4 +2,4 @@
     | C of 'T * int
 
 match C(1, 2) with
-| C(i, i1{caret}) -> ()
+| C({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) -> ()
