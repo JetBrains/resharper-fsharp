@@ -1,3 +1,4 @@
 [libraries]
 junit = "junit:junit:4.13.2"
 testng = "org.testng:testng:7.10.2"
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }

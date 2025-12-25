@@ -38,6 +38,7 @@ version = "$riderBaseVersion.$buildCounter"
 dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.testng)
+  testImplementation(libs.kotlin.test)
   intellijPlatform {
     val dir = file("build/rider")
     if (dir.exists()) {
@@ -139,7 +140,7 @@ val riderFSharpTargetsGroup = "rider-fsharp"
 fun File.writeTextIfChanged(content: String) {
   val bytes = content.toByteArray()
 
-  if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
+if (!exists() || !readBytes().contentEquals(bytes)) {
     println("Writing $path")
     writeBytes(bytes)
   }
