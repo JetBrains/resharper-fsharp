@@ -1,2 +1,2 @@
 ﻿match 1, 2 with
-| i, i1{caret} as t | (_, _ as t) -> ()
+| {spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret} as t | (_, _ as t) -> ()

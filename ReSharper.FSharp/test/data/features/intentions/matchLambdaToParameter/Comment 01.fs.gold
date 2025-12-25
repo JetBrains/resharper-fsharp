@@ -1,5 +1,5 @@
 ﻿module Module
 
-let f x{caret} = // comment
+let f {spotstart#1}x{spotend#1}{caret} = // comment
     match x with
     | 1 -> ()

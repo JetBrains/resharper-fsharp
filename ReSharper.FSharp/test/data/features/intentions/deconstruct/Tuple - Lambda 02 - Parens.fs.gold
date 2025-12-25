@@ -1,2 +1,2 @@
-﻿(1, 2) |> (fun (i, i1{caret}) -> ())
+﻿(1, 2) |> (fun ({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) -> ())
 

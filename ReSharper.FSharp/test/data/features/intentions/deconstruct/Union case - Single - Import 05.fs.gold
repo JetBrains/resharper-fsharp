@@ -11,4 +11,4 @@ namespace Ns2
 open Ns1.Module.Nested
 
 module Module =
-    let (A i{caret}) = Ns1.Module.Nested.A 1
+    let (A {spotstart#1}i{spotend#1}{caret}) = Ns1.Module.Nested.A 1

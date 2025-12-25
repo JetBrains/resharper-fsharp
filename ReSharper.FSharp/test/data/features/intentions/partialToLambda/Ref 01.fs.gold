@@ -1,3 +1,3 @@
 ﻿module Module
 
-fun foo -> {caret}id foo
+fun {spotstart#1}foo{spotend#1} -> {caret}id foo

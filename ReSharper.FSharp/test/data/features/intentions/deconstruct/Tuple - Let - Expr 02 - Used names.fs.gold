@@ -1,4 +1,4 @@
 ﻿do
     let i, i1, i2 = 1, 2, 3
-    let i2, i3, i4{caret} = 1, 2, 3
+    let {spotstart#1}i2{spotend#1}, {spotstart#2}i3{spotend#2}, {spotstart#3}i4{spotend#3}{caret} = 1, 2, 3
     i, i1 |> ignore

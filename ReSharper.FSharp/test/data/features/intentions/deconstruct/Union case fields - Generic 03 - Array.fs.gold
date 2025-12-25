@@ -2,4 +2,4 @@
     | C of 'T[]
 
 match C([| 1 |]) with
-| C int32s{caret} -> ()
+| C {spotstart#1}int32s{spotend#1}{caret} -> ()

@@ -3,6 +3,6 @@
 let f a b = a + b
 
 do fun _ ->
-    fun o ->
+    fun {spotstart#1}o{spotend#1} ->
         {caret}f
             a o

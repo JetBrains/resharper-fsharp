@@ -1,3 +1,3 @@
 ﻿open System.Collections.Generic
 
-let (KeyValue(s, i{caret})) = KeyValuePair("", 1)
+let (KeyValue({spotstart#1}s{spotend#1}, {spotstart#2}i{spotend#2}{caret})) = KeyValuePair("", 1)

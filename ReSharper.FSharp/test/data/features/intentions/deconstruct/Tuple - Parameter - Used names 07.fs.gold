@@ -1,6 +1,6 @@
 ﻿let s = ""
 
-let f ((i1, i2, s1{caret}): int * int * string) i =
+let f (({spotstart#1}i1{spotend#1}, {spotstart#2}i2{spotend#2}, {spotstart#3}s1{spotend#3}{caret}): int * int * string) i =
     let i1 = ()
     ignore i1, s
     ()

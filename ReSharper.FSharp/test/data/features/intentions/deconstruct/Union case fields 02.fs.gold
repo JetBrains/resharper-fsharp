@@ -5,4 +5,4 @@
     | D
 
 match D with
-| B(i, f{caret}) -> ()
+| B({spotstart#1}i{spotend#1}, {spotstart#2}f{spotend#2}{caret}) -> ()

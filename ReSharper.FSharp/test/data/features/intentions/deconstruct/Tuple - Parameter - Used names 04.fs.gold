@@ -1,4 +1,4 @@
 ﻿let i = 1
 
-let f ((i1, s{caret}): int * string) =
+let f (({spotstart#1}i1{spotend#1}, {spotstart#2}s{spotend#2}{caret}): int * string) =
     ignore i

@@ -1,5 +1,5 @@
 ﻿type T() =
     let i = 0
 
-    member this.P with set ((i1, s{caret}): int * string) = 
+    member this.P with set (({spotstart#1}i1{spotend#1}, {spotstart#2}s{spotend#2}{caret}): int * string) = 
         ignore i

@@ -1,2 +1,2 @@
-﻿let f (s, a{caret} as s1) s2 : string * string =
+﻿let f ({spotstart#1}s{spotend#1}, {spotstart#2}a{spotend#2}{caret} as s1) s2 : string * string =
     fst s1, snd s2

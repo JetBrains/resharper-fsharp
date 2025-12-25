@@ -10,4 +10,4 @@ module Nested1 =
     open Nested21.Nested3
 
     module Module22 =
-        let (A i{caret}) = Nested21.Nested3.A 1
+        let (A {spotstart#1}i{spotend#1}{caret}) = Nested21.Nested3.A 1

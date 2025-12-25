@@ -1,2 +1,2 @@
 ﻿let i1 = 1
-let i, i2, i3{caret} = 1, 2, 3
+let {spotstart#1}i{spotend#1}, {spotstart#2}i2{spotend#2}, {spotstart#3}i3{spotend#3}{caret} = 1, 2, 3

@@ -8,4 +8,4 @@ namespace Ns2
 open Ns1
 
 module Module =
-    let (A field{caret}) = Ns1.U.A 1
+    let (A {spotstart#1}field{spotend#1}{caret}) = Ns1.U.A 1

@@ -5,4 +5,4 @@
     | D
 
 match D with
-| C i{caret} -> ()
+| C {spotstart#1}i{spotend#1}{caret} -> ()

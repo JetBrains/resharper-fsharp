@@ -4,4 +4,4 @@ type U =
     | A of someFieldName: bool * int * StringBuilder * anotherField: double
 
 match A (true, 2, null, 4.) with
-| A(someFieldName, i, stringBuilder, anotherField{caret}) -> failwith "todo"
+| A({spotstart#1}someFieldName{spotend#1}, {spotstart#2}i{spotend#2}, {spotstart#3}stringBuilder{spotend#3}, {spotstart#4}anotherField{spotend#4}{caret}) -> failwith "todo"

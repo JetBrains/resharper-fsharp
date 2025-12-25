@@ -2,4 +2,4 @@
     | A of int * int
 
 match A(1, 2) with
-| A (i, i1{caret}) -> ()
+| A ({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) -> ()
