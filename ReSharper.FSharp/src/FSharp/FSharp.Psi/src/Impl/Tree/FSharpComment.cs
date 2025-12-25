@@ -116,7 +116,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private sealed class DocCommentBlockNodeType : FSharpCompositeNodeType
     {
-      public DocCommentBlockNodeType() : base("XML_DOC_BLOCK", DOC_COMMENT_BLOCK_INDEX, typeof(DocCommentBlockNodeType))
+      public DocCommentBlockNodeType() : base("XML_DOC_BLOCK", DOC_COMMENT_BLOCK_INDEX, typeof(XmlDocBlock))
       {
       }
 
