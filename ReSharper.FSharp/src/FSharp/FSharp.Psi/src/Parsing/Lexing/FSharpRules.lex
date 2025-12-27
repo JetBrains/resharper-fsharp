@@ -643,6 +643,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPDIRECTIVE> {HASH}"time"                       { yybegin(LINE); return MakeToken(PP_TIME); }
 <PPDIRECTIVE> {HASH}"I"                          { yybegin(LINE); return MakeToken(PP_I); }
 <PPDIRECTIVE> {HASH}"nowarn"                     { yybegin(LINE); return MakeToken(PP_NOWARN); }
+<PPDIRECTIVE> {HASH}"warnon"                     { yybegin(LINE); return MakeToken(PP_WARNON); }
 
 <PPDIRECTIVE> {HASH}"if"                         { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"else"                       { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
