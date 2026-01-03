@@ -10,8 +10,8 @@ repositories {
   maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
   maven("https://cache-redirector.jetbrains.com/maven-central")
   maven("https://cache-redirector.jetbrains.com/plugins.gradle.org")
-  val rd_version: String? by project
-  if (rd_version == "SNAPSHOT") {
+  val rdVersion: String? by project
+  if (rdVersion == "SNAPSHOT") {
     mavenLocal()
   }
 }
