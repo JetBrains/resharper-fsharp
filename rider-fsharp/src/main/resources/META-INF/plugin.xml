@@ -30,7 +30,7 @@
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <callHierarchyProvider language="F#" implementationClass="com.jetbrains.rider.inspections.callHierarchy.RiderCallHierarchyProvider"/>
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
-    <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
+    <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" id="F#" order="after RiderDefault,after C++,after Asp,after Razor,before Handlebars"/>
     <code.cleanup.support language="F#" implementationClass="com.jetbrains.rider.actions.impl.cleanup.BackendCodeCleanupSupportPolicy" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ProtocolCompletionContributor" />
