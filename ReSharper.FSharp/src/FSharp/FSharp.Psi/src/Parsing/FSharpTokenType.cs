@@ -15,13 +15,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       public FSharpTokenNodeType(string name, int index) : base(name, index)
       {
-        FSharpNodeTypeIndexer.Instance.Add(this, index);
+        FSharpNodeTypesRegistry.Instance.Add(this, index);
         TokenRepresentation = name;
       }
 
       public FSharpTokenNodeType(string name, int index, string representation) : base(name, index)
       {
-        FSharpNodeTypeIndexer.Instance.Add(this, index);
+        FSharpNodeTypesRegistry.Instance.Add(this, index);
         TokenRepresentation = representation;
       }
 
