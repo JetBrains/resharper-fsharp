@@ -193,6 +193,12 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Module - Top - Attr 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top - Attr 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Line comment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Line comment 02``() = x.DoNamedTest()
+    [<Test>] member x.``Nowarn 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nowarn 02``() = x.DoNamedTest()
+    [<Test>] member x.``Nowarn 03``() = x.DoNamedTest()
+
 [<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 type FSharpCodeCleanupTest() =
     inherit CodeCleanupTestBase()
