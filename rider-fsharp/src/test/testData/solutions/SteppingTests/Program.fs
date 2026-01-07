@@ -3,3 +3,6 @@ type T() =
         () |> ignore
 
 let t = T()
+
+FunctionsModule.run()
+FunctionsLocal.run()

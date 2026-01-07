@@ -39,4 +39,77 @@ class FSharpSteppingTest : DebuggerTestBase() {
             resumeSession()
         }, true)
     }
+
+    @Test
+    fun testStepIntoFunction() {
+        testDebugProgram({
+            toggleBreakpoint("FunctionsModule.fs", 16)
+            toggleBreakpoint("FunctionsModule.fs", 17)
+            toggleBreakpoint("FunctionsModule.fs", 18)
+            toggleBreakpoint("FunctionsModule.fs", 19)
+            toggleBreakpoint("FunctionsLocal.fs", 16)
+            toggleBreakpoint("FunctionsLocal.fs", 17)
+            toggleBreakpoint("FunctionsLocal.fs", 18)
+            toggleBreakpoint("FunctionsLocal.fs", 19)
+
+        }, {
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at module f1 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into module f1")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at module f2 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into module f2")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at module f3 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into module f3")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at module f4 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into module f4")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at local f1 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into local f1")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at local f2 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into local f2")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at local f3 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into local f3")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at local f4 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into local f4")
+
+            resumeSession()
+        }, true)
+    }
+
 }

@@ -1,0 +1,97 @@
+Stopped at module f1 call:
+--> FunctionsModule.fs:16(138,143) // f1 ()
+FunctionsModule.run() in SteppingTests.dll
+
+Stepped into module f1:
+--> FunctionsModule.fs:4(40,41) // 1
+FunctionsModule.f1() in SteppingTests.dll
+
+Stopped at module f2 call:
+--> FunctionsModule.fs:17(156,160) // f2 1
+FunctionsModule.run() in SteppingTests.dll
+
+Stepped into module f2:
+--> FunctionsModule.fs:7(58,63) // x + 1
+FunctionsModule.f2() in SteppingTests.dll
+    x = {int} 1
+
+Stopped at module f3 call:
+--> FunctionsModule.fs:18(173,179) // f3 1 2
+FunctionsModule.run() in SteppingTests.dll
+
+Stepped into module f3:
+--> FunctionsModule.fs:10(82,87) // a + b
+FunctionsModule.f3() in SteppingTests.dll
+    a = {int} 1
+    b = {int} 2
+
+Stopped at module f4 call:
+--> FunctionsModule.fs:19(192,198) // f4 1 2
+FunctionsModule.run() in SteppingTests.dll
+
+Stepped into module f4:
+--> FunctionsModule.fs:13(106,111) // a + 1
+FunctionsModule.f4<int>() in SteppingTests.dll
+    a = {int} 1
+    b = {int} 2
+    +[Type variables]
+
+Stopped at local f1 call:
+--> FunctionsLocal.fs:16(169,174) // f1 ()
+FunctionsLocal.run() in SteppingTests.dll
+    +f1 = FunctionsLocal.f1@5
+    +f2 = FunctionsLocal.f2@8
+    +f3 = FunctionsLocal.f3@11
+    +f4 = FunctionsLocal.f4@13
+
+Stepped into local f1:
+--> FunctionsLocal.fs:5(60,61) // 1
+FunctionsLocal.f1@5.Invoke() in SteppingTests.dll
+    +this = FunctionsLocal.f1@5
+    unitVar0 = {Unit} null
+
+Stopped at local f2 call:
+--> FunctionsLocal.fs:17(187,191) // f2 1
+FunctionsLocal.run() in SteppingTests.dll
+    +f1 = FunctionsLocal.f1@5
+    +f2 = FunctionsLocal.f2@8
+    +f3 = FunctionsLocal.f3@11
+    +f4 = FunctionsLocal.f4@13
+
+Stepped into local f2:
+--> FunctionsLocal.fs:8(86,91) // x + 1
+FunctionsLocal.f2@8.Invoke() in SteppingTests.dll
+    +this = FunctionsLocal.f2@8
+    x = {int} 1
+
+Stopped at local f3 call:
+--> FunctionsLocal.fs:18(204,210) // f3 1 2
+FunctionsLocal.run() in SteppingTests.dll
+    +f1 = FunctionsLocal.f1@5
+    +f2 = FunctionsLocal.f2@8
+    +f3 = FunctionsLocal.f3@11
+    +f4 = FunctionsLocal.f4@13
+
+Stepped into local f3:
+--> FunctionsLocal.fs:11(118,123) // a + b
+FunctionsLocal.f3@11.Invoke() in SteppingTests.dll
+    +this = FunctionsLocal.f3@11
+    a = {int} 1
+    b = {int} 2
+
+Stopped at local f4 call:
+--> FunctionsLocal.fs:19(223,229) // f4 1 2
+FunctionsLocal.run() in SteppingTests.dll
+    +f1 = FunctionsLocal.f1@5
+    +f2 = FunctionsLocal.f2@8
+    +f3 = FunctionsLocal.f3@11
+    +f4 = FunctionsLocal.f4@13
+
+Stepped into local f4:
+--> FunctionsLocal.fs:14(150,155) // a + 1
+FunctionsLocal.f4@13T<int>.Invoke() in SteppingTests.dll
+    +this = FunctionsLocal.f4@13T<int>
+    a = {int} 1
+    b = {int} 2
+    +[Type variables]
+

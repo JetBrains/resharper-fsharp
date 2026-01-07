@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="FunctionsLocal.fs" />
+        <Compile Include="FunctionsModule.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
