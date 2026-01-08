@@ -1,0 +1,18 @@
+let f x = async {
+    ()
+}
+
+let f x = async 1 {
+    ()
+}
+
+do
+    let f x = async {
+        ()
+    }
+
+    let f x = async 1 {
+        ()
+    }
+
+    ()

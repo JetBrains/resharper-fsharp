@@ -20,5 +20,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context) =>
       visitor.VisitNode(this, context);
+
+    public override void BeforeSubTreeChanged(ITreeNode elementContainingChanges)
+    {
+      this.OpenChameleon();
+      base.BeforeSubTreeChanged(elementContainingChanges);
+    }
   }
 }

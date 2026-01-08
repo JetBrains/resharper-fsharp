@@ -179,4 +179,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public static bool IsLambdaExpression([NotNull] this IChameleonExpression expr) =>
       expr.NotNull().Check(FSharpExpressionUtil.IsLambdaExpressionFunc, FcsExpressionUtil.IsLambdaExpressionFunc);
   }
+
+  public static class FSharpChameleonExpressionOwnerUtil
+  {
+    public static void OpenChameleon([CanBeNull] this ITreeNode treeNode)
+    {
+      if (treeNode is IFSharpChameleonExpressionOwner chameleonExpressionOwner)
+        _ = chameleonExpressionOwner.ChameleonExpression?.FirstChild;
+    }
+  }
 }
