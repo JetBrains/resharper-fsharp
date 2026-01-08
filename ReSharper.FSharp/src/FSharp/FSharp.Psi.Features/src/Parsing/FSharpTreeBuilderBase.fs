@@ -68,6 +68,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
 
     member x.AdvanceLexer() =
         if nextDirectiveOffset <> -1 && x.CurrentOffset = nextDirectiveOffset then
+            while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
+                x.Builder.AdvanceLexer() |> ignore
+
             let (WarningDirectiveRange directiveRange) = warnDirectives.Head
             setWarnDirectives warnDirectives.Tail
 

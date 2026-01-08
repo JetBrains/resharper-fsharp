@@ -1,0 +1,4 @@
+module Module
+
+let x = 5 
+#nowarn 1
