@@ -1,0 +1,6 @@
+﻿module MyModule =
+    let zzz = async {
+        return ()
+    }
+
+    zzz

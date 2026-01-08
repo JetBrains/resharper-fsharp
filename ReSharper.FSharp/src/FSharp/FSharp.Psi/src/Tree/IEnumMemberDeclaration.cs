@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IEnumCaseDeclaration : IFSharpTypeMemberDeclaration, ITypeMemberDeclaration
+  public partial interface IEnumCaseDeclaration : IFSharpTypeMemberDeclaration, ITypeMemberDeclaration, IFSharpChameleonExpressionOwner
   {
   }
 }

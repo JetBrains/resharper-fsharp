@@ -8,6 +8,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -215,11 +216,11 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
     let elementFactory = fsFile.CreateElementFactory()
 
     let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
-        moduleMember.InnerTokens() |> Seq.iter ignore
+        moduleMember.OpenChameleon()
         ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
-        anchor.InnerTokens() |> Seq.iter ignore
+        anchor.OpenChameleon()
         ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
 
     let duplicates (ns: string) (openStatement: IOpenStatement) =
