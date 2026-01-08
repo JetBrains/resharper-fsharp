@@ -14,6 +14,10 @@ type FSharpCodeFormatterTest() =
 
     override x.RelativeTestDataPath = "features/service/codeFormatter"
 
+    // todo: formatter: align with the rest of the body
+    [<Test>] member x.``Directive - Nowarn 01``() = x.DoNamedTest()
+    [<Test>] member x.``Directive - Nowarn 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - App - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - CompExpr 02``() = x.DoNamedTest()
