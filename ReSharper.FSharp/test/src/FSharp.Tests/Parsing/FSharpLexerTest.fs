@@ -175,3 +175,6 @@ type FSharpLexerTest() =
     [<Test>] member x.``Identifiers 02 - Unfinished backticked``() = x.DoNamedTest()
 
     [<Test>] member x.``Anonymous Records``() = x.DoNamedTest()
+
+    [<Test>] member x.``Directives 01 - nowarn``() = x.DoNamedTest()
+    [<Test>] member x.``Directives 02 - warnon``() = x.DoNamedTest()

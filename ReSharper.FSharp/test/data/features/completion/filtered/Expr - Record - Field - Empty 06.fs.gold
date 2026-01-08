@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3870
+Count: 3871
 Focus: Soft
 Range: "{ ♦ }"
 
@@ -234,6 +234,7 @@ voption
 #nowarn
 #r
 #time
+#warnon
 F1                          int
 F2                          int
 F3                          int
@@ -3893,6 +3894,7 @@ second |(in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 #nowarn
 #r
 #time
+#warnon
 AbstractClassAttribute
 AllowNullLiteralAttribute
 Array
