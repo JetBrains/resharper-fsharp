@@ -65,6 +65,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Inline - Not allowed - Active pattern 03 - Param``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Not allowed - Union case 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module binding 01``() = x.DoNamedTest()
     [<Test>] member x.``Module binding - Simple pattern, declaration``() = x.DoNamedTest()
     [<Test>] member x.``Module binding - Simple pattern, reference``() = x.DoNamedTest()
     [<Test>] member x.``Module binding - Function``() = x.DoNamedTest()

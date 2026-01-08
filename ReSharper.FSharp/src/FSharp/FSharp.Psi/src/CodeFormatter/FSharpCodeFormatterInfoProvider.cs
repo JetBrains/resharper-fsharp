@@ -111,12 +111,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Name("BindingBody")
         .Where(
           Parent().In(ElementBitsets.BINDING_BIT_SET.Union(ElementType.DO_STATEMENT, ElementType.DO_EXPR)),
-          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET.Union(ElementType.CHAMELEON_EXPRESSION)).Satisfies((node,
-            _) => node.Node switch
-          {
-            IChameleonExpression { Expression: ILambdaExpr } or ILambdaExpr => false,
-            _ => true
-          })
+          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET.Union(ElementType.CHAMELEON_EXPRESSION))
+            .Satisfies((node, _) => ForceInsertLineBreak(node.Node))
         )
         .Return(WrapType.KeepTogether | WrapType.LineBreakBeforeIfMultiline)
         .Build();
@@ -147,6 +143,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         )
         .Return(IntervalFormatType.InsertNewLineConditionally)
         .Build();
+      return;
+
+      bool ForceInsertLineBreak(ITreeNode treeNode)
+      {
+        var expr =
+          treeNode switch
+          {
+            IChameleonExpression chameleonExpression => chameleonExpression.Expression,
+            IExpression expression => expression,
+            _ => null
+          };
+
+        return expr switch
+        {
+          ILambdaExpr => false,
+          IPrefixAppExpr { ArgumentExpression: IComputationExpr } => false,
+          _ => true
+        };
+      }
     }
 
     public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
@@ -606,7 +621,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IndentType.AlignThrough)
         .Build();
 
-      DescribeNestedAlignment("PrefixAppAlignment", ElementType.PREFIX_APP_EXPR);
+      Describe<IndentingRule>()
+        .Name("PrefixAppAlignmentForNonComputationExpressionArg")
+        .Where(Node().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, _) =>
+          !IsNestedRefOrAppExpr(node.NodeOrNull) && IsPrefixAppWithNoComputationExprArg(node)))
+        .Return(IndentType.AlignThrough)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("PrefixAppNoAlignmentForComputationExpressionArg")
+        .Where(Node().In(ElementType.PREFIX_APP_EXPR).Satisfies((node, _) => 
+          !IsNestedRefOrAppExpr(node.NodeOrNull) && !IsPrefixAppWithNoComputationExprArg(node)))
+        .Return(IndentType.ExternalNoIndent)
+        .Build();
+
       DescribeNestedAlignment("RefExprAppAlignment", ElementType.REFERENCE_EXPR);
       DescribeNestedAlignment("FunctionTypeUsageAlignment", ElementType.FUNCTION_TYPE_USAGE);
       DescribeNestedAlignment("ArrayTypeUsageAlignment", ElementType.ARRAY_TYPE_USAGE);
@@ -685,6 +713,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IndentType.StartAfterFirstToken | IndentType.EndAtExternal)
         .Build();
     }
+
+    private static bool IsPrefixAppWithNoComputationExprArg(VirtNode node) =>
+      node.Node is IPrefixAppExpr { ArgumentExpression: not IComputationExpr };
 
     private void DescribeNestedAlignment(string title, NodeType nodeType) =>
       Describe<IndentingRule>()
