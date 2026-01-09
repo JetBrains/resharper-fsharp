@@ -74,6 +74,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Auto properties 02, compiled name``() = x.DoNamedTest()
 
     [<Test>] member x.``Members 01 - Virtual``() = x.DoNamedTest()
+    [<Test>] member x.``Members 02 - Virtual``() = x.DoNamedTest()
 
     [<Test>] member x.``Methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Methods 02, compiled name``() = x.DoNamedTest()
