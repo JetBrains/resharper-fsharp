@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -36,23 +37,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static bool CalcHasDefaultImplementation([CanBeNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv is not {IsDispatchSlot: true})
+      if (mfv is not { IsDispatchSlot: true })
         return false;
 
-      var mfvEntity = mfv.DeclaringEntity;
+      var mfvEntity = mfv.DeclaringEntity?.Value;
       if (mfvEntity == null)
         return false;
 
       var logicalName = mfv.LogicalName;
-      var mfvType = mfv.FullType.GenericArguments[1];
 
-      return mfvEntity.Value.MembersFunctionsAndValues.Any(m =>
+      return mfvEntity.MembersFunctionsAndValues.Any(m =>
         m.IsOverrideOrExplicitInterfaceImplementation &&
         logicalName == m.LogicalName &&
-        (m.XmlDocSig == mfv.XmlDocSig && m.ImplementedAbstractSignatures.Count == 0 ||
-         mfvType.Equals(m.FullType) &&
-         m.ImplementedAbstractSignatures.Count == 1 &&
-         m.ImplementedAbstractSignatures[0].DeclaringType.Equals(mfvEntity.Value.AsType())));
+        m.XmlDocSig == mfv.XmlDocSig &&
+        m.ImplementedAbstractSignatures.SingleItem() is { DeclaringType: { HasTypeDefinition: true } declaringType } &&
+        declaringType.TypeDefinition.Equals(mfvEntity));
     }
 
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
