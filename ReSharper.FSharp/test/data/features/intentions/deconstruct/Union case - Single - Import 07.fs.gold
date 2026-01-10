@@ -11,3 +11,6 @@ module Nested1 =
 
     module Module22 =
         let (A {spotstart#1}i{spotend#1}{caret}) = Nested21.Nested3.A 1
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item, _

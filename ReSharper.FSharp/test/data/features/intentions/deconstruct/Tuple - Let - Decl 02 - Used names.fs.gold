@@ -1,2 +1,7 @@
 ﻿let i1 = 1
 let {spotstart#1}i{spotend#1}, {spotstart#2}i2{spotend#2}, {spotstart#3}i3{spotend#3}{caret} = 1, 2, 3
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i2, item2, _
+  spot#3 [Count: 3, Focus: HardAtStart] i3, item3, _

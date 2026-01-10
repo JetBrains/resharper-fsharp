@@ -3,3 +3,6 @@
 
 let A {spotstart#1}i{spotend#1}{caret} as a = A 1
 let b = a
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item, _

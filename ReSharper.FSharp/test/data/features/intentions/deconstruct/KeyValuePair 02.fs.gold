@@ -1,3 +1,7 @@
 ﻿open System.Collections.Generic
 
 let (KeyValue({spotstart#1}s{spotend#1}, {spotstart#2}i{spotend#2}{caret})) = KeyValuePair("", 1)
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] s, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i, item2, _

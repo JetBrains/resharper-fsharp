@@ -1,2 +1,6 @@
 ﻿type T2() =
     member this.M({spotstart#1}a{spotend#1}, {spotstart#2}b{spotend#2}{caret} as x) = fst x
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] a, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] b, item2, _

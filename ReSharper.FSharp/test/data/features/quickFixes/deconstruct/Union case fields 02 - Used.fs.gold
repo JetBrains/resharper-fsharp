@@ -4,3 +4,7 @@
 
 match A with
 | B({spotstart#1}i{spotend#1}, {spotstart#2}i1{spotend#2}{caret}) -> ignore b
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i1, item2, _

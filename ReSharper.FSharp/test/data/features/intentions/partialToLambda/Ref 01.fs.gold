@@ -1,3 +1,6 @@
 ﻿module Module
 
 fun {spotstart#1}foo{spotend#1} -> {caret}id foo
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 2, Focus: HardAtStart] foo, _

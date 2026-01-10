@@ -2,3 +2,6 @@
     | A of field: int
 
 let (A {spotstart#1}field{spotend#1}{caret}) = A 1
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] field, i, item, _

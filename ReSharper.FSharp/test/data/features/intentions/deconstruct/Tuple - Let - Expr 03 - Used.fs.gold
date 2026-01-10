@@ -1,3 +1,8 @@
 ﻿do
     let {spotstart#1}i1{spotend#1}, {spotstart#2}i2{spotend#2}, {spotstart#3}i3{spotend#3}{caret} as i = 1, 2, 3
     i |> ignore
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i1, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i2, item2, _
+  spot#3 [Count: 3, Focus: HardAtStart] i3, item3, _

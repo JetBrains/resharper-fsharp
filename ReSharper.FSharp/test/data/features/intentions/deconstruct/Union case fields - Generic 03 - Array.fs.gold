@@ -3,3 +3,6 @@
 
 match C([| 1 |]) with
 | C {spotstart#1}int32s{spotend#1}{caret} -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] int32s, item, _

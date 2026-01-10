@@ -7,3 +7,7 @@ type U =
 match A with
 | B({spotstart#1}i{spotend#1}, Some 1, {spotstart#2}world{spotend#2}{caret}) -> ()
 | _ -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 4, Focus: HardAtStart] world, s, item3, _

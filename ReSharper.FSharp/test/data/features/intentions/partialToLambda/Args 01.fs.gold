@@ -3,3 +3,6 @@
 let f a b = a + b
 
 fun {spotstart#1}o{spotend#1} -> {caret}f a o
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 2, Focus: HardAtStart] o, _

@@ -1,2 +1,6 @@
 ﻿let f ({spotstart#1}s{spotend#1}, {spotstart#2}a{spotend#2}{caret} as s1) s2 : string * string =
     fst s1, snd s2
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] s, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] a, item2, _

@@ -3,3 +3,6 @@
 async {
     let {spotstart#1}objectFunc{spotend#1} = id{caret}
 }
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] objectFunc, identity, func

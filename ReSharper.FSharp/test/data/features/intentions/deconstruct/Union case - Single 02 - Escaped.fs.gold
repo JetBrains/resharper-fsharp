@@ -3,3 +3,6 @@
 
 match ``A B`` 1 with
 | ``A B`` {spotstart#1}field{spotend#1}{caret} -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] field, i, item, _

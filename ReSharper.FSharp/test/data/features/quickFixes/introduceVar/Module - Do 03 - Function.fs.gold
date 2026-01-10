@@ -1,1 +1,4 @@
 ﻿let {spotstart#1}identity{spotend#1} = id{caret}
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 2, Focus: HardAtStart] identity, func
