@@ -5,3 +5,9 @@ type U =
 
 match A (true, 2, null, 4.) with
 | A({spotstart#1}someFieldName{spotend#1}, {spotstart#2}i{spotend#2}, {spotstart#3}stringBuilder{spotend#3}, {spotstart#4}anotherField{spotend#4}{caret}) -> failwith "todo"
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 6, Focus: HardAtStart] someFieldName, fieldName, name, b, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i, item2, _
+  spot#3 [Count: 4, Focus: HardAtStart] stringBuilder, builder, item3, _
+  spot#4 [Count: 5, Focus: HardAtStart] anotherField, field, f, item4, _

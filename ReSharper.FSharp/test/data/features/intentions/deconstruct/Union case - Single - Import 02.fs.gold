@@ -7,3 +7,6 @@ module Module1 =
 
 module Module2 =
     let (Module1.A {spotstart#1}i{spotend#1}{caret}) = Module1.A 1
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item, _

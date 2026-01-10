@@ -1,2 +1,6 @@
 ﻿match 1, "" with
 | {spotstart#1}i{spotend#1}, {spotstart#2}s{spotend#2}{caret} -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] s, item2, _

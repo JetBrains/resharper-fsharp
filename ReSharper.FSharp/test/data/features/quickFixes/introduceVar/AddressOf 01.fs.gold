@@ -2,3 +2,6 @@
 
 let mutable s = "".ToString(){caret}
 &{spotstart#1}s{spotend#1}
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 1, Focus: HardAtStart] s

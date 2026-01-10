@@ -3,3 +3,6 @@
 do
     let {spotstart#1}nameLength{spotend#1} = name.Length{caret}
     ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] nameLength, length, i

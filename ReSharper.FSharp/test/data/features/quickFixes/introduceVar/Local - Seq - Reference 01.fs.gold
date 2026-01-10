@@ -3,3 +3,6 @@
 do
     let {spotstart#1}name{spotend#1} = name{caret}
     ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 2, Focus: HardAtStart] name, s

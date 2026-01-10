@@ -3,3 +3,6 @@
 let f {spotstart#1}x{spotend#1}{caret} =
     match x with
     | "" -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 1, Focus: HardAtStart] s

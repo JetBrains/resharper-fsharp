@@ -4,3 +4,7 @@
     let _ = i
     ()
 )
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i1, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] s, item2, _

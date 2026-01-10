@@ -7,3 +7,6 @@ type U =
 
 match A 1 with
 | Id(A {spotstart#1}i{spotend#1}{caret}) -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item, _

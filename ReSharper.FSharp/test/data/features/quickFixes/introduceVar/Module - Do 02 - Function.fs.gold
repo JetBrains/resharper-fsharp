@@ -1,3 +1,6 @@
 ﻿let foo (x: string) = ()
 
 let {spotstart#1}stringFunc{spotend#1} = foo{caret}
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 2, Focus: HardAtStart] stringFunc, func

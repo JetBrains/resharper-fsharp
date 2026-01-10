@@ -1,3 +1,7 @@
 ﻿do
     let f ({spotstart#1}i3{spotend#1}, {spotstart#2}foo{spotend#2}{caret} as s1) (i as i1 as i2) =
         fst s1 + i
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i3, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] foo, item2, _

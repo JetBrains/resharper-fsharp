@@ -4,3 +4,6 @@
 do
     let {spotstart#1}roar{spotend#1} = { Field = 123 }{caret}
     ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 1, Focus: HardAtStart] roar

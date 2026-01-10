@@ -3,3 +3,7 @@
 
 match C(1, Some "") with
 | C({spotstart#1}i{spotend#1}, {spotstart#2}stringOption{spotend#2}{caret}) -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 4, Focus: HardAtStart] stringOption, option, item2, _

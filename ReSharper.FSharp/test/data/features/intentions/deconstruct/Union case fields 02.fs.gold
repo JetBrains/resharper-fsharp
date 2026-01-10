@@ -6,3 +6,7 @@
 
 match D with
 | B({spotstart#1}i{spotend#1}, {spotstart#2}f{spotend#2}{caret}) -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] f, item2, _

@@ -8,3 +8,6 @@ type T() =
         fun _ ->
             {spotstart#1}thisProtectedProp{spotend#1}
         |> ignore
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] thisProtectedProp, xProtectedProp, protectedProp, prop

@@ -7,3 +7,7 @@ type U =
 match A with
 | B(Some 1, {spotstart#1}int32Option{spotend#1}, {spotstart#2}world{spotend#2}{caret}) -> ()
 | _ -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 5, Focus: HardAtStart] int32Option, option, foo, item2, _
+  spot#2 [Count: 4, Focus: HardAtStart] world, s, item3, _

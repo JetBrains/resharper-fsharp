@@ -9,3 +9,6 @@ match A with
            1, {spotstart#1}world{spotend#1}{caret}) ->
     ()
 | _ -> ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] world, s, item3, _

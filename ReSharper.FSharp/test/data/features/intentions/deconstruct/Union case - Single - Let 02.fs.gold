@@ -2,3 +2,7 @@
     | A of field: int * string
 
 let (A({spotstart#1}field{spotend#1}, {spotstart#2}s{spotend#2}{caret})) = A (1, "")
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] field, i, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] s, item2, _

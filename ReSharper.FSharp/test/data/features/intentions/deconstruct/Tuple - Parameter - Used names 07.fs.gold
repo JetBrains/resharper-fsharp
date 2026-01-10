@@ -4,3 +4,8 @@ let f (({spotstart#1}i1{spotend#1}, {spotstart#2}i2{spotend#2}, {spotstart#3}s1{
     let i1 = ()
     ignore i1, s
     ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 3, Focus: HardAtStart] i1, item1, _
+  spot#2 [Count: 3, Focus: HardAtStart] i2, item2, _
+  spot#3 [Count: 3, Focus: HardAtStart] s1, item3, _

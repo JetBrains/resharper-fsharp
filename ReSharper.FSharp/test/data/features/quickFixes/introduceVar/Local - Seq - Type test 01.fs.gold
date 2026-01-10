@@ -1,3 +1,6 @@
 ﻿do
     let {spotstart#1}b{spotend#1} = "" :? string{caret}
     ()
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 1, Focus: HardAtStart] b
