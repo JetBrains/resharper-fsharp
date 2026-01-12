@@ -91,6 +91,8 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Object Expr 03``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 04``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 05``() = x.DoNamedTest()
+    [<TestReferenceProjectOutput("AbstractMembers")>]
+    [<Test>] member x.``Object Expr 06``() = x.DoNamedTest()
 
     [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
 

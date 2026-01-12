@@ -223,7 +223,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
         var isCompiled = typeElement is ICompiledTypeElement;
         if (isCompiled)
-          return mfv.CompiledName;
+        {
+          var mfvCompiledName = mfv.CompiledName;
+          return mfv is { IsProperty: true, IsExtensionMember: false }
+            ? mfvCompiledName.SubstringAfter("get_").SubstringAfter("set_")
+            : mfvCompiledName;
+        }
 
         return mfv.LogicalName;
       }

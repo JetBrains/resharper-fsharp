@@ -15,6 +15,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpClassLib", "FSharpCla
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ModuleMembers", "ModuleMembers\ModuleMembers.fsproj", "{51D06D99-4C39-4105-8DD0-55F2D1B1CC9E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AbstractMembers", "AbstractMembers\AbstractMembers.fsproj", "{78228E45-825D-43D8-A8EB-5D8D5916C2E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -35,5 +37,7 @@ Global
 		{E1848B22-15CE-48E5-9993-DF9DB033F45C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51D06D99-4C39-4105-8DD0-55F2D1B1CC9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51D06D99-4C39-4105-8DD0-55F2D1B1CC9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78228E45-825D-43D8-A8EB-5D8D5916C2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78228E45-825D-43D8-A8EB-5D8D5916C2E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

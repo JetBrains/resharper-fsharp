@@ -1,0 +1,6 @@
+﻿{ new I1 with
+    member this.P1 = {selstart}failwith "todo"{selend}
+    member this.P2 = failwith "todo"
+    member this.P3 with set value = failwith "todo"
+    member this.P4 = failwith "todo"
+    member this.P4 with set value = failwith "todo" }
