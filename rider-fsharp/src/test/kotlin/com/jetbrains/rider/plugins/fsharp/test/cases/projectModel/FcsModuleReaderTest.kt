@@ -5,7 +5,6 @@ import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
-import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
@@ -21,7 +20,7 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
+import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.util.idea.syncFromBackend
@@ -118,7 +117,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testUnloadReloadCSharp() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
-        assertAllProjectsWereLoaded(project)
+        assertAllProjectsWereLoaded()
         dumpModuleReader(it, "Init", project)
 
         openFsFileDumpModuleReader(it, "1. Open F# file", true, emptyList())
@@ -147,7 +146,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testTypeInsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
-        assertAllProjectsWereLoaded(project)
+        assertAllProjectsWereLoaded()
         openFsFileDumpModuleReader(it, "Init", true, emptyList())
 
         addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
@@ -201,7 +200,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testTypeOutsideClassUnloadReload() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
-        assertAllProjectsWereLoaded(project)
+        assertAllProjectsWereLoaded()
         openFsFileDumpModuleReader(it, "Init", true, emptyList())
 
         addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
@@ -228,7 +227,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   fun testLoadReferenced() {
     executeWithGold(testGoldFile) {
       withNonFSharpProjectReferences {
-        assertAllProjectsWereLoaded(project)
+        assertAllProjectsWereLoaded()
         openFsFileDumpModuleReader(it, "Init", false, listOf("CSharpProject"))
 
         waitForDaemonCloseAllOpenEditors(project)
@@ -245,7 +244,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   @Test
   fun testGotoUsagesFromCSharp() {
     withNonFSharpProjectReferences {
-      assertAllProjectsWereLoaded(project)
+      assertAllProjectsWereLoaded()
       withOpenedEditor("CSharpProject/Class1.cs", "Class1.cs") {
         waitForNextDaemon()
         callAction(IdeActions.ACTION_GOTO_DECLARATION)
@@ -258,7 +257,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   @Test
   fun testGotoUsagesFromCSharpChangeCSharp() {
     withNonFSharpProjectReferences {
-      assertAllProjectsWereLoaded(project)
+      assertAllProjectsWereLoaded()
       withOpenedEditor("CSharpProject/Class1.cs", "Class1.cs") {
         typeWithLatency("1")
         waitForNextDaemon()
@@ -272,7 +271,7 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
   @Test
   fun testGotoUsagesFromCSharpChangeCSharp2() {
     withNonFSharpProjectReferences {
-      assertAllProjectsWereLoaded(project)
+      assertAllProjectsWereLoaded()
 
       withOpenedEditor("FSharpProject/Library.fs") {
         waitForNextDaemon()

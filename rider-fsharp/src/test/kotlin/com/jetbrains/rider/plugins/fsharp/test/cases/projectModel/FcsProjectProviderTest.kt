@@ -15,7 +15,6 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.framework.assertAllProjectsWereLoaded
 import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.BeforeMethod
@@ -63,7 +62,7 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
   @Solution("ProjectReferencesFSharp")
   @Test
   fun projectReferencesFSharp() {
-    assertAllProjectsWereLoaded(project)
+    assertAllProjectsWereLoaded()
     assertHasErrorsAndProjectStampAndReferences("ReferenceFrom/Library.fs", true, emptyList())
 
     waitForDaemonCloseAllOpenEditors(project)
@@ -88,7 +87,7 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
   @Test
   @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharp() {
-    assertAllProjectsWereLoaded(project)
+    assertAllProjectsWereLoaded()
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
 
     waitForDaemonCloseAllOpenEditors(project)
@@ -121,7 +120,7 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
   @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharpNoModuleReader() {
     withoutNonFSharpProjectReferences {
-      assertAllProjectsWereLoaded(project)
+      assertAllProjectsWereLoaded()
       assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", true, emptyList())
 
       waitForDaemonCloseAllOpenEditors(project)
