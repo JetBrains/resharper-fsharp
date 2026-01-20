@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 
@@ -160,7 +161,7 @@ public static class FSharpAccessRightUtil
       if (accessRights == AccessRights.PRIVATE && !IsTheSameOwner(fsTypeElement, context))
         return false;
 
-      if (accessRights == AccessRights.INTERNAL && !typeElement.IsInternalsVisibleToApplies(context.GetPsiModule()))
+      if (accessRights == AccessRights.INTERNAL && !AccessUtil.IsInternalSymbolAccessible(fsTypeElement, context.GetPsiModule()))
         return false;
 
       if (fsTypeElement is IFSharpSourceTypeElement fsSourceTypeElement)
