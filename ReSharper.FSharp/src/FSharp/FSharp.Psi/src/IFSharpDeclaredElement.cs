@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     string SourceName { get; }
   }
 
-  public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement, IAccessRightsOwner
+  public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement, ITypeMember
   {
     ModuleMembersAccessKind AccessKind { get; }
   }
