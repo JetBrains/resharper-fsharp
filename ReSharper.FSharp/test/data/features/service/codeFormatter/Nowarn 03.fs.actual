@@ -1,0 +1,39 @@
+TearDown : LoggedErrors : first.Parent == last.Parent
+--- EXCEPTION #1/2 [AssertionException]
+Message = “first.Parent == last.Parent”
+Data.GoldUri = file:///C:/Programming/resharper-fsharp/ReSharper.FSharp/test/data/features/service/codeFormatter/Nowarn%2003.fs.gold#select
+Data.GoldFile = “C:\Programming\resharper-fsharp\ReSharper.FSharp\test\data\features\service\codeFormatter\Nowarn 03.fs.gold”
+Data.Directory = C:\Programming\resharper-fsharp\ReSharper.FSharp\test\data\features\service\codeFormatter
+Data.ReentrancyGuard.ActionName = “Src\BaseTest.cs::RunGuarded{DoTestSolution in fixture FSharpCodeFormatterTest}”
+StackTraceString = “
+  в JetBrains.Diagnostics.Assertion.Fail(String message) in Fail.il:line IL_0006 mvid B12F
+     в JetBrains.Diagnostics.Assertion.Assert(Boolean condition, String message) in Assert.il:line IL_0008 mvid B12F
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.FormattingRangeContext.Reuse(VirtNode first, VirtNode last, CodeFormattingContext context) in Reuse.il:line IL_004B mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.SequentialNodeIterator`2.IterateOnce(VirtNode untilNode, IteratorState untilState) in IterateOnce.il:line IL_0327 mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.SequentialNodeIterator`2.Iterate(VirtNode untilNode, IteratorState untilState, Boolean shouldRunFinalizer) in Iterate.il:line IL_0044 mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.SequentialNodeIterator`2.IterateWithProgress(VirtNode untilNode, IteratorState untilState, String name, IProgressIndicator progress) in IterateWithProgress.il:line IL_006F mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.SimpleFormatProcessor.Process[TContext,TSettingsKey](TContext context, FmtSettingsHolder`1 settings, ISimpleSequentialNodeProcessor`1 simpleProcessor, IProgressIndicator progressIndicator, String taskName) in Process.il:line IL_0000 mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.FormattingStage`2.DoFormat() in DoFormat.il:line IL_0037 mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.CodeFormatterBase`1.DoDeclarativeFormatChanges[TContext](FormatterInfoProviderBase`2 provider, FormatTask[] formatTasks, AdditionalFormatterParameters parameters, Action`4 beforeFormat, Action`4 afterFormat, FmtSettingsHolder`1 settings, TContext context) in DoDeclarativeFormatChanges.il:line IL_02AF mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.CodeFormatterBase`1.DoDeclarativeFormatChangesWithAccu[TContext](FormatterInfoProviderBase`2 provider, FormatTask[] formatTasks, AdditionalFormatterParameters parameters, Action`4 beforeFormat, Action`4 afterFormat, FmtSettingsHolder`1 settings, Int32 tabWidth, ICustomFormatterInfoProvider customProvider) in DoDeclarativeFormatChangesWithAccu.il:line IL_02BB mvid 51A8
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.CodeFormatterBase`1.DoDeclarativeFormat[TContext](FmtSettingsHolder`1 settings, FormatterInfoProviderBase`2 provider, ICustomFormatterInfoProvider customProvider, FormatTask[] formatTasks, AdditionalFormatterParameters parameters, Action`4 beforeFormat, Action`4 afterFormat) in DoDeclarativeFormat.il:line IL_00D9 mvid 51A8
+     в JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter.FSharpCodeFormatter.Format(FormatTask[] formatTasks, AdditionalFormatterParameters parameters) в C:\Programming\resharper-fsharp\ReSharper.FSharp\src\FSharp\FSharp.Psi\src\CodeFormatter\FSharpCodeFormatter.cs:строка 131
+     в JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter.FSharpCodeFormatter.Format(ITreeNode firstElement, ITreeNode lastElement, CodeFormatProfile profile, AdditionalFormatterParameters parameters) в C:\Programming\resharper-fsharp\ReSharper.FSharp\src\FSharp\FSharp.Psi\src\CodeFormatter\FSharpCodeFormatter.cs:строка 117
+     в JetBrains.ReSharper.Psi.Impl.CodeStyle.CodeFormatterBase`1.FormatFile(IFile fileNode, CodeFormatProfile profile, AdditionalFormatterParameters parameters) in FormatFile.il:line IL_00A5 mvid 51A8
+     в JetBrains.ReSharper.FeaturesTestFramework.Formatter.CodeFormatterWithExplicitSettingsTestBase`1.<>c__DisplayClass4_0.<DoTest>b__0(TestData testData, TextWriter writer) in CodeFormatterWithExplicitSettingsTestBase.il:line IL_0107 mvid 6447
+     в JetBrains.ReSharper.TestFramework.TestOptionsIterator.<>c__DisplayClass34_0.<Iterate>g__ActionWithNewSettings|0(Int32 i, TestData data) in TestOptionsIterator.il:line IL_0011 mvid EAE9 or TestOptionsIterator.il:line IL_0035 mvid EAE9
+     в JetBrains.ReSharper.TestFramework.TestOptionsIterator.NestedOptionsIterator.Iterate(Int32 indentLevel, Func`3 actionWithNewSettings, TestData data) in Iterate.il:line IL_0000 mvid EAE9
+     в JetBrains.ReSharper.TestFramework.TestOptionsIterator.Iterate(FileSystemPath location, IDocument document, ISolution solution, Lazy`1 boundStore, Action`2 runTestIteration, Action restoreState) in Iterate.il:line IL_0000 mvid EAE9 or Iterate.il:line IL_004F mvid EAE9
+     в JetBrains.ReSharper.TestFramework.TestOptionsIterator.Iterate(VirtualFileSystemPath location, IDocument document, ISolution solution, Action`2 func, Action restoreState) in Iterate.il:line IL_0000 mvid EAE9 or Iterate.il:line IL_004F mvid EAE9
+     в JetBrains.ReSharper.TestFramework.TestOptionsIterator.<>c__DisplayClass27_0.<Iterate>b__0(TextWriter writer) in TestOptionsIterator.il:line IL_0011 mvid EAE9 or TestOptionsIterator.il:line IL_0035 mvid EAE9
+     в JetBrains.TestFramework.Utils.TestUtil.WriteToMemory(Action`1 test, Encoding encoding, ImmutableArray`1 debuggableTextFilesIfKnown) in WriteToMemory.il:line IL_001F mvid B756
+     в JetBrains.TestFramework.BaseTestNoShell.<>c__DisplayClass97_0.<ExecuteWithSpecifiedGold>b__0() in BaseTestNoShell.il:line IL_0000 mvid B756
+     в JetBrains.TestFramework.BaseTestNoShell.CatchTestExceptions(FileSystemPath goldPath, Func`1 action) in CatchTestExceptions.il:line IL_0173 mvid B756
+     в JetBrains.TestFramework.BaseTestNoShell.ExecuteWithGold(String testName, Action`1 test, Boolean caseSensitive, Encoding encoding, Boolean fullDiff, Boolean showDiff, FileSystemPath sourcePath) in ExecuteWithGold.il:line IL_0197 mvid B756
+     в JetBrains.ReSharper.FeaturesTestFramework.Formatter.CodeFormatterWithExplicitSettingsTestBase`1.DoTest(Lifetime lifetime, IProject testProject) in DoTest.il:line IL_0095 mvid 6447
+     в JetBrains.ReSharper.TestFramework.BaseTestWithSingleProject.DoTest(Lifetime lifetime, ISolution solution) in DoTest.il:line IL_00A6 mvid EAE9
+     в JetBrains.ReSharper.TestFramework.BaseTestWithSolution.<>c__DisplayClass54_0.<DoTestSolution>b__2() in BaseTestWithSolution.il:line IL_0018 mvid EAE9
+     в JetBrains.Application.Threading.IShellLocksEx.ExecuteWithReadLock(IShellLocks shellLocks, Action action, CallerInfo& callerInfo) in ExecuteWithReadLock.il:line IL_0016 mvid DA97 or ExecuteWithReadLock.il:line IL_0028 mvid DA97
+     в JetBrains.Application.Threading.IShellLocksEx.ExecuteWithReadLock(IShellLocks shellLocks, Action action, String callerFilePath, String callerMemberName) in ExecuteWithReadLock.il:line IL_0016 mvid DA97 or ExecuteWithReadLock.il:line IL_0028 mvid DA97
+     в JetBrains.Threading.ReentrancyGuard.Execute(CallerInfo& caller, Action action) in Execute.il:line IL_0130 mvid 26A5
+”
