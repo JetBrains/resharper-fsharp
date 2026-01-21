@@ -1,0 +1,8 @@
+Stopped at Prop1 call:
+--> StepOutInitClass.fs:12(282,289) // T.Prop1
+StepOutInitClass.run() in SteppingTests.dll
+
+Stepped into Prop1:
+--> StepOutInitClass.fs:9(262,263) // 1
+StepOutInitClass.T.get_Prop1() in SteppingTests.dll
+

@@ -8,6 +8,8 @@
     <ItemGroup>
         <Compile Include="FunctionsLocal.fs" />
         <Compile Include="FunctionsModule.fs" />
+        <Compile Include="Tuples.fs" />
+        <Compile Include="StepOutInitClass.fs"/>
         <Compile Include="Program.fs"/>
     </ItemGroup>
 

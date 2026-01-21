@@ -112,4 +112,55 @@ class FSharpSteppingTest : DebuggerTestBase() {
         }, true)
     }
 
+    @Test
+    fun testTuples() {
+        testDebugProgram({
+            toggleBreakpoint("Tuples.fs", 13)
+            toggleBreakpoint("Tuples.fs", 14)
+            toggleBreakpoint("Tuples.fs", 15)
+            toggleBreakpoint("Tuples.fs", 16)
+        }, {
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at f1 with existing tuple")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into f1")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at f1 with new tuple")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into f1")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at f2 with existing tuple")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into f2")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at f2 with new tuple")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into f2")
+            resumeSession()
+        }, true)
+    }
+
+    @Test
+    fun testStepOutInitClass() {
+        testDebugProgram({
+            toggleBreakpoint("StepOutInitClass.fs", 12)
+        }, {
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at Prop1 call")
+
+            stepInto()
+            dumpFullCurrentData(message = "Stepped into Prop1")
+            resumeSession()
+        }, true)
+    }
 }

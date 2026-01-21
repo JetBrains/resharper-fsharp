@@ -1,0 +1,46 @@
+Stopped at f1 with existing tuple:
+--> Tuples.fs:13(108,112) // f1 t
+Tuples.run() in SteppingTests.dll
+    +t = {Tuple<int, int>} (1, 2)
+
+Stepped into f1:
+--> Tuples.fs:4(30,43) // fst x + snd x
+Tuples.f1() in SteppingTests.dll
+    +x = {Tuple<int, int>} (1, 2)
+    x_0 = {int} 1
+    x_1 = {int} 2
+
+Stopped at f1 with new tuple:
+--> Tuples.fs:14(117,126) // f1 (1, 2)
+Tuples.run() in SteppingTests.dll
+    +t = {Tuple<int, int>} (1, 2)
+
+Stepped into f1:
+--> Tuples.fs:4(30,43) // fst x + snd x
+Tuples.f1() in SteppingTests.dll
+    +x = {Tuple<int, int>} (1, 2)
+    x_0 = {int} 1
+    x_1 = {int} 2
+
+Stopped at f2 with existing tuple:
+--> Tuples.fs:15(131,135) // f2 t
+Tuples.run() in SteppingTests.dll
+    +t = {Tuple<int, int>} (1, 2)
+
+Stepped into f2:
+--> Tuples.fs:7(65,70) // a + b
+Tuples.f2() in SteppingTests.dll
+    a = {int} 1
+    b = {int} 2
+
+Stopped at f2 with new tuple:
+--> Tuples.fs:16(140,149) // f2 (1, 2)
+Tuples.run() in SteppingTests.dll
+    +t = {Tuple<int, int>} (1, 2)
+
+Stepped into f2:
+--> Tuples.fs:7(65,70) // a + b
+Tuples.f2() in SteppingTests.dll
+    a = {int} 1
+    b = {int} 2
+
