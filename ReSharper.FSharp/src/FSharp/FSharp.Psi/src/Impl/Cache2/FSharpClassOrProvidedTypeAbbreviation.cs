@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         ? new GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation>(type, this)
         : null;
 
-    public bool IsProvidedAndGenerated => myParts is TypeAbbreviationOrDeclarationPart { IsProvidedAndGenerated: true };
+    public bool IsProvidedAndGenerated => Parts is TypeAbbreviationOrDeclarationPart { IsProvidedAndGenerated: true };
 
     public override MemberPresenceFlag GetMemberPresenceFlag() =>
       ProvidedClass is { } x ? x.GetMemberPresenceFlag() : base.GetMemberPresenceFlag();
@@ -53,6 +53,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       ProvidedClass is { } x ? x.GetXmlDoc() : base.GetXMLDoc(inherit);
 
     bool ILanguageSpecificDeclaredElement.IsErased =>
-      myParts is TypeAbbreviationOrDeclarationPart { IsUnionCase: false, IsProvidedAndGenerated: false };
+      Parts is TypeAbbreviationOrDeclarationPart { IsUnionCase: false, IsProvidedAndGenerated: false };
   }
 }

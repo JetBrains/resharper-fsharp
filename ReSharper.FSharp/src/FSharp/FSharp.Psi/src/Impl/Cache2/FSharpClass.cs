@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       part is IClassPart and IFSharpTypePart typePart and not IModulePart && 
       typePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
+    protected override MemberDecoration Modifiers => Parts.GetModifiers();
     public string SourceName => this.GetSourceName();
 
     public virtual ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
