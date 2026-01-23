@@ -80,5 +80,5 @@ type FSharpCodeFoldingProcess(logger: ILogger) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeFoldingProcessFactory(logger: ILogger) =
     interface ICodeFoldingProcessorFactory with
-        member x.CreateProcessor() =
+        member x.CreateProcessor(settingsStore) =
             FSharpCodeFoldingProcess(logger) :> _
