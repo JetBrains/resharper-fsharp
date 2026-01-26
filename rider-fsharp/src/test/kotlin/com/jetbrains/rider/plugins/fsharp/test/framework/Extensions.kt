@@ -10,7 +10,7 @@ import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.protocol.IProtocolHost
 import com.jetbrains.rider.protocol.protocolHost
-import com.jetbrains.rider.settings.RiderSettingMaintenanceController
+import com.jetbrains.rider.settings.RiderSettingTestMaintenanceController
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.framework.waitBackend
@@ -31,7 +31,7 @@ fun Editor.dumpTypeProviders(stream: PrintStream) {
 }
 
 fun withSetting(project: Project, setting: String, enterValue: String, exitValue: String, function: () -> Unit) {
-  val settingController = RiderSettingMaintenanceController.getInstance(project.protocolHost)
+  val settingController = RiderSettingTestMaintenanceController.getInstance(project.protocolHost)
   settingController.setSetting(setting, enterValue)
   try {
     function()
