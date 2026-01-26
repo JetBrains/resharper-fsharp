@@ -193,6 +193,7 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
         let parameters = context.Parameters
         (parameters.Multiplier <> 1 || parameters.EvaluationMode = EvaluationMode.Full) &&
 
+        context.ShowImportItemsInBasicCompletion() &&
         not (FSharpCodeCompletionContext.isFullEvaluationDisabled context)
 
     member val ParseAndCheckResults =

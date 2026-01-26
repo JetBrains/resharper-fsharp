@@ -4,6 +4,7 @@ open System
 open System.Linq.Expressions
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -589,6 +590,8 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field 05``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 06``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 07``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
     [<Test; Explicit("243")>] member x.``Pattern - Union case - List 01``() = x.DoNamedTest()
