@@ -124,7 +124,7 @@ WebExtensions
 #nowarn
 #r
 #time
-                            [Other^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
+                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
 AbandonedMutexException |(in System.Threading)

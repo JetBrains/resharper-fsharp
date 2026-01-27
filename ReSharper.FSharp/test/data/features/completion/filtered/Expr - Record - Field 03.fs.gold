@@ -111,7 +111,7 @@ F̣tpWebRequest |(in System.Net)
 F̣tpWebResponse |(in System.Net)
 F̣unc |(in System)
 F̣unctionPointerAttributes |(in System.Reflection.Metadata.Ecma335)
-                            [Other^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
+                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 AceF̣lags |(in System.Security.AccessControl)
 ActivityIdF̣ormat |(in System.Diagnostics)
 ActivityTraceF̣lags |(in System.Diagnostics)
