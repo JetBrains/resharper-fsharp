@@ -17,6 +17,11 @@ public static class AdvertiseRiderBundledPlugin
         FSharpInRiderProduct.DotFilesFolder,
         allowCommonPluginFiles: false),
       new RiderBundledProductArtifact(
+        FSharpInRiderProduct.Debugger.ProductTechnicalName,
+        FSharpInRiderProduct.Debugger.DebuggerSubplatformName,
+        FSharpInRiderProduct.Debugger.DebuggerFolder,
+        allowCommonPluginFiles: false),
+      new RiderBundledProductArtifact(
         FSharpInRiderProduct.Fantomas.ProductTechnicalName,
         FSharpInRiderProduct.Fantomas.FantomasSubplatformName,
         FSharpInRiderProduct.Fantomas.FantomasFolder,

@@ -1,0 +1,24 @@
+Stopped on g1 call:
+--> NestedCalls.fs:37(548,566) // g1 T.Prop1 T.Prop2
+NestedCalls.run() in SmartStepIntoTest.dll
+    +g1 = NestedCalls.g1@32
+    +g2 = NestedCalls.g2@34
+
+Stepped into Prop2:
+--> NestedCalls.fs:5(83,84) // 2
+NestedCalls.T.get_Prop2() in SmartStepIntoTest.dll
+
+Stopped on g2 call:
+--> NestedCalls.fs:38(571,589) // g2 T.Prop1 T.Prop2
+NestedCalls.run() in SmartStepIntoTest.dll
+    +g1 = NestedCalls.g1@32
+    +g2 = NestedCalls.g2@34
+
+Stepped into g2:
+--> NestedCalls.fs:35(527,532) // a + 1
+NestedCalls.g2@34T<int>.Invoke() in SmartStepIntoTest.dll
+    +this = NestedCalls.g2@34T<int>
+    a = {int} 1
+    b = {int} 2
+    +[Type variables]
+

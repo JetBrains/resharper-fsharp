@@ -59,6 +59,7 @@
     <Compile Include="src\Debugger\FSharpDebuggerLocalSymbolProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
     <Compile Include="src\Debugger\ZoneMarker.fs" />
+    <Compile Include="src\Debugger\FSharpSourceCallableExpressionsProvider.fs" />
     <Compile Include="src\ExternalSources\FSharpDeclaredElementBinder.fs" />
     <Compile Include="src\ExternalSources\ZoneMarker.fs" />
     <Compile Include="src\FileTemplates\FileTemplates.fs" />

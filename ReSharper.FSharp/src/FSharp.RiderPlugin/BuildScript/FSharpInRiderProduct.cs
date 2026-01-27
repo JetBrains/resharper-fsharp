@@ -41,6 +41,38 @@ public class FSharpInRiderProduct
     };
   }
 
+  public class Debugger
+  {
+    public static readonly SubplatformName DebuggerSubplatformName = new((RelativePath)"Plugins" / "resharper-fsharp" / "ReSharper.FSharp" / "src" / "FSharp.Debugger");
+
+    public static readonly RelativePath DebuggerFolder = @"plugins\rider-plugins-fsharp\dotnetDebuggerWorker";
+
+    public const string ProductTechnicalName = "FSharp.Debugger";
+
+    [BuildStep]
+    public static SubplatformComponentForPackagingFast[] ProductMetaDependency(AllAssembliesOnSources allassSrc)
+    {
+      if (!allassSrc.Has(DebuggerSubplatformName))
+        return Array.Empty<SubplatformComponentForPackagingFast>();
+
+      return new[]
+      {
+        new SubplatformComponentForPackagingFast
+        (
+          DebuggerSubplatformName,
+          new JetPackageMetadata
+          {
+            Spec = new JetSubplatformSpec
+            {
+              ComplementedProductName = RiderConstants.ProductTechnicalName
+            }
+          }
+        )
+      };
+    }
+  }
+
+
   public class Fantomas
   {
     public static readonly SubplatformName FantomasSubplatformName = new((RelativePath)"Plugins" / "resharper-fsharp" / "ReSharper.FSharp" / "src" / "FSharp.Fantomas.Host");

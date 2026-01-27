@@ -1,0 +1,5 @@
+--> Inline.fs:11(130,154) // not (eq T.Prop1 T.Prop2)
+[get_Prop1]
+[get_Prop2]
+[eq]
+

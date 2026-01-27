@@ -1,0 +1,23 @@
+--> ChainedCalls.fs:22(352,370) // let t1 = T(T.Prop)
+[get_Prop]
+[.ctor]
+
+--> ChainedCalls.fs:23(375,397) // let t2 = new T(T.Prop)
+[get_Prop]
+[.ctor]
+
+--> ChainedCalls.fs:25(411,428) // t1.M1().M2().M3()
+[M1]
+[M2]
+[M3]
+
+--> ChainedCalls.fs:26(441,456) // t1.M4(t1.Prop1)
+[get_Prop1]
+[M4]
+
+--> ChainedCalls.fs:27(469,499) // t1.M5(t1.Prop1, t1.Prop2).M1()
+[get_Prop1]
+[get_Prop2]
+[M5]
+[M1]
+
