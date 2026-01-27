@@ -1,0 +1,11 @@
+Stopped on not call:
+--> Inline.fs:11(130,154) // not (eq T.Prop1 T.Prop2)
+Inline.run() in SmartStepIntoTest.dll
+
+Stepped into eq:
+--> Inline.fs:8(98,103) // a = b
+Inline.eq<int>() in SmartStepIntoTest.dll
+    a = {int} 1
+    b = {int} 2
+    +[Type variables]
+

@@ -108,6 +108,10 @@ val pluginFiles = listOf(
   "FSharp/FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol"
 )
 
+val debuggerFiles = listOf(
+  "FSharp.Debugger/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Debugger.dll",
+)
+
 val typeProvidersFiles = listOf(
   "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.dll",
   "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.xml",
@@ -207,6 +211,7 @@ tasks {
     dependsOn(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
     files = files.map { "$resharperPluginPath/src/$it" }
+    val debuggerFiles = debuggerFiles.map { "$resharperPluginPath/src/$it" }
     val fantomasHostFiles = fantomasHostFiles.map { "$resharperPluginPath/src/$it" }
     val typeProvidersFiles = typeProvidersFiles.map { "$resharperPluginPath/src/$it" }
 
@@ -228,6 +233,7 @@ tasks {
     }
 
     moveToPlugin(files, "dotnet")
+    moveToPlugin(debuggerFiles, "dotnetDebuggerWorker")
     moveToPlugin(fantomasHostFiles, "fantomas")
     moveToPlugin(typeProvidersFiles, "typeProviders")
     moveToPlugin(listOf("projectTemplates"), "projectTemplates")
@@ -242,6 +248,7 @@ tasks {
         }
       }
       validateFiles(files, "dotnet")
+      validateFiles(debuggerFiles, "dotnetDebuggerWorker")
       validateFiles(fantomasHostFiles, "fantomas")
       validateFiles(typeProvidersFiles, "typeProviders")
       validateFiles(listOf(externalAnnotationsDirectory), "dotnet/Extensions/com.jetbrains.rider.fsharp/annotations")

@@ -163,4 +163,36 @@ class FSharpSteppingTest : DebuggerTestBase() {
             resumeSession()
         }, true)
     }
+
+    @Test
+    fun testPipes() {
+        testDebugProgram({
+            toggleBreakpoint("Pipes.fs", 4)
+            toggleBreakpoint("Pipes.fs", 5)
+            toggleBreakpoint("Pipes.fs", 7)
+        }, {
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at the first empty list")
+            stepOver()
+            dumpFullCurrentData(message = "Stepped to ignore")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at the second empty list")
+            stepOver()
+            dumpFullCurrentData(message = "Stepped to List.map")
+            stepOver()
+            dumpFullCurrentData(message = "Stepped to ignore")
+            resumeSession()
+
+            waitForPause()
+            dumpFullCurrentData(message = "Stopped at the second empty list")
+            stepOver()
+            dumpFullCurrentData(message = "Stepped to List.map")
+            stepOver()
+            dumpFullCurrentData(message = "Stepped to ignore")
+            resumeSession()
+        }, true)
+    }
+
 }

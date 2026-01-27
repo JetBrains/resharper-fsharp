@@ -1,0 +1,50 @@
+--> NestedCalls.fs:21(267,277) // f1 T.Prop1
+[get_Prop1]
+[f1]
+
+--> NestedCalls.fs:22(282,293) // f1 (T.M1())
+[M1]
+[f1]
+
+--> NestedCalls.fs:23(298,316) // f1 (T.M2(T.Prop1))
+[get_Prop1]
+[M2]
+[f1]
+
+--> NestedCalls.fs:24(321,349) // f1 (T.M2(T.Prop1 + T.Prop2))
+[get_Prop1]
+[get_Prop2]
+[M2]
+[f1]
+
+--> NestedCalls.fs:25(354,381) // f1 (T.M3(T.Prop1, T.Prop2))
+[get_Prop1]
+[get_Prop2]
+[M3]
+[f1]
+
+--> NestedCalls.fs:26(386,404) // f2 T.Prop1 T.Prop2
+[get_Prop1]
+[get_Prop2]
+[f2]
+
+--> NestedCalls.fs:27(409,427) // f2 T.Prop1 T.Prop2
+[get_Prop1]
+[get_Prop2]
+[f2]
+
+--> NestedCalls.fs:29(441,458) // T.Prop1 + T.Prop2
+[get_Prop1]
+[get_Prop2]
+
+--> NestedCalls.fs:37(548,566) // g1 T.Prop1 T.Prop2
+[get_Prop1]
+[get_Prop2]
+[g1 (method name: InvokeFast)]
+
+--> NestedCalls.fs:38(571,589) // g2 T.Prop1 T.Prop2
+[get_Prop1]
+[get_Prop2]
+[Specialize (hidden)]
+[g2 (method name: InvokeFast)]
+

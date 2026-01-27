@@ -1,0 +1,42 @@
+Stopped at the first empty list:
+--> Pipes.fs:4(31,33) // []
+Pipes.run() in SteppingTests.dll
+
+Stepped to ignore:
+--> Pipes.fs:4(37,43) // ignore
+Pipes.run() in SteppingTests.dll
+    +Pipe #1 input at line 4 = {FSharpList<object>} Length = 0
+
+Stopped at the second empty list:
+--> Pipes.fs:5(48,50) // []
+Pipes.run() in SteppingTests.dll
+    +Pipe #1 input at line 4 = {FSharpList<object>} Length = 0
+
+Stepped to List.map:
+--> Pipes.fs:5(54,65) // List.map id
+Pipes.run() in SteppingTests.dll
+    +Pipe #2 input at line 5 = {FSharpList<object>} Length = 0
+
+Stepped to ignore:
+--> Pipes.fs:5(69,75) // ignore
+Pipes.run() in SteppingTests.dll
+    +Pipe #2 input at line 5 = {FSharpList<object>} Length = 0
+    +Pipe #2 stage #1 at line 5 = {FSharpList<object>} Length = 0
+
+Stopped at the second empty list:
+--> Pipes.fs:7(81,83) // []
+Pipes.run() in SteppingTests.dll
+    +Pipe #2 input at line 5 = {FSharpList<object>} Length = 0
+    +Pipe #2 stage #1 at line 5 = {FSharpList<object>} Length = 0
+
+Stepped to List.map:
+--> Pipes.fs:8(91,102) // List.map id
+Pipes.run() in SteppingTests.dll
+    +Pipe #3 input at line 7 = {FSharpList<object>} Length = 0
+
+Stepped to ignore:
+--> Pipes.fs:9(110,116) // ignore
+Pipes.run() in SteppingTests.dll
+    +Pipe #3 input at line 7 = {FSharpList<object>} Length = 0
+    +Pipe #3 stage #1 at line 8 = {FSharpList<object>} Length = 0
+

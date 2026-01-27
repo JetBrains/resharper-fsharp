@@ -6,11 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="FunctionsLocal.fs" />
-        <Compile Include="FunctionsModule.fs" />
-        <Compile Include="Tuples.fs" />
-        <Compile Include="StepOutInitClass.fs"/>
-        <Compile Include="Pipes.fs"/>
+        <Compile Include="NestedCalls.fs"/>
+        <Compile Include="ChainedCalls.fs"/>
+        <Compile Include="Inline.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
