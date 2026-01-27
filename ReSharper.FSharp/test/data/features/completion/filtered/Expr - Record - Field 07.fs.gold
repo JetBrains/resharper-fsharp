@@ -357,7 +357,7 @@ ṢyntaxErrorException |(in System.Data)
 ṢystemAcl |(in System.Security.AccessControl)
 ṢystemColors |(in System.Drawing)
 ṢystemException |(in System)
-                            [Other^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
+                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 AccessControlṢections |(in System.Security.AccessControl)
 ActivityṢamplingResult |(in System.Diagnostics)
 ActivityṢource |(in System.Diagnostics)

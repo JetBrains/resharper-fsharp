@@ -87,7 +87,7 @@ Ḅyte |(in System)
 ḄyteArrayContent |(in System.Net.Http)
 ḄyteConverter |(in System.ComponentModel)
 ḄyteType |(in Microsoft.VisualBasic.CompilerServices)
-                            [Other^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, FromSingleCompletion^]
+                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ActionḄlock |(in System.Threading.Tasks.Dataflow)
 ArmḄase |(in System.Runtime.Intrinsics.Arm)
 ArrayḄufferWriter |(in System.Buffers)
