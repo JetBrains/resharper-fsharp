@@ -22,7 +22,16 @@ import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.framework.frameworkLogger
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.addReference
+import com.jetbrains.rider.test.scriptingApi.callAction
+import com.jetbrains.rider.test.scriptingApi.markupAdapter
+import com.jetbrains.rider.test.scriptingApi.reloadProject
+import com.jetbrains.rider.test.scriptingApi.typeFromOffset
+import com.jetbrains.rider.test.scriptingApi.typeWithLatency
+import com.jetbrains.rider.test.scriptingApi.unloadProject
+import com.jetbrains.rider.test.scriptingApi.waitForDaemonCloseAllOpenEditors
+import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod

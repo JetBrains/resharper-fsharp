@@ -1,6 +1,6 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer
 
-import java.util.*
+import java.util.Stack
 
 data class FSharpLexerInterpolatedStringState(
   public val Kind: FSharpInterpolatedStringKind,

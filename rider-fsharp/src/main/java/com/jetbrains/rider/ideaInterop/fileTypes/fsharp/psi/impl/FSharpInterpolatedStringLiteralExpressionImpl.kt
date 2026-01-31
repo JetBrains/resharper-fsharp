@@ -5,7 +5,12 @@ import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpElementType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFile
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.createSuitableLiteralTextEscaper
 
 class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
   FSharpStringLiteralExpressionBase(type),

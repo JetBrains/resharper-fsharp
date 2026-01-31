@@ -1,19 +1,19 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
-import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.changeFileContent
-import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
+import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
+import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import org.testng.annotations.Test
 import java.io.File
 import java.time.Duration

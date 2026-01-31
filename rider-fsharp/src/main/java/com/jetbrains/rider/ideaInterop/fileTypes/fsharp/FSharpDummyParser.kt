@@ -5,8 +5,12 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parse
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.parseEvenEmpty
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.scanOrRollback
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.tryEatAnyToken
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.whileMakingProgress
 
 class FSharpDummyParser : PsiParser {
   override fun parse(root: IElementType, builder: PsiBuilder): ASTNode {

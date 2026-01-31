@@ -1,6 +1,7 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl
 
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpFileElementType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.createCompositeElementType
 
 object FSharpElementTypes {
   val FILE = FSharpFileElementType()

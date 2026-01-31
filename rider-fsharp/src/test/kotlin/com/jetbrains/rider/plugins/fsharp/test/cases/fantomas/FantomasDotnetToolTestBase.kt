@@ -6,22 +6,32 @@ import com.intellij.util.io.delete
 import com.intellij.util.io.write
 import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
-import com.jetbrains.rider.plugins.fsharp.test.framework.*
+import com.jetbrains.rider.plugins.fsharp.test.framework.editFSharpBackendSettings
+import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
+import com.jetbrains.rider.plugins.fsharp.test.framework.runProcessWaitForExit
+import com.jetbrains.rider.plugins.fsharp.test.framework.withSetting
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.base.EditorTestBase
-import com.jetbrains.rider.test.tooling.testTools
 import com.jetbrains.rider.test.facades.solution.RiderSolutionWithFoldersApiFacade
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.restoreNuGet
+import com.jetbrains.rider.test.tooling.testTools
 import java.io.File
 import java.io.PrintStream
 import java.nio.file.Paths
 import java.time.Duration
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectory
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 
 abstract class FantomasDotnetToolTestBase : EditorTestBase() {
   override val testSolution: String = "FormatCodeApp"

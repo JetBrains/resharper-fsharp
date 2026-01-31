@@ -15,7 +15,13 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.addReference
+import com.jetbrains.rider.test.scriptingApi.buildSolutionWithReSharperBuild
+import com.jetbrains.rider.test.scriptingApi.deleteElement
+import com.jetbrains.rider.test.scriptingApi.markupAdapter
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
+import com.jetbrains.rider.test.scriptingApi.waitForDaemonCloseAllOpenEditors
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.util.idea.syncFromBackend
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test

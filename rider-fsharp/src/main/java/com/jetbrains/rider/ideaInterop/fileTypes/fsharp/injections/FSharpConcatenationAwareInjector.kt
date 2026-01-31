@@ -3,8 +3,14 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiElement
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.INTERPOLATED_STRINGS_WITHOUT_INSERTIONS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.INTERPOLATED_STRING_ENDS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.INTERPOLATED_STRING_STARTS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpressionPart
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralExpression
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpStringLiteralType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.getDollarsCount
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpression
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageInterpolatedStringLiteralExpressionPart
 import com.jetbrains.rider.languages.fileTypes.clr.psi.ClrLanguageStringLiteralExpression
