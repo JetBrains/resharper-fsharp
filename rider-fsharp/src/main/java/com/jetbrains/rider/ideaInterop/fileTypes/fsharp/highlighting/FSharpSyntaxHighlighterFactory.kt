@@ -6,7 +6,15 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.BLOCK_COMMENTS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.BYTECHAR
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.CHARACTER_LITERAL
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.IDENT_KEYWORDS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.INTERPOLATED_STRINGS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.LINE_COMMENT
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.NUMBERS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.PP_KEYWORDS
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.STRINGS
 
 open class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
   companion object {

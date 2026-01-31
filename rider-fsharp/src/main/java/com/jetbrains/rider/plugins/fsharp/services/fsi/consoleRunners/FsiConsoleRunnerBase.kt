@@ -25,7 +25,15 @@ import com.intellij.util.ui.UIUtil
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
-import com.jetbrains.rider.plugins.fsharp.services.fsi.*
+import com.jetbrains.rider.plugins.fsharp.services.fsi.CommandHistory
+import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost
+import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiInputOutputProcessor
+import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiProcessHandler
+import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiSandboxInfoUpdater
+import com.jetbrains.rider.plugins.fsharp.services.fsi.HistoryKeyListener
+import com.jetbrains.rider.plugins.fsharp.services.fsi.InputSeparatorGutterContentProvider
+import com.jetbrains.rider.plugins.fsharp.services.fsi.createFSharpSandbox
+import com.jetbrains.rider.plugins.fsharp.services.fsi.withGenericSandBoxing
 import org.jetbrains.annotations.Nls
 import javax.swing.BorderFactory
 

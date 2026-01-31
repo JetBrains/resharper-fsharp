@@ -1,9 +1,9 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
 import com.intellij.openapi.actionSystem.IdeActions
-import com.jetbrains.rider.test.annotations.report.Feature
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.annotations.report.Feature
 import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion

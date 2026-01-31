@@ -25,7 +25,8 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.LINE_COMMENT
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpInterpolatedStringLiteralExpression
-import com.jetbrains.rider.plugins.fsharp.editorActions.LineIndent.Type.*
+import com.jetbrains.rider.plugins.fsharp.editorActions.LineIndent.Type.Comments
+import com.jetbrains.rider.plugins.fsharp.editorActions.LineIndent.Type.Source
 import java.lang.Character.isWhitespace
 
 private val logger = Logger.getInstance(FSharpEnterHandlerDelegate::class.java)

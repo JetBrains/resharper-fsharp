@@ -12,7 +12,10 @@ import com.intellij.psi.util.PsiUtilCore
 import com.jetbrains.rd.platform.util.getLogger
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.*
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpSignatureFileImpl
 
 class FSharpParserDefinition : ParserDefinition {
     private val logger = getLogger<FSharpParserDefinition>()

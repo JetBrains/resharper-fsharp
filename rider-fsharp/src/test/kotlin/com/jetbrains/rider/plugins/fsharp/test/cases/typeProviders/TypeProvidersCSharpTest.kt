@@ -8,9 +8,20 @@ import com.jetbrains.rider.test.asserts.shouldBeFalse
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
+import com.jetbrains.rider.test.scriptingApi.defaultRefactoringRename
+import com.jetbrains.rider.test.scriptingApi.dumpActiveLookupItemsPresentations
+import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
+import com.jetbrains.rider.test.scriptingApi.dumpSevereHighlighters
+import com.jetbrains.rider.test.scriptingApi.markupAdapter
+import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
+import com.jetbrains.rider.test.scriptingApi.typeFromOffset
+import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
+import com.jetbrains.rider.test.scriptingApi.waitForAllAnalysisFinished
+import com.jetbrains.rider.test.scriptingApi.waitForCompletion
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 import java.io.File
 

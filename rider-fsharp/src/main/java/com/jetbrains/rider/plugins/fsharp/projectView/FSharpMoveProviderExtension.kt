@@ -10,7 +10,7 @@ import com.jetbrains.rider.model.RdProjectModelItemDescriptor
 import com.jetbrains.rider.projectView.ProjectElementView
 import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
-import com.jetbrains.rider.projectView.nodes.*
+import com.jetbrains.rider.projectView.nodes.getUserData
 import com.jetbrains.rider.projectView.utils.compareProjectModelEntities
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity

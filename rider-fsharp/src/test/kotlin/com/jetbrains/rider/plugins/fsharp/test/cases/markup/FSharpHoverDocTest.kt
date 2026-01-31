@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup
 
-import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.plugins.fsharp.test.framework.withCultureInfo
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
@@ -9,6 +8,7 @@ import com.jetbrains.rider.test.asserts.shouldContains
 import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import org.testng.annotations.Test
 
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
