@@ -51,6 +51,8 @@ dependencies {
     jetbrainsRuntime()
     bundledModule("intellij.rider")
     bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
+    bundledModule("intellij.rider.rdclient.dotnet")
+    bundledModule("intellij.rider.languages")
     bundledPlugin("com.intellij.modules.json")
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
