@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Intentions.Impl.LanguageSpecific
 open JetBrains.ReSharper.Intentions.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
