@@ -4,6 +4,7 @@ open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Intentions
+open JetBrains.ReSharper.Feature.Services.Intentions.ConfigureMenu
 open JetBrains.ReSharper.Intentions.DisableWarning
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
