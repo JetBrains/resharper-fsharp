@@ -45,6 +45,6 @@
 --> NestedCalls.fs:38(571,589) // g2 T.Prop1 T.Prop2
 [get_Prop1]
 [get_Prop2]
-[Specialize (hidden)]
+[Specialize (hidden) (no expr)]
 [g2 (method name: InvokeFast)]
 

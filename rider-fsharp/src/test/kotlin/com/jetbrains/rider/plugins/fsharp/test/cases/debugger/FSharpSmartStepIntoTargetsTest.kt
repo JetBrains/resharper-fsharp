@@ -1,25 +1,20 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.DebuggerTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.collectSmartStepIntoTargets
-import com.jetbrains.rider.test.scriptingApi.resumeSession
-import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
-import com.jetbrains.rider.test.scriptingApi.waitForPause
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 @Test
-@Mute("TeamCity config needs merging first")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("SmartStepIntoTest")
 class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
     override val projectName = "SmartStepIntoTest"
 
-    private fun testBreakpoints(fileName: String, lineNumbers: List<Int>) {
+    private fun testBreakpoints(fileName: String, lineNumbers: List<Int>, withOffsets: Boolean = true) {
         testDebugProgram({
             lineNumbers.forEach {
                 toggleBreakpoint(fileName, it)
@@ -27,7 +22,7 @@ class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
         }, {
             repeat(lineNumbers.size) {
                 waitForPause()
-                dumpExecutionPoint()
+                dumpExecutionPoint(withOffsets = withOffsets)
                 collectSmartStepIntoTargets(this)
                 resumeSession()
             }
@@ -47,5 +42,12 @@ class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
     @Test
     fun testInline() {
         testBreakpoints("Inline.fs", listOf(11))
+    }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testAsync() {
+        testBreakpoints("Async.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
     }
 }

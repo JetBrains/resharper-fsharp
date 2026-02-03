@@ -6,6 +6,7 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -115,6 +116,14 @@ type FSharpCallableExpressionsCollector private () =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpSourceCallableExpressionsProvider() =
+    let isReturnOrYield (tokenNode: ITokenNode) =
+        let tokenType = getTokenType tokenNode
+
+        tokenType == FSharpTokenType.RETURN ||
+        tokenType == FSharpTokenType.RETURN_BANG ||
+        tokenType == FSharpTokenType.YIELD ||
+        tokenType == FSharpTokenType.YIELD_BANG
+
     interface ISourceCallableExpressionsProvider with
         member this.GetExpressionList(file, solution, startLine, startCol, endLine, endCol) =
             let sourceFile = file.ToSourceFile()
@@ -139,6 +148,11 @@ type FSharpSourceCallableExpressionsProvider() =
                 match node with
                 | :? IFSharpExpression as expr -> expr
                 | :? IBinding as binding -> binding.Expression
+
+                // Workaround dotnet/fsharp#19248
+                | :? ITokenNode as tokenNode when isReturnOrYield tokenNode ->
+                    tokenNode.Parent.As<IFSharpExpression>() 
+
                 | _ -> null
 
             if isNull expr then null else

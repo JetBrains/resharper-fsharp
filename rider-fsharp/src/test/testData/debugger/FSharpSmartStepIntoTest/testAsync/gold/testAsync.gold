@@ -1,0 +1,20 @@
+Stopped inside a1:
+--> Async.fs:22(232,238) // return
+Stepped into f1:
+--> Async.fs:9(89,94) // x + 1
+Async.f1() in CeSteppingTests.dll
+    x = {int} 1
+
+Stopped inside a2:
+--> Async.fs:28(310,316) // return
+Stepped into T.Prop:
+--> Async.fs:6(71,72) // 1
+Async.T.get_Prop() in CeSteppingTests.dll
+
+Stopped inside a4:
+--> Async.fs:39(444,474) // let! a = incrementAsync T.Prop
+Stepped into incrementAsync:
+--> Async.fs:18(179,184) // async
+Async.incrementAsync() in CeSteppingTests.dll
+    i = {int} 1
+
