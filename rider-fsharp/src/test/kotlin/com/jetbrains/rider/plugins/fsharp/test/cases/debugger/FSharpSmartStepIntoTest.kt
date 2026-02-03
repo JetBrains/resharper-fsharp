@@ -1,20 +1,14 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.DebuggerTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.scriptingApi.dumpFullCurrentData
-import com.jetbrains.rider.test.scriptingApi.initSmartStepInto
-import com.jetbrains.rider.test.scriptingApi.resumeSession
-import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
-import com.jetbrains.rider.test.scriptingApi.waitForPause
+import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 @Test
-@Mute("TeamCity config needs merging first")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("SmartStepIntoTest")
 class FSharpSmartStepIntoTest : DebuggerTestBase() {
@@ -52,6 +46,38 @@ class FSharpSmartStepIntoTest : DebuggerTestBase() {
             initSmartStepInto(2, 0, 3, session)
             waitForPause()
             dumpFullCurrentData(message = "Stepped into eq")
+            resumeSession()
+        })
+    }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testAsync() {
+        testDebugProgram({
+            toggleBreakpoint(project, "Async.fs", 22)
+            toggleBreakpoint(project, "Async.fs", 28)
+            toggleBreakpoint(project, "Async.fs", 39)
+        }, {
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a1")
+            initSmartStepInto(1, 0, 4, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into f1")
+            resumeSession()
+
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a2")
+            initSmartStepInto(0, 0, 4, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into T.Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a4")
+            initSmartStepInto(1, 0, 5, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into incrementAsync")
             resumeSession()
         })
     }

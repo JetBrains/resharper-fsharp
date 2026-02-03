@@ -195,4 +195,59 @@ class FSharpSteppingTest : DebuggerTestBase() {
         }, true)
     }
 
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testAsync() {
+        testDebugProgram({
+            toggleBreakpoint("Async.fs", 27)
+            toggleBreakpoint("Async.fs", 33)
+            toggleBreakpoint("Async.fs", 39)
+            toggleBreakpoint("Async.fs", 46)
+            toggleBreakpoint("Async.fs", 56)
+        }, {
+            fun dumpState(message: String? = null) {
+                dumpExecutionPoint(message = message)
+                stream.println()
+            }
+
+            fun repeatStepOver(count: Int) {
+                repeat(count, {
+                    stepOver()
+                    dumpState(message = "Stepped over")
+                })
+            }
+
+            waitForPause()
+            dumpState(message = "Stopped inside a2")
+            stepOver()
+            dumpState(message = "Stepped over")
+            stepInto()
+            dumpState(message = "Stepped into Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a3")
+            stepOver()
+            dumpState(message = "Stepped over")
+            stepInto()
+            dumpState(message = "Stepped into Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a4")
+            repeatStepOver(2)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a5")
+            repeatStepOver(3)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a6")
+            repeatStepOver(4)
+            resumeSession()
+        }, true)
+    }
 }
