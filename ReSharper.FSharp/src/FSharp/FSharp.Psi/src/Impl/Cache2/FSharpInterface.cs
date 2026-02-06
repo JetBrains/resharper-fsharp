@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       part.ShortName == ShortName &&
       part is IFSharpInterfacePart interfacePart && interfacePart.MeasureTypeParametersCount == MeasureTypeParametersCount;
 
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
+    protected override MemberDecoration Modifiers => Parts.GetModifiers();
     public string SourceName => this.GetSourceName();
 
     public override IList<ITypeElement> GetSuperTypeElements()
