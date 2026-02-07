@@ -1,52 +1,30 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.Application.Parts;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches.AnnotatedEntities;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.Impl.Reflection2.ExternalAnnotations;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 {
-  [Language(typeof(FSharpLanguage), Instantiation.DemandAnyThreadSafe)]
+  [Language(typeof(FSharpLanguage))]
   public class FSharpAnnotatedMembersCacheProcessor : IAnnotatedEntitiesCacheProcessor
   {
-    public void Process(IFile file, HashSet<string> attributeNames, AnnotatedEntitiesSet context)
+    public void Process(IFile file, IndexableAnnotationsTable indexableAnnotationsTable, AnnotatedEntitiesSet.Builder builder)
     {
       var fsFile = file as IFSharpFile;
-      fsFile?.ProcessThisAndDescendants(new Processor(attributeNames, context));
+      fsFile?.ProcessThisAndDescendants(new Processor(indexableAnnotationsTable, builder));
     }
 
-    public void CollectPossibleMemberNames(List<string> consumer, IMetadataTypeMember member, IMetadataTypeInfo type)
+    private sealed class Processor(IndexableAnnotationsTable indexableAnnotationsTable, AnnotatedEntitiesSet.Builder builder)
+      : TreeNodeVisitor, IRecursiveElementProcessor
     {
-      if (member is not IMetadataMethod { IsStatic: true } method) return;
-
-      var methodName = method.Name;
-      if (methodName == DeclaredElementConstants.STATIC_CONSTRUCTOR_NAME) return;
-
-      var propertyName = FSharpNamesUtil.TryRemoveCompiledAccessorPrefix(methodName);
-      if (methodName == propertyName) return;
-
-      consumer.Add(propertyName);
-    }
-
-    private class Processor : TreeNodeVisitor, IRecursiveElementProcessor
-    {
-      private readonly HashSet<string> myAttributeNames;
-      private readonly AnnotatedEntitiesSet myContext;
-
-      public Processor(HashSet<string> attributeNames, AnnotatedEntitiesSet context)
-      {
-        myAttributeNames = attributeNames;
-        myContext = context;
-      }
-
       public bool ProcessingIsFinished => false;
 
       public bool InteriorShouldBeProcessed(ITreeNode element) => element is not IChameleonNode;
@@ -143,20 +121,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Annotations
 
       private void CollectAttributes(IAttributesOwnerDeclaration owner, string memberName)
       {
+        var containingTypeDeclaration = (owner as ITypeMemberDeclaration)?.GetContainingTypeDeclaration();
+        string containingTypeName = null;
+
         foreach (var attribute in owner.AttributesEnumerable)
         foreach (var attributeName in GetAttributeNames(attribute))
         {
-          if (attributeName != null && myAttributeNames.TryGetValue(attributeName, out var internedName))
+          if (attributeName != null && indexableAnnotationsTable.ContainsAttributeShortName(attributeName, out var index, out var saveFullMemberName))
           {
             if (owner is ITypeDeclaration)
-              myContext.AttributeToTypes.Add(internedName, memberName);
+            {
+              builder.AddAnnotatedType(index, memberName);
+            }
             else
             {
-              var containingTypeName = (owner as ITypeMemberDeclaration)?.GetContainingTypeDeclaration()?.CLRName;
-              myContext.AttributeToMembers.Add(internedName, memberName);
-              if (!string.IsNullOrEmpty(containingTypeName))
-                myContext.AttributeToFullMembers.Add(internedName,
-                  new FullTypeMemberName(containingTypeName, memberName));
+              builder.AddAnnotatedMember(index, memberName);
+
+              if (saveFullMemberName && containingTypeDeclaration is not null)
+              {
+                containingTypeName ??= containingTypeDeclaration.CLRName;
+
+                builder.AddAnnotatedMemberWithFullName(index, new FullTypeMemberName(containingTypeName, memberName));
+              }
             }
           }
         }
