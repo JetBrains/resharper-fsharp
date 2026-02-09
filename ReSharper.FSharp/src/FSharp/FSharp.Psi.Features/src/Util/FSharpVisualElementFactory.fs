@@ -54,8 +54,31 @@ type FSharpVisualElementFactory() =
         PredefinedColorTypes.ColorReferenceFromInvocation(
             StringComparer.Ordinal, qualifier.Reference, reference, args, factory)
 
+    let getFromNewExpr (newExpr: INewExpr) : IColorReference =
+        let argsOwner = newExpr :> IArgumentsOwner
+        if argsOwner.Arguments.IsEmpty() then null else
+
+        let reference = newExpr.Reference
+        let resolved = reference.Resolve().DeclaredElement
+        let typeElement =
+            match resolved with
+            | :? IConstructor as ctor -> ctor.ContainingType
+            | :? ITypeElement as te -> te
+            | _ -> null
+        if isNull typeElement then null else
+
+        let args = argsOwner.Arguments |> Seq.cast |> Seq.toArray
+        let colorElement = PredefinedColorTypes.ColorElementFromConstructorArgs(typeElement, args)
+        if isNull colorElement then null else
+
+        let range = Nullable(newExpr.GetDocumentRange())
+        FSharpColorReference.Create(colorElement, newExpr, range)
+    
     interface IVisualElementFactory with
         member x.GetColorReference(node) =
+            let newExpr = node.As<INewExpr>()
+            if isNotNull newExpr then getFromNewExpr newExpr else
+
             let referenceExpr = node.As<IReferenceExpr>()
             if isNull referenceExpr then null else
 
