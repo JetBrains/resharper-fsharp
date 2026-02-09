@@ -56,7 +56,7 @@ public class FSharpSequencePointInvokedMethodsProvider(ILogger logger, CorDebugg
             var methodSpec = metadata.GetMethodFromToken((MetadataToken)instruction.Operand, decodeContext);
             if (!CorSmartStepIntoProvider.TryCreateElement(methodSpec, instruction, logger, DebuggerHiddenProviders,
                   out var element))
-              return null;
+              return elements;
 
             if (element == null)
               continue;

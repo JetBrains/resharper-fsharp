@@ -205,6 +205,7 @@ class FSharpSteppingTest : DebuggerTestBase() {
             toggleBreakpoint("Async.fs", 39)
             toggleBreakpoint("Async.fs", 46)
             toggleBreakpoint("Async.fs", 56)
+            toggleBreakpoint("Async.fs", 77)
         }, {
             fun dumpState(message: String? = null) {
                 dumpExecutionPoint(message = message)
@@ -248,6 +249,74 @@ class FSharpSteppingTest : DebuggerTestBase() {
             dumpState(message = "Stopped inside a6")
             repeatStepOver(4)
             resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a9")
+            repeatStepOver(2)
+            resumeSession()
         }, true)
     }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testTask() {
+        testDebugProgram({
+            toggleBreakpoint("Task.fs", 27)
+            toggleBreakpoint("Task.fs", 33)
+            toggleBreakpoint("Task.fs", 39)
+            toggleBreakpoint("Task.fs", 46)
+            toggleBreakpoint("Task.fs", 56)
+            toggleBreakpoint("Task.fs", 77)
+        }, {
+            fun dumpState(message: String? = null) {
+                dumpExecutionPoint(message = message)
+                stream.println()
+            }
+
+            fun repeatStepOver(count: Int) {
+                repeat(count, {
+                    stepOver()
+                    dumpState(message = "Stepped over")
+                })
+            }
+
+            waitForPause()
+            dumpState(message = "Stopped inside a2")
+            stepOver()
+            dumpState(message = "Stepped over")
+            stepInto()
+            dumpState(message = "Stepped into Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a3")
+            stepOver()
+            dumpState(message = "Stepped over")
+            stepInto()
+            dumpState(message = "Stepped into Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a4")
+            repeatStepOver(2)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a5")
+            repeatStepOver(3)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a6")
+            repeatStepOver(4)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a9")
+            repeatStepOver(2)
+            resumeSession()
+        }, true)
+    }
+
 }

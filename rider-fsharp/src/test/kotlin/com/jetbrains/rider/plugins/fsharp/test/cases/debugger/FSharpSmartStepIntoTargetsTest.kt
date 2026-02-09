@@ -50,4 +50,12 @@ class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
     fun testAsync() {
         testBreakpoints("Async.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
     }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testTask() {
+        testBreakpoints("Task.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
+    }
+
 }

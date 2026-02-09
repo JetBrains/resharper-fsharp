@@ -81,5 +81,38 @@ class FSharpSmartStepIntoTest : DebuggerTestBase() {
             resumeSession()
         })
     }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testTask() {
+        testDebugProgram({
+            toggleBreakpoint(project, "Task.fs", 22)
+            toggleBreakpoint(project, "Task.fs", 28)
+            toggleBreakpoint(project, "Task.fs", 39)
+        }, {
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a1")
+            initSmartStepInto(1, 0, 2, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into f1")
+            resumeSession()
+
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a2")
+            initSmartStepInto(0, 0, 2, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into T.Prop")
+            resumeSession()
+
+            waitForPause()
+            dumpExecutionPoint(message = "Stopped inside a4")
+            initSmartStepInto(1, 0, 2, session)
+            waitForPause()
+            dumpFullCurrentData(message = "Stepped into incrementAsync")
+            resumeSession()
+        })
+    }
+
 }
 
