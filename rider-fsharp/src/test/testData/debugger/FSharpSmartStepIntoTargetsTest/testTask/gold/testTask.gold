@@ -1,0 +1,36 @@
+--> Task.fs:22 // return
+[get_Prop]
+[f1]
+
+--> Task.fs:28 // return
+[get_Prop]
+[f2]
+
+--> Task.fs:34 // return
+[get_Prop]
+[f2]
+
+--> Task.fs:39 // let! a = incrementAsync T.Prop
+[get_Prop]
+[incrementAsync]
+
+--> Task.fs:41 // return
+[get_Prop]
+[f2]
+
+--> Task.fs:51 // return
+[get_Prop]
+[f2]
+
+--> Task.fs:61 // return
+[get_Prop]
+[f2]
+
+--> Task.fs:66 // let! a = incrementAsync T.Prop
+[get_Prop]
+[incrementAsync]
+
+--> Task.fs:72 // return!
+[get_Prop]
+[incrementAsync]
+

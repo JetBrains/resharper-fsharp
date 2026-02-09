@@ -1,9 +1,12 @@
 using System.Linq;
 using Debugger.Common;
 using Debugger.Common.Utils;
+using JetBrains.Annotations;
 using JetBrains.Debugger.CorApi.ComInterop;
 using JetBrains.Metadata.Debug;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.UI.Interop;
+using JetBrains.Util;
 using Mono.Debugging.Autofac;
 using Mono.Debugging.Client;
 using Mono.Debugging.Client.Events;
@@ -24,6 +27,14 @@ public class FSharpAsyncStepper(CorDebuggerSession session) :
 
   public int Priority => int.MaxValue;
 
+  private static bool IsFSharpAsync([NotNull] IMetadataTypeInfo typeInfo) =>
+    typeInfo.GetFields().Any(field =>
+      field is { Name: "builder@", Type.FullName: "Microsoft.FSharp.Control.FSharpAsyncBuilder" });
+
+  private static bool IsFSharpTask([NotNull] IMetadataTypeInfo typeInfo) =>
+    typeInfo.InterfaceImplementations.Any(impl =>
+      impl.Interface.Type is { FullyQualifiedName: "Microsoft.FSharp.Core.CompilerServices.IResumableStateMachine`1" });
+
   private bool IsApplicable(CorStepContext stepContext)
   {
     if (stepContext.Language != Languages.FSharp)
@@ -37,10 +48,12 @@ public class FSharpAsyncStepper(CorDebuggerSession session) :
     if (typeInfo == null)
       return false;
 
-    return typeInfo.Name.Contains("@") && typeInfo.GetFields().Any(f => f is
-      { Name: "builder@", Type.FullName: "Microsoft.FSharp.Control.FSharpAsyncBuilder" });
+    if (!typeInfo.Name.Contains("@"))
+      return false;
+
+    return IsFSharpAsync(typeInfo) || IsFSharpTask(typeInfo);
   }
-  
+
   public bool TryStepOver(CorStepContext stepContext)
   {
     if (!IsApplicable(stepContext))
@@ -64,15 +77,26 @@ public class FSharpAsyncStepper(CorDebuggerSession session) :
 
     var sequencePoints =
       document.Methods
-        .SelectMany(m => m.SequencePoints.Select(sp => (m, sp)))
-        .Where(msp => !msp.sp.IsHidden)
+        .SelectMany(m =>
+        {
+          var sequencePoints = m.SequencePoints.Where(sp => !sp.IsHidden).AsIReadOnlyList();
+
+          // Workaround dotnet/fsharp#19255
+          return sequencePoints
+            .Where((sp, i) => i >= sequencePoints.Count - 1 || sp.StartLine <= sequencePoints[i + 1].EndLine)
+            .Select(sp => (m, sp));
+        });
+
+    var sortedSequencePoints =
+      sequencePoints
         .OrderBy(msp => msp.sp.StartLine)
         .ThenBy(msp => msp.sp.StartColumn);
 
     var nextMethodSequencePoint =
-      sequencePoints.FirstOrDefault(msp =>
+      sortedSequencePoints.FirstOrDefault(msp =>
         msp.sp.StartLine > currentSequencePoint.StartLine ||
         msp.sp.StartLine == currentSequencePoint.StartLine && msp.sp.StartColumn > currentSequencePoint.StartColumn);
+
     if (nextMethodSequencePoint.sp == null)
       return false;
 
@@ -96,6 +120,7 @@ public class FSharpAsyncStepper(CorDebuggerSession session) :
 
     myBreakpoint.Activate(false);
     myBreakpoint = null;
+    session.ThreadsManager.SetActiveThread(thread);
     session.OnTargetEvent(new TargetEventArgs(TargetEventType.TargetStepCompleted));
 
     return HandleBreakpointResult.Handled;

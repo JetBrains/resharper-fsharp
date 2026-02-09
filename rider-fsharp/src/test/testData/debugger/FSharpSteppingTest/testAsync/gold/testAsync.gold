@@ -52,3 +52,12 @@ Stepped over:
 Stepped over:
 --> Async.fs:61(768,774) // return
 
+Stopped inside a9:
+--> Async.fs:77(973,983) // let! a = a
+
+Stepped over:
+--> Async.fs:78(992,995) // use
+
+Stepped over:
+--> Async.fs:79(1019,1025) // return
+

@@ -1,4 +1,4 @@
-module Async
+module Task
 
 open System.Threading
 
@@ -12,37 +12,37 @@ let f2 a b =
     a + b
 
 let a =
-    async { return 1 }
+    task { return 1 }
 
 let incrementAsync i =
-    async { return i + 1 }
+    task { return i + 1 }
 
 let a1 =
-    async {
+    task {
         return f1 T.Prop
     }
 
 let a2 =
-    async {
+    task {
         let! aResult = a
         return f2 T.Prop aResult
     }
 
 let a3 =
-    async {
+    task {
         let i = 1
         return f2 i T.Prop
     }
 
 let a4 =
-    async {
+    task {
         let! a = incrementAsync T.Prop
         let i = a + 1
         return f2 i T.Prop
     }
 
 let a5 =
-    async {
+    task {
         let! a = a
         let i =
             ignore a
@@ -52,7 +52,7 @@ let a5 =
     }
 
 let a6 =
-    async {
+    task {
         let! a = a
         let i =
             a + 1 |> ignore
@@ -62,18 +62,18 @@ let a6 =
     }
 
 let a7 =
-    async {
+    task {
         let! a = incrementAsync T.Prop
         return a
     }
 
 let a8 =
-    async {
+    task {
         return! incrementAsync T.Prop
     }
 
 let a9 =
-    async {
+    task {
         let! a = a
         use d = disposable
         return a + 1
@@ -82,4 +82,4 @@ let a9 =
 let run () =
     let computations = [a1; a2; a3; a4; a5; a6; a7; a8; a9]
     for a in computations do
-        Async.RunSynchronously(a) |> ignore
+        a.Result |> ignore
