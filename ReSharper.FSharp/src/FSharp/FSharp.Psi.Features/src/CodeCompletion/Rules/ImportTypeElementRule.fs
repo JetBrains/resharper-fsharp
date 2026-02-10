@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 open System
 open System.Collections.Generic
 open System.Linq
-open System.Text
 open FSharp.Compiler.EditorServices
 open JetBrains.Application
 open JetBrains.ProjectModel
@@ -140,8 +139,6 @@ type FSharpImportTypeElementRule() =
         | _ -> false
 
     let isAllowed (context: FSharpCodeCompletionContext) (typeElement: ITypeElement) =
-        context.PsiModule != typeElement.Module &&
-
         not (isNestedType typeElement) &&
         not (isAssociatedModule typeElement) &&
 
@@ -185,23 +182,20 @@ type FSharpImportTypeElementRule() =
         if isNull fsFile then false else
 
         let openedModulesProvider = OpenedModulesProvider(element)
-        let scopes = openedModulesProvider.OpenedModuleScopes
-
         let isAttributeReferenceContext = context.IsInAttributeContext
-
         let symbolScope = getSymbolScope context.PsiModule true
-        
+
         let getContainingElementQualifiedName =
-             let moduleQualifiedNames = Dictionary<IClrDeclaredElement, string>()
-             let getQualifiedName = Func<_,_>(FSharpImplUtil.GetQualifiedName)
+            let moduleQualifiedNames = Dictionary<IClrDeclaredElement, string>()
+            let getQualifiedName = Func<_,_>(FSharpImplUtil.GetQualifiedName)
 
-             fun (typeElement: ITypeElement) ->
-                 let containingElement: IClrDeclaredElement =
-                     match typeElement.GetContainingType() with
-                     | null -> typeElement.GetContainingNamespace()
-                     | containingType -> containingType
+            fun (typeElement: ITypeElement) ->
+                let containingElement: IClrDeclaredElement =
+                    match typeElement.GetContainingType() with
+                    | null -> typeElement.GetContainingNamespace()
+                    | containingType -> containingType
 
-                 moduleQualifiedNames.GetOrCreateValue(containingElement, getQualifiedName)
+                moduleQualifiedNames.GetOrCreateValue(containingElement, getQualifiedName)
 
         let mutable name = ""
         let typesWithSameName = List<struct (ITypeElement * string)>()
@@ -238,9 +232,7 @@ type FSharpImportTypeElementRule() =
 
             if not (isAllowed context typeElement) then () else
 
-            // todo: check scope ranges
-            let ns = getContainingElementQualifiedName typeElement
-            if scopes.ContainsKey(ns) then () else
+            if FSharpImportUtil.isTypeElementInScope openedModulesProvider typeElement then () else
 
             let currentName =
                 let shortName = getSourceName typeElement
@@ -250,6 +242,7 @@ type FSharpImportTypeElementRule() =
                 addItems ()
                 name <- currentName
 
+            let ns = getContainingElementQualifiedName typeElement
             typesWithSameName.Add(struct (typeElement, ns))
 
         addItems ()

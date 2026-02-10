@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 328
+Count: 327
 Focus: Soft
 Range: "♦"
 
@@ -167,7 +167,6 @@ MatchFailureException
 MeasureAnnotatedAbbreviationAttribute
 MeasureAttribute
 Microsoft
-Module
 NativeInterop
 NoComparisonAttribute
 NoCompilerInliningAttribute
@@ -452,7 +451,6 @@ MatchFailureException
 MeasureAnnotatedAbbreviationAttribute
 MeasureAttribute
 Microsoft
-Module
 NativeInterop
 NoComparisonAttribute
 NoCompilerInliningAttribute

@@ -23,16 +23,7 @@ open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpLookupItemsProvider(logger: ILogger) =
-
-    let getAllSymbols (checkResults: FSharpCheckFileResults) =
-        let getSymbolsAsync = async {
-            let assemblySignature = checkResults.PartialAssemblySignature
-            return AssemblyContent.GetAssemblySignatureContent AssemblyContentType.Full assemblySignature
-        }
-
-        getSymbolsAsync.RunAsTask()
-
+type FcsLookupItemsProvider(logger: ILogger) =
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -97,15 +88,11 @@ type FSharpLookupItemsProvider(logger: ILogger) =
             let fcsContext = context.FcsCompletionContext
             let line = int fcsContext.Coords.Line + 1
 
-            let isAttributeReferenceContext = context.IsInAttributeContext
-            let getAllSymbols () = getAllSymbols checkResults
-
             try
                 let itemLists =
                     checkResults.GetDeclarationListSymbols(parseResults, line, fcsContext.LineText,
-                        fcsContext.PartialName, isAttributeReferenceContext, getAllSymbols)
+                        fcsContext.PartialName, context.IsInAttributeContext)
 
-                // todo: filter unresolved when long evaluation is disabled?
                 for list in itemLists do
                     Interruption.Current.CheckAndThrow()
 
@@ -141,11 +128,3 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.IsFinal = false
         member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Light
-
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpRangesProvider() =
-    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
-
-    override x.GetDefaultRanges(context) = context.Ranges
-    override x.SupportedEvaluationMode = EvaluationMode.Full

@@ -1,10 +1,9 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.CodeCompletion
 
 open System
 open System.Linq.Expressions
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -44,7 +43,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Basic 05 - Attribute suffix``() = x.DoNamedTest()
     [<Test>] member x.``Basic 06 - Attribute suffix``() = x.DoNamedTest()
 
-    [<Test; Explicit>] member x.``Bind - Rqa module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Bind - Rqa module 01``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 02``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 03``() = x.DoNamedTest()
     [<Test>] member x.``Bind - Rqa module 04``() = x.DoNamedTest()
@@ -225,7 +224,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Open 06 - Inside module, space``() = x.DoNamedTest()
 
     [<Test>] member x.``Open 07 - After System``() = x.DoNamedTest()
-    [<Test>] member x.``Open 08 - Before other System``() = x.DoNamedTest()
+    [<Test>] member x.``Open 08 - Before other System``() = x.DoNamedTest() 
+    [<Test>] member x.``Open 09``() = x.DoNamedTest() 
+    [<Test>] member x.``Open 10``() = x.DoNamedTest() 
+    [<Test>] member x.``Open 11``() = x.DoNamedTest() 
+    [<Test>] member x.``Open 12``() = x.DoNamedTest() 
 
     [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
     [<Test>] member x.``Open - Indent - Nested - After 01``() = x.DoNamedTest()
@@ -243,16 +246,16 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Import - Sibling namespace``() = x.DoNamedTest()
 
-    [<Test; Explicit("243")>] member x.``Import - Same project 01``() = x.DoNamedTest()
-
-    [<Explicit "Reuse the common setting">]
+    [<Test>] member x.``Import - Same project 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Same ns 01``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 02``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 03``() = x.DoTestFiles("File1.fs", "File2.fs")
-    [<Test; Explicit("243")>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 06``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 07``() = x.DoTestFiles("File1.fs", "File2.fs")
 
     [<TestReferenceProjectOutput("FSharpClassLib")>]
     [<Test>] member x.``Import - Compiled - FSharp 01``() = x.DoNamedTest()

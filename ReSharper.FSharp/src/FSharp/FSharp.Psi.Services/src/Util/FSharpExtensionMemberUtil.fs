@@ -226,7 +226,7 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
     |> Seq.filter isApplicable
     |> List :> _
 
-let getExtensionMembers (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
+let getNonImportedExtensionMembers (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
     if isNull refExpr then EmptyList.InstanceList else
 
     let isStaticContext = FSharpExpressionUtil.isStaticContext refExpr.Qualifier

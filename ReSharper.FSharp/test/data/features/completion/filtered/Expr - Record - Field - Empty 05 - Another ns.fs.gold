@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3874
+Count: 3875
 Focus: Soft
 Range: "f { ♦ }"
 
@@ -2729,6 +2729,7 @@ QuicListenerOptions |(in System.Net.Quic)
 QuicServerConnectionOptions |(in System.Net.Quic)
 QuicStream |(in System.Net.Quic)
 QuicStreamType |(in System.Net.Quic)
+R |(in Ns1)
 RC2 |(in System.Security.Cryptography)
 RC2CryptoServiceProvider |(in System.Security.Cryptography)
 RNGCryptoServiceProvider |(in System.Security.Cryptography)
@@ -6609,6 +6610,7 @@ QuicListenerOptions |(in System.Net.Quic)
 QuicServerConnectionOptions |(in System.Net.Quic)
 QuicStream |(in System.Net.Quic)
 QuicStreamType |(in System.Net.Quic)
+R |(in Ns1)
 RC2 |(in System.Security.Cryptography)
 RC2CryptoServiceProvider |(in System.Security.Cryptography)
 RNGCryptoServiceProvider |(in System.Security.Cryptography)
