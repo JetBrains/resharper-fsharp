@@ -5,8 +5,8 @@
     <PackageLock Include="JetBrains.Annotations" Version="2025.2.0" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.4.6" />
     <PackageLock Include="JetBrains.ICorDebug" Version="2.0.20251125.126" />
-    <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.1" />
-    <PackageLock Include="JetBrains.RdFramework" Version="2026.1.1" />
+    <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.2" />
+    <PackageLock Include="JetBrains.RdFramework" Version="2026.1.2" />
     <PackageLock Include="JetBrains.SharpGen.Runtime" Version="2.0.20251125.126" />
     <PackageLock Include="JetBrains.SharpGen.Runtime.COM" Version="2.0.20251125.126" />
     <PackageLock Include="Newtonsoft.Json" Version="13.0.3" />

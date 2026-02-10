@@ -8,10 +8,10 @@
     <PackageLock Include="JetBrains.Build.Platform.DistributedCache" Version="1.1.20250717.260" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2025.3.5.2" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.4.6" />
-    <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.1" />
+    <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.2" />
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.0.20251126.165" />
     <PackageLock Include="JetBrains.NuGet.Versioning" Version="7.0.20251126.165" />
-    <PackageLock Include="JetBrains.RdFramework" Version="2026.1.1" />
+    <PackageLock Include="JetBrains.RdFramework" Version="2026.1.2" />
     <PackageLock Include="JetBrains.ReSharper.TestRunner.Abstractions" Version="2.16.1" />
     <PackageLock Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageLock Include="NVelocity" Version="1.0.3" />
