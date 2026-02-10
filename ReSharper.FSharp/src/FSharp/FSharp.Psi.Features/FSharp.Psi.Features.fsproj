@@ -48,7 +48,8 @@
     <Compile Include="src\CodeCompletion\Rules\ImportStaticMemberRule.fs" />
     <Compile Include="src\CodeCompletion\Rules\NameSuggestionRule.fs" />
     <Compile Include="src\CodeCompletion\FSharpScriptReferenceCompletionProvider.fs" />
-    <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
+    <Compile Include="src\CodeCompletion\FcsLookupItemsProvider.fs" />
+    <Compile Include="src\CodeCompletion\FSharpLookupItemsRangesProvider.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\CodeStructure\FSharpGotoClassMemberProvider.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />

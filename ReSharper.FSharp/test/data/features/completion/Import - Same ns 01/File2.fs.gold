@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:T (in Ns1.Ns2)}
+﻿// ${COMPLETE_ITEM:T}
 module Ns1.Ns2.M
 
 T{caret}

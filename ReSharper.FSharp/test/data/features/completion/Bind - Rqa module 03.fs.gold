@@ -1,4 +1,4 @@
-﻿// ${COMPLETE_ITEM:Module.LocalType (in Ns)}
+﻿// ${COMPLETE_ITEM:LocalType}
 
 [<RequireQualifiedAccess>]
 module Ns.Module

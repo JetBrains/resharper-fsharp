@@ -10,16 +10,7 @@ let private isTypeOrNsInScope (openedModulesProvider: OpenedModulesProvider) (de
     let scopes = openedModulesProvider.OpenedModuleScopes.GetValuesSafe(name)
     OpenScope.inAnyScope openedModulesProvider.Context scopes
 
-let isTypeMemberInScope (openedModulesProvider: OpenedModulesProvider) (typeMember: ITypeMember) =
-    match typeMember.ContainingType with
-    | :? IFSharpModule as fsModule ->
-        isTypeOrNsInScope openedModulesProvider fsModule
-
-    | containingType ->
-        let ns = containingType.GetContainingNamespace()
-        isTypeOrNsInScope openedModulesProvider ns
-
-let isTypeElementInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
+let areMembersInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
     match typeElement with
     | :? IFSharpModule as fsModule ->
         isTypeOrNsInScope openedModulesProvider fsModule
@@ -28,14 +19,18 @@ let isTypeElementInScope (openedModulesProvider: OpenedModulesProvider) (typeEle
         let ns = containingType.GetContainingNamespace()
         isTypeOrNsInScope openedModulesProvider ns
 
-let isInScope (openedModulesProvider: OpenedModulesProvider) (declaredElement: IClrDeclaredElement) =
-    match declaredElement with
-    | :? ITypeElement as typeElement ->
-        isTypeElementInScope openedModulesProvider typeElement
+let isTypeMemberInScope (openedModulesProvider: OpenedModulesProvider) (typeMember: ITypeMember) =
+    areMembersInScope openedModulesProvider typeMember.ContainingType
 
-    | :? ITypeMember as typeMember ->
-        isTypeMemberInScope openedModulesProvider typeMember
+let isTypeElementInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
+    isTypeOrNsInScope openedModulesProvider typeElement ||
 
-    | _ ->
-        let containingType = declaredElement.GetContainingType()
-        isNotNull containingType && isTypeOrNsInScope openedModulesProvider containingType
+    match typeElement.GetContainingType() with
+    | :? IFSharpModule as fsModule ->
+        isTypeOrNsInScope openedModulesProvider fsModule
+
+    | null ->
+        let ns = typeElement.GetContainingNamespace()
+        isTypeOrNsInScope openedModulesProvider ns
+
+    | _ -> false

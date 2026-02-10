@@ -16,6 +16,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string QualifiedName => this.GetQualifiedName();
     public IList<string> Names => this.GetNames();
 
+    public override FSharpReferenceContext? ReferenceContext => 
+      ModuleAbbreviationDeclarationNavigator.GetByTypeName(this) != null ?
+        FSharpReferenceContext.Expression : FSharpReferenceContext.Type;
+
     public bool IsQualified => Qualifier != null;
     public FSharpSymbolReference QualifierReference => Qualifier?.Reference;
 

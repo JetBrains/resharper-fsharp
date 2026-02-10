@@ -64,9 +64,8 @@ type ImportModuleMemberBehavior(info: ImportModuleMemberInfo) =
 type ImportModuleMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let shouldIgnore (typeElement: ITypeElement) (ns: string) =
-        ns.StartsWith("Microsoft.FSharp.", StringComparison.Ordinal) &&
-        typeElement.Module.Name = "FSharp.Core"
+    let shouldIgnore (ns: string) =
+        ns.StartsWith("Microsoft.FSharp.", StringComparison.Ordinal)
 
     override this.SupportedEvaluationMode = EvaluationMode.LightAndFull
 
@@ -90,7 +89,7 @@ type ImportModuleMemberRule() =
         let referenceContext = referenceOwner.ReferenceContext
         if not referenceContext.HasValue then false else
 
-        let scopes = OpenedModulesProvider(referenceOwner).OpenedModuleScopes
+        let openedModulesProvider = OpenedModulesProvider(referenceOwner)
         let symbolScope = getSymbolScope context.PsiModule false
 
         let values =
@@ -104,11 +103,10 @@ type ImportModuleMemberRule() =
         for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
             Interruption.Current.CheckAndThrow()
 
+            if FSharpImportUtil.areMembersInScope openedModulesProvider typeElement then () else
+
             let fsTypeElement = typeElement.As<IFSharpTypeElement>()
             if isNull fsTypeElement || fsTypeElement.RequiresQualifiedAccess() then () else
-
-            // todo: check scope ranges
-            // todo: better check if imported
 
             let ns =
                 match fsTypeElement with
@@ -125,7 +123,7 @@ type ImportModuleMemberRule() =
 
             match ns with
             | None -> ()
-            | Some ns when scopes.ContainsKey(ns) || shouldIgnore typeElement ns -> ()
+            | Some ns when shouldIgnore ns -> ()
             | Some ns ->
 
             let members =

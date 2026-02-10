@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3866
+Count: 3864
 Focus: Soft
 Range: "♦"
 
@@ -46,7 +46,6 @@ Lazy
 None                        'T option
 Ok                          Result<'T,'TError>
 Some                        'T option
-T                           T
 ValueNone                   'T voption
 ValueSome                   'T voption
                             [Keywords]
@@ -165,8 +164,6 @@ MatchFailureException
 MeasureAnnotatedAbbreviationAttribute
 MeasureAttribute
 Microsoft
-Module
-Module.T
 NativeInterop
 NoComparisonAttribute
 NoCompilerInliningAttribute
@@ -202,6 +199,7 @@ StructuralComparisonAttribute
 StructuralEqualityAttribute
 StructuredFormatDisplayAttribute
 System
+T
 TailCallAttribute
 TaskBuilder
 TaskBuilderBase
@@ -3992,8 +3990,6 @@ MatchFailureException
 MeasureAnnotatedAbbreviationAttribute
 MeasureAttribute
 Microsoft
-Module
-Module.T
 NativeInterop
 NoComparisonAttribute
 NoCompilerInliningAttribute
@@ -4032,7 +4028,7 @@ StructuralComparisonAttribute
 StructuralEqualityAttribute
 StructuredFormatDisplayAttribute
 System
-T                           T
+T
 TailCallAttribute
 TaskBuilder
 TaskBuilderBase

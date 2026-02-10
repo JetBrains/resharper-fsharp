@@ -110,7 +110,6 @@ MatchFailureException
 MeasureAnnotatedAbbreviationAttribute
 MeasureAttribute
 Microsoft
-Module
 NativeInterop
 NoComparisonAttribute
 NoCompilerInliningAttribute

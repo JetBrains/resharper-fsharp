@@ -1,0 +1,8 @@
+﻿// ${COMPLETE_ITEM:i (in Ns1.Ns2.M)}
+namespace Ns1.Ns2
+
+open Ns1.Ns2.M
+
+module Module =
+    ()
+    i{caret}
