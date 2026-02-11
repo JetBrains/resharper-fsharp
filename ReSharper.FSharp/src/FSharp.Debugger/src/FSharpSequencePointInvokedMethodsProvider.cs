@@ -32,8 +32,10 @@ public class FSharpSequencePointInvokedMethodsProvider(ILogger logger, CorDebugg
 
   public override List<SmartStepIntoElement> GetSmartStepIntoElements(ICorDebugFunction function, uint startIp,
     uint endIp, IMetadataMethod metadataMethod, IMetadataAssemblyInternals metadata,
-    TypeDecodeContext decodeContext)
+    TypeDecodeContext decodeContext, out bool shouldBreakSmartStepInto)
   {
+    shouldBreakSmartStepInto = false;
+
     var module = function.GetModule();
     var moduleInfo = session.AppDomainsManager.GetOrCreateModuleInfo(module);
 
