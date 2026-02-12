@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Syntax
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application.Components
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -310,6 +311,9 @@ module FSharpNamingService =
     let mangleNameIfNecessary name =
         if reservedKeywords.Contains(name) then
             $"``{name}``" else
+
+        if IsOperatorDisplayName name then
+            name else
 
         match name with
         | "``sig``" -> name

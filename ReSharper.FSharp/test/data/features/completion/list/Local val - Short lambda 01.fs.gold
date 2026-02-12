@@ -1,2 +1,273 @@
 ﻿Completion: Basic
-Count: 0 (filtered)
+Count: 128
+Focus: Soft
+Range: "|> List.map _.♦"
+
+##### RELEVANCE SORT #####
+
+                            [FieldsAndProperties]
+Chars                       char    <==
+Length                      int
+                            [Methods, MemberOfCurrentType^]
+Clone                       obj
+CompareTo                   int
+Contains                    bool
+CopyTo                      unit
+EndsWith                    bool
+EnumerateRunes              StringRuneEnumerator
+Equals                      bool
+GetEnumerator               CharEnumerator
+GetHashCode                 int
+GetPinnableReference        inref<char>
+GetTypeCode                 TypeCode
+IndexOf                     int
+IndexOfAny                  int
+Insert                      string
+IsNormalized                bool
+LastIndexOf                 int
+LastIndexOfAny              int
+Normalize                   string
+PadLeft                     string
+PadRight                    string
+Remove                      string
+Replace                     string
+ReplaceLineEndings          string
+Split                       string array
+StartsWith                  bool
+Substring                   string
+ToCharArray                 char array
+ToLower                     string
+ToLowerInvariant            string
+ToString                    string
+ToUpper                     string
+ToUpperInvariant            string
+Trim                        string
+TrimEnd                     string
+TrimStart                   string
+TryCopyTo                   bool
+                            [Methods, MemberOfObject]
+GetType                     Type
+                            [FromLightAndDynamicEvaluation^, ExtensionMethods]
+GetReverseIndex             int
+                            [FromSingleCompletion^, ImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+Aggregate |(in System.Linq)
+All |(in System.Linq)
+Ancestors |(in System.Xml.Linq)
+AncestorsAndSelf |(in System.Xml.Linq)
+Any |(in System.Linq)
+Append |(in System.Linq)
+AsEnumerable |(in System.Linq)
+AsMemory |(in System)
+AsParallel |(in System.Linq)
+AsQueryable |(in System.Linq)
+AsSpan |(in System)
+Attributes |(in System.Xml.Linq)
+Average |(in System.Linq)
+Cast |(in System.Linq)
+Chunk |(in System.Linq)
+Concat |(in System.Linq)
+Contains |(in System.Linq)
+CopyToDataTable |(in System.Data)
+Count |(in System.Linq)
+DefaultIfEmpty |(in System.Linq)
+DescendantNodes |(in System.Xml.Linq)
+DescendantNodesAndSelf |(in System.Xml.Linq)
+Descendants |(in System.Xml.Linq)
+DescendantsAndSelf |(in System.Xml.Linq)
+Distinct |(in System.Linq)
+DistinctBy |(in System.Linq)
+ElementAt |(in System.Linq)
+ElementAtOrDefault |(in System.Linq)
+Elements |(in System.Xml.Linq)
+Except |(in System.Linq)
+ExceptBy |(in System.Linq)
+First |(in System.Linq)
+FirstOrDefault |(in System.Linq)
+GetReverseIndex |(in Microsoft.FSharp.Core.Operators.ArrayExtensions)
+GroupBy |(in System.Linq)
+GroupJoin |(in System.Linq)
+InDocumentOrder |(in System.Xml.Linq)
+Intersect |(in System.Linq)
+IntersectBy |(in System.Linq)
+IsNormalized |(in System)
+Join |(in System.Linq)
+Last |(in System.Linq)
+LastOrDefault |(in System.Linq)
+LongCount |(in System.Linq)
+Max |(in System.Linq)
+MaxBy |(in System.Linq)
+Min |(in System.Linq)
+MinBy |(in System.Linq)
+Nodes |(in System.Xml.Linq)
+Normalize |(in System)
+OfType |(in System.Linq)
+Order |(in System.Linq)
+OrderBy |(in System.Linq)
+OrderByDescending |(in System.Linq)
+OrderDescending |(in System.Linq)
+Prepend |(in System.Linq)
+Remove |(in System.Xml.Linq)
+Reverse |(in System.Linq)
+Select |(in System.Linq)
+SelectMany |(in System.Linq)
+SequenceEqual |(in System.Linq)
+Single |(in System.Linq)
+SingleOrDefault |(in System.Linq)
+Skip |(in System.Linq)
+SkipLast |(in System.Linq)
+SkipWhile |(in System.Linq)
+Sum |(in System.Linq)
+Take |(in System.Linq)
+TakeLast |(in System.Linq)
+TakeWhile |(in System.Linq)
+ToArray |(in System.Linq)
+ToDictionary |(in System.Linq)
+ToFrozenDictionary |(in System.Collections.Frozen)
+ToFrozenSet |(in System.Collections.Frozen)
+ToHashSet |(in System.Linq)
+ToImmutableArray |(in System.Collections.Immutable)
+ToImmutableDictionary |(in System.Collections.Immutable)
+ToImmutableHashSet |(in System.Collections.Immutable)
+ToImmutableList |(in System.Collections.Immutable)
+ToImmutableSortedDictionary |(in System.Collections.Immutable)
+ToImmutableSortedSet |(in System.Collections.Immutable)
+ToList |(in System.Linq)
+ToLookup |(in System.Linq)
+TryGetNonEnumeratedCount |(in System.Linq)
+Union |(in System.Linq)
+UnionBy |(in System.Linq)
+Where |(in System.Linq)
+Zip |(in System.Linq)
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Chars                       char    <==
+Clone                       obj
+CompareTo                   int
+Contains                    bool
+CopyTo                      unit
+EndsWith                    bool
+EnumerateRunes              StringRuneEnumerator
+Equals                      bool
+GetEnumerator               CharEnumerator
+GetHashCode                 int
+GetPinnableReference        inref<char>
+GetReverseIndex             int
+GetType                     Type
+GetTypeCode                 TypeCode
+IndexOf                     int
+IndexOfAny                  int
+Insert                      string
+IsNormalized                bool
+LastIndexOf                 int
+LastIndexOfAny              int
+Length                      int
+Normalize                   string
+PadLeft                     string
+PadRight                    string
+Remove                      string
+Replace                     string
+ReplaceLineEndings          string
+Split                       string array
+StartsWith                  bool
+Substring                   string
+ToCharArray                 char array
+ToLower                     string
+ToLowerInvariant            string
+ToString                    string
+ToUpper                     string
+ToUpperInvariant            string
+Trim                        string
+TrimEnd                     string
+TrimStart                   string
+TryCopyTo                   bool
+                            [Full, Generic]
+Aggregate |(in System.Linq)
+All |(in System.Linq)
+Ancestors |(in System.Xml.Linq)
+AncestorsAndSelf |(in System.Xml.Linq)
+Any |(in System.Linq)
+Append |(in System.Linq)
+AsEnumerable |(in System.Linq)
+AsMemory |(in System)
+AsParallel |(in System.Linq)
+AsQueryable |(in System.Linq)
+AsSpan |(in System)
+Attributes |(in System.Xml.Linq)
+Average |(in System.Linq)
+Cast |(in System.Linq)
+Chunk |(in System.Linq)
+Concat |(in System.Linq)
+Contains |(in System.Linq)
+CopyToDataTable |(in System.Data)
+Count |(in System.Linq)
+DefaultIfEmpty |(in System.Linq)
+DescendantNodes |(in System.Xml.Linq)
+DescendantNodesAndSelf |(in System.Xml.Linq)
+Descendants |(in System.Xml.Linq)
+DescendantsAndSelf |(in System.Xml.Linq)
+Distinct |(in System.Linq)
+DistinctBy |(in System.Linq)
+ElementAt |(in System.Linq)
+ElementAtOrDefault |(in System.Linq)
+Elements |(in System.Xml.Linq)
+Except |(in System.Linq)
+ExceptBy |(in System.Linq)
+First |(in System.Linq)
+FirstOrDefault |(in System.Linq)
+GetReverseIndex |(in Microsoft.FSharp.Core.Operators.ArrayExtensions)
+GroupBy |(in System.Linq)
+GroupJoin |(in System.Linq)
+InDocumentOrder |(in System.Xml.Linq)
+Intersect |(in System.Linq)
+IntersectBy |(in System.Linq)
+IsNormalized |(in System)
+Join |(in System.Linq)
+Last |(in System.Linq)
+LastOrDefault |(in System.Linq)
+LongCount |(in System.Linq)
+Max |(in System.Linq)
+MaxBy |(in System.Linq)
+Min |(in System.Linq)
+MinBy |(in System.Linq)
+Nodes |(in System.Xml.Linq)
+Normalize |(in System)
+OfType |(in System.Linq)
+Order |(in System.Linq)
+OrderBy |(in System.Linq)
+OrderByDescending |(in System.Linq)
+OrderDescending |(in System.Linq)
+Prepend |(in System.Linq)
+Remove |(in System.Xml.Linq)
+Reverse |(in System.Linq)
+Select |(in System.Linq)
+SelectMany |(in System.Linq)
+SequenceEqual |(in System.Linq)
+Single |(in System.Linq)
+SingleOrDefault |(in System.Linq)
+Skip |(in System.Linq)
+SkipLast |(in System.Linq)
+SkipWhile |(in System.Linq)
+Sum |(in System.Linq)
+Take |(in System.Linq)
+TakeLast |(in System.Linq)
+TakeWhile |(in System.Linq)
+ToArray |(in System.Linq)
+ToDictionary |(in System.Linq)
+ToFrozenDictionary |(in System.Collections.Frozen)
+ToFrozenSet |(in System.Collections.Frozen)
+ToHashSet |(in System.Linq)
+ToImmutableArray |(in System.Collections.Immutable)
+ToImmutableDictionary |(in System.Collections.Immutable)
+ToImmutableHashSet |(in System.Collections.Immutable)
+ToImmutableList |(in System.Collections.Immutable)
+ToImmutableSortedDictionary |(in System.Collections.Immutable)
+ToImmutableSortedSet |(in System.Collections.Immutable)
+ToList |(in System.Linq)
+ToLookup |(in System.Linq)
+TryGetNonEnumeratedCount |(in System.Linq)
+Union |(in System.Linq)
+UnionBy |(in System.Linq)
+Where |(in System.Linq)
+Zip |(in System.Linq)
