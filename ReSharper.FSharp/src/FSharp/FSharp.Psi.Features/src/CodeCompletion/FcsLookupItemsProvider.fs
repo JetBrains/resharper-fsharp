@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
-open FSharp.Compiler.Syntax
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -82,7 +82,7 @@ type FcsLookupItemsProvider(logger: ILogger) =
 
             let isFsiModuleToSkip (item: RiderDeclarationListItems) =
                 not (Array.isEmpty item.NamespaceToOpen) &&
-                item.Name.StartsWith(PrettyNaming.FsiDynamicModulePrefix, StringComparison.Ordinal)
+                item.Name.StartsWith(FsiDynamicModulePrefix, StringComparison.Ordinal)
 
             let parseResults = fsFile.ParseResults
             let fcsContext = context.FcsCompletionContext
@@ -96,7 +96,7 @@ type FcsLookupItemsProvider(logger: ILogger) =
                 for list in itemLists do
                     Interruption.Current.CheckAndThrow()
 
-                    if list.Name = ".. .." then () else
+                    if IsOperatorDisplayName list.Name then () else
                     if skipFsiModules && isFsiModuleToSkip list then () else
 
                     let lookupItem = FcsLookupItem(list, context, Ranges = context.Ranges)
