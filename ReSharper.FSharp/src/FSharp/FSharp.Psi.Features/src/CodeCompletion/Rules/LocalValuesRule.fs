@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.Syntax.PrettyNaming
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -47,6 +48,8 @@ type LocalValuesRule() =
             context.GetOrCreateDataUnderLock(LocalValuesUtil.valuesKey, treeNode, LocalValuesUtil.getLocalValues)
 
         for KeyValue(name, (_, fcsSymbolUse)) in values do
+            if IsOperatorDisplayName name then () else
+
             let icon = if isNull fcsSymbolUse then null else getIconId fcsSymbolUse.Symbol
 
             let info = FcsSymbolInfo(name, fcsSymbolUse, Ranges = context.Ranges)

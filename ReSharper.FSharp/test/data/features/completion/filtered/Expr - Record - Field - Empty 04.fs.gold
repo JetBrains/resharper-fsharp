@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3871
+Count: 3870
 Focus: Soft
 Range: "{ R = { ♦ } }"
 
@@ -217,7 +217,6 @@ UnverifiableAttribute
 ValueOption
 VolatileFieldAttribute
 WebExtensions
-[]
 array
 bigint
 bool
@@ -4055,7 +4054,6 @@ ValueOption
 ValueSome                   'T voption
 VolatileFieldAttribute
 WebExtensions
-[]
 abs                         ^T
 acos                        ^T
 and
