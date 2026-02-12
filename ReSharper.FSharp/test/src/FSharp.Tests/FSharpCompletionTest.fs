@@ -106,6 +106,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Local val - New line 18``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 19``() = x.DoNamedTest()
     [<Test>] member x.``Local val - New line 20``() = x.DoNamedTest()
+    [<Test>] member x.``Local val - Op 01``() = x.DoNamedTest()
+    [<Test>] member x.``Local val - Op 02``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Pattern - Field 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Lambda - Arg - Curried - Expr 01``() = x.DoNamedTest()
@@ -718,7 +720,7 @@ type FSharpSelectionCompletionTest() =
 type FSharpCompletionListTest() =
     inherit CodeCompletionTestBase()
 
-    override x.RelativeTestDataPath = "features/completion/list"
+    override x.RelativeTestDataPath = "features/completion/naming"
 
     override x.TestType = CodeCompletionTestType.ModernList
 
@@ -745,8 +747,15 @@ type FSharpCompletionListTest() =
     [<Test>] member x.``Naming - Type parameter 01``() = x.DoNamedTest()
     [<Test>] member x.``Naming - Type parameter 02``() = x.DoNamedTest()
 
+[<FSharpTest>]
+type FSharpCompletionModernListTest() =
+    inherit CodeCompletionTestBase()
+
+    override x.RelativeTestDataPath = "features/completion/list"
+
+    override x.TestType = CodeCompletionTestType.ModernList
+
     // todo: [cc] those two tests are sensitive to `CLRLookupItemRelevance` values compactification
     [<Test>] member x.``Pattern Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Record Property 01``() = x.DoNamedTest()
-
     [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
