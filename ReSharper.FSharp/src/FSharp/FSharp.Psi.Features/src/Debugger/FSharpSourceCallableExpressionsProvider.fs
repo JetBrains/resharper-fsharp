@@ -4,6 +4,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
+open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -38,7 +39,8 @@ type FSharpCallableExpressionsCollector private () =
         | Some expected, Some (_, actual) -> expected = actual
         | _ -> false
 
-    let processInvokedReference (applicationInfo: (IFSharpExpression * int) option) (reference: FSharpSymbolReference) (result: List<_>) =
+    let processInvokedReference (applicationInfo: (IFSharpExpression * int) option) (reference: FSharpSymbolReference)
+            (result: List<_>) =
         if not (isInvocation applicationInfo reference) then () else
 
         match reference.Resolve().DeclaredElement with
@@ -61,7 +63,7 @@ type FSharpCallableExpressionsCollector private () =
                 match applicationInfo with
                 | None -> range, reference.GetElement().GetText()
                 | Some(appExpr, _) -> appExpr.GetDocumentRange(), appExpr.GetText()
-            
+
             let expr = DocumentRangeExpression(presentationRange, name, exprText, range)
             result.Add(expr)
 
@@ -124,6 +126,67 @@ type FSharpSourceCallableExpressionsProvider() =
         tokenType == FSharpTokenType.YIELD ||
         tokenType == FSharpTokenType.YIELD_BANG
 
+    let getMatchBranchExprs (matchExpr: IMatchExpr) : ITreeNode list =
+        if isNull matchExpr then [] else
+
+        matchExpr.ClausesEnumerable
+        |> Seq.collect (fun clause -> [clause.WhenExpression :> ITreeNode; clause.Expression])
+        |> Seq.toList
+
+    let getNextExpr (expr: IFSharpExpression) (seqExpr: ISequentialExpr) : ITreeNode =
+        let exprs = seqExpr.Expressions
+        let exprIndex = exprs.IndexOf(expr)
+        let fSharpExpressionOption = exprs |> Seq.tryItem (exprIndex + 1)
+        fSharpExpressionOption |> Option.defaultValue null :> _
+
+    let getPossibleNextExpressions (node: ITreeNode) =
+        let result = List<ITreeNode>()
+
+        let mutable shouldContinue = true
+        for parent in node.ContainingNodes(true) do
+            if not shouldContinue then () else
+
+            let expr = parent.As<IFSharpExpression>()
+            if isNull expr then () else
+
+            match expr with
+            | :? IComputationExpr -> shouldContinue <- false
+            | :? IForEachExpr as forExpr -> result.AddRange([forExpr.ForKeyword; forExpr.DoExpression])
+            | _ ->
+
+            let ifExpr = IfExprNavigator.GetByConditionExpr(expr)
+            if isNotNull ifExpr then
+                result.AddRange([ifExpr.ThenExpr; ifExpr.ElseExpr]) else
+
+            let matchExpr = MatchExprNavigator.GetByExpression(expr)
+            if isNotNull matchExpr then
+                result.AddRange(getMatchBranchExprs matchExpr) else
+
+            let matchClause = MatchClauseNavigator.GetByWhenExpression(expr)
+            let matchExpr = MatchExprNavigator.GetByClause(matchClause)
+            if isNotNull matchExpr then
+                result.AddRange(getMatchBranchExprs matchExpr) else
+
+            let seqExpr = SequentialExprNavigator.GetByExpression(expr)
+            if isNotNull seqExpr then
+                result.Add(getNextExpr expr seqExpr) else
+
+            let whileExpr = WhileExprNavigator.GetByExpression(expr)
+            if isNotNull whileExpr then
+                result.AddRange([whileExpr.ConditionExpr; whileExpr.DoExpression]) else
+
+            ()
+
+        result
+
+    let expressionSelectionProvider =
+        { new ExpressionSelectionProviderBase<IFSharpExpression>() with
+            override this.IsTokenSkipped(token) =
+                let tokenType = getTokenType token
+                isNotNull tokenType && tokenType.IsKeyword ||
+
+                base.IsTokenSkipped(token) }
+
     interface ISourceCallableExpressionsProvider with
         member this.GetExpressionList(file, solution, startLine, startCol, endLine, endCol) =
             let sourceFile = file.ToSourceFile()
@@ -151,7 +214,7 @@ type FSharpSourceCallableExpressionsProvider() =
 
                 // Workaround dotnet/fsharp#19248
                 | :? ITokenNode as tokenNode when isReturnOrYield tokenNode ->
-                    tokenNode.Parent.As<IFSharpExpression>() 
+                    tokenNode.Parent.As<IFSharpExpression>()
 
                 | _ -> null
 
@@ -159,6 +222,37 @@ type FSharpSourceCallableExpressionsProvider() =
 
             let result = List()
             expr.ProcessThisAndDescendants(FSharpCallableExpressionsCollector.Instance, result)
+            result
+
+        member this.GetAdditionalResumeLocations(location) =
+            let projectFile = location.ProjectFile
+            let sourceFile = projectFile.ToSourceFile()
+            if isNull sourceFile then null else
+
+            let startCoords = DocumentCoords(docLine (location.StartLine - 1), docColumn (location.StartCol - 1))
+            let endCoords = DocumentCoords(docLine (location.EndLine - 1), docColumn (location.EndCol - 1))
+
+            let document = sourceFile.Document
+            let startOffset = document.GetOffsetByCoordsSafe startCoords
+            let endOffset = document.GetOffsetByCoordsSafe endCoords
+            if not startOffset.HasValue || not endOffset.HasValue then null else
+
+            let fsFile = sourceFile.GetPrimaryPsiFile().AsFSharpFile()
+            if isNull fsFile then null else
+
+            let startOffset = DocumentOffset(document, startOffset.Value)
+            let endOffset = DocumentOffset(document, endOffset.Value)
+            let range = DocumentRange(&startOffset, &endOffset)
+            
+            let node = fsFile.FindNodeAt(range)
+            if isNull node then null else
+
+            let result = List()
+            let nextExprs = getPossibleNextExpressions node
+            for expr in nextExprs do
+                if isNotNull expr then
+                    result.Add(SequencePointLocation(projectFile, int expr.StartLine, expr.Indent))
+
             result
 
         member this.GetCallableSource(file, solution, startLine, startCol, endLine, endCol, callIndex, callableName) = ""

@@ -5,6 +5,7 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.DebuggerTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import com.jetbrains.rider.test.scriptingApi.DebugTestExecutionContext
 import com.jetbrains.rider.test.scriptingApi.dumpFullCurrentData
 import com.jetbrains.rider.test.scriptingApi.resumeSession
 import com.jetbrains.rider.test.scriptingApi.stepInto
@@ -18,6 +19,18 @@ import org.testng.annotations.Test
 @Solution("SteppingTests")
 class FSharpSteppingTest : DebuggerTestBase() {
     override val projectName = "SteppingTests"
+
+    fun DebugTestExecutionContext.dumpState(message: String? = null) {
+        dumpExecutionPoint(message = message, withOffsets = false)
+        stream.println()
+    }
+
+    fun DebugTestExecutionContext.repeatStepOver(count: Int) {
+        repeat(count, {
+            stepOver()
+            dumpState(message = "Stepped over")
+        })
+    }
 
     @Test
     fun testHiddenSequencePointInConstructor() {
@@ -207,18 +220,6 @@ class FSharpSteppingTest : DebuggerTestBase() {
             toggleBreakpoint("Async.fs", 56)
             toggleBreakpoint("Async.fs", 77)
         }, {
-            fun dumpState(message: String? = null) {
-                dumpExecutionPoint(message = message)
-                stream.println()
-            }
-
-            fun repeatStepOver(count: Int) {
-                repeat(count, {
-                    stepOver()
-                    dumpState(message = "Stepped over")
-                })
-            }
-
             waitForPause()
             dumpState(message = "Stopped inside a2")
             stepOver()
@@ -269,18 +270,6 @@ class FSharpSteppingTest : DebuggerTestBase() {
             toggleBreakpoint("Task.fs", 56)
             toggleBreakpoint("Task.fs", 77)
         }, {
-            fun dumpState(message: String? = null) {
-                dumpExecutionPoint(message = message)
-                stream.println()
-            }
-
-            fun repeatStepOver(count: Int) {
-                repeat(count, {
-                    stepOver()
-                    dumpState(message = "Stepped over")
-                })
-            }
-
             waitForPause()
             dumpState(message = "Stopped inside a2")
             stepOver()
@@ -315,6 +304,58 @@ class FSharpSteppingTest : DebuggerTestBase() {
             waitForPause()
             dumpState(message = "Stopped inside a9")
             repeatStepOver(2)
+            resumeSession()
+        }, true)
+    }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testControlFlowAsync() {
+        testDebugProgram({
+            toggleBreakpoint("ControlFlowAsync.fs", 5)
+            toggleBreakpoint("ControlFlowAsync.fs", 18)
+            toggleBreakpoint("ControlFlowAsync.fs", 28)
+        }, {
+            waitForPause()
+            dumpState(message = "Stopped inside a1")
+            repeatStepOver(6)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a2")
+            repeatStepOver(5)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a3")
+            repeatStepOver(8)
+            resumeSession()
+        }, true)
+    }
+
+    @Test
+    @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
+    @Solution("CeSteppingTests")
+    fun testControlFlowTask() {
+        testDebugProgram({
+            toggleBreakpoint("ControlFlowTask.fs", 5)
+            toggleBreakpoint("ControlFlowTask.fs", 18)
+            toggleBreakpoint("ControlFlowTask.fs", 28)
+        }, {
+            waitForPause()
+            dumpState(message = "Stopped inside a1")
+            repeatStepOver(6)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a2")
+            repeatStepOver(5)
+            resumeSession()
+
+            waitForPause()
+            dumpState(message = "Stopped inside a3")
+            repeatStepOver(8)
             resumeSession()
         }, true)
     }

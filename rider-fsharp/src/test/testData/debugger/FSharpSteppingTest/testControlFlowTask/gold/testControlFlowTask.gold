@@ -1,0 +1,66 @@
+Stopped inside a1:
+--> ControlFlowTask.fs:5 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowTask.fs:7 // match l |> List.head with
+
+Stepped over:
+--> ControlFlowTask.fs:7 // l
+
+Stepped over:
+--> ControlFlowTask.fs:7 // List.head
+
+Stepped over:
+--> ControlFlowTask.fs:9 // false
+
+Stepped over:
+--> ControlFlowTask.fs:10 // printfn "1"
+
+Stepped over:
+--> ControlFlowTask.fs:13 // printfn "()"
+
+Stopped inside a2:
+--> ControlFlowTask.fs:18 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowTask.fs:20 // for
+
+Stepped over:
+--> ControlFlowTask.fs:20 // in
+
+Stepped over:
+--> ControlFlowTask.fs:21 // printfn $"{i}"
+
+Stepped over:
+--> ControlFlowTask.fs:20 // in
+
+Stepped over:
+--> ControlFlowTask.fs:21 // printfn $"{i}"
+
+Stopped inside a3:
+--> ControlFlowTask.fs:28 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowTask.fs:30 // for
+
+Stepped over:
+--> ControlFlowTask.fs:30 // in
+
+Stepped over:
+--> ControlFlowTask.fs:31 // let j = i + 1
+
+Stepped over:
+--> ControlFlowTask.fs:32 // printfn $"{j}"
+
+Stepped over:
+--> ControlFlowTask.fs:30 // in
+
+Stepped over:
+--> ControlFlowTask.fs:31 // let j = i + 1
+
+Stepped over:
+--> ControlFlowTask.fs:32 // printfn $"{j}"
+
+Stepped over:
+--> ControlFlowTask.fs:30 // in
+
