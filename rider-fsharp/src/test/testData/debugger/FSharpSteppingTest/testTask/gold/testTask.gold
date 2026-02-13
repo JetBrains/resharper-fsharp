@@ -1,63 +1,63 @@
 Stopped inside a2:
---> Task.fs:27(280,296) // let! aResult = a
+--> Task.fs:27 // let! aResult = a
 
 Stepped over:
---> Task.fs:28(305,311) // return
+--> Task.fs:28 // return
 
 Stepped into Prop:
---> Task.fs:6(70,71) // 1
+--> Task.fs:6 // 1
 
 Stopped inside a3:
---> Task.fs:33(365,374) // let i = 1
+--> Task.fs:33 // let i = 1
 
 Stepped over:
---> Task.fs:34(383,389) // return
+--> Task.fs:34 // return
 
 Stepped into Prop:
---> Task.fs:6(70,71) // 1
+--> Task.fs:6 // 1
 
 Stopped inside a4:
---> Task.fs:39(437,467) // let! a = incrementAsync T.Prop
+--> Task.fs:39 // let! a = incrementAsync T.Prop
 
 Stepped over:
---> Task.fs:40(476,489) // let i = a + 1
+--> Task.fs:40 // let i = a + 1
 
 Stepped over:
---> Task.fs:41(498,504) // return
+--> Task.fs:41 // return
 
 Stopped inside a5:
---> Task.fs:46(552,562) // let! a = a
+--> Task.fs:46 // let! a = a
 
 Stepped over:
---> Task.fs:48(591,599) // ignore a
+--> Task.fs:48 // ignore a
 
 Stepped over:
---> Task.fs:49(612,617) // a + 1
+--> Task.fs:49 // a + 1
 
 Stepped over:
---> Task.fs:51(627,633) // return
+--> Task.fs:51 // return
 
 Stopped inside a6:
---> Task.fs:56(681,691) // let! a = a
+--> Task.fs:56 // let! a = a
 
 Stepped over:
---> Task.fs:58(720,725) // a + 1
+--> Task.fs:58 // a + 1
 
 Stepped over:
---> Task.fs:58(729,735) // ignore
+--> Task.fs:58 // ignore
 
 Stepped over:
---> Task.fs:59(748,749) // 1
+--> Task.fs:59 // 1
 
 Stepped over:
---> Task.fs:61(759,765) // return
+--> Task.fs:61 // return
 
 Stopped inside a9:
---> Task.fs:77(961,971) // let! a = a
+--> Task.fs:77 // let! a = a
 
 Stepped over:
---> Task.fs:78(980,983) // use
+--> Task.fs:78 // use
 
 Stepped over:
---> Task.fs:79(1007,1013) // return
+--> Task.fs:79 // return
 
