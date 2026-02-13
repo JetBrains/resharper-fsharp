@@ -1,0 +1,66 @@
+Stopped inside a1:
+--> ControlFlowAsync.fs:5 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowAsync.fs:7 // match l |> List.head with
+
+Stepped over:
+--> ControlFlowAsync.fs:7 // l
+
+Stepped over:
+--> ControlFlowAsync.fs:7 // List.head
+
+Stepped over:
+--> ControlFlowAsync.fs:9 // false
+
+Stepped over:
+--> ControlFlowAsync.fs:10 // printfn "1"
+
+Stepped over:
+--> ControlFlowAsync.fs:13 // printfn "()"
+
+Stopped inside a2:
+--> ControlFlowAsync.fs:18 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowAsync.fs:20 // for
+
+Stepped over:
+--> ControlFlowAsync.fs:21 // printfn $"{i}"
+
+Stepped over:
+--> ControlFlowAsync.fs:21 // printfn $"{i}"
+
+Stepped over:
+--> ControlFlowAsync.fs:21 // printfn $"{i}"
+
+Stepped over:
+--> ControlFlowAsync.fs:23 // printfn "()"
+
+Stopped inside a3:
+--> ControlFlowAsync.fs:28 // let l = [1; 2; 3]
+
+Stepped over:
+--> ControlFlowAsync.fs:30 // for
+
+Stepped over:
+--> ControlFlowAsync.fs:31 // let j = i + 1
+
+Stepped over:
+--> ControlFlowAsync.fs:32 // printfn $"{j}"
+
+Stepped over:
+--> ControlFlowAsync.fs:31 // let j = i + 1
+
+Stepped over:
+--> ControlFlowAsync.fs:32 // printfn $"{j}"
+
+Stepped over:
+--> ControlFlowAsync.fs:31 // let j = i + 1
+
+Stepped over:
+--> ControlFlowAsync.fs:32 // printfn $"{j}"
+
+Stepped over:
+--> ControlFlowAsync.fs:34 // printfn "()"
+

@@ -701,19 +701,19 @@ newExpr options { stubBase="ReferenceOwnerExprBase"; }:
   fSharpExpression<EXPR, ArgumentExpression>;
 
 forExpr options { stubBase="UnitExpressionBase"; }:
-  FOR
+  FOR<FOR_KEYWORD, ForKeyword>
   localDeclaration<IDENTIFIER, Identifier>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   fSharpExpression<IDENT_EXPR, IdentExpression>
-  TO
+  TO<TO_KEYWORD, ToKeyword>
   fSharpExpression<TO_EXPR, ToExpression>
-  DO
+  DO<DO_KEYWORD, DoKeyword>
   fSharpExpression<DO_EXPR, DoExpression>;
 
 forEachExpr options { stubBase="UnitExpressionBase"; }:
-  FOR
+  FOR<FOR_KEYWORD, ForKeyword>
   fSharpPattern<PAT, Pattern>
-  IN
+  IN<IN_KEYWORD, InKeyword>
   fSharpExpression<IN_EXPR, InExpression>
   forEachBodySeparator{BODY_SEPARATOR, BodySeparator}
   fSharpExpression<DO_EXPR, DoExpression>;
@@ -725,7 +725,7 @@ private forEachBodySeparator{ROLE, Getter}:
 whileExpr options { stubBase="UnitExpressionBase"; }:
   WHILE<WHILE_KEYWORD, WhileKeyword>
   fSharpExpression<WHILE_EXPR, ConditionExpr>
-  DO
+  DO<DO_KEYWORD, DoKeyword>
   fSharpExpression<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
