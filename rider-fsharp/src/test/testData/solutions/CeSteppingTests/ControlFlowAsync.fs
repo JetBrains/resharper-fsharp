@@ -1,0 +1,43 @@
+module ControlFlow.Async
+
+let a1 =
+    async {
+        let l = [1; 2; 3]
+
+        match l |> List.head with
+        | 0 -> printfn "0"
+        | 1 when false -> printfn "1"
+        | 1 -> printfn "1"
+        | _ -> printfn "_"
+
+        printfn "()"
+    }
+
+let a2 =
+    async {
+        let l = [1; 2; 3]
+
+        for i in l do
+            printfn $"{i}"
+
+        printfn "()"
+    }
+
+let a3 =
+    async {
+        let l = [1; 2; 3]
+
+        for i in l do
+            let j = i + 1
+            printfn $"{j}"
+
+        printfn "()"
+    }
+
+let run () =
+    let computations = [a1; a2; a3]
+    for a in computations do
+        let t = Async.StartAsTask(a)
+        t.Result |> ignore
+
+run ()

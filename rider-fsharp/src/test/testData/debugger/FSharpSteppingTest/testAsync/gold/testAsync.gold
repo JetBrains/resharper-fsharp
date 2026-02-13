@@ -1,63 +1,63 @@
 Stopped inside a2:
---> Async.fs:27(285,301) // let! aResult = a
+--> Async.fs:27 // let! aResult = a
 
 Stepped over:
---> Async.fs:28(310,316) // return
+--> Async.fs:28 // return
 
 Stepped into Prop:
---> Async.fs:6(71,72) // 1
+--> Async.fs:6 // 1
 
 Stopped inside a3:
---> Async.fs:33(371,380) // let i = 1
+--> Async.fs:33 // let i = 1
 
 Stepped over:
---> Async.fs:34(389,395) // return
+--> Async.fs:34 // return
 
 Stepped into Prop:
---> Async.fs:6(71,72) // 1
+--> Async.fs:6 // 1
 
 Stopped inside a4:
---> Async.fs:39(444,474) // let! a = incrementAsync T.Prop
+--> Async.fs:39 // let! a = incrementAsync T.Prop
 
 Stepped over:
---> Async.fs:40(483,496) // let i = a + 1
+--> Async.fs:40 // let i = a + 1
 
 Stepped over:
---> Async.fs:41(505,511) // return
+--> Async.fs:41 // return
 
 Stopped inside a5:
---> Async.fs:46(560,570) // let! a = a
+--> Async.fs:46 // let! a = a
 
 Stepped over:
---> Async.fs:48(599,607) // ignore a
+--> Async.fs:48 // ignore a
 
 Stepped over:
---> Async.fs:49(620,625) // a + 1
+--> Async.fs:49 // a + 1
 
 Stepped over:
---> Async.fs:51(635,641) // return
+--> Async.fs:51 // return
 
 Stopped inside a6:
---> Async.fs:56(690,700) // let! a = a
+--> Async.fs:56 // let! a = a
 
 Stepped over:
---> Async.fs:58(729,734) // a + 1
+--> Async.fs:58 // a + 1
 
 Stepped over:
---> Async.fs:58(738,744) // ignore
+--> Async.fs:58 // ignore
 
 Stepped over:
---> Async.fs:59(757,758) // 1
+--> Async.fs:59 // 1
 
 Stepped over:
---> Async.fs:61(768,774) // return
+--> Async.fs:61 // return
 
 Stopped inside a9:
---> Async.fs:77(973,983) // let! a = a
+--> Async.fs:77 // let! a = a
 
 Stepped over:
---> Async.fs:78(992,995) // use
+--> Async.fs:78 // use
 
 Stepped over:
---> Async.fs:79(1019,1025) // return
+--> Async.fs:79 // return
 
