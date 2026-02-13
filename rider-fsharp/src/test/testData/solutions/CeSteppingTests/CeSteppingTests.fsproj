@@ -9,6 +9,8 @@
         <Compile Include="File.fs" />
         <Compile Include="Async.fs" />
         <Compile Include="Task.fs" />
+        <Compile Include="ControlFlowAsync.fs"/>
+        <Compile Include="ControlFlowTask.fs"/>
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
