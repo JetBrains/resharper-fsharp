@@ -10,21 +10,29 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
-  public abstract class FSharpDaemonStageBase(bool visibleDocumentsOnly = false, bool enableInSignatures = true) : IDaemonStage
+  public abstract class FSharpDaemonStageBase(bool visibleDocumentsOnly = false, bool enableInSignatures = true)
+    : IModernDaemonStage
   {
-    protected virtual bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>
-      (!visibleDocumentsOnly || processKind == DaemonProcessKind.VISIBLE_DOCUMENT) &&
-      sourceFile != null && sourceFile.IsValid() &&
-      sourceFile.Properties is { IsNonUserFile: false, ProvidesCodeModel: true } &&
-      sourceFile.LanguageType.Is<FSharpProjectFileType>() &&
-      (enableInSignatures || !sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>());
+    public bool IsApplicable(IPsiSourceFile sourceFile, DaemonProcessKind processKind)
+    {
+      if (visibleDocumentsOnly && processKind != DaemonProcessKind.VISIBLE_DOCUMENT)
+        return false;
+
+      if (sourceFile.Properties is not { IsNonUserFile: false, ProvidesCodeModel: true })
+        return false;
+
+      if (!sourceFile.LanguageType.Is<FSharpProjectFileType>())
+        return false;
+
+      if (!enableInSignatures && sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+        return false;
+
+      return true;
+    }
 
     public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess daemonProcess,
       IContextBoundSettingsStore settings, DaemonProcessKind processKind)
     {
-      if (!IsSupported(daemonProcess.SourceFile, processKind))
-        return EmptyList<IDaemonStageProcess>.InstanceList;
-
       if (daemonProcess.SourceFile.GetPrimaryPsiFile() is not IFSharpFile fsFile)
         return EmptyList<IDaemonStageProcess>.Instance;
 
