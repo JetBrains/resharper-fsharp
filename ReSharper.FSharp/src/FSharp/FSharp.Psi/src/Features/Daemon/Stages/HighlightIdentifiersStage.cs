@@ -16,8 +16,8 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
-  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesAfter = new[] {typeof(CollectUsagesStage)})]
-  public class HighlightIdentifiersStage() : FSharpDaemonStageBase(true)
+  [DaemonStage(Instantiation.DemandAnyThreadSafe, StagesAfter = [typeof(CollectUsagesStage)])]
+  public class HighlightIdentifiersStage() : FSharpDaemonStageBase(visibleDocumentsOnly: true)
   {
     protected override IDaemonStageProcess CreateStageProcess(IFSharpFile psiFile, IContextBoundSettingsStore settings,
       IDaemonProcess process, DaemonProcessKind _) =>
