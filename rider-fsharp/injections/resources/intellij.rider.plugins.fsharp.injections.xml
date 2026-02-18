@@ -1,14 +1,15 @@
 <idea-plugin package="intellij.rider.plugins.fsharp.injections">
 
+    <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
     <dependencies>
-      <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
       <plugin id="com.jetbrains.rider.fsharp"/>
       <module name="intellij.database.sql.core.impl"/>
       <module name="intellij.platform.langInjection"/>
-      <module name="intellij.rider.plugins.appender.lang"/>
+        <module name="intellij.rider.languages"/>
       <module name="intellij.rider.plugins.appender.database"/>
-      <!-- endregion -->
+        <module name="intellij.rider.plugins.appender.lang"/>
     </dependencies>
+    <!-- endregion -->
 
     <extensions defaultExtensionNs="org.intellij.intelliLang">
         <languageSupport implementation="intellij.rider.plugins.fsharp.injections.FSharpInjectionSupport"/>
