@@ -3,8 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.QuickDoc
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
+open JetBrains.Application.Parts
 open JetBrains.DocumentModel.DataContext
-open JetBrains.ReSharper.Daemon
 open JetBrains.ReSharper.Daemon.Tooltips
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -12,11 +12,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
-open JetBrains.Util
 
 module FSharpQuickDoc =
     let getFSharpToolTipText (token: IFSharpIdentifier) : ToolTipText option =
@@ -144,3 +144,18 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
             tryFindToken context
             |> Option.iter (fun token ->
                 resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, token :?> _), FSharpLanguage.Instance))
+
+
+[<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadSafe)>]
+type FSharpShouldNotSuppressUndeclaredElements() =
+    interface IShouldNotSuppressUndeclaredElements with
+        member _.Check(file, offset) =
+            let referenceOwner =
+                file.FindNodeAt(TreeOffset(offset)).As<IFSharpIdentifier>()
+                |> FSharpReferenceOwnerNavigator.GetByIdentifier
+
+            // Covers the erased provided types and its members
+            match referenceOwner with
+            | :? IReferenceExpr
+            | :? ITypeReferenceName -> referenceOwner.Reference.HasFcsSymbol
+            | _ -> false
