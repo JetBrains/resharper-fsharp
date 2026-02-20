@@ -10,7 +10,7 @@
   <depends>com.intellij.rider.rdclient.spellchecker</depends>
 
   <content>
-    <module name="intellij.rider.plugins.fsharp/injections" />
+    <module name="intellij.rider.plugins.fsharp.injections" />
   </content>
 
   <extensions defaultExtensionNs="com.intellij">

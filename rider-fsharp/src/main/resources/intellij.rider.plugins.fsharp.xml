@@ -1,8 +1,0 @@
-<idea-plugin>
-
-    <dependencies>
-        <plugin id="com.intellij.ml.llm"/>
-        <module name="intellij.platform.langInjection"/>
-    </dependencies>
-
-</idea-plugin>

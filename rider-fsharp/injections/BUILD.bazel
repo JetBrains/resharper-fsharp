@@ -1,0 +1,48 @@
+### auto-generated section `build intellij.rider.plugins.fsharp.injections` start
+load("@rules_jvm//:jvm.bzl", "jvm_library", "resourcegroup")
+
+resourcegroup(
+  name = "injections_resources",
+  srcs = glob(["resources/**/*"]),
+  strip_prefix = "resources"
+)
+
+jvm_library(
+  name = "injections",
+  module_name = "intellij.rider.plugins.fsharp.injections",
+  visibility = ["//visibility:public"],
+  srcs = glob(["src/**/*.kt", "src/**/*.java", "src/**/*.form"], allow_empty = True),
+  resources = [":injections_resources"],
+  deps = [
+    "@lib//:kotlin-stdlib",
+    "//dotnet/Plugins:rider-plugins-fsharp",
+    "@community//platform/core-api:core",
+    "@community//plugins/IntelliLang:langInjection",
+    "//rider/languages",
+    "@community//platform/lang-impl",
+    "//dbe/sql/core-impl:database-sql-core-impl",
+    "@community//platform/lang-api:lang",
+    "//rider/plugins/plugins-appender/lang",
+    "//rider/plugins/plugins-appender/database",
+  ]
+)
+
+jvm_library(
+  name = "injections_test_lib",
+  module_name = "intellij.rider.plugins.fsharp.injections",
+  visibility = ["//visibility:public"],
+  srcs = glob([], allow_empty = True),
+  runtime_deps = [
+    ":injections",
+    "//dotnet/Plugins:rider-plugins-fsharp_test_lib",
+    "@community//platform/core-api:core_test_lib",
+    "@community//plugins/IntelliLang:langInjection_test_lib",
+    "//rider/languages:languages_test_lib",
+    "@community//platform/lang-impl:lang-impl_test_lib",
+    "//dbe/sql/core-impl:database-sql-core-impl_test_lib",
+    "@community//platform/lang-api:lang_test_lib",
+    "//rider/plugins/plugins-appender/lang:lang_test_lib",
+    "//rider/plugins/plugins-appender/database:database_test_lib",
+  ]
+)
+### auto-generated section `build intellij.rider.plugins.fsharp.injections` end

@@ -1,0 +1,23 @@
+<idea-plugin package="intellij.rider.plugins.fsharp.injections">
+
+    <dependencies>
+      <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
+      <plugin id="com.jetbrains.rider.fsharp"/>
+      <module name="intellij.database.sql.core.impl"/>
+      <module name="intellij.platform.langInjection"/>
+      <module name="intellij.rider.plugins.appender.lang"/>
+      <module name="intellij.rider.plugins.appender.database"/>
+      <!-- endregion -->
+    </dependencies>
+
+    <extensions defaultExtensionNs="org.intellij.intelliLang">
+        <languageSupport implementation="intellij.rider.plugins.fsharp.injections.FSharpInjectionSupport"/>
+        <injectionConfig config="fsharpInjections.xml"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <multiHostInjector implementation="intellij.rider.plugins.fsharp.injections.FSharpConcatenationToInjectorAdapter" order="first"/>
+        <concatenationAwareInjector implementation="intellij.rider.plugins.fsharp.injections.FSharpConcatenationAwareInjector"/>
+        <sql.resolveExtension implementation="intellij.rider.plugins.fsharp.injections.FSharpSqlDapperParameterResolveExtension"/>
+    </extensions>
+</idea-plugin>

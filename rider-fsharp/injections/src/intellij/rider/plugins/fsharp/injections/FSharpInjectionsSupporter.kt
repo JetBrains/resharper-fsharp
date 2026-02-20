@@ -1,4 +1,4 @@
-package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections
+package intellij.rider.plugins.fsharp.injections
 
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
