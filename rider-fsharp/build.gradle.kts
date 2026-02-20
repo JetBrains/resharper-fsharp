@@ -357,7 +357,7 @@ tasks {
   }
 
   wrapper {
-    gradleVersion = "8.7"
+    gradleVersion = "8.14.3"
     distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
   }
 
