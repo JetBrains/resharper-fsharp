@@ -88,6 +88,14 @@ if (!isMonorepo) {
     }
   }
 }
+sourceSets.main {
+  resources {
+    srcDir("injections/resources")
+  }
+  kotlin {
+    srcDir("injections/src")
+  }
+}
 
 val libFiles = listOf(
   "FSharp/FSharp.Common/$outputRelativePath/FSharp.Core.dll",

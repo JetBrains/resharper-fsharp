@@ -1,4 +1,4 @@
-package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.injections
+package intellij.rider.plugins.fsharp.injections
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.ElementManipulators
