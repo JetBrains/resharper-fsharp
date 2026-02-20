@@ -329,7 +329,7 @@ type FSharpNonTailRecursionGutterMarkType() =
 
   RegisterHighlighter(
       FSharpHighlightingAttributeIds.Function,
-      FallbackAttributeId = FSharpHighlightingAttributeIds.Value,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Method,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Function",
       Layer = HighlighterLayer.SYNTAX,
