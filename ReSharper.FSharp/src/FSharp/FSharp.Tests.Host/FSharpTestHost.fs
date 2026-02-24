@@ -91,10 +91,10 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         JetBrains.Core.Unit.Instance
 
     let typeProvidersRuntimeVersion _ =
-        solution.GetComponent<IProxyExtensionTypingProvider>().RuntimeVersion()
+        solution.GetComponent<ITypeProvidersShim>().RuntimeVersion()
 
     let dumpTypeProvidersProcess _ =
-        solution.GetComponent<IProxyExtensionTypingProvider>().DumpTypeProvidersProcess()
+        solution.GetComponent<ITypeProvidersShim>().DumpTypeProvidersProcess()
 
     let getCultureInfoAndSetNew (culture: string) =
         let currentCulture = CultureInfo.CurrentUICulture

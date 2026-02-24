@@ -611,7 +611,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 /// which makes FCS cached resolve results stale
 [<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
-        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, typeProvidersShim: IProxyExtensionTypingProvider,
+        psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, typeProvidersShim: ITypeProvidersShim,
         fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>) =
 
     interface ISolutionLoadTasksStartPsiListener2 with

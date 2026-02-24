@@ -12,8 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       out ProxyProvidedTypeWithContext providedType)
     {
       providedType = null;
-      var extensionTypingProvider = psiModule.GetSolution().GetComponent<IProxyExtensionTypingProvider>();
-      return extensionTypingProvider.TypeProvidersManager?.Context.ProvidedAbbreviations.TryGet(psiModule, name,
+      var typeProvidersShim = psiModule.GetSolution().GetComponent<ITypeProvidersShim>();
+      return typeProvidersShim.SolutionTypeProvidersClient?.Context.ProvidedAbbreviations.TryGet(psiModule, name,
         out providedType) ?? false;
     }
   }
