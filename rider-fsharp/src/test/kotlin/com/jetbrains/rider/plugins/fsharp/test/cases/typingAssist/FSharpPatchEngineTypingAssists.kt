@@ -187,12 +187,19 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
     "Enter 28 - No indent after else and new line",
     "Enter 29 - No indent before source",
     "Enter 30 - No indent before source 2",
+    "Enter 31 - Inside empty ctor",
     "Enter 32 - Nested binding",
     "Enter 33 - After then on line with multiple parens in row",
     "Enter 34 - After line with multiple parens in row",
     "Enter 35 - Nested binding and indent",
     "Enter 36 - Indent after =, trim before source",
+    "Enter 38 - Empty list",
+    "Enter 39 - Empty list with spaces",
+    "Enter 40 - Empty list continuing line",
+    "Enter 41 - Empty array continuing line",
     "Enter 42 - Before first list element and new line",
+    "Enter 43 - Before first list element",
+    "Enter 44 - Before first list element and spaces",
     "Enter 45 - Before first list element in multiline list",
     "Enter 46 - Before first list element in multiline list",
     "Enter 47 - Before first list element in multiline list",
@@ -263,7 +270,13 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
     "Enter - String 12",
     "Enter - String 13",
     "Enter - String 14",
-    "Enter - String 15"
+    "Enter - String 15",
+    "Enter - Parens - Begin 01",
+    "Enter - Parens - Begin 02",
+    "Enter - Parens - Type 01",
+    "Enter - Parens - Type 02",
+    "Enter - Parens - Type 03",
+    "Enter - Parens - Type 04"
   )
 
   @DataProvider(name = SUPPORTED_BACKEND_CASES)
