@@ -2,8 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <PackageLock Include="Fantomas.Core" Version="7.0.3" />
-    <PackageLock Include="FSharp.Core" Version="9.0.201" />
-    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2025.3.5.2" />
+    <PackageLock Include="FSharp.Core" Version="10.0.103" />
+    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2026.1.0" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.2" />
     <PackageLock Include="JetBrains.NuGet.Frameworks" Version="7.0.20251126.165" />
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.0.20251126.165" />

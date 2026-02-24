@@ -16,9 +16,10 @@ IFSharpImplFile
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpIdentifierToken(type:IDENTIFIER, text:Base)
-          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          FSharpIdentifierToken(type:IDENTIFIER, text:a)
-          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-          IFromErrorExpr
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          IParenExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IReferenceExpr
+              FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
