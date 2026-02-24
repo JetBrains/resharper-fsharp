@@ -14,6 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
     public (T model, int typeProviderId) Get(int key) => myEntities[key];
 
-    public string Dump() => $"{typeof(T).Name}:\nCount: {myEntities.Count}";
+    public string Dump(TypeProvidersCache _) => $"{typeof(T).Name}:\nCount: {myEntities.Count}";
   }
 }

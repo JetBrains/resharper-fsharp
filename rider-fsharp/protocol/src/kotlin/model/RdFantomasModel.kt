@@ -11,7 +11,6 @@ object RdFantomasModel : Root() {
 
   private val rdFcsParsingOptions = structdef {
     field("lastSourceFile", string)
-    field("lightSyntax", bool.nullable)
     field("conditionalCompilationDefines", array(string))
     field("isExe", bool)
     field("langVersion", string)

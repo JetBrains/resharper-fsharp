@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
+open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.Application.Parts
@@ -26,7 +27,7 @@ module internal Reflection =
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
-                  schema: SettingsSchema, settingsStore: ISettingsStore) =
+                  schema: SettingsSchema) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
@@ -83,8 +84,7 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
             if isNull value then "" else value |]
 
     let toRdFcsParsingOptions (options: FSharpParsingOptions) =
-        let lightSyntax = Option.toNullable options.IndentationAwareSyntax
-        RdFcsParsingOptions(Array.last options.SourceFiles, lightSyntax,
+        RdFcsParsingOptions(Array.last options.SourceFiles,
             List.toArray options.ConditionalDefines, options.IsExe, options.LangVersionText)
 
     do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())

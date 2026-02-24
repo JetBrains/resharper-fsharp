@@ -1,1 +1,1 @@
-#r "nuget: <caret> "
+#r "nuget: JetBrains.Annotati<caret> "

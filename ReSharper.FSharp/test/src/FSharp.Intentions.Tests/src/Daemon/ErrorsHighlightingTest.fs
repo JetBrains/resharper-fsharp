@@ -22,8 +22,7 @@ type ErrorsHighlightingTest() =
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
     [<Test>] member x.``Enum Rqa analyzer 02 - F# 9``() = x.DoNamedTest()
 
-    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp70)>] member x.``Extension analyzer 01``() = x.DoNamedTest()
-    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>] member x.``Extension analyzer 02``() = x.DoNamedTest()
+    [<Test>] member x.``Extension analyzer 01``() = x.DoNamedTest()
 
     [<HighlightOnly(typeof<RedundantIndexerDotWarning>)>]
     [<Test>] member x.``Indexer dot analyzer 01``() = x.DoNamedTest()
@@ -47,9 +46,6 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Self id 01``() = x.DoNamedTest()
     [<Test>] member x.``Self id 02 - Property with accessors``() = x.DoNamedTest()
-
-    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp46)>]
-    [<Test>] member x.``Self id - Not available 01``() = x.DoNamedTest()
 
     [<HighlightOnly(typeof<InvalidXmlDocPositionWarning>)>]
     [<Test>] member x.``Invalid XmlDoc position 01``() = x.DoNamedTest()
