@@ -21,13 +21,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Hosts
 
     private static string RuntimeVersion(Unit _) => PlatformUtil.CurrentFrameworkDescription;
 
-    private string Dump(Unit _) =>
-      string.Join("\n\n",
-        myTypeProvidersContext.TypeProvidersCache.Dump(),
-        myTypeProvidersContext.ProvidedTypesCache.Dump(),
-        myTypeProvidersContext.ProvidedAssembliesCache.Dump(),
-        myTypeProvidersContext.ProvidedConstructorsCache.Dump(),
-        myTypeProvidersContext.ProvidedMethodsCache.Dump(),
-        myTypeProvidersContext.ProvidedPropertyCache.Dump());
+    private string Dump(Unit _)
+    {
+      var tpCache = myTypeProvidersContext.TypeProvidersCache;
+      return string.Join("\n\n",
+        tpCache.Dump(),
+        myTypeProvidersContext.ProvidedTypesCache.Dump(tpCache),
+        myTypeProvidersContext.ProvidedAssembliesCache.Dump(tpCache),
+        myTypeProvidersContext.ProvidedConstructorsCache.Dump(tpCache),
+        myTypeProvidersContext.ProvidedMethodsCache.Dump(tpCache),
+        myTypeProvidersContext.ProvidedPropertyCache.Dump(tpCache));
+    }
   }
 }
