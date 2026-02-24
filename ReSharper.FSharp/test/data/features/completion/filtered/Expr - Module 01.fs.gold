@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 326
+Count: 327
 Focus: Soft
 Range: "♦"
 
@@ -235,6 +235,7 @@ voption
 #nowarn
 #r
 #time
+#warnon
 FSharpFunc
 Failure                     exn
 abs                         ^T
@@ -348,6 +349,7 @@ using                       'U
 #nowarn
 #r
 #time
+#warnon
 AbstractClassAttribute
 AllowNullLiteralAttribute
 Array
