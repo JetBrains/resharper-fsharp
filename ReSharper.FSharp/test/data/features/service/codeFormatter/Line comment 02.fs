@@ -1,0 +1,5 @@
+module M
+
+let _ =
+    1
+    // A
