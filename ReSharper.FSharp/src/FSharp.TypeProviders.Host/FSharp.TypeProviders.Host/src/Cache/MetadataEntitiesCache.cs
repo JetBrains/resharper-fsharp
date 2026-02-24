@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
         return true;
       });
 
-    public virtual string Dump() => "";
+    public virtual string Dump(TypeProvidersCache tpCache) => "";
 
     public IEnumerator<KeyValuePair<T, (int id, HashSet<int> referencingProviders)>> GetEnumerator() =>
       IdsCache.GetEnumerator();
@@ -137,20 +137,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
         ? myMetadataEntitiesCache.TryGetKey(model, requestingTypeProviderId, out key)
         : myCreatedByProviderTypes.TryGetLeftByRight((model, requestingTypeProviderId), out key);
 
-    public string Dump() =>
+    public string Dump(TypeProvidersCache tpCache) =>
       string.Join("\n\n",
         "Created by provider Types:\n" + string.Join("\n",
           myCreatedByProviderTypes
-            .OrderBy(t => t.Value.type.FullName)
             .Select(t =>
-              $"{t.Value.type.FullName} tp: {t.Value.typeProviderId} " +
-              $"(from {t.Value.type.Assembly.GetLogName()})")),
+              $"{t.Value.type.FullName} (from {t.Value.type.Assembly.GetLogName()}), " +
+              $"owners: {tpCache.DumpNames([t.Value.typeProviderId])}")
+            .OrderBy()),
         "Provided Types:\n" + string.Join("\n",
           myMetadataEntitiesCache
-            .OrderBy(t => t.Key.FullName)
             .Select(t =>
-              $"{t.Key.FullName} tps: {string.Join("|", t.Value.referencingProviders.OrderBy().ToArray())} " +
-              $"(from {t.Key.Assembly.GetLogName()})")));
+              $"{t.Key.FullName} (from {t.Key.Assembly.GetLogName()}), " +
+              $"owners: {tpCache.DumpNames(t.Value.referencingProviders)}")
+            .OrderBy()));
   }
 
   public class ProvidedAssembliesCache : MetadataEntitiesCache<ProvidedAssembly>
@@ -159,11 +159,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
     {
     }
 
-    public override string Dump() =>
+    public override string Dump(TypeProvidersCache tpCache) =>
       "Provided Assemblies:\n" + string.Join("\n",
         IdsCache
-          .Select(t => (Name: t.Key.GetLogName(), Providers: t.Value.referencingProviders.OrderBy().ToArray()))
-          .OrderBy(t => t.Name)
-          .Select(t => $"{t.Name} tps: {string.Join("|", t.Providers)}"));
+          .Select(t => (Assembly: t.Key, Providers: t.Value.referencingProviders.OrderBy().ToArray()))
+          .Select(t => t.Assembly.GetLogName() +
+                       (t.Assembly.GetName().Name is "mscorlib" or "netstandard"
+                         ? ""
+                         : $", owners: {tpCache.DumpNames(t.Providers)}"))
+          .OrderBy());
   }
 }

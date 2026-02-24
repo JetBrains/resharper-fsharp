@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Utils;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Utils;
 using JetBrains.Util.dataStructures;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -31,7 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Host.Cache
 
     public string Dump() =>
       "Type Providers:\n" + string.Join("\n",
-        myTypeProviders.Select(t =>
-          $"{t.Key} {t.Value.typeProvider.GetType().AssemblyQualifiedName} (from {Path.GetFileName(t.Value.envKey)})"));
+        myTypeProviders
+          .Select(t => $"{t.Value.typeProvider.GetDumpName()} (from {Path.GetFileName(t.Value.envKey)})")
+          .OrderBy());
   }
 }

@@ -74,7 +74,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
         | SynModuleDecl.Open(openDeclTarget, range) ->
             x.ProcessOpenDeclTarget(openDeclTarget, range)
 
-        | SynModuleDecl.Let(_, bindings, range) ->
+        | SynModuleDecl.Let(_, bindings, range, _) ->
             x.ProcessTopLevelBindings(bindings, range)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
@@ -201,7 +201,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
         match typeMember with
         | SynMemberDefn.ImplicitCtor _ -> ()
-        | SynMemberDefn.LetBindings(bindings, _, _, range) ->
+        | SynMemberDefn.LetBindings(bindings, _, _, range, _) ->
             x.ProcessTopLevelBindings(bindings, range)
         | _ ->
 
@@ -1061,7 +1061,7 @@ type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path
             x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
 
-        | SynExpr.LetOrUse(_, _, _, _, bindings, bodyExpr, _, _) ->
+        | SynExpr.LetOrUse({ Bindings = bindings; Body = bodyExpr }) ->
             x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(bodyExpr)
             x.ProcessBindings(bindings)

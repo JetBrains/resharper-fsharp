@@ -48,7 +48,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SwaggerProviderCSharp")
   fun changeStaticArg() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {

@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Parsing
 
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -496,7 +496,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Type app 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 02 - ML-style``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 03 - tuple``() = x.DoNamedTest()
-    [<Test>] member x.``Types - Type app 04 - ML-style tuple``() = x.DoNamedTest()
+    [<Test; Explicit("Not supported anymore")>] member x.``Types - Type app 04 - ML-style tuple``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 05 - Qualifier and generics``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 06 - Multiple qualifiers and generics``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 07 - Var``() = x.DoNamedTest()
