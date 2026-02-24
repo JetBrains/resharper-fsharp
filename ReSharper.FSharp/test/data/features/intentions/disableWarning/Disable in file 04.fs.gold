@@ -1,0 +1,9 @@
+﻿// ReSharper disable FSharpRedundantApplication
+
+module M
+
+id{caret} 1 // ${QF_TO_EXECUTE:Disable in file with comment}
+
+// ReSharper disable B
+// ReSharper disable once C
+()
