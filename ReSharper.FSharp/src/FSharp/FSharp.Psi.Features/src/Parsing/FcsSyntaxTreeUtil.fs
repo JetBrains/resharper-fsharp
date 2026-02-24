@@ -39,7 +39,7 @@ type SynMemberDefn with
         match x with
         | SynMemberDefn.Member(SynBinding(xmlDoc = xmlDoc), _)
         | SynMemberDefn.ImplicitCtor(xmlDoc = xmlDoc)
-        | SynMemberDefn.LetBindings(SynBinding(xmlDoc = xmlDoc) :: _, _, _, _)
+        | SynMemberDefn.LetBindings(SynBinding(xmlDoc = xmlDoc) :: _, _, _, _, _)
         | SynMemberDefn.AbstractSlot(SynValSig(xmlDoc = xmlDoc), _, _, _)
         | SynMemberDefn.ValField(SynField(xmlDoc = xmlDoc), _)
         | SynMemberDefn.AutoProperty(xmlDoc = xmlDoc) -> xmlDoc.ToXmlDoc(false, None)
