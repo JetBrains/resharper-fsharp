@@ -3,20 +3,20 @@ Before:
 [In-Process dump]:
 
 Type Providers:
-1 ProviderImplementation.SimpleErasingProvider
-2 ProviderImplementation.SimpleGenerativeProvider
+ProviderImplementation.SimpleErasingProvider
+ProviderImplementation.SimpleGenerativeProvider
 
 Provided Types:
-1 SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-1 SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-1 SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 
 Provided Assemblies:
-2 netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-2 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
 GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
@@ -26,22 +26,22 @@ GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] =
 [Out-Process dump]:
 
 Type Providers:
-1 ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
-2 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
+ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
+ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
 
 Created by provider Types:
-SimpleErasingProviderNamespace.AbstractType tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.ClassWithInterfaces tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.SimpleErasedType tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType tp: 2 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype tp: 2 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
 
 Provided Types:
-System.Object tps: 1|2 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider
 
 Provided Assemblies:
-netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 tps: 1
-TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae tps: 1|2
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae, owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider
 
 ProvidedConstructorInfo:
 Count: 0
@@ -60,20 +60,20 @@ After:
 [In-Process dump]:
 
 Type Providers:
-1 ProviderImplementation.SimpleErasingProvider
-2 ProviderImplementation.SimpleGenerativeProvider
+ProviderImplementation.SimpleErasingProvider
+ProviderImplementation.SimpleGenerativeProvider
 
 Provided Types:
-1 SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-1 SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-1 SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-2 System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 
 Provided Assemblies:
-2 netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-2 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
 GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] = 
@@ -83,22 +83,22 @@ GUID(GenerativeTypeProvider)-A6CC28E6[.NETStandard,Version=v2.0] =
 [Out-Process dump]:
 
 Type Providers:
-1 ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
-2 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
+ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
+ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from GenerativeTypeProvider.dll)
 
 Created by provider Types:
-SimpleErasingProviderNamespace.AbstractType tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.ClassWithInterfaces tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.SimpleErasedType tp: 1 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType tp: 2 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype tp: 2 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
 
 Provided Types:
-System.Object tps: 1|2 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider
 
 Provided Assemblies:
-netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 tps: 1
-TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae tps: 1|2
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae, owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider
 
 ProvidedConstructorInfo:
 Count: 0

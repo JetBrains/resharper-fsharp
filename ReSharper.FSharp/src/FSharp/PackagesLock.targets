@@ -3,10 +3,10 @@
   <ItemGroup>
     <PackageLock Include="Antlr2.Runtime" Version="2.7.7.3" />
     <PackageLock Include="Fantomas.Core" Version="7.0.3" />
-    <PackageLock Include="FSharp.Core" Version="9.0.201" />
+    <PackageLock Include="FSharp.Core" Version="10.0.103" />
     <PackageLock Include="JetBrains.Annotations" Version="2025.2.0" />
     <PackageLock Include="JetBrains.Build.Platform.DistributedCache" Version="1.1.20250717.260" />
-    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2025.3.5.2" />
+    <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2026.1.0" />
     <PackageLock Include="JetBrains.HabitatDetector" Version="1.4.6" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.1.2" />
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.0.20251126.165" />
