@@ -1,9 +1,12 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.QuickDoc
 
 open FSharp.Compiler.EditorServices
+open FSharp.Compiler.Symbols
+open FSharp.Compiler.Text
 open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
 open JetBrains.Application.Parts
+open JetBrains.DocumentManagers
 open JetBrains.DocumentModel.DataContext
 open JetBrains.ReSharper.Daemon.Tooltips
 open JetBrains.ReSharper.Feature.Services.QuickDoc
@@ -19,7 +22,35 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 
 module FSharpQuickDoc =
+    let createTextTooltipText text =
+        ToolTipText([ToolTipElement.Single([|TaggedText(TextTag.Text, text)|], FSharpXmlDoc.None)])
+
+    let getKeywordTooltipText (token: IFSharpIdentifier) =
+        if token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_SOURCE_DIRECTORY then
+            let sourceFile = token.FSharpFile.GetSourceFile()
+            if isNull sourceFile then None else
+            let path = sourceFile.Document.TryGetFilePath()
+            if path.IsEmpty then None
+            else createTextTooltipText path.Directory.FullPath |> Some
+
+        elif token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE then
+             token.FSharpFile.GetSourceFile()
+             |> Option.ofObj
+             |> Option.map _.Name
+             |> Option.map createTextTooltipText
+
+        elif token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_LINE then
+            token.GetStartLine().Plus1().ToString()
+            |> createTextTooltipText
+            |> Some
+        
+        else None
+
     let getFSharpToolTipText (token: IFSharpIdentifier) : ToolTipText option =
+        match getKeywordTooltipText token with
+        | Some _ as text -> text
+        | None ->
+
         match token.FSharpFile.GetParseAndCheckResults(true, "FSharpQuickDoc") with
         | None -> None
         | Some results ->
@@ -150,12 +181,19 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
 type FSharpShouldNotSuppressUndeclaredElements() =
     interface IShouldNotSuppressUndeclaredElements with
         member _.Check(file, offset) =
-            let referenceOwner =
-                file.FindNodeAt(TreeOffset(offset)).As<IFSharpIdentifier>()
-                |> FSharpReferenceOwnerNavigator.GetByIdentifier
+            match file.FindNodeAt(TreeOffset(offset)) with
+            | :? IFSharpIdentifier as identifier ->
+                let tokenType = identifier.GetTokenType()
+                if tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_DIRECTORY ||
+                   tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE ||
+                   tokenType == FSharpTokenType.KEYWORD_STRING_LINE then true else
 
-            // Covers the erased provided types and its members
-            match referenceOwner with
-            | :? IReferenceExpr
-            | :? ITypeReferenceName -> referenceOwner.Reference.HasFcsSymbol
+                let referenceOwner = identifier |> FSharpReferenceOwnerNavigator.GetByIdentifier
+
+                // Covers the erased provided types and its members
+                match referenceOwner with
+                | :? IReferenceExpr
+                | :? ITypeReferenceName -> referenceOwner.Reference.HasFcsSymbol
+                | _ -> false
+
             | _ -> false
