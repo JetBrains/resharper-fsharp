@@ -225,6 +225,7 @@ public interface FSharpTokenType {
   IElementType PP_QUIT = createToken("PP_QUIT");
   IElementType PP_I = createToken("PP_I");
   IElementType PP_NOWARN = createToken("PP_NOWARN");
+  IElementType PP_WARNON = createToken("PP_WARNON");
   IElementType PP_REFERENCE = createToken("PP_REFERENCE");
   IElementType PP_TIME = createToken("PP_TIME");
   IElementType PP_IF_SECTION = createToken("PP_IF_SECTION");
@@ -434,6 +435,7 @@ public interface FSharpTokenType {
     PP_I,
     PP_TIME,
     PP_NOWARN,
+    PP_WARNON,
     PP_HELP,
     PP_QUIT,
     PP_DIRECTIVE

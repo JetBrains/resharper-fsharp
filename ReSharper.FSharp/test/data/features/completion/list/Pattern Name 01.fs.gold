@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 257
+Count: 258
 Focus: Soft
 Range: "| Some(♦)"
 
@@ -267,6 +267,7 @@ voption
 #nowarn
 #r
 #time
+#warnon
 FSharpFunc
 ctx                         Current file context
 nguid                       Insert new GUID
@@ -284,6 +285,7 @@ value                       <==
 #nowarn
 #r
 #time
+#warnon
 AbstractClassAttribute
 AllowNullLiteralAttribute
 Array
