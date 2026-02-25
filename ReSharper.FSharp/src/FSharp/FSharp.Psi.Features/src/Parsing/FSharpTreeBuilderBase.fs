@@ -77,8 +77,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
             let mark = x.Mark()
             x.AdvanceToEnd(directiveRange)
             x.Done(directiveRange, mark, ElementType.WARNING_DIRECTIVE)
+            
+            if not x.Eof then x.Builder.AdvanceLexer() |> ignore
 
-        x.Builder.AdvanceLexer() |> ignore
+        else x.Builder.AdvanceLexer() |> ignore
 
     member x.AdvanceToStart(range: range) =
         x.AdvanceToOffset(x.GetStartOffset(range))
