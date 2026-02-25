@@ -1,0 +1,8 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpWarningDirective
+      FSharpTokenType+PpNowarnTokenElement(type:PP_NOWARN, text:#nowarn)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpToken(type:INT32, text:1)
+
