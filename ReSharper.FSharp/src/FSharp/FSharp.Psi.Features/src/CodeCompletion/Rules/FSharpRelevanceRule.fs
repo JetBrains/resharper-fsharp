@@ -52,11 +52,7 @@ type FSharpRelevanceRule() =
             match info.FcsSymbol with
             | :? FSharpEntity ->
                 markRelevance item CLRLookupItemRelevance.TypesAndNamespaces
-
-                if not (Array.isEmpty info.NamespaceToOpen) then
-                    markRelevance item CLRLookupItemRelevance.NotImportedType
-                else
-                    markRelevance item CLRLookupItemRelevance.ImportedType
+                markRelevance item CLRLookupItemRelevance.ImportedType
 
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 if not mfv.IsModuleValueOrMember then

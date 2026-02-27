@@ -27,7 +27,6 @@ type FcsSymbolInfo(text, symbolUse: FSharpSymbolUse) =
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = if isNotNull symbolUse then symbolUse.Symbol else Unchecked.defaultof<_>
         member this.FcsSymbolUse = symbolUse
-        member this.NamespaceToOpen = [||]
 
 [<Language(typeof<FSharpLanguage>)>]
 type LocalValuesRule() =
