@@ -26,20 +26,22 @@ module FSharpQuickDoc =
         ToolTipText([ToolTipElement.Single([|TaggedText(textTag, text)|], FSharpXmlDoc.None)])
 
     let getKeywordTooltipText (token: IFSharpIdentifier) =
-        if token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_SOURCE_DIRECTORY then
+        let tokenType = token.GetTokenType()
+
+        if tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_DIRECTORY then
             let sourceFile = token.FSharpFile.GetSourceFile()
             if isNull sourceFile then None else
             let path = sourceFile.Document.TryGetFilePath()
             if path.IsEmpty then None else
             createTextTooltipText TextTag.StringLiteral $"\"{path.Directory.FullPath}\"" |> Some
 
-        elif token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE then
+        elif tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE then
              token.FSharpFile.GetSourceFile()
              |> Option.ofObj
              |> Option.map (fun x -> $"\"{x.Name}\"")
              |> Option.map (createTextTooltipText TextTag.StringLiteral)
 
-        elif token.GetTokenType() == FSharpTokenType.KEYWORD_STRING_LINE then
+        elif tokenType == FSharpTokenType.KEYWORD_STRING_LINE then
             token.GetStartLine().Plus1().ToString()
             |> createTextTooltipText TextTag.NumericLiteral
             |> Some
