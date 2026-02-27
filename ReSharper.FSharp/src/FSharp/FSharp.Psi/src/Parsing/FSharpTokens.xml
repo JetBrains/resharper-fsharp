@@ -116,11 +116,6 @@
         <Token name="DOLLAR" representation="$" />
         <Token name="QUOTE" representation="'" />
 
-
-        <Token name="KEYWORD_STRING_SOURCE_DIRECTORY" representation="__SOURCE_DIRECTORY__" />
-        <Token name="KEYWORD_STRING_SOURCE_FILE" representation="__SOURCE_FILE__" />
-        <Token name="KEYWORD_STRING_LINE" representation="__LINE__" />
-
         <Token name="PP_HELP" representation="#help" />
         <Token name="PP_QUIT" representation="#quit" />
         <Token name="PP_TIME" representation="#time" />
@@ -153,6 +148,9 @@
         <Token name="QMARK" representation="?" />
         <Token name="QMARK_QMARK" representation="??" />
         <Token name="STAR" representation="*" />
+        <Token name="KEYWORD_STRING_SOURCE_DIRECTORY" representation="__SOURCE_DIRECTORY__" />
+        <Token name="KEYWORD_STRING_SOURCE_FILE" representation="__SOURCE_FILE__" />
+        <Token name="KEYWORD_STRING_LINE" representation="__LINE__" />
     </Tokens>
 
     <Tokens NodeType="FSharpTokenNodeType">

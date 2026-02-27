@@ -1,0 +1,1 @@
+__SOURCE_{caret}DIRECTORY__
