@@ -7,7 +7,7 @@
     void Remove(TKey partialKey);
 
     //Test api
-    string Dump();
+    string Dump(TypeProvidersCache tpCache);
   }
 
   public interface IBiDirectionalProvidedCache<T, TKey> : IProvidedCache<(T model, int typeProviderId), TKey>
