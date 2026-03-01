@@ -130,7 +130,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
         let sequentialLifetimes = scriptsUpdateLifetimes.GetOrAdd(path, SequentialLifetimes(lifetime))
         let currentLifetime = sequentialLifetimes.Next()
 
-        locks.StartBackgroundRead(currentLifetime, (fun _ ->
+        locks.StartReadActionAsync(currentLifetime, Action(fun _ ->
             if not currentLifetime.IsAlive then () else
 
             let newOptions = getOptionsImpl path source
@@ -157,7 +157,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
             | _, Some newOptions -> update path newOptions
             | _ -> ()
-        ), retryOnOperationCanceled = true).NoAwait()
+        )).NoAwait()
 
 
     let rec getFcsProject path source allowRetry : FcsProject option =
