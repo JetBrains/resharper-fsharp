@@ -9,13 +9,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods.Queries
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Resolve.TypeInference
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 open JetBrains.Util.Extension
@@ -109,7 +109,7 @@ let (|FSharpExtensionMember|_|) (typeMember: ITypeMember) =
     | FSharpCompiledExtensionMember _ -> ValueSome()
     | _ -> ValueNone
 
-let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) isStaticContext (nameOpt: string option) =
+let getExtensionMembersForType (context: ITreeNode) (fcsType: FSharpType) isStaticContext (nameOpt: string option) =
     if isNull fcsType then EmptyList.InstanceList else
 
     let psiModule = context.GetPsiModule()
@@ -134,7 +134,6 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
         typeElements.AsReadOnly()
 
     let openedModulesProvider = OpenedModulesProvider(context)
-    let accessContext = FSharpAccessContext(context)
 
     let matchesType (typeMember: ITypeMember) : bool =
         match typeMember with
@@ -158,25 +157,21 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
             let parameters = method.Parameters
             if parameters.Count = 0 then false else
 
-            let consumer = RecursiveConsumer(method.TypeParameters.ToIReadOnlyList())
-            let typeInferenceMatcher = CLRTypeInferenceMatcher.Instance
-            typeInferenceMatcher.Match(TypeInferenceKind.LowerBound, exprType, parameters[0].Type, consumer)
+            let thisParameter = parameters[0]
+            let parameterType = thisParameter.Type
+            let parameterKind = thisParameter.Kind
+            let typeParameters = method.TypeParameters.ToIReadOnlyList()
+            let conversionRule = ClrPredefinedTypeConversionRule.INSTANCE
+            if typeParameters.Count > 0 then
+                let substitution = TypeInferenceUtil.InferTypes(FSharpLanguage.Instance, psiModule, exprType, parameterType, typeParameters, conversionRule)
+                isNotNull substitution &&
+
+                let substitutedType = substitution.Apply(parameterType)
+                conversionRule.HasExtensionMethodThisArgumentConversion(exprType, substitutedType, parameterKind, false)
+            else
+                conversionRule.HasExtensionMethodThisArgumentConversion(exprType, parameterType, parameterKind, false)
 
         | _ -> false
-
-    let isAccessible (typeMember: ITypeMember) =
-        let isTypeAccessible = 
-            let containingType = typeMember.ContainingType
-            let accessRightsOwner = containingType :?> IAccessRightsOwner
-            match accessRightsOwner.GetAccessRights() with
-            | AccessRights.PUBLIC -> true
-            | _ -> containingType.Module.AreInternalsVisibleTo(psiModule)
-
-        isTypeAccessible &&
-
-        match typeMember with
-        | FSharpExtensionMember _ -> true
-        | _ -> AccessUtil.IsSymbolAccessible(typeMember, accessContext)
 
     let matchesName (typeMember: ITypeMember) =
         match nameOpt with
@@ -211,27 +206,35 @@ let getExtensionMembersForType (context: IFSharpTreeNode) (fcsType: FSharpType) 
 
         | _ -> not isStaticContext
 
+    let isInScope (typeMember: ITypeMember) : bool =
+        match typeMember with
+        | FSharpExtensionMember -> FSharpImportUtil.areMembersInScope openedModulesProvider typeMember.ContainingType
+        | _ -> FSharpImportUtil.isExtensionMemberInScope openedModulesProvider typeMember
+
     let isApplicable (typeMember: ITypeMember) =
         resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
-        not (FSharpImportUtil.isTypeMemberInScope openedModulesProvider typeMember) &&
-        isAccessible typeMember &&
+        not (isInScope typeMember) &&
+        FSharpAccessRightUtil.IsAccessible(typeMember.ContainingType, context) &&
         matchesCallingConvention typeMember &&
         matchesType typeMember
 
-    let query = ExtensionMembersQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt))
-    let methods = query.EnumerateMembers() |> List.ofSeq
+    let query = ExtensionMembersQuery(solution.GetPsiServices(), FSharpRequest(psiModule, exprType, nameOpt)) //.MaybeForReceiverType(exprType)
 
-    methods
-    |> Seq.filter isApplicable
-    |> List :> _
+    let result = List()
+    for typeMember in query.EnumerateMembers() do
+        Interruption.Current.CheckAndThrow()
+        if isApplicable typeMember then
+            result.Add(typeMember)
 
-let getNonImportedExtensionMembers (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
+    result
+
+let getNonImportedExtensionMembers (context: ITreeNode) (nameOpt: string option) (refExpr: IReferenceExpr) : IList<ITypeMember> =
     if isNull refExpr then EmptyList.InstanceList else
 
     let isStaticContext = FSharpExpressionUtil.isStaticContext refExpr.Qualifier
     let fcsType = getQualifierFcsType refExpr
-    getExtensionMembersForType refExpr fcsType isStaticContext nameOpt
+    getExtensionMembersForType context fcsType isStaticContext nameOpt
 
 let groupByNameAndNs members =
     members |> Seq.groupBy (fun (typeMember: ITypeMember) ->
