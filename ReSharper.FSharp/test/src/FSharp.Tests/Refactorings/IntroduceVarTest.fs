@@ -175,8 +175,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Not allowed - Indexer - Set 03``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Indexer - Set 04``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Indexer 01 - Item``() = x.DoNamedTest()
-    [<Test>] member x.``Not allowed - Indexer 02 - Named``() = x.DoNamedTest()
-    [<Test>] member x.``Not allowed - Indexer 03``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Indexer 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Not allowed - Op 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Op 02 - Prefix app``() = x.DoNamedTest()

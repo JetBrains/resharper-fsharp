@@ -1,118 +1,118 @@
 [In-Process dump]:
 
 Type Providers:
-19 FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
-31 FSharp.Management.DesignTime.WmiExtender
-26 FSharp.Management.NamespaceProvider+FileSystemProvider
-25 FSharp.Management.NamespaceProvider+RegistrySystemProvider
-27 FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
-29 FSharp.Management.NamespaceProvider+StringReaderProvider
-28 FSharp.Management.NamespaceProvider+SystemTimeZonesProvider
-30 FSharp.Management.PowerShellProvider.PowerShellProvider
-32 FSharp.Text.RegexProvider.RegexProvider
-22 ProviderImplementation.CsvProvider
-24 ProviderImplementation.HtmlProvider
-20 ProviderImplementation.JsonProvider
-35 ProviderImplementation.SimpleErasingProvider
-36 ProviderImplementation.SimpleGenerativeProvider
-23 ProviderImplementation.WorldBankProvider
-21 ProviderImplementation.XmlProvider
-33 SwaggerProvider.OpenApiClientTypeProvider
-34 SwaggerProvider.SwaggerTypeProvider
+FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+FSharp.Management.DesignTime.WmiExtender
+FSharp.Management.NamespaceProvider+FileSystemProvider
+FSharp.Management.NamespaceProvider+RegistrySystemProvider
+FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.NamespaceProvider+StringReaderProvider
+FSharp.Management.NamespaceProvider+SystemTimeZonesProvider
+FSharp.Management.PowerShellProvider.PowerShellProvider
+FSharp.Text.RegexProvider.RegexProvider
+ProviderImplementation.CsvProvider
+ProviderImplementation.HtmlProvider
+ProviderImplementation.JsonProvider
+ProviderImplementation.SimpleErasingProvider
+ProviderImplementation.SimpleGenerativeProvider
+ProviderImplementation.WorldBankProvider
+ProviderImplementation.XmlProvider
+SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.SwaggerTypeProvider
 
 Provided Types:
-19 FSharp.Configuration.AppSettings (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-19 FSharp.Configuration.IniFile (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-19 FSharp.Configuration.YamlConfig (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-22 FSharp.Data.CsvProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-24 FSharp.Data.HtmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-20 FSharp.Data.JsonProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-23 FSharp.Data.WorldBankData (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-23 FSharp.Data.WorldBankDataProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-21 FSharp.Data.XmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-26 FSharp.Management.FileSystem (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-30 FSharp.Management.PowerShellProvider (from FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-25 FSharp.Management.Registry (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath,relativeTo=".",watch="True" (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath,relativeTo=".",watch="True"+.. (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath,relativeTo=".",watch="True"+bin (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath,relativeTo=".",watch="True"+obj (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-27 FSharp.Management.RelativePath,relativeTo=".",watch="True"+Test (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-29 FSharp.Management.StringReader (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-28 FSharp.Management.SystemTimeZones (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-31 FSharp.Management.WmiProvider (from FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-32 FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-35 Microsoft.FSharp.Control.FSharpHandler`1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-35 Microsoft.FSharp.Control.FSharpHandler`1[System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpFunc`2 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-32 Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-33 Microsoft.FSharp.Core.Unit (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-35 ProviderImplementation.InternalType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-35 ProviderImplementation.IPrintable (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-35 SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-35 SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-35 SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-36 SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-36 SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-33 Swagger.ProvidedApiClientBase (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-33 SwaggerProvider.OpenApiClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-33 SwaggerProvider.PetStore (from generated assembly)
-33 SwaggerProvider.PetStore+ApiResponse (from generated assembly)
-33 SwaggerProvider.PetStore+Category (from generated assembly)
-33 SwaggerProvider.PetStore+Client (from generated assembly)
-33 SwaggerProvider.PetStore+OperationTypes (from generated assembly)
-33 SwaggerProvider.PetStore+OperationTypes+UpdatePetWithForm_formUrlEncoded (from generated assembly)
-33 SwaggerProvider.PetStore+OperationTypes+UploadFile_formData (from generated assembly)
-33 SwaggerProvider.PetStore+Order (from generated assembly)
-33 SwaggerProvider.PetStore+Pet (from generated assembly)
-33 SwaggerProvider.PetStore+Tag (from generated assembly)
-33 SwaggerProvider.PetStore+User (from generated assembly)
-34 SwaggerProvider.SwaggerClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-32 System.Boolean (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-27 System.Boolean (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-32 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Int32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-33 System.Int64 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-33 System.Net.Http.HttpClient (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-33 System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-27 System.Object (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-32 System.String (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-27 System.String (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-32 System.Text.RegularExpressions.Group (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Text.RegularExpressions.Match (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Text.RegularExpressions.Regex (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.Text.RegularExpressions.RegexOptions (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-33 System.Threading.Tasks.Task`1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-33 System.Threading.Tasks.Task`1[Microsoft.FSharp.Core.Unit] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-32 System.TimeSpan (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-35 System.Void (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+FSharp.Configuration.AppSettings (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Configuration.IniFile (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Configuration.YamlConfig (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Data.CsvProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Data.HtmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Data.JsonProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Data.WorldBankData (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Data.WorldBankDataProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Data.XmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
+FSharp.Management.FileSystem (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.PowerShellProvider (from FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.Registry (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath,relativeTo=".",watch="True" (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+.. (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+bin (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+obj (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+Test (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.StringReader (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.SystemTimeZones (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Management.WmiProvider (from FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
+Microsoft.FSharp.Control.FSharpHandler`1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Control.FSharpHandler`1[System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpFunc`2 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+Microsoft.FSharp.Core.Unit (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+ProviderImplementation.InternalType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+ProviderImplementation.IPrintable (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
+Swagger.ProvidedApiClientBase (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
+SwaggerProvider.OpenApiClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
+SwaggerProvider.PetStore (from generated assembly)
+SwaggerProvider.PetStore+ApiResponse (from generated assembly)
+SwaggerProvider.PetStore+Category (from generated assembly)
+SwaggerProvider.PetStore+Client (from generated assembly)
+SwaggerProvider.PetStore+OperationTypes (from generated assembly)
+SwaggerProvider.PetStore+OperationTypes+UpdatePetWithForm_formUrlEncoded (from generated assembly)
+SwaggerProvider.PetStore+OperationTypes+UploadFile_formData (from generated assembly)
+SwaggerProvider.PetStore+Order (from generated assembly)
+SwaggerProvider.PetStore+Pet (from generated assembly)
+SwaggerProvider.PetStore+Tag (from generated assembly)
+SwaggerProvider.PetStore+User (from generated assembly)
+SwaggerProvider.SwaggerClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
+System.Boolean (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+System.Boolean (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Int32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Int64 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Net.Http.HttpClient (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Object (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.String (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+System.String (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Group (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Match (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.Regex (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Text.RegularExpressions.RegexOptions (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Threading.Tasks.Task`1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Threading.Tasks.Task`1[Microsoft.FSharp.Core.Unit] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.TimeSpan (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+System.Void (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
 
 Provided Assemblies:
-19 FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-32 FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-22 FSharp.Data, Version=3.3.3.0, Culture=neutral
-27 FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
-30 FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
-31 FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
-32 FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-33 generated assembly
-27 mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-32 netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
-33 SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral
-35 TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
+FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
+FSharp.Data, Version=3.3.3.0, Culture=neutral
+FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
+FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
+FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null
+FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+generated assembly
+mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae
 
 Provided Abbreviations:
 GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] = 
@@ -133,141 +133,141 @@ GUID(TypeProviderLibrary)-B9287C3D[.NETStandard,Version=v2.0] =
 [Out-Process dump]:
 
 Type Providers:
-36 ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
-35 ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
-34 SwaggerProvider.SwaggerTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-33 SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-32 FSharp.Text.RegexProvider.RegexProvider, FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-31 FSharp.Management.DesignTime.WmiExtender, FSharp.Management.WMI.DesignTime, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-30 FSharp.Management.PowerShellProvider.PowerShellProvider, FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-29 FSharp.Management.NamespaceProvider+StringReaderProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-28 FSharp.Management.NamespaceProvider+SystemTimeZonesProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-27 FSharp.Management.NamespaceProvider+RelativeFileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-26 FSharp.Management.NamespaceProvider+FileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-25 FSharp.Management.NamespaceProvider+RegistrySystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-24 ProviderImplementation.HtmlProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-23 ProviderImplementation.WorldBankProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-22 ProviderImplementation.CsvProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-21 ProviderImplementation.XmlProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-20 ProviderImplementation.JsonProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
-19 FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider, FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider, FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.DesignTime.WmiExtender, FSharp.Management.WMI.DesignTime, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.NamespaceProvider+FileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.NamespaceProvider+RegistrySystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.NamespaceProvider+RelativeFileSystemProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.NamespaceProvider+StringReaderProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.NamespaceProvider+SystemTimeZonesProvider, FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Management.PowerShellProvider.PowerShellProvider, FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+FSharp.Text.RegexProvider.RegexProvider, FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+ProviderImplementation.CsvProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+ProviderImplementation.HtmlProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+ProviderImplementation.JsonProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+ProviderImplementation.SimpleErasingProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
+ProviderImplementation.SimpleGenerativeProvider, TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae (from TypeProviderLibrary.dll)
+ProviderImplementation.WorldBankProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+ProviderImplementation.XmlProvider, FSharp.Data.DesignTime, Version=3.3.3.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
+SwaggerProvider.SwaggerTypeProvider, SwaggerProvider.DesignTime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (from TypeProviderLibrary.dll)
 
 Created by provider Types:
-FSharp.Configuration.AppSettings tp: 19 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Configuration.IniFile tp: 19 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Configuration.YamlConfig tp: 19 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Data.CsvProvider tp: 22 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Data.HtmlProvider tp: 24 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Data.JsonProvider tp: 20 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Data.WorldBankData tp: 23 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Data.WorldBankDataProvider tp: 23 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Data.XmlProvider tp: 21 (from FSharp.Data, Version=3.3.3.0, Culture=neutral)
-FSharp.Management.FileSystem tp: 26 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.PowerShellProvider tp: 30 (from FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.Registry tp: 25 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath,relativeTo=".",watch="True" tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath,relativeTo=".",watch="True"+.. tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath,relativeTo=".",watch="True"+bin tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath,relativeTo=".",watch="True"+obj tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.RelativePath,relativeTo=".",watch="True"+Test tp: 27 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.StringReader tp: 29 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.SystemTimeZones tp: 28 (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Management.WmiProvider tp: 31 (from FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType tp: 32 (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null)
-Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] tp: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] tp: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] tp: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] tp: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-SimpleErasingProviderNamespace.AbstractType tp: 35 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.ClassWithInterfaces tp: 35 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleErasingProviderNamespace.SimpleErasedType tp: 35 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType tp: 36 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype tp: 36 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-SwaggerProvider.OpenApiClientProvider tp: 33 (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-SwaggerProvider.PetStore tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+ApiResponse tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Category tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Client tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+OperationTypes tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+OperationTypes+UpdatePetWithForm_formUrlEncoded tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+OperationTypes+UploadFile_formData tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Order tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Pet tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Tag tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+Tag[] tp: 33 (from generated assembly)
-SwaggerProvider.PetStore+User tp: 33 (from generated assembly)
-SwaggerProvider.SwaggerClientProvider tp: 34 (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] tp: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] tp: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] tp: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+ApiResponse] tp: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Order] tp: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Pet[]] tp: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Pet] tp: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+User] tp: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
+FSharp.Configuration.AppSettings (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+FSharp.Configuration.IniFile (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+FSharp.Configuration.YamlConfig (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+FSharp.Data.CsvProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.CsvProvider
+FSharp.Data.HtmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.HtmlProvider
+FSharp.Data.JsonProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.JsonProvider
+FSharp.Data.WorldBankData (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.WorldBankProvider
+FSharp.Data.WorldBankDataProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.WorldBankProvider
+FSharp.Data.XmlProvider (from FSharp.Data, Version=3.3.3.0, Culture=neutral), owners: ProviderImplementation.XmlProvider
+FSharp.Management.FileSystem (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+FileSystemProvider
+FSharp.Management.PowerShellProvider (from FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.PowerShellProvider.PowerShellProvider
+FSharp.Management.Registry (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RegistrySystemProvider
+FSharp.Management.RelativePath (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.RelativePath,relativeTo=".",watch="True" (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+.. (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+bin (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+obj (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.RelativePath,relativeTo=".",watch="True"+Test (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+FSharp.Management.StringReader (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+StringReaderProvider
+FSharp.Management.SystemTimeZones (from FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.NamespaceProvider+SystemTimeZonesProvider
+FSharp.Management.WmiProvider (from FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Management.DesignTime.WmiExtender
+FSharp.Text.RegexProvider.Regex (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)" (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType (from FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpFunc`2[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpOption`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+SimpleErasingProviderNamespace.AbstractType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.ClassWithInterfaces (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleErasingProviderNamespace.SimpleErasedType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
+SimpleGenerativeProviderNamespace.SimpleGenerativeType+GenerativeSubtype (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleGenerativeProvider
+SwaggerProvider.OpenApiClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+ApiResponse (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Category (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Client (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+OperationTypes (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+OperationTypes+UpdatePetWithForm_formUrlEncoded (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+OperationTypes+UploadFile_formData (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Order (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Pet (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Tag (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+Tag[] (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.PetStore+User (from generated assembly), owners: SwaggerProvider.OpenApiClientTypeProvider
+SwaggerProvider.SwaggerClientProvider (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral), owners: SwaggerProvider.SwaggerTypeProvider
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)",noMethodPrefix="True"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<AreaCode>^\\d{3})-(?<PhoneNumber>\\d{3}-\\d{4}$)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Collections.Generic.IEnumerable`1[FSharp.Text.RegexProvider.Regex,pattern="(?<Number>\\d+)"+MatchType] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+ApiResponse] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Order] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Pet[]] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+Pet] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[SwaggerProvider.PetStore+User] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
 
 Provided Types:
-FSharp.Configuration.YamlConfigTypeProvider+Root tps: 19 (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral)
-Microsoft.FSharp.Control.FSharpHandler`1 tps: 35 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Control.FSharpHandler`1[System.String] tps: 35 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpFunc`2 tps: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] tps: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.FSharpOption`1[System.Int64] tps: 33 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-Microsoft.FSharp.Core.Unit tps: 33|35 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-ProviderImplementation.InternalType tps: 35 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-ProviderImplementation.IPrintable tps: 35 (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae)
-Swagger.ProvidedApiClientBase tps: 33 (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral)
-System.Boolean tps: 32|33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Boolean tps: 27 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-System.Enum tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Int32 tps: 32|35 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Int64 tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.MulticastDelegate tps: 35 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Net.Http.HttpClient tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Net.Http.HttpMessageInvoker tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Object tps: 25|26|27|28|29|30|31 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-System.Object tps: 19|32|33|34|35|36 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.String tps: 32|33|35|36 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.String tps: 27 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-System.String[] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Text.RegularExpressions.Capture tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Text.RegularExpressions.Group tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Text.RegularExpressions.Match tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Text.RegularExpressions.Regex tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Text.RegularExpressions.RegexOptions tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1 tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[Microsoft.FSharp.Core.Unit] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[System.Object] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Threading.Tasks.Task`1[System.String] tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.TimeSpan tps: 32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.ValueType tps: 27 (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
-System.ValueType tps: 32|33|35 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-System.Void tps: 33|35|36 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-T tps: 32|35 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
-TResult tps: 33 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51)
-TResult tps: 32 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a)
+FSharp.Configuration.YamlConfigTypeProvider+Root (from FSharp.Configuration, Version=1.0.0.0, Culture=neutral), owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+Microsoft.FSharp.Control.FSharpHandler`1 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: ProviderImplementation.SimpleErasingProvider
+Microsoft.FSharp.Control.FSharpHandler`1[System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: ProviderImplementation.SimpleErasingProvider
+Microsoft.FSharp.Core.FSharpFunc`2 (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpFunc`2[System.Text.RegularExpressions.Match,System.String] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+Microsoft.FSharp.Core.FSharpOption`1[System.Int64] (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: SwaggerProvider.OpenApiClientTypeProvider
+Microsoft.FSharp.Core.Unit (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: ProviderImplementation.SimpleErasingProvider, SwaggerProvider.OpenApiClientTypeProvider
+ProviderImplementation.InternalType (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+ProviderImplementation.IPrintable (from TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae), owners: ProviderImplementation.SimpleErasingProvider
+Swagger.ProvidedApiClientBase (from SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Boolean (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+System.Boolean (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider, SwaggerProvider.OpenApiClientTypeProvider
+System.Enum (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Int32 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider
+System.Int64 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.MulticastDelegate (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: ProviderImplementation.SimpleErasingProvider
+System.Net.Http.HttpClient (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Net.Http.HttpMessageInvoker (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Object (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089), owners: FSharp.Management.DesignTime.WmiExtender, FSharp.Management.NamespaceProvider+FileSystemProvider, FSharp.Management.NamespaceProvider+RegistrySystemProvider, FSharp.Management.NamespaceProvider+RelativeFileSystemProvider, FSharp.Management.NamespaceProvider+StringReaderProvider, FSharp.Management.NamespaceProvider+SystemTimeZonesProvider, FSharp.Management.PowerShellProvider.PowerShellProvider
+System.Object (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider, FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider, SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.SwaggerTypeProvider
+System.String (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+System.String (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider, SwaggerProvider.OpenApiClientTypeProvider
+System.String[] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Text.RegularExpressions.Capture (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Text.RegularExpressions.Group (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Text.RegularExpressions.Match (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Text.RegularExpressions.Regex (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Text.RegularExpressions.RegexOptions (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.Threading.Tasks.Task (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1 (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[Microsoft.FSharp.Core.Unit] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[System.Object] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.Threading.Tasks.Task`1[System.String] (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
+System.TimeSpan (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider
+System.ValueType (from mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089), owners: FSharp.Management.NamespaceProvider+RelativeFileSystemProvider
+System.ValueType (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider, SwaggerProvider.OpenApiClientTypeProvider
+System.Void (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider, SwaggerProvider.OpenApiClientTypeProvider
+T (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider
+TResult (from FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a), owners: FSharp.Text.RegexProvider.RegexProvider
+TResult (from netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51), owners: SwaggerProvider.OpenApiClientTypeProvider
 
 Provided Assemblies:
-FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null tps: 19
-FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a tps: 32|33|35
-FSharp.Data, Version=3.3.3.0, Culture=neutral tps: 20|21|22|23|24
-FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null tps: 25|26|27|28|29
-FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null tps: 30
-FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null tps: 31
-FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null tps: 32
-generated assembly tps: 33
-mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089 tps: 25|27
-netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51 tps: 19|32|33|35
-SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral tps: 33|34
-TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae tps: 35|36
+FSharp.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, owners: FSharp.Configuration.ConfigTypeProvider+FSharpConfigurationProvider
+FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, owners: FSharp.Text.RegexProvider.RegexProvider, ProviderImplementation.SimpleErasingProvider, SwaggerProvider.OpenApiClientTypeProvider
+FSharp.Data, Version=3.3.3.0, Culture=neutral, owners: ProviderImplementation.CsvProvider, ProviderImplementation.HtmlProvider, ProviderImplementation.JsonProvider, ProviderImplementation.WorldBankProvider, ProviderImplementation.XmlProvider
+FSharp.Management, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null, owners: FSharp.Management.NamespaceProvider+FileSystemProvider, FSharp.Management.NamespaceProvider+RegistrySystemProvider, FSharp.Management.NamespaceProvider+RelativeFileSystemProvider, FSharp.Management.NamespaceProvider+StringReaderProvider, FSharp.Management.NamespaceProvider+SystemTimeZonesProvider
+FSharp.Management.PowerShell, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null, owners: FSharp.Management.PowerShellProvider.PowerShellProvider
+FSharp.Management.WMI, Version=0.4.5.0, Culture=neutral, PublicKeyToken=null, owners: FSharp.Management.DesignTime.WmiExtender
+FSharp.Text.RegexProvider, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, owners: FSharp.Text.RegexProvider.RegexProvider
+generated assembly, owners: SwaggerProvider.OpenApiClientTypeProvider
+mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51
+SwaggerProvider.Runtime, Version=1.0.0.0, Culture=neutral, owners: SwaggerProvider.OpenApiClientTypeProvider, SwaggerProvider.SwaggerTypeProvider
+TestTypeProviders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae, owners: ProviderImplementation.SimpleErasingProvider, ProviderImplementation.SimpleGenerativeProvider
 
 ProvidedConstructorInfo:
 Count: 20
