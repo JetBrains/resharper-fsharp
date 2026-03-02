@@ -121,7 +121,7 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
         if isNull refExpr then [] else
 
         let name = reference.GetName()
-        FSharpExtensionMemberUtil.getNonImportedExtensionMembers (Some name) refExpr
+        FSharpExtensionMemberUtil.getNonImportedExtensionMembers refExpr (Some name) refExpr
         |> FSharpExtensionMemberUtil.groupByNameAndNs
         |> Seq.map (snd >> Seq.tryHead)
         |> Seq.choose id
