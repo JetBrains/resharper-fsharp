@@ -62,9 +62,8 @@ type internal TypeProvidersCache() =
     member x.Dump() =
         let typeProviders =
             proxyTypeProvidersPerId
-            |> Seq.map (fun t -> t.Key, t.Value.GetDisplayName(true))
-            |> Seq.sortBy snd
-            |> Seq.map (fun (id, name) -> $"{id} {name}")
+            |> Seq.map _.Value.GetDisplayName(true)
+            |> Seq.sortBy id
             |> String.concat "\n"
 
         $"Type Providers:\n{typeProviders}"

@@ -67,7 +67,7 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
   fun `nuget reference - verbatim string`() = doTestTyping("nu", "Script.fsx")
 
   @Test
-  fun `nuget reference - package name`() = doTestTyping("JetBrains.Annotatio", "Script.fsx")
+  fun `nuget reference - package name`() = doTestTyping("o", "Script.fsx")
 
   @Test
   fun `nuget reference - version`() = doTestTyping("-", "Script.fsx")
