@@ -2,11 +2,12 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpImportUtil
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
 let private isTypeOrNsInScope (openedModulesProvider: OpenedModulesProvider) (declaredElement: IClrDeclaredElement) =
-    let name = getQualifiedName declaredElement
+    let name = getClrName declaredElement
     let scopes = openedModulesProvider.OpenedModuleScopes.GetValuesSafe(name)
     OpenScope.inAnyScope openedModulesProvider.Context scopes
 
@@ -15,22 +16,27 @@ let areMembersInScope (openedModulesProvider: OpenedModulesProvider) (typeElemen
     | :? IFSharpModule as fsModule ->
         isTypeOrNsInScope openedModulesProvider fsModule
 
-    | containingType ->
-        let ns = containingType.GetContainingNamespace()
+    | typeElement ->
+        let ns = typeElement.GetContainingNamespace()
         isTypeOrNsInScope openedModulesProvider ns
 
-let isTypeMemberInScope (openedModulesProvider: OpenedModulesProvider) (typeMember: ITypeMember) =
-    areMembersInScope openedModulesProvider typeMember.ContainingType
+let isExtensionMemberInScope (openedModulesProvider: OpenedModulesProvider) (typeMember: ITypeMember) =
+    let containingTypeOrNs: IClrDeclaredElement =
+        let typeElement = typeMember.ContainingType
+        match typeElement.GetContainingType() with
+        | null -> typeElement.GetNamespace()
+        | containingType -> containingType
+
+    isTypeOrNsInScope openedModulesProvider containingTypeOrNs
 
 let isTypeElementInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
-    isTypeOrNsInScope openedModulesProvider typeElement ||
-
     match typeElement.GetContainingType() with
-    | :? IFSharpModule as fsModule ->
-        isTypeOrNsInScope openedModulesProvider fsModule
-
     | null ->
         let ns = typeElement.GetContainingNamespace()
         isTypeOrNsInScope openedModulesProvider ns
 
-    | _ -> false
+    | :? IFSharpModule as fsModule ->
+        isTypeOrNsInScope openedModulesProvider fsModule
+
+    | typeElement ->
+        areMembersInScope openedModulesProvider typeElement

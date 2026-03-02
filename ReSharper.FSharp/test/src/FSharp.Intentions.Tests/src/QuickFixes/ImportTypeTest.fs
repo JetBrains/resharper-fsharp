@@ -1,8 +1,9 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes.Import
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -76,6 +77,9 @@ type ImportExtensionMemberTest() =
     member x.DoNamedTestFsCs() =
         x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
+    [<Test>] member x.``Attribute - Source 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Source 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Dot lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Dot lambda 02``() = x.DoNamedTest()
 
@@ -118,7 +122,11 @@ type ImportExtensionMemberTest() =
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Not Available - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not Available - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Not Available - Function 03``() = x.DoNamedTest()
     [<Test>] member x.``Not Available - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not Available - Type 02``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

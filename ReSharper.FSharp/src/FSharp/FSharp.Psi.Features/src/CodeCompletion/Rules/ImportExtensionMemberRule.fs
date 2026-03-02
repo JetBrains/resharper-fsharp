@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.UI.RichText
-open JetBrains.Util.Extension
 
 [<Language(typeof<FSharpLanguage>)>]
 type ImportExtensionMemberRule() =
@@ -43,7 +42,7 @@ type ImportExtensionMemberRule() =
     override this.AddLookupItems(context, collector) =
         let refExpr = getRefExpr context
         let members =
-            FSharpExtensionMemberUtil.getNonImportedExtensionMembers None refExpr
+            FSharpExtensionMemberUtil.getNonImportedExtensionMembers context.NodeInFile None refExpr
             |> FSharpExtensionMemberUtil.groupByNameAndNs
 
         let iconManager = context.BasicContext.Solution.GetComponent<PsiIconManager>()
