@@ -400,6 +400,12 @@ type OpenedModulesProvider(context: ITreeNode) =
         let scope = OpenScope.Range(moduleDecl.GetTreeTextRange())
         importQualifiedName scope moduleDecl.ClrName
 
+        let fsModule = moduleDecl.DeclaredElement.As<IFSharpModule>()
+        if isNotNull fsModule && fsModule.IsAutoOpen then
+            let parent = moduleDecl.Parent
+            let scope = OpenScope.Range(TreeTextRange(moduleDecl.GetTreeEndOffset(), parent.GetTreeEndOffset()))
+            importQualifiedName scope moduleDecl.ClrName
+
         let namedModuleDecl = moduleDecl.As<INamedModuleDeclaration>()
         if isNotNull namedModuleDecl then
             importQualifiedName scope namedModuleDecl.NamespaceName
