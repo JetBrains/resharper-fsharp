@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3653
+Count: 3654
 Focus: Soft
 Range: "♦"
 
@@ -124,6 +124,7 @@ WebExtensions
 #nowarn
 #r
 #time
+#warnon
                             [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
@@ -3679,6 +3680,7 @@ SecondProp                  string    <==
 #nowarn
 #r
 #time
+#warnon
 Array
 Array2D
 Array3D

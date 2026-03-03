@@ -129,6 +129,7 @@
         <Token name="PP_ELSE_SECTION" representation="#else" />
         <Token name="PP_ENDIF" representation="#endif" />
         <Token name="PP_NOWARN" representation="#nowarn" />
+        <Token name="PP_WARNON" representation="#warnon" />
 
         <Token name="PP_OR" representation="||" />
         <Token name="PP_AND" representation="&amp;&amp;" />
