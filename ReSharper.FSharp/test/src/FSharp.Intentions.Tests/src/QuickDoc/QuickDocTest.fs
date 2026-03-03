@@ -27,6 +27,7 @@ type QuickDocTest() =
         let textControl = this.OpenTextControl(lifetime)
         let solution = project.GetSolution()
         let document = textControl.Document
+        let solutionPath = this.FinalSolutionItemsBasePath
 
         let createDataContext () =
             let actionManager = this.ShellInstance.GetComponent<IActionManager>()
@@ -63,6 +64,7 @@ type QuickDocTest() =
                     startIdx <- text.IndexOf(XmlDocHtmlUtil.START_HEAD_MARKER, StringComparison.Ordinal)
                     endIdx <- text.IndexOf(XmlDocHtmlUtil.END_HEAD_MARKER, StringComparison.Ordinal) + XmlDocHtmlUtil.END_HEAD_MARKER.Length
                 
+                text <- text.Replace(solutionPath.FullPath, "<Test Solution Path>")
                 writer.Write(text);
             )
         )
@@ -93,3 +95,7 @@ type QuickDocTest() =
 
     [<Test>] member x.``Top Level Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested Module 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Source directory 01``() = x.DoNamedTest() 
+    [<Test>] member x.``Source file 01``() = x.DoNamedTest() 
+    [<Test>] member x.``Line 01``() = x.DoNamedTest() 
