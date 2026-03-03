@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3869
+Count: 3870
 Focus: Soft
 Range: "if true then { F1 = 1 } else { ♦ }"
 
@@ -240,6 +240,7 @@ voption
 #nowarn
 #r
 #time
+#warnon
 FSharpFunc
 Failure                     exn
 abs                         ^T
@@ -3898,6 +3899,7 @@ F3                          int
 #nowarn
 #r
 #time
+#warnon
 AbstractClassAttribute
 AllowNullLiteralAttribute
 Array

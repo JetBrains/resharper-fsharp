@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3607
+Count: 3608
 Focus: Soft
 Range: "♦ }"
 
@@ -76,6 +76,7 @@ yield
 #nowarn
 #r
 #time
+#warnon
                             [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
@@ -3633,6 +3634,7 @@ F3                          int
 #nowarn
 #r
 #time
+#warnon
 abstract
 and
 as

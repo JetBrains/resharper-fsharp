@@ -1462,4 +1462,36 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
       IDENT ('Ident')
       """.trimIndent());
   }
+
+    @Test
+    fun `test nowarn directive`() {
+        doTest("#nowarn 1 \n #nowarn \"1\"",
+            """
+      PP_NOWARN ('#nowarn')
+      WHITESPACE (' ')
+      INT32 ('1')
+      WHITESPACE (' ')
+      NEW_LINE ('\n')
+      WHITESPACE (' ')
+      PP_NOWARN ('#nowarn')
+      WHITESPACE (' ')
+      STRING ('"1"')
+      """.trimIndent());
+    }
+
+    @Test
+    fun `test warnon directive`() {
+        doTest("#warnon 1 \n #warnon \"1\"",
+            """
+      PP_WARNON ('#warnon')
+      WHITESPACE (' ')
+      INT32 ('1')
+      WHITESPACE (' ')
+      NEW_LINE ('\n')
+      WHITESPACE (' ')
+      PP_WARNON ('#warnon')
+      WHITESPACE (' ')
+      STRING ('"1"')
+      """.trimIndent());
+    }
 }

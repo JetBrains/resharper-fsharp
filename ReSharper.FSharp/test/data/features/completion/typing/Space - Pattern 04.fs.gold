@@ -234,6 +234,7 @@ voption
 #nowarn
 #r
 #time
+#warnon
 FSharpFunc
 Failure
 abs
