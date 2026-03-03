@@ -31,15 +31,17 @@ module FSharpQuickDoc =
         if tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_DIRECTORY then
             let sourceFile = token.FSharpFile.GetSourceFile()
             if isNull sourceFile then None else
+
             let path = sourceFile.Document.TryGetFilePath()
             if path.IsEmpty then None else
-            createFcsTooltipText TextTag.StringLiteral $"\"{path.Directory.FullPath}\"" |> Some
+
+            createFcsTooltipText TextTag.StringLiteral $"\"{path.Directory.FullPath}\""
+            |> Some
 
         elif tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE then
              token.FSharpFile.GetSourceFile()
              |> Option.ofObj
-             |> Option.map (fun x -> $"\"{x.Name}\"")
-             |> Option.map (createFcsTooltipText TextTag.StringLiteral)
+             |> Option.map (fun x -> createFcsTooltipText TextTag.StringLiteral $"\"{x.Name}\"")
 
         elif tokenType == FSharpTokenType.KEYWORD_STRING_LINE then
             token.GetStartLine().Plus1().ToString()
