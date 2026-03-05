@@ -1,50 +1,50 @@
 --> NestedCalls.fs:21(267,277) // f1 T.Prop1
-[NestedCalls+T::get_Prop1]
-[NestedCalls::f1]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[f1, NestedCalls] -> f1 T.Prop1
 
 --> NestedCalls.fs:22(282,293) // f1 (T.M1())
-[NestedCalls+T::M1]
-[NestedCalls::f1]
++[M1, NestedCalls+T] -> T.M1()
++[f1, NestedCalls] -> f1 (T.M1())
 
 --> NestedCalls.fs:23(298,316) // f1 (T.M2(T.Prop1))
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::M2]
-[NestedCalls::f1]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[M2, NestedCalls+T] -> T.M2(T.Prop1)
++[f1, NestedCalls] -> f1 (T.M2(T.Prop1))
 
 --> NestedCalls.fs:24(321,349) // f1 (T.M2(T.Prop1 + T.Prop2))
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[NestedCalls+T::M2]
-[NestedCalls::f1]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
++[M2, NestedCalls+T] -> T.M2(T.Prop1 + T.Prop2)
++[f1, NestedCalls] -> f1 (T.M2(T.Prop1 + T.Prop2))
 
 --> NestedCalls.fs:25(354,381) // f1 (T.M3(T.Prop1, T.Prop2))
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[NestedCalls+T::M3]
-[NestedCalls::f1]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
++[M3, NestedCalls+T] -> T.M3(T.Prop1, T.Prop2)
++[f1, NestedCalls] -> f1 (T.M3(T.Prop1, T.Prop2))
 
 --> NestedCalls.fs:26(386,404) // f2 T.Prop1 T.Prop2
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[NestedCalls::f2]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
++[f2, NestedCalls] -> f2 T.Prop1 T.Prop2
 
 --> NestedCalls.fs:27(409,427) // f2 T.Prop1 T.Prop2
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[NestedCalls::f2]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
++[f2, NestedCalls] -> f2 T.Prop1 T.Prop2
 
 --> NestedCalls.fs:29(441,458) // T.Prop1 + T.Prop2
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
 
 --> NestedCalls.fs:37(548,566) // g1 T.Prop1 T.Prop2
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[Microsoft.FSharp.Core.FSharpFunc`2::g1 (method name: InvokeFast)]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
++[g1 (method name: InvokeFast), Microsoft.FSharp.Core.FSharpFunc`2] -> g1 T.Prop1 T.Prop2
 
 --> NestedCalls.fs:38(571,589) // g2 T.Prop1 T.Prop2
-[NestedCalls+T::get_Prop1]
-[NestedCalls+T::get_Prop2]
-[Microsoft.FSharp.Core.FSharpTypeFunc::Specialize (hidden) (no expr)]
-[Microsoft.FSharp.Core.FSharpFunc`2::g2 (method name: InvokeFast)]
++[get_Prop1, NestedCalls+T] -> T.Prop1
++[get_Prop2, NestedCalls+T] -> T.Prop2
+-[Specialize, Microsoft.FSharp.Core.FSharpTypeFunc] -> (no expr)
++[g2 (method name: InvokeFast), Microsoft.FSharp.Core.FSharpFunc`2] -> g2 T.Prop1 T.Prop2
 

@@ -64,7 +64,7 @@ type FSharpCallableExpressionsCollector private () =
                 | None -> range, reference.GetElement().GetText()
                 | Some(appExpr, _) -> appExpr.GetDocumentRange(), appExpr.GetText()
 
-            let expr = DocumentRangeExpression(presentationRange, name, exprText, range)
+            let expr = DocumentRangeExpression(name, exprText, range)
             result.Add(expr)
 
     static member Instance = FSharpCallableExpressionsCollector()

@@ -17,48 +17,33 @@ import org.testng.annotations.Test
 class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
     override val projectName = "SmartStepIntoTest"
 
-    private fun testBreakpoints(fileName: String, lineNumbers: List<Int>, withOffsets: Boolean = true) {
-        testDebugProgram({
-            lineNumbers.forEach {
-                toggleBreakpoint(fileName, it)
-            }
-        }, {
-            repeat(lineNumbers.size) {
-                waitForPause()
-                dumpExecutionPoint(withOffsets = withOffsets)
-                collectSmartStepIntoTargets(this)
-                resumeSession()
-            }
-        })
-    }
-
     @Test
     fun testNestedCalls() {
-        testBreakpoints("NestedCalls.fs", listOf(21, 22, 23, 24, 25, 26, 27, 29, 37, 38))
+        testSmartStepIntoTargets("NestedCalls.fs", listOf(21, 22, 23, 24, 25, 26, 27, 29, 37, 38))
     }
 
     @Test
     fun testChainedCalls() {
-        testBreakpoints("ChainedCalls.fs", listOf(22, 23, 25, 26, 27))
+        testSmartStepIntoTargets("ChainedCalls.fs", listOf(22, 23, 25, 26, 27))
     }
 
     @Test
     fun testInline() {
-        testBreakpoints("Inline.fs", listOf(11))
+        testSmartStepIntoTargets("Inline.fs", listOf(11))
     }
 
     @Test
     @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
     @Solution("CeSteppingTests")
     fun testAsync() {
-        testBreakpoints("Async.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
+        testSmartStepIntoTargets("Async.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
     }
 
     @Test
     @TestSettings(sdkVersion = SdkVersion.DOT_NET_10, buildTool = BuildTool.SDK)
     @Solution("CeSteppingTests")
     fun testTask() {
-        testBreakpoints("Task.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
+        testSmartStepIntoTargets("Task.fs", listOf(22, 28, 34, 39, 41, 51, 61, 66, 72), false)
     }
 
 }
