@@ -1,54 +1,54 @@
 --> Async.fs:22 // return
-[Async+T::get_Prop]
-[Async::f1]
-[Async+a1@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f1, Async] -> f1 T.Prop
+-[.ctor, Async+a1@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:28 // return
-[Async+T::get_Prop]
-[Async::f2]
-[Async+a2@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f2, Async] -> f2 T.Prop aResult
+-[.ctor, Async+a2@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:34 // return
-[Async+T::get_Prop]
-[Async::f2]
-[Async+a3@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f2, Async] -> f2 i T.Prop
+-[.ctor, Async+a3@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:39 // let! a = incrementAsync T.Prop
-[Async+T::get_Prop]
-[Async::incrementAsync]
-[Async+a4@<generated name>::.ctor (no expr)]
-[Async+a4@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[incrementAsync, Async] -> incrementAsync T.Prop
+-[.ctor, Async+a4@<generated name>] -> (no expr)
+-[.ctor, Async+a4@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:41 // return
-[Async+T::get_Prop]
-[Async::f2]
-[Async+a4@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f2, Async] -> f2 i T.Prop
+-[.ctor, Async+a4@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:51 // return
-[Async+T::get_Prop]
-[Async::f2]
-[Async+a5@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f2, Async] -> f2 i T.Prop
+-[.ctor, Async+a5@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:61 // return
-[Async+T::get_Prop]
-[Async::f2]
-[Async+a6@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[f2, Async] -> f2 i T.Prop
+-[.ctor, Async+a6@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:66 // let! a = incrementAsync T.Prop
-[Async+T::get_Prop]
-[Async::incrementAsync]
-[Async+a7@<generated name>::.ctor (no expr)]
-[Async+a7@<generated name>::.ctor (no expr)]
-[Microsoft.FSharp.Control.AsyncPrimitives::MakeAsync (hidden) (no expr)]
++[get_Prop, Async+T] -> T.Prop
++[incrementAsync, Async] -> incrementAsync T.Prop
+-[.ctor, Async+a7@<generated name>] -> (no expr)
+-[.ctor, Async+a7@<generated name>] -> (no expr)
+-[MakeAsync, Microsoft.FSharp.Control.AsyncPrimitives] -> (no expr)
 
 --> Async.fs:72 // return!
-[Async+T::get_Prop]
-[Async::incrementAsync]
++[get_Prop, Async+T] -> T.Prop
++[incrementAsync, Async] -> incrementAsync T.Prop
 
