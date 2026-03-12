@@ -119,7 +119,7 @@ type FSharpQuickFixUtilComponent() =
         member x.BindTo(reference, typeElement, _, _) =
             x.BindTo(reference :?> _, typeElement) :> _
 
-        member x.AddImportsForExtensionMethod(reference, _) = reference
+        member x.AddImportsForExtensionMember(reference, _) = reference
 
         member this.BindTo(reference, typeElement) =
             this.BindTo(reference :?> _, typeElement)
