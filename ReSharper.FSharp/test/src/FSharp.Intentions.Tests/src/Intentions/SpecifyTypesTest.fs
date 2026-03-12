@@ -1,7 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.Intentions
 
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -95,6 +97,10 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Ambiguous 03``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Ambiguous 04 - Generics``() = x.DoNamedTest()
 
+    [<Test>] member x.``Binding - LetBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Binding - AndBang - 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Binding - UseBang - 01`` () = x.DoNamedTest()
+
 
 // Most tests are in TypeHintContextActionsTests
 [<AssertCorrectTreeStructure>]
@@ -114,6 +120,12 @@ type SpecifyPatternTypeActionTest() =
     [<Test>] member x.``Import types - Flexible type 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Flexible type 02``() = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Pattern - LetBang - 01 - F# 9`` () = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Pattern - AndBang - 01 - F# 9`` () = x.DoNamedTest()
+
 
 type SpecifyTypesActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<MemberAndFunctionAnnotationAction>()
@@ -125,9 +137,21 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``Let bindings - Tuples 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
-    [<Test>] member x.``LetBang - 01`` () = x.DoNamedTest()
-    [<Test>] member x.``UseBang - 01`` () = x.DoNamedTest()
-    [<Test>] member x.``AndBang - 01`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Binding - LetBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Binding - LetBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Binding - LetBang - 03 - Typed`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Binding - UseBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test;>] member x.``Binding - UseBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Binding - UseBang - 03 - Typed`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Binding - AndBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Binding - AndBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Binding - AndBang - 03 - Typed`` () = x.DoNamedTest()
 
 type SpecifyPatternTypeActionAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<PatternAnnotationAction>()
@@ -136,3 +160,18 @@ type SpecifyPatternTypeActionAvailabilityTest() =
 
     [<Test>] member x.``Patterns - 01``() = x.DoNamedTest()
     [<Test>] member x.``Patterns - 02 - Scoped``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - LetBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Pattern - LetBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Pattern - LetBang - 03 - Typed`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - UseBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test;>] member x.``Pattern - UseBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Pattern - UseBang - 03 - Typed`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - AndBang - 01`` () = x.DoNamedTest()
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Pattern - AndBang - 02 - F# 9`` () = x.DoNamedTest()
+    [<Test>] member x.``Pattern - AndBang - 03 - Typed`` () = x.DoNamedTest()

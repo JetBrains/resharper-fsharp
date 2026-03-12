@@ -11,12 +11,18 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -57,19 +63,28 @@ module SpecifyTypes =
     let areParametersAnnotated (parametersOwner: IParameterOwnerMemberDeclaration) =
         countParametersWithoutAnnotation parametersOwner = 0
 
+    let canAnnotateBindingInsteadOfHeadPattern (binding: IBinding) =
+        isNotNull binding && (not binding.IsComputed || FSharpLanguageLevel.isFSharp100Supported binding)
+
     let rec getAvailability (node: ITreeNode) =
         if not (isValid node) then Availability.Unavailable else
 
         match node with
         | :? IBinding as binding ->
-            if binding.IsComputed then Availability.Unavailable else
+            if canAnnotateBindingInsteadOfHeadPattern binding then
+                { CanSpecifyParameterTypes = not (areParametersAnnotated binding)
+                  CanSpecifyReturnType = isNull binding.ReturnTypeInfo }
 
-            { CanSpecifyParameterTypes = not (areParametersAnnotated binding)
-              CanSpecifyReturnType = isNull binding.ReturnTypeInfo }
+            else getAvailability binding.HeadPattern
 
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
-            if isNotNull binding then getAvailability binding else
+            if canAnnotateBindingInsteadOfHeadPattern binding then getAvailability binding else
+
+            match LetOrUseExprNavigator.GetByBinding(binding) with
+            // Because older compiler versions do not support typed 'use!'
+            | NotNull letOrUse when letOrUse.IsUse && letOrUse.IsComputed -> Availability.Unavailable
+            | _ ->
 
             let pattern =
                 match OptionalValPatNavigator.GetByPattern(pattern) with
@@ -122,13 +137,10 @@ module SpecifyTypes =
         match node with
         | :? IFSharpPattern as pattern ->
             let binding = BindingNavigator.GetByHeadPattern(pattern.IgnoreParentParens())
-            if isNotNull binding then specifyTypes binding availability else
+            if canAnnotateBindingInsteadOfHeadPattern binding then specifyTypes binding availability else
 
             match pattern with
             | :? IReferencePat as pattern ->
-                let binding = BindingNavigator.GetByHeadPattern(pattern)
-                if isNotNull binding then specifyTypes binding availability else
-
                 let symbolUse = pattern.GetFcsSymbolUse()
 
                 let mfv = symbolUse.Symbol :?> FSharpMemberOrFunctionOrValue
@@ -196,7 +208,10 @@ type MemberAndFunctionAnnotationAction(dataProvider: FSharpContextActionDataProv
     inherit AnnotationActionBase<IParameterOwnerMemberDeclaration>(dataProvider)
 
     override this.IsAvailable(node: IParameterOwnerMemberDeclaration) =
-        isAtParametersOwnerKeywordOrIdentifier dataProvider node
+        isAtParametersOwnerKeywordOrIdentifier dataProvider node &&
+        match node with
+        | :? IBinding as binding -> SpecifyTypes.canAnnotateBindingInsteadOfHeadPattern binding
+        | _ -> true
 
     override this.Text =
         if this.ContextNode.ParametersDeclarationsEnumerable.Any() then "Add type annotations"
@@ -222,10 +237,12 @@ type PatternAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     interface IContextAction with
         override x.IsAvailable(_: IUserDataHolder) =
             myActions <- ResizeArray<IBulbAction>(2)
-            let refPat = dataProvider.GetSelectedElement<IReferencePat>()
 
+            let refPat = dataProvider.GetSelectedElement<IReferencePat>()
             if not (isValid refPat) then false else
-            if isNotNull (BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())) then false else
+
+            let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
+            if SpecifyTypes.canAnnotateBindingInsteadOfHeadPattern binding then false else
 
             let availability = SpecifyTypes.getAvailability refPat
             if not availability.IsAvailable then false else
