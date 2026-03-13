@@ -1,0 +1,8 @@
+﻿module Module
+
+open System
+
+async {
+    use! x: IDisposable{caret} = failwith ""
+    ()
+}
