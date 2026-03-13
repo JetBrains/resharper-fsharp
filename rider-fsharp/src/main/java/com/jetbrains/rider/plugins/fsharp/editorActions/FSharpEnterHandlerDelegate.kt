@@ -735,8 +735,7 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     dataContext: DataContext,
     originalHandler: EditorActionHandler?
   ): Result {
-    if (file.language != FSharpLanguage) return Result.Continue
-    if (!isPatchEngineEnabled) return Result.Stop
+    if (file.language != FSharpLanguage || !isPatchEngineEnabled) return Result.Continue
     runCatching {
       handleEnter(editor, caretOffset.get())
       return Result.Stop
