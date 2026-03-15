@@ -9,6 +9,7 @@
       <module name="intellij.rider.test.framework.testng"/>
       <module name="intellij.rider.test.framework.unit"/>
       <module name="intellij.rider.test.framework.junit"/>
+      <module name="intellij.libraries.kotlinx.coroutines.core"/>
       <module name="intellij.platform.core"/>
       <module name="intellij.platform.core.impl"/>
       <module name="intellij.platform.core.ui"/>
