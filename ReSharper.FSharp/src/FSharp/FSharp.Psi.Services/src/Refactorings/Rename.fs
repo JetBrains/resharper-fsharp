@@ -146,11 +146,11 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.GetOptionsModel(declaredElement, reference, _) =
         FSharpCustomRenameModel(declaredElement, reference, (* todo *) ChangeNameKind.SourceName) :> _
 
-    override x.IsValidName(decl: IDeclaration, _: DeclaredElementType, name: string) =
+    override x.IsValidName(decl: IDeclaration, _: IDeclaredElement, name: string) =
         namingService.IsValidName(decl.DeclaredElement, name)
 
-    override x.IsValidName(element: IDeclaredElement, _: DeclaredElementType, name: string) =
-        namingService.IsValidName(element, name)
+    override x.IsValidName(element: IDeclaredElement, name: string) =
+        namingService.IsValidName(element, name) 
 
     override x.GetInitialPage(workflow) =
         let createPage (workflow: IRenameWorkflow) =
