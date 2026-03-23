@@ -1,6 +1,6 @@
 module Module
 
 async {
-    let! x{off} = async { () }
+    let!{on} x{on} = async { () }
     return ()
 }
