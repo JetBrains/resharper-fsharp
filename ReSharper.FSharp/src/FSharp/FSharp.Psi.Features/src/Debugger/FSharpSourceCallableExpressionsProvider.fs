@@ -6,6 +6,7 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -24,10 +25,12 @@ type FSharpCallableExpressionsCollector private () =
         let expectedArgCount: int option =
             match reference.GetFcsSymbol() with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
+                if mfv.IsProperty || mfv.IsValue && mfv.IsModuleValueOrMember then Some 0 else
                 if mfv.IsValue then None else
-                if mfv.IsProperty then Some 0 else
 
-                Some mfv.CurriedParameterGroups.Count
+                let fcsType = getAbbreviatedType mfv.FullType
+                let typeArgs = FcsTypeUtil.getFunctionTypeArgs false fcsType
+                Some typeArgs.Length
 
             | :? FSharpUnionCase as unionCase when unionCase.HasFields -> Some 1
             | :? FSharpEntity as entity when entity.FSharpFields.Count > 0 -> Some 1
@@ -36,11 +39,19 @@ type FSharpCallableExpressionsCollector private () =
 
         match expectedArgCount, argCount with
         | Some 0, None -> true
-        | Some expected, Some (_, actual) -> expected = actual
+        | Some expected, Some (_, actual, _) -> expected = actual
         | _ -> false
 
-    let processInvokedReference (applicationInfo: (IFSharpExpression * int) option) (reference: FSharpSymbolReference)
-            (result: List<_>) =
+    let isValueCompiledAsMethod (declaredElement: IDeclaredElement) =
+        match declaredElement with
+        | :? IFSharpTypeMember as fsTypeMember ->
+            match fsTypeMember.Symbol with
+            | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsValue && mfv.IsValCompiledAsMethod
+            | _ -> false
+        | _ -> false
+
+    let processInvokedReference (applicationInfo: (IFSharpExpression * int * bool) option)
+            (reference: FSharpSymbolReference) (result: List<_>) =
         if not (isInvocation applicationInfo reference) then () else
 
         match reference.Resolve().DeclaredElement with
@@ -49,22 +60,27 @@ type FSharpCallableExpressionsCollector private () =
             t.IsTuple() || t.IsValueTuple() -> ()
 
         | declaredElement ->
+            let isValueCompiledAsMethod = isValueCompiledAsMethod declaredElement
+
             let name =
-                // todo: use compiled names
-                let shortName = reference.GetName()
                 match declaredElement with
-                | :? IProperty -> "get_" + shortName
+                | :? IProperty as property -> property.Getter.ShortName
                 | :? IConstructor -> ".ctor"
-                | _ -> shortName
+                | _ -> declaredElement.ShortName
 
             let range = reference.GetDocumentRange()
 
             let presentationRange, exprText =
                 match applicationInfo with
                 | None -> range, reference.GetElement().GetText()
-                | Some(appExpr, _) -> appExpr.GetDocumentRange(), appExpr.GetText()
+                | Some(appExpr, _, hasPipedArg) ->
+                    let text =
+                        let exprText = appExpr.GetText()
+                        if hasPipedArg then exprText + " …" else exprText
 
-            let expr = DocumentRangeExpression(name, exprText, range)
+                    appExpr.GetDocumentRange(), text
+
+            let expr = DocumentRangeExpression(name, exprText, range, IsHidden = isValueCompiledAsMethod)
             result.Add(expr)
 
     static member Instance = FSharpCallableExpressionsCollector()
@@ -88,6 +104,8 @@ type FSharpCallableExpressionsCollector private () =
         member this.ProcessBeforeInterior(element, result) =
             let expr = element.As<IFSharpExpression>()
             let expr = expr.IgnoreInnerParens()
+            let hasPipedArg = BinaryAppExprNavigator.GetByRightArgument(expr) |> isPredefinedInfixOpApp "|>"
+
             match expr with
             | :? IPrefixAppExpr as prefixAppExpr ->
                 let qualifiedExpr = prefixAppExpr.FunctionExpression.As<IQualifiedExpr>()
@@ -98,16 +116,21 @@ type FSharpCallableExpressionsCollector private () =
                 for argExpr in argExpressions do
                     this.Process(argExpr, result)
 
-                let argCount = Some(prefixAppExpr :> IFSharpExpression, argExpressions.Count)
+                let argCount =
+                    let ownArgExprCount = argExpressions.Count
+                    let count = if hasPipedArg then ownArgExprCount + 1 else ownArgExprCount
+                    Some(prefixAppExpr :> IFSharpExpression, count, hasPipedArg)
+
                 processInvokedReference argCount prefixAppExpr.InvokedFunctionReference result
 
             | :? INewExpr as newExpr ->
                 this.Process(newExpr.ArgumentExpression, result)
-                processInvokedReference (Some(newExpr, 1)) newExpr.Reference result
+                processInvokedReference (Some(newExpr, 1, false)) newExpr.Reference result
 
             | :? IReferenceExpr as refExpr ->
                 this.Process(refExpr.Qualifier, result)
-                processInvokedReference None refExpr.Reference result
+                let appInfo = if hasPipedArg then Some(refExpr :> IFSharpExpression, 1, true) else None
+                processInvokedReference appInfo refExpr.Reference result
 
             | :? IBinaryAppExpr as binaryAppExpr ->
                 this.Process(binaryAppExpr.LeftArgument, result)
@@ -211,6 +234,9 @@ type FSharpSourceCallableExpressionsProvider() =
                 match node with
                 | :? IFSharpExpression as expr -> expr
                 | :? IBinding as binding -> binding.Expression
+
+                | :? IFSharpIdentifier as fsIdentifier ->
+                    fsIdentifier.Parent.As<IReferenceExpr>()
 
                 // Workaround dotnet/fsharp#19248
                 | :? ITokenNode as tokenNode when isReturnOrYield tokenNode ->

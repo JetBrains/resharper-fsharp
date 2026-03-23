@@ -1,0 +1,240 @@
+Stopped at t:
+--> Program.fs:17(122,133) // let t = T()
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+
+Stepped over t and l1:
+--> Program.fs:20(147,159) // let l2 = [1]
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +t = Program.T
+
+Stepped over l2:
+--> Program.fs:21(160,177) // let l3 = [""; ""]
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +l2 = {FSharpList<int>} Length = 1
+    +t = Program.T
+
+Stepped over l3:
+--> Program.fs:22(187,189) // l3
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +t = Program.T
+
+Stepped over l3 expr:
+--> Program.fs:22(193,210) // List.map _.Length
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +Pipe #1 input at line 22 = {FSharpList<string>} Length = 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +t = Program.T
+
+Stepped over l4:
+--> Program.fs:24(212,254) // let i1 = l1.Length + l2.Length + l3.Length
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +List.map _.Length … returned = {FSharpList<int>} Length = 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i1:
+--> Program.fs:25(255,267) // let i2 = f 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +Program.l1() returned = {FSharpList<object>} Length = 0
+    l1.Length returned = {int} 0
+    l2.Length returned = {int} 1
+    l3.Length returned = {int} 2
+    i1 = {int} 3
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i2:
+--> Program.fs:26(268,286) // let i3 = f (1 + 1)
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    f 1 returned = {int} 2
+    i1 = {int} 3
+    i2 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i3:
+--> Program.fs:27(287,321) // let i4 = f (System.Math.Max(1, 2))
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    f (1 + 1) returned = {int} 3
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i4:
+--> Program.fs:28(322,334) // let i5 = g 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    System.Math.Max(1, 2) returned = {int} 2
+    f (System.Math.Max(1, 2)) returned = {int} 3
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i5:
+--> Program.fs:29(335,350) // let i6 = t.Prop
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    g 1 returned = {int} 1
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i6:
+--> Program.fs:30(351,371) // let i7 = h ((+) 1) 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    t.Prop returned = {int} 1
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i7:
+--> Program.fs:31(372,392) // let i8 = h (add 1) 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    h ((+) 1) 1 returned = {int} 2
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over i8:
+--> Program.fs:33(394,407) // let u1 = g ()
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    h (add 1) 1 returned = {int} 2
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over u1:
+--> Program.fs:34(408,422) // let u2 = id ()
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over u2:
+--> Program.fs:36(424,451) // let s1 = "123".Substring(1)
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    +t = Program.T
+
+Stepped over s1:
+--> Program.fs:37(452,492) // let s2 = "123".Substring(1).Substring(1)
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    "123".Substring(1) returned = {string} "23"
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    s1 = {string} "23"
+    +t = Program.T
+
+Stepped over s2:
+--> Program.fs:39(494,508) // let f1 = add 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    "123".Substring(1) returned = {string} "23"
+    "123".Substring(1).Substring(1) returned = {string} "3"
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    s1 = {string} "23"
+    s2 = {string} "3"
+    +t = Program.T
+
+Stepped over f1:
+--> Program.fs:41(510,512) // ()
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +f1 = Program.f1@39
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    s1 = {string} "23"
+    s2 = {string} "3"
+    +t = Program.T
+

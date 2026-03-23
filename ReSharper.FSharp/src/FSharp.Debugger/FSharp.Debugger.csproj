@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup Label="PackageReference">
     <PackageReference Include="Autofac" />
+    <PackageReference Include="FSharp.Core" />
     <PackageReference Include="JetBrains.ICorDebug"/>
     <PackageReference Include="JetBrains.SharpGen.Runtime"/>
     <PackageReference Include="JetBrains.SharpGen.Runtime.COM"/>
