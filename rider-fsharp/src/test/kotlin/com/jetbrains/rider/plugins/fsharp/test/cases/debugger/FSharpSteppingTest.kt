@@ -12,7 +12,9 @@ import com.jetbrains.rider.test.scriptingApi.stepInto
 import com.jetbrains.rider.test.scriptingApi.stepOver
 import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
 import com.jetbrains.rider.test.scriptingApi.waitForPause
+import com.jetbrains.rider.test.scriptingApi.withOverridingDebugSettings
 import org.testng.annotations.Test
+import java.time.Duration
 
 @Test
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -30,6 +32,11 @@ class FSharpSteppingTest : DebuggerTestBase() {
             stepOver()
             dumpState(message = "Stepped over")
         })
+    }
+
+    fun DebugTestExecutionContext.stepOver(message: String) {
+        stepOver()
+        dumpFullCurrentData(message = message)
     }
 
     @Test
@@ -358,6 +365,44 @@ class FSharpSteppingTest : DebuggerTestBase() {
             repeatStepOver(8)
             resumeSession()
         }, true)
+    }
+
+    @Test
+    @Solution("ReturnValueTest")
+    fun testReturnValues() {
+        withOverridingDebugSettings({
+            disableExternalSourceDebug()
+            showReturnValues = true
+            returnValuesTimeout = Duration.ofMinutes(3).toMillis().toInt()
+        }) {
+            testDebugProgram({
+                toggleBreakpoint("Program.fs", 17)
+            }, {
+                waitForPause()
+                dumpFullCurrentData(message = "Stopped at t")
+
+                stepOver("Stepped over t and l1")
+                stepOver("Stepped over l2")
+                stepOver("Stepped over l3")
+                stepOver("Stepped over l3 expr")
+                stepOver("Stepped over l4")
+                stepOver("Stepped over i1")
+                stepOver("Stepped over i2")
+                stepOver("Stepped over i3")
+                stepOver("Stepped over i4")
+                stepOver("Stepped over i5")
+                stepOver("Stepped over i6")
+                stepOver("Stepped over i7")
+                stepOver("Stepped over i8")
+                stepOver("Stepped over u1")
+                stepOver("Stepped over u2")
+                stepOver("Stepped over s1")
+                stepOver("Stepped over s2")
+                stepOver("Stepped over f1")
+
+                resumeSession()
+            }, true)
+        }
     }
 
 }

@@ -15,4 +15,7 @@ public static class FSharpMetadataUtil
 
     return declaringType.TypeName == "FSharpTypeFunc";
   }
+
+  public static bool IsUnit([CanBeNull] this IMetadataType metadataType) =>
+    metadataType is { FullName: "Microsoft.FSharp.Core.Unit" };
 }
