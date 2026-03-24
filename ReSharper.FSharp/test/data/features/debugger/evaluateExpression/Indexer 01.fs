@@ -1,3 +1,3 @@
 module Module
 
-"qwe".[0]{caret}
+"qwe".[0{caret}]

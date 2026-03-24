@@ -1,3 +1,3 @@
 module Module
 
-foo.bar{caret}
+foo.ba{caret}r
