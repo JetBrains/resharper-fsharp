@@ -9,6 +9,8 @@
         <Compile Include="NestedCalls.fs"/>
         <Compile Include="ChainedCalls.fs"/>
         <Compile Include="Inline.fs" />
+        <Compile Include="UnionCases.fs" />
+        <Compile Include="Values.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 

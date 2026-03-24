@@ -1,3 +1,5 @@
 NestedCalls.run()
 ChainedCalls.run()
 Inline.run()
+UnionCases.run()
+Values.run()

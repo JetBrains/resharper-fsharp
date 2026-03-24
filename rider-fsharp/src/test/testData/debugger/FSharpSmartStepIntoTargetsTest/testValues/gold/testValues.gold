@@ -1,0 +1,8 @@
+--> Values.fs:10(88,92) // f l1
+-[l1, Values] -> l1
++[f, Values] -> f l1
+
+--> Values.fs:11(97,101) // f l2
+-[get_l2, Values] -> l2
++[f, Values] -> f l2
+

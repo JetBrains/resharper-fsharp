@@ -64,9 +64,16 @@ type FSharpCallableExpressionsCollector private () =
 
             let name =
                 match declaredElement with
-                | :? IProperty as property -> property.Getter.ShortName
+                | null -> reference.GetName()
+                | :? IProperty as property when not isValueCompiledAsMethod -> property.Getter.ShortName
                 | :? IConstructor -> ".ctor"
-                | _ -> declaredElement.ShortName
+                | _ ->
+
+                match reference.GetFcsSymbol() with
+                | :? FSharpUnionCase as fcsUnionCase -> "New" + fcsUnionCase.Name
+                | _ ->
+
+                declaredElement.ShortName
 
             let range = reference.GetDocumentRange()
 
@@ -103,8 +110,7 @@ type FSharpCallableExpressionsCollector private () =
 
         member this.ProcessBeforeInterior(element, result) =
             let expr = element.As<IFSharpExpression>()
-            let expr = expr.IgnoreInnerParens()
-            let hasPipedArg = BinaryAppExprNavigator.GetByRightArgument(expr) |> isPredefinedInfixOpApp "|>"
+            let hasPipedArg = BinaryAppExprNavigator.GetByRightArgument(expr.IgnoreParentParens()) |> isPredefinedInfixOpApp "|>"
 
             match expr with
             | :? IPrefixAppExpr as prefixAppExpr ->
