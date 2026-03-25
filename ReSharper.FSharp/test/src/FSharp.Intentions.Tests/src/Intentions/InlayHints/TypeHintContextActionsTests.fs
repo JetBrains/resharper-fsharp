@@ -54,7 +54,8 @@ type TypeHintContextActionsTests() =
     [<Test>] member x.``Match 04 - List 03``() = x.DoNamedTest()
     [<Test>] member x.``Match 05 - List 04 - Import type``() = x.DoNamedTest()
 
-    [<Test>] member x.``Not available 01 - Let bang``() = x.DoNamedTest()
+    [<Test>] member x.``Let bang 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not available 02 - Property with accessors``() = x.DoNamedTest()
 
     override x.CreateBulbAction(_, dataModel) =

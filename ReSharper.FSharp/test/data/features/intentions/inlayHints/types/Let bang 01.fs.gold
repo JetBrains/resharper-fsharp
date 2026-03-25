@@ -1,0 +1,6 @@
+﻿module Module
+
+async {
+    let! x: unit{caret} = Async.Sleep(50)
+    return x
+}
