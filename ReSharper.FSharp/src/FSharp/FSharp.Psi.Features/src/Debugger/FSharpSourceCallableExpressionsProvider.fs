@@ -50,6 +50,14 @@ type FSharpCallableExpressionsCollector private () =
             | _ -> false
         | _ -> false
 
+    let hasSpecialUnionCaseName (fcsUnionCase: FSharpUnionCase) =
+        let fcsEntity = fcsUnionCase.DeclaringEntity
+        match fcsEntity.BasicQualifiedName with
+        | None -> false
+        | Some name ->
+
+        name = fsOptionTypeName.FullName
+
     let processInvokedReference (applicationInfo: (IFSharpExpression * int * bool) option)
             (reference: FSharpSymbolReference) (result: List<_>) =
         if not (isInvocation applicationInfo reference) then () else
@@ -63,23 +71,25 @@ type FSharpCallableExpressionsCollector private () =
             let isValueCompiledAsMethod = isValueCompiledAsMethod declaredElement
 
             let name =
+                match reference.GetFcsSymbol() with
+                | :? FSharpUnionCase as fcsUnionCase when not (hasSpecialUnionCaseName fcsUnionCase) ->
+                    "New" + fcsUnionCase.Name
+                | _ ->
+
                 match declaredElement with
                 | null -> reference.GetName()
                 | :? IProperty as property when not isValueCompiledAsMethod -> property.Getter.ShortName
                 | :? IConstructor -> ".ctor"
-                | _ ->
+                | _ -> declaredElement.ShortName
 
-                match reference.GetFcsSymbol() with
-                | :? FSharpUnionCase as fcsUnionCase -> "New" + fcsUnionCase.Name
-                | _ ->
+            let nameRange = reference.GetDocumentRange()
 
-                declaredElement.ShortName
-
-            let range = reference.GetDocumentRange()
-
-            let presentationRange, exprText =
+            let wholeRange, exprText =
                 match applicationInfo with
-                | None -> range, reference.GetElement().GetText()
+                | None ->
+                    let referenceOwner = reference.GetElement()
+                    referenceOwner.GetDocumentRange(), referenceOwner.GetText()
+
                 | Some(appExpr, _, hasPipedArg) ->
                     let text =
                         let exprText = appExpr.GetText()
@@ -87,7 +97,7 @@ type FSharpCallableExpressionsCollector private () =
 
                     appExpr.GetDocumentRange(), text
 
-            let expr = DocumentRangeExpression(name, exprText, range, IsHidden = isValueCompiledAsMethod)
+            let expr = DocumentRangeExpression(name, exprText, nameRange, wholeRange, IsHidden = isValueCompiledAsMethod)
             result.Add(expr)
 
     static member Instance = FSharpCallableExpressionsCollector()
