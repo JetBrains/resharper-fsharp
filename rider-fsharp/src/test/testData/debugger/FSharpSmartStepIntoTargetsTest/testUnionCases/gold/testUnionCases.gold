@@ -1,25 +1,25 @@
 --> UnionCases.fs:13(165,195) // f1 (A(Some 1, T.Prop, T.Prop))
--[Some, Microsoft.FSharp.Core.FSharpOption`1] -> (no expr)
+-[Some, Microsoft.FSharp.Core.FSharpOption`1] -> Some 1
 +[get_Prop, UnionCases+T] -> T.Prop
 +[get_Prop, UnionCases+T] -> T.Prop
 -[NewA, UnionCases+U] -> A(Some 1, T.Prop, T.Prop)
 +[f1, UnionCases] -> f1 (A(Some 1, T.Prop, T.Prop))
 
 --> UnionCases.fs:14(200,211) // f2 (Some 1)
--[Some, Microsoft.FSharp.Core.FSharpOption`1] -> (no expr)
+-[Some, Microsoft.FSharp.Core.FSharpOption`1] -> Some 1
 +[f2, UnionCases] -> f2 (Some 1)
 
 --> UnionCases.fs:15(216,277) // [ f2 None; f2 (Some 1); f2 (Some 2) ], [f2 (Some 3); f2 None]
 +[f2, UnionCases] -> f2 None
--[Some, Microsoft.FSharp.Core.FSharpOption`1] -> (no expr)
+-[Some, Microsoft.FSharp.Core.FSharpOption`1] -> Some 1
 +[f2, UnionCases] -> f2 (Some 1)
--[Some, Microsoft.FSharp.Core.FSharpOption`1] -> (no expr)
+-[Some, Microsoft.FSharp.Core.FSharpOption`1] -> Some 2
 +[f2, UnionCases] -> f2 (Some 2)
 -[get_Empty, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
 -[Cons, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
 -[Cons, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
 -[Cons, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
--[Some, Microsoft.FSharp.Core.FSharpOption`1] -> (no expr)
+-[Some, Microsoft.FSharp.Core.FSharpOption`1] -> Some 3
 +[f2, UnionCases] -> f2 (Some 3)
 +[f2, UnionCases] -> f2 None
 -[get_Empty, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
