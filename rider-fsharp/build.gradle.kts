@@ -49,6 +49,7 @@ dependencies {
       rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
+    bundledModule("intellij.rd.client")
     bundledModule("intellij.rider")
     bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
     bundledModule("intellij.rider.rdclient.dotnet")
