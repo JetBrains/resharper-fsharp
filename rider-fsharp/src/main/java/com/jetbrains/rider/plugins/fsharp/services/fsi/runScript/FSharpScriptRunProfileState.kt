@@ -9,17 +9,17 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
 import com.jetbrains.rider.debugger.showElevationDialogIfNeeded
 import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost
+import com.jetbrains.rider.run.configurations.RiderAsyncRunProfileState
 import com.jetbrains.rider.run.createRunCommandLine
 import com.jetbrains.rider.runtime.DotNetExecutable
 import com.jetbrains.rider.runtime.DotNetRuntime
 
-//TODO: unify in platform
 class FSharpScriptRunProfileState(
   private val dotNetExecutable: DotNetExecutable,
   private val dotNetRuntime: DotNetRuntime,
   private val environment: ExecutionEnvironment
-) : RunProfileState {
-  suspend fun executeSuspending(executor: Executor): ExecutionResult {
+) : RiderAsyncRunProfileState, RunProfileState {
+  override suspend fun executeAsync(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
     try {
       dotNetExecutable.validate()
       val commandLine = dotNetExecutable.createRunCommandLine(dotNetRuntime)

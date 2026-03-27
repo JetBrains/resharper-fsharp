@@ -21,7 +21,7 @@ class FSharpScriptExecutorFactory : AsyncExecutorFactory {
     thisLogger().info("Configuration will be executed on ${runtimeToExecute.javaClass.name}")
     return when (executorId) {
       DefaultRunExecutor.EXECUTOR_ID -> FSharpScriptRunProfileState(dotNetExecutable, runtimeToExecute, environment)
-      DefaultDebugExecutor.EXECUTOR_ID -> runtimeToExecute.createDebugState(dotNetExecutable, environment)
+      DefaultDebugExecutor.EXECUTOR_ID -> FSharpScriptDebugProfileState(environment, runtimeToExecute.createDebugState(dotNetExecutable, environment))
       else -> throw CantRunException(RiderRunBundle.message("dialog.message.unsupported.executor.error", executorId))
     }
   }
