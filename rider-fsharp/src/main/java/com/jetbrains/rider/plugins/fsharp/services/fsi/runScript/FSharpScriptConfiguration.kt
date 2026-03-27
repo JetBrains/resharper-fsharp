@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.JDOMExternalizerUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.rdclient.util.idea.toVirtualFile
+import com.jetbrains.rider.debugger.DotNetAsyncRunnableConfiguration
 import com.jetbrains.rider.debugger.IRiderDebuggable
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType
 import com.jetbrains.rider.plugins.fsharp.FSharpBundle
@@ -15,7 +16,6 @@ import com.jetbrains.rider.run.configurations.DotProfilingAwareRunConfiguration
 import com.jetbrains.rider.run.configurations.RiderAsyncRunConfiguration
 import org.jdom.Element
 
-//TODO: IRiderDebuggable
 class FSharpScriptConfiguration(name: String,
                                 var scriptFile: VirtualFile?,
                                 var envs: Map<String, String>,
@@ -25,7 +25,7 @@ class FSharpScriptConfiguration(name: String,
                              project,
                              factory,
                              { FSharpScriptConfigurationEditor(it) },
-                             FSharpScriptExecutorFactory()), IRiderDebuggable, DotProfilingAwareRunConfiguration {
+                             FSharpScriptExecutorFactory()), DotNetAsyncRunnableConfiguration, IRiderDebuggable, DotProfilingAwareRunConfiguration {
   companion object {
     private const val SCRIPT_PATH = "SCRIPT_PATH"
   }
