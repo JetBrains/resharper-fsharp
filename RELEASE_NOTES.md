@@ -1,8 +1,36 @@
 # Release notes
 
-## 2025.3
+## 2026.1
 
-2025.3
+### Debugger
+
+We've reimplemented how stepping is handled in .NET debugger, and these changes fix many cases where 'Step Into' could step to an unexpected place.
+
+* **New**: 'Smart Step Into' allows choosing which method to step into in a statement, allowing to skip stepping through intermediate calls
+* **New**: stepping in `async` and `task` expressions
+* **New**: return values for F# expressions are shown in the debugger window
+
+### Code completion
+* **Improve**: faster accepting of suggested provided by F# compiler service
+* **Fix**: unexpected `open` could be added by code completion
+* **Fix**: wrong extension methods could be suggested to be imported
+* **Improve**: operators are not suggested in code completion anymore
+
+### Analysis
+* **Improve**: F# functions are highlighted as methods by default now
+* **New**: tooltips show compile-time keyword constants like `__LINE__` or `__SOURCE_FILE__`
+* **Improve**: better `#warnon` support
+* **Fix**: tooltips were not shown for some provided types
+
+
+### Misc
+* **Fix**: Generate overrides: fix some members weren't suggested for overriding
+* **Improve**: Disable warning fix: extra comments are removed now
+* **Improve**: Implement additional steps in 'Extend selection' on property accessor declarations
+* **Fix**: Formatter: fix nodes are reindented too far during refactorings
+
+
+## 2025.3
 
 Quick fixes:
 * Change type:
