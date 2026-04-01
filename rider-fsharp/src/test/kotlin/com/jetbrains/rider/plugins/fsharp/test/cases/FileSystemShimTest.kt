@@ -15,8 +15,9 @@ import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import org.testng.annotations.Test
-import java.io.File
+import java.nio.file.Path
 import java.time.Duration
+import kotlin.io.path.pathString
 
 @Solution("CoreConsoleApp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -31,7 +32,7 @@ class FileSystemShimTest : PerTestSolutionTestBase() {
     val stampBefore = getTimestamp(file)
 
     val newText = "namespace NewTextHere"
-    changeFileContent(project, file) { newText }
+    changeFileContent(project, file.toFile()) { newText }
 
     LocalFileSystem.getInstance().refresh(false)
     waitAndPump(
@@ -41,12 +42,12 @@ class FileSystemShimTest : PerTestSolutionTestBase() {
       { "Timestamp wasn't changed." })
     val stampAfter = getTimestamp(file)
 
-    val (source, timestamp) = project.fcsHost.getSourceCache.sync(file.path).shouldNotBeNull("Couldn't get the source.")
+    val (source, timestamp) = project.fcsHost.getSourceCache.sync(file.pathString).shouldNotBeNull("Couldn't get the source.")
     assert(source == newText) { "Source differs from new text." }
     assert(timestamp == stampAfter) { "Timestamp differs from expected." }
   }
 
-  private fun getTimestamp(file: File) =
-    project.fcsHost.getLastModificationStamp.sync(file.path)
+  private fun getTimestamp(file: Path) =
+    project.fcsHost.getLastModificationStamp.sync(file.pathString)
 
 }

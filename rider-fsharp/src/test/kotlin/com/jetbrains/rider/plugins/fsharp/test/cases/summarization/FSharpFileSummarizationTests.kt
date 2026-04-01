@@ -7,6 +7,7 @@ import com.jetbrains.rd.ide.model.junieModel
 import com.jetbrains.rdclient.util.idea.toIOFile
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectory
+import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.protocol.protocol
@@ -37,7 +38,7 @@ class FSharpFileSummarizationTests : PerTestSolutionTestBase() {
   private fun doTest(solutionRelativeFilePath: Path) {
     changeFileSystem2(project) {
       replaceFileContent(project, solutionRelativeFilePath.name)
-      arrayOf(getVirtualFileFromPath(solutionRelativeFilePath.name, project.solutionDirectory).toIOFile())
+      arrayOf(getVirtualFileFromPath(solutionRelativeFilePath.name, project.solutionDirectoryPath).toIOFile())
     }
 
     executeWithGold(testGoldFile) { gold ->

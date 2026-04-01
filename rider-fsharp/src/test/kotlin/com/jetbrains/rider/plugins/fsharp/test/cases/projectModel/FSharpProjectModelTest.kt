@@ -195,7 +195,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
       dump2("Init", false, false) { }
 
       dump2("Move File1 and File2 lines", false, true) {
-        val fsprojFile = File(activeSolutionDirectory, "ClassLibrary1/ClassLibrary1.fsproj")
+        val fsprojFile = File(activeSolutionDirectory.toFile(), "ClassLibrary1/ClassLibrary1.fsproj")
         changeFileContent(project, fsprojFile) { content ->
           content
             .replace("<Compile Include=\"File2.fs\" />", "<Compile Include=\"File2.fs.tmp\" />")

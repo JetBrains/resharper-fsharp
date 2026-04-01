@@ -21,8 +21,8 @@ import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.restoreNuGet
 import com.jetbrains.rider.test.tooling.testTools
-import java.io.File
 import java.io.PrintStream
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Duration
 import kotlin.io.path.Path
@@ -114,7 +114,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
 
   override val solutionApiFacade: SolutionApiFacade by lazy {
     object : RiderSolutionWithFoldersApiFacade(testWorkDirectoryStorage.customWorkDirectoryName, checkSolutionLoad) {
-      override fun openSolution(solutionFile: File, params: OpenSolutionParams): Project {
+      override fun openSolution(solutionFile: Path, params: OpenSolutionParams): Project {
         application.protocolManager.protocolHosts.forEach {
           editFSharpBackendSettings(it) {
             dotnetCliHomeEnvVar = getDotnetCliHome().absolutePathString()
