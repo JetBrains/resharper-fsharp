@@ -66,7 +66,7 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   override val testDataDirectory
     get() = testDataStorage.testDataDirectory.resolve("../../../../ReSharper.FSharp/test/data/features/service/typingAssist")
   override val testCaseSourceDirectory
-    get() = activeSolutionDirectory
+    get() = activeSolutionDirectory.toFile()
 
   protected val backendCases
     get() =
@@ -76,7 +76,7 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
 
   private fun doTest(caseName: String, isSupportedTestCase: Boolean) {
     val newSourceFile =
-      testDataDirectory.resolve("$caseName.fs").copyTo(activeSolutionDirectory.resolve("$caseName.fs.source"))
+      testDataDirectory.resolve("$caseName.fs").copyTo(activeSolutionDirectory.resolve("$caseName.fs.source").toFile())
 
     changeFileContent(project, newSourceFile) {
       it.replace("{caret}", "<caret>")
