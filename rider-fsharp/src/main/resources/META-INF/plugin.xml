@@ -104,6 +104,7 @@
     <spellchecker.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.spellchecker.FSharpSpellcheckingStrategy" order="first"/>
 
     <xdebugger.inlineBreakpointsDisabler implementation="com.jetbrains.rider.plugins.fsharp.breakpoints.FSharpInlineBreakpointsDisabler"/>
+      <applicationSettings service="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
   </extensions>
 
   <actions resource-bundle="messages.FSharpBundle">
