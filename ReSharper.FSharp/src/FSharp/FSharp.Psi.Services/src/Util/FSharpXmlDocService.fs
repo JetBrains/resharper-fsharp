@@ -64,13 +64,8 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
         let xmlNode =
             match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
-                let xmlDocument = XmlDocument()
-                try
-                    xmlDocument.LoadXml("<root>" + xmlDoc.GetXmlText() + "</root>")
-                    Some(xmlDocument.SelectSingleNode("root"))
-                with e ->
-                    xmlDocument.LoadXml("<summary>" + e.Message + "</summary>")
-                    Some xmlDocument
+                let _, xmlNode = XMLDocUtil.LoadMemberDocXmlUntilFirstError(xmlDoc.UnprocessedLines, null)
+                Option.ofObj xmlNode
 
             | FSharpXmlDoc.FromXmlFile(dllFile, memberName) ->
                 symbol
