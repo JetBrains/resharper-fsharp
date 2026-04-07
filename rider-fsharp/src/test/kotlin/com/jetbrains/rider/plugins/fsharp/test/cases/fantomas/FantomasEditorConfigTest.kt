@@ -11,7 +11,7 @@ import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import java.io.File
+import kotlin.io.path.copyTo
 
 @Test
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
@@ -20,8 +20,8 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override fun beforeDoTestWithDocuments() {
     super.beforeDoTestWithDocuments()
 
-    val sourceEditorConfigFile = File(testCaseSourceDirectory, ".editorconfig")
-    val slnEditorConfigFile = File(testWorkDirectory, ".editorconfig")
+    val sourceEditorConfigFile = testCaseSourceDirectory.resolve(".editorconfig")
+    val slnEditorConfigFile = testWorkDirectory.resolve(".editorconfig")
     sourceEditorConfigFile.copyTo(slnEditorConfigFile, true)
     flushFileChanges(project)
   }

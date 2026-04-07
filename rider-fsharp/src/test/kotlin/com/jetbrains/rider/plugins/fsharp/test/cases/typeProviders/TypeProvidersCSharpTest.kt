@@ -23,7 +23,8 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.pathString
 
 @Solution("YamlProviderCSharp")
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
@@ -64,7 +65,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
 
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
       waitForNextDaemon()
-      executeWithGold(File(testGoldFile.path + "_before")) {
+      executeWithGold(Path.of(testGoldFile.pathString + "_before")) {
         dumpSevereHighlighters(it)
       }
 
@@ -72,7 +73,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
       typeFromOffset("1", 195)
       waitForAllAnalysisFinished(project!!)
 
-      executeWithGold(File(testGoldFile.path + "_after")) {
+      executeWithGold(Path.of(testGoldFile.pathString + "_after")) {
         dumpSevereHighlighters(it)
       }
     }
@@ -85,7 +86,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
       defaultRefactoringRename("Renamed")
       waitForNextDaemon()
       markupAdapter.hasErrors.shouldBeFalse()
-      executeWithGold(File(testGoldFile.path + " - csharp")) {
+      executeWithGold(Path.of(testGoldFile.pathString + " - csharp")) {
         dumpOpenedDocument(it, project!!)
       }
     }
@@ -93,7 +94,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     withOpenedEditor("YamlProviderLibrary/Library.fs") {
       waitForDaemon()
       markupAdapter.hasErrors.shouldBeFalse()
-      executeWithGold(File(testGoldFile.path + " - fsharp")) {
+      executeWithGold(Path.of(testGoldFile.pathString + " - fsharp")) {
         dumpOpenedDocument(it, project!!)
       }
     }
