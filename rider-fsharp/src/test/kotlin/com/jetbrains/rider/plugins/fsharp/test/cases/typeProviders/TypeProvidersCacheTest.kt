@@ -23,6 +23,8 @@ import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import org.testng.annotations.Test
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.pathString
 
 @Solution("TypeProviderLibrary")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
@@ -32,7 +34,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   override val traceScenarios: Set<LogTraceScenario>
     get() = super.traceScenarios + RdLogTraceScenarios.Daemon
 
-  private fun checkTypeProviders(testGoldFile: File, sourceFile: String) {
+  private fun checkTypeProviders(testGoldFile: Path, sourceFile: String) {
     withOpenedEditor(sourceFile) {
       waitForDaemon()
       executeWithGold(testGoldFile) {
@@ -44,12 +46,12 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Test
   @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun checkCachesWhenProjectReloading() {
-    checkTypeProviders(File(testGoldFile.path + "_before"), defaultSourceFile)
+    checkTypeProviders(Path.of(testGoldFile.pathString + "_before"), defaultSourceFile)
 
     unloadAllProjects()
     reloadAllProjects(project)
 
-    checkTypeProviders(File(testGoldFile.path + "_after"), defaultSourceFile)
+    checkTypeProviders(Path.of(testGoldFile.pathString + "_after"), defaultSourceFile)
   }
 
   @Test
@@ -66,7 +68,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
       typeWithLatency("//")
       waitForNextDaemon()
 
-      executeWithGold(File(testGoldFile.path + "_before")) {
+      executeWithGold(Path.of(testGoldFile.pathString + "_before")) {
         dumpTypeProviders(it)
       }
 
@@ -74,7 +76,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
       typeWithLatency(" ")
       waitForNextDaemon()
 
-      executeWithGold(File(testGoldFile.path + "_after")) {
+      executeWithGold(Path.of(testGoldFile.pathString + "_after")) {
         dumpTypeProviders(it)
       }
 
@@ -107,11 +109,11 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Mute("RIDER-103648")
   @Test(description = "RIDER-73091")
   fun script() {
-    checkTypeProviders(File(testGoldFile.path + "_before"), "TypeProviderLibrary/Script.fsx")
+    checkTypeProviders(Path.of(testGoldFile.pathString + "_before"), "TypeProviderLibrary/Script.fsx")
 
     unloadAllProjects()
     reloadAllProjects(project)
 
-    checkTypeProviders(File(testGoldFile.path + "_after"), "TypeProviderLibrary/Script.fsx")
+    checkTypeProviders(Path.of(testGoldFile.pathString + "_after"), "TypeProviderLibrary/Script.fsx")
   }
 }

@@ -15,6 +15,11 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditorFacade
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import java.nio.file.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.extension
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.nameWithoutExtension
 
 abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode) : PatchEngineEditorTestBase(mode) {
   override val checkTextControls = false
@@ -63,20 +68,20 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   PatchEngineEditorTestBase(PatchEngineEditorTestMode.SpeculativeRebaseProhibited) {
   override val checkTextControls = false
   override val testSolution = "CoreConsoleApp"
-  override val testDataDirectory
-    get() = testDataStorage.testDataDirectory.resolve("../../../../ReSharper.FSharp/test/data/features/service/typingAssist")
+  override val testDataDirectory: Path
+      get() = testDataStorage.testDataDirectory.resolve("../../../../ReSharper.FSharp/test/data/features/service/typingAssist")
   override val testCaseSourceDirectory
-    get() = activeSolutionDirectory.toFile()
+    get() = activeSolutionDirectory
 
   protected val backendCases
     get() =
-      testDataDirectory.listFiles()
+      testDataDirectory.listDirectoryEntries()
         .filter { it.extension == "fs" }
         .map { it.nameWithoutExtension }
 
   private fun doTest(caseName: String, isSupportedTestCase: Boolean) {
     val newSourceFile =
-      testDataDirectory.resolve("$caseName.fs").copyTo(activeSolutionDirectory.resolve("$caseName.fs.source").toFile())
+      testDataDirectory.resolve("$caseName.fs").copyTo(activeSolutionDirectory.resolve("$caseName.fs.source"), true)
 
     changeFileContent(project, newSourceFile) {
       it.replace("{caret}", "<caret>")

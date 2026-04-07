@@ -25,7 +25,6 @@ import java.io.PrintStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Duration
-import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createParentDirectories
@@ -37,7 +36,7 @@ abstract class FantomasDotnetToolTestBase : EditorTestBase() {
   override val testSolution: String = "FormatCodeApp"
   override val restoreNuGetPackages = false
 
-  private fun getDotnetCliHome() = Path(testWorkDirectory.parent, "dotnetHomeCli")
+  private fun getDotnetCliHome() = testWorkDirectory.parent.resolve("dotnetHomeCli")
   private val fantomasNotifications = ArrayList<String>()
   protected val bundledVersion = "7.0.3.0"
   protected val globalVersion = "4.7.2.0"
