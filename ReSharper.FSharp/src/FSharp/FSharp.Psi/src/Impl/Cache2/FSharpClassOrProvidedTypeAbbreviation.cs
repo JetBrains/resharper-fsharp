@@ -49,8 +49,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override IEnumerable<IField> Constants => ProvidedClass is { } x ? x.Constants : base.Constants;
     public override IEnumerable<IField> Fields => ProvidedClass is { } x ? x.Fields : base.Fields;
 
-    public override XmlNode GetXMLDoc(bool inherit) =>
-      ProvidedClass is { } x ? x.GetXmlDoc() : base.GetXMLDoc(inherit);
+    // TODO: should we renderContent for ProvidedClass case? 
+    public override XmlNode GetXMLDoc(bool renderContent) =>
+      ProvidedClass is { } x ? x.GetXmlDoc(renderContent) : base.GetXMLDoc(renderContent);
 
     bool ILanguageSpecificDeclaredElement.IsErased =>
       Parts is TypeAbbreviationOrDeclarationPart { IsUnionCase: false, IsProvidedAndGenerated: false };

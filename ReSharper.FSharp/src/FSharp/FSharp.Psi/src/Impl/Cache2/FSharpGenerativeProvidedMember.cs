@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public abstract override string ShortName { get; }
     protected override IClrDeclaredElement ContainingElement => ContainingTypeElement;
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
-    public override XmlNode GetXMLDoc(bool inherit) => Info.GetXmlDoc(this);
+    public override XmlNode GetXMLDoc(bool renderContent) => Info.GetXmlDoc(this, renderContent);
     public override ITypeMember GetContainingTypeMember() => ContainingType as ITypeMember;
     public override ITypeElement GetContainingType() => ContainingTypeElement;
 

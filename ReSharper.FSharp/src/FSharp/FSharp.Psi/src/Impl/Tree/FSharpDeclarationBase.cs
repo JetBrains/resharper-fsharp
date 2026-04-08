@@ -4,6 +4,7 @@ using FSharp.Compiler.CodeAnalysis;
 using FSharp.Compiler.Symbols;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -29,7 +30,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual TreeTextRange GetNameIdentifierRange() => NameIdentifier.GetNameIdentifierRange();
 
     public virtual XmlDocBlock XmlDocBlock => FirstChild as XmlDocBlock;
-    public XmlNode GetXMLDoc(bool inherit) => XmlDocBlock?.GetXML(null);
+    public XmlNode GetXMLDoc(bool renderContent)
+    {
+      var xmlDocBlock = XmlDocBlock;
+      if (xmlDocBlock == null)
+        return null;
+
+      var xmlNode = xmlDocBlock.GetXML(null);
+
+      if (renderContent && xmlNode == null)
+        return XmlDocCommentsUtil.TryReconstructXmlDoc(xmlDocBlock, DeclaredElement as IXmlDocIdOwner);
+
+      return xmlNode;
+    }
 
     public bool IsSynthetic() => false;
 

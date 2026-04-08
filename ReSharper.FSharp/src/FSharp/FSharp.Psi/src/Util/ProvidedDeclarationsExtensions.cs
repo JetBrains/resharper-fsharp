@@ -1,16 +1,21 @@
 using System.Xml;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
+using JetBrains.ReSharper.Psi.Util;
 using static FSharp.Compiler.TypeProviders;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class ProvidedMemberUtils
   {
-    public static XmlNode GetXmlDoc(this IProvidedCustomAttributeProvider provider, ITypeMember element)
+    public static XmlNode GetXmlDoc(this IProvidedCustomAttributeProvider provider, ITypeMember element, bool renderContent)
     {
       var xmlDocs = provider.GetXmlDocAttributes(null);
-      DocCommentBlockUtil.TryGetXml(xmlDocs, element, out var node);
+
+      if (XMLDocUtil.Load(xmlDocs, element, out var node) && renderContent)
+      {
+        XMLDocUtil.ExtendWithInheritedDocTag(element, node);
+      }
+
       return node;
     }
   }

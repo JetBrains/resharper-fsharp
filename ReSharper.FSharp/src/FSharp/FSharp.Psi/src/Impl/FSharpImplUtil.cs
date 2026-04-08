@@ -30,6 +30,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
@@ -1026,8 +1027,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static XmlNode GetXmlDoc(this IFSharpSourceTypeElement typeElement, bool inherit) =>
-      typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(inherit);
+    public static XmlNode GetXmlDoc(this IFSharpSourceTypeElement typeElement, bool renderContent)
+    {
+      var xmlNode = typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(renderContent);
+
+      if (renderContent)
+        XMLDocUtil.ExtendWithInheritedDocTag(typeElement, xmlNode);
+
+      return xmlNode;
+    }
 
     private static string Print(AccessRights accessRights) => accessRights.ToString().ToLowerInvariant();
 

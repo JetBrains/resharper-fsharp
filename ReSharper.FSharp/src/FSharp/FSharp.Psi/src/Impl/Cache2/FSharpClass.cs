@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
@@ -52,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
 
-    public override XmlNode GetXMLDoc(bool inherit) => this.GetXmlDoc(inherit);
+    public override XmlNode GetXMLDoc(bool renderContent) => this.GetXmlDoc(renderContent);
 
     public override string ToString() => this.TestToString(BuildTypeParameterString());
   }

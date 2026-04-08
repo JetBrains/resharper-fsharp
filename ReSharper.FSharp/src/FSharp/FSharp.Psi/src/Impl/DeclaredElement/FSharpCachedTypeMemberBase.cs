@@ -38,20 +38,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType()?.IdSubstitution ??
       EmptySubstitution.INSTANCE;
 
-    // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDoc(bool inherit)
+    public XmlNode GetXMLDoc(bool renderContent)
     {
       var declarations = GetDeclarations();
       var primaryDeclaration = declarations.FirstOrDefault(t => t.IsFSharpSigFile()) ?? declarations.FirstOrDefault();
+      var xmlNode = primaryDeclaration?.GetXMLDoc(renderContent);
 
-      return primaryDeclaration is IFSharpDeclaration { XmlDocBlock: { } xmlDocBlock }
-        ? xmlDocBlock.GetXML(this as ITypeMember)
-        : null;
+      if (renderContent && this is IClrDeclaredElement clrDeclaredElement)
+        XMLDocUtil.ExtendWithInheritedDocTag(clrDeclaredElement, xmlNode);
+        
+      return xmlNode;
     }
 
-    // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDescriptionSummary(bool inherit) =>
-      XMLDocUtil.ExtractSummary(GetXMLDoc(inherit));
+    public XmlNode GetXMLDescriptionSummary(bool renderContent) =>
+      XMLDocUtil.ExtractSummary(GetXMLDoc(renderContent));
 
     public abstract DeclaredElementType GetElementType();
   }
