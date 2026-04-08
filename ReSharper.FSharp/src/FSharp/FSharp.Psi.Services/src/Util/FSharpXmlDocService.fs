@@ -10,10 +10,12 @@ open JetBrains.Application.UI.Components.Theming
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.QuickDoc.Render
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.ReSharper.Psi.Xml.XmlDocComments
 open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
@@ -61,15 +63,21 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
             | _ -> None)
 
     let getXmlNode fsXmlDoc (symbol: FSharpSymbol option) (psiModule: IPsiModule) =
-        let xmlNode =
-            match fsXmlDoc with
+        let declaredElement = symbol |> Option.bind (fun symbol -> symbol.GetDeclaredElement(psiModule) |> Option.ofObj)
+
+        match fsXmlDoc with
             | FSharpXmlDoc.FromXmlText(xmlDoc) ->
-                let _, xmlNode = XMLDocUtil.LoadMemberDocXmlUntilFirstError(xmlDoc.UnprocessedLines, null)
-                Option.ofObj xmlNode
+                declaredElement
+                |> Option.bind (fun e -> match e with :? IXmlDocIdOwner as owner -> Some owner | _ -> None)
+                |> Option.toObj
+                |> (fun xmlDocOwner ->
+                    match XMLDocUtil.Load(xmlDoc.UnprocessedLines, xmlDocOwner) with
+                    | true, node -> node
+                    | _ -> XmlDocCommentsUtil.TryReconstructXmlDoc(xmlDoc.UnprocessedLines, FSharpXmlDocLanguage.Instance))
+                |> Option.ofObj
 
             | FSharpXmlDoc.FromXmlFile(dllFile, memberName) ->
-                symbol
-                |> Option.bind (fun symbol -> symbol.GetDeclaredElement(psiModule) |> Option.ofObj)
+                declaredElement
                 |> Option.bind (fun declaredElement -> declaredElement.GetXMLDoc(false) |> Option.ofObj)
                 |> Option.orElseWith (fun _ ->
                     getIndex dllFile
@@ -82,7 +90,11 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
 
             | FSharpXmlDoc.None -> None
 
-        xmlNode |> Option.filter (fun x -> not (x.InnerText.IsNullOrWhitespace()))
+        |> Option.filter (fun x -> not (x.InnerText.IsNullOrWhitespace()))
+        |> Option.map (fun xmlNode ->
+            XMLDocUtil.ExtendWithInheritedDocTag(declaredElement |> Option.toObj, xmlNode, psiModule)
+            xmlNode
+        )
 
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc, symbol: FSharpSymbol option, psiModule: IPsiModule) =

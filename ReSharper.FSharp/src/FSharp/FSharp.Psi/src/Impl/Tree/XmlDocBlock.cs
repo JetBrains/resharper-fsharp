@@ -4,6 +4,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
 using JetBrains.Util;
 
@@ -49,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public XmlNode GetXML(ITypeMember element)
     {
       var lines = FSharpDocCommentXmlPsi.GetCommentLines(this);
-      DocCommentBlockUtil.TryGetXml(lines, element, out var node);
+      XMLDocUtil.Load(lines, element, out var node);
       return node;
     }
 

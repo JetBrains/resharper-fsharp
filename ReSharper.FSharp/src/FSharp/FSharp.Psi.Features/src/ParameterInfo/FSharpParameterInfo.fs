@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -201,9 +202,8 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                         // todo: implement providing xml in declared element, remove this code
                         match this.XmlDoc with
                         | FSharpXmlDoc.FromXmlText xmlDoc ->
-                            match DocCommentBlockUtil.TryGetXml(xmlDoc.UnprocessedLines, null) with
-                            | true, node -> XMLDocUtil.ExtractParameterSummary(node, name)
-                            | _ -> null
+                            let xmlDoc = XmlDocCommentsUtil.TryReconstructXmlDoc(xmlDoc.UnprocessedLines, FSharpXmlDocLanguage.Instance)
+                            XMLDocUtil.ExtractParameterSummary(xmlDoc, name)
                         | _ -> null
                     else
                         parameter.GetXMLDescriptionSummary(true)

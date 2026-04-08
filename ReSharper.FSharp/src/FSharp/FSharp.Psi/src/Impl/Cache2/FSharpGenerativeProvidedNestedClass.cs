@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
     public override IPsiModule Module { get; }
     public override IPsiServices GetPsiServices() => Module.GetPsiServices();
-    public override XmlNode GetXMLDoc(bool inherit) => myMembersConverter.GetXmlDoc();
+    public override XmlNode GetXMLDoc(bool renderContent) => myMembersConverter.GetXmlDoc(renderContent);
 
     public override bool Equals(object obj) =>
       obj switch
