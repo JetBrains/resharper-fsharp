@@ -219,17 +219,17 @@ type DisableWarningInFileAction(file: IFSharpFile, warning) =
         | Warning.ReSharper severityId -> severityId.SourceName = ReSharperControlConstruct.DisableAllReSharperWarningsID
         | _ -> false
     
-    let findPlaceToInsert (file: IFSharpFile) (engine: IDiagnosticDirectivePresenter) =
-        let rec findLastNode (prevNode: ITreeNode) (node: ITreeNode) (engine: IDiagnosticDirectivePresenter) =
+    let findPlaceToInsert (file: IFSharpFile) presenter =
+        let rec findLastNode (prevNode: ITreeNode) (node: ITreeNode) (presenter: IDiagnosticDirectivePresenter) =
             match node with
             | :? Whitespace
-            | :? NewLine -> findLastNode prevNode node.NextSibling engine
+            | :? NewLine -> findLastNode prevNode node.NextSibling presenter
 
             | :? IWarningDirective when (warning.DiagnosticId :? ReSharperDiagnosticId) ->
-                findLastNode node.NextSibling node.NextSibling engine
+                findLastNode node.NextSibling node.NextSibling presenter
 
             | :? IWarningDirective | :? FSharpComment as directive ->
-                match engine.Parse(directive) with
+                match presenter.Parse(directive) with
                 | None -> prevNode, true
                 | Some directive ->
                     if directive.Type = Restore then prevNode, true else
@@ -241,7 +241,7 @@ type DisableWarningInFileAction(file: IFSharpFile, warning) =
                         |> Option.defaultValue ""
 
                     if warning.DiagnosticId.SourceName > firstDiagnosticId then
-                        findLastNode node.NextSibling node.NextSibling engine
+                        findLastNode node.NextSibling node.NextSibling presenter
                     
                     else prevNode, false
 
@@ -253,7 +253,7 @@ type DisableWarningInFileAction(file: IFSharpFile, warning) =
             | :? IAnonModuleDeclaration as firstModule -> firstModule.FirstChild
             | _ -> file.FirstChild
 
-        let node, needsAdditionalNewLine = findLastNode firstNode firstNode engine
+        let node, needsAdditionalNewLine = findLastNode firstNode firstNode presenter
         node, needsAdditionalNewLine
 
     let removeExistingDirectives (presenter: IDiagnosticDirectivePresenter) =
