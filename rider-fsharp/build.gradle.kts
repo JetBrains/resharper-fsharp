@@ -16,8 +16,13 @@ plugins {
   kotlin("jvm")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
 apply {
-  plugin("kotlin")
+    plugin("kotlin")
 }
 
 repositories {
@@ -275,7 +280,7 @@ tasks {
   }
 
   withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_25)
     dependsOn(":protocol:rdgen", ":lexer:generateLexer")
   }
 
@@ -360,7 +365,7 @@ tasks {
   }
 
   wrapper {
-    gradleVersion = "8.14.3"
+    gradleVersion = "9.4.1"
     distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
   }
 
