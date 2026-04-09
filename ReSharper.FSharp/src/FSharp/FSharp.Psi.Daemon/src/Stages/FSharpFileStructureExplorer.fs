@@ -24,7 +24,7 @@ type FSharpFileStructure(fsFile: IFSharpFile) =
     do
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             for moduleMember in moduleDecl.MembersEnumerable do
-                let nowarnDirective = moduleMember.As<INowarnDirective>()
+                let nowarnDirective = moduleMember.As<IWarningDirective>()
                 if isNull nowarnDirective then () else
 
                 for argToken in nowarnDirective.ArgsEnumerable do

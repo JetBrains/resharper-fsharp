@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FSharp.Compiler.Symbols;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Collections;
@@ -76,5 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IFSharpTypeMemberDeclaration CreateTypeMember(string source);
 
     IDotLambdaExpr CreateDotLambda();
+  
+    IHashDirective CreateHashDirective(string directive, IEnumerable<string> args);
   }
 }

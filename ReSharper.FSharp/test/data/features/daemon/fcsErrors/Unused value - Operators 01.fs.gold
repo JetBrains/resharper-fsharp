@@ -15,17 +15,17 @@ do
     ()
 
 ---------------------------------------------------------
-(0): ReSharper Warning: The '=' operator should not normally be redefined. To define equality semantics for a type, override the 'Object.Equals' member in the definition of that type.
+(0): ReSharper Warning [FS0086]: The '=' operator should not normally be redefined. To define equality semantics for a type, override the 'Object.Equals' member in the definition of that type.
 (1): ReSharper Dead Code [FS1182]: The value '=' is unused
 (2): ReSharper Dead Code [FS1182]: The value '-' is unused
 (3): ReSharper Dead Code [FS1182]: The value '+' is unused
-(4): ReSharper Warning: The '&&' operator should not normally be redefined. Consider using a different operator name
+(4): ReSharper Warning [FS0086]: The '&&' operator should not normally be redefined. Consider using a different operator name
 (5): ReSharper Dead Code [FS1182]: The value '&&' is unused
-(6): ReSharper Warning: The '||' operator should not normally be redefined. Consider using a different operator name
+(6): ReSharper Warning [FS0086]: The '||' operator should not normally be redefined. Consider using a different operator name
 (7): ReSharper Dead Code [FS1182]: The value '||' is unused
-(8): ReSharper Warning: The '>' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
+(8): ReSharper Warning [FS0086]: The '>' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
 (9): ReSharper Dead Code [FS1182]: The value '>' is unused
-(10): ReSharper Warning: The '<' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
+(10): ReSharper Warning [FS0086]: The '<' operator should not normally be redefined. To define overloaded comparison semantics for a particular type, implement the 'System.IComparable' interface in the definition of that type.
 (11): ReSharper Dead Code [FS1182]: The value '<' is unused
 (12): ReSharper Dead Code [FS1182]: The value '(*)' is unused
 (13): ReSharper Dead Code [FS1182]: The value '?' is unused

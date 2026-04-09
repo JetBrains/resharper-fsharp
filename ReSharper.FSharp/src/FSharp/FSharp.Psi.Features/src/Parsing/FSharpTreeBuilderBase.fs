@@ -12,7 +12,6 @@ open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -1084,7 +1083,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
             match id with
             | "l" | "load" -> ElementType.LOAD_DIRECTIVE
             | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
-            | "nowarn" -> ElementType.NOWARN_DIRECTIVE
+            | "nowarn" | "warnon" -> ElementType.WARNING_DIRECTIVE
             | "I" -> ElementType.I_DIRECTIVE
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)

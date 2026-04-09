@@ -6,7 +6,7 @@ IFSharpImplFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-  FSharpWarningDirective
+  IWarningDirective
     FSharpTokenType+PpWarnonTokenElement(type:PP_WARNON, text:#warnon)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     FSharpToken(type:INT32, text:1182)

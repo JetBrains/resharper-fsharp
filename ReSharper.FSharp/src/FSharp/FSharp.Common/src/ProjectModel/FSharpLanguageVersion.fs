@@ -38,6 +38,7 @@ type FSharpLanguageLevel =
     /// Nullness
     | FSharp90 = 90
 
+    // #warnon, typed let!/use!
     | FSharp100 = 100
 
     | Latest = 100

@@ -1,0 +1,9 @@
+﻿// ${QF_TO_EXECUTE:Disable once with '#nowarn'}
+
+module A
+
+let _ =
+#nowarn FS0025
+    let 5{caret} = 5
+#warnon FS0025
+    ()

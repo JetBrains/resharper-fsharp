@@ -28,4 +28,10 @@
     <data name="FSharpDisableAndRestoreWithComments_Text" xml:space="preserve">
         <value>Disable and restore with comments</value>
     </data>
+    <data name="FSharpDisableInFileWithDirective_Text" xml:space="preserve">
+        <value>Disable in file with '#nowarn'</value>
+    </data>
+    <data name="FSharpDisableAndRestoreWithDirectives_Text" xml:space="preserve">
+        <value>Disable once with '#nowarn'</value>
+    </data>
 </root>

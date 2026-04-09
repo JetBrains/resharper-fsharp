@@ -8,7 +8,6 @@ using JetBrains.Application.Threading;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -504,6 +503,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             .HasType(ElementType.DO_STATEMENT),
           Node().HasRole(DoStatement.CHAMELEON_EXPR))
         .Return(IndentType.External)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("HashDirectives")
+        .Where(Node().In(ElementBitsets.HASH_DIRECTIVE_BIT_SET))
+        .Return(IndentType.AbsoluteIndent | IndentType.External, 0)
         .Build();
     }
 
@@ -1097,6 +1102,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build()
         .AndViceVersa()
         .Build();
+
+      Describe<FormattingRule>()
+        .Priority(1000000)
+        .Name("HashDirectivesLeft")
+        .Where(Left().In(ElementBitsets.HASH_DIRECTIVE_BIT_SET))
+        .Return(IntervalFormatType.InsertNewLine)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Priority(1000000)
+        .Name("HashDirectivesRight")
+        .Where(Right().In(ElementBitsets.HASH_DIRECTIVE_BIT_SET))
+        .Return(IntervalFormatType.InsertNewLine)
+        .Build();
     }
 
     private void DescribeEmptyOnlyFormatting(IBuilderAction<IBlankWithSinglePattern> parent, NodeType left,
@@ -1150,6 +1169,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       }
 
       Describe<BlankLinesAroundNodeRule>()
+        .AddNodesToGroupConditionally(Node().In(ElementBitsets.HASH_DIRECTIVE_BIT_SET))
         .AddNodesToGroupBefore(Node().In(Comments))
         .AddNodesToGroupAfter(Node().In(Comments))
         .AllowedNodesBefore(Node().Satisfies((node, _) => !noBlankLineAfterNodeTypes[node.NodeType]))

@@ -17,25 +17,38 @@ type FSharpErrorHighlightingBase(message, range: DocumentRange) =
         member x.IsValid() = range.IsValid()
         member x.CalculateRange() = range
 
+[<Sealed>]
+[<ConfigurableSeverityHighlighting("", Languages = "F#", OverlapResolve = OverlapResolveKind.NONE)>]
+type FcsDiagnosticHighlighting(message: string, range: DocumentRange, compilerId, severity, defaultSeverity) =
+    let title =
+        // TODO: provide a title from FCS?
+        if message.Length > 30 then message.Substring(0, 30) + "..."
+        else message
+
+    interface IHighlighting with
+        member x.ToolTip = message
+        member x.ErrorStripeToolTip = message
+        member x.IsValid() = range.IsValid()
+        member x.CalculateRange() = range
+
+    interface ICustomSeverityHighlighting with
+        member this.Severity = severity
+
+    interface ICustomHighlightingWithConfigurableSeverityItem with
+        member this.ConfigurableSeverityItem =
+            ConfigurableSeverityItem(compilerId, null, HighlightingGroupIds.CompilerWarnings,
+                                     title, null, defaultSeverity,
+                                     compilerIds = compilerId)
+
+    interface ICustomCompilerIdHighlighting with
+        member this.CompilerId = compilerId
+        member this.Title = title
+
 
 [<StaticSeverityHighlighting(Severity.ERROR, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.ERROR,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type ErrorHighlighting(message, range) =
-    inherit FSharpErrorHighlightingBase(message, range)
-
-
-[<StaticSeverityHighlighting(Severity.WARNING, typeof<HighlightingGroupIds.IdentifierHighlightings>,
-                             AttributeId = AnalysisHighlightingAttributeIds.WARNING,
-                             OverlapResolve = OverlapResolveKind.NONE)>]
-type WarningHighlighting(message, range) =
-    inherit FSharpErrorHighlightingBase(message, range)
-
-
-[<StaticSeverityHighlighting(Severity.INFO, typeof<HighlightingGroupIds.IdentifierHighlightings>,
-                             AttributeId = AnalysisHighlightingAttributeIds.WARNING,
-                             OverlapResolve = OverlapResolveKind.NONE)>]
-type InfoHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
