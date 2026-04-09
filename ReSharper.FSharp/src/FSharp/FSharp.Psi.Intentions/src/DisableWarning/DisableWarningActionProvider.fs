@@ -38,20 +38,20 @@ type DisableWarningActionProvider(settingsManager: HighlightingSettingsManager) 
 
             let warning =
                 match compilerId with
-                | Some compilerId -> Compiler(CompilerDiagnosticId(compilerId))
-                | _ -> ReSharper(ReSharperDiagnosticId(severityId))
+                | Some compilerId -> Warning.Compiler(CompilerDiagnosticId(compilerId))
+                | _ -> Warning.ReSharper(ReSharperDiagnosticId(severityId))
 
             [|
                match warning with
-               | ReSharper diagnosticId ->
+               | Warning.ReSharper diagnosticId ->
                    yield DisableWarningOnceAction(ranges, psiFile, diagnosticId).ToConfigureActionIntention(disableAnchor)
                    yield DisableAndRestoreWarningAction(ranges, psiFile, warning).ToConfigureActionIntention(disableAnchor)
                    yield DisableWarningInFileAction(psiFile, warning).ToConfigureActionIntention(disableAnchor)
                    
                    let disableAllAnchor = disableAnchor.CreateNext(separate = true)
-                   yield DisableWarningInFileAction(psiFile, ReSharper(ReSharperDiagnosticId(ReSharperControlConstruct.DisableAllReSharperWarningsID))).ToConfigureActionIntention(disableAllAnchor)
+                   yield DisableWarningInFileAction(psiFile, Warning.ReSharper(ReSharperDiagnosticId(ReSharperControlConstruct.DisableAllReSharperWarningsID))).ToConfigureActionIntention(disableAllAnchor)
 
-               | Compiler _ ->
+               | Warning.Compiler _ ->
                    if FSharpLanguageLevel.isFSharp100Supported psiFile then
                        yield DisableAndRestoreWarningAction(ranges, psiFile, warning).ToConfigureActionIntention(disableAnchor)
 

@@ -41,6 +41,7 @@ type CompilerDiagnosticId(sourceName: string) =
 
     override this.GetHashCode() = (normalize sourceName).GetHashCode()
 
+[<RequireQualifiedAccess>]
 type Warning =
     | ReSharper of diagnosticId: ReSharperDiagnosticId
     | Compiler of diagnosticId: CompilerDiagnosticId
@@ -125,8 +126,8 @@ module private Utils =
     
     let createDirectivePresenter diagnosticId: IDiagnosticDirectivePresenter =
         match diagnosticId with
-        | ReSharper _ -> ReSharperDirectivePresenter.Instance
-        | Compiler _ -> CompilerDirectivePresenter.Instance
+        | Warning.ReSharper _ -> ReSharperDirectivePresenter.Instance
+        | Warning.Compiler _ -> CompilerDirectivePresenter.Instance
 
 
 [<AbstractClass>]
@@ -195,7 +196,7 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[], file, warning
 
 
 type DisableWarningOnceAction(highlightingRanges, file, warning: ReSharperDiagnosticId) =
-    inherit DisableWarningActionBase(highlightingRanges, file, ReSharper(warning))
+    inherit DisableWarningActionBase(highlightingRanges, file, Warning.ReSharper(warning))
 
     let presenter: IDiagnosticDirectivePresenter = ReSharperDirectivePresenter.Instance
     override this.Text = Strings.FSharpDisableOnceWithComment_Text
@@ -207,15 +208,15 @@ type DisableAndRestoreWarningAction(highlightingRanges, file, warning) =
 
     override this.Text =
         match warning with
-        | ReSharper _ -> Strings.FSharpDisableAndRestoreWithComments_Text
-        | Compiler _ -> Strings.FSharpDisableAndRestoreWithDirectives_Text
+        | Warning.ReSharper _ -> Strings.FSharpDisableAndRestoreWithComments_Text
+        | Warning.Compiler _ -> Strings.FSharpDisableAndRestoreWithDirectives_Text
 
 type DisableWarningInFileAction(file: IFSharpFile, warning) =
     inherit DisableWarningActionBase([||], file, warning)
 
     let disableAll =
         match warning with
-        | ReSharper severityId -> severityId.SourceName = ReSharperControlConstruct.DisableAllReSharperWarningsID
+        | Warning.ReSharper severityId -> severityId.SourceName = ReSharperControlConstruct.DisableAllReSharperWarningsID
         | _ -> false
     
     let findPlaceToInsert (file: IFSharpFile) (engine: IDiagnosticDirectivePresenter) =
@@ -257,8 +258,8 @@ type DisableWarningInFileAction(file: IFSharpFile, warning) =
 
     let removeExistingDirectives (presenter: IDiagnosticDirectivePresenter) =
         let directives =
-            [| for comment in file.Descendants() do
-                   match presenter.Parse(comment) with
+            [| for node in file.Descendants() do
+                   match presenter.Parse(node) with
                    | Some directive -> directive
                    | None -> () |]
 
@@ -276,10 +277,10 @@ type DisableWarningInFileAction(file: IFSharpFile, warning) =
 
     override this.Text =
         match warning with
-        | ReSharper _ ->
+        | Warning.ReSharper _ ->
             if disableAll then Strings.FSharpDisableAllInspectionsInFile_Text
             else Strings.FSharpDisableInFileWithComment_Text
-        | Compiler _ ->
+        | Warning.Compiler _ ->
             Strings.FSharpDisableInFileWithDirective_Text
 
     override this.IsAvailable _ = isValid file
