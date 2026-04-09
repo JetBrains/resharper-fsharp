@@ -130,9 +130,7 @@ module private Utils =
 
 
 [<AbstractClass>]
-type DisableWarningActionBase(highlightingRanges: DocumentRange[],
-                              file: IFSharpFile,
-                              warning: Warning) =
+type DisableWarningActionBase(highlightingRanges: DocumentRange[], file, warning) =
     inherit ContextActionBase()
 
     let presenter = createDirectivePresenter warning
@@ -198,6 +196,7 @@ type DisableWarningActionBase(highlightingRanges: DocumentRange[],
 
 type DisableWarningOnceAction(highlightingRanges, file, warning: ReSharperDiagnosticId) =
     inherit DisableWarningActionBase(highlightingRanges, file, ReSharper(warning))
+
     let presenter: IDiagnosticDirectivePresenter = ReSharperDirectivePresenter.Instance
     override this.Text = Strings.FSharpDisableOnceWithComment_Text
     override this.DisableNode = presenter.CreateDirective(file, DisableOnce, [warning.SourceName])
@@ -205,6 +204,7 @@ type DisableWarningOnceAction(highlightingRanges, file, warning: ReSharperDiagno
 
 type DisableAndRestoreWarningAction(highlightingRanges, file, warning) =
     inherit DisableWarningActionBase(highlightingRanges, file, warning)
+
     override this.Text =
         match warning with
         | ReSharper _ -> Strings.FSharpDisableAndRestoreWithComments_Text
