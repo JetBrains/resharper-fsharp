@@ -5,7 +5,6 @@ open System.Collections.Generic
 open FSharp.Compiler.Diagnostics
 open FSharp.Compiler.Diagnostics.ExtendedData
 open FSharp.Compiler.Symbols
-open FSharp.Compiler.Text
 open JetBrains.Application
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -126,11 +125,21 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let endOffset = getDocumentOffset document (docCoords error.EndLine error.EndColumn)
             DocumentRange(&startOffset, &endOffset)
 
+    let convertSeverity severity =
+        match severity with
+        | FSharpDiagnosticSeverity.Hidden -> Severity.DO_NOT_SHOW
+        | FSharpDiagnosticSeverity.Info -> Severity.INFO
+        | FSharpDiagnosticSeverity.Warning -> Severity.WARNING
+        | FSharpDiagnosticSeverity.Error -> Severity.ERROR
+
     let createGenericHighlighting (error: FSharpDiagnostic) range: IHighlighting =
-        match error.Severity with
-        | FSharpDiagnosticSeverity.Info -> InfoHighlighting(error.Message, range) :> _
-        | FSharpDiagnosticSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
-        | _ -> ErrorHighlighting(error.Message, range) :> _
+        if error.DefaultSeverity = FSharpDiagnosticSeverity.Error then ErrorHighlighting(error.Message, range) else
+
+        let compilerId = error.ErrorNumberText
+        let severity = convertSeverity error.Severity
+        let defaultSeverity = convertSeverity error.DefaultSeverity
+
+        FcsDiagnosticHighlighting(error.Message, range, compilerId, severity, defaultSeverity)
 
     /// Finds node of the corresponding type in the range.
     let createHighlightingFromNode highlightingCtor range: IHighlighting =

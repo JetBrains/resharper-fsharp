@@ -23,7 +23,7 @@ IFSharpImplFile
   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
   Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-  FSharpWarningDirective
+  IWarningDirective
     FSharpTokenType+PpNowarnTokenElement(type:PP_NOWARN, text:#nowarn)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     FSharpToken(type:INT32, text:1)

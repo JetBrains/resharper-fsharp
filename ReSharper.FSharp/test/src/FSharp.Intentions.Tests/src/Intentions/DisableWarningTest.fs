@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions
 
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
@@ -12,7 +13,7 @@ type DisableWarningTest() =
     override x.AllowNotFoundHighlightings = true
 
     [<Test>] member x.``Disable once 01``() = x.DoNamedTest()
-    [<Test>] member x.``Disable once 02 - Compiler warning``() = x.DoNamedTest()
+    [<Test>] member x.``Disable once 02 - Compiler warning - Not available``() = x.DoNamedTest()
     [<Test>] member x.``Disable once 03 - Indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Disable and restore 01``() = x.DoNamedTest()
@@ -36,3 +37,17 @@ type DisableWarningTest() =
     [<Test>] member x.``Disable all 02``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 03``() = x.DoNamedTest()
     [<Test>] member x.``Disable all 04``() = x.DoNamedTest()
+    [<Test>] member x.``Disable all 05``() = x.DoNamedTest()
+
+    [<Test>] member x.``Compiler warning - Disable and restore 01``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable and restore 02``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable and restore 03``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    [<Test>] member x.``Compiler warning - Disable and restore 04 - Not available``() = x.DoNamedTest()
+
+    [<Test>] member x.``Compiler warning - Disable in file 01``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable in file 02``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable in file 03``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable in file 04``() = x.DoNamedTest()
+    [<Test>] member x.``Compiler warning - Disable in file 05``() = x.DoNamedTest()

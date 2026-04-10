@@ -1503,7 +1503,7 @@ interface hashDirective:
   loadDirective |
   referenceDirective |
   iDirective |
-  nowarnDirective |
+  warningDirective
   otherDirective;
 
 lineDirective:
@@ -1522,9 +1522,9 @@ iDirective:
   PP_I<PP_I, HashToken>
   STRING<STRING, Args>*;
 
-nowarnDirective:
-  PP_NOWARN<PP_NOWARN, HashToken>
-  STRING<STRING, Args>*;
+warningDirective:
+  (PP_NOWARN<DIRECTIVE, HashToken> | PP_WARNON<DIRECTIVE, HashToken>)
+  (IDENTIFIER<DIAGNOSTIC_ID, Args> | literalToken{DIAGNOSTIC_ID, Args})*;
 
 otherDirective:
   PP_DIRECTIVE<PP_DIRECTIVE, HashToken>

@@ -436,3 +436,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] c
 
         member this.CreateDotLambda() =
             getExpression "_.P" :?> IDotLambdaExpr
+
+        member this.CreateHashDirective(directive, args) =
+            let source = "#" + directive + " " + String.concat " " args
+            let moduleDecl = getModuleDeclaration source
+
+            moduleDecl.Parent.Children() |> Seq.tryFind (fun x -> x :? IHashDirective) |> Option.get :?> _

@@ -102,12 +102,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsFiltered() => true;
     public override NodeType NodeType => ElementType.DOC_COMMENT_BLOCK;
   }
-  
-  public class FSharpWarningDirective : FSharpCompositeElement
-  {
-    public override bool IsFiltered() => true;
-    public override NodeType NodeType => ElementType.WARNING_DIRECTIVE;
-  }
 
   partial class ElementType
   {
@@ -121,18 +115,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
 
       public override CompositeElement Create() => new XmlDocBlock();
-    }
-
-    public static readonly CompositeNodeType WARNING_DIRECTIVE = new FSharpWarningDirectiveNodeType();
-    public const int WARNING_DIRECTIVE_INDEX = 1901;
-
-    private sealed class FSharpWarningDirectiveNodeType : FSharpCompositeNodeType
-    {
-      public FSharpWarningDirectiveNodeType() : base("WARNING_DIRECTIVE", WARNING_DIRECTIVE_INDEX, typeof(FSharpWarningDirective))
-      {
-      }
-
-      public override CompositeElement Create() => new FSharpWarningDirective();
     }
   }
 }

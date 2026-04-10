@@ -42,3 +42,5 @@ type public Strings() =
     static member FSharpDisableOnceWithComment_Text = Strings.ResourceManager.GetString("FSharpDisableOnceWithComment_Text")
     static member FSharpDisableInFileWithComment_Text = Strings.ResourceManager.GetString("FSharpDisableInFileWithComment_Text")
     static member FSharpDisableAndRestoreWithComments_Text = Strings.ResourceManager.GetString("FSharpDisableAndRestoreWithComments_Text")
+    static member FSharpDisableInFileWithDirective_Text = Strings.ResourceManager.GetString("FSharpDisableInFileWithDirective_Text")
+    static member FSharpDisableAndRestoreWithDirectives_Text = Strings.ResourceManager.GetString("FSharpDisableAndRestoreWithDirectives_Text")
