@@ -50,12 +50,17 @@ let isFSharpAssembly (psiModule: IPsiModule) =
 
     value == BooleanBoxes.True
 
+let [<Literal>] FSharpCore = "FSharp.Core"
+
 [<Extension; CompiledName("IsFromFSharpAssembly")>]
 let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =
     isFSharpAssembly declaredElement.Module
 
-
-let [<Literal>] FSharpCore = "FSharp.Core"
+[<Extension; CompiledName("IsFromFSharpCore")>]
+let isFromFSharpCore (declaredElement: IClrDeclaredElement) =
+    match declaredElement.Module with
+    | :? IAssemblyPsiModule as assemblyPsiModule -> assemblyPsiModule.Name = FSharpCore
+    | _ -> false
 
 [<Extension; CompiledName("IsFSharpCore")>]
 let isFSharpCore (assemblyName: AssemblyNameInfo) =

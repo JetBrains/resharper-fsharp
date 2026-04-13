@@ -20,6 +20,9 @@ let compilationRepresentationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.C
 [<CompiledName("CustomOperationAttrTypeName")>]
 let customOperationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CustomOperationAttribute"
 
+[<CompiledName("NoDynamicInvocationAttrTypeName")>]
+let noDynamicInvocationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.NoDynamicInvocationAttribute"
+
 [<CompiledName("AutoOpenAttrTypeName")>]
 let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
 
