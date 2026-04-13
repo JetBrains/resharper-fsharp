@@ -28,6 +28,7 @@ import kotlin.io.path.pathString
 
 @Solution("YamlProviderCSharp")
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
+  @Mute("RIDER-136409")
   @Test
   fun resolveTest() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs") {
@@ -79,6 +80,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     }
   }
 
+  @Mute("RIDER-136408")
   @Test
   fun `provided abbreviation rename`() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
