@@ -12,13 +12,23 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Resolve
-open JetBrains.ReSharper.Psi.Util
 
 type FSharpCallableExpressionsCollector private () =
+    static let forceInlineModules =
+        [ "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators"
+          "Microsoft.FSharp.Core.Operators"
+          "Microsoft.FSharp.Core.Operators.OperatorIntrinsics"
+          "Microsoft.FSharp.Core.Operators.Checked"
+          "Microsoft.FSharp.Core.Operators.Unchecked"
+          "Microsoft.FSharp.NativeInterop.NativePtrModule" ]
+        |> List.map clrTypeName
+        |> HashSet
+
     let isInvocation argCount (reference: FSharpSymbolReference) : bool =
         if isNull reference then false else
 
@@ -50,55 +60,58 @@ type FSharpCallableExpressionsCollector private () =
             | _ -> false
         | _ -> false
 
-    let hasSpecialUnionCaseName (fcsUnionCase: FSharpUnionCase) =
-        let fcsEntity = fcsUnionCase.DeclaringEntity
-        match fcsEntity.BasicQualifiedName with
+    let hasSpecialName (fcsUnionCase: FSharpUnionCase) =
+        match fcsUnionCase.DeclaringEntity.BasicQualifiedName with
         | None -> false
-        | Some name ->
+        | Some name -> name = fsOptionTypeName.FullName
 
-        name = fsOptionTypeName.FullName
+    let isForceInlined (declaredElement: IDeclaredElement) =
+        let typeMember = declaredElement.As<ITypeMember>()
+        if isNull typeMember then false else
+
+        typeMember.HasAttributeInstance(noDynamicInvocationAttrTypeName, false) ||
+
+        isFromFSharpCore typeMember &&
+        let containingType = typeMember.ContainingType
+        isNotNull containingType && forceInlineModules.Contains(containingType.GetClrName())
 
     let processInvokedReference (applicationInfo: (IFSharpExpression * int * bool) option)
             (reference: FSharpSymbolReference) (result: List<_>) =
         if not (isInvocation applicationInfo reference) then () else
 
-        match reference.Resolve().DeclaredElement with
-        | :? ITypeMember as typeMember when
-            let t = typeMember.ContainingType
-            t.IsTuple() || t.IsValueTuple() -> ()
+        let declaredElement = reference.Resolve().DeclaredElement
+        if isForceInlined declaredElement then () else
 
-        | declaredElement ->
-            let isValueCompiledAsMethod = isValueCompiledAsMethod declaredElement
+        let isValueCompiledAsMethod = isValueCompiledAsMethod declaredElement
 
-            let name =
-                match reference.GetFcsSymbol() with
-                | :? FSharpUnionCase as fcsUnionCase when not (hasSpecialUnionCaseName fcsUnionCase) ->
-                    "New" + fcsUnionCase.Name
-                | _ ->
+        let name =
+            match reference.GetFcsSymbol() with
+            | :? FSharpUnionCase as fcsUnionCase when not (hasSpecialName fcsUnionCase) -> "New" + fcsUnionCase.Name
+            | _ ->
 
-                match declaredElement with
-                | null -> reference.GetName()
-                | :? IProperty as property when not isValueCompiledAsMethod -> property.Getter.ShortName
-                | :? IConstructor -> ".ctor"
-                | _ -> declaredElement.ShortName
+            match declaredElement with
+            | null -> reference.GetName()
+            | :? IProperty as property when not isValueCompiledAsMethod -> property.Getter.ShortName
+            | :? IConstructor -> ".ctor"
+            | _ -> declaredElement.ShortName
 
-            let nameRange = reference.GetDocumentRange()
+        let nameRange = reference.GetDocumentRange()
 
-            let wholeRange, exprText =
-                match applicationInfo with
-                | None ->
-                    let referenceOwner = reference.GetElement()
-                    referenceOwner.GetDocumentRange(), referenceOwner.GetText()
+        let wholeRange, exprText =
+            match applicationInfo with
+            | None ->
+                let referenceOwner = reference.GetElement()
+                referenceOwner.GetDocumentRange(), referenceOwner.GetText()
 
-                | Some(appExpr, _, hasPipedArg) ->
-                    let text =
-                        let exprText = appExpr.GetText()
-                        if hasPipedArg then exprText + " …" else exprText
+            | Some(appExpr, _, hasPipedArg) ->
+                let text =
+                    let exprText = appExpr.GetText()
+                    if hasPipedArg then exprText + " …" else exprText
 
-                    appExpr.GetDocumentRange(), text
+                appExpr.GetDocumentRange(), text
 
-            let expr = DocumentRangeExpression(name, exprText, nameRange, wholeRange, IsHidden = isValueCompiledAsMethod)
-            result.Add(expr)
+        let expr = DocumentRangeExpression(name, exprText, nameRange, wholeRange, IsHidden = isValueCompiledAsMethod)
+        result.Add(expr)
 
     static member Instance = FSharpCallableExpressionsCollector()
 
