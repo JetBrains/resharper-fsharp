@@ -23,6 +23,9 @@ let customOperationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CustomOpera
 [<CompiledName("AutoOpenAttrTypeName")>]
 let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
 
+[<CompiledName("NoDynamicInvocationAttrTypeName")>]
+let noDynamicInvocationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.NoDynamicInvocationAttribute"
+
 [<CompiledName("RequireQualifiedAccessAttrTypeName")>]
 let requireQualifiedAccessAttrTypeName = clrTypeName "Microsoft.FSharp.Core.RequireQualifiedAccessAttribute"
 
