@@ -61,6 +61,11 @@ let [<Literal>] FSharpCore = "FSharp.Core"
 let isFSharpCore (assemblyName: AssemblyNameInfo) =
     isNotNull assemblyName && AssemblyNameInfo.SimpleNameComparer.Equals(FSharpCore, assemblyName.Name)
 
+[<Extension; CompiledName("IsFromFSharpCore")>]
+let isFromFSharpCore (declaredElement: IClrDeclaredElement) =
+    match declaredElement.Module with
+    | :? IAssemblyPsiModule as assemblyPsiModule -> isFSharpCore assemblyPsiModule.Assembly.AssemblyName
+    | _ -> false
 
 let [<Literal>] SignatureInfoResourceName = "FSharpSignatureInfo."
 let [<Literal>] SignatureInfoResourceNameOld = "FSharpSignatureData."
