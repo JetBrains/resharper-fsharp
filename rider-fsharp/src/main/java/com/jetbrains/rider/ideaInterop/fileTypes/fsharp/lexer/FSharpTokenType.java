@@ -1,10 +1,31 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.Language;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.impl.source.tree.LazyParseablePsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.IReparseableElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage;
 import org.jetbrains.annotations.NotNull;
 
 public interface FSharpTokenType {
+
+  IElementType DUMMY_CONTAINER = new IReparseableElementType("DUMMY_CONTAINER", FSharpLanguage.INSTANCE) {
+    @Override
+    public boolean isReparseable(@NotNull ASTNode currentNode,
+                                 @NotNull CharSequence newText,
+                                 @NotNull Language fileLanguage,
+                                 @NotNull Project project) {
+      return true;
+    }
+
+    @Override
+    public ASTNode createNode(CharSequence text) {
+      return new LazyParseablePsiElement(this, text);
+    }
+  };
 
   IElementType BIGNUM = createToken("BIGNUM");
   IElementType BLOCK_COMMENT = createToken("BLOCK_COMMENT");

@@ -1,3 +1,4 @@
 FSharpFile
-  FSharpStringLiteralExpression
-    PsiElement(UNFINISHED_STRING)('"\n1')
+  PsiElement(DUMMY_CONTAINER)
+    FSharpStringLiteralExpression
+      PsiElement(UNFINISHED_STRING)('"\n1')

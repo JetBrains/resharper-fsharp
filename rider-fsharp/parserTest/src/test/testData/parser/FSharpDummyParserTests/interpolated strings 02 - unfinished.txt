@@ -1,8 +1,9 @@
 FSharpFile
-  FSharpInterpolatedStringLiteralExpression
-    FSharpInterpolatedStringLiteralExpressionPart
-      PsiElement(REGULAR_INTERPOLATED_STRING_START)('$"1 {')
-    PsiElement(INT32)('2')
-    PsiWhiteSpace('\n')
-    PsiWhiteSpace('\n')
-    PsiElement(INT32)('3')
+  PsiElement(DUMMY_CONTAINER)
+    FSharpInterpolatedStringLiteralExpression
+      FSharpInterpolatedStringLiteralExpressionPart
+        PsiElement(REGULAR_INTERPOLATED_STRING_START)('$"1 {')
+      PsiElement(INT32)('2')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('\n')
+      PsiElement(INT32)('3')

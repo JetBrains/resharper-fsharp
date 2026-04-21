@@ -1,11 +1,12 @@
 FSharpFile
-  FSharpStringLiteralExpression
-    PsiElement(STRING)('"1"')
-  PsiWhiteSpace('\n')
-  PsiWhiteSpace('\n')
-  FSharpStringLiteralExpression
-    PsiElement(VERBATIM_STRING)('@"123"')
-  PsiWhiteSpace('\n')
-  PsiWhiteSpace('\n')
-  FSharpStringLiteralExpression
-    PsiElement(TRIPLE_QUOTED_STRING)('"""1"""')
+  PsiElement(DUMMY_CONTAINER)
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"1"')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('\n')
+    FSharpStringLiteralExpression
+      PsiElement(VERBATIM_STRING)('@"123"')
+    PsiWhiteSpace('\n')
+    PsiWhiteSpace('\n')
+    FSharpStringLiteralExpression
+      PsiElement(TRIPLE_QUOTED_STRING)('"""1"""')

@@ -3,6 +3,7 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
+import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
@@ -17,12 +18,28 @@ class FSharpDummyParser : PsiParser {
     builder.setWhitespaceSkippedCallback { elementType, _, end ->
       if (elementType == FSharpTokenType.NEW_LINE) currentLineStart = end
     }
-    builder.parseFile(root)
+    if (root == FSharpTokenType.DUMMY_CONTAINER) {
+      builder.parseDummyContainer()
+    } else if (root == FSharpElementTypes.FILE) {
+      builder.parseFile()
+    }
     return builder.treeBuilt
   }
 
-  private fun PsiBuilder.parseFile(fileElementType: IElementType) {
-    parseEvenEmpty(fileElementType) {
+  private fun PsiBuilder.parseFile() {
+    parseEvenEmpty(FSharpElementTypes.FILE) {
+      val marker = mark()
+      val lexemeCount =
+        if (this is PsiBuilderImpl) lexemeCount
+        else Int.MAX_VALUE - rawTokenIndex()
+
+      rawAdvanceLexer(lexemeCount)
+      marker.collapse(FSharpTokenType.DUMMY_CONTAINER)
+    }
+  }
+
+  private fun PsiBuilder.parseDummyContainer() {
+    parseEvenEmpty(FSharpTokenType.DUMMY_CONTAINER) {
       whileMakingProgress {
         if (!parseDummyExpression()) advanceLexerWithNewLineCounting()
         true
