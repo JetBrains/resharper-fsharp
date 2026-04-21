@@ -4,7 +4,6 @@ import com.intellij.openapi.components.serviceAsync
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rd.ide.model.FileSummaryRequest
 import com.jetbrains.rd.ide.model.junieModel
-import com.jetbrains.rdclient.util.idea.toIOFile
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.projectView.solutionDirectoryPath
@@ -38,7 +37,7 @@ class FSharpFileSummarizationTests : PerTestSolutionTestBase() {
   private fun doTest(solutionRelativeFilePath: Path) {
     changeFileSystem2(project) {
       replaceFileContent(project, solutionRelativeFilePath.name)
-      arrayOf(getVirtualFileFromPath(solutionRelativeFilePath.name, project.solutionDirectoryPath).toIOFile())
+      arrayOf(getVirtualFileFromPath(solutionRelativeFilePath.name, project.solutionDirectoryPath).toNioPath())
     }
 
     executeWithGold(testGoldFile) { gold ->
