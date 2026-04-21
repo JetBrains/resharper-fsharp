@@ -1,2 +1,3 @@
 FSharpFile
-  <empty list>
+  PsiElement(DUMMY_CONTAINER)
+    <empty list>
