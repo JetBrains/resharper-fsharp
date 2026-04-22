@@ -32,7 +32,7 @@ class FileSystemShimTest : PerTestSolutionTestBase() {
     val stampBefore = getTimestamp(file)
 
     val newText = "namespace NewTextHere"
-    changeFileContent(project, file.toFile()) { newText }
+    changeFileContent(project, file) { newText }
 
     LocalFileSystem.getInstance().refresh(false)
     waitAndPump(
