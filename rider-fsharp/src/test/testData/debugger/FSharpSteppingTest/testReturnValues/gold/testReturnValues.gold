@@ -40,7 +40,6 @@ $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
 Stepped over i1:
 --> Program.fs:25(255,267) // let i2 = f 1
 $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
-    +l1 = {FSharpList<object>} Length = 0
     l1.Length = {int} 0
     l2.Length = {int} 1
     l3.Length = {int} 2
