@@ -3,7 +3,6 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
-import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
@@ -29,11 +28,7 @@ class FSharpDummyParser : PsiParser {
   private fun PsiBuilder.parseFile() {
     parseEvenEmpty(FSharpElementTypes.FILE) {
       val marker = mark()
-      val lexemeCount =
-        if (this is PsiBuilderImpl) lexemeCount
-        else Int.MAX_VALUE - rawTokenIndex()
-
-      rawAdvanceLexer(lexemeCount)
+      advanceToEOF()
       marker.collapse(FSharpTokenType.DUMMY_CONTAINER)
     }
   }
