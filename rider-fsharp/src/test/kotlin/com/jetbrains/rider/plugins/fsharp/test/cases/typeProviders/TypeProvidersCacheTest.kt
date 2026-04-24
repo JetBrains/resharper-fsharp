@@ -7,7 +7,6 @@ import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.asserts.shouldBeTrue
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.PlatformType
@@ -21,10 +20,11 @@ import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.scriptingApi.deleteRecursivelySafe
 import org.testng.annotations.Test
-import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.pathString
+import kotlin.io.path.createDirectory
 
 @Solution("TypeProviderLibrary")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
@@ -58,13 +58,13 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
   @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]),
          Mute("RIDER-121793")])
   fun invalidation() {
-    val testDirectory = File(project.basePath + "/TypeProviderLibrary/Test")
+    val testDirectory = Path.of(project.basePath!!, "TypeProviderLibrary", "Test")
 
     withOpenedEditor(defaultSourceFile) {
       disableTimedMarkupSuppression()
       waitForDaemon()
 
-      testDirectory.deleteRecursively().shouldBeTrue()
+      testDirectory.deleteRecursivelySafe()
       typeWithLatency("//")
       waitForNextDaemon()
 
@@ -72,7 +72,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
         dumpTypeProviders(it)
       }
 
-      testDirectory.mkdir().shouldBeTrue()
+      testDirectory.createDirectory()
       typeWithLatency(" ")
       waitForNextDaemon()
 
