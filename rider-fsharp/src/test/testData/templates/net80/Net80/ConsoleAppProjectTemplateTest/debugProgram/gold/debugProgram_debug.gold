@@ -1,3 +1,0 @@
---> Program.fs:2(63,86) // printfn "Hello from F#"
-$Program.main@() in <StartupCode$ConsoleApplication>, ConsoleApplication.dll
-

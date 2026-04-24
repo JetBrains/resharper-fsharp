@@ -1,0 +1,47 @@
+===================
+Opened
+
+-Project
+ -UnitTestProject * 1 project
+  -UnitTestProject
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      coverlet.collector/6.0.4
+      FSharp.Core/10.0.100
+      Microsoft.NET.Test.Sdk/17.14.1
+      xunit.runner.visualstudio/3.1.4
+      xunit/2.9.3
+     -Frameworks
+      Microsoft.NETCore.App
+   Tests.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : UnitTestProject.sln)[]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+Project [Name:UnitTestProject, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Tests.fs)[COMPILE ]
+    ProjectFileImpl(Path : UnitTestProject.fsproj)[]
+    Folder [Name:net8.0, Virtual:.nuget/packages, IsHidden:true]
+      Child items:
+        ProjectFileImpl(Path : Microsoft.NET.Test.Sdk.Program.fs)[Hidden COMPILE Properties:CompileOrder=CompileAfter]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : UnitTestProject.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+    ProjectFileImpl(Path : xunit.abstractions.dll (.nuget/packages))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.visualstudio.testadapter.dll (.nuget/packages))[Hidden NONE ]
+
+
+
