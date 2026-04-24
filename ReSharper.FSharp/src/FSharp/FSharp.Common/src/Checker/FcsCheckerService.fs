@@ -15,6 +15,7 @@ open JetBrains.DataFlow
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.impl
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -40,8 +41,7 @@ type FcsProjectInvalidationType =
 
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
-type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-        settingsStore: ISettingsStore, locks: IShellLocks) =
+type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISettingsStore, locks: IShellLocks) =
 
     let checker =
         lazy
@@ -64,11 +64,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
                                      parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
 
             checker
-
-    do
-        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->
-            if checker.IsValueCreated then
-                checker.Value.InvalidateAll())
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
@@ -197,6 +192,13 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, onSolutionCloseNotif
         let offset = context.GetNavigationRange().EndOffset - 1
         let coords = offset.ToDocumentCoords()
         x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, resolveExpr, opName)
+        
+    interface ISolutionManagerEventsListener with                            
+        member _.OnBeforeSolutionOpen(_) = ()                                
+        member _.OnSolutionElementCreated() = ()
+        member _.OnBeforeSolutionClosed() =                                  
+            if checker.IsValueCreated then
+                checker.Value.InvalidateAll()
 
 
 type FSharpParseAndCheckResults =
