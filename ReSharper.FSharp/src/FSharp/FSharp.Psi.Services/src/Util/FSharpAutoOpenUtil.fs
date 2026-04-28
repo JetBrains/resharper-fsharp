@@ -1,5 +1,6 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.FSharpAutoOpenUtil
 
+open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -10,8 +11,9 @@ open JetBrains.Util
 let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (autoOpenCache: FSharpAutoOpenCache)
         (assembly: IPsiAssembly) =
     let result = List()
+    let ctx = Object()
 
-    psiAssemblyFileLoader.GetOrLoadAssembly(assembly, true, fun psiAssembly assemblyFile metadataAssembly ->
+    psiAssemblyFileLoader.LoadAssembly(assembly, PsiAssemblyLoadOptions.LoadMetadataAndAssemblyFile, ctx, fun psiAssembly assemblyFile metadataAssembly ctx ->
         let attributesSet = assemblyFile.CreateAssemblyAttributes()
         let attributes = getAutoOpenAttributes attributesSet
 
