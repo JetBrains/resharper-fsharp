@@ -202,13 +202,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return modulesNames;
     }
 
-    object IAssemblyCache.Build(IPsiAssembly assembly)
+    bool IAssemblyCache.IsApplicable(IPsiAssembly assembly, bool hasSourceProject)
     {
-      ISet<string> result = null;
-      myPsiAssemblyFileLoader.GetOrLoadAssembly(assembly, true, (_, _, metadataAssembly) =>
-        result = Build(metadataAssembly));
+      return !hasSourceProject;
+    }
 
-      return result;
+    AssemblyCacheBuildParameters IAssemblyCache.GetBuildParameters(IPsiAssembly assembly)
+    {
+      return new AssemblyCacheBuildParameters(PsiAssemblyLoadOptions.LoadMetadataAssembly
+                                              | PsiAssemblyLoadOptions.LoadMetadataAssemblyReferences
+                                              | PsiAssemblyLoadOptions.LoadMetadataTypes);
+    }
+
+    object IAssemblyCache.Build(IPsiAssembly assembly, IMetadataAssembly metadataAssembly, IPsiAssemblyFile assemblyFile, object context)
+    {
+      if (metadataAssembly is null)
+        return null;
+
+      return Build(metadataAssembly);
     }
 
     void IAssemblyCache.Merge(IPsiAssembly assembly, object part, Func<bool> checkForTermination)
