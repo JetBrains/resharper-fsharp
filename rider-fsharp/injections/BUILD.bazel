@@ -29,6 +29,7 @@ jvm_library(
 
 jvm_library(
   name = "injections_test_lib",
+  testonly = True,
   module_name = "intellij.rider.plugins.fsharp.injections",
   visibility = ["//visibility:public"],
   srcs = glob([], allow_empty = True),
