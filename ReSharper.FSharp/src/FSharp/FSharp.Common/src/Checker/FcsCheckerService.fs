@@ -194,10 +194,10 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, resolveExpr, opName)
         
     interface ISolutionManagerEventsListener with                            
-        member _.OnBeforeSolutionOpen(_) = ()                                
-        member _.OnSolutionElementCreated() = ()
-        member _.OnBeforeSolutionClosed() =                                  
-            if checker.IsValueCreated then
+        member _.OnBeforeSolutionOpen(_, _) = ()                                
+        member _.OnSolutionElementCreated(_) = ()
+        member _.OnBeforeSolutionClosed(sender) =                                  
+            if checker.IsValueCreated && sender.IsRealSolutionOwner then
                 checker.Value.InvalidateAll()
 
 
