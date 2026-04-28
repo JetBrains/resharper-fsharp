@@ -628,12 +628,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         [ for i in typeParameters.Count - 1 .. -1 .. 0 do
             mkGenericParameterDef typeParameters[i] ]
 
-    let hasExtensions (typeElement: ITypeElement) =
+    let rec hasExtensions (typeElement: ITypeElement) =
         let typeElement = typeElement.As<TypeElement>()
         if isNull typeElement then false else
 
         typeElement.EnumerateParts()
-        |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos))
+        |> Seq.exists (fun part -> not (Array.isEmpty part.ExtensionMemberInfos)) ||
+
+        typeElement.NestedTypes
+        |> Seq.exists hasExtensions
 
     let mkTypeDefCustomAttrs (typeElement: ITypeElement) =
         let hasExtensions = hasExtensions typeElement

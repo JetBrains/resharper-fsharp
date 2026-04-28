@@ -86,6 +86,8 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Event 02``() = x.DoNamedTest()
     [<Test>] member x.``Event 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Extension 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Field - Const 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 02 - Wrong type``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 03 - Same name``() = x.DoNamedTest()
