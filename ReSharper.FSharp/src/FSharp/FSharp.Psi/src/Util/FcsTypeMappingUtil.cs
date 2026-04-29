@@ -398,16 +398,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       [NotNull] IPsiModule psiModule) =>
       TypeFactory.CreateTypeByCLRName(clrTypeName, psiModule, true);
 
-    public class FcsTypeClrName : DeclaredTypeFromCLRName
+    internal class FcsTypeClrName([NotNull] IClrTypeName clrName, string moduleName, [NotNull] IPsiModule module)
+      : DeclaredTypeFromCLRName(clrName, module)
     {
-      private readonly string myModuleName;
-
-      protected internal FcsTypeClrName([NotNull] IClrTypeName clrName, string moduleName, [NotNull] IPsiModule module)
-        : base(clrName, module)
-      {
-        myModuleName = moduleName;
-      }
-
       // todo: remove this type, implement resolve
       internal FcsTypeClrName(ITypeElement typeElement, IPsiModule psiModule)
         : this(typeElement.GetClrName().GetPersistent(), typeElement.Module.Name, psiModule)
@@ -419,7 +412,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       protected override ITypeElement ChooseBestCandidate(ICollection<ITypeElement> candidates)
       {
-        var typeElements = candidates.Where(typeElement => typeElement.Module.Name == myModuleName).ToList();
+        var typeElements = candidates.Where(typeElement => typeElement.Module.Name == moduleName).ToList();
         return typeElements.Count == 1
           ? typeElements[0]
           : base.ChooseBestCandidate(typeElements);
