@@ -89,6 +89,28 @@ type FcsTypeDef =
       mutable Members: FcsTypeDefMembers }
 
 
+type FcsModuleReaderCompilerGeneratedType(clrTypeName, psiModule) =
+    inherit DeclaredTypeFromCLRName(clrTypeName, psiModule)
+
+    override this.ChooseBestCandidate(candidates) =
+        let frameworkCandidates =
+            candidates
+            |> Seq.filter (fun candidate -> 
+                match candidate.Module with
+                | :? IAssemblyPsiModule as assemblyPsiModule -> assemblyPsiModule.Assembly.IsFrameworkAssembly
+                | _ -> false
+            )
+            |> Seq.toArray
+
+        match frameworkCandidates with
+        | [| candidate |] -> candidate
+        | _ ->
+
+        match base.ChooseBestCandidate(frameworkCandidates) with
+        | null -> base.ChooseBestCandidate(candidates)
+        | typeElement -> typeElement
+
+
 type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonCache, path,
         shim: IFcsAssemblyReaderShim, realReader: ILModuleReader option) =
     let locks = psiModule.GetPsiServices().Locks
@@ -506,16 +528,18 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 // and C# nullness metadata export makes use of it.
                 InterfaceImpl.Create(mkType declaredType) ]
 
-    let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list): ILAttribute option =
-        let attrType = TypeFactory.CreateTypeByCLRName(attrTypeName, psiModule, true)
+    let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list) : ILAttribute option =
+        let attrType = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule)
 
         match attrType.GetTypeElement() with
         | null -> None
         | typeElement ->
 
-        let ctor = typeElement.Constructors.First(fun ctor -> args.IsEmpty = ctor.IsParameterless)
-        let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
-        Some(ILAttribute.Decoded(methodSpec, args, []))
+        typeElement.Constructors
+        |> Seq.tryFind (fun ctor -> args.IsEmpty = ctor.IsParameterless)
+        |> Option.map (fun ctor ->
+            ILAttribute.Decoded(ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, []), args, [])
+        )
 
     let mkCompilerGeneratedAttributeNoArgs (attrTypeName: IClrTypeName): ILAttribute option =
         mkCompilerGeneratedAttribute attrTypeName []
@@ -530,8 +554,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         mkCompilerGeneratedAttributeNoArgs PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN
 
     let internalsVisibleToAttribute arg =
-        let args = [ ILAttribElem.String(Some(arg)) ]
-        mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS args
+        mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS [ ILAttribElem.String(Some(arg)) ]
 
     // todo: typeof, arrays
     let attributeValueTypes =
