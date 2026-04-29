@@ -41,6 +41,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     protected readonly NodeTypeSet Comments =
       new(FSharpTokenType.LINE_COMMENT, FSharpTokenType.BLOCK_COMMENT);
 
+    protected readonly NodeTypeSet LeftNodesCapturingLParIfNoLinebreak =
+      new(FSharpTokenType.LINE_COMMENT);
+
     protected override void Initialize()
     {
       base.Initialize();
@@ -170,6 +173,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       var bracesRule = Describe<BracesRule>()
         .LPar(FSharpTokenType.LBRACE)
         .RPar(FSharpTokenType.RBRACE)
+        .LeftNodesCapturingLParIfNoLinebreak(LeftNodesCapturingLParIfNoLinebreak)
         .FormatBeforeParent(true)
         .DisableParentAlignment(false)
         .ProhibitBlankLinesNearBracesInBsdStyle(false)
