@@ -119,11 +119,11 @@ module FSharpKeywordsProvider =
         let keywordItems = Dictionary()
             
         for keyword, description in keywordsWithDescription do
-            keywordItems.Add(keyword, FSharpKeywordLookupItem(keyword, description))
+            keywordItems.Add(keyword, (keyword, description))
 
         for keyword in reparseContextAwareKeywords do
             if not (keywordItems.ContainsKey(keyword)) then
-                keywordItems.Add(keyword, FSharpKeywordLookupItem(keyword, ""))
+                keywordItems.Add(keyword, (keyword, ""))
 
         keywordItems
 
@@ -348,8 +348,9 @@ type FSharpKeywordsRule() =
             for keyword in keywords do
                 match tryGetValue keyword FSharpKeywordsProvider.keywordItems with
                 | None -> ()
-                | Some item ->
+                | Some(keyword, description) ->
 
+                let item = FSharpKeywordLookupItem(keyword, description)
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 item.IsReparseContextAware <- contextAware
                 markRelevance item CLRLookupItemRelevance.Keywords

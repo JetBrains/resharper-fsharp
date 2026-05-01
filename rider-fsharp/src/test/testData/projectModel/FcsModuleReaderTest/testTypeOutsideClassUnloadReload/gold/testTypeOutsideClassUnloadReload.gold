@@ -11,8 +11,8 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty projects: 1
-    FSharpProject, IsValid: True
+Dirty modules:
+  FSharpProject, IsValid: True
 
 ===================
 2. Open F# file
@@ -31,10 +31,8 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty types in readers:
+Dirty modules:
   CSharpProject, IsValid: True
-    CSharpClass
-    CSharpClass2
 
 ===================
 4. Open F# file

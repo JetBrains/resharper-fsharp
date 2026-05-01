@@ -11,8 +11,8 @@ Dependencies to referencing modules:
 2. Unload C# project
 
 Readers by module: 0
-Dirty projects: 1
-    FSharpProject, IsValid: True
+Dirty modules:
+  FSharpProject, IsValid: True
 
 ===================
 3. Open F#
