@@ -14,7 +14,6 @@ import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.OpenSolutionParams
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.ProjectModelBaseTest
@@ -33,8 +32,6 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemonCloseAllOpenEditors
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.util.idea.syncFromBackend
-import org.testng.annotations.AfterMethod
-import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.PrintStream
 import java.time.Duration
@@ -42,23 +39,10 @@ import java.time.Duration
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("EmptySolution")
 class FcsModuleReaderTest : ProjectModelBaseTest() {
-  companion object {
-    private var launchCounter = 0
-  }
-
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
     super.modifyOpenSolutionParams(params)
     params.restoreNuGetPackages = true
     params.backendLoadedTimeout = Duration.ofMinutes(20)
-  }
-
-  @AfterMethod(alwaysRun = true)
-  fun tearDownTestCase() {
-    launchCounter = 0
-  }
-
-  @BeforeMethod
-  fun beforeTestCase() {
   }
 
   private fun EditorImpl.assertFcsStampAndReferencedProjectNames(
@@ -119,8 +103,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     frameworkLogger.info("Editor switched to $targetFileName")
   }
 
-
-  @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testUnloadReloadCSharp() {
@@ -149,7 +131,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-  @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testTypeInsideClassUnloadReload() {
@@ -203,7 +184,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-    @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testTypeOutsideClassUnloadReload() {
@@ -229,8 +209,6 @@ class FcsModuleReaderTest : ProjectModelBaseTest() {
     }
   }
 
-
-  @Mute("RIDER-102738")
   @Solution("ProjectReferencesCSharp2")
   @Test
   fun testLoadReferenced() {

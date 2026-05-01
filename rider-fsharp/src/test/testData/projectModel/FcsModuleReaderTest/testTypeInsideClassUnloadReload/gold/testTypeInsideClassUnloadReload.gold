@@ -11,8 +11,8 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty projects: 1
-    FSharpProject, IsValid: True
+Dirty modules:
+  FSharpProject, IsValid: True
 
 ===================
 2. Open F# file
@@ -31,10 +31,8 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty types in readers:
+Dirty modules:
   CSharpProject, IsValid: True
-    CSharpClass
-    CSharpClass2
 
 ===================
 4. Open F# file
@@ -49,8 +47,8 @@ Dependencies to referencing modules:
 5. Unload C# project
 
 Readers by module: 0
-Dirty projects: 1
-    FSharpProject, IsValid: True
+Dirty modules:
+  FSharpProject, IsValid: True
 
 ===================
 6. Open F# file
@@ -65,13 +63,9 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty projects: 2
-    FSharpProject, IsValid: True
-    CSharpProject, IsValid: True
-Dirty types in readers:
+Dirty modules:
+  FSharpProject, IsValid: True
   CSharpProject, IsValid: True
-    CSharpClass
-    CSharpClass2
 
 ===================
 8. Open F# file
@@ -90,21 +84,16 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty types in readers:
+Dirty modules:
   CSharpProject, IsValid: True
-    CSharpClass
-    CSharpClass2
 
 ===================
 10. Unload C# project
 
 Readers by module: 0
-Dirty projects: 1
-    FSharpProject, IsValid: True
-Dirty types in readers:
+Dirty modules:
   CSharpProject, IsValid: False
-    CSharpClass
-    CSharpClass2
+  FSharpProject, IsValid: True
 
 ===================
 11. Open F# file
@@ -119,13 +108,9 @@ Readers by module: 1
 Dependencies to referencing modules:
   CSharpProject, IsValid: True
     FSharpProject
-Dirty projects: 2
-    FSharpProject, IsValid: True
-    CSharpProject, IsValid: True
-Dirty types in readers:
+Dirty modules:
+  FSharpProject, IsValid: True
   CSharpProject, IsValid: True
-    CSharpClass
-    CSharpClass2
 
 ===================
 13. Open F# file

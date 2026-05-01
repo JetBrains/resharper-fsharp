@@ -232,7 +232,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                         builder.AppendLine($"    {referencing.Project.Name}") |> ignore
 
             if dirtyModules.Count > 0 then
-                builder.AppendLine("Dirty types in readers:") |> ignore
+                builder.AppendLine("Dirty modules:") |> ignore
                 for psiModule in dirtyModules do
                     builder.AppendLine($"  {psiModule.DisplayName}, IsValid: {psiModule.IsValid()}") |> ignore
 
