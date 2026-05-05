@@ -38,20 +38,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType()?.IdSubstitution ??
       EmptySubstitution.INSTANCE;
 
-    public XmlNode GetXMLDoc(bool renderContent)
+    /// <inheritdoc cref="IXmlDocOwnerTreeNode.GetXMLDoc"/>
+    public XmlNode GetXMLDoc(bool expand)
     {
       var declarations = GetDeclarations();
       var primaryDeclaration = declarations.FirstOrDefault(t => t.IsFSharpSigFile()) ?? declarations.FirstOrDefault();
-      var xmlNode = primaryDeclaration?.GetXMLDoc(renderContent);
+      var xmlNode = primaryDeclaration?.GetXMLDoc(expand);
 
-      if (renderContent && this is IClrDeclaredElement clrDeclaredElement)
+      if (expand && this is IClrDeclaredElement clrDeclaredElement)
         XMLDocUtil.ExtendWithInheritedDocTag(clrDeclaredElement, xmlNode);
         
       return xmlNode;
     }
 
-    public XmlNode GetXMLDescriptionSummary(bool renderContent) =>
-      XMLDocUtil.ExtractSummary(GetXMLDoc(renderContent));
+    public XmlNode GetXMLDescriptionSummary(bool expand) =>
+      XMLDocUtil.ExtractSummary(GetXMLDoc(expand));
 
     public abstract DeclaredElementType GetElementType();
   }

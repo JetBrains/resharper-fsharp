@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public IList<ITypeParameter> AllTypeParameters =>
       this.GetAllTypeParametersReversed();
 
-    public override XmlNode GetXMLDoc(bool renderContent) => this.GetXmlDoc(renderContent);
+    public override XmlNode GetXMLDoc(bool expand) => this.GetXmlDoc(expand);
 
     public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
