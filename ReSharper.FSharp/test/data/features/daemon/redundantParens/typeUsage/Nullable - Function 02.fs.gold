@@ -1,0 +1,7 @@
+﻿module Module
+
+type A = int -> |(|(0)string | null|)|(1)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

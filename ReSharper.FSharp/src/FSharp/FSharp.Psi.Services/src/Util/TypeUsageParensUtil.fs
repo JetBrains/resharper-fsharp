@@ -37,6 +37,15 @@ let rec requiresParensInAbbreviation (typeUsage: ITypeUsage) =
         requiresParensInAbbreviation argTypeUsage
     | _ -> false
 
+let checkCompoundType (typeUsage: ITypeUsage) =
+    isNotNull (TupleTypeUsageNavigator.GetByItem(typeUsage)) ||
+    isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(typeUsage)) ||
+    isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(typeUsage)) ||
+    isNotNull (IsInstPatNavigator.GetByTypeUsage(typeUsage)) ||
+    isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(typeUsage)) ||
+    isNotNull (WithNullTypeUsageNavigator.GetByTypeUsage(typeUsage)) ||
+    isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes typeUsage))
+
 let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
     let parentTypeUsage = context.Parent.As<ITypeUsage>()
     if isNotNull parentTypeUsage && not (applicable parentTypeUsage) then true else
@@ -64,22 +73,12 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(argTypeUsage))
         if isInAbbreviation && requiresParensInAbbreviation argTypeUsage then true else
 
-        isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
-        isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context)) ||
-        isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(context)) ||
-        isNotNull (IsInstPatNavigator.GetByTypeUsage(context)) ||
-        isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(context)) ||
-        isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context))
+        checkCompoundType context
 
     | :? IFunctionTypeUsage ->
-        isNotNull (TupleTypeUsageNavigator.GetByItem(context)) ||
-        isNotNull (FunctionTypeUsageNavigator.GetByArgumentTypeUsage(context)) ||
-        isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context)) ||
-        isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(context)) ||
-        isNotNull (IsInstPatNavigator.GetByTypeUsage(context)) ||
         isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) ||
-        isNotNull (CaseFieldDeclarationNavigator.GetByTypeUsage(context)) ||
-        isNotNull (IsInstPatNavigator.GetByTypeUsage(ignoreParentCompoundTypes context)) ||
+        isNotNull (FunctionTypeUsageNavigator.GetByArgumentTypeUsage(context)) ||
+        checkCompoundType context ||
 
         let longestReturn = getLongestReturnFromReturn context
         isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn)) ||
@@ -97,6 +96,6 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         isNotNull referenceName && referenceName.TypeArgumentList :? IPostfixAppTypeArgumentList
 
     | :? IWithNullTypeUsage ->
-        isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(context))
+        checkCompoundType context
 
     | _ -> false
