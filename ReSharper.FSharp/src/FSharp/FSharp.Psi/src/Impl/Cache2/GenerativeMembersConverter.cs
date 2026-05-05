@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       TypeElement = typeElement;
     }
 
-    public XmlNode GetXmlDoc(bool renderContent) => Type.GetXmlDoc(TypeElement, renderContent);
+    public XmlNode GetXmlDoc(bool expand) => Type.GetXmlDoc(TypeElement, expand);
 
     // Operators for provided types are compiled into non-operator methods
     public IEnumerable<IOperator> Operators => EmptyList<IOperator>.InstanceList;

@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual TreeTextRange GetNameIdentifierRange() => NameIdentifier.GetNameIdentifierRange();
 
     public virtual XmlDocBlock XmlDocBlock => FirstChild as XmlDocBlock;
-    public XmlNode GetXMLDoc(bool renderContent)
+    public XmlNode GetXMLDoc(bool expand)
     {
       var xmlDocBlock = XmlDocBlock;
       if (xmlDocBlock == null)
@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var xmlNode = xmlDocBlock.GetXML(null);
 
-      if (renderContent && xmlNode == null)
+      if (expand && xmlNode == null)
         return XmlDocCommentsUtil.TryReconstructXmlDoc(xmlDocBlock, DeclaredElement as IXmlDocIdOwner);
 
       return xmlNode;

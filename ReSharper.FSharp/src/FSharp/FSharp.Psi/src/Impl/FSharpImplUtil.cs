@@ -1027,11 +1027,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static XmlNode GetXmlDoc(this IFSharpSourceTypeElement typeElement, bool renderContent)
+    public static XmlNode GetXmlDoc(this IFSharpSourceTypeElement typeElement, bool expand)
     {
-      var xmlNode = typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(renderContent);
+      var xmlNode = typeElement.GetFirstTypePart()?.GetDeclaration()?.GetXMLDoc(expand);
 
-      if (renderContent)
+      if (expand)
         XMLDocUtil.ExtendWithInheritedDocTag(typeElement, xmlNode);
 
       return xmlNode;

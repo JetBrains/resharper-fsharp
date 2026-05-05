@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public string SourceName => this.GetSourceName();
 
-    public override XmlNode GetXMLDoc(bool renderContent) => this.GetXmlDoc(renderContent);
+    public override XmlNode GetXMLDoc(bool expand) => this.GetXmlDoc(expand);
     
     public ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.RequiresQualifiedAccess;
     public ITypeDeclaration DefiningDeclaration => this.GetDefiningDeclaration();
