@@ -102,9 +102,3 @@ type FSharpImportTypeHelper() =
 
         member x.ReferenceTargetCanBeType _ = true
         member x.ReferenceTargetIsUnlikelyBeType _ = false
-
-
-
-
-
-// todo: ExtensionMethodImportUtilBase
