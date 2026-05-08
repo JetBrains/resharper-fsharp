@@ -1,0 +1,4 @@
+module Module
+
+type A = (string | null) seq
+
