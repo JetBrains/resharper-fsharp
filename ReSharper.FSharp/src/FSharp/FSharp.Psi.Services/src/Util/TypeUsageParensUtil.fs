@@ -37,7 +37,7 @@ let rec requiresParensInAbbreviation (typeUsage: ITypeUsage) =
         requiresParensInAbbreviation argTypeUsage
     | _ -> false
 
-let checkCompoundType (typeUsage: ITypeUsage) =
+let compoundTypeNeedsParens (typeUsage: ITypeUsage) =
     isNotNull (TupleTypeUsageNavigator.GetByItem(typeUsage)) ||
     isNotNull (ArrayTypeUsageNavigator.GetByTypeUsage(typeUsage)) ||
     isNotNull (PostfixAppTypeArgumentListNavigator.GetByTypeUsage(typeUsage)) ||
@@ -73,12 +73,12 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         let isInAbbreviation = isNotNull (TypeAbbreviationRepresentationNavigator.GetByAbbreviatedType(argTypeUsage))
         if isInAbbreviation && requiresParensInAbbreviation argTypeUsage then true else
 
-        checkCompoundType context
+        compoundTypeNeedsParens context
 
     | :? IFunctionTypeUsage ->
         isNotNull (ParameterSignatureTypeUsageNavigator.GetByTypeUsage(context)) ||
         isNotNull (FunctionTypeUsageNavigator.GetByArgumentTypeUsage(context)) ||
-        checkCompoundType context ||
+        compoundTypeNeedsParens context ||
 
         let longestReturn = getLongestReturnFromReturn context
         isNotNull (ValFieldDeclarationNavigator.GetByTypeUsage(longestReturn)) ||
@@ -96,6 +96,6 @@ let needsParens (context: ITypeUsage) (typeUsage: ITypeUsage): bool =
         isNotNull referenceName && referenceName.TypeArgumentList :? IPostfixAppTypeArgumentList
 
     | :? IWithNullTypeUsage ->
-        checkCompoundType context
+        compoundTypeNeedsParens context
 
     | _ -> false
