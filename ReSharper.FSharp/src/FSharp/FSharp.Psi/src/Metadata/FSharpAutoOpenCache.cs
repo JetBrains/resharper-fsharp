@@ -202,10 +202,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return modulesNames;
     }
 
-    bool IAssemblyCache.IsApplicable(IPsiAssembly assembly, bool hasSourceProject)
-    {
-      return !hasSourceProject;
-    }
+    bool IAssemblyCache.IsApplicable(IPsiAssembly assembly) => true;
 
     AssemblyCacheBuildParameters IAssemblyCache.GetBuildParameters(IPsiAssembly assembly)
     {
