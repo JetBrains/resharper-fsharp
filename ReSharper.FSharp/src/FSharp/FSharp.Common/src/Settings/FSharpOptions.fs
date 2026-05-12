@@ -118,7 +118,7 @@ type FSharpSettingsProviderBase<'T>(lifetime: Lifetime, settings: IContextBoundS
     let settingsKey = settingsSchema.GetKey<'T>()
 
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
-        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
+        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext2()))
         FSharpSettingsProviderBase(lifetime, settings, settingsSchema, solution.Locks)
 
     member x.GetValueProperty<'V>(name: string) =

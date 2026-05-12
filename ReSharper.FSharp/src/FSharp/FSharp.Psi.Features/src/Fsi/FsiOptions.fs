@@ -99,7 +99,7 @@ type FsiOptionsProvider [<NotUsedByComponentContainer>] (lifetime, settings, set
     inherit FSharpSettingsProviderBase<FsiOptions>(lifetime, settings, settingsSchema, shellLocks)
 
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore, settingsSchema) =
-        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
+        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext2()))
         FsiOptionsProvider(lifetime, settings, settingsSchema, solution.Locks)
 
     member val AutoDetect               = base.GetValueProperty<bool>("AutoDetect")
