@@ -189,35 +189,69 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         member this.Changed _ =
             compilerPathToLanguageLevels.Clear()
 
-
 [<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
-type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
-    let (|PsiModule|) (psiModule: IPsiModule) =
-        let project = psiModule.ContainingProjectModule.NotNull() :?> IProject
-        project, psiModule.TargetFrameworkId
+type FSharpLanguageLevelProviderForAnyModule() =
+    abstract IsApplicable: IPsiModule -> bool
+    default this.IsApplicable _ = true
+
+    abstract GetLanguageLevel: IPsiModule -> FSharpLanguageLevel
+    default this.GetLanguageLevel _ = FSharpLanguageLevel.Latest
+
+    abstract TryGetLanguageVersion: IPsiModule -> Nullable<FSharpLanguageVersion>
+    default this.TryGetLanguageVersion _ = Nullable(FSharpLanguageVersion.Latest)
+
+    abstract ConvertToLanguageLevel: FSharpLanguageVersion * IPsiModule -> FSharpLanguageLevel
+    default this.ConvertToLanguageLevel(_, _) = FSharpLanguageLevel.Latest
+
+    abstract IsAvailable: FSharpLanguageLevel * IPsiModule -> bool
+    default this.IsAvailable(_, _) = true
 
     interface ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion> with
         member this.IsApplicable(psiModule) =
-            psiModule.ContainingProjectModule :? IProject
+            this.IsApplicable(psiModule)
 
-        member this.GetLanguageLevel(PsiModule(project, targetFramework)) =
-            projectProperty.GetLanguageLevel(project, targetFramework)
+        member this.GetLanguageLevel(psiModule) =
+            this.GetLanguageLevel(psiModule)
 
-        member this.ConvertToLanguageLevel(languageVersion, PsiModule(project, targetFramework)) =
-            projectProperty.ConvertToLanguageLevel(languageVersion, project, targetFramework)
+        member this.TryGetLanguageVersion(psiModule) =
+            this.TryGetLanguageVersion(psiModule)
+
+        member this.IsAvailable(languageLevel, psiModule) =
+            this.IsAvailable(languageLevel, psiModule)
+
+        member this.ConvertToLanguageLevel(languageVersion, psiModule) =
+            this.ConvertToLanguageLevel(languageVersion, psiModule)
 
         member this.ConvertToLanguageVersion(languageLevel) =
             FSharpLanguageLevel.toLanguageVersion languageLevel
 
-        member this.IsAvailable(languageLevel: FSharpLanguageLevel, PsiModule(project, targetFramework)): bool =
-            languageLevel <= projectProperty.GetLatestAvailableLanguageLevel(project, targetFramework)
-
-        member this.TryGetLanguageVersion(PsiModule(project, targetFramework)) =
-            Nullable(projectProperty.GetLanguageVersion(project, targetFramework))
-
         member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
         member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
+
+[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
+    inherit FSharpLanguageLevelProviderForAnyModule()
+
+    let (|PsiModule|) (psiModule: IPsiModule) =
+        let project = psiModule.ContainingProjectModule.NotNull() :?> IProject
+        project, psiModule.TargetFrameworkId
+
+    override this.IsApplicable(psiModule) =
+        psiModule.ContainingProjectModule :? IProject
+
+    override this.GetLanguageLevel(PsiModule(project, targetFramework)) =
+        projectProperty.GetLanguageLevel(project, targetFramework)
+
+    override this.ConvertToLanguageLevel(languageVersion, PsiModule(project, targetFramework)) =
+        projectProperty.ConvertToLanguageLevel(languageVersion, project, targetFramework)
+
+    override this.IsAvailable(languageLevel: FSharpLanguageLevel, PsiModule(project, targetFramework)): bool =
+        languageLevel <= projectProperty.GetLatestAvailableLanguageLevel(project, targetFramework)
+
+    override this.TryGetLanguageVersion(PsiModule(project, targetFramework)) =
+        Nullable(projectProperty.GetLanguageVersion(project, targetFramework))
+
 
 [<ShellFeaturePart>]
 [<ZoneMarker(typeof<IReSharperHostNetSharedFeatureZone>)>]

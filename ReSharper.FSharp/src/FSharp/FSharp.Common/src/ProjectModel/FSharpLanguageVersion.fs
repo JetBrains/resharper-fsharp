@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open System
 open System.Collections.Generic
+open JetBrains.Application.Extensibility
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -93,11 +94,13 @@ module FSharpLanguageLevel =
     let key = Key<Boxed<FSharpLanguageLevel>>("LanguageLevel")
 
     let ofPsiModuleNoCache (psiModule: IPsiModule) =
+        let solutionFeaturePartsContainer = psiModule.GetPsiServices().GetComponent<SolutionFeaturePartsContainer>()
+
         let levelProvider =
-            psiModule.GetPsiServices()
-                .GetComponent<SolutionFeaturePartsContainer>()
-                .GetFeatureParts<ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion>>(fun p ->
-                    p.IsApplicable(psiModule))
+            solutionFeaturePartsContainer
+                .GetFeatureParts<ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion>>(_.IsApplicable(psiModule))
+                .ToIList()
+                .FilterOverriddenComponents()
                 .SingleItem()
 
         levelProvider.GetLanguageLevel(psiModule)
