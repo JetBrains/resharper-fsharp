@@ -84,11 +84,10 @@ type FSharpScriptOptions =
 module FSharpExperimentalFeatures =
     let [<Literal>] postfixTemplates = "Enable postfix templates"
     let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
-    let [<Literal>] formatter = "Enable F# code formatter"
+    let [<Literal>] formatter = "Prefer ReSharper code formatter"
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
     let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Enable generative type providers analysis in C#/VB.NET projects"
-    let [<Literal>] tryRecoverFcsProjects = "Try to reuse FCS results on project changes"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -109,10 +108,7 @@ type FSharpExperimentalFeatures =
       mutable OutOfProcessTypeProviders: bool
 
       [<SettingsEntry(true, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis); DefaultValue>]
-      mutable GenerativeTypeProvidersInMemoryAnalysis: bool
-
-      [<SettingsEntry(false, FSharpExperimentalFeatures.tryRecoverFcsProjects); DefaultValue>]
-      mutable TryRecoverFcsProjects: bool }
+      mutable GenerativeTypeProvidersInMemoryAnalysis: bool }
 
 
 [<AllowNullLiteral>]
@@ -148,7 +144,6 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution: ISolution, settings,
     member val Formatter = base.GetValueProperty<bool>("Formatter")
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
     member val GenerativeTypeProvidersInMemoryAnalysis = base.GetValueProperty<bool>("GenerativeTypeProvidersInMemoryAnalysis")
-    member val TryRecoverFcsProjects = base.GetValueProperty<bool>("TryRecoverFcsProjects")
 
 
 [<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
@@ -227,11 +222,11 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
 
         this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryReferences), nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
 
+        this.AddHeader("Experimental features")
+        this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
         if configurations.IsInternalMode() then
-            this.AddHeader("Experimental features")
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
-            this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
 
 
 [<ShellComponent>]
