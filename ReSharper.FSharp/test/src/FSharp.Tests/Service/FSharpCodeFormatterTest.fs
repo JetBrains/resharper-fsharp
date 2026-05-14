@@ -206,4 +206,6 @@ type FSharpCodeCleanupTest() =
 
     override x.RelativeTestDataPath = "features/service/codeCleanup"
 
-    [<Test; Explicit>] member x.``Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 02``() = x.DoNamedTest()

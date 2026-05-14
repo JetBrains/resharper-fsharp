@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open JetBrains.Application.Infra
 open JetBrains.Application.Parts
+open JetBrains.Application.Progress
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
@@ -10,6 +11,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
@@ -25,10 +27,79 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         "FSharpReformatCode",
         CodeCleanupLanguage("F#", 2),
         CodeCleanupOptionDescriptor.ReformatGroup,
-        typeof<Strings>)
+        typeof<Strings>, displayName = "F#")
 
     let language = FSharpLanguage.Instance
 
+    let reformatWithReSharper (sourceFile: IPsiSourceFile) (rangeMarker: IRangeMarker) (profile: CodeCleanupProfile)
+            (progressIndicator: IProgressIndicator) =
+        let solution = sourceFile.GetSolution()
+        let codeFormatProfile = profile.GetSetting(ReformatOptions.CODE_FORMATER_PROFILE_DESCRIPTOR)
+        let formatter = language.Formatter().NotNull()
+
+        sourceFile.GetPsiServices().Transactions.Execute("F# Reformat code", fun () ->
+            if isNotNull rangeMarker then
+                CodeFormatterHelper.Format(language, solution, rangeMarker.DocumentRange, codeFormatProfile, true,
+                    false, progressIndicator)
+            else
+                formatter.FormatFile(sourceFile.FSharpFile, codeFormatProfile, progressIndicator)
+        ) |> ignore
+
+    let reformatWithFantomas (sourceFile: IPsiSourceFile) (rangeMarker: IRangeMarker) =
+        let fsFile = sourceFile.FSharpFile
+        if isNull fsFile then () else
+
+        match fsFile.ParseTree with
+        | None -> ()
+        | Some _ ->
+
+        let filePath = sourceFile.GetLocation().FullPath
+        let document = sourceFile.Document :?> DocumentBase
+        let text = document.GetText()
+
+        let solution = fsFile.GetSolution()
+        let settingsStore = sourceFile.GetSettingsStoreWithEditorConfig()
+        let formatter = fsFile.Language.LanguageServiceNotNull().CodeFormatter
+        let settings = formatter.GetFormatterSettings(solution, sourceFile, settingsStore, false) :?> _
+        let fantomasHost = solution.GetComponent<FantomasHost>()
+
+        let stamp = document.LastModificationStamp
+        let modificationSide = TextModificationSide.NotSpecified
+        let newLineText = sourceFile.DetectLineEnding().GetPresentation()
+        let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
+
+        try
+            if isNotNull rangeMarker then
+                let range = ofDocumentRange rangeMarker.DocumentRange
+                let formatted = fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText, settingsStore)
+                let offset = rangeMarker.DocumentRange.StartOffset.Offset
+                let oldLength = rangeMarker.DocumentRange.Length
+                let documentChange = DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide)
+                use _ = WriteLockCookie.Create()
+                document.ChangeDocument(documentChange, TimeStamp.NextValue)
+                sourceFile.GetPsiServices().Files.CommitAllDocuments()
+            else
+                let textControl = textControlManager.VisibleTextControls
+                                  |> Seq.tryFind (fun c -> c.Document == document && c.Window.IsFocused.Value)
+                let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
+                let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition, settingsStore)
+                let newCursorPosition = formatResult.CursorPosition
+
+                document.ReplaceText(document.DocumentRange, formatResult.Code)
+                sourceFile.GetPsiServices().Files.CommitAllDocuments()
+
+                if isNull textControl || isNull newCursorPosition then () else
+
+                // move cursor after current document transaction
+                let moveCursorLifetime = new LifetimeDefinition()
+                let codeCleanupService = solution.GetComponent<CodeCleanupService>()
+                codeCleanupService.WholeFileCleanupCompletedAfterSave.Advise(moveCursorLifetime.Lifetime, fun _ ->
+                    moveCursorLifetime.Terminate()
+                    textControl.Value.Caret.MoveTo(docLine newCursorPosition.Row,
+                                                   docColumn newCursorPosition.Column,
+                                                   CaretVisualPlacement.Generic))
+        with _ -> ()
+    
     interface IReformatCodeCleanupModule with
         member x.Name = Strings.FSharpReformatCode_Name_Reformat_FSharp
         member x.LanguageType = language
@@ -50,64 +121,12 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
             profile.GetSetting(REFORMAT_CODE_DESCRIPTOR)
 
         member x.Process(sourceFile, rangeMarker, profile, progressIndicator, _) =
-            // let solution = sourceFile.GetSolution()
-            // let codeFormatProfile = profile.GetSetting(ReformatOptions.CODE_FORMATER_PROFILE_DESCRIPTOR)
-            //
-            // sourceFile.GetPsiServices().Transactions.Execute("F# Reformat code", fun () ->
-            //     CodeFormatterHelper.Format(language, solution, rangeMarker.DocumentRange, codeFormatProfile, true,
-            //     false, progressIndicator)
-            // ) |> ignore
+            let useReSharperFormatter () =
+                sourceFile
+                    .GetSolution()
+                    .GetSolutionInstanceComponent<FSharpExperimentalFeaturesProvider>().Formatter.Value
 
-            let fsFile = sourceFile.FSharpFile
-            if isNull fsFile then () else
-
-            match fsFile.ParseTree with
-            | None -> ()
-            | Some _ ->
-
-            let filePath = sourceFile.GetLocation().FullPath
-            let document = sourceFile.Document :?> DocumentBase
-            let text = document.GetText()
-
-            let solution = fsFile.GetSolution()
-            let settingsStore = sourceFile.GetSettingsStoreWithEditorConfig()
-            let formatter = fsFile.Language.LanguageServiceNotNull().CodeFormatter
-            let settings = formatter.GetFormatterSettings(solution, sourceFile, settingsStore, false) :?> _
-            let fantomasHost = solution.GetComponent<FantomasHost>()
-
-            let stamp = document.LastModificationStamp
-            let modificationSide = TextModificationSide.NotSpecified
-            let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-            let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
-
-            try
-                if isNotNull rangeMarker then
-                    let range = ofDocumentRange rangeMarker.DocumentRange
-                    let formatted = fantomasHost.FormatSelection(filePath, range, text, settings, parsingOptions, newLineText, settingsStore)
-                    let offset = rangeMarker.DocumentRange.StartOffset.Offset
-                    let oldLength = rangeMarker.DocumentRange.Length
-                    let documentChange = DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide)
-                    use _ = WriteLockCookie.Create()
-                    document.ChangeDocument(documentChange, TimeStamp.NextValue)
-                    sourceFile.GetPsiServices().Files.CommitAllDocuments()
-                else
-                    let textControl = textControlManager.VisibleTextControls
-                                      |> Seq.tryFind (fun c -> c.Document == document && c.Window.IsFocused.Value)
-                    let cursorPosition = textControl |> Option.map (fun c -> c.Caret.Position.Value.ToDocLineColumn())
-                    let formatResult = fantomasHost.FormatDocument(filePath, text, settings, parsingOptions, newLineText, cursorPosition, settingsStore)
-                    let newCursorPosition = formatResult.CursorPosition
-
-                    document.ReplaceText(document.DocumentRange, formatResult.Code)
-                    sourceFile.GetPsiServices().Files.CommitAllDocuments()
-
-                    if isNull textControl || isNull newCursorPosition then () else
-
-                    // move cursor after current document transaction
-                    let moveCursorLifetime = new LifetimeDefinition()
-                    let codeCleanupService = solution.GetComponent<CodeCleanupService>()
-                    codeCleanupService.WholeFileCleanupCompletedAfterSave.Advise(moveCursorLifetime.Lifetime, fun _ ->
-                        moveCursorLifetime.Terminate()
-                        textControl.Value.Caret.MoveTo(docLine newCursorPosition.Row,
-                                                       docColumn newCursorPosition.Column,
-                                                       CaretVisualPlacement.Generic))
-            with _ -> ()
+            if isNotNull rangeMarker || useReSharperFormatter () then
+                reformatWithReSharper sourceFile rangeMarker profile progressIndicator
+            else
+                reformatWithFantomas sourceFile rangeMarker
