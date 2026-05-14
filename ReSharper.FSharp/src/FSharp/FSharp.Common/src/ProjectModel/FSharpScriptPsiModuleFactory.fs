@@ -519,28 +519,23 @@ type ScriptReferences =
 
 [<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
 type FSharpScriptLanguageLevelProvider(scriptSettingsProvider: FSharpScriptSettingsProvider) =
+    inherit FSharpLanguageLevelProviderForAnyModule()
+
     let getLanguageLevel () =
         FSharpLanguageLevel.ofLanguageVersion scriptSettingsProvider.LanguageVersion.Value
 
-    interface ILanguageLevelProvider<FSharpLanguageLevel, FSharpLanguageVersion> with
-        member this.IsApplicable(psiModule) =
-            psiModule :? FSharpScriptPsiModule
+    override this.IsApplicable(psiModule) =
+        psiModule :? FSharpScriptPsiModule
 
-        member this.GetLanguageLevel _ =
-            getLanguageLevel ()
+    override this.GetLanguageLevel _ =
+        getLanguageLevel ()
 
-        member this.ConvertToLanguageLevel(languageVersion, _) =
-            FSharpLanguageLevel.ofLanguageVersion languageVersion
+    override this.ConvertToLanguageLevel(languageVersion, _) =
+        FSharpLanguageLevel.ofLanguageVersion languageVersion
 
-        member this.ConvertToLanguageVersion(languageLevel) =
-            FSharpLanguageLevel.toLanguageVersion languageLevel
+    override this.IsAvailable(languageLevel: FSharpLanguageLevel, _: IPsiModule): bool =
+        languageLevel <= getLanguageLevel ()
 
-        member this.IsAvailable(languageLevel: FSharpLanguageLevel, _: IPsiModule): bool =
-            languageLevel <= getLanguageLevel ()
+    override this.TryGetLanguageVersion _ =
+        Nullable(scriptSettingsProvider.LanguageVersion.Value)
 
-        member this.TryGetLanguageVersion _ =
-            Nullable(scriptSettingsProvider.LanguageVersion.Value)
-
-        member this.IsAvailable(_: FSharpLanguageVersion, _: IPsiModule): bool = failwith "todo"
-        member this.LanguageVersionModifier = failwith "todo"
-        member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
