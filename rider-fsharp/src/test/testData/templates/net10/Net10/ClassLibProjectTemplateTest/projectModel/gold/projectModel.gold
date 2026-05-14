@@ -10,7 +10,7 @@ Opened
       -Implicit
        ...
      -Packages
-      FSharp.Core/10.0.100
+      FSharp.Core/10.1.202
      -Frameworks
       Microsoft.NETCore.App
    Library.fs
@@ -31,6 +31,7 @@ Project [Name:ClassLibrary, GUID:GUID]
             Folder [Name:net10.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
