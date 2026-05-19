@@ -66,6 +66,7 @@ dependencies {
     bundledModule("intellij.platform.langInjection")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
+    bundledPlugin("com.intellij.moduleSet.structureView")
     bundledModule("intellij.resharper.assist")
     instrumentationTools()
     // TODO: Temporary I hope hope hope
