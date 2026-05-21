@@ -21,7 +21,7 @@ open JetBrains.TextControl
 open JetBrains.UI.RichText
 
 [<AbstractClass>]
-type FSharpQuickFixBase() =
+type FSharpLegacyQuickFixBase() =
     inherit QuickFixBase()
 
     abstract ExecutePsiTransaction: solution: ISolution -> unit
@@ -50,18 +50,22 @@ type FSharpQuickFixBase() =
 
 
 [<AbstractClass>]
-type FSharpModernQuickFixBase() =
+type FSharpQuickFixBase() =
     inherit ModernQuickFixBase()
 
-    member x.SelectExpression(expressions: (IFSharpExpression * string) array, action) =
-        let menuItems =
-            expressions
-            |> Array.map (fun (expr, text) ->
-                let range = expr.GetDocumentRange()
-                BulbActionCommandMenuItem<IFSharpExpression>(Text = text, Data = expr, Range = range)
-            )
+    member this.ShowMenuAndExecute(occurrences: BulbActionCommandMenuItem<_>[], action) =
+        BulbActionCommands.ShowMenu(occurrences, fun _ _ occurrence ->
+            BulbActionCommands.ExecutePsiTransaction(fun _ _ -> action occurrence)
+        )
 
+    member x.ShowMenuAndExecute<'Node when 'Node :> ITreeNode>(occurrences: ('Node * string) array, action, rangeSelector) =
         BulbActionCommandSequence.From(
+            let menuItems =
+                occurrences
+                |> Array.map (fun (node, text) ->
+                    BulbActionCommandMenuItem<'Node>(Text = text, Data = node, Range = rangeSelector node)
+                )
+
             BulbActionCommands.ShowMenu(menuItems, fun _ _ selectedExpr ->
                 BulbActionCommands.ExecutePsiTransaction(fun _ _ ->
                     action selectedExpr
@@ -70,6 +74,15 @@ type FSharpModernQuickFixBase() =
             )
         )
 
+    member x.ShowMenuAndExecute(occurrences, action) =
+        x.ShowMenuAndExecute(occurrences, action, _.GetDocumentRange())
+
+    abstract ExecutePsiTransaction: solution: ISolution -> unit
+    default x.ExecutePsiTransaction _ = ()
+
+    override x.ExecutePsiTransaction(solution, _) =
+        x.ExecutePsiTransaction(solution)
+        null
 
 [<AbstractClass>]
 type FSharpScopedQuickFixBase(contextNode: ITreeNode) =

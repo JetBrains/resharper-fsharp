@@ -228,8 +228,9 @@ type ChangeReturnTypeFromInvocationFix(node: IFSharpTypeOwnerNode, fcsDiagnostic
 
         reference.Resolve().DeclaredElement
 
-    override this.SetType(decl, _, fcsType) =
+    override this.SetType(decl, fcsSymbol, fcsType) =
         let decl = FSharpParameterOwnerDeclarationNavigator.Unwrap(decl)
+        let mfv = fcsSymbol.As<FSharpMemberOrFunctionOrValue>()
 
         let lambdaParamsCount =
             let bindingParamDeclCount =
@@ -237,12 +238,11 @@ type ChangeReturnTypeFromInvocationFix(node: IFSharpTypeOwnerNode, fcsDiagnostic
                 | :? IParameterOwnerMemberDeclaration as paramOwnerDecl -> paramOwnerDecl.ParametersDeclarations.Count
                 | _ -> 0
 
-            let mfv = decl.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
             mfv.CurriedParameterGroups.Count - bindingParamDeclCount
 
         let decl = decl.As<IFSharpTypeOwnerDeclaration>()
         if isNull decl.TypeUsage then
-            FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
+            FSharpTypeUsageUtil.setFcsParametersOwnerReturnType mfv decl
 
         decl.TypeUsage
         |> FSharpTypeUsageUtil.skipParameters lambdaParamsCount

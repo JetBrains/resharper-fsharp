@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
+open JetBrains.ReSharper.Feature.Services.BulbActions
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -64,6 +66,7 @@ and MatchPostfixTemplateBehavior(info) =
             matchExpr :> ITreeNode
         )
 
-    override x.AfterComplete(textControl, node, _) =
-        textControl.Caret.MoveTo(node.GetDocumentEndOffset() + 1, CaretVisualPlacement.DontScrollIfVisible)
-        textControl.RescheduleCompletion(node.GetSolution())
+    override this.AfterComplete(textControl, node, _) =
+        let offset = node.GetDocumentEndOffset() + 1
+        let command = BulbActionCommands.ShowCodeCompletionPopup(offset, FSharpLanguage.Instance, AutopopupType.SoftAutopopup)
+        this.RunAndForget(command, textControl)

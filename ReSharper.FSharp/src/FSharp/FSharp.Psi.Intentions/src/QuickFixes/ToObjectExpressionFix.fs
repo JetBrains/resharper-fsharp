@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type ToObjectExpressionFix(error: AbstractTypeCannotBeInstantiatedError) =
@@ -16,7 +15,7 @@ type ToObjectExpressionFix(error: AbstractTypeCannotBeInstantiatedError) =
 
     override this.Text = "Convert to object expression"
 
-    override this.IsAvailable(cache) =
+    override this.IsAvailable _ =
         let appExpr = expr.As<IPrefixAppExpr>()
         isNotNull appExpr &&
 
@@ -25,7 +24,7 @@ type ToObjectExpressionFix(error: AbstractTypeCannotBeInstantiatedError) =
 
         NewObjPostfixTemplate.isApplicableExpr refExpr
 
-    override this.ExecutePsiTransaction(solution, var0) =
+    override this.ExecutePsiTransaction(_, _) =
         let factory = expr.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())

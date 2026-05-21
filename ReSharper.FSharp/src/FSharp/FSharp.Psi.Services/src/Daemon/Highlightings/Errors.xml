@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Errors language="F#" implementationLanguage="F#">
+<Errors language="F#"
+        implementationLanguage="F#"
+        defaultResourceType="Strings"
+        forkTranslationForAllHighlightings="true">
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi;
@@ -14,92 +17,92 @@
   <SeverityConfiguration>
     <Group name="HighlightingGroupIds.CodeRedundancy">
       <Tag name="FSharpRedundantParens" default="WARNING">
-        <Title resourceName="RemoveRedundantParentheses" resourceType="Strings"/>
-        <Description resourceName="ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics" resourceType="Strings"/>
+        <Title resourceName="RemoveRedundantParentheses"/>
+        <Description resourceName="ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics"/>
       </Tag>
       <Tag name="FSharpRedundantOpen" default="WARNING">
-        <Title resourceName="RedundantOpenDirective" resourceType="Strings"/>
-        <Description resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemoved" resourceType="Strings"/>
+        <Title resourceName="RedundantOpenDirective"/>
+        <Description resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemoved"/>
       </Tag>
       <Tag name="FSharpRedundantBackticks" default="WARNING">
-        <Title resourceName="RedundantIdentifierEscaping" resourceType="Strings"/>
-        <Description resourceName="RedundantUseOfEscapingSequences" resourceType="Strings"/>
+        <Title resourceName="RedundantIdentifierEscaping"/>
+        <Description resourceName="RedundantUseOfEscapingSequences"/>
       </Tag>
       <Tag name="FSharpRedundantNameQualifier" default="WARNING">
-        <Title resourceName="RedundantNameQualifier" resourceType="Strings"/>
-        <Description resourceName="RedundantUseOfQualifierForName" resourceType="Strings"/>
+        <Title resourceName="RedundantNameQualifier"/>
+        <Description resourceName="RedundantUseOfQualifierForName"/>
       </Tag>
       <Tag name="FSharpRedundantNew" default="WARNING">
-        <Title resourceName="RedundantNewKeyword" resourceType="Strings"/>
-        <Description resourceName="NewKeywordIsNotRequiredAndCanBeSafelyRemoved" resourceType="Strings"/>
+        <Title resourceName="RedundantNewKeyword"/>
+        <Description resourceName="NewKeywordIsNotRequiredAndCanBeSafelyRemoved"/>
       </Tag>
       <Tag name="FSharpRedundantAttributeParens" default="WARNING">
-        <Title resourceName="RedundantAttributeParenthesesArgument" resourceType="Strings"/>
-        <Description resourceName="ParenthesesAreRedundantIfAttributeHasNoArguments" resourceType="Strings"/>
+        <Title resourceName="RedundantAttributeParenthesesArgument"/>
+        <Description resourceName="ParenthesesAreRedundantIfAttributeHasNoArguments"/>
       </Tag>
       <Tag name="FSharpRedundantAttributeSuffix" default="WARNING">
-        <Title resourceName="RedundantAttributeSuffix" resourceType="Strings"/>
-        <Description resourceName="RedundantAttributeSuffix1" resourceType="Strings"/>
+        <Title resourceName="RedundantAttributeSuffix"/>
+        <Description resourceName="RedundantAttributeSuffix1"/>
       </Tag>
       <Tag name="FSharpRedundantUnionCaseFieldPatterns" default="WARNING">
-        <Title resourceName="RedundantUnionCaseFieldsMatching" resourceType="Strings"/>
-        <Description resourceName="ExplicitFieldsMatchingIsRedundantAndCanBeReplacedWith" resourceType="Strings"/>
+        <Title resourceName="RedundantUnionCaseFieldsMatching"/>
+        <Description resourceName="ExplicitFieldsMatchingIsRedundantAndCanBeReplacedWith"/>
       </Tag>
       <Tag name="FSharpConsWithEmptyListPat" default="SUGGESTION">
-        <Title resourceName="RedundantConcatenationWithEmptyList" resourceType="Strings"/>
-        <Description resourceName="RedundantConcatenationWithEmptyList2" resourceType="Strings"/>
+        <Title resourceName="RedundantConcatenationWithEmptyList"/>
+        <Description resourceName="RedundantConcatenationWithEmptyList2"/>
       </Tag>
       <Tag name="FSharpRedundantApplication" default="WARNING">
-        <Title resourceName="RedundantApplication" resourceType="Strings"/>
-        <Description resourceName="ApplicationIsRedundantAndCanBeReplacedWithItsArgument" resourceType="Strings"/>
+        <Title resourceName="RedundantApplication"/>
+        <Description resourceName="ApplicationIsRedundantAndCanBeReplacedWithItsArgument"/>
       </Tag>
       <Tag name="FSharpRedundantRequireQualifiedAccessAttribute" default="WARNING">
-        <Title resourceName="RedundantRequireQualifiedAccessAttribute" resourceType="Strings"/>
-        <Description resourceName="EnumTypeAlwaysRequiresQualifiedAccess" resourceType="Strings"/>
+        <Title resourceName="RedundantRequireQualifiedAccessAttribute"/>
+        <Description resourceName="EnumTypeAlwaysRequiresQualifiedAccess"/>
       </Tag>
       <Tag name="FSharpLambdaCanBeSimplified" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeSimplified" resourceType="Strings"/>
-        <Description resourceName="LambdaExpressionCanBeSimplified3" resourceType="Strings"/>
+        <Title resourceName="LambdaExpressionCanBeSimplified"/>
+        <Description resourceName="LambdaExpressionCanBeSimplified3"/>
       </Tag>
       <Tag name="FSharpLambdaCanBeReplacedWithInnerExpression" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeReplacedWithInnerExpression" resourceType="Strings"/>
-        <Description resourceName="LambdaExpressionCanBeReplacedWithInnerExpression4" resourceType="Strings"/>
+        <Title resourceName="LambdaExpressionCanBeReplacedWithInnerExpression"/>
+        <Description resourceName="LambdaExpressionCanBeReplacedWithInnerExpression4"/>
       </Tag>
       <Tag name="FSharpBuiltinFunctionReimplementation" default="HINT">
-        <Title resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction" resourceType="Strings"/>
-        <Description resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction5" resourceType="Strings"/>
+        <Title resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction"/>
+        <Description resourceName="LambdaExpressionCanBeReplacedWithBuiltInFunction5"/>
       </Tag>
       <Tag name="FSharpUseWildSelfId" default="SUGGESTION">
-        <Title resourceName="UseSelfId" resourceType="Strings"/>
-        <Description resourceName="UseSelfId6" resourceType="Strings"/>
+        <Title resourceName="UseSelfId"/>
+        <Description resourceName="UseSelfId6"/>
       </Tag>
       <Tag name="FSharpRedundantStringInterpolation" default="SUGGESTION">
-        <Title resourceName="RedundantStringInterpolation" resourceType="Strings"/>
-        <Description resourceName="StringInterpolationExpressionWithoutArgumentsIsRedundant" resourceType="Strings"/>
+        <Title resourceName="RedundantStringInterpolation"/>
+        <Description resourceName="StringInterpolationExpressionWithoutArgumentsIsRedundant"/>
       </Tag>
       <Tag name="FSharpInterpolatedString" default="SUGGESTION">
-        <Title resourceName="FormatStringCanBeReplacedWithAnInterpolatedString" resourceType="Strings"/>
-        <Description resourceName="FormatStringCanBeReplacedWithAnInterpolatedString7" resourceType="Strings"/>
+        <Title resourceName="FormatStringCanBeReplacedWithAnInterpolatedString"/>
+        <Description resourceName="FormatStringCanBeReplacedWithAnInterpolatedString7"/>
       </Tag>
       <Tag name="FSharpExpressionCanBeReplacedWithCondition" default="HINT">
-        <Title resourceName="IfExpressionCanBeReplacedWithItsCondition" resourceType="Strings"/>
-        <Description resourceName="IfExpressionCanBeReplacedWithItsCondition8" resourceType="Strings"/>
+        <Title resourceName="IfExpressionCanBeReplacedWithItsCondition"/>
+        <Description resourceName="IfExpressionCanBeReplacedWithItsCondition8"/>
       </Tag>
       <Tag name="FSharpRedundantAsPattern" default="WARNING">
-        <Title resourceName="RedundantAsPattern" resourceType="Strings"/>
-        <Description resourceName="AsPatternCanBeReplacedWithItsName" resourceType="Strings"/>
+        <Title resourceName="RedundantAsPattern"/>
+        <Description resourceName="AsPatternCanBeReplacedWithItsName"/>
       </Tag>
       <Tag name="FSharpRedundantDotInIndexer" default="WARNING">
-        <Title resourceName="RedundantInIndexer" resourceType="Strings"/>
-        <Description resourceName="CanBeRemovedInIndexers" resourceType="Strings"/>
+        <Title resourceName="RedundantInIndexer"/>
+        <Description resourceName="CanBeRemovedInIndexers"/>
       </Tag>
       <Tag name="NestedRecordUpdateCanBeSimplified" default="SUGGESTION">
-        <Title resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
-        <Description resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+        <Title resourceName="NestedRecordUpdateCanBeSimplifiedMessage"/>
+        <Description resourceName="NestedRecordUpdateCanBeSimplifiedMessage"/>
       </Tag>
       <Tag name="FSharpDotLambdaCanBeUsed" default="HINT">
-        <Title resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
-        <Description resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
+        <Title resourceName="DotLambdaCanBeUsedStringMessage"/>
+        <Description resourceName="DotLambdaCanBeUsedStringMessage"/>
       </Tag>
     </Group>
   </SeverityConfiguration>
@@ -110,7 +113,7 @@
 
   <Warning name="UnusedOpen" configurableSeverity="FSharpRedundantOpen">
     <Parameter type="IOpenStatement" name="openStatement"/>
-    <Message resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemovedMessage" resourceType="Strings"/>
+    <Message resourceName="OpenDirectiveIsNotRequiredByTheCodeAndCanBeSafelyRemovedMessage"/>
     <Range>openStatement.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE"/>
     <QuickFix>RemoveUnusedOpensFix</QuickFix>
@@ -120,7 +123,7 @@
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message resourceName="ExtensionMemberInNonExtensionTypeLooksSuspiciousMessage" resourceType="Strings"/>
+    <Message resourceName="ExtensionMemberInNonExtensionTypeLooksSuspiciousMessage"/>
     <QuickFix>AddExtensionAttributeFix</QuickFix>
   </Warning>
 
@@ -128,14 +131,14 @@
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <Message resourceName="ExtensionTypeDoesnTHaveAnyExtensionMembersMessage" resourceType="Strings"/>
+    <Message resourceName="ExtensionTypeDoesnTHaveAnyExtensionMembersMessage"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionAttributeIsRedundant">
     <Parameter type="IAttribute" name="attribute"/>
     <Range>attribute.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <Message resourceName="ExtensionAttributeIsRedundantMessage" resourceType="Strings"/>
+    <Message resourceName="ExtensionAttributeIsRedundantMessage"/>
     <QuickFix>RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
@@ -143,21 +146,21 @@
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message resourceName="ExtensionMemberShouldBeStaticMessage" resourceType="Strings"/>
+    <Message resourceName="ExtensionMemberShouldBeStaticMessage"/>
   </Warning>
 
   <Warning name="RedundantRequireQualifiedAccessAttribute" configurableSeverity="FSharpRedundantRequireQualifiedAccessAttribute">
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantRequireQualifiedAccessAttributeMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantRequireQualifiedAccessAttributeMessage"/>
     <QuickFix>RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantBackticks" configurableSeverity="FSharpRedundantBackticks">
     <Parameter type="FSharpIdentifierToken" name="identifier"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantIdentifierEscapingMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantIdentifierEscapingMessage"/>
     <Range>identifier.GetHighlightingRange().StartOffsetRange().ExtendRight(2)</Range>
     <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :> _</SecondaryRanges>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
@@ -167,7 +170,7 @@
     <Parameter type="INewExpr" name="newExpr"/>
     <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="NewKeywordIsRedundantMessage" resourceType="Strings"/>
+    <Message resourceName="NewKeywordIsRedundantMessage"/>
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
 
@@ -175,14 +178,14 @@
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message resourceName="ConvertToUseBindingMessage" resourceType="Strings"/>
+    <Message resourceName="ConvertToUseBindingMessage"/>
     <QuickFix>ConvertToUseFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" configurableSeverity="FSharpRedundantParens" isSuppressedInTests="true">
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
@@ -191,7 +194,7 @@
   <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenPatFix</QuickFix>
@@ -200,7 +203,7 @@
   <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
     <Parameter type="IParenTypeUsage" name="parenTypeUsage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantParenthesesMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
     <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
@@ -210,7 +213,7 @@
     <Parameter type="IAttribute" name="attribute"/>
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage" resourceType="Strings"/>
+    <Message resourceName="ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage"/>
     <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
@@ -218,7 +221,7 @@
     <Parameter type="IAttribute" name="attribute"/>
     <Range>getAttributeSuffixRange attribute</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="AttributeSuffixIsRedundantMessage" resourceType="Strings"/>
+    <Message resourceName="AttributeSuffixIsRedundantMessage"/>
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
@@ -226,21 +229,21 @@
     <Parameter type="ITreeNode" name="treeNode"/>
     <Range>getQualifierRange treeNode</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="QualifierIsRedundantMessage" resourceType="Strings"/>
+    <Message resourceName="QualifierIsRedundantMessage"/>
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantUnionCaseFieldPatterns" configurableSeverity="FSharpRedundantUnionCaseFieldPatterns">
     <Parameter type="IParenPat" name="parenPat"/>
     <Range>parenPat.GetHighlightingRange()</Range>
-    <Message resourceName="RedundantUnionCaseFieldsMatchingMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantUnionCaseFieldsMatchingMessage"/>
     <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
   <Warning name="ConsWithEmptyListPat" configurableSeverity="FSharpConsWithEmptyListPat">
     <Parameter type="IListConsPat" name="listConsPat"/>
     <Range>listConsPat.GetHighlightingRange()</Range>
-    <Message resourceName="PatternCanBeSimplifiedMessage" resourceType="Strings"/>
+    <Message resourceName="PatternCanBeSimplifiedMessage"/>
     <QuickFix>SimplifyListConsPatFix</QuickFix>
   </Warning>
 
@@ -249,7 +252,7 @@
     <Parameter type="IFSharpExpression" name="argExpr"/>
     <Range>getFunctionApplicationRange appExpr</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="RedundantApplicationMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantApplicationMessage"/>
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
@@ -257,7 +260,7 @@
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
-    <Message resourceName="LambdaCanBeSimplifiedMessage" resourceType="Strings"/>
+    <Message resourceName="LambdaCanBeSimplifiedMessage"/>
     <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
@@ -265,9 +268,7 @@
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
-    </Message>
+    <Message>getLambdaCanBeReplacedWarningText replaceCandidate</Message>
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
@@ -275,24 +276,22 @@
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>sprintf "Lambda can be replaced with '%s'" funName</Argument>
-    </Message>
+    <Message>sprintf "Lambda can be replaced with '%s'" funName</Message>
     <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
   </Warning>
 
-  <Warning name="DotLambdaCanBeUsed" configurableSeverity="FSharpDotLambdaCanBeUsed">
+  <Warning name="DotLambdaCanBeUsed" configurableSeverity="FSharpDotLambdaCanBeUsed" forkTranslation="false">
     <Parameter type="ILambdaExpr" name="lambda"/>
     <Parameter type="IReferenceExpr" name="rootRefExpr"/>
     <Range>getTreeNodesDocumentRange lambda lambda.RArrow</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message resourceName="DotLambdaCanBeUsedStringMessage" resourceType="Strings"/>
+    <Message resourceName="DotLambdaCanBeUsedStringMessage"/>
     <QuickFix>ReplaceLambdaWithDotLambdaFix</QuickFix>
   </Warning>
 
   <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
     <Parameter type="INamedSelfId" name="selfId"/>
-    <Message resourceName="UseMessage" resourceType="Strings"/>
+    <Message resourceName="UseMessage"/>
     <Range>selfId.GetDocumentRange()</Range>
     <QuickFix>UseWildSelfIdFix</QuickFix>
   </Warning>
@@ -301,15 +300,17 @@
     <Parameter type="ILiteralExpr" name="formatStringExpr"/>
     <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
     <Parameter type="IFSharpExpression" name="outerPrefixAppExpr"/>
-    <Parameter type="(DocumentRange * IFSharpExpression) list" name="formatSpecsAndExprs" isValid="skip"/>
+    <Parameter type="string[]" name="formatSpecs" isCollection="true"/>
+    <Parameter type="int[]" name="specOffsets" isCollection="true"/>
+    <Parameter type="IFSharpExpression[]" name="expressions" isCollection="true"/>
     <Range>formatStringExpr.GetHighlightingRange()</Range>
-    <Message resourceName="FormatStringCanBeReplacedWithAnInterpolatedStringMessage" resourceType="Strings"/>
+    <Message resourceName="FormatStringCanBeReplacedWithAnInterpolatedStringMessage"/>
     <QuickFix>ReplaceWithInterpolatedStringFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantStringInterpolation" configurableSeverity="FSharpRedundantStringInterpolation">
     <Parameter type="IInterpolatedStringExpr" name="expr"/>
-    <Message resourceName="RedundantStringInterpolationMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantStringInterpolationMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>expr.GetDollarSignRange()</Range>
     <QuickFix>ReplaceWithRegularStringFix</QuickFix>
@@ -318,19 +319,14 @@
   <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
     <Parameter type="IIfThenElseExpr" name="expr"/>
     <Parameter type="bool" name="needsNegation"/>
-    <Message resourceName="Message" resourceType="Strings">
-      <Argument>
-        if needsNegation then "Expression can be replaced with condition negation"
-        else "Expression can be replaced with condition"
-      </Argument>
-    </Message>
+    <Message>if needsNegation then "Expression can be replaced with condition negation" else "Expression can be replaced with condition"</Message>
     <Range>expr.GetDocumentRange()</Range>
     <QuickFix>ReplaceWithConditionFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAsPattern" configurableSeverity="FSharpRedundantAsPattern">
     <Parameter type="IAsPat" name="asPat"/>
-    <Message resourceName="RedundantAsPatternMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantAsPatternMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getAsPatternRange asPat</Range>
     <QuickFix>RemoveRedundantAsPatFix</QuickFix>
@@ -338,17 +334,17 @@
 
   <Warning name="RedundantIndexerDot" configurableSeverity="FSharpRedundantDotInIndexer">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
-    <Message resourceName="RedundantMessage" resourceType="Strings"/>
+    <Message resourceName="RedundantMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getIndexerDotRange indexerExpr</Range>
     <QuickFix>RemoveIndexerDotFix</QuickFix>
   </Warning>
 
-  <Warning name="NestedRecordUpdateCanBeSimplified" configurableSeverity="NestedRecordUpdateCanBeSimplified">
+  <Warning name="NestedRecordUpdateCanBeSimplified" configurableSeverity="NestedRecordUpdateCanBeSimplified" forkTranslation="false">
     <Parameter type="IRecordFieldBinding" name="outerBinding"/>
     <Parameter type="IRecordFieldBinding" name="innerBinding"/>
-    <Parameter type="string list" name="fieldQualifiedName" isValid="skip"/>
-    <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage" resourceType="Strings"/>
+    <Parameter type="string[]" name="fieldQualifiedName" isValid="skip" isCollection="true"/>
+    <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getNestedRecordUpdateRange outerBinding innerBinding</Range>
     <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>

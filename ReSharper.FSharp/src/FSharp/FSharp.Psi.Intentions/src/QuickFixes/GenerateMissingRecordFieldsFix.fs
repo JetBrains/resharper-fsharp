@@ -1,9 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
 open System.Linq
 open JetBrains.Diagnostics
-open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -35,25 +34,17 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let declaredElement = reference.Resolve().DeclaredElement
         isNotNull declaredElement
 
-    override x.ExecutePsiTransaction(solution, _) =
+    override x.ExecutePsiTransaction(_, _) =
         let typeElement = recordExpr.Reference.Resolve().DeclaredElement :?> ITypeElement
         Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
 
         let generatedBindings = RecordExprUtil.generateBindings typeElement recordExpr
 
-        Action<_>(fun textControl ->
-            let templatesManager = LiveTemplatesManager.Instance
-            let endCaretPosition = recordExpr.RightBrace.GetDocumentEndOffset()
+        let hotspotInfos =
+            generatedBindings.ToArray()
+            |> Array.map (fun binding ->
+                let templateField = TemplateField(binding.ReferenceName.ShortName, SimpleHotspotExpression(null), 0)
+                HotspotInfo(templateField, binding.Expression.GetDocumentRange(), KeepExistingText = true))
 
-            let hotspotInfos =
-                generatedBindings.ToArray()
-                |> Array.map (fun binding ->
-                    let templateField = TemplateField(binding.ReferenceName.ShortName, SimpleHotspotExpression(null), 0)
-                    HotspotInfo(templateField, binding.Expression.GetDocumentRange(), KeepExistingText = true))
-
-            let hotspotSession =
-                templatesManager.CreateHotspotSessionAtopExistingText(
-                    solution, endCaretPosition, textControl,
-                    LiveTemplatesManager.EscapeAction.LeaveTextAndCaret, hotspotInfos)
-
-            hotspotSession.ExecuteAndForget())
+        let endCaretPosition = recordExpr.RightBrace.GetDocumentEndOffset()
+        BulbActionCommands.ShowHotspotSession(hotspotInfos, endCaretPosition)

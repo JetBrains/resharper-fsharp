@@ -11,7 +11,7 @@ module IntroduceVarFix =
     let [<Literal>] introduceVarOutsideLambdaText = "Introduce 'let' binding outside lambda"
 
 type IntroduceVarFix(node: IFSharpTypeOwnerNode, removeExpr, escapeLambdas, addMutable, text) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpLegacyQuickFixBase()
 
     let mutable expr = node.As<IFSharpExpression>()
 

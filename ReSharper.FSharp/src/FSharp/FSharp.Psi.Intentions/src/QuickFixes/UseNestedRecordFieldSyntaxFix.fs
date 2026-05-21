@@ -4,7 +4,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWarning) =
@@ -37,6 +36,7 @@ type UseNestedRecordFieldSyntaxFix(warning: NestedRecordUpdateCanBeSimplifiedWar
             | [] -> []
             | _ -> findRequiredQualifierForRecordField outerBinding |> Option.defaultValue []
 
-        let newBinding = factory.CreateRecordFieldBinding(fieldQualifier @ fieldName, isNotNull outerBinding.Semicolon)
+        let qualifiedName = fieldQualifier @ List.ofArray fieldName
+        let newBinding = factory.CreateRecordFieldBinding(qualifiedName, isNotNull outerBinding.Semicolon)
         replace newBinding.Expression (innerBinding.Expression.IgnoreInnerParens())
         replace outerBinding newBinding

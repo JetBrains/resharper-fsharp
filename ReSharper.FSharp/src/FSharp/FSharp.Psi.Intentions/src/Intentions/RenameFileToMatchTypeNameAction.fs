@@ -14,7 +14,7 @@ open JetBrains.Util
 [<ContextAction(GroupType = typeof<FSharpContextActions>, Name = "Match file name with type name", Priority = 1s,
                 Description = "Renames current file to match the name of the single type or a top-level module.")>]
 type RenameFileToMatchTypeNameAction(dataProvider: FSharpContextActionDataProvider) =
-    inherit FSharpContextActionBase(dataProvider)
+    inherit FSharpLegacyContextActionBase()
 
     let isApplicable (typeElement: ITypeElement) =
         let types = HashSet()

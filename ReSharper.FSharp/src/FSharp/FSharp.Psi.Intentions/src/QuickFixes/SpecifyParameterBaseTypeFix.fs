@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open FSharp.Compiler.Symbols
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
-open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands.Menu
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -11,8 +11,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 open JetBrains.UI.RichText
 
 module SpecifyParameterBaseTypeFix =
@@ -30,9 +30,9 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
     let pat =
         if not refExpr.IsSimpleName then null else
 
-          refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
+        refExpr.Reference.Resolve().DeclaredElement.As<ILocalReferencePat>()
 
-    let mutable baseType: FSharpType option = None
+    let solution = refExpr.GetSolution()
 
     let getFcsEntity (typeUsage: ITypeUsage) =
         let namedTypeUsage = typeUsage.As<INamedTypeUsage>()
@@ -119,21 +119,16 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
         )
         |> Option.defaultValue false
 
-    override this.ExecutePsiTransaction _ =
+    member this.Execute fcsType =
         use writeCookie = WriteLockCookie.Create(pat.IsPhysical())
 
-        TypeAnnotationUtil.specifyPatternType baseType.Value pat
+        TypeAnnotationUtil.specifyPatternType fcsType pat
+        null
 
-    override this.Execute(solution, textControl) =
+    override x.GetCommandSequence() =
         let fcsEntity, displayContext = getFcsEntity typeUsage |> Option.get
-        let superTypes = getSuperTypes fcsEntity
-        baseType <- this.SelectType(superTypes, displayContext, solution, textControl)
+        let typeNames = getSuperTypes fcsEntity
 
-        if baseType.IsSome then
-            base.Execute(solution, textControl)
-
-    member x.SelectType(typeNames: (FSharpType * bool) list, displayContext: FSharpDisplayContext, solution: ISolution,
-            textControl: ITextControl) =
         let occurrences =
             typeNames
             |> List.map (fun (fcsType, isImmediateSuperType) ->
@@ -150,13 +145,8 @@ type SpecifyParameterBaseTypeFix(refExpr: IReferenceExpr, typeUsage: ITypeUsage)
                 let richText = RichText(fcsType.Format(displayContext))
                 if isImmediateSuperType then
                     richText.SetStyle(JetFontStyles.Bold, 0, richText.Length) |> ignore
-                WorkflowPopupMenuOccurrence(richText, RichText.Empty, fcsType, icon))
+                BulbActionCommandMenuItem<_>(Text = richText, Data = fcsType, Icon = icon)
+            )
             |> List.toArray
 
-        let occurrence =
-            let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
-            popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null)
-
-        occurrence
-        |> Option.ofObj
-        |> Option.bind (fun occurrence -> occurrence.Entities |> Seq.tryHead)
+        BulbActionCommandSequence.From(x.ShowMenuAndExecute(occurrences, x.Execute))

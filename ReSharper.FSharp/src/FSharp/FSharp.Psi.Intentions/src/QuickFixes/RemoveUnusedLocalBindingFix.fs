@@ -1,17 +1,14 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 
 type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     inherit FSharpQuickFixBase()
@@ -119,7 +116,6 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
             ModificationUtil.DeleteChildRange(rangeToDelete)
 
-            Action<_>(fun textControl ->
-                let anchorIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
-                let offset = letBindings.Bindings[anchorIndex].GetDocumentRange().EndOffset
-                textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))
+            let anchorIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
+            let binding = letBindings.Bindings[anchorIndex]
+            BulbActionCommands.SetCaretAfter(binding)

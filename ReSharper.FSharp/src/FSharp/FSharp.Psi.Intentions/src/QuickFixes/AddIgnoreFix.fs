@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type AddIgnoreFix(node: IFSharpTypeOwnerNode) =
-    inherit FSharpModernQuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let expr = node.As<IFSharpExpression>()
 
@@ -65,7 +65,7 @@ type AddIgnoreFix(node: IFSharpTypeOwnerNode) =
             let occurrences =
                 [| innerExpression, text
                    expr, "Whole expression" |]
-            x.SelectExpression(occurrences, addIgnore)
+            x.ShowMenuAndExecute(occurrences, addIgnore)
 
         | _ -> base.GetCommandSequence()
 

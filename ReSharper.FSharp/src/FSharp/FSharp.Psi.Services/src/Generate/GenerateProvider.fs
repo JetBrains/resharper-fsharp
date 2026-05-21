@@ -233,8 +233,8 @@ type FSharpOverridingMembersBuilder() =
             |> GenerateOverrides.sanitizeMembers
 
         let addedMembers = GenerateOverrides.addMembers inputElements typeDecl anchor
-        let selectedRange = GenerateOverrides.getGeneratedSelectionTreeRange addedMembers
-        context.SetSelectedRange(selectedRange)
+        let expr = GenerateOverrides.getGeneratedBodyToSelect addedMembers
+        context.SetSelectedRange(expr.GetTreeTextRange())
 
 
 [<Language(typeof<FSharpLanguage>)>]

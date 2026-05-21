@@ -25,7 +25,7 @@ type RecordExprAnalyzer() =
 
         if isNull innerFieldBinding.Expression then ()
         elif not (innerFieldBinding.ReferenceName.Reference.GetFcsSymbol() :? FSharpField) then () else
-        let qualifiedFieldName = qualifiedFieldNameReversed |> List.rev
+        let qualifiedFieldName = qualifiedFieldNameReversed |> Array.ofList |> Array.rev
         consumer.AddHighlighting(NestedRecordUpdateCanBeSimplifiedWarning(outerFieldBinding, innerFieldBinding, qualifiedFieldName))
 
     let rec compareReferenceExprs (x: IReferenceExpr) (y: IReferenceExpr) =

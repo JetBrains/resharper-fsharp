@@ -1,16 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
-
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
 [<RequireQualifiedAccess>]
@@ -50,7 +47,4 @@ type AddMatchAllClauseFix(expr: IMatchLikeExpr, generatedExpr: GeneratedClauseEx
             let refExpr = ctorExpr.FunctionExpression :?> IReferenceExpr
             FSharpBindUtil.bindDeclaredElementToReference expr refExpr.Reference exnTypeElement ""
 
-        Action<_>(fun textControl ->
-            let range = clause.Expression.GetDocumentRange()
-            textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
-            textControl.Selection.SetRange(range))
+        BulbActionCommands.SetSelection(clause.Expression)

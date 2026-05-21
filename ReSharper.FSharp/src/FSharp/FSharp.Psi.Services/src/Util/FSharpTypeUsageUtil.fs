@@ -44,8 +44,7 @@ let setFcsParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (m
 
     setParametersOwnerReturnTypeNoBind decl fcsReturnType
 
-let setFcsParametersOwnerReturnType (decl: IFSharpTypeOwnerDeclaration) =
-    let mfv = decl.GetFcsSymbolUse().Symbol.As<FSharpMemberOrFunctionOrValue>()
+let setFcsParametersOwnerReturnType (mfv: FSharpMemberOrFunctionOrValue) (decl: IFSharpTypeOwnerDeclaration) =
     let fcsReturnType, returnTypeUsage = setFcsParametersOwnerReturnTypeNoBind decl mfv
     TypeAnnotationUtil.bindAnnotations [ fcsReturnType, returnTypeUsage ]
 

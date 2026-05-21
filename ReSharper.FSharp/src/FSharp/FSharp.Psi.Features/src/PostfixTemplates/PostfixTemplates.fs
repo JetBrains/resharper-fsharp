@@ -1,10 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
 open JetBrains.Application.Parts
-open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
@@ -290,6 +290,9 @@ type FSharpPostfixTemplateBehaviorBase(info) =
     member this.GetExpression(context: PostfixExpressionContext) =
         let node = context.Expression :?> IFSharpTreeNode
         FSharpPostfixTemplates.removeTemplateAndGetParentExpression node
+
+    member this.RunAndForget(command: IBulbActionCommand, textControl) =
+        command.RunAndForget(info.ExecutionContext.Solution, textControl, info.Text)
 
 
 [<AbstractClass>]

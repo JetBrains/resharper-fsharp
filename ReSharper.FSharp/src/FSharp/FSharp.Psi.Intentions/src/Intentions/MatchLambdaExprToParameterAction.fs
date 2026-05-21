@@ -1,8 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
 open FSharp.Compiler.Symbols
-open JetBrains.ReSharper.Feature.Services.Bulbs
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -85,7 +84,5 @@ type MatchLambdaExprToParameterAction(dataProvider) =
         let nodes: ITreeNode list = [parameterDecl; matchExpr.Expression]
         hotspotsRegistry.Register(nodes, NameSuggestionsExpression(names))
 
-        Action<_>(fun texControl ->
-            let offset = parameterDecl.GetDocumentEndOffset()
-            BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, offset).Invoke(texControl)
-        )
+        let endCaretPosition = parameterDecl.GetDocumentEndOffset()
+        BulbActionCommands.ShowHotspotSession(hotspotsRegistry, endCaretPosition)
