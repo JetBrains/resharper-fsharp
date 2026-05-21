@@ -16,6 +16,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.Feature.Services.BulbActions.Commands
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -507,5 +508,11 @@ module FSharpTestPopup =
                     occurrences
                     |> Seq.tryLast
                     |> Option.defaultValue null
+            )
+        )
+
+        BulbActionExecutorTestUtil.RegisterContextConfigurer(lifetime, solution,
+            _.add_OnSessionStarted(
+                _.UserData.PutData(BulbActionExecutorTestUtil.BulbMenuItemOccurrenceTextKey, occurrenceName)
             )
         )
