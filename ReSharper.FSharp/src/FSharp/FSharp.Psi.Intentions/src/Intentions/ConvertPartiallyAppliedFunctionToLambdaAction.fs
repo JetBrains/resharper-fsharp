@@ -1,8 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
 open JetBrains.Diagnostics
-open JetBrains.ReSharper.Feature.Services.Bulbs
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -175,7 +173,5 @@ type ConvertPartiallyAppliedFunctionToLambdaAction(dataProvider: FSharpContextAc
             hotspotsRegistry.Register(nodes, nameExpression)
         )
 
-        Action<_>(fun textControl ->
-            let endOffset = bodyExpr.GetDocumentStartOffset()
-            BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, endOffset).Invoke(textControl)
-        )
+        let endCaretPosition = bodyExpr.GetDocumentStartOffset()
+        BulbActionCommands.ShowHotspotSession(hotspotsRegistry, endCaretPosition)

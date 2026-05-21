@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 open JetBrains.Util
 
 [<ContextAction(Name = "IfToElif", GroupType = typeof<FSharpContextActions>, Description = "Converts `if` expression to 'elif'")>]
@@ -47,5 +46,4 @@ type IfToElifAction(dataProvider: FSharpContextActionDataProvider) =
         let elifExpr = ModificationUtil.ReplaceChild(ifExpr, ElementType.ELIF_EXPR.Create())
         LowLevelModificationUtil.AddChild(elifExpr, ifExpr.Children().AsArray())
 
-        Action<_>(fun textControl ->
-            textControl.Caret.MoveTo(elifExpr.GetDocumentStartOffset(), CaretVisualPlacement.DontScrollIfVisible))
+        BulbActionCommands.SetCaretBefore(elifExpr)

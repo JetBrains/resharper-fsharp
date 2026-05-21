@@ -2,13 +2,13 @@
 
 open System.Text
 open JetBrains.Metadata.Reader.API
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -45,11 +45,12 @@ module ReplaceWithInterpolatedStringFix =
          | _ -> false
 
 type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarning) =
-    inherit FSharpScopedQuickFixBase(warning.FormatStringExpr)
+    inherit FSharpScopedNonIncrementalQuickFixBase(warning.FormatStringExpr)
 
     let outerPrefixAppExpr = warning.OuterPrefixAppExpr
     let prefixAppExpr = warning.PrefixAppExpr
     let formatStringExpr = warning.FormatStringExpr
+    let isSprintf = isPredefinedFunctionRef "sprintf" prefixAppExpr.FunctionExpression
 
     override this.Text = "To interpolated string"
 
@@ -57,15 +58,14 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         isValid formatStringExpr
 
     override this.ExecutePsiTransaction _ =
+        use prohibitTypeCheckCookie = ProhibitTypeCheckCookie.Create()
         use writeCookie = WriteLockCookie.Create(formatStringExpr.IsPhysical())
 
         let appliedExprFormatSpecs =
-            let startOffset = formatStringExpr.GetDocumentRange().StartOffset.Offset
-
-            warning.FormatSpecsAndExprs
-            |> Seq.map (fun (specifierRange, expr) ->
-                let index = specifierRange.EndOffset.Offset - startOffset
-                index, InsertInterpolation(specifierRange.GetText(), expr))
+            (warning.SpecOffsets, warning.FormatSpecs, warning.Expressions)
+            |||> Seq.zip3
+            |> Seq.map (fun (index, specifier, expr) ->
+                index, InsertInterpolation(specifier, expr))
 
         let formatString = formatStringExpr.GetText()
 
@@ -116,10 +116,12 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
         interpolatedSb.Insert(0, '$') |> ignore
         let interpolatedStringExpr = factory.CreateExpr(interpolatedSb.ToString())
 
-        if isPredefinedFunctionRef "sprintf" prefixAppExpr.FunctionExpression then
+        if isSprintf then
             let newChild = ModificationUtil.ReplaceChild(outerPrefixAppExpr, interpolatedStringExpr)
             if not (isWhitespace (newChild.GetPreviousToken())) then
                 ModificationUtil.AddChildBefore(newChild, Whitespace()) |> ignore
         else
             ModificationUtil.ReplaceChild(formatStringExpr, interpolatedStringExpr) |> ignore
             ModificationUtil.ReplaceChild(outerPrefixAppExpr, prefixAppExpr) |> ignore
+
+    override this.IsReanalysisRequired = false

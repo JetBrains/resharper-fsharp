@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Resources.Shell
 
@@ -47,5 +46,5 @@ and NewObjPostfixTemplateBehavior(info) =
         )
 
     override this.AfterComplete(textControl, node, _) =
-        let objExpr = node :?> IObjExpr
-        GenerateOverrides.selectObjExprMemberOrCallCompletion objExpr textControl
+        let command = GenerateOverrides.selectObjExprMemberOrCallCompletion (downcast node)
+        this.RunAndForget(command, textControl)

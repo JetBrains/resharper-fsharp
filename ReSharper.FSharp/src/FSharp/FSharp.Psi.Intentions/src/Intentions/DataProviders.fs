@@ -5,11 +5,21 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ContentModel
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
 type FSharpContextActionDataProvider(solution, textControl, fsFile) =
     inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, fsFile)
+    
+    interface ISupportsContentModelForkTranslation with
+        member this.TryTranslateToCurrentFork(translator) =
+            match translator.TryTranslateNodeToCurrentFork(this.PsiFile) with
+            | null -> null
+            | fileInFork ->
+    
+            let textControlInFork = translator.TranslateTextControl(this.TextControl)
+            FSharpContextActionDataProvider(this.Solution, textControlInFork, fileInFork)
 
 
 [<ContextActionDataBuilder(typeof<FSharpContextActionDataProvider>)>]

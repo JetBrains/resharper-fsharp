@@ -5,6 +5,8 @@ open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Symbols
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Feature.Services.BulbActions
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -12,7 +14,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -27,7 +28,6 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.TextControl
 
 let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     let sameParamNumberMembersGroups =
@@ -177,14 +177,14 @@ let noEmptyLineAnchors =
 let getThisOrPreviousMeaningfulSibling (node: ITreeNode) =
     if isNotNull node && node.IsFiltered() then node.GetPreviousMeaningfulSibling() else node
 
-let getGeneratedSelectionTreeRange (addedMembers: IMemberDeclaration seq) =
+let getGeneratedBodyToSelect (addedMembers: IMemberDeclaration seq) =
     match Seq.tryHead addedMembers with
-    | None -> TreeTextRange.InvalidRange
+    | None -> null
     | Some memberDecl ->
 
     match Seq.tryHead memberDecl.AccessorDeclarationsEnumerable with
-    | Some accessorDecl -> accessorDecl.Expression.GetTreeTextRange()
-    | _ -> memberDecl.Expression.GetTreeTextRange()
+    | Some accessorDecl -> accessorDecl.Expression
+    | _ -> memberDecl.Expression
 
 let private getObjectTypeReprAnchor (objectTypeRepr: IObjectModelTypeRepresentation) (psiView: IPsiView) =
     let node = psiView.GetSelectedTreeNode()
@@ -505,17 +505,11 @@ let convertToObjectExpression (factory: IFSharpElementFactory) (psiModule: IPsiM
 
     objExpr
 
-let selectObjExprMemberOrCallCompletion (objExpr: IObjExpr) (textControl: ITextControl) =
+let selectObjExprMemberOrCallCompletion (objExpr: IObjExpr) : IBulbActionCommand =
     match objExpr.MemberDeclarationsEnumerable |> Seq.tryHead with
-    | Some decl ->
-        let memberDecl = decl.As<IMemberDeclaration>()
-        if isNull memberDecl then () else
+    | Some(:? IMemberDeclaration as decl) ->
+        BulbActionCommands.SetSelection(decl.Expression)
 
-        let expr = memberDecl.Expression
-        textControl.Caret.MoveTo(expr.GetDocumentEndOffset(), CaretVisualPlacement.DontScrollIfVisible)
-        textControl.Selection.SetRange(expr.GetDocumentRange())
-
-    | None ->
-        let rBraceOffset = objExpr.RightBrace.GetDocumentStartOffset()
-        textControl.Caret.MoveTo(rBraceOffset - 1, CaretVisualPlacement.DontScrollIfVisible)
-        textControl.RescheduleCompletion(objExpr.GetSolution())
+    | _ ->
+        let offset = objExpr.RightBrace.GetDocumentStartOffset() - 1
+        BulbActionCommands.ShowCodeCompletionPopup(offset, FSharpLanguage.Instance, AutopopupType.SoftAutopopup)

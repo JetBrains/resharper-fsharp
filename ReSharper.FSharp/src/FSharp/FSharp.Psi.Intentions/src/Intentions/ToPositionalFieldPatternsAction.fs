@@ -1,20 +1,17 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
-open JetBrains.ReSharper.Feature.Services.Bulbs
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -87,6 +84,5 @@ type ToPositionalFieldPatternsAction(dataProvider: FSharpContextActionDataProvid
                 let rangeMarker = itemPat.GetDocumentRange().CreateRangeMarker()
                 hotspotsRegistry.Register(rangeMarker, nameSuggestionsExpression)
 
-        Action<_>(fun textControl ->
-            BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, replacedPat.GetDocumentEndOffset()).Invoke(textControl)
-        )
+        let endCaretPosition = replacedPat.GetDocumentEndOffset()
+        BulbActionCommands.ShowHotspotSession(hotspotsRegistry, endCaretPosition)

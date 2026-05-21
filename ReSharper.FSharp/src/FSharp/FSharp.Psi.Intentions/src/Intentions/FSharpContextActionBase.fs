@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Psi.Tree
 
 [<AbstractClass>]
 type FSharpContextActionBase(dataProvider: FSharpContextActionDataProvider) =
-    inherit ContextActionBase()
+    inherit ModernContextActionBase()
 
     abstract ExecutePsiTransaction: ISolution -> unit
     default x.ExecutePsiTransaction _ = ()
@@ -17,3 +17,14 @@ type FSharpContextActionBase(dataProvider: FSharpContextActionDataProvider) =
 
     member x.IsAtTreeNode(node: ITreeNode) =
         isAtTreeNode dataProvider node
+
+[<AbstractClass>]
+type FSharpLegacyContextActionBase() =
+    inherit ContextActionBase()
+
+    abstract ExecutePsiTransaction: ISolution -> unit
+    default x.ExecutePsiTransaction _ = ()
+
+    override x.ExecutePsiTransaction(solution, _) =
+        x.ExecutePsiTransaction(solution)
+        null

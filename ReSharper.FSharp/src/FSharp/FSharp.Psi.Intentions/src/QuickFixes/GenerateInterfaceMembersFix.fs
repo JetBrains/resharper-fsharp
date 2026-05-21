@@ -1,8 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler.Symbols
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
@@ -16,7 +16,6 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 
 type FSharpGeneratorMfvElement(mfv, displayContext, substitution, addTypes) =
     new (mfvInstance: FcsMfvInstance, addTypes) =
@@ -171,10 +170,5 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
                 impl.WithKeyword
 
         let addedMembers = GenerateOverrides.addMembers membersToGenerate typeDeclaration anchor
-
-        Action<_>(fun textControl ->
-            let treeTextRange = GenerateOverrides.getGeneratedSelectionTreeRange addedMembers
-            if treeTextRange.IsValid() then
-                let documentRange = anchor.GetContainingFile().GetDocumentRange(treeTextRange)
-                textControl.Caret.MoveTo(documentRange.StartOffset, CaretVisualPlacement.DontScrollIfVisible)
-                textControl.Selection.SetRange(documentRange))
+        let expr = GenerateOverrides.getGeneratedBodyToSelect addedMembers
+        BulbActionCommands.SetSelection(expr)

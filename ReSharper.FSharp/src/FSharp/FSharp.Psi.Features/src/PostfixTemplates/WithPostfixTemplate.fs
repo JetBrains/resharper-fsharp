@@ -2,12 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
 open JetBrains.Application.Threading
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.BulbActions
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -16,7 +17,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 open JetBrains.UI.RichText
 
 module WithPostfixTemplate =
@@ -152,6 +152,8 @@ and WithPostfixTemplateBehavior(info) =
 
             let innermostExpr = WithPostfixTemplate.getInnermostRecordExpr recordExpr
             let range = innermostExpr.GetDocumentRange()
-            textControl.Caret.MoveTo(range.EndOffset - 2, CaretVisualPlacement.DontScrollIfVisible)
-            textControl.RescheduleCompletion(solution)
+            
+            let offset = range.EndOffset - 2
+            let command = BulbActionCommands.ShowCodeCompletionPopup(offset, FSharpLanguage.Instance, AutopopupType.SoftAutopopup)
+            x.RunAndForget(command, textControl)
         ) |> ignore

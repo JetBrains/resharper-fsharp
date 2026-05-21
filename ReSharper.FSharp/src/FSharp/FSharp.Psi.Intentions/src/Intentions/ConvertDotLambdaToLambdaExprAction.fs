@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
-open System
-open JetBrains.ReSharper.Feature.Services.Bulbs
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -9,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -89,7 +87,5 @@ type ConvertDotLambdaToLambdaExprAction(dataProvider: FSharpContextActionDataPro
         let nodes = [pattern :> ITreeNode; qualifierExpr]
         hotspotsRegistry.Register(nodes, NameSuggestionsExpression(names))
 
-        Action<_>(fun texControl ->
-            let offset = bodyExpr.GetDocumentStartOffset()
-            BulbActionUtils.ExecuteHotspotSession(hotspotsRegistry, offset).Invoke(texControl)
-        )
+        let endCaretPosition = bodyExpr.GetDocumentStartOffset()
+        BulbActionCommands.ShowHotspotSession(hotspotsRegistry, endCaretPosition)

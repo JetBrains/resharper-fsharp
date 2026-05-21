@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions.Deconstruction
@@ -15,6 +17,7 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
             match DeconstructionFromUnionCaseFields.TryCreate(pattern, false) with
             | null -> None
             | d -> Some(pattern, d)
+
         isNotNull deconstruction
 
     override this.IsAvailable _ =
@@ -34,5 +37,8 @@ type DeconstructPatternFix(error: UnionCaseExpectsTupledArgumentsError) =
     override x.ExecutePsiTransaction(_, _) =
         match deconstruction with
         | Some(pattern, deconstruction) ->
-            FSharpDeconstruction.deconstruct true null deconstruction pattern
-        | _ -> failwithf ""
+            match FSharpDeconstructionImpl.deconstructImpl true deconstruction pattern with
+            | Some(hotspotsRegistry, _) ->
+                BulbActionCommands.ShowHotspotSession(hotspotsRegistry, DocumentOffset.InvalidOffset)
+            | _ -> null
+        | _ -> null

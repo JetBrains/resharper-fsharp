@@ -1,19 +1,17 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
 open System.Collections.Generic
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
+open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.MatchTree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.TextControl
 open JetBrains.Util
 
 [<AbstractClass>]
@@ -51,16 +49,14 @@ type AddMissingMatchClausesFixBase(warning: MatchIncompleteWarning) =
         let deconstructions = this.GetGenerationDeconstructions(value, deconstructions)
         MatchTree.generateClauses matchExpr value nodes deconstructions
 
-        Action<_>(fun textControl ->
-            lastClause
-            |> Option.iter (fun (clause: IMatchClause) ->
-                let newClause = clause.GetNextMeaningfulSibling().As<IMatchClause>()
-                if isNotNull newClause then
-                    let range = newClause.Expression.GetDocumentRange()
-                    textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
-                    textControl.Selection.SetRange(range)
-            )
+        lastClause
+        |> Option.map (fun (clause: IMatchClause) ->
+            match clause.GetNextMeaningfulSibling() with
+            | :? IMatchClause as newClause ->
+                BulbActionCommands.SetSelection(newClause.Expression.GetDocumentRange())
+            | _ -> null
         )
+        |> Option.defaultValue null
 
 
 type AddMissingPatternsFix(warning: MatchIncompleteWarning) =

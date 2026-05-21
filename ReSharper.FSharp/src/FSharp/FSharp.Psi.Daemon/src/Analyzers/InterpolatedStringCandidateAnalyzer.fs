@@ -110,12 +110,10 @@ type InterpolatedStringCandidateAnalyzer() =
 
         if anyDisallowedExprs then () else
 
-        let formatSpecsAndExprs =
-            appliedExprs
-            |> Seq.rev
-            |> Seq.zip matchingFormatSpecsAndArity
-            |> Seq.map (fun ((r, _), expr) -> r, expr)
-            |> List.ofSeq
+        let exprs = appliedExprs |> Seq.rev |> Array.ofSeq
+        let formatSpecs = matchingFormatSpecsAndArity |> Seq.map fst
+        let offsets = formatSpecs |> Seq.map (fun range -> range.EndOffset.Offset - literalExpr.GetDocumentStartOffset().Offset) |> Array.ofSeq
+        let formatSpecs = formatSpecs |> Seq.map _.GetText() |> Array.ofSeq
 
-        InterpolatedStringCandidateWarning(literalExpr, prefixAppExpr, outerPrefixAppExpr, formatSpecsAndExprs)
+        InterpolatedStringCandidateWarning(literalExpr, prefixAppExpr, outerPrefixAppExpr, formatSpecs, offsets, exprs)
         |> consumer.AddHighlighting

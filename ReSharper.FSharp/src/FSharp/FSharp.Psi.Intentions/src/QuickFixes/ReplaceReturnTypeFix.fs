@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
@@ -83,6 +84,14 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
         isNull returnTypeUsage || canUpdateReturnType returnTypeUsage
 
     override this.ExecutePsiTransaction _ =
+        let decls =
+            decl.DeclaredElement.GetDeclarations()
+            |> Seq.map (fun decl ->
+                let fsDecl = decl :?> IFSharpDeclaration
+                let mfv = fsDecl.GetFcsSymbol().As<FSharpMemberOrFunctionOrValue>()
+                fsDecl, mfv
+            )
+
         use writeCookie = WriteLockCookie.Create(decl.IsPhysical())
 
         let paramCount =
@@ -90,7 +99,7 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
             | :? IParameterOwnerMemberDeclaration as paramOwnerDecl -> paramOwnerDecl.ParametersDeclarations.Count
             | _ -> 0
 
-        for originalDecl in decl.DeclaredElement.GetDeclarations() do
+        for originalDecl, fcsSymbol in decls do
             let decl = unwrapDecl originalDecl
             if isNull decl then () else
 
@@ -101,7 +110,7 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
                     lambdaParametersCount
 
             if isNull decl.TypeUsage then
-                FSharpTypeUsageUtil.setFcsParametersOwnerReturnType decl
+                FSharpTypeUsageUtil.setFcsParametersOwnerReturnType fcsSymbol decl
 
             let typeUsage =
                 let pat = originalDecl.As<IReferencePat>()
