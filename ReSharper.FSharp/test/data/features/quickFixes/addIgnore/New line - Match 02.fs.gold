@@ -1,4 +1,6 @@
-﻿let x =
+﻿//${OCCURRENCE:Whole expression}
+
+let x =
     match () with
     | _ ->
         1
