@@ -1,11 +1,11 @@
 <Project>
   <Sdk Name="JetBrains.Build.VersionLockFileTargets" Version="0.0.4" />
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj' and '$(Configuration)'!='Release'">
     <DefineConstants>TRACE;DEBUG;JET_MODE_ASSERT</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj' and '$(Configuration)'=='Release'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
