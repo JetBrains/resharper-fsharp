@@ -1,13 +1,34 @@
 ﻿## GotoDeclarationProvider activity:
-  Immediate result:
-    TO: [O] | |A| of int RANGE: (15,16) @ Union - Case - Single - Fields 01 - Pattern.fs
+  Show context popup menu `Declarations of union case 'A'`:
+    TO: [O] | |A| of int RANGE: (30,31) @ Union - Case - Single - Fields 01 - Pattern.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Union - Case - Single - Fields 01 - Pattern.fs<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: | **A** of int
     Navigation result:
       opened file: Union - Case - Single - Fields 01 - Pattern.fs
       ------------------
+
       type U =
           | |CARET|A of int
 
       match A 123 with
+      ------------------
+
+    TO: [O] | |A| of int RANGE: (30,31) @ Union - Case - Single - Fields 01 - Pattern.fsi
+    Menu item (enabled) :
+      icon: FsharpSignature
+      text: Union - Case - Single - Fields 01 - Pattern.fsi<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: | **A** of int
+    Navigation result:
+      opened file: Union - Case - Single - Fields 01 - Pattern.fsi
+      ------------------
+
+      type U =
+          | |CARET|A of int
+
       ------------------
 
 

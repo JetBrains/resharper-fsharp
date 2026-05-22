@@ -97,7 +97,7 @@ type NameSuggestionFromAsInstanceOfRule() =
             isNotNull isInstType &&
 
             let typeElement = isInstType.GetTypeElement()
-            isNotNull typeElement && typeElement.IsUnion()
+            isNotNull typeElement && typeElement.IsFSharpUnion()
 
         collector.RemoveWhere(fun item ->
             match item with

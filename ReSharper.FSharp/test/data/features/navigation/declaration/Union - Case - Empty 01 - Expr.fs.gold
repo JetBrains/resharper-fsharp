@@ -1,9 +1,31 @@
 ﻿## GotoDeclarationProvider activity:
-  Immediate result:
-    TO: [O] | |A| RANGE: (15,16) @ Union - Case - Empty 01 - Expr.fs
+  Show context popup menu `Declarations of union case 'A'`:
+    TO: [O] | |A| RANGE: (30,31) @ Union - Case - Empty 01 - Expr.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Union - Case - Empty 01 - Expr.fs<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: | **A**
     Navigation result:
       opened file: Union - Case - Empty 01 - Expr.fs
       ------------------
+
+      type U =
+          | |CARET|A
+          | B
+
+      ------------------
+
+    TO: [O] | |A| RANGE: (30,31) @ Union - Case - Empty 01 - Expr.fsi
+    Menu item (enabled) :
+      icon: FsharpSignature
+      text: Union - Case - Empty 01 - Expr.fsi<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: | **A**
+    Navigation result:
+      opened file: Union - Case - Empty 01 - Expr.fsi
+      ------------------
+
       type U =
           | |CARET|A
           | B

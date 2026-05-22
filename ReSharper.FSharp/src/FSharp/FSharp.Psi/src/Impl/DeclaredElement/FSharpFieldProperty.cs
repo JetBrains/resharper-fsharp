@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         : null;
     }
 
-    public int Index => GetDeclaration()?.Index ?? -1;
+    public override int Index => GetDeclaration()?.Index ?? -1;
   }
 
   /// Record field compiled to a property.
@@ -87,6 +87,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         ? new FSharpGeneratedParameter(constructor, this, false)
         : null;
 
-    public int Index => throw new System.NotImplementedException();
+    public virtual int Index => throw new System.NotImplementedException();
+
+    public override DeclaredElementType FSharpElementType => CLRDeclaredElementType.FIELD;
   }
 }

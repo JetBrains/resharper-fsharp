@@ -10,14 +10,12 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class TopActivePatternCase : FSharpCachedTypeMemberBase<TopActivePatternCaseDeclaration>,
-    IFSharpDeclaredElement, IActivePatternCase
+  internal class TopActivePatternCase(ITopActivePatternCaseDeclaration declaration)
+    : FSharpCachedTypeMemberBase<TopActivePatternCaseDeclaration>(declaration),
+      IFSharpDeclaredElement, IActivePatternCase
   {
-    public TopActivePatternCase(ITopActivePatternCaseDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.ActivePatternCase;
+    public DeclaredElementType FSharpElementType => null;
     public override string ShortName => GetDeclaration()?.CompiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public int Index => GetDeclaration()?.Index ?? -1;

@@ -65,5 +65,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     string IAlternativeNameOwner.AlternativeName => SourceName != ShortName ? SourceName : null;
 
     public override string ToString() => this.TestToString(BuildTypeParameterString());
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.Module;
   }
 }

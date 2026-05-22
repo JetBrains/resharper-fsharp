@@ -1,0 +1,34 @@
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of field 'F'`:
+    TO: [O] { |F|: int } RANGE: (30,31) @ Record - Field 02.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Record - Field 02.fs<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: { **F**: int }
+    Navigation result:
+      opened file: Record - Field 02.fs
+      ------------------
+
+      type R =
+          { |CARET|F: int }
+
+      let r = { F = 1 }
+      ------------------
+
+    TO: [O] { |F|: int } RANGE: (30,31) @ Record - Field 02.fsi
+    Menu item (enabled) :
+      icon: FsharpSignature
+      text: Record - Field 02.fsi<font color="06C"> (4)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: { **F**: int }
+    Navigation result:
+      opened file: Record - Field 02.fsi
+      ------------------
+
+      type R =
+          { |CARET|F: int }
+
+      ------------------
+
+

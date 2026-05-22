@@ -53,6 +53,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic =>
       GetDeclaration() is { IsStatic: true };
+    
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.Value;
   }
 
   internal class FSharpValField([NotNull] ValFieldDeclaration declaration)

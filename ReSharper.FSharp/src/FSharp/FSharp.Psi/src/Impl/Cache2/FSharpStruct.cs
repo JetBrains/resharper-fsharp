@@ -37,6 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
     public ITypeDeclaration DefiningDeclaration => this.GetDefiningDeclaration();
+    public virtual DeclaredElementType FSharpElementType => this.TryGetFSharpDeclaredElementType();
 
     public override string ToString() => this.TestToString(BuildTypeParameterString());
   }

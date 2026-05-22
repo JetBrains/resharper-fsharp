@@ -33,7 +33,7 @@ type NewRecordPostfixTemplate() =
         match refExpr.Qualifier with
         | :? IReferenceExpr as refExpr ->
             let typeElement = refExpr.Reference.Resolve().DeclaredElement.As<ITypeElement>()
-            typeElement.IsRecord()
+            typeElement.IsFSharpRecord()
         | _ -> false
 
     override this.IsEnabled _ = true

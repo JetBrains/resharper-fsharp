@@ -47,7 +47,7 @@ module NewObjPostfixTemplate =
 
     let isApplicableType (typeElement: ITypeElement) =
         (typeElement :? IClass || typeElement :? IInterface) &&
-        not (typeElement.IsRecord() || typeElement.IsUnion())
+        not (typeElement.IsFSharpRecord() || typeElement.IsFSharpUnion())
 
     let isApplicableExpr (expr: IFSharpExpression) =
         let reference = getReference expr

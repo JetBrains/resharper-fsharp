@@ -10,12 +10,9 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpLiteral : FSharpTypeMember<TopPatternDeclarationBase>, IField, ITopLevelPatternDeclaredElement
+  internal class FSharpLiteral([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpTypeMember<TopPatternDeclarationBase>(declaration), IField, ITopLevelPatternDeclaredElement
   {
-    public FSharpLiteral([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     [CanBeNull] public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 
     public override DeclaredElementType GetElementType() =>

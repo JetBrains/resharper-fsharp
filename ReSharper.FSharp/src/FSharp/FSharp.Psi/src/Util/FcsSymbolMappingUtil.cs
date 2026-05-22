@@ -233,7 +233,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (unionTypeElement == null) return null;
 
       // todo: remove preferType param, get the field through the union case
-      if (!preferType && unionTypeElement is IFSharpSourceTypeElement sourceTypeElement && sourceTypeElement.IsUnion())
+      if (!preferType && unionTypeElement is IFSharpSourceTypeElement sourceTypeElement && sourceTypeElement.IsFSharpUnion())
       {
         var sourceUnionCase = sourceTypeElement.GetSourceUnionCases()
           .FirstOrDefault(sourceUnionCase => sourceUnionCase.ShortName == unionCase.Name);

@@ -53,5 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override int GetHashCode() =>
       ShortName.GetHashCode();
+
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.Value;
   }
 }

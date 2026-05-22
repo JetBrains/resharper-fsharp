@@ -1,0 +1,35 @@
+﻿## GotoDeclarationProvider activity:
+  Show context popup menu `Declarations of module 'NestedModule'`:
+    TO: [O] module |Nested| = RANGE: (22,28) @ Module 02.fs
+    Menu item (enabled) :
+      icon: Fsharp
+      text: Module 02.fs<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: module **Nested** =
+    Navigation result:
+      opened file: Module 02.fs
+      ------------------
+      module Module
+
+      module |CARET|Nested =
+          let x = 1
+
+      ------------------
+
+    TO: [O] module |Nested| = RANGE: (22,28) @ Module 02.fsi
+    Menu item (enabled) :
+      icon: FsharpSignature
+      text: Module 02.fsi<font color="06C"> (3)</font>
+      tail: <font color="FF6D6D6D">in <TestProject></font>
+      tooltip: module **Nested** =
+    Navigation result:
+      opened file: Module 02.fsi
+      ------------------
+      module Module
+
+      module |CARET|Nested =
+          val x: int
+
+      ------------------
+
+

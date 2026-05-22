@@ -5,17 +5,11 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled
 {
-  public class CompiledActivePatternCase : DelegatingDeclaredElement, IFSharpGeneratedFromOtherElement,
-    IActivePatternCase
+  public class CompiledActivePatternCase([NotNull] IMethod activePattern, string name, int index)
+    : DelegatingDeclaredElement(activePattern), IFSharpGeneratedFromOtherElement, IActivePatternCase
   {
-    public CompiledActivePatternCase([NotNull] IMethod activePattern, string name, int index) : base(activePattern)
-    {
-      ShortName = name;
-      Index = index;
-    }
-
-    public override string ShortName { get; }
-    public int Index { get; }
+    public override string ShortName { get; } = name;
+    public int Index { get; } = index;
 
     public override ITypeMember GetContainingTypeMember() => (ITypeMember)Origin;
     public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.ActivePatternCase;
@@ -35,19 +29,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled
 
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new CompiledActivePatternCasePointer(this, ShortName, Index);
+    
+    public DeclaredElementType FSharpElementType => FSharpDeclaredElementType.ActivePatternCase;
   }
 
-  public class CompiledActivePatternCasePointer : FSharpGeneratedElementPointerBase<CompiledActivePatternCase, IMethod>
+  public class CompiledActivePatternCasePointer(CompiledActivePatternCase patternCase, string shortName, int index)
+    : FSharpGeneratedElementPointerBase<CompiledActivePatternCase, IMethod>(patternCase)
   {
-    public string ShortName { get; }
-    public int Index { get; }
-
-    public CompiledActivePatternCasePointer(CompiledActivePatternCase patternCase, string shortName, int index)
-      : base(patternCase)
-    {
-      ShortName = shortName;
-      Index = index;
-    }
+    public string ShortName { get; } = shortName;
+    public int Index { get; } = index;
 
     public override CompiledActivePatternCase CreateGenerated(IMethod fsElement) => new(fsElement, ShortName, Index);
   }
