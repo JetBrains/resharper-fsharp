@@ -58,3 +58,7 @@ let rec isFcsTypeAccessible (context: ITreeNode) (fcsType: FSharpType) =
 
     else
         true
+
+let isRef (fcsType: FSharpType) =
+    let fcsType = fcsType.ErasedType
+    fcsType.HasTypeDefinition && fcsType.TypeDefinition.IsByRef

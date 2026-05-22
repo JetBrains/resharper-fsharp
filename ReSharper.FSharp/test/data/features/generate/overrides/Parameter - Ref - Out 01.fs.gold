@@ -1,0 +1,13 @@
+﻿Provided elements:
+ 0: M(System.String):System.Void
+ 1: Equals(System.Object?):System.Boolean
+ 2: Finalize():System.Void
+ 3: GetHashCode():System.Int32
+ 4: ToString():System.String?
+
+// ${KIND:Overrides}
+// ${SELECT0:M(System.String):System.Void}
+type T() =
+    inherit Class()
+
+    override this.M(s) = {selstart}base.M(&s){selend}

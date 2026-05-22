@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -66,7 +67,8 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
 
         let getParamNameAndType defaultName (param: FSharpParameter) =
             let name = param.Name |> Option.defaultWith defaultName |> FSharpNamingService.mangleNameIfNecessary
-            name, getParamType param
+            let paramType = getParamType param
+            name, paramType
 
         let getValueParamNameAndType (param: FSharpParameter) =
             getParamNameAndType (fun _ -> "value") param
@@ -131,6 +133,10 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
         (not (overridableMember :? IAccessor) || not generateParameters)
 
     if mayHaveBaseCalls && shouldCallBase element then
+        let paramNameTypeGroups =
+            paramNameTypeGroups
+            |> List.map (List.map (fun (name, fcsType) -> if isRef fcsType then $"&{name}" else name))
+
         let args =
             if paramNameTypeGroups.IsEmpty || not generateParameters then "" else
 
@@ -139,10 +145,10 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
             paramNameTypeGroups
             |> List.mapi (fun i paramNames ->
                 match paramNames, i with
-                | [head, _], 0 when groupCount > 1 -> $" {head}"
-                | [head, _], _ when groupCount > 1 -> head
+                | [head], 0 when groupCount > 1 -> $" {head}"
+                | [head], _ when groupCount > 1 -> head
                 | _ ->
-                    let names = paramNames |> List.map fst |> String.concat ", "
+                    let names = paramNames |> String.concat ", "
                     $"({names})"
             )
             |> String.concat " "

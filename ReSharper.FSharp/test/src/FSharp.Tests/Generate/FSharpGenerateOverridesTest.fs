@@ -10,6 +10,9 @@ type FSharpGenerateOverridesTest() =
 
     override x.RelativeTestDataPath = "features/generate/overrides"
 
+    member x.DoNamedTestFsCs() =
+        x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+
     [<Test>] member x.``Anchor - Ctor - Primary 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Anchor - Inherit 02``() = x.DoNamedTest()
@@ -116,6 +119,8 @@ type FSharpGenerateOverridesTest() =
     [<Test; Explicit>] member x.``Object expr 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Input elements - Overriden 01``() = x.DoNamedTest()
+
+    [<Test; Explicit "Fails on the buildserver">] member x.``Parameter - Ref - Out 01``() = x.DoNamedTestFsCs()
 
     [<Test>] member x.``Repr - Empty - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Repr - Empty - Class 02 - Same line``() = x.DoNamedTest()
