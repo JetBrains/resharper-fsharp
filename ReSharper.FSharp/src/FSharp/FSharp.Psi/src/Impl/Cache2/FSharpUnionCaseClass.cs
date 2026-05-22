@@ -17,5 +17,7 @@ public class FSharpUnionCaseClass([NotNull] Class.IClassPart part) : FSharpClass
   public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
     new FSharpUnionCaseClassPointer(this);
 
+  public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.UnionCase;
+
   public override string ToString() => this.TestToString(BuildTypeParameterString());
 }

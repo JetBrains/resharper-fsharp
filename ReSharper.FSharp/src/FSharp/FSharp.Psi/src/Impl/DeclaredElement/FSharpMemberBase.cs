@@ -11,12 +11,11 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IFSharpMember
+  internal abstract class FSharpMemberBase<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpTypeMember<TDeclaration>(declaration), IFSharpMember
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
+    public override DeclaredElementType FSharpElementType => null;
 
     public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 

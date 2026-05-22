@@ -8,12 +8,10 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpAnonRecordFieldProperty : FSharpDeclaredElementBase, IFSharpAnonRecordFieldProperty
+  internal class FSharpAnonRecordFieldProperty(FSharpSymbolReference reference)
+    : FSharpDeclaredElementBase, IFSharpAnonRecordFieldProperty
   {
-    public FSharpSymbolReference Reference { get; }
-
-    public FSharpAnonRecordFieldProperty(FSharpSymbolReference reference) =>
-      Reference = reference;
+    public FSharpSymbolReference Reference { get; } = reference;
 
     public FSharpField FcsField => Reference.GetFcsSymbol() as FSharpField;
     public FSharpAnonRecordTypeDetails AnonType => FcsField.AnonRecordFieldDetails.Item1;
@@ -28,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     public override DeclaredElementType GetElementType() =>
-      CommonDeclaredElementType.AnonymousTypeProperty;
+      FSharpDeclaredElementType.RecordField;
 
     public override IPsiModule Module => Reference.GetElement().GetPsiModule();
     public override IPsiServices GetPsiServices() => Module.GetPsiServices();
@@ -64,5 +62,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       ShortName.GetHashCode();
 
     public string SourceName => ShortName;
+    public DeclaredElementType FSharpElementType => null;
   }
 }

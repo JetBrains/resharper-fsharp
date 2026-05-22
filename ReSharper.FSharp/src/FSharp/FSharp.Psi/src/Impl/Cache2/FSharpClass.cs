@@ -5,7 +5,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.Xml.XmlDocComments;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
@@ -32,6 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public virtual ModuleMembersAccessKind AccessKind => EnumerateParts().GetAccessKind();
     public ITypeDeclaration DefiningDeclaration => this.GetDefiningDeclaration();
+    public virtual DeclaredElementType FSharpElementType => this.TryGetFSharpDeclaredElementType();
 
     public override IClass GetSuperClass()
     {

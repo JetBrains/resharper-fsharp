@@ -192,14 +192,18 @@ type FSharpGoToDeclarationTest() =
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test; Explicit>] member x.``Same type from different assemblies``() = x.DoNamedTest()
 
-    [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Module 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Module 02``() = x.DoNamedTestWithSignature()
 
-    [<Test>] member x.``Union - Case - Fields 01 - Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Union - Case - Fields 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Record - Field 01``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Record - Field 02``() = x.DoNamedTestWithSignature()
 
-    [<Test>] member x.``Union - Case - Single - Fields 01 - Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Union - Case - Single - Fields 01 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Union - Case - Fields 01 - Expr``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Union - Case - Fields 02 - Pattern``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Expr``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Union - Case - Single - Fields 01 - Pattern``() = x.DoNamedTestWithSignature()
 
     [<Test>] member x.``Union - Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Union - Field 02 - Single case``() = x.DoNamedTest()

@@ -147,7 +147,7 @@ let private generateUnorderedBindings recordExpr (existingBindings: TreeNodeColl
     generateBindingsImpl recordExpr indexedBindings declaredFields
 
 let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr) : IRecordFieldBinding seq =
-    Assertion.Assert(recordTypeElement.IsRecord(), "Expecting record type")
+    Assertion.Assert(recordTypeElement.IsFSharpRecord(), "Expecting record type")
 
     let fieldNames = recordTypeElement.GetRecordFieldNames()
     let existingBindings = recordExpr.FieldBindings

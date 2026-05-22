@@ -168,5 +168,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
       bool HasSameName(ITypeElement typeElement) =>
         !Equals(typeElement) && typeElement.TypeParametersCount == 0 && typeElement.GetSourceName() == sourceName;
     }
+
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.Module;
   }
 }

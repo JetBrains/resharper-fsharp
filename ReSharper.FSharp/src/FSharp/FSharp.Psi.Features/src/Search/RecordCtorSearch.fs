@@ -20,13 +20,13 @@ type RecordCtorSearchFactory() =
 
     override x.GetAllPossibleWordsInFile(declaredElement) =
         match declaredElement with
-        | :? ITypeElement as typeElement when typeElement.IsRecord() -> typeElement.GetRecordFieldNames() :> _
+        | :? ITypeElement as typeElement when typeElement.IsFSharpRecord() -> typeElement.GetRecordFieldNames() :> _
         | _ -> EmptyList.Instance :> _
 
     override x.CreateReferenceSearcher(declaredElements, findCandidates) =
         let recordTypeElements =
             declaredElements.FilterByType<ITypeElement>()
-            |> Seq.filter (fun typeElement -> typeElement.IsRecord())
+            |> Seq.filter (fun typeElement -> typeElement.IsFSharpRecord())
             |> Array.ofSeq
 
         if recordTypeElements.IsEmpty() then null else

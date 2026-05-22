@@ -37,6 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic => true;
 
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.UnionCase;
+
     public override IType ReturnType =>
       GetContainingType() is { } containingType
         ? TypeFactory.CreateType(containingType)

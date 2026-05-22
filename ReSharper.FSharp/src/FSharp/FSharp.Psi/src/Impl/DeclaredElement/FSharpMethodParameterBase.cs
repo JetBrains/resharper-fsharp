@@ -48,6 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
     public abstract string ShortName { get; }
     public abstract string SourceName { get; }
+    public DeclaredElementType FSharpElementType => null;
     public ITypeElement GetContainingType() => Owner.GetContainingType();
     public ITypeMember GetContainingTypeMember() => (ITypeMember) Owner;
 

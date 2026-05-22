@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
@@ -68,7 +67,7 @@ type FSharpDeclaredElementIconProvider() =
                     PsiSymbolsThemedIcons.Class.Id
 
             | :? TypeElement as typeElement when
-                    typeElement.PresentationLanguage.Is<FSharpLanguage>() && typeElement.IsUnion() ->
+                    typeElement.PresentationLanguage.Is<FSharpLanguage>() && typeElement.IsFSharpUnion() ->
                 PsiSymbolsThemedIcons.Enum.Id
 
             | :? IFSharpFieldProperty as fieldProp ->

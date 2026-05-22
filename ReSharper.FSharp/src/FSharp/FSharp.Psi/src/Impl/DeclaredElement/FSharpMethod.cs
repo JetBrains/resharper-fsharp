@@ -9,23 +9,17 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpMethod<TDeclaration> : FSharpMethodBase<TDeclaration>, IFSharpMethod
+  internal class FSharpMethod<TDeclaration>([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpMethodBase<TDeclaration>(declaration), IFSharpMethod
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    public FSharpMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
   }
 
-  internal class FSharpTypePrivateMethod : FSharpMethodBase<FSharpProperTypeMemberDeclarationBase>, ITypePrivateMember,
-    ITopLevelPatternDeclaredElement
+  internal class FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration)
+    : FSharpMethodBase<FSharpProperTypeMemberDeclarationBase>(declaration), ITypePrivateMember,
+      ITopLevelPatternDeclaredElement
   {
-    public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
-    {
-    }
-
     public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
 
     public override bool IsStatic =>
@@ -35,5 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is { } decl && decl.GetContainingTypeDeclaration()?.GetFcsSymbol() is FSharpEntity fcsEntity
         ? fcsEntity.GenericParameters.Concat(base.MfvTypeParameters).ToList()
         : base.MfvTypeParameters;
+
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.Function;
   }
 }

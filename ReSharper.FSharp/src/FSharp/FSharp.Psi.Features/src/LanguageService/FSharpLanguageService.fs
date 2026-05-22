@@ -18,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Parsing
@@ -56,7 +55,7 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
         | _ -> true
 
     override x.TypePresenter = CLRTypePresenter.Instance
-    override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
+    override x.DeclaredElementPresenter = FSharpDeclaredElementPresenter.Instance :> _
 
     override x.FindTypeDeclarations _ = EmptyList.Instance :> _
 

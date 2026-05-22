@@ -13,6 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   public interface IFSharpDeclaredElement : IClrDeclaredElement
   {
     string SourceName { get; }
+    [CanBeNull] DeclaredElementType FSharpElementType { get; }
   }
 
   public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement, ITypeMember

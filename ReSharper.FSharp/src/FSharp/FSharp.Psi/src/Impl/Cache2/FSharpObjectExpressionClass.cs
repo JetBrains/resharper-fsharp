@@ -17,6 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public AccessRights RepresentationAccessRights => AccessRights.PUBLIC;
     public bool IsErased => true;
 
+    public override DeclaredElementType FSharpElementType => FSharpDeclaredElementType.ObjectExpression;
+
     public override string ToString() => this.TestToString(BuildTypeParameterString());
   }
 }

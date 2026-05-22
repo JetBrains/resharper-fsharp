@@ -1,5 +1,5 @@
 ﻿## GotoDeclarationProvider activity:
-  Show context popup menu `Declarations of property 'x'`:
+  Show context popup menu `Declarations of value 'x'`:
     TO: [O] let |x| = 123 RANGE: (18,19) @ Signature 01.fs
     Menu item (enabled) :
       icon: Fsharp

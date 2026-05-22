@@ -8,24 +8,21 @@ using JetBrains.ReSharper.Psi.Impl.reflection2.elements.Compiled;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled
 {
-  public class FSharpCompiledClassBase : Class, IFSharpCompiledTypeElement
+  public abstract class FSharpCompiledClassBase(
+    [CanBeNull] FSharpMetadataEntity entity,
+    [NotNull] ICompiledEntity parent,
+    [NotNull] IReflectionBuilder builder,
+    [NotNull] IMetadataTypeInfo info)
+    : Class(parent, builder, info), IFSharpCompiledTypeElement
   {
-    [NotNull] private FSharpDeclaredName FSharpName { get; }
-    public FSharpCompiledTypeRepresentation Representation { get; }
-    public FSharpAccessRights FSharpAccessRights { get; }
+    [NotNull] private FSharpDeclaredName FSharpName { get; } = FSharpMetadataEntityModule.getCompiledModuleDeclaredName(entity);
+    public FSharpCompiledTypeRepresentation Representation { get; } = FSharpMetadataEntityModule.getRepresentation(entity);
+    public FSharpAccessRights FSharpAccessRights { get; } = entity.GetFSharpAccessRights();
 
     public ICacheTrieNode AlternativeNameTrieNode { get; set; }
 
-    public FSharpCompiledClassBase([CanBeNull] FSharpMetadataEntity entity, [NotNull] ICompiledEntity parent,
-      [NotNull] IReflectionBuilder builder,
-      [NotNull] IMetadataTypeInfo info) : base(parent, builder, info)
-    {
-      FSharpName = FSharpMetadataEntityModule.getCompiledModuleDeclaredName(entity);
-      Representation = FSharpMetadataEntityModule.getRepresentation(entity);
-      FSharpAccessRights = entity.GetFSharpAccessRights();
-    }
-
     public string SourceName => FSharpName.SourceName;
+    public virtual DeclaredElementType FSharpElementType => this.TryGetFSharpDeclaredElementType();
     string IAlternativeNameOwner.AlternativeName => FSharpName.AlternativeName;
     public virtual ModuleMembersAccessKind AccessKind => ModuleMembersAccessKind.Normal; // todo
   }

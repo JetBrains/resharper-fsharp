@@ -331,7 +331,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => false
       };
 
-    public static bool IsUnion([NotNull] this ITypeElement typeElement) =>
+    public static bool IsFSharpUnion([NotNull] this ITypeElement typeElement) =>
       typeElement switch
       {
         IFSharpSourceTypeElement fsTypeElement => fsTypeElement.GetPart<IUnionPart>() != null,
@@ -669,7 +669,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => typeElement.HasAttributeInstance(FSharpPredefinedType.AutoOpenAttrTypeName, false)
       };
 
-    public static bool IsRecord([CanBeNull] this ITypeElement typeElement) =>
+    public static bool IsFSharpRecord([CanBeNull] this ITypeElement typeElement) =>
       typeElement switch
       {
         IFSharpSourceTypeElement fsTypeElement => (fsTypeElement.GetPart<IRecordPart>() != null),
@@ -709,8 +709,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ModuleMembersAccessKind.Normal;
     }
 
+    public static DeclaredElementType TryGetFSharpDeclaredElementType([NotNull] this ITypeElement typeElement)
+    {
+      if (typeElement.IsFSharpRecord())
+        return FSharpDeclaredElementType.Record;
+      
+      if (typeElement.IsFSharpUnion())
+        return FSharpDeclaredElementType.Union;
+      
+      if (typeElement.IsModule())
+        return FSharpDeclaredElementType.Module;
+
+      if (typeElement.IsFSharpException())
+        return FSharpDeclaredElementType.Exception;
+
+      return null;
+    }
+
     public static bool MayHaveRequireQualifiedAccessAttribute([NotNull] this ITypeElement typeElement) =>
-      typeElement.IsModule() || typeElement.IsUnion() || typeElement.IsRecord();
+      typeElement.IsModule() || typeElement.IsFSharpUnion() || typeElement.IsFSharpRecord();
 
     public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) =>
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;

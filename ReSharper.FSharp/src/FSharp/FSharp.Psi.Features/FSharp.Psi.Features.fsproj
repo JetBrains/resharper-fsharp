@@ -103,6 +103,7 @@
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpElementFactory.fs" />
+    <Compile Include="src\LanguageService\FSharpDeclaredElementPresenter.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />

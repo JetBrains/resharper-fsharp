@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return;
       }
 
-      if ((containingType.IsUnion() || containingType.IsRecord()) && !containingType.RequiresQualifiedAccess())
+      if ((containingType.IsFSharpUnion() || containingType.IsFSharpRecord()) && !containingType.RequiresQualifiedAccess())
       {
         // Containing module may require qualifier.
         SetRequiredQualifiers(reference, containingType, context);

@@ -10,7 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   // todo: why provided type for simple union?
   // type T = a
-  public class FSharpClassOrProvidedTypeAbbreviation([NotNull] Class.IClassPart part) : FSharpClass(part), ILanguageSpecificDeclaredElement
+  public class FSharpClassOrProvidedTypeAbbreviation([NotNull] Class.IClassPart part)
+    : FSharpClass(part), ILanguageSpecificDeclaredElement
   {
     // Triggers FCS resolve
     private GenerativeMembersConverter<FSharpClassOrProvidedTypeAbbreviation> ProvidedClass =>
@@ -53,7 +54,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override XmlNode GetXMLDoc(bool expand) =>
       ProvidedClass is { } x ? x.GetXmlDoc(expand) : base.GetXMLDoc(expand);
 
-    bool ILanguageSpecificDeclaredElement.IsErased =>
+    internal bool IsTypeAbbreviation =>
       Parts is TypeAbbreviationOrDeclarationPart { IsUnionCase: false, IsProvidedAndGenerated: false };
+
+    bool ILanguageSpecificDeclaredElement.IsErased => IsTypeAbbreviation;
+
+    public override DeclaredElementType FSharpElementType =>
+      IsTypeAbbreviation
+        ? FSharpDeclaredElementType.TypeAbbreviation
+        : !IsProvidedAndGenerated ? FSharpDeclaredElementType.Union : null;
   }
 }

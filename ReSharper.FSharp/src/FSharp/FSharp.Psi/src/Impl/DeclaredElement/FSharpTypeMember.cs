@@ -16,13 +16,10 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpTypeMember<TDeclaration> : FSharpCachedTypeMemberBase<TDeclaration>, IFSharpTypeMember
+  internal abstract class FSharpTypeMember<TDeclaration>([NotNull] IDeclaration declaration)
+    : FSharpCachedTypeMemberBase<TDeclaration>(declaration), IFSharpTypeMember
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpTypeMember([NotNull] IDeclaration declaration) : base(declaration)
-    {
-    }
-
     public ITypeMember GetContainingTypeMember() =>
       (ITypeMember) GetContainingType();
 
@@ -147,5 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       fcsType != null
         ? fcsType.MapType(AllTypeParameters, Module)
         : TypeFactory.CreateUnknownType(Module);
+
+    public virtual DeclaredElementType FSharpElementType => null;
   }
 }

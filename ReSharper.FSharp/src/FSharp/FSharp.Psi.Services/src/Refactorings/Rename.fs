@@ -282,7 +282,7 @@ type SingleUnionCaseRenameEvaluator() =
 
         member x.CreateFromElement(initialElement, _, _) =
             let isApplicable (typeElement: ITypeElement) =
-                typeElement.IsUnion() &&
+                typeElement.IsFSharpUnion() &&
 
                 let sourceName = typeElement.GetSourceName()
                 sourceName <> SharedImplUtil.MISSING_DECLARATION_NAME &&
