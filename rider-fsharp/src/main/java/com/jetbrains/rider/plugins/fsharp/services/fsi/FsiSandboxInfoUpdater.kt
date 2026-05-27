@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessOutputType
 import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.openapi.client.ClientAppSession
 import com.intellij.openapi.editor.Editor
@@ -88,7 +89,7 @@ class FsiSandboxInfoUpdater(
   }
 
   fun onOutputEnd() {
-    if (fsiProcessOutputListener.lastOutputType != ProcessOutputTypes.SYSTEM) {
+    if (!ProcessOutputType.isSystem(fsiProcessOutputListener.lastOutputType)) {
       verifiedCommandNumber += 1
       if (fsiProcessOutputListener.lastOutputType == ProcessOutputTypes.STDOUT) {
         correctCommandNumbers.add(verifiedCommandNumber)
@@ -105,7 +106,7 @@ class FsiSandboxInfoUpdater(
     var lastOutputType: Key<*> = ProcessOutputTypes.SYSTEM
 
     override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-      if (outputType == ProcessOutputTypes.STDOUT && lastOutputType != ProcessOutputTypes.SYSTEM)
+      if (outputType == ProcessOutputTypes.STDOUT && !ProcessOutputType.isSystem(lastOutputType))
         lastOutputType = ProcessOutputTypes.STDOUT
     }
 
