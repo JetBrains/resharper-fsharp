@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Debugger.Common;
 using Debugger.Common.ManagedSymbols;
 using JetBrains.Debugger.CorApi.ComInterop;
 using JetBrains.Metadata.Access;
 using JetBrains.Metadata.Debug;
-using JetBrains.Metadata.Debug.Pdb;
-using JetBrains.Metadata.Debug.Pdb.DebugSubsection;
 using JetBrains.Metadata.IL;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Utils;
-using JetBrains.Metadata.Utils.PE.Directories;
 using JetBrains.Util;
 using Mono.Debugging.Autofac;
 using Mono.Debugging.Client;
@@ -39,9 +37,7 @@ public class FSharpSequencePointInvokedMethodsProvider(ILogger logger, CorDebugg
     var module = function.GetModule();
     var moduleInfo = session.AppDomainsManager.GetOrCreateModuleInfo(module);
 
-    var debugData = PdbReader.ReadPdb(moduleInfo.AssemblyPath.ChangeExtension(ExtensionConstants.Pdb),
-      DebugInfoType.Portable);
-    var nameProvider = debugData != null ? new LocalVariablesNameProvider(debugData) : null;
+    var symbolMethod = moduleInfo.Symbols.GetMethod(metadataMethod.Token.Value, SymbolsSourceType.Internal);
 
     var evalStack = new Stack<string>();
     var elements = new List<SmartStepIntoElement>();
@@ -119,7 +115,7 @@ public class FSharpSequencePointInvokedMethodsProvider(ILogger logger, CorDebugg
         case OpcodeValue.Ldloc_3:
         case OpcodeValue.Ldloc_s:
           var varIndex = instruction.GetVariableIndexOperand();
-          var variableName = nameProvider?.GetVariableName(metadataMethod, varIndex);
+          var variableName = GetLocalVariableName(symbolMethod, varIndex, instruction.Offset);
           evalStack.Push(variableName);
           break;
 
@@ -271,6 +267,18 @@ public class FSharpSequencePointInvokedMethodsProvider(ILogger logger, CorDebugg
     }
 
     return elements;
+  }
+
+  private static string GetLocalVariableName(IManagedSymbolMethod symbolMethod, int slot, int ilOffset)
+  {
+    if (symbolMethod == null)
+      return null;
+
+    foreach (var localVariable in symbolMethod.RootScope.GetLocalVariablesRecursiveForOffset(ilOffset))
+      if (localVariable.IlIndex == slot)
+        return localVariable.Name;
+
+    return null;
   }
 
   private static bool IsFSharpFuncInvoke(IMetadataMethod method)
