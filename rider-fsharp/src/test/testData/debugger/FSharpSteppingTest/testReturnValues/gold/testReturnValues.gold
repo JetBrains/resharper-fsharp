@@ -219,8 +219,58 @@ $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
     +t = Program.T
 
 Stepped over f1:
---> Program.fs:41(510,512) // ()
+--> Program.fs:47(577,581) // f2 1
 $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    +f1 = Program.f1@39
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    s1 = {string} "23"
+    s2 = {string} "3"
+    +t = Program.T
+
+Stopped inside f2, then branch:
+--> Program.fs:43(547,548) // 1
+Program.f2() in ReturnValueTest.dll
+    i = {int} 1
+
+Stepped over return:
+--> Program.fs:47(577,581) // f2 1
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    f2 1 = {int} 1
+    +f1 = Program.f1@39
+    i1 = {int} 3
+    i2 = {int} 2
+    i3 = {int} 3
+    i4 = {int} 3
+    i5 = {int} 1
+    i6 = {int} 1
+    i7 = {int} 2
+    i8 = {int} 2
+    +l2 = {FSharpList<int>} Length = 1
+    +l3 = {FSharpList<string>} Length = 2
+    +l4 = {FSharpList<int>} Length = 2
+    s1 = {string} "23"
+    s2 = {string} "3"
+    +t = Program.T
+
+Stopped inside f2, else branch:
+--> Program.fs:45(566,567) // 2
+Program.f2() in ReturnValueTest.dll
+    i = {int} 0
+
+Stepped over return:
+--> Program.fs:48(590,594) // f2 0
+$Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
+    f2 0 = {int} 2
     +f1 = Program.f1@39
     i1 = {int} 3
     i2 = {int} 2

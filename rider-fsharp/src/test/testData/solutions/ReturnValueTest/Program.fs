@@ -38,4 +38,13 @@ let s2 = "123".Substring(1).Substring(1)
 
 let f1 = add 1
 
+let f2 i =
+    if i > 0 then
+        1
+    else
+        2
+
+let _ = f2 1
+let _ = f2 0
+
 ()

@@ -377,6 +377,8 @@ class FSharpSteppingTest : DebuggerTestBase() {
         }) {
             testDebugProgram({
                 toggleBreakpoint("Program.fs", 17)
+                toggleBreakpoint("Program.fs", 43)
+                toggleBreakpoint("Program.fs", 45)
             }, {
                 waitForPause()
                 dumpFullCurrentData(message = "Stopped at t")
@@ -399,6 +401,16 @@ class FSharpSteppingTest : DebuggerTestBase() {
                 stepOver("Stepped over s1")
                 stepOver("Stepped over s2")
                 stepOver("Stepped over f1")
+
+                resumeSession()
+                waitForPause()
+                dumpFullCurrentData(message = "Stopped inside f2, then branch")
+                stepOver("Stepped over return")
+
+                resumeSession()
+                waitForPause()
+                dumpFullCurrentData(message = "Stopped inside f2, else branch")
+                stepOver("Stepped over return")
 
                 resumeSession()
             }, true)
