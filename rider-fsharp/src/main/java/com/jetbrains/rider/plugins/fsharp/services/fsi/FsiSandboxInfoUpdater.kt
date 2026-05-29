@@ -91,7 +91,7 @@ class FsiSandboxInfoUpdater(
   fun onOutputEnd() {
     if (!ProcessOutputType.isSystem(fsiProcessOutputListener.lastOutputType)) {
       verifiedCommandNumber += 1
-      if (fsiProcessOutputListener.lastOutputType == ProcessOutputTypes.STDOUT) {
+      if (ProcessOutputType.isStdout(fsiProcessOutputListener.lastOutputType)) {
         correctCommandNumbers.add(verifiedCommandNumber)
 
         updateSandboxInfo()
@@ -106,7 +106,7 @@ class FsiSandboxInfoUpdater(
     var lastOutputType: Key<*> = ProcessOutputTypes.SYSTEM
 
     override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-      if (outputType == ProcessOutputTypes.STDOUT && !ProcessOutputType.isSystem(lastOutputType))
+      if (ProcessOutputType.isStdout(outputType) && !ProcessOutputType.isSystem(lastOutputType))
         lastOutputType = ProcessOutputTypes.STDOUT
     }
 

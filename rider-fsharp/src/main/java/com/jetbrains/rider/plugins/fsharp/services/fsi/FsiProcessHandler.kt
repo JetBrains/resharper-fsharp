@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
-import com.intellij.execution.process.ProcessOutputTypes
+import com.intellij.execution.process.ProcessOutputType
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.rd.util.launchOnUi
 import com.intellij.openapi.util.Key
@@ -36,12 +36,12 @@ internal class FsiProcessHandler(
     lifetime.launchOnUi {
       it.consumeEach { (text, outputType) ->
         if (text != "> ") {
-          when (outputType) {
-            ProcessOutputTypes.STDOUT -> {
+          when {
+            ProcessOutputType.isStdout(outputType) -> {
               fsiInputOutputProcessor.printOutputText(text, ConsoleViewContentType.NORMAL_OUTPUT)
             }
 
-            ProcessOutputTypes.STDERR -> {
+            ProcessOutputType.isStderr(outputType) -> {
               fsiInputOutputProcessor.printOutputText(text, ConsoleViewContentType.ERROR_OUTPUT)
             }
           }
@@ -56,9 +56,8 @@ internal class FsiProcessHandler(
   }
 
   override fun notifyTextAvailable(text: String, outputType: Key<*>) {
-    when (outputType) {
-      ProcessOutputTypes.STDOUT,
-      ProcessOutputTypes.STDERR -> {
+    when {
+      ProcessOutputType.isStdout(outputType) || ProcessOutputType.isStderr(outputType) -> {
         ThreadingAssertions.assertBackgroundThread()
         channel.trySendBlocking(text to outputType)
       }
