@@ -64,8 +64,8 @@ type FSharpCodeStructureProvider() =
 
         | :? IFSharpTypeDeclaration as typeDecl ->
             match typeDecl.TypeRepresentation with
-            | :? IUnionRepresentation as unionDecl ->
-                let cases = Seq.cast unionDecl.UnionCases
+            | :? IEnumLikeTypeRepresentation as enumLikeRepr ->
+                let cases = Seq.cast enumLikeRepr.Cases
                 processTypeDeclaration typeDecl cases parent
 
             | :? IRecordRepresentation as recordDecl ->
