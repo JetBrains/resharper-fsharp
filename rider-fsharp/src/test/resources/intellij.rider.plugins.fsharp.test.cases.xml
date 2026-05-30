@@ -13,6 +13,7 @@
       <module name="intellij.libraries.kotlin.reflect"/>
       <module name="intellij.libraries.kotlinx.coroutines.core"/>
       <module name="intellij.libraries.teamcity.service.messages"/>
+      <module name="intellij.libraries.xz"/>
       <module name="intellij.platform.analysis"/>
       <module name="intellij.platform.analysis.impl"/>
       <module name="intellij.platform.codeStyle"/>
@@ -28,6 +29,7 @@
       <module name="intellij.platform.util.ex"/>
       <module name="intellij.rd.client"/>
       <module name="intellij.rider.languages"/>
+      <module name="intellij.xml.impl"/>
     </dependencies>
     <!-- endregion -->
 </idea-plugin>
