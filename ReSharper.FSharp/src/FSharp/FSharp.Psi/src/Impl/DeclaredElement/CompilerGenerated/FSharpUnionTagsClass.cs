@@ -58,6 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       Union.GetSingleOrDefaultSourceFile();
 
     public override bool IsStatic => true;
+    public bool IsClosed => false;
 
     public IEnumerable<IField> Constants
     {
