@@ -45,9 +45,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Host
         return Assembly.LoadFile(assemblyPath);
       }
 
-      Console.Error.Write($"\nFailed to resolve assembly by name '{eventArgs.Name}'" +
-                          $"\n  Requesting assembly: {eventArgs.RequestingAssembly?.FullName}" +
-                          $"\n  Probing paths: {string.Join("\n", OurAdditionalProbingPaths)}");
+      Console.Error.Write($"\nFailed to resolve assembly by name '{eventArgs.Name}', " +
+                          $"requesting assembly: '{eventArgs.RequestingAssembly?.FullName}'");
       return null;
     }
 
