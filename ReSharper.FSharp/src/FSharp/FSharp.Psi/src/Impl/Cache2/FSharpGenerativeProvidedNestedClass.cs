@@ -65,6 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override AccessRights GetAccessRights() =>
       ProvidedType.IsPublic || ProvidedType.IsNestedPublic ? AccessRights.PUBLIC : AccessRights.PRIVATE;
 
+    public bool IsClosed => false;
     public override bool IsAbstract => ProvidedType.IsAbstract;
     public override bool IsSealed => ProvidedType.IsSealed;
     public override string XMLDocId => XMLDocUtil.GetTypeElementXmlDocId(this);
