@@ -277,6 +277,14 @@ type FSharpNonTailRecursionGutterMarkType() =
       Layer = HighlighterLayer.SYNTAX,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
+    RegisterHighlighter(
+      FSharpHighlightingAttributeIds.StructRecord,
+      FallbackAttributeId = DefaultLanguageAttributeIds.STRUCT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//StructRecord",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+
   RegisterHighlighter(
       FSharpHighlightingAttributeIds.Literal,
       FallbackAttributeId = DefaultLanguageAttributeIds.CONSTANT,

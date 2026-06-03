@@ -1,0 +1,6 @@
+﻿type |Record|(0) = { |A|(1): |int|(2) }
+
+---------------------------------------------------------
+(0): ReSharper F# Record Identifier: 
+(1): ReSharper F# Field Identifier: 
+(2): ReSharper F# Struct Identifier: 
