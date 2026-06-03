@@ -28,7 +28,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
         return FSharpHighlightingAttributeIdsModule.Union;
 
       if (entity.IsFSharpRecord)
-        return FSharpHighlightingAttributeIdsModule.Record;
+        return entity.IsValueType
+          ? FSharpHighlightingAttributeIdsModule.StructRecord
+          : FSharpHighlightingAttributeIdsModule.Record;
 
       if (entity.IsMeasure)
         return FSharpHighlightingAttributeIdsModule.UnitOfMeasure;
