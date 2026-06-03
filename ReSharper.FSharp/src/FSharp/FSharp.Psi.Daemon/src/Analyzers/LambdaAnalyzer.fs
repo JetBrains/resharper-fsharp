@@ -187,8 +187,8 @@ type LambdaAnalyzer() =
         | _ -> true
 
     let tryCreateWarning (ctor: ILambdaExpr * 'a -> #IHighlighting) (lambda: ILambdaExpr, replacementExpr: 'a as arg)
-            isFSharp6Supported =
-        if isFSharp6Supported && hasExplicitConversion lambda then null else
+            delegatesConversionSupported =
+        if delegatesConversionSupported && hasExplicitConversion lambda then null else
 
         let lambda = lambda.IgnoreParentParens()
 
@@ -201,7 +201,7 @@ type LambdaAnalyzer() =
         | ValueSome (:? FSharpActivePatternCase) -> null
         | _ ->
 
-        let outerReferenceCheck = isLambdaArgOwnerSupported lambda isFSharp6Supported replacementExprSymbol
+        let outerReferenceCheck = isLambdaArgOwnerSupported lambda delegatesConversionSupported replacementExprSymbol
         if not outerReferenceCheck then null else
 
         match replacementExprSymbol with
@@ -352,7 +352,7 @@ type LambdaAnalyzer() =
                     isFSharp60Supported :> _
 
             | true, false, replaceCandidate ->
-                tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) isFSharp60Supported :> _
+                tryCreateWarning LambdaCanBeSimplifiedWarning (lambda, replaceCandidate) false :> _
 
             | _ ->
 

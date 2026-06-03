@@ -29,6 +29,7 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Snd``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 02 - Method overloads``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 03 - Simplify lambda``() = x.DoNamedTest()
 
     [<Test; TestReferences("System.Core")>] member x.``Delegates``() = x.DoNamedTest()
 
