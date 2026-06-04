@@ -21,6 +21,8 @@ type FSharpImportTypeHelper() =
         not (isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)))
 
     interface IImportTypeHelper with
+        member x.IsAvailable(reference) = true
+
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
             if isNull reference || reference.IsQualified then Seq.empty else
