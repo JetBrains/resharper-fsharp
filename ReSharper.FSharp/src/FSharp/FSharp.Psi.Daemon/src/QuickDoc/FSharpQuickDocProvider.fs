@@ -86,12 +86,6 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         richTextEscapeToHtml text +
         "</pre></div>"
 
-    let createToolTip (header: RichText) (body: RichText) =
-        if body.IsEmpty then
-            asContent header
-        else
-            (asDefinition header).Append(body)
-
     member x.CreateRichTextTooltip() =
         FSharpQuickDoc.getFSharpToolTipText identifier
         |> Option.map (fun (ToolTipText layouts) ->
@@ -110,6 +104,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                               if not overload.TypeMapping.IsEmpty then
                                 yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
                             |> richTextJoin "\n\n"
+                            |> asDefinition
 
                         let body =
                             [ match xmlDocService.GetXmlDoc(overload.XmlDoc, overload.Symbol, identifier.GetPsiModule()) with
@@ -122,7 +117,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                               | _ -> () ]
                             |> richTextJoin "\n\n"
 
-                        createToolTip header body))
+                        header.Append(body)))
             |> richTextJoin IdentifierTooltipProvider.RIDER_TOOLTIP_SEPARATOR
         )
         |> Option.defaultValue null

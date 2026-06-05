@@ -1,1 +1,1 @@
-<div class='content'><span style="color:#000080">val</span> <span style="color:#000000">argv</span>: <span style="color:#000000">string</span> <span style="color:#000000">array</span></div>
+<div class='definition'><pre style='word-wrap: break-word; white-space: pre-wrap;'><span style="color:#000080">val</span> <span style="color:#000000">argv</span>: <span style="color:#000000">string</span> <span style="color:#000000">array</span></pre></div>
