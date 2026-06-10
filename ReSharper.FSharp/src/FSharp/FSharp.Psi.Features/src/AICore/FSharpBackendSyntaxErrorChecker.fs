@@ -19,7 +19,7 @@ open JetBrains.Util
 type FSharpBackendSyntaxErrorChecker(checkerService: FcsCheckerService, documentFactory: IInMemoryDocumentFactory) =    
     let convertDiagnostic(document: IDocument) (diagnostic: FSharpDiagnostic) :BackendError =
         let startOffset = getDocumentOffset document (docCoords diagnostic.StartLine diagnostic.StartColumn)
-        BackendError(startOffset.Offset, diagnostic.Message)
+        BackendError(startOffset.Offset, diagnostic.Message, BackendErrorSeverity.ERROR)
 
     interface ICustomSyntaxErrorChecker with
         member this.IsAvailable(language) = language :? FSharpLanguage
