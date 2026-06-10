@@ -5,6 +5,7 @@ import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.collections.sorted
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.pathString
 
@@ -292,6 +293,7 @@ tasks {
   }
 
   named<Test>("test") {
+    classpath -= classpath.filter { it.name.startsWith("jsvg-") && it.name.endsWith(".jar") }.sorted().dropLast(1)
     useTestNG {
       groupByInstances = true
     }
