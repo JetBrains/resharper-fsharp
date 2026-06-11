@@ -1,4 +1,5 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
+import org.gradle.api.internal.file.collections.DefaultConfigurableFileCollection
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
@@ -293,8 +294,12 @@ tasks {
   }
 
   named<Test>("test") {
-    val jarsToRemove = classpath.filter { it.name.startsWith("jsvg-") && it.name.endsWith(".jar") }.sorted().dropLast(1)
-    classpath = classpath.filter { !jarsToRemove.contains(it) }
+    fun reorderClasspath(path1: String, path2: String) {
+      val problematicPath = classpath.filter { it.name == path1 || it.name == path2 }
+      classpath -= problematicPath
+      classpath += files(problematicPath.reversed())
+    }
+    reorderClasspath("intellij.libraries.jsvg.jar", "intellij.charts.jar")
     useTestNG {
       groupByInstances = true
     }
