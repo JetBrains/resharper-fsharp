@@ -1,5 +1,6 @@
-NestedCalls.run()
 ChainedCalls.run()
+ControlFlow.run()
 Inline.run()
+NestedCalls.run()
 UnionCases.run()
 Values.run()
