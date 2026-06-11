@@ -28,6 +28,11 @@ class FSharpSmartStepIntoTargetsTest : DebuggerTestBase() {
     }
 
     @Test
+    fun testControlFlow() {
+        testSmartStepIntoTargets("ControlFlow.fs", listOf(8, 11, 15, 18))
+    }
+
+    @Test
     fun testUnionCases() {
         testSmartStepIntoTargets("UnionCases.fs", listOf(13, 14, 15))
     }

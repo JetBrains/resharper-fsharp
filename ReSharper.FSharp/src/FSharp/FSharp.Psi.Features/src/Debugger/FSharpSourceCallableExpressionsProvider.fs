@@ -4,7 +4,6 @@ open System.Collections.Generic
 open FSharp.Compiler.Symbols
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
-open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -75,7 +74,7 @@ type FSharpCallableExpressionsCollector private () =
         let containingType = typeMember.ContainingType
         isNotNull containingType && forceInlineModules.Contains(containingType.GetClrName())
 
-    let processInvokedReference (applicationInfo: (IFSharpExpression * int * bool) option)
+    let processInvokedReference (applicationInfo: (ITreeNode * int * bool) option)
             (reference: FSharpSymbolReference) (result: List<_>) =
         if not (isInvocation applicationInfo reference) then () else
 
@@ -115,56 +114,77 @@ type FSharpCallableExpressionsCollector private () =
 
     static member Instance = FSharpCallableExpressionsCollector()
 
-    member this.Process(expr: IFSharpExpression, result) =
+    member this.Process(expr: IFSharpTypeOwnerNode, result) =
         if isNotNull expr then
             expr.ProcessThisAndDescendants(this, result)
 
     interface IRecursiveElementProcessor<List<DocumentRangeExpression>> with
-        member this.IsProcessingFinished(context) = false
-        member this.ProcessAfterInterior(element, context) = ()
+        member this.IsProcessingFinished _ = false
+        member this.ProcessAfterInterior(_, _) = ()
 
-        member this.InteriorShouldBeProcessed(element, context) =
+        member this.InteriorShouldBeProcessed(element, _) =
             match element with
             | :? IBinaryAppExpr
             | :? INewExpr
+            | :? IParametersOwnerPat
             | :? IPrefixAppExpr
-            | :? IReferenceExpr -> false
+            | :? IReferenceExpr
+            | :? IReferencePat -> false
             | _ -> true
 
         member this.ProcessBeforeInterior(element, result) =
-            let expr = element.As<IFSharpExpression>()
-            let hasPipedArg = BinaryAppExprNavigator.GetByRightArgument(expr.IgnoreParentParens()) |> isPredefinedInfixOpApp "|>"
+            match element with
+            | :? IFSharpExpression as expr ->
+                let hasPipedArg = BinaryAppExprNavigator.GetByRightArgument(expr.IgnoreParentParens()) |> isPredefinedInfixOpApp "|>"
 
-            match expr with
-            | :? IPrefixAppExpr as prefixAppExpr ->
-                let qualifiedExpr = prefixAppExpr.FunctionExpression.As<IQualifiedExpr>()
-                if isNotNull qualifiedExpr then
-                    this.Process(qualifiedExpr.Qualifier, result)
+                match expr with
+                | :? IPrefixAppExpr as prefixAppExpr ->
+                    let qualifiedExpr = prefixAppExpr.FunctionExpression.As<IQualifiedExpr>()
+                    if isNotNull qualifiedExpr then
+                        this.Process(qualifiedExpr.Qualifier, result)
 
-                let argExpressions = prefixAppExpr.AppliedExpressions
-                for argExpr in argExpressions do
-                    this.Process(argExpr, result)
+                    let argExpressions = prefixAppExpr.AppliedExpressions
+                    for argExpr in argExpressions do
+                        this.Process(argExpr, result)
 
-                let argCount =
-                    let ownArgExprCount = argExpressions.Count
-                    let count = if hasPipedArg then ownArgExprCount + 1 else ownArgExprCount
-                    Some(prefixAppExpr :> IFSharpExpression, count, hasPipedArg)
+                    let argCount =
+                        let ownArgExprCount = argExpressions.Count
+                        let count = if hasPipedArg then ownArgExprCount + 1 else ownArgExprCount
+                        Some(prefixAppExpr :> ITreeNode, count, hasPipedArg)
 
-                processInvokedReference argCount prefixAppExpr.InvokedFunctionReference result
+                    processInvokedReference argCount prefixAppExpr.InvokedFunctionReference result
 
-            | :? INewExpr as newExpr ->
-                this.Process(newExpr.ArgumentExpression, result)
-                processInvokedReference (Some(newExpr, 1, false)) newExpr.Reference result
+                | :? INewExpr as newExpr ->
+                    this.Process(newExpr.ArgumentExpression, result)
+                    processInvokedReference (Some(newExpr, 1, false)) newExpr.Reference result
 
-            | :? IReferenceExpr as refExpr ->
-                this.Process(refExpr.Qualifier, result)
-                let appInfo = if hasPipedArg then Some(refExpr :> IFSharpExpression, 1, true) else None
-                processInvokedReference appInfo refExpr.Reference result
+                | :? IReferenceExpr as refExpr ->
+                    this.Process(refExpr.Qualifier, result)
+                    let appInfo = if hasPipedArg then Some(refExpr :> ITreeNode, 1, true) else None
+                    processInvokedReference appInfo refExpr.Reference result
 
-            | :? IBinaryAppExpr as binaryAppExpr ->
-                this.Process(binaryAppExpr.LeftArgument, result)
-                this.Process(binaryAppExpr.RightArgument, result)
-                this.Process(binaryAppExpr.Operator, result)
+                | :? IBinaryAppExpr as binaryAppExpr ->
+                    this.Process(binaryAppExpr.LeftArgument, result)
+                    this.Process(binaryAppExpr.RightArgument, result)
+                    this.Process(binaryAppExpr.Operator, result)
+
+                | _ -> ()
+
+            | :? IFSharpPattern as pat ->
+                match pat with
+                | :? IParametersOwnerPat as parameterOwnerPat ->
+                    let parameters = parameterOwnerPat.Parameters
+                    let appInfo = Some(parameterOwnerPat :> ITreeNode, parameters.Count, false)
+                    processInvokedReference appInfo parameterOwnerPat.Reference result
+
+                    for parameter in parameters do
+                        this.Process(parameter, result)
+
+                | :? IReferencePat as referencePat ->
+                    let appInfo = Some(referencePat :> ITreeNode, 1, false)
+                    processInvokedReference appInfo referencePat.Reference result
+
+                | _ -> ()
 
             | _ -> ()
 
@@ -231,16 +251,8 @@ type FSharpSourceCallableExpressionsProvider() =
 
         result
 
-    let expressionSelectionProvider =
-        { new ExpressionSelectionProviderBase<IFSharpExpression>() with
-            override this.IsTokenSkipped(token) =
-                let tokenType = getTokenType token
-                isNotNull tokenType && tokenType.IsKeyword ||
-
-                base.IsTokenSkipped(token) }
-
     interface ISourceCallableExpressionsProvider with
-        member this.GetExpressionList(file, solution, startLine, startCol, endLine, endCol) =
+        member this.GetExpressionList(file, _, startLine, startCol, endLine, endCol) =
             let sourceFile = file.ToSourceFile()
             if isNull sourceFile then null else
 
@@ -255,28 +267,37 @@ type FSharpSourceCallableExpressionsProvider() =
             let fsFile = sourceFile.GetPrimaryPsiFile().AsFSharpFile()
             if isNull fsFile then null else
 
-            let expr =
+            let node: ITreeNode =
                 let startOffset = DocumentOffset(document, startOffset.Value)
                 let endOffset = DocumentOffset(document, endOffset.Value)
 
                 let node = fsFile.FindNodeAt(DocumentRange(&startOffset, &endOffset))
                 match node with
+                | :? IConditionOwnerExpr as conditionOwnerExpr -> conditionOwnerExpr.ConditionExpr
+                | :? IForEachExpr as forEachExpr -> forEachExpr.Pattern
+                | :? IMatchExpr as matchExpr -> matchExpr.Expression
+
                 | :? IFSharpExpression as expr -> expr
                 | :? IBinding as binding -> binding.Expression
 
-                | :? IFSharpIdentifier as fsIdentifier ->
-                    fsIdentifier.Parent.As<IReferenceExpr>()
+                | :? IFSharpIdentifier as fsIdentifier when (fsIdentifier.Parent :? IFSharpExpression) ->
+                    fsIdentifier.Parent
 
                 // Workaround dotnet/fsharp#19248
                 | :? ITokenNode as tokenNode when isReturnOrYield tokenNode ->
                     tokenNode.Parent.As<IFSharpExpression>()
 
+                | :? ITokenNode as tokenNode when getTokenType tokenNode == FSharpTokenType.FOR ->
+                    match tokenNode.Parent with
+                    | :? IForEachExpr as forEachExpr -> forEachExpr.InExpression
+                    | _ -> null
+
                 | _ -> null
 
-            if isNull expr then null else
+            if isNull node then null else
 
             let result = List()
-            expr.ProcessThisAndDescendants(FSharpCallableExpressionsCollector.Instance, result)
+            node.ProcessThisAndDescendants(FSharpCallableExpressionsCollector.Instance, result)
             result
 
         member this.GetAdditionalResumeLocations(location) =
@@ -310,5 +331,5 @@ type FSharpSourceCallableExpressionsProvider() =
 
             result
 
-        member this.GetCallableSource(file, solution, startLine, startCol, endLine, endCol, callIndex, callableName) = ""
-        member this.GetExpressionRange(file, solution, startLine, startCol) = DocumentRange.InvalidRange
+        member this.GetCallableSource(_, _, _, _, _, _, _, _) = ""
+        member this.GetExpressionRange(_, _, _, _) = DocumentRange.InvalidRange
