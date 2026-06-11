@@ -293,7 +293,8 @@ tasks {
   }
 
   named<Test>("test") {
-    classpath -= classpath.filter { it.name.startsWith("jsvg-") && it.name.endsWith(".jar") }.sorted().dropLast(1)
+    val jarsToRemove = classpath.filter { it.name.startsWith("jsvg-") && it.name.endsWith(".jar") }.sorted().dropLast(1)
+    classpath = classpath.filter { !jarsToRemove.contains(it) }
     useTestNG {
       groupByInstances = true
     }
