@@ -8,6 +8,7 @@ open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Application.UI.Controls.JetPopupMenu
 open JetBrains.Application.UI.Controls.TreeView
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.RdBackend.Common.Env
 open JetBrains.ReSharper.Feature.Services.CodeStructure
@@ -175,11 +176,13 @@ type FSharpDeclarationCodeStructureElement(declaration: IDeclaration, parent, pa
 type FSharpPatternDeclarationCodeStructureElement(pat: IReferencePat, parent, parentBlock: ICodeStructureBlockStart) =
     inherit FSharpDeclarationCodeStructureElement(pat, parent, parentBlock)
 
-    let patternPointer = pat.GetPsiServices().Pointers.CreateTreeElementPointer(pat)
-
     override this.GetTextRange() =
-        match patternPointer.GetTreeNode().Binding with
-        | null -> base.GetTextRange()
+        match this.TreeNode.As<IReferencePat>() with
+        | null -> DocumentRange.InvalidRange
+        | pat ->
+
+        match pat.Binding with
+        | null -> pat.GetDocumentRange()
         | binding -> binding.GetDocumentRange()
 
 
