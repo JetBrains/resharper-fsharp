@@ -81,6 +81,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpDiagnostic GetDiagnostic(Position pos) =>
       GetCachedDiagnostics().TryGetValue(pos);
 
+    public bool MarkedAsUnresolved(FSharpSymbolReference reference)
+    {
+      var resolvedSymbols = GetResolvedSymbols();
+      return reference.SymbolOffset is var symbolOffset && 
+             symbolOffset.IsValid() && 
+             resolvedSymbols.UnresolvedReferences.Contains(symbolOffset.Offset);
+    }
+
     public void SetCachedDiagnostics(IDictionary<Position, FSharpDiagnostic> diagnostics)
     {
       using var cookie = MonitorInterruptibleCookie.EnterOrThrow(myLock);
@@ -292,6 +300,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         Interruption.Current.CheckAndThrow();
       }
 
+      foreach (var diagnostic in checkResults.Diagnostics)
+      {
+        if (diagnostic.ErrorNumber != 39)
+          continue;
+
+        var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(document.GetTreeStartOffset(diagnostic.Range));
+        var referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier);
+
+        if (referenceOwner != null)
+          resolvedSymbols.UnresolvedReferences.Add(referenceOwner.Reference.SymbolOffset.Offset);
+      }
+
       return resolvedSymbols;
     }
 
@@ -365,6 +385,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Declarations = new(symbolUsesCount / 4);
       [NotNull] internal readonly CompactMap<int, FcsResolvedSymbolUse> Uses = new(symbolUsesCount);
+      [NotNull] internal readonly HashSet<int> UnresolvedReferences = [];
     }
 
     private class ParenMatcher() : BracketMatcher(ourParens)
