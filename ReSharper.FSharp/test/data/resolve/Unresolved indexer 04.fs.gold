@@ -1,0 +1,6 @@
+﻿|System|(0).|Int32|(1).|MaxValue1|(2)[0]
+
+------------------------------------------------
+0: result=IGNORABLE declaredElem=null
+1: result=IGNORABLE declaredElem=null
+2: result=NOT_RESOLVED declaredElem=null, should report resolve error

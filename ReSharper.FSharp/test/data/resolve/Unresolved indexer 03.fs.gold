@@ -1,0 +1,6 @@
+﻿|System|(0).|Int32|(1).|MaxValue|(2)[0]
+
+------------------------------------------------
+0: result=OK declaredElem=System
+1: result=OK declaredElem=System.Int32
+2: result=OK declaredElem=int System.Int32.MaxValue
