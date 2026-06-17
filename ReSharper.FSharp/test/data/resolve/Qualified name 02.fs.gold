@@ -1,0 +1,5 @@
+﻿|String|(0).|concat|(1)
+
+------------------------------------------------
+0: result=OK declaredElem=Microsoft.FSharp.Core.StringModule
+1: result=OK declaredElem=string Microsoft.FSharp.Core.StringModule.Concat(string sep, System.Collections.Generic.IEnumerable<string> strings)
