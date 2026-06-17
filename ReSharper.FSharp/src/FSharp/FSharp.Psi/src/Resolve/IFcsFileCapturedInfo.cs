@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     [CanBeNull]
     FSharpDiagnostic GetDiagnostic(Position offset);
 
-    bool MarkedAsUnresolved(FSharpSymbolReference reference);
+    bool ShouldReportResolveError(FSharpSymbolReference reference);
 
     void SetCachedDiagnostics([CanBeNull] IDictionary<Position, FSharpDiagnostic> diagnostics);
   }

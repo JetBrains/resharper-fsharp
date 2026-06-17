@@ -81,12 +81,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpDiagnostic GetDiagnostic(Position pos) =>
       GetCachedDiagnostics().TryGetValue(pos);
 
-    public bool MarkedAsUnresolved(FSharpSymbolReference reference)
+    public bool ShouldReportResolveError(FSharpSymbolReference reference)
     {
-      var resolvedSymbols = GetResolvedSymbols();
-      return reference.SymbolOffset is var symbolOffset && 
-             symbolOffset.IsValid() && 
-             resolvedSymbols.UnresolvedReferences.Contains(symbolOffset.Offset);
+      var symbolOffset = reference.SymbolOffset;
+      return symbolOffset.IsValid() && GetResolvedSymbols().UnresolvedReferences.Contains(symbolOffset.Offset);
     }
 
     public void SetCachedDiagnostics(IDictionary<Position, FSharpDiagnostic> diagnostics)
@@ -302,10 +300,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       foreach (var diagnostic in checkResults.Diagnostics)
       {
-        if (diagnostic.ErrorNumber != 39)
+        if (diagnostic.ErrorNumber != 39) 
           continue;
 
-        var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(document.GetTreeStartOffset(diagnostic.Range));
+        var identRange = document.GetTextRange(diagnostic.Range);
+        identRange = FixRange(identRange.StartOffset, identRange.EndOffset, null, buffer, lexer);
+
+        var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(new TreeOffset(identRange.StartOffset));
+        if (identifier == null || identifier.GetDocumentRange().Length != identRange.Length)
+          continue;
+
         var referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier);
 
         if (referenceOwner != null)

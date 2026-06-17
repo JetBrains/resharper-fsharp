@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [NotNull]
     IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null);
 
-    bool MarkedAsUnresolved(FSharpSymbolReference reference);
+    bool ShouldReportResolveError(FSharpSymbolReference reference);
 
     /// Documents are currently used in F# files parsing for getting line index info.
     /// This property is only set in FSharpElementFactory to override the document for the context source file

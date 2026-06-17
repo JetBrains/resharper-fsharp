@@ -2,4 +2,4 @@
 
 ------------------------------------------------
 0: result=IGNORABLE declaredElem=null
-1: result=NOT_RESOLVED declaredElem=null
+1: result=NOT_RESOLVED declaredElem=null, should report resolve error

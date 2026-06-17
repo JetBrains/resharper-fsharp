@@ -1,5 +1,5 @@
 ﻿|A|(0).|B|(1)
 
 ------------------------------------------------
-0: result=NOT_RESOLVED declaredElem=null
+0: result=NOT_RESOLVED declaredElem=null, should report resolve error
 1: result=IGNORABLE declaredElem=null

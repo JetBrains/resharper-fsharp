@@ -31,6 +31,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public bool MarkedAsUnresolved(FSharpSymbolReference reference) => false;
+    public bool ShouldReportResolveError(FSharpSymbolReference reference) => false;
   }
 }

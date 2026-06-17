@@ -32,8 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? myOwner.FSharpFile.GetSymbolUse(offset.Offset)
         : null;
 
-    private bool MarkedAsUnresolved => 
-      myOwner.FSharpFile.MarkedAsUnresolved(this);
+    public bool ShouldReportResolveError => 
+      myOwner.FSharpFile.ShouldReportResolveError(this);
 
     public virtual TreeOffset SymbolOffset
     {
@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       var element = GetDeclaredElement();
       if (element == null)
-        return MarkedAsUnresolved
+        return ShouldReportResolveError
           ? ResolveResultWithInfo.Unresolved
           : ResolveResultWithInfo.Ignore;
 
