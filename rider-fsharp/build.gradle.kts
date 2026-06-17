@@ -56,6 +56,7 @@ dependencies {
       rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
+    bundledPlugin("intellij.ssh.plugin")
     bundledPlugin("intellij.bookmarks.plugin")
     bundledPlugin("intellij.libraries.misc.plugin")
     bundledModule("intellij.rd.client")
@@ -67,7 +68,6 @@ dependencies {
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
-    bundledModule("intellij.platform.ssh")
     bundledModule("intellij.platform.langInjection")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
