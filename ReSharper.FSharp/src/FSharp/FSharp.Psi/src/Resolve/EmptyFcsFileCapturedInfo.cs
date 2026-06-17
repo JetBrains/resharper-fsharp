@@ -30,5 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public void SetCachedDiagnostics(IDictionary<Position, FSharpDiagnostic> diagnostics)
     {
     }
+
+    public bool ShouldReportResolveError(FSharpSymbolReference reference) => false;
   }
 }

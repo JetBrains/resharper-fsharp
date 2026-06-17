@@ -1,0 +1,8 @@
+﻿let (||B||(0)) () = ()
+
+(|||B|(1)||(2)) ()
+
+------------------------------------------------
+0: result=IGNORABLE declaredElem=null
+1: result=OK declaredElem=B
+2: result=OK declaredElem=void Active pattern 01.|B|()

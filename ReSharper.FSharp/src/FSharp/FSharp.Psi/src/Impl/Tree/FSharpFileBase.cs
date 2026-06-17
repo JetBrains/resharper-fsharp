@@ -63,6 +63,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IReadOnlyList<FcsResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null) =>
       FcsCapturedInfo.GetAllDeclaredSymbols();
 
+    public bool ShouldReportResolveError(FSharpSymbolReference reference) => 
+      FcsCapturedInfo.ShouldReportResolveError(reference);
+
     public FSharpSymbolUse GetSymbolUse(int offset) =>
       FcsCapturedInfo.GetSymbolUse(offset);
 
