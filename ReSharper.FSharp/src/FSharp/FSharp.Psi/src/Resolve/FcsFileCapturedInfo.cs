@@ -305,11 +305,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
         var identRange = document.GetTextRange(diagnostic.Range);
         identRange = FixRange(identRange.StartOffset, identRange.EndOffset, null, buffer, lexer);
-
-        var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(new TreeOffset(identRange.StartOffset));
-        if (identifier == null || buffer[identRange.EndOffset - 1] == ']')
+        if (buffer[identRange.EndOffset - 1] == ']')
           continue;
 
+        var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(new TreeOffset(identRange.StartOffset));
         var referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier);
 
         if (referenceOwner != null)
