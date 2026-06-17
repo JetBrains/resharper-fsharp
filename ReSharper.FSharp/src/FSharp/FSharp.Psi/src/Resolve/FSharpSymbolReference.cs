@@ -32,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? myOwner.FSharpFile.GetSymbolUse(offset.Offset)
         : null;
 
+    public bool ShouldReportResolveError => 
+      myOwner.FSharpFile.ShouldReportResolveError(this);
+
     public virtual TreeOffset SymbolOffset
     {
       get
@@ -57,7 +60,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       var element = GetDeclaredElement();
       if (element == null)
-        return ResolveResultWithInfo.Ignore;
+        return ShouldReportResolveError
+          ? ResolveResultWithInfo.Unresolved
+          : ResolveResultWithInfo.Ignore;
 
       if (element is ITypeElement typeElement && GetFcsSymbol() is FSharpEntity { GenericArguments: var inst } && !inst.IsEmpty())
       {
