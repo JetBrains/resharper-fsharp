@@ -307,7 +307,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         identRange = FixRange(identRange.StartOffset, identRange.EndOffset, null, buffer, lexer);
 
         var identifier = fsFile.GetContainingNodeAt<IFSharpIdentifier>(new TreeOffset(identRange.StartOffset));
-        if (identifier == null || identifier.GetDocumentRange().Length != identRange.Length)
+        if (identifier == null || buffer[identRange.EndOffset - 1] == ']')
           continue;
 
         var referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier);
