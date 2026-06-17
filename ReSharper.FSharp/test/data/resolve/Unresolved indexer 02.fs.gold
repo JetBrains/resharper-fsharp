@@ -1,0 +1,6 @@
+﻿let |x|(0) = 1
+|x|(1).[0]
+
+------------------------------------------------
+0: result=IGNORABLE declaredElem=null
+1: result=OK declaredElem=int Unresolved indexer 02.x
