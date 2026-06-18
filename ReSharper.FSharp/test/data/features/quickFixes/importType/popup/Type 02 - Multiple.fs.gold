@@ -1,0 +1,5 @@
+﻿open System
+open System.IO
+
+let x: Action<int> = null
+let y: StreamReader{caret} = null
