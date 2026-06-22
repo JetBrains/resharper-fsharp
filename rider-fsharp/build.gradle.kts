@@ -56,6 +56,10 @@ dependencies {
       rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
     }
     jetbrainsRuntime()
+    bundledPlugin("intellij.vcs.plugin")
+    bundledPlugin("intellij.vcs.split.plugin")
+    bundledPlugin("Git4Idea")
+    bundledPlugin("intellij.problemView.plugin")
     bundledPlugin("intellij.ssh.plugin")
     bundledPlugin("intellij.bookmarks.plugin")
     bundledPlugin("intellij.libraries.misc.plugin")
