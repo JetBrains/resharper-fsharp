@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -8,9 +9,10 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
 class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
   @Test

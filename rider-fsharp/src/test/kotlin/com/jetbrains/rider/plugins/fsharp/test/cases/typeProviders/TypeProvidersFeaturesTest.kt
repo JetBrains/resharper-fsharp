@@ -4,8 +4,10 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.IdeActions
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.EditorTestBase
+import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold
@@ -16,13 +18,14 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.gotoDeclaration
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import java.time.Duration
 
-@Test
+@Tag(Tags.Episode.FSharp)
+@Solution("SwaggerProviderCSharp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class TypeProvidersFeaturesTest : EditorTestBase() {
-  override val testSolution = "SwaggerProviderCSharp"
   override val restoreNuGetPackages = true
   override val traceScenarios: Set<LogTraceScenario>
     get() = super.traceScenarios + FSharpLogTraceScenarios.FSharpTypeProviders

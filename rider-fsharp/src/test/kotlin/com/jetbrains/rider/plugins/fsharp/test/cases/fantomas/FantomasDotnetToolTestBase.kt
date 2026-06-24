@@ -15,7 +15,7 @@ import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.asserts.shouldBe
-import com.jetbrains.rider.test.base.EditorTestBase
+import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.facades.solution.RiderSolutionWithFoldersApiFacade
 import com.jetbrains.rider.test.facades.solution.SolutionApiFacade
 import com.jetbrains.rider.test.framework.frameworkLogger

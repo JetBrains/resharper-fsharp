@@ -1,9 +1,12 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.lexer
 
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
-import org.testng.annotations.Test
+import org.junit.Test
+import org.junit.jupiter.api.Tag
 
+@Tag(Tags.Episode.FSharp)
 class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   override fun createLexer() = FSharpLexer()
 

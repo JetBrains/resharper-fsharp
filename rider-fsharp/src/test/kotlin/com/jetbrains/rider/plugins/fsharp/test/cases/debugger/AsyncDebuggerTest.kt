@@ -1,16 +1,18 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.DebuggerTestBase
+import com.jetbrains.rider.test.junit5.base.debugger.DebuggerTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.toggleBreakpoint
 import com.jetbrains.rider.test.scriptingApi.waitForPause
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
 @Solution("AsyncProgram")
 class AsyncDebuggerTest : DebuggerTestBase() {
@@ -22,7 +24,7 @@ class AsyncDebuggerTest : DebuggerTestBase() {
     params.restoreNuGetPackages = true
   }
 
-  @Test(description = "RIDER-27263")
+  @Test // RIDER-27263
   fun testAsyncBreakpoint() {
     // Note that this test doesn't checks the behavior of FSharpBreakpointVariantsProvider, since it's never called
     // in tests. But the test breakpoints are multi-method by default, and we should just check that multi-method

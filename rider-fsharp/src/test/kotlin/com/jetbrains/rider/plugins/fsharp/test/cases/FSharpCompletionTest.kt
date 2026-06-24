@@ -2,12 +2,13 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
+import com.jetbrains.rider.test.junit5.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
 abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : PatchEngineCompletionTestBase(mode) {
   override val testSolution: String = "CoreConsoleApp"
@@ -86,7 +87,9 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
   fun `nuget reference - replace path part`() = doTestChooseItem("Folder3/", "Script.fsx")
 
   @Mute("RIDER-104549")
+  @Test
   fun `comments - language injections`() = doTestChooseItem("f#")
+  @Test
   fun `doc comments - not available`() {
     dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       waitForDaemon()
@@ -96,15 +99,15 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
   }
 }
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Sequential)
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative)
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Mute("RIDER-116517")
 class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase)

@@ -1,13 +1,14 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Issue
 import com.jetbrains.rider.test.annotations.report.Issues
-import com.jetbrains.rider.test.base.ProjectModelBaseTest
+import com.jetbrains.rider.test.junit5.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.TestProjectModelContext
@@ -20,8 +21,10 @@ import com.jetbrains.rider.test.scriptingApi.cutItem
 import com.jetbrains.rider.test.scriptingApi.deleteElement
 import com.jetbrains.rider.test.scriptingApi.pasteItem
 import com.jetbrains.rider.test.scriptingApi.renameItem
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
+@Tag(Tags.Episode.FSharp)
 @Solution("EmptySolution")
 class FSharpProjectModelTest : ProjectModelBaseTest() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
@@ -205,7 +208,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     }
   }
 
-  @Test(description = "RIDER-107198")
+  @Test // RIDER-107198
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {

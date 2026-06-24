@@ -5,7 +5,7 @@ import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.OpenSolutionParams
-import com.jetbrains.rider.test.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
 
 abstract class BaseTypeProvidersTest : PerTestSolutionTestBase() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {

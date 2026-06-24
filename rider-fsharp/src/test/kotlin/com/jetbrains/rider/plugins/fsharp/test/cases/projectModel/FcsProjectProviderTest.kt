@@ -5,6 +5,7 @@ import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.testFramework.ProjectViewTestUtil
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.editors.getProjectModelId
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.plugins.fsharp.test.framework.withoutNonFSharpProjectReferences
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
@@ -12,9 +13,9 @@ import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
+import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.scriptingApi.addReference
 import com.jetbrains.rider.test.scriptingApi.buildSolutionWithReSharperBuild
 import com.jetbrains.rider.test.scriptingApi.deleteElement
@@ -23,16 +24,18 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForDaemonCloseAllOpenEditors
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.util.idea.syncFromBackend
-import org.testng.annotations.BeforeMethod
-import org.testng.annotations.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FcsProjectProviderTest : PerTestSolutionTestBase() {
   override val traceCategories
     get() = super.traceCategories.plus("JetBrains.ReSharper.Plugins.FSharp.Checker.FcsProjectProvider")
 
-  @BeforeMethod(alwaysRun = true)
+  @BeforeEach
   fun setUpTestCaseProjectModel() {
     ProjectViewTestUtil.setupImpl(project, true)
   }

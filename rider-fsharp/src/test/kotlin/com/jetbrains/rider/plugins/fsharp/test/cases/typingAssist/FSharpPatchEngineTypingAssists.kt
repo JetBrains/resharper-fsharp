@@ -1,10 +1,11 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
 import com.intellij.openapi.actionSystem.IdeActions
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Feature
-import com.jetbrains.rider.test.base.PatchEngineEditorTestBase
+import com.jetbrains.rider.test.junit5.base.PatchEngineEditorTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
@@ -13,8 +14,11 @@ import com.jetbrains.rider.test.reporting.SubsystemConstants
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditorFacade
-import org.testng.annotations.DataProvider
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.extension
@@ -25,18 +29,18 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
   override val checkTextControls = false
   override val testSolution = "CoreConsoleApp"
 
-  @DataProvider(name = "simpleCases")
   fun simpleCases() = arrayOf(
-    arrayOf("emptyFile"),
-    arrayOf("docComment"),
-    arrayOf("indent1"),
-    arrayOf("indent2"),
-    arrayOf("removeSelection1"),
-    arrayOf("removeSelection2"),
-    arrayOf("trailingSpace")
+    "emptyFile",
+    "docComment",
+    "indent1",
+    "indent2",
+    "removeSelection1",
+    "removeSelection2",
+    "trailingSpace"
   )
 
-  @Test(dataProvider = "simpleCases")
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("simpleCases")
   fun testStartNewLine(caseName: String) {
     dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       typeOrCallAction(IdeActions.ACTION_EDITOR_START_NEW_LINE)
@@ -52,15 +56,14 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
   }
 }
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
   FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
 
-
-@Test
+@Tag(Tags.Episode.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -105,21 +108,18 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
     )
   }
 
-  @Test(dataProvider = SUPPORTED_BACKEND_CASES)
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("supportedCases")
   fun test(caseName: String) = doTest(caseName, true)
 
   // Enable for local testing
-  @Test(dataProvider = NOT_SUPPORTED_BACKEND_CASES, enabled = false)
+  @Disabled
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("notSupportedCases")
   fun notSupported(caseName: String) = doTest(caseName, false)
-
-  companion object {
-    const val NOT_SUPPORTED_BACKEND_CASES = "notSupportedBackendCases"
-    const val SUPPORTED_BACKEND_CASES = "supportedBackendCases"
-  }
 }
 
-
-@Test
+@Tag(Tags.Episode.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -271,24 +271,20 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
     "Enter - String 15"
   )
 
-  @DataProvider(name = SUPPORTED_BACKEND_CASES)
   fun supportedCases() = tests.toTypedArray()
 
-  @DataProvider(name = NOT_SUPPORTED_BACKEND_CASES)
   fun notSupportedCases() =
     backendCases
       .filter { it.startsWith("Enter") && !tests.contains(it) }
       .toTypedArray()
 }
 
-
-@Test
+@Tag(Tags.Episode.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpBackspaceTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(IdeActions.ACTION_EDITOR_BACKSPACE) {
 
-  @DataProvider(name = SUPPORTED_BACKEND_CASES)
   fun supportedCases() = backendCases
     .filter { it.startsWith("Backspace") || it.contains(" - Backspace") }
     .toTypedArray()
