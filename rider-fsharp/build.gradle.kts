@@ -43,8 +43,10 @@ val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$riderBaseVersion.$buildCounter"
 
 dependencies {
-  testImplementation(libs.junit)
-  testImplementation(libs.testng)
+  testImplementation(libs.junit5)
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.2")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
   testImplementation(libs.kotlin.test)
   intellijPlatform {
     val dir = file("build/rider")
@@ -305,9 +307,7 @@ tasks {
       classpath += files(problematicPath.reversed())
     }
     reorderClasspath("intellij.libraries.jsvg.jar", "intellij.charts.jar")
-    useTestNG {
-      groupByInstances = true
-    }
+    useJUnitPlatform()
   }
 
   withType<Test> {

@@ -1,4 +1,4 @@
 [libraries]
-junit = "junit:junit:4.13.2"
-testng = "org.testng:testng:7.10.2"
+junit4 = "junit:junit:4.13.2"
+junit5 = "org.junit.jupiter:junit-jupiter-api:5.14.4"
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
