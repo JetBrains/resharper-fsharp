@@ -9,5 +9,5 @@ object RiderTestDataMarker : IRiderTestDataMarker {
     get() = Path.of("src/test/testData")
 
   override val pluginDirectoryInUltimate: Path
-    get() = Path.of("dotnet/Plugins/resharper-fsharp/rider-fsharp")
+    get() = Path.of("dotnet/Plugins/resharper-fsharp/rider-fsharp/parserTest")
 }
