@@ -379,7 +379,12 @@ tasks {
 
     executable = "dotnet"
     workingDir(resharperPluginPath)
-    args("build", "-consoleloggerparameters:ErrorsOnly", "ReSharper.FSharp.sln")
+    args(
+      "build",
+      "-consoleloggerparameters:ErrorsOnly",
+      "--configuration", buildConfiguration,
+      "ReSharper.FSharp.sln"
+    )
   }
 
   wrapper {
