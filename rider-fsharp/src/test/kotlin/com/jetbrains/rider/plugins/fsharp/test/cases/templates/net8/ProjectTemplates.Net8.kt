@@ -1,26 +1,31 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net8
 
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.ChecklistItems
-import com.jetbrains.rider.test.base.templates.sdk.ClassLibProjectTemplateTestBase
-import com.jetbrains.rider.test.base.templates.sdk.ConsoleAppProjectTemplateTestBase
-import com.jetbrains.rider.test.base.templates.sdk.XUnitProjectTemplateTestBase
+import com.jetbrains.rider.test.junit5.base.sdk.ClassLibProjectTemplateTestBase
+import com.jetbrains.rider.test.junit5.base.sdk.ConsoleAppProjectTemplateTestBase
+import com.jetbrains.rider.test.junit5.base.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.reporting.SubsystemConstants
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Tag
 
-@Suppress("unused")
+@Suppress("JUnitTestCaseWithNoTests")
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
 @TestEnvironment(platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
 @Subsystem(SubsystemConstants.PROJECT_TEMPLATES)
-object Net8 {
+class Net8 {
+    @Nested
     @ChecklistItems(["New Solution or New Project Wizard/Project templates basic creation/Class libraries"])
-    class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.classLibrary) {
+    inner class ClassLibProjectTemplateTest : ClassLibProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.classLibrary) {
         override val targetFramework: String = "net8.0"
         override val buildFilesIgnoreList: Set<Regex> = setOf(
             Regex("ClassLibrary/bin/Debug/net8\\.0/ClassLibrary\\.deps\\.json"),
@@ -32,8 +37,9 @@ object Net8 {
         }
     }
 
+    @Nested
     @ChecklistItems(["New Solution or New Project Wizard/Project templates basic creation/Console apps"])
-    class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.consoleApplication) {
+    inner class ConsoleAppProjectTemplateTest : ConsoleAppProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.consoleApplication) {
         override val breakpointLine: Int = 2
         override val expectedOutput: String = "Hello from F#"
         override val debugFileName: String = "Program.fs"
@@ -50,8 +56,9 @@ object Net8 {
         }
     }
 
+    @Nested
     @ChecklistItems(["New Solution or New Project Wizard/Project templates basic creation/Unit Tests"])
-    class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.xUnit) {
+    inner class XUnitProjectTemplateTest : XUnitProjectTemplateTestBase(ProjectTemplates.Sdk.Net8.FSharp.xUnit) {
         override val sessionElements: Int = 3
         override val debugFileName: String = "Tests.fs"
         override val breakpointLine: Int = 8

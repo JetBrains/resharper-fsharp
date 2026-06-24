@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.daemon.util.hasErrors
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
@@ -22,10 +23,12 @@ import com.jetbrains.rider.test.scriptingApi.waitForCompletion
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import kotlin.io.path.pathString
 
+@Tag(Tags.Episode.FSharp)
 @Solution("YamlProviderCSharp")
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
   @Mute("RIDER-136409")

@@ -8,10 +8,11 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.jetbrains.rider.editors.getPsiFile
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.PerTestSolutionTestBase
+import com.jetbrains.rider.test.junit5.base.PerTestSolutionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -20,9 +21,10 @@ import com.jetbrains.rider.test.scriptingApi.getHighlighters
 import com.jetbrains.rider.test.scriptingApi.typeFromOffset
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @Solution("CoreConsoleApp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class InjectionEscapersTest : PerTestSolutionTestBase() {
@@ -82,20 +84,34 @@ class InjectionEscapersTest : PerTestSolutionTestBase() {
     }
   }
 
+  @Test
   fun `escaping - regular`() = doFullEditingTest()
+  @Test
   @Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
   fun `escaping - regular - interpolated`() = doFullEditingTest()
+  @Test
   fun `escaping - triple quoted`() = doFullEditingTest()
+  @Test
   fun `escaping - triple quoted - interpolated`() = doFullEditingTest()
+  @Test
   fun `escaping - verbatim`() = doFullEditingTest()
+  @Test
   fun `escaping - verbatim - interpolated`() = doFullEditingTest()
+  @Test
   fun `escaping - raw`() = doFullEditingTest()
 
+  @Test
   fun `backslash - simple`() = doBackslashTest()
+  @Test
   fun `backslash at the end - regular`() = doBackslashTest()
+  @Test
   fun `backslash at the end - verbatim`() = doBackslashTest()
+  @Test
   fun `backslash at the end - triple quoted`() = doBackslashTest()
+  @Test
   fun `backslash at the end - raw`() = doBackslashTest()
+  @Test
   fun `backslash before hole - interpolated`() = doBackslashTest()
+  @Test
   fun `escaped backslash at the end - regular`() = doBackslashTest()
 }

@@ -1,12 +1,15 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.base.RiderSqlInjectionTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import org.testng.annotations.Test
+import com.jetbrains.rider.test.junit5.base.RiderSqlInjectionTestBase
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("CoreConsoleApp")
 class FSharpSqlAutomaticInjectionTest : RiderSqlInjectionTestBase() {

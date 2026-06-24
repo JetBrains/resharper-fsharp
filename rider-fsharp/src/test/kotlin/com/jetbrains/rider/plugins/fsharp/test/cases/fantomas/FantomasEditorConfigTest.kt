@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
+import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
 import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
 import com.jetbrains.rider.test.annotations.TestSettings
@@ -10,10 +11,11 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import kotlin.io.path.copyTo
 
-@Test
+@Tag(Tags.Episode.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override val testSolution = "FormatCodeApp"
@@ -52,15 +54,15 @@ class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
     }
   }
 
-  @Test(description = "Doesn't support experimental_stroustrup, 'cramped' should be used instead")
+  @Test // Doesn't support experimental_stroustrup, 'cramped' should be used instead
   fun `editorconfig enum values 01`() = doEditorConfigTestWithVersion("6.0.1")
 
-  @Test(description = "Supports stroustrup")
+  @Test // Supports stroustrup
   fun `editorconfig enum values 02`() = doEditorConfigTestWithVersion("6.0.1")
 
-  @Test(description = "RIDER-111743")
+  @Test // RIDER-111743
   fun `editorconfig overrides 01 - final newline`() = doEditorConfigTest()
 
-  @Test(description = "RIDER-111743")
+  @Test // RIDER-111743
   fun `editorconfig overrides 02 - final newline`() = doEditorConfigTest()
 }
