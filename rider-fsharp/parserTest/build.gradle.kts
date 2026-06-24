@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
   implementation(project(":"))
-  testImplementation(libs.junit)
+  testImplementation(libs.junit4)
   testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.2")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
