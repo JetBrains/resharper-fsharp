@@ -33,7 +33,7 @@ abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileT
 }
 
 
-class FSharpDummyParserTests : FSharpFrontendParserTest(FSharpFileType) {
+class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
   override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpFileImpl)
 
   @Test fun `test empty`() = doTest()
@@ -65,7 +65,7 @@ class FSharpDummyParserTests : FSharpFrontendParserTest(FSharpFileType) {
 }
 
 
-class FSharpScriptDummyParserTests : FSharpFrontendParserTest(FSharpScriptFileType) {
+class FSharpScriptDummyParserTest : FSharpFrontendParserTest(FSharpScriptFileType) {
   override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpScriptFileImpl)
 
   @Test fun `test empty`() = doTest()
