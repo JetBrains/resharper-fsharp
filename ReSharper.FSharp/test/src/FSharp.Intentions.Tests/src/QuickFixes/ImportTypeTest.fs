@@ -5,6 +5,7 @@ open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped.Popups
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -79,6 +80,14 @@ type ImportTypeTest() =
     [<Test>] member x.``Static member - String 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Static member - Not available 01 - Qualified``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type ImportTypeAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase<FSharpImportTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/importType/availability"
+
+    [<Test>] member x.``Static member 01``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
