@@ -307,6 +307,8 @@ tasks {
       classpath += files(problematicPath.reversed())
     }
     reorderClasspath("intellij.libraries.jsvg.jar", "intellij.charts.jar")
+    // Ignore IJ Platform JUnit5 framework set up and tear down
+    systemProperty("intellij.build.test.ignoreFirstAndLastTests", "true")
     useJUnitPlatform()
   }
 
