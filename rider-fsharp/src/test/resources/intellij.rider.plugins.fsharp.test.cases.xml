@@ -3,12 +3,9 @@
     <dependencies>
       <plugin id="com.jetbrains.rider.fsharp"/>
       <module name="intellij.rider.test.framework"/>
-      <module name="intellij.rider.test.framework.integration.testng"/>
-      <module name="intellij.rider.test.framework.integration.testng.tests"/>
       <module name="intellij.rider.test.framework.core"/>
-      <module name="intellij.rider.test.framework.testng"/>
-      <module name="intellij.rider.test.framework.unit"/>
       <module name="intellij.rider.test.framework.junit"/>
+      <module name="intellij.rider.test.framework.integration.junit"/>
       <module name="intellij.libraries.commons.compress"/>
       <module name="intellij.libraries.commons.logging"/>
       <module name="intellij.libraries.gson"/>
@@ -38,7 +35,6 @@
       <module name="intellij.platform.util.ex"/>
       <module name="intellij.rd.client"/>
       <module name="intellij.rider.languages"/>
-      <module name="intellij.rider.test.framework.integration.junit"/>
       <module name="intellij.xml.impl"/>
     </dependencies>
     <!-- endregion -->
