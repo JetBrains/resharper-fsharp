@@ -7,9 +7,13 @@ import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.junit5.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
+import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 
+// Order by name due to tests dependency on their order. TODO: Investigate the reason of dependency and fix it
+@TestMethodOrder(MethodOrderer.MethodName::class)
 abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : PatchEngineCompletionTestBase(mode) {
   override val testSolution: String = "CoreConsoleApp"
   override val restoreNuGetPackages = true
