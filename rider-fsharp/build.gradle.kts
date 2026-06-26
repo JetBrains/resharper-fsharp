@@ -55,7 +55,7 @@ dependencies {
       local(dir)
     } else {
       logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-      rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
+      rider("$riderBaseVersion-SNAPSHOT") { useInstaller = false }
     }
     jetbrainsRuntime()
     bundledPlugin("intellij.vcs.plugin")
@@ -79,7 +79,6 @@ dependencies {
     bundledPlugin("rider.intellij.plugin.appender")
     bundledPlugin("intellij.structureView.plugin")
     bundledModule("intellij.resharper.assist")
-    instrumentationTools()
     // TODO: Temporary I hope hope hope
     bundledLibrary(provider {
       project.intellijPlatform.platformPath.resolve("lib/testFramework.jar").pathString

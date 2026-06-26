@@ -25,10 +25,10 @@ dependencies {
     val dir = file("../build/rider")
     if (dir.exists()) {
       logger.lifecycle("*** Using Rider SDK from local path " + dir.absolutePath)
-      local(dir)
+      logger.lifecycle("*** (already imported from the main module)")
     } else {
       logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-      rider("$riderBaseVersion-SNAPSHOT", useInstaller = false)
+      rider("$riderBaseVersion-SNAPSHOT") { useInstaller = false }
     }
     jetbrainsRuntime()
     testFramework(TestFrameworkType.Bundled)
