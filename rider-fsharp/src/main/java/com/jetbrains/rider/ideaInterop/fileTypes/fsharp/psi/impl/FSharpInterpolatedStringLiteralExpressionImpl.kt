@@ -32,7 +32,7 @@ class FSharpInterpolatedStringLiteralExpressionImpl(type: FSharpElementType) :
     val dummyFile =
       PsiFileFactory.getInstance(project).createFileFromText("dummy.fs", FSharpFileType, text) as FSharpFile
 
-    val newStringExpression = dummyFile.firstChild as FSharpInterpolatedStringLiteralExpressionImpl
+    val newStringExpression = dummyFile.firstChild.firstChild as FSharpInterpolatedStringLiteralExpressionImpl
     return replace(newStringExpression) as PsiLanguageInjectionHost
   }
 
