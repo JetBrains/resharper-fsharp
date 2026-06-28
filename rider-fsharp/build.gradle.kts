@@ -59,7 +59,6 @@ dependencies {
     }
     jetbrainsRuntime()
     bundledPlugin("intellij.vcs.plugin")
-    bundledPlugin("intellij.vcs.split.plugin")
     bundledPlugin("Git4Idea")
     bundledPlugin("intellij.problemView.plugin")
     bundledPlugin("intellij.ssh.plugin")
