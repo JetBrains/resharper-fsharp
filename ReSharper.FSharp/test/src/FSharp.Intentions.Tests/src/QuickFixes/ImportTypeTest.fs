@@ -1,5 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes.Import
 
+open System.Linq
+open JetBrains.Diagnostics
+open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped.Popups
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -67,6 +72,23 @@ type ImportTypeTest() =
     [<Test>] member x.``Accessibility 07``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 08``() = x.DoNamedTestWithTwoFiles()
     [<Test>] member x.``Accessibility 09``() = x.DoNamedTestWithTwoFiles()
+
+[<FSharpTest>]
+type ImportTypePopupTest() =
+    inherit FSharpQuickFixTestBase<FSharpPopupImportTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/importType/popup"
+
+    override x.ExecuteBulbAction(textControl, actionOwner, _, _) =
+        let scopedPopupAction = actionOwner.QuickFix.As<IScopedPopupAction>()
+        let intentionPopup = 
+          ScopedIntentionsManager.TryGetScopedPopupAction(scopedPopupAction, x.Solution, textControl.Document.GetDocumentRange()).NotNull();
+
+        let singleAction = intentionPopup.Actions.Single().NotNull()
+        singleAction.Execute(x.Solution, textControl)
+
+    [<Test>] member x.``Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type 02 - Multiple``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

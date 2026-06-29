@@ -1,0 +1,3 @@
+﻿open System.IO
+
+let s: StreamReader{caret} = ""
