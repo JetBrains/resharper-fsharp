@@ -1,0 +1,6 @@
+﻿//${RUN:Import missing references in file}
+open System
+open System.IO
+
+let x: StreamReader{caret} = null
+let y = String.Empty

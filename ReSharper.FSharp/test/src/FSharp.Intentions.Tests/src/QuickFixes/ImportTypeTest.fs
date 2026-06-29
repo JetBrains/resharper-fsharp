@@ -5,6 +5,7 @@ open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped.Popups
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -21,6 +22,7 @@ type ImportTypeTest() =
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type 02 - Empty line``() = x.DoNamedTest()
     [<Test>] member x.``Type 03 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Type 04 - Multiple - Static members``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Generic List 01``() = x.DoNamedTest()
@@ -72,6 +74,21 @@ type ImportTypeTest() =
     [<Test>] member x.``Accessibility 07``() = x.DoNamedTest()
     [<Test>] member x.``Accessibility 08``() = x.DoNamedTestWithTwoFiles()
     [<Test>] member x.``Accessibility 09``() = x.DoNamedTestWithTwoFiles()
+
+    [<Test>] member x.``Static member - Debugger 01``() = x.DoNamedTest()
+    [<Test>] member x.``Static member - Debugger 02``() = x.DoNamedTest()
+    [<Test>] member x.``Static member - String 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Static member - Not available 01 - Qualified``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type ImportTypeAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase<FSharpImportTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/importType/availability"
+
+    [<Test>] member x.``Static member 01``() = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type ImportTypePopupTest() =
@@ -216,14 +233,3 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
-
-
-[<FSharpTest>]
-type FSharpImportStaticMemberTest() =
-    inherit FSharpQuickFixTestBase<FSharpImportStaticMemberFromQualifierTypeFix>()
-
-    override x.RelativeTestDataPath = "features/quickFixes/import/staticMember"
-
-    [<Test>] member x.``Debugger 01``() = x.DoNamedTest()
-    [<Test>] member x.``Debugger 02``() = x.DoNamedTest()
-    [<Test>] member x.``String 01``() = x.DoNamedTest()

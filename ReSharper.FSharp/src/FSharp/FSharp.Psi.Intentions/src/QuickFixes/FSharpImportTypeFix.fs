@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
 
@@ -38,6 +39,10 @@ type FSharpPopupImportTypeFix(reference) =
 
 type FSharpReferenceModuleAndTypeFix(reference) =
     inherit ReferenceModuleAndTypeFix(reference)
+
+    override this.IsAvailable(cache) =
+        base.IsAvailable(cache) &&
+        not (FSharpImportStaticMemberUtil.isAvailable reference)
 
     override this.GetSymbolScope(context) =
         let symbolCache = context.GetPsiServices().Symbols
