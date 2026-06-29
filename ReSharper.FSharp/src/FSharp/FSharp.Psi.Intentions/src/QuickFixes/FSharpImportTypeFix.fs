@@ -25,6 +25,16 @@ type FSharpImportTypeFix(reference) =
     override this.DoAdditionalOrdering(candidates) =
         FSharpImportTypeFix.doAdditionalSorting candidates
 
+type FSharpPopupImportTypeFix(reference) =
+    inherit ImportTypeQuickPopupFix(reference)
+
+    override this.GetSymbolScope(context) =
+        let symbolCache = context.GetPsiServices().Symbols
+        symbolCache.GetAlternativeNamesSymbolScope(context.GetPsiModule(), true)
+
+    override this.DoAdditionalOrdering(candidates) =
+        FSharpImportTypeFix.doAdditionalSorting candidates
+
 
 type FSharpReferenceModuleAndTypeFix(reference) =
     inherit ReferenceModuleAndTypeFix(reference)

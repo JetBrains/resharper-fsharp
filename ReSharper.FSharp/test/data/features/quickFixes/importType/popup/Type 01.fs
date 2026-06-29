@@ -1,0 +1,1 @@
+let s: StreamReader{caret} = ""

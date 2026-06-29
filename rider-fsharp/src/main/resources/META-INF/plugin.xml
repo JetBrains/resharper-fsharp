@@ -29,6 +29,7 @@
 
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
+    <backend.auto.import.support language="F#" implementationClass="com.jetbrains.rider.intentions.RiderAutoImportSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <enterHandlerDelegate implementation="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpEnterHandlerDelegate"
