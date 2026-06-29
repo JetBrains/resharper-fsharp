@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open System.Collections.Generic
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -7,12 +8,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
@@ -20,12 +23,31 @@ type FSharpImportTypeHelper() =
         let referenceName = context.As<ITypeReferenceName>()
         not (isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)))
 
+    let findImportStaticMemberTypeCandidates reference =
+        if not (FSharpImportStaticMemberUtil.isAvailable reference) then Seq.empty else
+
+        let memberName = reference.GetName()
+        let qualifierReference = reference.QualifierReference
+        if isNull qualifierReference then Seq.empty else
+
+        let accessContext = FSharpAccessContext(qualifierReference.GetElement())
+        let result = HashSet()
+
+        for typeElement in FSharpImportStaticMemberUtil.getTypeElements (Some(memberName)) qualifierReference do
+            for typeMember in typeElement.EnumerateOwnMembersWithName(memberName, false) do
+                if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
+                    result.Add(typeElement) |> ignore
+
+        result
+
     interface IImportTypeHelper with
         member x.IsAvailable(reference) = true
 
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
-            if isNull reference || reference.IsQualified then Seq.empty else
+            if isNull reference then Seq.empty else
+
+            if reference.IsQualified then findImportStaticMemberTypeCandidates reference else
 
             let context = reference.GetElement()
             if not (isApplicable context) then Seq.empty else
