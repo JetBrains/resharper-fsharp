@@ -5,9 +5,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -93,7 +93,7 @@ type NamedUnionCaseFieldsPatRule() =
                     .WithPresentation(fun _ ->
                         TextPresentation(lookupText, PsiSymbolsThemedIcons.Field.Id, info, DisplayTypeName = fieldType))
                     .WithBehavior(fun _ -> TextualBehavior(info))
-                    .WithMatcher(fun _ -> TextualMatcher(info))
+                    .WithMatcher(LookupItemMatcher.Literal)
                     // Force the items to be on top in the list.
                     .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatch)
 

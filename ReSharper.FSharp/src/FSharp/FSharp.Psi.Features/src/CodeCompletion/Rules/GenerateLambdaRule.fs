@@ -7,9 +7,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.Util
@@ -135,7 +135,7 @@ type GenerateLambdaRule() =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextualPresentation(RichText(presentationText), info) :> _)
                 .WithBehavior(fun _ -> GenerateLambdaBehavior(info) :> _)
-                .WithMatcher(fun _ -> TextualMatcher(presentationText, info) :> _)
+                .WithMatcher(LookupItemMatcher.CustomText(presentationText))
                 .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatchLambda)
 
         item.Placement.Location <- PlacementLocation.Top

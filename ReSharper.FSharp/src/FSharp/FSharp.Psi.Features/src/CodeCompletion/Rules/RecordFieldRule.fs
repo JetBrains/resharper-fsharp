@@ -7,9 +7,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -167,7 +167,7 @@ type RecordFieldRule() =
                         let typeText = field.FieldType.Format()
                         TextPresentation(info, typeText, emphasize, PsiSymbolsThemedIcons.Field.Id) :> _)
                     .WithBehavior(fun _ -> TextualBehavior(info))
-                    .WithMatcher(fun _ -> TextualMatcher(info) :> _)
+                    .WithMatcher(LookupItemMatcher.Literal)
 
             let item: ILookupItem =
                 if not emphasize then item else

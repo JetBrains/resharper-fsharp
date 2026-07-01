@@ -5,9 +5,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -42,7 +42,7 @@ module Module =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextualPresentation(info) :> _)
                 .WithBehavior(fun _ -> TextualBehavior(info))
-                .WithMatcher(fun _ -> TextualMatcher(info))
+                .WithMatcher(LookupItemMatcher.Literal)
                 .WithRelevance(CLRLookupItemRelevance.LocalVariablesAndParameters)
         )
 
