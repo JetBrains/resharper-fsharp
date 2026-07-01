@@ -6,9 +6,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -110,7 +110,7 @@ type ToRecursiveFunctionRule() =
                     LookupItemFactory.CreateLookupItem(info)
                         .WithPresentation(fun _ -> TextualPresentation(lookupText, info) :> _)
                         .WithBehavior(fun _ -> ToRecursiveFunctionBehavior(info, letBindings.GetTreeStartOffset()) :> _)
-                        .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
+                        .WithMatcher(LookupItemMatcher.CustomText(name))
                         .WithRelevance(CLRLookupItemRelevance.GenerateItems)
 
                 collector.Add(item)

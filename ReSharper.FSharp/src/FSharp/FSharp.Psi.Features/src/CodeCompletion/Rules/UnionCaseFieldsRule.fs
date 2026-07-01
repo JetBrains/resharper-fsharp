@@ -5,9 +5,9 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -160,7 +160,7 @@ type UnionCaseFieldsPatternRule() =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextPresentation(info, null, false))
                 .WithBehavior(fun _ -> UnionCaseFieldsBehaviour(info))
-                .WithMatcher(fun _ -> TextualMatcher(info))
+                .WithMatcher(LookupItemMatcher.Literal)
                 .WithRelevance(Relevance)
 
         item.Placement.Location <- PlacementLocation.Top

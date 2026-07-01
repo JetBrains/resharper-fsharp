@@ -6,9 +6,9 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Matchers
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
@@ -71,7 +71,7 @@ type ImportStaticMemberRule() =
                                 LookupUtil.AddInformationText(name, $"(in {qualifiedName})")
                                 TextualPresentation(name, info, iconManager.GetImage(typeMember, language, true)))
                             .WithBehavior(fun _ -> ImportDeclaredElementBehavior(info))
-                            .WithMatcher(fun _ -> TextualMatcher(name, info) :> _)
+                            .WithMatcher(LookupItemMatcher.Literal)
                             .WithRelevance(CLRLookupItemRelevance.ImportedType)
 
                     if seenNamesAndNs.Add((name, qualifiedName)) then
