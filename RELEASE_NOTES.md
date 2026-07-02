@@ -1,5 +1,30 @@
 # Release notes
 
+## 2026.2
+
+### Quick fixes and context actions
+* **New:** Context actions show previews now
+* **New:** A new editor popup allows importing types easily, matching the C# implementation
+* **New:** It's possible to disable and restore compiler warnings via a new quick fix
+* **Fix:** Fixing multiple errors by importing types now works as expected
+* **Improve:** Adding type annotations is now possible on more expressions
+* **Fix:** Byref parameters are produced correctly when generating overrides
+
+### Debugger
+* **Fix:** Thanks to lots of stepping fixes, stepping into a function now works more reliably
+* **Fix:** Fix return values weren't shown after stepping out of some F# functions
+* **Fix:** Fix unexpected return values for framework methods
+
+### Code analysis and navigation
+* **Fix:** C# 14 extensions were not analyzed correctly
+* **Improve:** Simplifying lambda expressions is not suggested in cases where it would break code
+* **Fix:** Redundant parens analyzer take nullable types into account now
+* **Fix:** Enum fields were missing in file structure navigation
+* **Improve:** Struct record types can be highlighted differently now
+* **Improve:** The fonts were improved in editor popups
+
+
+
 ## 2026.1
 
 ### Debugger
