@@ -38,7 +38,7 @@ type DisableWarningActionProvider(settingsManager: HighlightingSettingsManager) 
 
             let warning =
                 match compilerId with
-                | Some compilerId -> Warning.Compiler(CompilerDiagnosticId(compilerId))
+                | Some compilerId -> Warning.Compiler(CompilerDiagnosticId.Create(psiFile, compilerId))
                 | _ -> Warning.ReSharper(ReSharperDiagnosticId(severityId))
 
             [|

@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
@@ -24,8 +25,8 @@ type ReSharperDiagnosticId = ReSharperDiagnosticId of diagnosticId: string with
     interface IDiagnosticId with
         member x.SourceName = x.SourceName
 
-type CompilerDiagnosticId(sourceName: string) =
-    let normalize (s: string) = s.Trim().Trim('"').TrimStart('F', 'S', '0')
+type CompilerDiagnosticId private (sourceName: string) =
+    static let normalize (s: string) = s.Trim().Trim('"').TrimStart('F', 'S', '0')
 
     member _.SourceName = sourceName
 
@@ -40,6 +41,16 @@ type CompilerDiagnosticId(sourceName: string) =
             false
 
     override this.GetHashCode() = (normalize sourceName).GetHashCode()
+
+    static member FromNode(node: ITokenNode): IDiagnosticId =
+        CompilerDiagnosticId(node.GetText())
+
+    static member Create(file: IFSharpFile, compilerId) =
+        let compilerId =
+            if FSharpLanguageLevel.isFSharp90Supported file then compilerId
+            else $"\"{normalize compilerId}\""
+
+        CompilerDiagnosticId(compilerId)
 
 [<RequireQualifiedAccess>]
 type Warning =
@@ -115,7 +126,7 @@ module private Utils =
                 | :? IWarningDirective as directive ->
                     Some { Type = if directive.IsNowarn() then Disable else Restore
                            Node = directive
-                           DiagnosticIds = directive.ArgsEnumerable |> Seq.map (fun x -> CompilerDiagnosticId(x.GetText())) }
+                           DiagnosticIds = directive.ArgsEnumerable |> Seq.map CompilerDiagnosticId.FromNode }
                 | _ -> None
     
             member x.CreateDirective(file, directiveType, diagnosticIds) =
