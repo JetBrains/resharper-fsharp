@@ -1,0 +1,5 @@
+module A
+
+5{caret}
+
+// ${QF_TO_EXECUTE:Disable in file with '#nowarn'}
