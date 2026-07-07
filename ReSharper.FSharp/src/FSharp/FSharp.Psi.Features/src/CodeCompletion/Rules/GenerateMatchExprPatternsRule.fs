@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -105,7 +104,7 @@ type GenerateMatchExprPatternsRule() =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextualPresentation(RichText("Match values"), info) :> _)
                 .WithBehavior(fun _ -> GenerateMatchExprPatternsBehavior(info) :> _)
-                .WithMatcher(LookupItemMatcher.CustomText("Match values"))
+                .WithTextToMatch("Match values")
                 .WithRelevance(Relevance)
 
         item.Placement.Location <- PlacementLocation.Top

@@ -9,7 +9,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.Util
@@ -135,7 +134,7 @@ type GenerateLambdaRule() =
             LookupItemFactory.CreateLookupItem(info)
                 .WithPresentation(fun _ -> TextualPresentation(RichText(presentationText), info) :> _)
                 .WithBehavior(fun _ -> GenerateLambdaBehavior(info) :> _)
-                .WithMatcher(LookupItemMatcher.CustomText(presentationText))
+                .WithTextToMatch(presentationText)
                 .WithRelevance(CLRLookupItemRelevance.ExpectedTypeMatchLambda)
 
         item.Placement.Location <- PlacementLocation.Top
