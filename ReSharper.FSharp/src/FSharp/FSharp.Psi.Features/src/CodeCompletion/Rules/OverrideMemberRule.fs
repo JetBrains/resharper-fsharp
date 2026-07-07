@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLo
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Matching
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -192,7 +191,7 @@ type OverrideMemberRule() =
                         TextualPresentation(text, info, image = icon)
                     )
                     .WithBehavior(fun _ -> OverrideBehavior(info, types))
-                    .WithMatcher(LookupItemMatcher.CustomText(presentationText))
+                    .WithTextToMatch(presentationText)
 
             collector.Add(overrideItem)
 
