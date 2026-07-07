@@ -51,3 +51,6 @@ type DisableWarningTest() =
     [<Test>] member x.``Compiler warning - Disable in file 03``() = x.DoNamedTest()
     [<Test>] member x.``Compiler warning - Disable in file 04``() = x.DoNamedTest()
     [<Test>] member x.``Compiler warning - Disable in file 05``() = x.DoNamedTest()
+
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
+    [<Test>] member x.``Compiler warning - Disable in file 06 - Warning number syntax``() = x.DoNamedTest()
