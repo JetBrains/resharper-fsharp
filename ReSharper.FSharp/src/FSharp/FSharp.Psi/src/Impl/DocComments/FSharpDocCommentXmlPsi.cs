@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
@@ -29,9 +30,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
     }
 
     [NotNull, Pure]
-    public static IReadOnlyList<string> GetCommentLines([NotNull] XmlDocBlock block) =>
+    public static IReadOnlyList<StringUtil.TextWithNewLine> GetCommentLines([NotNull] XmlDocBlock block) =>
       block.DocComments
-        .Select(t => t.CommentText)
+        .Select(t => new StringUtil.TextWithNewLine(t.CommentText, (t.NextSibling as NewLine)?.GetText() ?? Environment.NewLine))
         .ToIReadOnlyList();
 
     protected override IReadOnlyList<ITreeNode> GetDocCommentNodes() => DocCommentBlock.DocComments;
