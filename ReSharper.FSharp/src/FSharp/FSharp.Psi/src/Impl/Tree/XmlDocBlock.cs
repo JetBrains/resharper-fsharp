@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments;
@@ -49,7 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public XmlNode GetXML(ITypeMember element)
     {
-      var lines = FSharpDocCommentXmlPsi.GetCommentLines(this);
+      var lines = FSharpDocCommentXmlPsi.GetCommentLines(this)
+        .Select(x => x.Text).ToIReadOnlyList();
       XMLDocUtil.Load(lines, element, out var node);
       return node;
     }
