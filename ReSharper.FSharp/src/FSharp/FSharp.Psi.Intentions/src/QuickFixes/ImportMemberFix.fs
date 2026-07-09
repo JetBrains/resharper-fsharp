@@ -6,6 +6,10 @@ open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.Intentions
+open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
+open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
+open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Intentions.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -19,6 +23,24 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpExtensionMemberImportUtil() =
+    inherit ExtensionMemberImportUtilBase()
+
+    override this.CollectApplicableCandidates(applicableCandidates, reference, acceptableErrorTypes) =
+        let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
+        if isNull refExpr then () else
+
+        let name = reference.GetName()
+        FSharpExtensionMemberUtil.getNonImportedExtensionMembers refExpr (Some name) refExpr
+        |> FSharpExtensionMemberUtil.groupByNameAndNs
+        |> Seq.map (snd >> Seq.tryHead)
+        |> Seq.choose id
+        |> applicableCandidates.AddRange
+
+    override this.LanguageType = FSharpLanguage.Instance
+
 
 [<AbstractClass>]
 type FSharpImportMemberActionBase<'T when 'T :> IClrDeclaredElement>(reference: FSharpSymbolReference) =
@@ -53,18 +75,6 @@ type FSharpImportModuleMemberAction(typeElement: ITypeElement, reference: FSharp
         reference.SetRequiredQualifiersForContainingType(typeElement, referenceOwner)
 
 
-type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference) =
-    inherit FSharpImportMemberActionBase<ITypeMember>(reference)
-
-    override this.Bind() =
-        let referenceOwner = reference.GetElement()
-        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeMember "bind"
-
-    override this.Text =
-        let containingTypeShortName = typeMember.ContainingType.ShortName
-        $"Use {containingTypeShortName}.{reference.GetName()}"
-
-
 [<AbstractClass>]
 type FSharpImportMemberFixBase<'T when 'T :> IClrDeclaredElement>(reference: IReference) =
     inherit FSharpQuickFixBase()
@@ -97,22 +107,9 @@ type FSharpImportMemberFixBase<'T when 'T :> IClrDeclaredElement>(reference: IRe
 
         importActions.ToQuickFixIntentions(anchor)
 
-
-type FSharpImportExtensionMemberFix(reference: IReference) =
-    inherit FSharpImportMemberFixBase<ITypeMember>(reference)
-
-    override this.FindMembers(reference) =
-        let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
-        if isNull refExpr then [] else
-
-        let name = reference.GetName()
-        FSharpExtensionMemberUtil.getNonImportedExtensionMembers refExpr (Some name) refExpr
-        |> FSharpExtensionMemberUtil.groupByNameAndNs
-        |> Seq.map (snd >> Seq.tryHead)
-        |> Seq.choose id
-
-    override this.CreateAction(typeMember, reference) =
-        FSharpImportExtensionMemberAction(typeMember, reference)
+    override this.CreateBulbActions() =
+        this.FindMembers(reference)
+        |> Seq.map (fun typeMember -> this.CreateAction(typeMember, reference))
 
 
 type FSharpImportModuleMemberFix(reference: IReference) =
@@ -172,3 +169,35 @@ type FSharpImportModuleMemberFix(reference: IReference) =
 
     override this.CreateAction(typeElement, reference) =
         FSharpImportModuleMemberAction(typeElement, reference)
+
+
+type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FSharpSymbolReference) =
+    inherit ModernBulbActionBase()
+
+    override this.Text =
+        let containingTypeShortName = typeMember.ContainingType.ShortName
+        $"Use {containingTypeShortName}.{reference.GetName()}"
+
+    override this.ExecutePsiTransaction(_, _) =
+        use writeCookie = WriteLockCookie.Create(reference.GetElement().IsPhysical())
+        let referenceOwner = reference.GetElement()
+        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeMember "bind"
+        null
+
+    interface IModernManualScopedAction with
+        member this.ExecuteAction(solution, scope, sourceHighlighting, progress) =
+            this.ExecutePsiTransaction(solution, progress)
+    
+        member this.FileCollectorInfo = FileCollectorInfo.Default
+        member this.ScopedText = this.Text
+
+type FSharpImportExtensionMemberFix(reference: IReference) =
+    inherit ScopedImportQuickFixBase(reference)
+
+    let reference = reference.As<FSharpSymbolReference>()
+
+    override this.CreateBulbActions() =
+        let extensionMembers = this.EnumeratePossibleExtensionMembers(reference)
+        [| for KeyValue(_, m) in extensionMembers do
+            for m in m ->
+                FSharpImportExtensionMemberAction(m, reference) |]
