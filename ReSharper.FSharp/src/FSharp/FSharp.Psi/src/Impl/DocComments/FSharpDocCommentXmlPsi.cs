@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
     [NotNull, Pure]
     public static IReadOnlyList<StringUtil.TextWithNewLine> GetCommentLines([NotNull] XmlDocBlock block) =>
       block.DocComments
-        .Select(t => new StringUtil.TextWithNewLine(t.CommentText, (t.NextSibling as NewLine)?.GetText() ?? Environment.NewLine))
+        .Select(t => new StringUtil.TextWithNewLine(t.CommentText, t.GetNextToken() is NewLine nl ? nl.GetText() : Environment.NewLine))
         .ToIReadOnlyList();
 
     protected override IReadOnlyList<ITreeNode> GetDocCommentNodes() => DocCommentBlock.DocComments;
