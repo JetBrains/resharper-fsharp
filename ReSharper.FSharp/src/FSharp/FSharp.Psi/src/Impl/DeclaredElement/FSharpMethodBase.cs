@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override ExtensionMemberKind ExtensionMemberKind =>
       Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS)
         ? ExtensionMemberKind.CLASSIC_METHOD
-        : ExtensionMemberKind.NONE;
+        : base.ExtensionMemberKind;
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

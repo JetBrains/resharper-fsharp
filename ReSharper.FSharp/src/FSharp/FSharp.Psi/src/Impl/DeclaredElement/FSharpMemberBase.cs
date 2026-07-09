@@ -2,6 +2,7 @@
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -21,6 +22,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool IsFSharpExtensionMember =>
       GetContainingType() is IFSharpModule && GetDeclaration() is IMemberSignatureOrDeclaration;
+
+    public override ExtensionMemberKind ExtensionMemberKind => 
+      IsFSharpExtensionMember ? FSharpExtensionMemberKind.INSTANCE : ExtensionMemberKind.NONE;
 
     protected override ITypeElement GetTypeElement(IDeclaration declaration)
     {
