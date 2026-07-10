@@ -135,10 +135,13 @@ type FSharpQuickFixUtilComponent() =
             x.BindTo(reference :?> _, typeElement) :> _
 
         member x.AddImportsForExtensionMember(reference, extensionMembers) =
-            let reference = reference :?> FSharpSymbolReference
-            let referenceOwner = reference.GetElement()
-            FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference extensionMembers[0] FcsImportExtensionOpName
-            reference
+            match reference with
+            | :? FSharpSymbolReference as reference ->
+                let referenceOwner = reference.GetElement()
+                FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference extensionMembers[0] FcsImportExtensionOpName
+                reference
+
+            | _ -> null
 
         member this.BindTo(reference, typeElement) =
             this.BindTo(reference :?> _, typeElement)
