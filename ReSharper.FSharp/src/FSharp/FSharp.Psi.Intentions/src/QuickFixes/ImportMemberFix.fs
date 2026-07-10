@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open System.Collections.Generic
+open System.Linq
 open JetBrains.Application
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
 open JetBrains.ReSharper.Feature.Services.BulbActions
@@ -107,10 +108,6 @@ type FSharpImportMemberFixBase<'T when 'T :> IClrDeclaredElement>(reference: IRe
 
         importActions.ToQuickFixIntentions(anchor)
 
-    override this.CreateBulbActions() =
-        this.FindMembers(reference)
-        |> Seq.map (fun typeMember -> this.CreateAction(typeMember, reference))
-
 
 type FSharpImportModuleMemberFix(reference: IReference) =
     inherit FSharpImportMemberFixBase<ITypeElement>(reference)
@@ -180,15 +177,16 @@ type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FShar
 
     override this.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(reference.GetElement().IsPhysical())
-        let referenceOwner = reference.GetElement()
-        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeMember "bind"
-        null
+        let reference = QuickFixUtil.BindTo(reference, [|typeMember|])
+
+        if isNull reference then BulbActionCommands.ShowTooltip("Failed to import extension member")
+        else null
 
     interface IModernManualScopedAction with
         member this.ExecuteAction(solution, scope, sourceHighlighting, progress) =
             this.ExecutePsiTransaction(solution, progress)
     
-        member this.FileCollectorInfo = FileCollectorInfo.Default
+        member this.FileCollectorInfo = FileCollectorInfo.Empty
         member this.ScopedText = this.Text
 
 type FSharpImportExtensionMemberFix(reference: IReference) =
@@ -201,3 +199,14 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
         [| for KeyValue(_, m) in extensionMembers do
             for m in m ->
                 FSharpImportExtensionMemberAction(m, reference) |]
+
+    override this.CreateBulbItems() =
+        let importActions = this.CreateBulbActions().ToArray()
+
+        let anchor: IAnchor =
+            if importActions.Length > 2 then
+                SubmenuAnchor(ResolveProblemsFixAnchors.ImportFix, "Import...")
+            else
+                ResolveProblemsFixAnchors.ImportFix
+
+        importActions.ToQuickFixIntentions(anchor)
