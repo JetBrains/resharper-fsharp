@@ -196,9 +196,8 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
 
     override this.CreateBulbActions() =
         let extensionMembers = this.EnumeratePossibleExtensionMembers(reference)
-        [| for KeyValue(_, m) in extensionMembers do
-            for m in m ->
-                FSharpImportExtensionMemberAction(m, reference) |]
+        [| for KeyValue(_, extensionMembers) in extensionMembers do
+            for m in extensionMembers -> FSharpImportExtensionMemberAction(m, reference) |]
 
     override this.CreateBulbItems() =
         let importActions = this.CreateBulbActions().ToArray()
