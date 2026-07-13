@@ -20,8 +20,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     private readonly VirtualFileSystemPath mySpecifiedPath;
     protected override string Name => "Fantomas";
 
-    private static readonly FileSystemPath FantomasHostDirectory =
-      typeof(FantomasProcess).Assembly.GetPath().Directory.Parent / "fantomas";
+    private static FileSystemPath FantomasHostDirectory
+    {
+      get
+      {
+        var assemblyDir = typeof(FantomasProcess).Assembly.GetPath().Directory;
+        var defaultDirectory = assemblyDir.Parent / "fantomas";
+
+        // In the monorepo, assemblies are located in a shared folder
+        return defaultDirectory.ExistsDirectory ? defaultDirectory : assemblyDir;
+      }
+    }
 
     private static readonly FileSystemPath FantomasDllsDirectory = FantomasHostDirectory;
 
