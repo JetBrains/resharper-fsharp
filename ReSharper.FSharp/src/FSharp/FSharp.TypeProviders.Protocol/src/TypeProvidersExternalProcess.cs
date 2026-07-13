@@ -29,8 +29,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
 
     protected override string Name => "Out-of-Process TypeProviders";
 
-    private static readonly FileSystemPath TypeProvidersDirectory =
-      typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory.Parent / "typeProviders";
+    private static FileSystemPath TypeProvidersDirectory
+    {
+      get
+      {
+        var assemblyDir = typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory;
+        var defaultDirectory = assemblyDir.Parent / "typeProviders";
+
+        // In the monorepo, assemblies are located in a shared folder
+        return defaultDirectory.ExistsDirectory ? defaultDirectory : assemblyDir;
+      }
+    }
 
     protected override RdFSharpTypeProvidersModel CreateModel(Lifetime lifetime, IProtocol protocol)
     {
