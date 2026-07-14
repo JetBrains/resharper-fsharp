@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol
     {
       get
       {
-        var assemblyDir = typeof(TypeProvidersExternalProcess).Assembly.GetPath().Directory;
+        var assemblyDir = typeof(TypeProvidersExternalProcess).Assembly.GetDirectory();
         var defaultDirectory = assemblyDir.Parent / "typeProviders";
 
         // In the monorepo, assemblies are located in a shared folder

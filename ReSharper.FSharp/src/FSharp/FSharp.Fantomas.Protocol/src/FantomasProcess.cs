@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
     {
       get
       {
-        var assemblyDir = typeof(FantomasProcess).Assembly.GetPath().Directory;
+        var assemblyDir = typeof(FantomasProcess).Assembly.GetDirectory();
         var defaultDirectory = assemblyDir.Parent / "fantomas";
 
         // In the monorepo, assemblies are located in a shared folder
