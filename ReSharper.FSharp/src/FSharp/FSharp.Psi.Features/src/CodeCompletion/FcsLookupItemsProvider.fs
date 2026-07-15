@@ -126,5 +126,4 @@ type FcsLookupItemsProvider(logger: ILogger) =
 
         member x.IsDynamic = false
         member x.IsFinal = false
-        member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Light
