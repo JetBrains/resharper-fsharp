@@ -138,3 +138,7 @@ type public Strings() =
     static member NestedRecordUpdateCanBeSimplifiedMessage = Strings.ResourceManager.GetString("NestedRecordUpdateCanBeSimplifiedMessage")
     static member DotLambdaCanBeUsedStringMessage = Strings.ResourceManager.GetString("DotLambdaCanBeUsedStringMessage")
     static member ValueMustBeMutableMessage = Strings.ResourceManager.GetString("ValueMustBeMutableMessage")
+    static member CodeCleanupTask_RemoveRedundantParens = Strings.ResourceManager.GetString("CodeCleanupTask_RemoveRedundantParens")
+    static member CodeCleanupTask_UseNewSyntax = Strings.ResourceManager.GetString("CodeCleanupTask_UseNewSyntax")
+    static member CodeCleanupTask_SimplifyLambdaExpressions = Strings.ResourceManager.GetString("CodeCleanupTask_SimplifyLambdaExpressions")
+    static member CodeCleanupTask_RemoveOtherRedundancies = Strings.ResourceManager.GetString("CodeCleanupTask_RemoveOtherRedundancies")

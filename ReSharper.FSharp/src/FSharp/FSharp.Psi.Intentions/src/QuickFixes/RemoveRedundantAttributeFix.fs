@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantAttributeFix(attr: IAttribute) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(attr)
 
     new (warning: RedundantRequireQualifiedAccessAttributeWarning) =
         RemoveRedundantAttributeFix(warning.Attr)

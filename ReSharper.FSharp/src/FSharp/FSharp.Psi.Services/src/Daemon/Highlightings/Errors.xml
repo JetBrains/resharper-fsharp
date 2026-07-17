@@ -7,6 +7,7 @@
     JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpCodeCleanupDescriptors;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -139,7 +140,7 @@
     <Range>attribute.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <Message resourceName="ExtensionAttributeIsRedundantMessage"/>
-    <QuickFix>RemoveRedundantAttributeFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
@@ -154,7 +155,7 @@
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="RedundantRequireQualifiedAccessAttributeMessage"/>
-    <QuickFix>RemoveRedundantAttributeFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantAttributeFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantBackticks" configurableSeverity="FSharpRedundantBackticks">
@@ -163,7 +164,7 @@
     <Message resourceName="RedundantIdentifierEscapingMessage"/>
     <Range>identifier.GetHighlightingRange().StartOffsetRange().ExtendRight(2)</Range>
     <SecondaryRanges>[| identifier.GetHighlightingRange().EndOffsetRange().ExtendLeft(2) |] :> _</SecondaryRanges>
-    <QuickFix>RemoveRedundantBackticksFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantNew" configurableSeverity="FSharpRedundantNew">
@@ -171,7 +172,7 @@
     <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="NewKeywordIsRedundantMessage"/>
-    <QuickFix>RemoveRedundantNewFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantNewFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
@@ -188,7 +189,7 @@
     <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenExpr.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenExpr.RightParen</SecondaryRanges>
-    <QuickFix>RemoveRedundantParenExprFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_REDUNDANT_PARENS">RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenPat" configurableSeverity="FSharpRedundantParens">
@@ -197,7 +198,7 @@
     <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenPat.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenPat.RightParen</SecondaryRanges>
-    <QuickFix>RemoveRedundantParenPatFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_REDUNDANT_PARENS">RemoveRedundantParenPatFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenTypeUsage" configurableSeverity="FSharpRedundantParens">
@@ -206,7 +207,7 @@
     <Message resourceName="RedundantParenthesesMessage"/>
     <Range>parenTypeUsage.LeftParen.GetHighlightingRange()</Range>
     <SecondaryRanges>secondaryRangesFromNode parenTypeUsage.RightParen</SecondaryRanges>
-    <QuickFix>RemoveRedundantParenTypeUsageFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_REDUNDANT_PARENS">RemoveRedundantParenTypeUsageFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeParens" configurableSeverity="FSharpRedundantAttributeParens">
@@ -214,7 +215,7 @@
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage"/>
-    <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_REDUNDANT_PARENS">RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantAttributeSuffix" configurableSeverity="FSharpRedundantAttributeSuffix">
@@ -244,7 +245,7 @@
     <Parameter type="IListConsPat" name="listConsPat"/>
     <Range>listConsPat.GetHighlightingRange()</Range>
     <Message resourceName="PatternCanBeSimplifiedMessage"/>
-    <QuickFix>SimplifyListConsPatFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">SimplifyListConsPatFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantApplication" configurableSeverity="FSharpRedundantApplication">
@@ -253,7 +254,7 @@
     <Range>getFunctionApplicationRange appExpr</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="RedundantApplicationMessage"/>
-    <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
   <Warning name="LambdaCanBeSimplified" configurableSeverity="FSharpLambdaCanBeSimplified">
@@ -269,7 +270,7 @@
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
     <Message>getLambdaCanBeReplacedWarningText replaceCandidate</Message>
-    <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
+    <QuickFix cleanupTasks="SIMPLIFY_LAMBDA_EXPRESSIONS">ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
   <Warning name="LambdaCanBeReplacedWithBuiltinFunction" configurableSeverity="FSharpBuiltinFunctionReimplementation">
@@ -277,7 +278,7 @@
     <Parameter type="string" name="funName"/>
     <Range>lambda.GetHighlightingRange()</Range>
     <Message>sprintf "Lambda can be replaced with '%s'" funName</Message>
-    <QuickFix>ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
+    <QuickFix cleanupTasks="SIMPLIFY_LAMBDA_EXPRESSIONS">ReplaceLambdaWithBuiltinFunctionFix</QuickFix>
   </Warning>
 
   <Warning name="DotLambdaCanBeUsed" configurableSeverity="FSharpDotLambdaCanBeUsed" forkTranslation="false">
@@ -286,7 +287,7 @@
     <Range>getTreeNodesDocumentRange lambda lambda.RArrow</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="DotLambdaCanBeUsedStringMessage"/>
-    <QuickFix>ReplaceLambdaWithDotLambdaFix</QuickFix>
+    <QuickFix cleanupTasks="SIMPLIFY_LAMBDA_EXPRESSIONS, USE_NEW_SYNTAX">ReplaceLambdaWithDotLambdaFix</QuickFix>
   </Warning>
 
   <Warning name="UseWildSelfId" configurableSeverity="FSharpUseWildSelfId">
@@ -305,7 +306,7 @@
     <Parameter type="IFSharpExpression[]" name="expressions" isCollection="true"/>
     <Range>formatStringExpr.GetHighlightingRange()</Range>
     <Message resourceName="FormatStringCanBeReplacedWithAnInterpolatedStringMessage"/>
-    <QuickFix>ReplaceWithInterpolatedStringFix</QuickFix>
+    <QuickFix cleanupTasks="USE_NEW_SYNTAX">ReplaceWithInterpolatedStringFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantStringInterpolation" configurableSeverity="FSharpRedundantStringInterpolation">
@@ -313,7 +314,7 @@
     <Message resourceName="RedundantStringInterpolationMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>expr.GetDollarSignRange()</Range>
-    <QuickFix>ReplaceWithRegularStringFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">ReplaceWithRegularStringFix</QuickFix>
   </Warning>
 
   <Warning name="ExpressionCanBeReplacedWithCondition" configurableSeverity="FSharpExpressionCanBeReplacedWithCondition">
@@ -329,7 +330,7 @@
     <Message resourceName="RedundantAsPatternMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getAsPatternRange asPat</Range>
-    <QuickFix>RemoveRedundantAsPatFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantAsPatFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantIndexerDot" configurableSeverity="FSharpRedundantDotInIndexer">
@@ -337,7 +338,7 @@
     <Message resourceName="RedundantMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getIndexerDotRange indexerExpr</Range>
-    <QuickFix>RemoveIndexerDotFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES, USE_NEW_SYNTAX">RemoveIndexerDotFix</QuickFix>
   </Warning>
 
   <Warning name="NestedRecordUpdateCanBeSimplified" configurableSeverity="NestedRecordUpdateCanBeSimplified" forkTranslation="false">
@@ -347,6 +348,6 @@
     <Message resourceName="NestedRecordUpdateCanBeSimplifiedMessage"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Range>getNestedRecordUpdateRange outerBinding innerBinding</Range>
-    <QuickFix>UseNestedRecordFieldSyntaxFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES, USE_NEW_SYNTAX">UseNestedRecordFieldSyntaxFix</QuickFix>
   </Warning>
 </Errors>

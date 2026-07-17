@@ -1,8 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -11,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 [<AbstractClass>]
 type ReplaceWithInnerTreeNodeFixBase(parentNode: IFSharpExpression, innerNode: IFSharpExpression, addParensIfNeeded) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(parentNode)
 
     override x.IsAvailable _ =
         isValid parentNode && isValid innerNode

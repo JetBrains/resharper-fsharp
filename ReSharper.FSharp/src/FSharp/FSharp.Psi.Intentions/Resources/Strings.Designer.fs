@@ -4,11 +4,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
 open System
 open JetBrains.Application.I18n
 open JetBrains.DataFlow
-open JetBrains.Diagnostics
 open JetBrains.Lifetimes
-open JetBrains.Util
 open JetBrains.Util.Logging
-open JetBrains.Application.I18n.Plurals
 
 [<global.System.Diagnostics.DebuggerNonUserCode>]
 [<global.System.Runtime.CompilerServices.CompilerGenerated>]

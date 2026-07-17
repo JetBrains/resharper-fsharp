@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantAsPatFix(warning: RedundantAsPatternWarning) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.AsPat)
 
     let asPat = warning.AsPat
 

@@ -65,6 +65,7 @@
     <Compile Include="src\Util\LocalValuesUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="src\Daemon\Highlightings\FSharpCodeCleanupDescriptors.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
       <Mode>ERRORS</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors</Namespace>

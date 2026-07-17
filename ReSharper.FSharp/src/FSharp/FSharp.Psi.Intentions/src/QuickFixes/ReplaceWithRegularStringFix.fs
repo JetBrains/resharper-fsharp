@@ -5,11 +5,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceWithRegularStringFix(warning: RedundantStringInterpolationWarning) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase(warning.Expr)
 
     let expr = warning.Expr
 
