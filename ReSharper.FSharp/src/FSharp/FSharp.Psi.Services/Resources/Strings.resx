@@ -325,7 +325,7 @@
     <data name="CodeCleanupTask_SimplifyLambdaExpressions" xml:space="preserve">
         <value>Simplify lambda expressions</value>
     </data>
-    <data name="CodeCleanupTask_RemoveOtherRedundancies" xml:space="preserve">
+    <data name="CodeCleanupTask_RemoveOtherCodeRedundancies" xml:space="preserve">
         <value>Remove other code redundancies</value>
     </data>
 </root>

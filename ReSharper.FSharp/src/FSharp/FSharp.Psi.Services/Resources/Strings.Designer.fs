@@ -141,4 +141,4 @@ type public Strings() =
     static member CodeCleanupTask_RemoveRedundantParens = Strings.ResourceManager.GetString("CodeCleanupTask_RemoveRedundantParens")
     static member CodeCleanupTask_UseNewSyntax = Strings.ResourceManager.GetString("CodeCleanupTask_UseNewSyntax")
     static member CodeCleanupTask_SimplifyLambdaExpressions = Strings.ResourceManager.GetString("CodeCleanupTask_SimplifyLambdaExpressions")
-    static member CodeCleanupTask_RemoveOtherRedundancies = Strings.ResourceManager.GetString("CodeCleanupTask_RemoveOtherRedundancies")
+    static member CodeCleanupTask_RemoveOtherCodeRedundancies = Strings.ResourceManager.GetString("CodeCleanupTask_RemoveOtherCodeRedundancies")
