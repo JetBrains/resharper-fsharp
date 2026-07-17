@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.withDisabledOutOfProcessTypeProviders
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 @Solution("TypeProviderLibrary")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class TypeProvidersSettingTest : BaseTypeProvidersTest() {
+  @Mute("RIDER-139900")
   @Test
   fun disabledTypeProvidersSetting() {
     withDisabledOutOfProcessTypeProviders {
