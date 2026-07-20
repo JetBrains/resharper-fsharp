@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled;
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 
 /// <summary>
 /// Represents a kind of F#-specific extension member.
