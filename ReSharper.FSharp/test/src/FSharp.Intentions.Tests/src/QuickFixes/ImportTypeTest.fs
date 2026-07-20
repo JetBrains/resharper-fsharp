@@ -90,14 +90,6 @@ type ImportTypeAvailabilityTest() =
 
     [<Test>] member x.``Static member 01``() = x.DoNamedTest()
 
-[<FSharpTest>]
-type ImportExtensionAvailabilityTest() =
-    inherit QuickFixAvailabilityTestBase<FSharpImportExtensionMemberFix>()
-
-    override x.RelativeTestDataPath = "features/quickFixes/import/extension/availability"
-
-    [<Test>] member x.``Extension 01``() = x.DoNamedTest()
-
 
 [<FSharpTest>]
 type ImportTypePopupTest() =
@@ -176,6 +168,16 @@ type ImportExtensionMemberTest() =
     [<Test>] member x.``Not Available - Function 03``() = x.DoNamedTest()
     [<Test>] member x.``Not Available - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Not Available - Type 02``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ImportExtensionAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase<FSharpImportExtensionMemberFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/extension/availability"
+
+    [<Test>] member x.``Extension 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extension 02 - Multiple``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

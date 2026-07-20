@@ -204,7 +204,7 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
 
         let anchor: IAnchor =
             if importActions.Length > 2 then
-                SubmenuAnchor(ResolveProblemsFixAnchors.ImportFix, "Import...")
+                SubmenuAnchor(ResolveProblemsFixAnchors.ImportFix, "Import and use...")
             else
                 ResolveProblemsFixAnchors.ImportFix
 

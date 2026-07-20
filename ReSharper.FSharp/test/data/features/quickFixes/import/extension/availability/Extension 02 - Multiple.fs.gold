@@ -1,0 +1,17 @@
+﻿module A =
+    type System.String with
+        member _.FirstOrDefault() = ()
+
+module B =
+    type System.String with
+        member _.FirstOrDefault() = ()
+
+let _ = "".|FirstOrDefault|(0)()
+
+------------------------------------------------
+0: The type 'String' does not define the field, constructor or member 'FirstOrDefault'.
+QUICKFIXES:
+Import and use...
+--Use A.FirstOrDefault
+--Use B.FirstOrDefault
+--Use Enumerable.FirstOrDefault
