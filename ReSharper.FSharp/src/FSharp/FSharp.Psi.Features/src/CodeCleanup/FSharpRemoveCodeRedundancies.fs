@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCleanup.HighlightingModule
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpCodeCleanupDescriptors
 
-[<CodeCleanupModule(Instantiation.DemandAnyThreadSafe)>] //[CodeCleanupModule(ModulesAfter = [typeof(OptimizeUsings)])]
+[<CodeCleanupModule>] //[CodeCleanupModule(ModulesAfter = [typeof(OptimizeUsings)])]
 type FSharpRemoveCodeRedundancies() =
     inherit HighlightingCleanupModule()
 
