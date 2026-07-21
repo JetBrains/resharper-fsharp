@@ -209,3 +209,5 @@ type FSharpCodeCleanupTest() =
     [<Test>] member x.``Expr - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Full cleanup without reformat 01``() = x.DoTestFilesWithProfile("Full cleanup without reformat.profile", "Code cleanup.fs")

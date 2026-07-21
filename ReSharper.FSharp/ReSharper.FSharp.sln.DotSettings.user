@@ -1,0 +1,15 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ACodeCleanupTestBase_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FUsers_003FAlexey_002EBerezhnykh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F13e2463351244bd7856520dff3ccc410631a8_003F37_003F05f89cd1_003FCodeCleanupTestBase_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=70ecfde9_002Da6ce_002D4472_002D8508_002D16ba668a00b4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Full cleanup without reformat 01" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::AF85AA16-C863-42F2-AE7E-44C3E36F8883::.NETFramework,Version=v4.7.2::JetBrains.ReSharper.Plugins.FSharp.Tests.Features.FSharpCodeCleanupTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cc49b7ec_002D1526_002D491f_002Daad1_002D1a014be50bdc/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Extension 02 - Multiple" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=src_002FFSharp_002ECommon_002FResources_002FStrings/@EntryIndexedValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=src_002FFSharp_002EPsi_002EDaemon_002FResources_002FStrings/@EntryIndexedValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=src_002FFSharp_002EPsi_002EFeatures_002FResources_002FStrings/@EntryIndexedValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=src_002FFSharp_002EPsi_002EIntentions_002FResources_002FStrings/@EntryIndexedValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/Initialized/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>

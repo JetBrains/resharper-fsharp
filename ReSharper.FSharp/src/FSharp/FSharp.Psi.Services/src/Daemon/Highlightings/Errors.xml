@@ -223,7 +223,7 @@
     <Range>getAttributeSuffixRange attribute</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="AttributeSuffixIsRedundantMessage"/>
-    <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantQualifier" configurableSeverity="FSharpRedundantNameQualifier">
@@ -231,7 +231,7 @@
     <Range>getQualifierRange treeNode</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="QualifierIsRedundantMessage"/>
-    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+    <QuickFix cleanupTasks="REMOVE_OTHER_REDUNDANCIES">RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantUnionCaseFieldPatterns" configurableSeverity="FSharpRedundantUnionCaseFieldPatterns">

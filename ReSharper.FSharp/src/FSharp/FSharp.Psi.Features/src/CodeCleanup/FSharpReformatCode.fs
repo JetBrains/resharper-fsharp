@@ -27,7 +27,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         "FSharpReformatCode",
         CodeCleanupLanguage("F#", 2),
         CodeCleanupOptionDescriptor.ReformatGroup,
-        typeof<Strings>)
+        typeof<Strings>, displayName = "FSharpReformatCode")
 
     let language = FSharpLanguage.Instance
 

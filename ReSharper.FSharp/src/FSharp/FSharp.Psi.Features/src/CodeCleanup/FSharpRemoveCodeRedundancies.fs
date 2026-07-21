@@ -26,6 +26,6 @@ type FSharpRemoveCodeRedundancies() =
                 profile.SetSetting<bool>(descriptor, false)
 
     override this.Descriptors = [|for descriptor in descriptors -> descriptor|]
-    override this.IsAvailableOnSelection = false
+    override this.IsAvailableOnSelection = true
     override this.LanguageType = FSharpLanguage.Instance
     override this.Name = "F# Code Cleanup"
