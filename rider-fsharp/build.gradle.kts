@@ -75,6 +75,7 @@ dependencies {
     bundledPlugin("JavaScript")
     bundledPlugin("com.intellij.css")
     bundledPlugin("com.intellij.database")
+    bundledModule("intellij.spellchecker")
     bundledModule("intellij.platform.langInjection")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
