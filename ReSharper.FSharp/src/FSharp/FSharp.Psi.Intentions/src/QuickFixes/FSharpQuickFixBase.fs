@@ -138,6 +138,8 @@ type FSharpQuickFixUtilComponent() =
             match reference with
             | :? FSharpSymbolReference as reference ->
                 let referenceOwner = reference.GetElement()
+                use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
                 FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference extensionMembers[0] FcsImportExtensionOpName
                 reference
 

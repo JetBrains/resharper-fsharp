@@ -176,7 +176,6 @@ type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FShar
         $"Use {containingTypeShortName}.{reference.GetName()}"
 
     override this.ExecutePsiTransaction(_, _) =
-        use writeCookie = WriteLockCookie.Create(reference.GetElement().IsPhysical())
         let reference = QuickFixUtil.BindTo(reference, [|typeMember|])
 
         if isNull reference then BulbActionCommands.ShowTooltip("Failed to import extension member")
