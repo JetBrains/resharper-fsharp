@@ -8,7 +8,6 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.jetbrains.rider.editors.getPsiFile
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
@@ -21,10 +20,11 @@ import com.jetbrains.rider.test.scriptingApi.getHighlighters
 import com.jetbrains.rider.test.scriptingApi.typeFromOffset
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Solution("CoreConsoleApp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class InjectionEscapersTest : PerTestSolutionTestBase() {

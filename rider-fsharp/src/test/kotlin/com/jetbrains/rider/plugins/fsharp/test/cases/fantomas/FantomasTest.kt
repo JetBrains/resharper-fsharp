@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestSettings
@@ -13,10 +12,11 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.reformatCode
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
 class FantomasTest : EditorTestBase() {
   override val testSolution: String = "FormatCodeApp"

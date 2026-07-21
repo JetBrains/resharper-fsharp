@@ -4,7 +4,6 @@ import com.intellij.openapi.components.serviceAsync
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rd.ide.model.FileSummaryRequest
 import com.jetbrains.rd.ide.model.junieModel
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.projectView.solutionDirectoryPath
@@ -22,6 +21,7 @@ import com.jetbrains.rider.test.scriptingApi.changeFileSystem2
 import com.jetbrains.rider.test.scriptingApi.getVirtualFileFromPath
 import com.jetbrains.rider.test.scriptingApi.replaceFileContent
 import com.jetbrains.rider.test.scriptingApi.runBlockingWithProtocolPumping
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
@@ -29,7 +29,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.name
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 class FSharpFileSummarizationTests : PerTestSolutionTestBase() {
 
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)

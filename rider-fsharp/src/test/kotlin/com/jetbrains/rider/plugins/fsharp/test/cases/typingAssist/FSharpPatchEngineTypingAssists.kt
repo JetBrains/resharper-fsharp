@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
 import com.intellij.openapi.actionSystem.IdeActions
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Feature
@@ -14,6 +13,7 @@ import com.jetbrains.rider.test.reporting.SubsystemConstants
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditorFacade
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -56,14 +56,14 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
   }
 }
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
   FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -119,7 +119,7 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   fun notSupported(caseName: String) = doTest(caseName, false)
 }
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -279,7 +279,7 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
       .toTypedArray()
 }
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)

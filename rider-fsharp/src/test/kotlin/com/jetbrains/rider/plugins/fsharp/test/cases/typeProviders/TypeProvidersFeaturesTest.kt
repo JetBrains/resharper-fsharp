@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.IdeActions
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.junit5.base.EditorTestBase
@@ -18,11 +17,12 @@ import com.jetbrains.rider.test.scriptingApi.dumpOpenedDocument
 import com.jetbrains.rider.test.scriptingApi.gotoDeclaration
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.time.Duration
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Solution("SwaggerProviderCSharp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class TypeProvidersFeaturesTest : EditorTestBase() {

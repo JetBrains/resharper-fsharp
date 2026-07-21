@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.templates.net8
 
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestEnvironment
@@ -14,11 +13,12 @@ import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.reporting.SubsystemConstants
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 
 @Suppress("JUnitTestCaseWithNoTests")
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
 @TestEnvironment(platform = [PlatformType.WINDOWS_X64, PlatformType.MAC_OS_ALL, PlatformType.LINUX_X64])
 @Subsystem(SubsystemConstants.PROJECT_TEMPLATES)

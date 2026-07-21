@@ -7,6 +7,7 @@ import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
 import com.jetbrains.rider.test.junit5.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -103,15 +104,15 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
   }
 }
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Sequential)
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative)
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Mute("RIDER-116517")
 class FSharpCompletionSpeculativeAndForceRebaseTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
