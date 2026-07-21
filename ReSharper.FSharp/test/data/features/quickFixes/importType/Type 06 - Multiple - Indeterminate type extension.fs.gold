@@ -1,0 +1,5 @@
+﻿//${RUN:Import missing references in file}
+open System.Collections.Generic
+open System.Linq
+
+let f (x: IList{caret}<int>) = x.Select(id)

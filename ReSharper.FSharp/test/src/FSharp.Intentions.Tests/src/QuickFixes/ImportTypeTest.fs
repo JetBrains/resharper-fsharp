@@ -24,6 +24,7 @@ type ImportTypeTest() =
     [<Test>] member x.``Type 03 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Type 04 - Multiple - Static members``() = x.DoNamedTest()
     [<Test>] member x.``Type 05 - Multiple - Extensions``() = x.DoNamedTest()
+    [<Test>] member x.``Type 06 - Multiple - Indeterminate type extension``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Generic List 01``() = x.DoNamedTest()
