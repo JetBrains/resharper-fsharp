@@ -18,9 +18,8 @@ module FSharpCodeCleanupDescriptors =
         myDescriptors.Add(descriptor)
         descriptor
 
-    let REMOVE_REDUNDANT_PARENS = createDescriptor "RemoveRedundantParens"
+    let REMOVE_CODE_REDUNDANCIES = createDescriptor "RemoveCodeRedundancies"
     let SIMPLIFY_LAMBDA_EXPRESSIONS = createDescriptor "SimplifyLambdaExpressions"
     let USE_NEW_SYNTAX = createDescriptor "UseNewSyntax"
-    let REMOVE_OTHER_REDUNDANCIES = createDescriptor "RemoveOtherCodeRedundancies"
 
     let descriptors = myDescriptors.AsReadOnly()

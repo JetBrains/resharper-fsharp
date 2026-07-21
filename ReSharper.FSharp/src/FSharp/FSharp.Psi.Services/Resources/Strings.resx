@@ -316,16 +316,13 @@
     <data name="ValueMustBeMutableMessage" xml:space="preserve">
         <value>A value must be mutable in order to mutate the contents or take the address of a value type</value>
     </data>
-    <data name="CodeCleanupTask_RemoveRedundantParens" xml:space="preserve">
-        <value>Remove redundant parens</value>
-    </data>
     <data name="CodeCleanupTask_UseNewSyntax" xml:space="preserve">
         <value>Use new syntax</value>
     </data>
     <data name="CodeCleanupTask_SimplifyLambdaExpressions" xml:space="preserve">
         <value>Simplify lambda expressions</value>
     </data>
-    <data name="CodeCleanupTask_RemoveOtherCodeRedundancies" xml:space="preserve">
+    <data name="CodeCleanupTask_RemoveCodeRedundancies" xml:space="preserve">
         <value>Remove other code redundancies</value>
     </data>
 </root>
