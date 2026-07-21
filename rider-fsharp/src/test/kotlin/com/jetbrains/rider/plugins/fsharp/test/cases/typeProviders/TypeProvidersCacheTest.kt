@@ -2,7 +2,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
@@ -22,13 +21,14 @@ import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.scriptingApi.deleteRecursivelySafe
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import kotlin.io.path.pathString
 import kotlin.io.path.createDirectory
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Solution("TypeProviderLibrary")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {

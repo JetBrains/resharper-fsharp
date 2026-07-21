@@ -2,7 +2,6 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.projectView.ProjectEntityView
 import com.jetbrains.rider.projectView.solutionName
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
@@ -19,11 +18,12 @@ import com.jetbrains.rider.test.maskAllAccordingDumpFilesProfile
 import com.jetbrains.rider.test.scriptingApi.createDataContextFor
 import com.jetbrains.rider.test.scriptingApi.dumpSolutionExplorerTree
 import com.jetbrains.rider.test.scriptingApi.prepareProjectView
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)

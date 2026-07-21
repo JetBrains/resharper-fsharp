@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 
 import com.jetbrains.rd.ide.model.RdDndOrderType
-import com.jetbrains.rider.plugins.fsharp.test.cases.Tags
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.OpenSolutionParams
 import com.jetbrains.rider.test.annotations.Solution
@@ -21,10 +20,11 @@ import com.jetbrains.rider.test.scriptingApi.cutItem
 import com.jetbrains.rider.test.scriptingApi.deleteElement
 import com.jetbrains.rider.test.scriptingApi.pasteItem
 import com.jetbrains.rider.test.scriptingApi.renameItem
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(Tags.Episode.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp)
 @Solution("EmptySolution")
 class FSharpProjectModelTest : ProjectModelBaseTest() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
