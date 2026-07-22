@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typingAssist
 
 import com.intellij.openapi.actionSystem.IdeActions
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Feature
@@ -25,9 +26,9 @@ import kotlin.io.path.extension
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.nameWithoutExtension
 
+@Solution("CoreConsoleApp")
 abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode) : PatchEngineEditorTestBase(mode) {
   override val checkTextControls = false
-  override val testSolution = "CoreConsoleApp"
 
   fun simpleCases() = arrayOf(
     "emptyFile",
@@ -67,10 +68,10 @@ class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+@Solution("CoreConsoleApp")
 abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: String) :
   PatchEngineEditorTestBase(PatchEngineEditorTestMode.SpeculativeRebaseProhibited) {
   override val checkTextControls = false
-  override val testSolution = "CoreConsoleApp"
   override val testDataDirectory: Path
       get() = testDataStorage.testDataDirectory.resolve("../../../../ReSharper.FSharp/test/data/features/service/typingAssist")
   override val testCaseSourceDirectory

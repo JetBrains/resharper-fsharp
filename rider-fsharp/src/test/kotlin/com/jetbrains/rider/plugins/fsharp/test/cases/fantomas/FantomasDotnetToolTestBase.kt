@@ -14,6 +14,7 @@ import com.jetbrains.rider.plugins.fsharp.test.framework.withSetting
 import com.jetbrains.rider.projectView.solutionDirectory
 import com.jetbrains.rider.protocol.protocolManager
 import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.asserts.shouldBe
 import com.jetbrains.rider.test.junit5.base.EditorTestBase
 import com.jetbrains.rider.test.facades.solution.RiderSolutionWithFoldersApiFacade
@@ -32,8 +33,8 @@ import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
+@Solution("FormatCodeApp")
 abstract class FantomasDotnetToolTestBase : EditorTestBase() {
-  override val testSolution: String = "FormatCodeApp"
   override val restoreNuGetPackages = false
 
   private fun getDotnetCliHome() = testWorkDirectory.parent.resolve("dotnetHomeCli")

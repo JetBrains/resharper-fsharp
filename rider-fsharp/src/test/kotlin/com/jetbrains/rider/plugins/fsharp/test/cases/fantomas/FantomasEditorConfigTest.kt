@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
 import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
 import com.jetbrains.rider.plugins.fsharp.test.framework.withEditorConfig
+import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -17,8 +18,8 @@ import kotlin.io.path.copyTo
 
 @Tag(TeamCityTags.Plugins.FSharp)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
+@Solution("FormatCodeApp")
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
-  override val testSolution = "FormatCodeApp"
   override fun beforeDoTestWithDocuments() {
     super.beforeDoTestWithDocuments()
 
