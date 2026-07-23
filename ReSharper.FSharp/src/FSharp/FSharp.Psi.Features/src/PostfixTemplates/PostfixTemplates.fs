@@ -278,7 +278,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, usageStatistics) =
 
         let node = reference.GetTreeNode().NotNull()
         let context = fsCompletionContext.BasicContext
-        let settings = context.ContextBoundSettingsStore
+        let settings = context.SettingsStore
         let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
         FSharpPostfixTemplateContext(node, executionContext)
 
