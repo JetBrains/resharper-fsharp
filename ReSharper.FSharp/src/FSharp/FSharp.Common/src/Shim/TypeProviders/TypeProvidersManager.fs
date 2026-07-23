@@ -130,7 +130,7 @@ type TypeProvidersManager(connection: TypeProvidersConnection, fcsProjectProvide
         )
 
         scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
-            fun psiModule -> disposeTypeProviders psiModule.Path.FullPath)
+            fun struct(psiModule, _) -> disposeTypeProviders psiModule.Path.FullPath)
 
     interface IProxyTypeProvidersManager with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
