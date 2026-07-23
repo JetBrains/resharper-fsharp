@@ -1,0 +1,6 @@
+﻿//${RUN:Import missing references in file}
+open System.IO
+open System.Linq
+
+let x: StreamReader{caret} = null
+let y = "".FirstOrDefault()

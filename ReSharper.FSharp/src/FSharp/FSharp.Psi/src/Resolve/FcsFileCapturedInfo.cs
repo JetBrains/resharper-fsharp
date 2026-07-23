@@ -300,7 +300,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       foreach (var diagnostic in checkResults.Diagnostics)
       {
-        if (diagnostic.ErrorNumber != 39) 
+        if (diagnostic.ErrorNumber != 39 && 
+            diagnostic.ErrorNumber != 72)
           continue;
 
         var identRange = document.GetTextRange(diagnostic.Range);

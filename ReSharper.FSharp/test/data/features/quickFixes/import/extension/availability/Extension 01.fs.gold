@@ -1,0 +1,9 @@
+﻿let _ = "".|FirstOrDefault|(0)()
+
+------------------------------------------------
+0: The type 'String' does not define the field, constructor or member 'FirstOrDefault'.
+QUICKFIXES:
+Import missing references in file
+--Import missing references in project
+--Import missing references in solution
+Use Enumerable.FirstOrDefault
