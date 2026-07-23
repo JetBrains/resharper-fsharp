@@ -292,7 +292,11 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
-            scriptPsiModuleInvalidated.Fire((psiModule, true)))
+            scriptPsiModuleInvalidated.Fire((psiModule, true))
+            
+            if not (scriptsFromProjectFiles.ContainsKey(path)) then
+                scriptToDirectReferencingScripts.Remove(path) |> ignore
+                scriptsReferences.Remove(path) |> ignore)
 
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path
