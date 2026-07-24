@@ -1,0 +1,29 @@
+﻿Project
+1:Folder1[1]
+  1:File1
+2:Sep[1]
+  1:FileS
+3:Folder1[2]
+  1:File2
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Sep/FileS
+Folder1/File2
+
+
+=======
+Remove folder 'Sep':
+Remove folder 'Sep'
+Refresh whole project
+
+Project
+1:Folder1[1]
+  1:File1
+  2:File2
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Folder1/File2
+
+

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Folder1\Nested\File1.fs" />
+    <Compile Include="Folder2\File2.fs" />
+    <Compile Include="Folder1\Nested\File3.fs" />
+    <Compile Include="Folder1\File4.fs" />
+  </ItemGroup>
+</Project>

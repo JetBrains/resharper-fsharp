@@ -1,0 +1,162 @@
+===================
+Init
+
+-Project
+ -InterleavedFolder * 1 project
+  -ClassLibrary1
+   -Dependencies
+    -.NET 5.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      Microsoft.NETCore.App
+   File0.fs
+   -Folder
+    File1.fs
+    -Sub
+     File2.fs
+    File3.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : InterleavedFolder.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    ProjectFileImpl(Path : File0.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net5.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File0.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/Sub/File2.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+  InterleavedFolder.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net5.0[1]
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+2:File0.fs
+3:Folder[1]
+  1:File1.fs
+  2:Sub[1]
+    1:File2.fs
+  3:File3.fs
+
+net5.0
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+File0.fs
+Folder/File1.fs
+Folder/Sub/File2.fs
+Folder/File3.fs
+
+===================
+1. Move folder 'Folder' before 'File0.fs'
+
+-Project
+ -InterleavedFolder * 1 project
+  -ClassLibrary1
+   -Dependencies
+    -.NET 5.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      Microsoft.NETCore.App
+   -Folder
+    File1.fs
+    -Sub
+     File2.fs
+    File3.fs
+   File0.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : InterleavedFolder.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    ProjectFileImpl(Path : File0.fs)[COMPILE ]
+    Folder [Name:Folder]
+      Child items:
+        ProjectFileImpl(Path : File1.fs)[COMPILE ]
+        ProjectFileImpl(Path : File3.fs)[COMPILE ]
+        Folder [Name:Sub]
+          Child items:
+            ProjectFileImpl(Path : File2.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net5.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/File0.fs
+  ClassLibrary1/Folder/File1.fs
+  ClassLibrary1/Folder/File3.fs
+  ClassLibrary1/Folder/Sub/File2.fs
+  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+  InterleavedFolder.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net5.0[1]
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+2:Folder[1]
+  1:File1.fs
+  2:Sub[1]
+    1:File2.fs
+  3:File3.fs
+3:File0.fs
+
+net5.0
+obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+Folder/File1.fs
+Folder/Sub/File2.fs
+Folder/File3.fs
+File0.fs
+

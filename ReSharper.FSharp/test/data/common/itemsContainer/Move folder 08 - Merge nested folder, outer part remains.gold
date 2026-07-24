@@ -1,0 +1,43 @@
+﻿Project
+1:Folder1[1]
+  1:Nested[1]
+    1:File1
+2:Folder2[1]
+  1:File2
+3:Folder1[2]
+  1:Nested[2]
+    1:File3
+  2:File4
+
+.NETFramework,Version=v0.0
+Folder1/Nested/File1
+Folder2/File2
+Folder1/Nested/File3
+Folder1/File4
+
+
+=======
+Move 'Folder1(2)/Nested' after 'Folder1/Nested/File1':
+Remove 'Folder1/Nested/File3'
+Refresh Folder1[2]
+Update view Folder1/File4
+Add 'Folder1/Nested/File3' After 'Folder1/Nested/File1'
+Update view Folder1/Nested/File3
+
+Project
+1:Folder1[1]
+  1:Nested[1]
+    1:File1
+    2:File3
+2:Folder2[1]
+  1:File2
+3:Folder1[2]
+  1:File4
+
+.NETFramework,Version=v0.0
+Folder1/Nested/File1
+Folder1/Nested/File3
+Folder2/File2
+Folder1/File4
+
+

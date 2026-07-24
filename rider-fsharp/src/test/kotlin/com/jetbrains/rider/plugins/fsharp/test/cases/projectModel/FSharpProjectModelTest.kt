@@ -216,4 +216,199 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
       dump2("Init", checkSlnFile = false, compareProjFile = false) { }
     }
   }
+
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FSharpProjectTree")
+  fun testFSharpMoveFolder() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+
+      // Move a whole folder part to a new position among top level items. Its items move
+      // sequentially, like individual files.
+      dump2("1. Move folder 'Folder(1)' after 'File3.fs'", false, true) {
+        moveItem(
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"),
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FSharpProjectTree")
+  fun testFSharpMoveFolderJoinParts() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+
+      // Move a folder part next to another part of the same folder: the parts should join
+      // into a single folder.
+      dump2("1. Move folder 'Folder(2)' before 'Folder(1)' (join parts)", false, true) {
+        moveItem(
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"),
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), RdDndOrderType.Before
+        )
+      }
+    }
+  }
+
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FSharpProjectTree")
+  fun testFSharpMoveNestedFolder() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+
+      // Move a folder part that contains a nested (split) subfolder 'Sub'. The nested structure
+      // and item order must be preserved at the destination.
+      dump2("1. Move folder 'Folder(2)' (with nested 'Sub') before 'EmptyFolder'", false, true) {
+        moveItem(
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"),
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.Before
+        )
+      }
+    }
+  }
+
+  // Move a whole non-split folder that interleaves files and a subfolder. Its items must be
+  // re-added in the container (fsproj) order — File1, Sub/File2, File3 — not grouped by the
+  // project model, and the emptied source folder must not be left behind.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("InterleavedFolder")
+  fun testFSharpMoveWholeFolderKeepsOrder() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move folder 'Folder' before 'File0.fs'", false, true) {
+        moveItem(
+          arrayOf("InterleavedFolder", "ClassLibrary1", "Folder"),
+          arrayOf("InterleavedFolder", "ClassLibrary1", "File0.fs"), RdDndOrderType.Before
+        )
+      }
+    }
+  }
+
+  // Reorder a non-split empty folder within the same parent. An empty folder has no files, so it
+  // is moved as a whole folder (remove + re-add of its <Folder Include/> marker) rather than via
+  // its files. CanMove treats a same-location folder move as a reorder rather than a name clash.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FSharpProjectTree")
+  fun testFSharpMoveEmptyFolder() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move empty folder 'EmptyFolder' before 'File3.fs'", false, true) {
+        moveItem(
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"),
+          arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), RdDndOrderType.Before
+        )
+      }
+    }
+  }
+
+  // Move an empty folder next to another empty folder. The two stay distinct (different names) and
+  // reorder correctly.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("EmptyFolders")
+  fun testFSharpMoveEmptyFolderNextToAnother() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move empty folder 'FolderA' after 'FolderB'", false, true) {
+        moveItem(
+          arrayOf("EmptyFolders", "ClassLibrary1", "FolderA"),
+          arrayOf("EmptyFolders", "ClassLibrary1", "FolderB"), RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  // Move a whole folder that contains an empty subfolder. The empty subfolder's <Folder Include/>
+  // marker must move with the folder's files, not be left behind.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FolderWithEmptySub")
+  fun testFSharpMoveFolderWithEmptySubfolder() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move folder 'Outer' after 'Sibling.fs'", false, true) {
+        moveItem(
+          arrayOf("FolderWithEmptySub", "ClassLibrary1", "Outer"),
+          arrayOf("FolderWithEmptySub", "ClassLibrary1", "Sibling.fs"), RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  // Folder1 (containing nested 'Nested') is split by Folder2. Move the second Folder1 part above
+  // Folder2 so it merges back into the first part.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SplitNested")
+  fun testFSharpMergeSplitFolderWithNested() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move folder 'Folder1(2)' before 'Folder2'", false, true) {
+        moveItem(
+          arrayOf("SplitNested", "ClassLibrary1", "Folder1?2"),
+          arrayOf("SplitNested", "ClassLibrary1", "Folder2"), RdDndOrderType.Before
+        )
+      }
+    }
+  }
+
+  // Move only the nested 'Nested' part after File1. It merges with the first 'Nested' part, while
+  // the second Folder1 part keeps File4 and stays split.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SplitNestedWithFile")
+  fun testFSharpMergeNestedFolderOuterPartRemains() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+        moveItem(
+          arrayOf("SplitNestedWithFile", "ClassLibrary1", "Folder1?2", "Nested"),
+          arrayOf("SplitNestedWithFile", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
+          RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  // Move the nested 'Nested' part after File1. It merges, and the now-empty second Folder1 part is
+  // removed.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SplitNested")
+  fun testFSharpMergeNestedFolderEmptyOuterPartRemoved() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+        moveItem(
+          arrayOf("SplitNested", "ClassLibrary1", "Folder1?2", "Nested"),
+          arrayOf("SplitNested", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
+          RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  // Move the nested 'Nested' part after File1. Removing the emptied second Folder1 part makes the
+  // two Folder2 parts adjacent, so both Folder1 and Folder2 split parts merge.
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SplitNestedTwoFolders")
+  fun testFSharpMergeNestedFolderJoinsBothFolders() {
+    doTestDumpProjectsView {
+      dump2("Init", false, false) { }
+      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+        moveItem(
+          arrayOf("SplitNestedTwoFolders", "ClassLibrary1", "Folder1?2", "Nested"),
+          arrayOf("SplitNestedTwoFolders", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
+          RdDndOrderType.After
+        )
+      }
+    }
+  }
 }

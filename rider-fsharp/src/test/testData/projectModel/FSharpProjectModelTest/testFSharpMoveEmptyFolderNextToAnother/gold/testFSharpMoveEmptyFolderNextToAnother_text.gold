@@ -1,0 +1,22 @@
+===================
+Init
+
+[File1.fs]
+module File1
+
+
+[File2.fs]
+module File2
+
+
+===================
+1. Move empty folder 'FolderA' after 'FolderB'
+
+[File1.fs]
+module File1
+
+
+[File2.fs]
+module File2
+
+

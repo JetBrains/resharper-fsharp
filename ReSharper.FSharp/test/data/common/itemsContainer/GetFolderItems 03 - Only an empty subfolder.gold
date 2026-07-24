@@ -1,0 +1,15 @@
+﻿Add folder 'Outer/EmptySub' After 'File0'
+Refresh whole project
+Update view Outer/EmptySub[1]
+Project
+1:File0
+2:Outer[1]
+  1:EmptySub[1]
+
+.NETFramework,Version=v0.0
+File0
+
+
+=======
+GetFolderItems('Outer'[1]):
+Outer/EmptySub

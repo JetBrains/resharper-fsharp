@@ -1,0 +1,35 @@
+﻿Project
+1:Folder1[1]
+  1:File1
+2:Sep[1]
+  1:FileS
+3:Folder1[2]
+  1:File2
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Sep/FileS
+Folder1/File2
+
+
+=======
+Move 'Sep' after 'Folder1(2)':
+Remove 'Sep/FileS'
+Add 'Sep/FileS' After 'Folder1/File2'
+Refresh whole project
+Update view Sep/FileS
+Update view Sep[1]
+
+Project
+1:Folder1[1]
+  1:File1
+  2:File2
+2:Sep[1]
+  1:FileS
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Folder1/File2
+Sep/FileS
+
+

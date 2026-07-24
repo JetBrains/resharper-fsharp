@@ -1,0 +1,43 @@
+﻿Project
+1:Folder1[1]
+  1:File1
+2:Folder2[1]
+  1:File2
+3:Folder1[2]
+  1:File3
+4:File4
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Folder2/File2
+Folder1/File3
+File4
+
+
+=======
+Move 'Folder1(1)' after 'File4':
+Remove 'Folder1/File1'
+Refresh whole project
+Update view Folder2[1]
+Update view Folder1[1]
+Update view File4
+Add 'Folder1/File1' After 'File4'
+Refresh whole project
+Update view Folder1/File1
+
+Project
+1:Folder2[1]
+  1:File2
+2:Folder1[1]
+  1:File3
+3:File4
+4:Folder1[2]
+  1:File1
+
+.NETFramework,Version=v0.0
+Folder2/File2
+Folder1/File3
+File4
+Folder1/File1
+
+

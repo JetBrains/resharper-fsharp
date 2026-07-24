@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-run id="2" testcasecount="0" result="Failed" label="Invalid" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.2.1.0" clr-version="4.0.30319.42000" start-time="2026-07-23 14:18:35Z" end-time="2026-07-23 14:18:35Z" duration="0.003029">
+  <command-line><![CDATA[C:\Users\Eugene.Auduchinok\.nuget\packages\nunit.consolerunner\3.2.1\tools\nunit3-console.exe Bin.RiderBackend/JetBrains.ReSharper.Plugins.FSharp.Common.Tests.dll]]></command-line>
+  <test-suite type="Assembly" id="0-1" name="JetBrains.ReSharper.Plugins.FSharp.Common.Tests.dll" fullname="C:\Developer\ultimate\dotnet\Plugins\resharper-fsharp\ReSharper.FSharp\test\data\common\itemsContainer\Bin.RiderBackend\JetBrains.ReSharper.Plugins.FSharp.Common.Tests.dll" testcasecount="0" runstate="NotRunnable" result="Failed" label="Invalid">
+    <properties>
+      <property name="_SKIPREASON" value="File not found: C:\Developer\ultimate\dotnet\Plugins\resharper-fsharp\ReSharper.FSharp\test\data\common\itemsContainer\Bin.RiderBackend\JetBrains.ReSharper.Plugins.FSharp.Common.Tests.dll" />
+    </properties>
+    <reason>
+      <message>File not found: C:\Developer\ultimate\dotnet\Plugins\resharper-fsharp\ReSharper.FSharp\test\data\common\itemsContainer\Bin.RiderBackend\JetBrains.ReSharper.Plugins.FSharp.Common.Tests.dll</message>
+    </reason>
+  </test-suite>
+</test-run>
