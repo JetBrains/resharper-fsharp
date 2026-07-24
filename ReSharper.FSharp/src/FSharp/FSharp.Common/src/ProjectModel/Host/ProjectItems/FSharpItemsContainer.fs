@@ -356,6 +356,13 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
                 mapping.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType))
 
+        member x.GetFolderItems(viewFolder: FSharpViewItem) =
+            use lock = locker.UsingReadLock()
+            tryGetProjectMark viewFolder.ProjectItem
+            |> Option.bind tryGetProjectMapping
+            |> Option.map _.GetFolderItems(viewFolder)
+            |> Option.defaultValue []
+
         member x.TryGetParentFolderIdentity(viewFile: FSharpViewItem): FSharpViewFolderIdentity option =
             use lock = locker.UsingReadLock()
             tryGetProjectMark viewFile.ProjectItem
@@ -401,6 +408,7 @@ type IFSharpItemsContainer =
     abstract member RemoveProject: IProject -> unit
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
+    abstract member GetFolderItems: FSharpViewItem -> VirtualFileSystemPath list
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
     abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> (VirtualFileSystemPath * BuildAction)[]
     abstract member Dump: TextWriter -> unit
@@ -664,6 +672,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         getChildrenSorted (ProjectItem item)
         |> Seq.iter (removeItem refreshFolder update)
 
+        // A split part is already removed when its last child goes (removeSplittedFolderIfEmpty).
+        if not (children[item.Parent] |> Seq.contains item) then () else
+
         tryJoinRelativeFolders itemBefore itemAfter refreshFolder update
         match item with
         | FileItem _ -> files.Remove(item.PhysicalPath) |> ignore
@@ -702,6 +713,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             tryJoinRelativeFolders lastChildBefore firstChildAfter folderRefresher itemUpdater
             folderRefresher itemBefore.Parent
         | _ -> ()
+
+    // A folder moved file by file leaves an emptied source part behind; drop empty split parts.
+    let removeEmptyFolderParts (itemPath: VirtualFileSystemPath) folderRefresher itemUpdater =
+        let mutable folderPath = itemPath.Parent
+        while folders[folderPath].Count > 0 do
+            for part in folders[folderPath] |> List.ofSeq do
+                removeSplittedFolderIfEmpty (ProjectItem part) folderPath folderRefresher itemUpdater
+            folderPath <- folderPath.Parent
 
     let rec tryGetAdjacentRelativeItem relativeToItem modifiedItemCompilerOrder relativeToType =
         match relativeToItem with
@@ -773,12 +792,12 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
         ItemInfo.Create(path, logicalPath, parent, sortKey)
 
-    let iter f =
-        let rec iter (parent: FSharpProjectModelElement) =
-            for item in getChildrenSorted parent do
-                f item
-                iter (ProjectItem item)
-        iter project
+    let rec iterFrom (parent: FSharpProjectModelElement) f =
+        for item in getChildrenSorted parent do
+            f item
+            iterFrom (ProjectItem item) f
+
+    let iter f = iterFrom project f
 
     member x.Update(items) =
         let folders = Stack()
@@ -968,7 +987,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | _ -> failwithf "No item found for %O" path
 
     member x.RemoveFolder(path, refreshFolder, update) =
-        for folder in folders[path] do
+        for folder in List.ofSeq folders[path] do
             removeItem refreshFolder update folder
 
     member x.UpdateFolder(oldLocation, newLocation, update) =
@@ -981,6 +1000,16 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member x.TryGetFolderItems(path: VirtualFileSystemPath): IList<FSharpProjectItem> =
         folders[path]
 
+    member x.GetFolderItems(viewItem: FSharpViewItem): VirtualFileSystemPath list =
+        match tryGetProjectItem viewItem with
+        | Some(FolderItem _ as folderItem) ->
+            let result = List()
+            iterFrom (ProjectItem folderItem) (function
+                | FileItem _ | EmptyFolder _ as item -> result.Add(item.PhysicalPath)
+                | _ -> ())
+            List.ofSeq result
+        | _ -> []
+
     member x.AddFile(BuildAction action, compileOrder, path, logicalPath, relativeToPath, relativeToType, refreshFolder, update) =
         let info = createNewItemInfo path logicalPath relativeToPath relativeToType refreshFolder update
         let item = FileItem(info, action, compileOrder, targetFrameworkIds, true) // todo
@@ -988,6 +1017,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         files.Add(path, item)
         addChild item
         update item
+
+        removeEmptyFolderParts path refreshFolder update
 
     member x.AddFolder(path, relativeToPath, relativeToType, refreshFolder, update) =
         let info = createNewItemInfo path path relativeToPath relativeToType refreshFolder update
@@ -1350,6 +1381,28 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
             match project.FindProjectItemsByLocation(path).FirstOrDefault() with
             | null -> None
             | item -> Some(OrderingContext(RelativeTo(item, relativeToType))))
+
+
+[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
+type FSharpMovedProjectItemsProvider(container: IFSharpItemsContainer) =
+    interface IMovedProjectItemsProvider with
+        member x.IsApplicable(project) = project.IsFSharp
+
+        member x.GetProjectItemsToMove(nodeValues) =
+            nodeValues
+            |> Seq.tryPick (function :? FSharpViewItem as viewItem -> Some viewItem | _ -> None)
+            |> Option.bind (fun viewItem ->
+                match viewItem.ProjectItem.GetProject() with
+                | null -> None
+                | project ->
+                    container.GetFolderItems(viewItem)
+                    |> List.choose (fun path -> project.FindProjectItemsByLocation(path) |> Seq.tryHead)
+                    |> function
+                       | [] -> None
+                       | items -> Some(ResizeArray(items) :> IReadOnlyList<IProjectItem>)
+            )
+            |> Option.toObj
 
 
 [<ShellComponent>]

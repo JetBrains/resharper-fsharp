@@ -1,0 +1,38 @@
+===================
+Init
+
+[File4.fs]
+module File4
+
+
+[File1.fs]
+module File1
+
+
+[File3.fs]
+module File3
+
+
+[File2.fs]
+module File2
+
+
+===================
+1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'
+
+[File4.fs]
+module File4
+
+
+[File1.fs]
+module File1
+
+
+[File3.fs]
+module File3
+
+
+[File2.fs]
+module File2
+
+

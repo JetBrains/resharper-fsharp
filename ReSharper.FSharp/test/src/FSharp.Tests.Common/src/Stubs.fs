@@ -25,6 +25,7 @@ type StubFSharpItemsContainer() =
         member this.RemoveProject _ = ()
         member this.TryGetSortKey _ = None
         member this.TryGetParentFolderIdentity _ = None
+        member this.GetFolderItems _ = []
         member this.CreateFoldersWithParents _ = []
         member this.GetProjectItemsPaths(_, _) = [||]
         member this.Dump _ = ()

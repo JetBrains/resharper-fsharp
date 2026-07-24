@@ -1,0 +1,15 @@
+﻿Project
+1:Folder[1]
+  1:Sub[1]
+    1:File1
+  2:File2
+
+.NETFramework,Version=v0.0
+Folder/Sub/File1
+Folder/File2
+
+
+=======
+GetFolderItems('Folder'[1]):
+Folder/Sub/File1
+Folder/File2

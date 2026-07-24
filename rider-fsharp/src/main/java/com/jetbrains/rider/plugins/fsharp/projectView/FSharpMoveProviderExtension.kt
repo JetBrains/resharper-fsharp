@@ -71,9 +71,6 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     relativeTo: ProjectElementView,
     orderType: RdDndOrderType
   ): Boolean {
-    if (entities.any { it.isProjectFolder() && it.containingProjectEntity()?.url?.virtualFile?.extension == "fsproj" })
-      return false
-
     if (orderType == RdDndOrderType.None) {
       return super.allowPaste(entities, relativeTo, orderType)
     }

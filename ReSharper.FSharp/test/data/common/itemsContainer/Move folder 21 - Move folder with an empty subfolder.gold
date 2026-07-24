@@ -1,0 +1,47 @@
+﻿Project
+1:Folder[1]
+  1:File1
+  2:File2
+2:Sibling
+
+.NETFramework,Version=v0.0
+Folder/File1
+Folder/File2
+Sibling
+
+
+=======
+Add folder 'Folder/EmptySub' After 'Folder/File1'
+Update view Folder/File2
+Update view Folder/EmptySub[1]
+Move 'Folder' (File1, EmptySub, File2) after 'Sibling':
+Remove 'Folder/File1'
+Update view Folder/EmptySub[1]
+Update view Folder/File2
+Add 'Folder/File1' After 'Sibling'
+Refresh whole project
+Update view Folder/File1
+Remove folder 'Folder/EmptySub'
+Update view Folder/File2
+Add folder 'Folder/EmptySub' After 'Folder/File1'
+Update view Folder/EmptySub[1]
+Remove 'Folder/File2'
+Refresh whole project
+Update view Sibling
+Update view Folder[1]
+Add 'Folder/File2' After 'Folder/EmptySub'
+Update view Folder/File2
+
+Project
+1:Sibling
+2:Folder[1]
+  1:File1
+  2:EmptySub[1]
+  3:File2
+
+.NETFramework,Version=v0.0
+Sibling
+Folder/File1
+Folder/File2
+
+

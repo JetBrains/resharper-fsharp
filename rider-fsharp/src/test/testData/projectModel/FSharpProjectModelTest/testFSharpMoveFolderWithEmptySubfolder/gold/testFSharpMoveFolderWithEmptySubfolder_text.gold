@@ -1,0 +1,30 @@
+===================
+Init
+
+[File1.fs]
+module File1
+
+
+[File2.fs]
+module File2
+
+
+[Sibling.fs]
+module Sibling
+
+
+===================
+1. Move folder 'Outer' after 'Sibling.fs'
+
+[File1.fs]
+module File1
+
+
+[File2.fs]
+module File2
+
+
+[Sibling.fs]
+module Sibling
+
+
