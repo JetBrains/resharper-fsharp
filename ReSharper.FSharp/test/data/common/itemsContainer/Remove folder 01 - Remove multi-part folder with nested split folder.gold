@@ -1,0 +1,41 @@
+﻿Project
+1:Folder[1]
+  1:File1
+  2:File2
+2:File3
+3:Folder[2]
+  1:File4
+  2:Sub[1]
+    1:Class1
+  3:File5
+  4:Sub[2]
+    1:Class2
+
+.NETFramework,Version=v0.0
+Folder/File1
+Folder/File2
+File3
+Folder/File4
+Folder/Sub/Class1
+Folder/File5
+Folder/Sub/Class2
+
+
+=======
+Remove folder 'Folder':
+Remove folder 'Folder'
+Refresh whole project
+Update view Folder/File2
+Update view File3
+Update view Folder[1]
+Update view Folder/Sub[1]
+Update view Folder/File5
+Update view Folder/Sub[1]
+
+Project
+1:File3
+
+.NETFramework,Version=v0.0
+File3
+
+

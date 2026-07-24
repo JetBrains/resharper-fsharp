@@ -1,0 +1,30 @@
+===================
+Init
+
+[File1.fs]
+module File1
+
+
+[File3.fs]
+module File3
+
+
+[File2.fs]
+module File2
+
+
+===================
+1. Move folder 'Folder1(2)' before 'Folder2'
+
+[File1.fs]
+module File1
+
+
+[File3.fs]
+module File3
+
+
+[File2.fs]
+module File2
+
+

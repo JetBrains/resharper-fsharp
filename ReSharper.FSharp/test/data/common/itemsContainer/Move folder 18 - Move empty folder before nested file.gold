@@ -1,0 +1,35 @@
+﻿Project
+1:Folder[1]
+  1:File1
+  2:File2
+2:File3
+
+.NETFramework,Version=v0.0
+Folder/File1
+Folder/File2
+File3
+
+
+=======
+Create empty 'EmptyFolder' after 'File3', then move it before 'Folder/File1':
+Add folder 'EmptyFolder' After 'File3'
+Update view EmptyFolder[1]
+Remove folder 'EmptyFolder'
+Add folder 'EmptyFolder' Before 'Folder/File1'
+Update view Folder[1]
+Update view File3
+Update view EmptyFolder[1]
+
+Project
+1:EmptyFolder[1]
+2:Folder[1]
+  1:File1
+  2:File2
+3:File3
+
+.NETFramework,Version=v0.0
+Folder/File1
+Folder/File2
+File3
+
+

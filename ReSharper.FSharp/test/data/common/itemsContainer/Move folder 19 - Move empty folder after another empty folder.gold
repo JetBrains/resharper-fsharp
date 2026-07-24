@@ -1,0 +1,33 @@
+﻿Project
+1:File1
+2:File2
+
+.NETFramework,Version=v0.0
+File1
+File2
+
+
+=======
+Create empty 'FolderA' and 'FolderB', then move 'FolderA' after 'FolderB':
+Add folder 'FolderA' After 'File1'
+Update view File2
+Update view FolderA[1]
+Add folder 'FolderB' After 'File2'
+Update view FolderB[1]
+Remove folder 'FolderA'
+Update view File2
+Update view FolderB[1]
+Add folder 'FolderA' After 'FolderB'
+Update view FolderA[1]
+
+Project
+1:File1
+2:File2
+3:FolderB[1]
+4:FolderA[1]
+
+.NETFramework,Version=v0.0
+File1
+File2
+
+

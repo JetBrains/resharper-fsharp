@@ -638,6 +638,34 @@ type FSharpItemsContainerTest() =
                 container.OnRemoveFile("Compile", "Another/File3"))
 
     [<Test>]
+    member x.``Remove folder 01 - Remove multi-part folder with nested split folder``() =
+        // Mirrors the FSharpProjectTree fixture: 'Folder' is split into two parts and its 'Sub'
+        // subfolder is split too. Removing the whole folder must drop every part and nested item.
+        x.DoContainerModificationTest(
+            [ "Folder[1]/File1"
+              "Folder[1]/File2"
+              "File3"
+              "Folder[2]/File4"
+              "Folder[2]/Sub[1]/Class1"
+              "Folder[2]/File5"
+              "Folder[2]/Sub[2]/Class2" ],
+            fun container writer ->
+                writer.WriteLine("Remove folder 'Folder':")
+                container.OnRemoveFolder("Folder"))
+
+    [<Test>]
+    member x.``Remove folder 02 - Removing a separator joins the split folder``() =
+        // Deleting the whole 'Sep' folder that sat between the two Folder1 parts makes them
+        // adjacent, so Folder1 is joined into a single part.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "Sep[1]/FileS"
+              "Folder1[2]/File2" ],
+            fun container writer ->
+                writer.WriteLine("Remove folder 'Sep':")
+                container.OnRemoveFolder("Sep"))
+
+    [<Test>]
     member x.``Modification 01 - Move file``() =
         x.DoContainerModificationTest(
             [ "File1"
@@ -647,6 +675,355 @@ type FSharpItemsContainerTest() =
                 writer.WriteLine("Move 'Folder/File4' after 'File1':")
                 container.OnRemoveFile("Compile", "Folder/File4")
                 container.OnAddFile("Compile", "File4", "File1", Some RelativeToType.After))
+
+    // Moving a WHOLE folder is decomposed by the platform (HostMoveAction) into a single
+    // OnRemoveFolder (which drops the folder and its whole subtree) followed by per-file Add
+    // operations. To keep the items in their original order the reference item is advanced to
+    // the previously added file after each add (see HostMoveAction.Commit).
+    //
+    // Moving a single PART of a split folder is decomposed into per-file Remove + Add (removing
+    // the folder would drop the other parts too), again with the reference advanced.
+
+    [<Test>]
+    member x.``Move folder 01 - Move non-split folder before top level file``() =
+        x.DoContainerModificationTest(
+            [ "File1"
+              "Folder[1]/File2"
+              "Folder[1]/File3"
+              "Folder[1]/File4"
+              "File5" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder' before 'File1':")
+                container.OnRemoveFolder("Folder")
+                container.OnAddFile("Compile", "Folder/File2", "File1", Some RelativeToType.Before)
+                container.OnAddFile("Compile", "Folder/File3", "Folder/File2", Some RelativeToType.After)
+                container.OnAddFile("Compile", "Folder/File4", "Folder/File3", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 02 - Move non-split folder after top level file``() =
+        x.DoContainerModificationTest(
+            [ "File1"
+              "Folder[1]/File2"
+              "Folder[1]/File3"
+              "Folder[1]/File4"
+              "File5" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder' after 'File5':")
+                container.OnRemoveFolder("Folder")
+                container.OnAddFile("Compile", "Folder/File2", "File5", Some RelativeToType.After)
+                container.OnAddFile("Compile", "Folder/File3", "Folder/File2", Some RelativeToType.After)
+                container.OnAddFile("Compile", "Folder/File4", "Folder/File3", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 03 - Join split folder parts``() =
+        // Folder is split into two parts by 'Another'. Moving the second part up next to the
+        // first part should merge the parts into one.
+        x.DoContainerModificationTest(
+            [ "Folder[1]/File1"
+              "Another[1]/File2"
+              "Folder[2]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder(2)' before 'Another':")
+                container.OnRemoveFile("Compile", "Folder/File3")
+                container.OnAddFile("Compile", "Folder/File3", "Another/File2", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 04 - Join split folder parts, multiple files``() =
+        x.DoContainerModificationTest(
+            [ "Folder[1]/File1"
+              "Another[1]/File2"
+              "Folder[2]/File3"
+              "Folder[2]/File4" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder(2)' before 'Another':")
+                container.OnRemoveFile("Compile", "Folder/File3")
+                container.OnRemoveFile("Compile", "Folder/File4")
+                container.OnAddFile("Compile", "Folder/File3", "Another/File2", Some RelativeToType.Before)
+                container.OnAddFile("Compile", "Folder/File4", "Folder/File3", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 05 - Move nested folder before top level file``() =
+        x.DoContainerModificationTest(
+            [ "File1"
+              "Folder[1]/Sub[1]/File2"
+              "Folder[1]/Sub[1]/File3"
+              "File4" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder' before 'File1':")
+                container.OnRemoveFolder("Folder")
+                container.OnAddFile("Compile", "Folder/Sub/File2", "File1", Some RelativeToType.Before)
+                container.OnAddFile("Compile", "Folder/Sub/File3", "Folder/Sub/File2", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 06 - Join split nested folder parts``() =
+        x.DoContainerModificationTest(
+            [ "Folder[1]/Sub[1]/File1"
+              "Another[1]/File2"
+              "Folder[2]/Sub[2]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder(2)' before 'Another':")
+                container.OnRemoveFile("Compile", "Folder/Sub/File3")
+                container.OnAddFile("Compile", "Folder/Sub/File3", "Another/File2", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 07 - Merge split folder containing nested folder``() =
+        // Folder1 (with nested 'Nested') is split by Folder2. Moving the second Folder1 part above
+        // Folder2 merges it back into the first part.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/Nested[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/Nested[2]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(2)' before 'Folder2':")
+                container.OnRemoveFile("Compile", "Folder1/Nested/File3")
+                container.OnAddFile("Compile", "Folder1/Nested/File3", "Folder2/File2", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 08 - Merge nested folder, outer part remains``() =
+        // Move only the nested 'Nested' part after File1. It merges with the first 'Nested' part;
+        // the second Folder1 part keeps File4 and stays split.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/Nested[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/Nested[2]/File3"
+              "Folder1[2]/File4" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(2)/Nested' after 'Folder1/Nested/File1':")
+                container.OnRemoveFile("Compile", "Folder1/Nested/File3")
+                container.OnAddFile("Compile", "Folder1/Nested/File3", "Folder1/Nested/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 09 - Merge nested folder, empty outer part removed``() =
+        // Move the nested 'Nested' part after File1. It merges, and the now-empty second Folder1
+        // part is removed.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/Nested[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/Nested[2]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(2)/Nested' after 'Folder1/Nested/File1':")
+                container.OnRemoveFile("Compile", "Folder1/Nested/File3")
+                container.OnAddFile("Compile", "Folder1/Nested/File3", "Folder1/Nested/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 10 - Merge nested folder joins both folders' parts``() =
+        // Removing the second Folder1 part (after moving its nested file out) makes the two
+        // Folder2 parts adjacent, so both Folder1 and Folder2 split parts merge.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/Nested[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/Nested[2]/File3"
+              "Folder2[2]/File4" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(2)/Nested' after 'Folder1/Nested/File1':")
+                container.OnRemoveFile("Compile", "Folder1/Nested/File3")
+                container.OnAddFile("Compile", "Folder1/Nested/File3", "Folder1/Nested/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 11 - Merge split folder by moving first part down``() =
+        // Reverse direction of case 07: move the first part down past the separator so it merges
+        // into the second part.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(1)' after 'Folder2':")
+                container.OnRemoveFile("Compile", "Folder1/File1")
+                container.OnAddFile("Compile", "Folder1/File1", "Folder2/File2", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 12 - Merge outer parts of a three-part folder``() =
+        // Folder1 is split into three parts. Moving the third part next to the first merges those
+        // two, leaving the middle part still split off.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "A[1]/FileA"
+              "Folder1[2]/File2"
+              "B[1]/FileB"
+              "Folder1[3]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(3)' before 'A':")
+                container.OnRemoveFile("Compile", "Folder1/File3")
+                container.OnAddFile("Compile", "Folder1/File3", "A/FileA", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 13 - Relocate a folder part without merging``() =
+        // Move a part to a spot not adjacent to the other part: the folder stays split, relocated.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "Folder2[1]/File2"
+              "Folder1[2]/File3"
+              "File4" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(1)' after 'File4':")
+                container.OnRemoveFile("Compile", "Folder1/File1")
+                container.OnAddFile("Compile", "Folder1/File1", "File4", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 14 - Renumber part identities when moving a middle part``() =
+        // Folder1 is split into three parts. Moving the middle part (2) before the first part
+        // removes the middle part and renumbers the trailing part's identity from [3] to [2].
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "A[1]/FileA"
+              "Folder1[2]/File2"
+              "B[1]/FileB"
+              "Folder1[3]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder1(2)' before 'Folder1(1)':")
+                container.OnRemoveFile("Compile", "Folder1/File2")
+                container.OnAddFile("Compile", "Folder1/File2", "Folder1/File1", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 15 - Moving a separating folder joins the folder it split``() =
+        // 'Sep' is a non-split folder sitting between the two Folder1 parts. Moving it out is done
+        // by moving its file (like every folder move); the emptied source 'Sep' part is dropped so
+        // the two Folder1 parts become adjacent and join into a single part.
+        x.DoContainerModificationTest(
+            [ "Folder1[1]/File1"
+              "Sep[1]/FileS"
+              "Folder1[2]/File2" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Sep' after 'Folder1(2)':")
+                container.OnRemoveFile("Compile", "Sep/FileS")
+                container.OnAddFile("Compile", "Sep/FileS", "Folder1/File2", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 16 - Move whole folder with nested subfolder``() =
+        // Moving a whole folder is done by moving its files one by one in container order. The
+        // interleaved subfolder keeps its place in the order and the emptied source folder is not
+        // left behind as a ghost.
+        x.DoContainerModificationTest(
+            [ "File0"
+              "Folder[1]/File1"
+              "Folder[1]/Sub[1]/File2"
+              "Folder[1]/File3" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Folder' before 'File0':")
+                container.OnRemoveFile("Compile", "Folder/File1")
+                container.OnAddFile("Compile", "Folder/File1", "File0", Some RelativeToType.Before)
+                container.OnRemoveFile("Compile", "Folder/Sub/File2")
+                container.OnAddFile("Compile", "Folder/Sub/File2", "Folder/File1", Some RelativeToType.After)
+                container.OnRemoveFile("Compile", "Folder/File3")
+                container.OnAddFile("Compile", "Folder/File3", "Folder/Sub/File2", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 17 - Move empty folder``() =
+        // An empty folder holds no files, so it is moved as a whole folder (remove + add), not file
+        // by file. It is created first (empty folders only exist once explicitly added), then moved.
+        x.DoContainerModificationTest(
+            [ "File1"
+              "File2" ],
+            fun container writer ->
+                writer.WriteLine("Add empty 'EmptyFolder' between the files, then move it after 'File2':")
+                container.OnAddFolder("EmptyFolder", "File1", Some RelativeToType.After)
+                container.OnRemoveFolder("EmptyFolder")
+                container.OnAddFolder("EmptyFolder", "File2", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 18 - Move empty folder before nested file``() =
+        // Mimics the frontend 'move EmptyFolder before Folder(1)': the drop resolves to the first
+        // file inside Folder, so the empty folder is re-added relative to a nested file while it
+        // itself lives at the project root.
+        x.DoContainerModificationTest(
+            [ "Folder/File1"
+              "Folder/File2"
+              "File3" ],
+            fun container writer ->
+                writer.WriteLine("Create empty 'EmptyFolder' after 'File3', then move it before 'Folder/File1':")
+                container.OnAddFolder("EmptyFolder", "File3", Some RelativeToType.After)
+                container.OnRemoveFolder("EmptyFolder")
+                container.OnAddFolder("EmptyFolder", "Folder/File1", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 19 - Move empty folder after another empty folder``() =
+        // Two distinct empty folders. Moving one after the other reorders it next to the other;
+        // they stay separate folders (different names).
+        x.DoContainerModificationTest(
+            [ "File1"
+              "File2" ],
+            fun container writer ->
+                writer.WriteLine("Create empty 'FolderA' and 'FolderB', then move 'FolderA' after 'FolderB':")
+                container.OnAddFolder("FolderA", "File1", Some RelativeToType.After)
+                container.OnAddFolder("FolderB", "File2", Some RelativeToType.After)
+                container.OnRemoveFolder("FolderA")
+                container.OnAddFolder("FolderA", "FolderB", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 20 - Move empty folder before another empty folder``() =
+        // Two adjacent empty folders. Moving the second before the first swaps their order.
+        x.DoContainerModificationTest(
+            [ "File1" ],
+            fun container writer ->
+                writer.WriteLine("Create empty 'FolderA' and 'FolderB' adjacent, then move 'FolderB' before 'FolderA':")
+                container.OnAddFolder("FolderA", "File1", Some RelativeToType.After)
+                container.OnAddFolder("FolderB", "FolderA", Some RelativeToType.After)
+                container.OnRemoveFolder("FolderB")
+                container.OnAddFolder("FolderB", "FolderA", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Move folder 21 - Move folder with an empty subfolder``() =
+        // Moving a whole folder moves its files and its empty subfolder together (the empty
+        // subfolder's marker must not be left behind). Models the per-item move the seam produces.
+        x.DoContainerModificationTest(
+            [ "Folder/File1"
+              "Folder/File2"
+              "Sibling" ],
+            fun container writer ->
+                container.OnAddFolder("Folder/EmptySub", "Folder/File1", Some RelativeToType.After)
+                writer.WriteLine("Move 'Folder' (File1, EmptySub, File2) after 'Sibling':")
+                container.OnRemoveFile("Compile", "Folder/File1")
+                container.OnAddFile("Compile", "Folder/File1", "Sibling", Some RelativeToType.After)
+                container.OnRemoveFolder("Folder/EmptySub")
+                container.OnAddFolder("Folder/EmptySub", "Folder/File1", Some RelativeToType.After)
+                container.OnRemoveFile("Compile", "Folder/File2")
+                container.OnAddFile("Compile", "Folder/File2", "Folder/EmptySub", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Move folder 22 - Move empty folder into another folder``() =
+        // Nesting an empty folder into a sibling folder: its path changes, so it is removed and
+        // re-added under the new parent.
+        x.DoContainerModificationTest(
+            [ "Folder/File1"
+              "File2" ],
+            fun container writer ->
+                container.OnAddFolder("EmptyFolder", "File2", Some RelativeToType.After)
+                writer.WriteLine("Move 'EmptyFolder' into 'Folder' after 'Folder/File1':")
+                container.OnRemoveFolder("EmptyFolder")
+                container.OnAddFolder("Folder/EmptyFolder", "Folder/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``GetFolderItems 01 - Files only``() =
+        x.DoGetFolderItemsTest([ "Folder/File1"; "Folder/File2" ], "Folder")
+
+    [<Test>]
+    member x.``GetFolderItems 02 - Files and an empty subfolder``() =
+        // The empty subfolder is an item to move too, so it appears among the files in order.
+        x.DoGetFolderItemsTest(
+            [ "Folder/File1"; "Folder/File2" ], "Folder",
+            setup = fun container -> container.OnAddFolder("Folder/EmptySub", "Folder/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``GetFolderItems 03 - Only an empty subfolder``() =
+        x.DoGetFolderItemsTest(
+            [ "File0" ], "Outer",
+            setup = fun container -> container.OnAddFolder("Outer/EmptySub", "File0", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``GetFolderItems 04 - Nested subfolder with files``() =
+        // A subfolder that holds files is not itself an item; its files are collected recursively.
+        x.DoGetFolderItemsTest([ "Folder/Sub/File1"; "Folder/File2" ], "Folder")
+
+    [<Test>]
+    member x.``GetFolderItems 05 - Empty folder nested in a subfolder with files``() =
+        x.DoGetFolderItemsTest(
+            [ "Folder/Sub/File1" ], "Folder",
+            setup = fun container -> container.OnAddFolder("Folder/Sub/EmptyLeaf", "Folder/Sub/File1", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``GetFolderItems 06 - Split folder part collects only that part``() =
+        x.DoGetFolderItemsTest([ "Folder/File1"; "Other/FileO"; "Folder/File2" ], "Folder", identity = 2)
 
     [<Test>]
     member x.``Create modification context 01 - No modification``() =
@@ -917,6 +1294,24 @@ type FSharpItemsContainerTest() =
 
         stringWriter.ToString()
 
+    // Dumps IFSharpItemsContainer.GetFolderItems for the folder at queryPath (identity defaults to
+    // 1), so we can pin down exactly which items a folder move expands to. `setup` can add empty
+    // folders (they can't be declared in the initial item list, which only holds Compile items).
+    member x.DoGetFolderItemsTest(items: string list, queryPath: string, ?identity: int, ?setup: LoggingFSharpItemsContainer -> unit) =
+        let identity = defaultArg identity 1
+        x.ExecuteWithGold(fun writer ->
+            let container = createContainer (items |> List.map (createItem "Compile")) writer
+            (defaultArg setup ignore) container
+            container.Dump(writer)
+            writer.WriteLine()
+            writer.WriteLine("=======")
+            writer.WriteLine(sprintf "GetFolderItems('%s'[%d]):" queryPath identity)
+            let viewFolder = createViewFolder (projectPath queryPath) identity (Dictionary())
+            for path in (container :> IFSharpItemsContainer).GetFolderItems(viewFolder) do
+                let (NormalizedPath rel) = path
+                writer.WriteLine(rel))
+        |> ignore
+
     member x.DoContainerModificationTest(items: string list, action: LoggingFSharpItemsContainer -> TextWriter -> unit, ?dump) =
         x.DoContainerModificationTest(items |> List.map (createItem "Compile"), action, ?dump = dump)
 
@@ -1041,6 +1436,19 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
     member x.OnRemoveFile(itemType, location) =
         writer.WriteLine(sprintf "Remove '%O'" location)
         container.OnRemoveFile(projectMark, itemType, projectPath location)
+
+    member x.OnRemoveFolder(location) =
+        writer.WriteLine(sprintf "Remove folder '%O'" location)
+        container.OnRemoveFolder(projectMark, projectPath location)
+
+    member x.OnAddFolder(location, relativeTo, relativeToType: RelativeToType option) =
+        let output, relativeToPath =
+            match relativeTo with
+            | null -> "", null
+            | relativeTo -> sprintf " %O '%O'" (relativeToType.NotNull().Value) relativeTo, projectPath relativeTo
+        writer.Write(sprintf "Add folder '%O'" location)
+        writer.WriteLine(output)
+        container.OnAddFolder(projectMark, projectPath location, relativeToPath, Option.toNullable relativeToType)
 
     member x.OnUpdateFile(oldItemType, oldLocation, newItemType, newLocation) =
         writer.WriteLine(sprintf "Update file: '%O' (%O) -> '%O' (%O)" oldLocation oldItemType newLocation newItemType)

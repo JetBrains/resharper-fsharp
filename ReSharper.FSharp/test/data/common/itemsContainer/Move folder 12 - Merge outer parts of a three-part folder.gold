@@ -1,0 +1,46 @@
+﻿Project
+1:Folder1[1]
+  1:File1
+2:A[1]
+  1:FileA
+3:Folder1[2]
+  1:File2
+4:B[1]
+  1:FileB
+5:Folder1[3]
+  1:File3
+
+.NETFramework,Version=v0.0
+Folder1/File1
+A/FileA
+Folder1/File2
+B/FileB
+Folder1/File3
+
+
+=======
+Move 'Folder1(3)' before 'A':
+Remove 'Folder1/File3'
+Refresh whole project
+Add 'Folder1/File3' Before 'A/FileA'
+Update view Folder1/File3
+
+Project
+1:Folder1[1]
+  1:File1
+  2:File3
+2:A[1]
+  1:FileA
+3:Folder1[2]
+  1:File2
+4:B[1]
+  1:FileB
+
+.NETFramework,Version=v0.0
+Folder1/File1
+Folder1/File3
+A/FileA
+Folder1/File2
+B/FileB
+
+

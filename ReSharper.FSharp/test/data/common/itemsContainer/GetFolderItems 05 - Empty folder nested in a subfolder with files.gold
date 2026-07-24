@@ -1,0 +1,16 @@
+﻿Add folder 'Folder/Sub/EmptyLeaf' After 'Folder/Sub/File1'
+Update view Folder/Sub/EmptyLeaf[1]
+Project
+1:Folder[1]
+  1:Sub[1]
+    1:File1
+    2:EmptyLeaf[1]
+
+.NETFramework,Version=v0.0
+Folder/Sub/File1
+
+
+=======
+GetFolderItems('Folder'[1]):
+Folder/Sub/File1
+Folder/Sub/EmptyLeaf

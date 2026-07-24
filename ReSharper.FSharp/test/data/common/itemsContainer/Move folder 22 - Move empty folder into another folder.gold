@@ -1,0 +1,29 @@
+﻿Project
+1:Folder[1]
+  1:File1
+2:File2
+
+.NETFramework,Version=v0.0
+Folder/File1
+File2
+
+
+=======
+Add folder 'EmptyFolder' After 'File2'
+Update view EmptyFolder[1]
+Move 'EmptyFolder' into 'Folder' after 'Folder/File1':
+Remove folder 'EmptyFolder'
+Add folder 'Folder/EmptyFolder' After 'Folder/File1'
+Update view Folder/EmptyFolder[1]
+
+Project
+1:Folder[1]
+  1:File1
+  2:EmptyFolder[1]
+2:File2
+
+.NETFramework,Version=v0.0
+Folder/File1
+File2
+
+

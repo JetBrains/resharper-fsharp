@@ -1,0 +1,50 @@
+﻿Project
+1:File0
+2:Folder[1]
+  1:File1
+  2:Sub[1]
+    1:File2
+  3:File3
+
+.NETFramework,Version=v0.0
+File0
+Folder/File1
+Folder/Sub/File2
+Folder/File3
+
+
+=======
+Move 'Folder' before 'File0':
+Remove 'Folder/File1'
+Update view Folder/Sub[1]
+Update view Folder/File3
+Add 'Folder/File1' Before 'File0'
+Refresh whole project
+Update view File0
+Update view Folder[1]
+Update view Folder/File1
+Remove 'Folder/Sub/File2'
+Add 'Folder/Sub/File2' After 'Folder/File1'
+Refresh Folder[1]
+Update view Folder/Sub/File2
+Update view Folder/File3
+Remove 'Folder/File3'
+Refresh whole project
+Add 'Folder/File3' After 'Folder/Sub/File2'
+Update view Folder/File3
+
+Project
+1:Folder[1]
+  1:File1
+  2:Sub[1]
+    1:File2
+  3:File3
+2:File0
+
+.NETFramework,Version=v0.0
+Folder/File1
+Folder/Sub/File2
+Folder/File3
+File0
+
+
