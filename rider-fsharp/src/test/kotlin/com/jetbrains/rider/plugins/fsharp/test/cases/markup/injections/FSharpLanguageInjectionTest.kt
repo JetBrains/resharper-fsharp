@@ -25,7 +25,7 @@ private fun BaseTestWithMarkup.doTest() {
   }
 }
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("CoreConsoleApp")
 class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
@@ -61,7 +61,7 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
   fun testInjectionByFunction() = doTest()
 }
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("FableApp")
 class FSharpFrontendFrameworksTest : BaseTestWithMarkup() {

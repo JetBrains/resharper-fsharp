@@ -28,7 +28,7 @@ import java.nio.file.Path
 import kotlin.io.path.pathString
 import kotlin.io.path.createDirectory
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Solution("TypeProviderLibrary")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class TypeProvidersCacheTest : BaseTypeProvidersTest() {
