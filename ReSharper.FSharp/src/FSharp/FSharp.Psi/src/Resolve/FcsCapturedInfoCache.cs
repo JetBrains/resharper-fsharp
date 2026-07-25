@@ -27,6 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   public class FcsCapturedInfoCache : IPsiSourceFileCache, IFcsCapturedInfoCache
   {
     private readonly object mySyncObj = new();
+    private readonly FSharpScriptPsiModulesProvider myScriptPsiModulesProvider;
     private readonly IShellLocks myLocks;
     public IFcsProjectProvider FcsProjectProvider { get; }
 
@@ -39,11 +40,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FcsCapturedInfoCache(Lifetime lifetime, IFcsProjectProvider fcsProjectProvider,
       FSharpScriptPsiModulesProvider scriptPsiModulesProvider, IShellLocks locks)
     {
+      myScriptPsiModulesProvider = scriptPsiModulesProvider;
       myLocks = locks;
       FcsProjectProvider = fcsProjectProvider;
 
       fcsProjectProvider.ProjectRemoved.Advise(lifetime, RemoveProject);
-      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, InvalidateScript);
+      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, x => InvalidateScript(x.PsiModule, x.IsRemoved));
     }
 
     private static bool IsFSharpFile(IPsiSourceFile sourceFile) =>
@@ -55,10 +57,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       Invalidate(projectKey);
     }
 
-    private void InvalidateScript(IPsiModule psiModule)
+    private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved)
     {
       myLocks.AssertWriteAccessAllowed();
-      ScriptCaches.Remove(psiModule);
+
+      if (isRemoved) 
+        ScriptCaches.Remove(scriptPsiModule);
+
+      else if (ScriptCaches.TryGetValue(scriptPsiModule, out var symbols))
+        symbols.Invalidate(scriptPsiModule.SourceFile);
+
+      InvalidateDirectReferencingScripts(scriptPsiModule, [scriptPsiModule]);
+    }
+
+    private void InvalidateDirectReferencingScripts(FSharpScriptPsiModule psiModule, HashSet<FSharpScriptPsiModule> visited)
+    {
+      var referencedByScripts = myScriptPsiModulesProvider.GetDirectReferencingScripts(psiModule);
+      foreach (var script in referencedByScripts)
+      {
+        if (!ScriptCaches.TryGetValue(script, out var symbols)) continue;
+
+        symbols.Invalidate(psiModule.SourceFile);
+        if (!visited.Add(script)) continue;
+
+        InvalidateDirectReferencingScripts(script, visited);
+      }
     }
 
     private void Invalidate(FcsProjectKey projectKey)
@@ -87,9 +110,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     protected virtual void Invalidate(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      if (psiModule is FSharpScriptPsiModule)
+      if (psiModule is FSharpScriptPsiModule scriptPsiModule)
       {
-        ScriptCaches.Remove(psiModule);
+        InvalidateScript(scriptPsiModule, isRemoved: false);
         return;
       }
 
@@ -231,7 +254,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         if (psiModule is FSharpScriptPsiModule)
         {
-          var scriptInfo = new FcsModuleCapturedInfo(null, true);
+          if (ScriptCaches.TryGetValue(psiModule, out var scriptInfo))
+            return scriptInfo;
+
+          scriptInfo = new FcsModuleCapturedInfo(null, true);
           ScriptCaches[psiModule] = scriptInfo;
           return scriptInfo;
         }
