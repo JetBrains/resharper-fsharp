@@ -21,7 +21,7 @@ import java.nio.file.Path
 import java.time.Duration
 import kotlin.io.path.pathString
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Solution("CoreConsoleApp")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FileSystemShimTest : PerTestSolutionTestBase() {

@@ -57,14 +57,14 @@ abstract class FSharpTypingAssistPatchEngineTest(mode: PatchEngineEditorTestMode
   }
 }
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FSharpTypingAssistPatchEngineSpeculativeAndForceRebaseTest :
   FSharpTypingAssistPatchEngineTest(PatchEngineEditorTestMode.SpeculativeAndForceRebase)
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -120,7 +120,7 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
   fun notSupported(caseName: String) = doTest(caseName, false)
 }
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
@@ -280,7 +280,7 @@ class FSharpEnterTypingAssistSyncTest : FSharpBackendSyncTypingAssistTestBase(Id
       .toTypedArray()
 }
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @Subsystem(SubsystemConstants.TYPING_ASSIST)
 @Feature("Typing Assist")
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
