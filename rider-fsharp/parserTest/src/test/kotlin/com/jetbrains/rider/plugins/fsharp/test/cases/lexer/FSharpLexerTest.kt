@@ -6,7 +6,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.FSharpParser)
+@Tag(TeamCityTags.Plugins.FSharp.Unit)
 class FSharpLexerTest : RiderFrontendLexerTest("fs", { FSharpLexer() }) {
   @Test
   fun testDigit() {

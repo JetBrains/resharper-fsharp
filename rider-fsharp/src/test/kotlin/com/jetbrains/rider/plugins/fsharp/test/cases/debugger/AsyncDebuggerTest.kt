@@ -12,7 +12,7 @@ import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
 @Solution("AsyncProgram")
 class AsyncDebuggerTest : DebuggerTestBase() {

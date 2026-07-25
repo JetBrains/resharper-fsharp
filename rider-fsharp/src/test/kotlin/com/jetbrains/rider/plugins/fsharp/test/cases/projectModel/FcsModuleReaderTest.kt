@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test
 import java.io.PrintStream
 import java.time.Duration
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("EmptySolution")
 class FcsModuleReaderTest : ProjectModelBaseTest() {

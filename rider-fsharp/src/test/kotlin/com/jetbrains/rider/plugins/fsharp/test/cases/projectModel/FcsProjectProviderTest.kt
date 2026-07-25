@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 class FcsProjectProviderTest : PerTestSolutionTestBase() {
   override val traceCategories

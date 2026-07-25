@@ -29,7 +29,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.div
 import kotlin.io.path.name
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 class FSharpFileSummarizationTests : PerTestSolutionTestBase() {
 
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)

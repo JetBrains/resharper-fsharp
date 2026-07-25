@@ -38,7 +38,7 @@ abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileT
   }
 }
 
-@Tag(TeamCityTags.Plugins.FSharpParser)
+@Tag(TeamCityTags.Plugins.FSharp.Unit)
 class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
   override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpFileImpl)
 
@@ -70,7 +70,7 @@ class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
   @Test fun `test unfinished 03 - interpolated in interpolated`() = doTest()
 }
 
-@Tag(TeamCityTags.Plugins.FSharpParser)
+@Tag(TeamCityTags.Plugins.FSharp.Unit)
 class FSharpScriptDummyParserTest : FSharpFrontendParserTest(FSharpScriptFileType) {
   override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpScriptFileImpl)
 

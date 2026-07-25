@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
-@Tag(TeamCityTags.Plugins.FSharp)
+@Tag(TeamCityTags.Plugins.FSharp.General)
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
