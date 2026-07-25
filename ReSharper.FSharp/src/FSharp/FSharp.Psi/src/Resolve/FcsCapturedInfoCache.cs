@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       FcsProjectProvider = fcsProjectProvider;
 
       fcsProjectProvider.ProjectRemoved.Advise(lifetime, RemoveProject);
-      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, InvalidateScript);
+      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, x => InvalidateScript(x.PsiModule, x.IsRemoved));
     }
 
     private static bool IsFSharpFile(IPsiSourceFile sourceFile) =>
@@ -57,13 +57,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       Invalidate(projectKey);
     }
 
-    private void InvalidateScript((FSharpScriptPsiModule psiModule, bool isRemoved) script)
+    private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved)
     {
       myLocks.AssertWriteAccessAllowed();
 
-      var scriptPsiModule = script.psiModule;
-
-      if (script.isRemoved) 
+      if (isRemoved) 
         ScriptCaches.Remove(scriptPsiModule);
 
       else if (ScriptCaches.TryGetValue(scriptPsiModule, out var symbols))
@@ -114,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var psiModule = sourceFile.PsiModule;
       if (psiModule is FSharpScriptPsiModule scriptPsiModule)
       {
-        InvalidateScript((scriptPsiModule, isRemoved: false));
+        InvalidateScript(scriptPsiModule, isRemoved: false);
         return;
       }
 

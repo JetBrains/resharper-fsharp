@@ -36,6 +36,8 @@ open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
+type FSharpScriptInvalidationEvent = { PsiModule: FSharpScriptPsiModule; IsRemoved: bool }
+
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
@@ -43,7 +45,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         platformManager: IPlatformManager, assemblyFactory: AssemblyFactory, projectFileExtensions,
         projectFileTypeCoordinator, checkerService: FcsCheckerService) as this =
 
-    let scriptPsiModuleInvalidated = new Signal<struct (FSharpScriptPsiModule * bool)>("ScriptPsiModuleInvalidated")
+    let scriptPsiModuleInvalidated = new Signal<FSharpScriptInvalidationEvent>("ScriptPsiModuleInvalidated")
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<VirtualFileSystemPath, FSharpScriptPsiModule>()
@@ -149,7 +151,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             for path in removedReferences.Assemblies do psiModule.RemoveReference(path)
             if not scriptOptionsProvider.SyncUpdate then
                 changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
-                scriptPsiModuleInvalidated.Fire((psiModule, false))
+                scriptPsiModuleInvalidated.Fire({ PsiModule = psiModule; IsRemoved = false })
 
         solution.GetComponent<IDaemon>().Invalidate("F# script references are invalidated")
 
@@ -292,8 +294,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed)
-            scriptPsiModuleInvalidated.Fire((psiModule, true))
-            
+            scriptPsiModuleInvalidated.Fire({ PsiModule = psiModule; IsRemoved = true })
+
             if not (scriptsFromProjectFiles.ContainsKey(path)) then
                 scriptToDirectReferencingScripts.Remove(path) |> ignore
                 scriptsReferences.Remove(path) |> ignore)
