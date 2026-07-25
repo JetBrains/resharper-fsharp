@@ -48,6 +48,29 @@ module rec CommonUtil =
         member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value)
         member x.contains (key: 'TKey) = x.ContainsKey key
 
+    type DictionaryExtensions<'TValue, 'TCollection when 'TCollection: null and 'TCollection :> ICollection<'TValue>>() =
+        [<Extension>]
+        static member RemoveAndTrim(x: IDictionary<'TKey, 'TCollection>, key, value) =
+            match x.TryGetValue(key) with
+            | null -> ()
+            | collection ->
+
+            collection.Remove(value) |> ignore
+            if collection.Count = 0 then x.Remove(key) |> ignore
+
+        [<Extension>]
+        static member InitAndAdd(x: IDictionary<'TKey, 'TCollection>, key, value, ctor) =
+            let collection =
+                match x.TryGetValue(key) with
+                | null ->
+                    let collection = ctor()
+                    x.Add(key, collection)
+                    collection
+
+                | collection -> collection
+
+            collection.Add(value)
+
     type ISet<'T> with
         member x.remove el = x.Remove el |> ignore
         member x.add el = x.Add el |> ignore
