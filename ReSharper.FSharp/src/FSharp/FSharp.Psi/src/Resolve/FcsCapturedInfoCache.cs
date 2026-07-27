@@ -59,8 +59,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved)
     {
-      myLocks.AssertWriteAccessAllowed();
-
       if (isRemoved) 
         ScriptCaches.Remove(scriptPsiModule);
 
@@ -75,10 +73,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var referencedByScripts = myScriptPsiModulesProvider.GetDirectReferencingScripts(psiModule);
       foreach (var script in referencedByScripts)
       {
-        if (!ScriptCaches.TryGetValue(script, out var symbols)) continue;
-
-        symbols.Invalidate(psiModule.SourceFile);
         if (!visited.Add(script)) continue;
+
+        if (!ScriptCaches.TryGetValue(script, out var symbols)) continue;
+        symbols.Invalidate(psiModule.SourceFile);
 
         InvalidateDirectReferencingScripts(script, visited);
       }
