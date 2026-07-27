@@ -2,6 +2,7 @@
 Prefix: "S"
 Count: 938
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "S♦"
         ▲▲
 
@@ -18,7 +19,7 @@ Ṣystem
 ṣig
 ṣtatic
 ṣtruct
-                            [FromLightAndDynamicEvaluation^, TypesAndNamespaces, ImportedType]
+                            [FromLightEvaluation^, TypesAndNamespaces, ImportedType]
 CompilerṢervices
 FṢharp
 NonṢtructuralComparison
@@ -357,7 +358,7 @@ ṢyntaxErrorException |(in System.Data)
 ṢystemAcl |(in System.Security.AccessControl)
 ṢystemColors |(in System.Drawing)
 ṢystemException |(in System)
-                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+                            [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 AccessControlṢections |(in System.Security.AccessControl)
 ActivityṢamplingResult |(in System.Diagnostics)
 ActivityṢource |(in System.Diagnostics)

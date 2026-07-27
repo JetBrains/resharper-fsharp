@@ -1,12 +1,13 @@
 ﻿Completion: Basic
 Count: 6 (filtered)
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "seq { ♦l.Length }"
                △
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, Keywords, NormalSelectionPriority, Other]
 do!
 let!
 match!

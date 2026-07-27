@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 1
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| :? string as ♦"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
 s                           <==
 
 ##### ALPHABETIC SORT #####

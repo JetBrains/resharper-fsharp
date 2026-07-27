@@ -2,6 +2,7 @@
 Prefix: "B"
 Count: 263
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| B♦"
           ▲▲
 
@@ -12,7 +13,7 @@ ḄackgroundTaskBuilder       <==
                             [Keywords]
 ḅase
 ḅegin
-                            [FromLightAndDynamicEvaluation^, TypesAndNamespaces, ImportedType]
+                            [FromLightEvaluation^, TypesAndNamespaces, ImportedType]
 AsyncḄuilder
 TaskḄuilder
 TaskḄuilderBase
@@ -87,7 +88,7 @@ Ḅyte |(in System)
 ḄyteArrayContent |(in System.Net.Http)
 ḄyteConverter |(in System.ComponentModel)
 ḄyteType |(in Microsoft.VisualBasic.CompilerServices)
-                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+                            [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ActionḄlock |(in System.Threading.Tasks.Dataflow)
 ArmḄase |(in System.Runtime.Intrinsics.Arm)
 ArrayḄufferWriter |(in System.Buffers)
