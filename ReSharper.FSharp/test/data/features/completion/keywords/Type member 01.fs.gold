@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 8 (filtered)
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "♦"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, Keywords, NormalSelectionPriority, Other]
 abstract
 default
 inherit

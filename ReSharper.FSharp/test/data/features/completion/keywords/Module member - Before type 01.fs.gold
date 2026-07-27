@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 5 (filtered)
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "♦ type T"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, Keywords, NormalSelectionPriority, Other]
 exception
 extern
 module

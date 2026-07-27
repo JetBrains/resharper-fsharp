@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 2 (filtered)
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "open ♦"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Keywords, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, Keywords, NormalSelectionPriority, Other]
 global                      <==
 type
 

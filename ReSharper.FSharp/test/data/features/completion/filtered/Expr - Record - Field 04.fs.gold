@@ -1,6 +1,7 @@
 ﻿Completion: Basic
 Count: 3608
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "♦ }"
 
 ##### RELEVANCE SORT #####
@@ -67,7 +68,7 @@ while
 while!
 with
 yield
-                            [FromLightAndDynamicEvaluation^]
+                            [FromLightEvaluation^]
 #I
 #else
 #endif
@@ -77,7 +78,7 @@ yield
 #r
 #time
 #warnon
-                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+                            [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
 AbandonedMutexException |(in System.Threading)
