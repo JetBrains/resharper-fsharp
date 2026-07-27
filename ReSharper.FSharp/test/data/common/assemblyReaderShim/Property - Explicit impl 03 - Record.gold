@@ -19,7 +19,7 @@ let s22: string = pi.P2
 is not compatible with type
     'string'    
 
-(1): ReSharper Error Highlighting: The type 'C' does not define the field, constructor or member 'P2'.
+(1): ReSharper Error Highlighting: The type 'C' does not define a field, constructor, or member named 'P2'.
 (2): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
     'string'    
 is not compatible with type

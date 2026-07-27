@@ -136,12 +136,12 @@ module FSharpPostfixTemplates =
             isLastMeaningfulNodeOnLine exprStmt &&
             Seq.isEmpty exprStmt.AttributesEnumerable
 
-        isBlockLike ArrayOrListExprNavigator.GetByExpression isParentApplicable ||
-        isBlockLike ComputationExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike AccessorDeclarationNavigator.GetByExpression isParentApplicable ||
+        isBlockLike ArrayOrListExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike AutoPropertyDeclarationNavigator.GetByExpression isParentApplicable ||
         isBlockLike BindingNavigator.GetByExpression isParentApplicable ||
         isBlockLike BinaryAppExprNavigator.GetByArgument isBinaryExprApplicable ||
+        isBlockLike ComputationExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike DoLikeExprNavigator.GetByExpression isParentApplicable ||
         isBlockLike DoLikeStatementNavigator.GetByExpression isExprStmtApplicable ||
         isBlockLike ForEachExprNavigator.GetByDoExpression isParentApplicable ||
@@ -156,7 +156,8 @@ module FSharpPostfixTemplates =
         isBlockLike SecondaryConstructorDeclarationNavigator.GetByExpression isParentApplicable ||
         isBlockLike SequentialExprNavigator.GetByExpression isSequentialExprApplicable ||
         isBlockLike SetExprNavigator.GetByRightExpression isParentApplicable ||
-        isBlockLike WhileExprNavigator.GetByDoExpression isParentApplicable
+        isBlockLike WhileExprNavigator.GetByDoExpression isParentApplicable ||
+        isBlockLike YieldOrReturnExprNavigator.GetByExpression isParentApplicable
 
     let rec removeTemplateAndGetParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with

@@ -7,26 +7,26 @@
 1||(4)
 |> ignore
 
-[1, 2]||(5)
-|> dict||(6)
-
-[1]||(7)
-|> List.iter ignore
+|[1, 2]||(5)|(6)
+|> dict||(7)
 
 [1]||(8)
-|> List.map ignore||(9)
+|> List.iter ignore
 
-5||(10)
-|> Some||(11)
+[1]||(9)
+|> List.map ignore||(10)
+
+5||(11)
+|> Some||(12)
 
 
 
 let f _ _ = ()
 
-1||(12)
-|> f||(13)
+1||(13)
+|> f||(14)
 
-1||(14)
+1||(15)
 |> f 1
 
 
@@ -35,21 +35,21 @@ type A =
     static member F = fun _ -> 5
     static member F1 = fun _ -> fun _ -> ()
 
-1||(15)
-|> A.F||(16)
+1||(16)
+|> A.F||(17)
 
-1||(17)
-|> A.F1||(18)
+1||(18)
+|> A.F1||(19)
 
-1||(19)
+1||(20)
 |> A.F1 1
 
 
 
 open System.Collections.Generic
 
-[1]||(20)
-|> List||(21)
+[1]||(21)
+|> List||(22)
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : unit
@@ -58,19 +58,20 @@ open System.Collections.Generic
 (3): ReSharper Parameter Name Hint: : unit
 (4): ReSharper Parameter Name Hint: : int
 (5): ReSharper Parameter Name Hint: : (int * int) list
-(6): ReSharper Parameter Name Hint: : IDictionary<int,int>
-(7): ReSharper Parameter Name Hint: : int list
+(6):  [FS3886]: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?
+(7): ReSharper Parameter Name Hint: : IDictionary<int,int>
 (8): ReSharper Parameter Name Hint: : int list
-(9): ReSharper Parameter Name Hint: : unit list
-(10): ReSharper Parameter Name Hint: : int
-(11): ReSharper Parameter Name Hint: : int option
-(12): ReSharper Parameter Name Hint: : int
-(13): ReSharper Parameter Name Hint: : obj -> unit
-(14): ReSharper Parameter Name Hint: : int
+(9): ReSharper Parameter Name Hint: : int list
+(10): ReSharper Parameter Name Hint: : unit list
+(11): ReSharper Parameter Name Hint: : int
+(12): ReSharper Parameter Name Hint: : int option
+(13): ReSharper Parameter Name Hint: : int
+(14): ReSharper Parameter Name Hint: : obj -> unit
 (15): ReSharper Parameter Name Hint: : int
 (16): ReSharper Parameter Name Hint: : int
 (17): ReSharper Parameter Name Hint: : int
-(18): ReSharper Parameter Name Hint: : int -> unit
-(19): ReSharper Parameter Name Hint: : int
-(20): ReSharper Parameter Name Hint: : int list
-(21): ReSharper Parameter Name Hint: : List<int>
+(18): ReSharper Parameter Name Hint: : int
+(19): ReSharper Parameter Name Hint: : int -> unit
+(20): ReSharper Parameter Name Hint: : int
+(21): ReSharper Parameter Name Hint: : int list
+(22): ReSharper Parameter Name Hint: : List<int>

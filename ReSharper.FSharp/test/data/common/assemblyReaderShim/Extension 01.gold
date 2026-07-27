@@ -9,6 +9,6 @@ let i5: int = Extensions.get_Property("")
 let i6: int = Extensions.|Property|(2)("")
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: The type 'String' does not define the field, constructor or member 'Property'.
-(1): ReSharper Error Highlighting: The type 'String' does not define the field, constructor or member 'get_Property'.
-(2): ReSharper Error Highlighting: The type 'Extensions' does not define the field, constructor or member 'Property'.
+(0): ReSharper Error Highlighting: The type 'String' does not define a field, constructor, or member named 'Property'.
+(1): ReSharper Error Highlighting: The type 'String' does not define a field, constructor, or member named 'get_Property'.
+(2): ReSharper Error Highlighting: The type 'Extensions' does not define a field, constructor, or member named 'Property'.

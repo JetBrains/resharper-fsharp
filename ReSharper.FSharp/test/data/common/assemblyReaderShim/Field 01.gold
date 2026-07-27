@@ -1,7 +1,7 @@
 ﻿module Module
 
 let c: Class = Class.StaticField
-let _: Class = |Class.Field|(0)
+let _: Class = Class.|Field|(0)
 
 let _: Class = c.Field
 let _: Class = c.|StaticField|(1)
@@ -10,10 +10,10 @@ let _: Class = c.|StaticField|(1)
 let _: string = Class.StaticFieldString
 
 
-let _: bool = |Class.ProtectedStaticFieldBool|(2)
-let _: int16 = |c.ProtectedFieldShort|(3)
+let _: bool = Class.|ProtectedStaticFieldBool|(2)
+let _: int16 = c.|ProtectedFieldShort|(3)
 
-let _: int16 = ||Class.ProtectedFieldShort|(4)|(5)
+let _: int16 = Class.||ProtectedFieldShort|(4)|(5)
 let _: bool = c.|ProtectedStaticFieldBool|(6)
 
 
@@ -36,8 +36,8 @@ Class.StaticField <- null
 c.Field <- null
 |c.ReadonlyField <- null|(16)
 
-|Class.Field|(17) <- null
-|Class.ReadonlyField|(18) <- null
+Class.|Field|(17) <- null
+Class.|ReadonlyField|(18) <- null
 c.|StaticField|(19) <- null
 c.|StaticReadonlyField|(20) <- null
 
@@ -49,14 +49,14 @@ c.|StaticReadonlyField|(20) <- null
 (4): ReSharper Underlined Error Highlighting: Field 'ProtectedFieldShort' is not static
 (5): ReSharper Underlined Error Highlighting: The struct or class field 'ProtectedFieldShort' is not accessible from this code location
 (6): ReSharper Underlined Error Highlighting: 'ProtectedStaticFieldBool' is static
-(7): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalStaticFieldInt'.
-(8): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalFieldDouble'.
-(9): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalFieldDouble'.
-(10): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'InternalStaticFieldInt'.
-(11): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateStaticFieldInt'.
-(12): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateFieldDouble'.
-(13): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateFieldDouble'.
-(14): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PrivateStaticFieldInt'.
+(7): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'InternalStaticFieldInt'.
+(8): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'InternalFieldDouble'.
+(9): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'InternalFieldDouble'.
+(10): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'InternalStaticFieldInt'.
+(11): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PrivateStaticFieldInt'.
+(12): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PrivateFieldDouble'.
+(13): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PrivateFieldDouble'.
+(14): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PrivateStaticFieldInt'.
 (15): ReSharper Underlined Error Highlighting: This field is readonly
 (16): ReSharper Underlined Error Highlighting: This field is readonly
 (17): ReSharper Underlined Error Highlighting: Field 'Field' is not static

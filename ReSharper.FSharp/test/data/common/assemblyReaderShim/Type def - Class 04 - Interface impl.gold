@@ -16,5 +16,5 @@ do
     (c3 :> IDisposable).Dispose()
 
 ---------------------------------------------------------
-(0): ReSharper Error Highlighting: The type 'Class2' does not define the field, constructor or member 'Dispose'.
-(1): ReSharper Error Highlighting: The type 'Class3' does not define the field, constructor or member 'Dispose'.
+(0): ReSharper Error Highlighting: The type 'Class2' does not define a field, constructor, or member named 'Dispose'.
+(1): ReSharper Error Highlighting: The type 'Class3' does not define a field, constructor, or member named 'Dispose'.

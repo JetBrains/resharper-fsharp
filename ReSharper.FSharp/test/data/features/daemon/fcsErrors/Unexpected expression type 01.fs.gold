@@ -2,10 +2,11 @@
 
 let f (_: int list list) = ()
 
-f [|0, 1|(0)]
+f |[|0, 1|(0)]|(1)
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: This expression was expected to have type
     'int list'    
-but here has type
+but is a tuple of type
     'int * int'    
+(1):  [FS3886]: This list expression contains a single tuple element. Did you mean to use ';' instead of ',' to separate list elements?

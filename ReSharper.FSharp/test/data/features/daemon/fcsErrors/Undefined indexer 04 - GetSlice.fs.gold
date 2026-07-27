@@ -14,9 +14,9 @@ l|[1 .. 2, 3 .. 4]|(6)
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Redundant '.'
-(1): ReSharper Underlined Error Highlighting: The type 'String' does not define the field, constructor or member 'GetSlice'.
+(1): ReSharper Underlined Error Highlighting: The type 'String' does not define a field, constructor, or member named 'GetSlice'.
 (2): ReSharper Dead Code: Redundant '.'
-(3): ReSharper Underlined Error Highlighting: The type 'String' does not define the field, constructor or member 'GetSlice'.
-(4): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'GetSlice'.
-(5): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'SetSlice'.
-(6): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define the field, constructor or member 'GetSlice'.
+(3): ReSharper Underlined Error Highlighting: The type 'String' does not define a field, constructor, or member named 'GetSlice'.
+(4): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define a field, constructor, or member named 'GetSlice'.
+(5): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define a field, constructor, or member named 'SetSlice'.
+(6): ReSharper Underlined Error Highlighting: The type 'List<_>' does not define a field, constructor, or member named 'GetSlice'.

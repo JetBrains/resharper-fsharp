@@ -20,12 +20,12 @@ let e3 = |ObsoleteEnum|(12).A
 Class() |> ignore
 |Class|(13)(1) |> ignore
 
-|Class.ObsoleteField|(14) |> ignore
-|Class.ObsoleteMethod|(15)()
-|Class.ObsoleteProperty|(16) |> ignore
-|Class.ObsoleteEvent|(17) |> ignore
+Class.|ObsoleteField|(14) |> ignore
+Class.|ObsoleteMethod|(15)()
+Class.|ObsoleteProperty|(16) |> ignore
+Class.|ObsoleteEvent|(17) |> ignore
 
-|Enum.A|(18) |> ignore
+Enum.|A|(18) |> ignore
 
 ---------------------------------------------------------
 (0): ReSharper Warning: This construct is deprecated. Class is obsolete
