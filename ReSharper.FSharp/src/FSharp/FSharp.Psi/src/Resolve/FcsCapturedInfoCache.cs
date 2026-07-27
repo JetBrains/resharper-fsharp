@@ -196,7 +196,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       using var writeCookie = WriteLockCookie.Create(underTransaction);
       using var lockCookie = MonitorInterruptibleCookie.EnterOrThrow(mySyncObj);
 
-      if (ModuleCaches.IsEmpty())
+      if (ModuleCaches.IsEmpty() && ScriptCaches.IsEmpty())
       {
         myDirtyFiles.Clear();
         return;
