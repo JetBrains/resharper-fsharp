@@ -1,6 +1,7 @@
 ﻿Completion: Basic
 Count: 257
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| Some(♦)"
 
 ##### RELEVANCE SORT #####
@@ -256,7 +257,7 @@ unativeint
 unit
 voidptr
 voption
-                            [FromSingleCompletion^, FromLightAndDynamicEvaluation^, NormalSelectionPriority^, Other^]
+                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
 #I
 #else
 #endif

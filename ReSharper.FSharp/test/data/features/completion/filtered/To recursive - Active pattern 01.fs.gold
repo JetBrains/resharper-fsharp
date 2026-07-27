@@ -1,6 +1,7 @@
 ﻿Completion: Basic
 Count: 3863
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "♦"
 
 ##### RELEVANCE SORT #####
@@ -222,7 +223,7 @@ outref
 unit
 voidptr
 voption
-                            [FromLightAndDynamicEvaluation^]
+                            [FromLightEvaluation^]
 #I
 #else
 #endif
@@ -333,7 +334,7 @@ uint8                       uint8
 unativeint                  unativeint
 unbox                       'T
 using                       'U
-                            [FromSingleCompletion^, TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+                            [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
 AbandonedMutexException |(in System.Threading)

@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 2
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| :? StringBuilder as ♦"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
 builder                     <==
 stringBuilder
 
