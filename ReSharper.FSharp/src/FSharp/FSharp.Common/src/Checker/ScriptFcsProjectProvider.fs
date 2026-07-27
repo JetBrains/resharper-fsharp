@@ -149,6 +149,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                     let arrayEq a1 a2 =
                         Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
+                    options1.OriginalLoadReferences = options2.OriginalLoadReferences &&
                     arrayEq options1.OtherOptions options2.OtherOptions &&
                     arrayEq options1.SourceFiles options2.SourceFiles
 
