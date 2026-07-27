@@ -203,16 +203,22 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
             ira.DoStart() |> ignore
         )
-    
-    let sameProjectSorter (psiModule: FSharpScriptPsiModule) =
-        match psiModule.SourceFile with
-        | :? IPsiProjectFile as psiProjectFile ->
-            let project = psiProjectFile.GetProject()
-            fun (psiModule: FSharpScriptPsiModule) ->
-                match psiModule.SourceFile with
-                | :? IPsiProjectFile as psiProjectFile when psiProjectFile.GetProject() = project -> 1
-                | _ -> 0
-        | _ -> fun _ -> 0
+
+    let tryGetScriptModuleFromTheSameProject (contextModule: FSharpScriptPsiModule) path =
+        let sameProjectSorter =
+            match contextModule.SourceFile with
+            | :? IPsiProjectFile as psiProjectFile ->
+                let project = psiProjectFile.GetProject()
+                fun (psiModule: FSharpScriptPsiModule) ->
+                    match psiModule.SourceFile with
+                    | :? IPsiProjectFile as psiProjectFile when psiProjectFile.GetProject() = project -> 1
+                    | _ -> 0
+            | _ -> fun _ -> 0
+
+        let modules = getPsiModulesForPath path
+        if Seq.isEmpty modules then None else
+
+        modules |> Seq.maxBy sameProjectSorter |> Some
 
     do
         if not scriptOptionsProvider.SyncUpdate then
@@ -269,13 +275,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     member x.GetReferencedScriptPsiModules(psiModule: FSharpScriptPsiModule) =
         let mutable paths = Unchecked.defaultof<ScriptReferences>
         match scriptsReferences.TryGetValue(psiModule.Path, &paths) with
-        | true -> paths.Files |> Seq.map (getPsiModulesForPath >> Seq.maxBy (sameProjectSorter psiModule))
+        | true -> paths.Files |> Seq.choose (tryGetScriptModuleFromTheSameProject psiModule)
         | _ -> EmptyList.Instance
 
     member x.GetDirectReferencingScripts(psiModule: FSharpScriptPsiModule) =
         let mutable paths = Unchecked.defaultof<_>
         match scriptToDirectReferencingScripts.TryGetValue(psiModule.Path, &paths) with
-        | true -> paths |> Seq.map (getPsiModulesForPath >> Seq.maxBy (sameProjectSorter psiModule))
+        | true -> paths |> Seq.choose (tryGetScriptModuleFromTheSameProject psiModule)
         | _ -> EmptyList.Instance
 
     member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule, changeBuilder: PsiModuleChangeBuilder) =
