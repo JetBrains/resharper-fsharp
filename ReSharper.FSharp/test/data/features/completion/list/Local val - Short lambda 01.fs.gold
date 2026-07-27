@@ -1,6 +1,7 @@
 ﻿Completion: Basic
 Count: 123
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "|> List.map _.♦"
 
 ##### RELEVANCE SORT #####
@@ -47,9 +48,9 @@ TrimStart                   string
 TryCopyTo                   bool
                             [Methods, MemberOfObject]
 GetType                     Type
-                            [FromLightAndDynamicEvaluation^, ExtensionMethods]
+                            [FromLightEvaluation^, ExtensionMethods]
 GetReverseIndex             int
-                            [FromSingleCompletion^, ImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+                            [ImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 Aggregate |(in System.Linq)
 All |(in System.Linq)
 Ancestors |(in System.Xml.Linq)

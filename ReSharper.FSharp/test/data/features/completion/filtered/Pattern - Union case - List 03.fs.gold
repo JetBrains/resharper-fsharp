@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 1
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| B2(U1.♦) -> ()"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, Methods, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, Methods, NormalSelectionPriority, Other]
 A1                          U1    <==
 
 ##### ALPHABETIC SORT #####

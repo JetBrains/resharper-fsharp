@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 3 (filtered)
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| i :: ♦"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
 i                           <==
 int32s
 l

@@ -1,11 +1,12 @@
 ﻿Completion: Basic
 Count: 2
 Focus: Soft
+Rules: [\w] => add_to_prefix
 Range: "| Bar(apple = a; ♦) -> ()"
 
 ##### RELEVANCE SORT #####
 
-                            [FromSingleCompletion, FromLightAndDynamicEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
 banana| |=                  string          OrderStr=banana    <==
 citrus| |=                  float           OrderStr=citrus
 
