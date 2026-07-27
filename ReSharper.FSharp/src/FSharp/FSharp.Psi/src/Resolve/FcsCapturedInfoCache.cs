@@ -59,10 +59,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved)
     {
-      myLocks.AssertWriteAccessAllowed();
-
-      if (isRemoved) 
+      if (isRemoved)
+      {
+        myLocks.AssertWriteAccessAllowed();
         ScriptCaches.Remove(scriptPsiModule);
+      }
 
       else if (ScriptCaches.TryGetValue(scriptPsiModule, out var symbols))
         symbols.Invalidate(scriptPsiModule.SourceFile);
