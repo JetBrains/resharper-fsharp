@@ -275,7 +275,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     member x.GetReferencedScriptPsiModules(psiModule: FSharpScriptPsiModule) =
         let mutable paths = Unchecked.defaultof<ScriptReferences>
         match scriptsReferences.TryGetValue(psiModule.Path, &paths) with
-        | true -> paths.Files|> Seq.choose (tryGetScriptModuleFromTheSameProject psiModule)
+        | true -> paths.Files |> Seq.choose (tryGetScriptModuleFromTheSameProject psiModule)
         | _ -> EmptyList.Instance
 
     member x.GetDirectReferencingScripts(psiModule: FSharpScriptPsiModule) =
