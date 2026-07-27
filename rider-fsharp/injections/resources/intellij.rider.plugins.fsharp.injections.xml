@@ -4,10 +4,13 @@
     <dependencies>
       <plugin id="com.jetbrains.rider.fsharp"/>
       <module name="intellij.database.sql.core.impl"/>
+      <module name="intellij.platform.core"/>
+      <module name="intellij.platform.lang"/>
+      <module name="intellij.platform.lang.impl"/>
       <module name="intellij.platform.langInjection"/>
-        <module name="intellij.rider.languages"/>
+      <module name="intellij.rider.languages"/>
       <module name="intellij.rider.plugins.appender.database"/>
-        <module name="intellij.rider.plugins.appender.lang"/>
+      <module name="intellij.rider.plugins.appender.lang"/>
     </dependencies>
     <!-- endregion -->
 
