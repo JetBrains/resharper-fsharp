@@ -12,5 +12,5 @@ type T() =
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: No abstract or interface member was found that corresponds to this override
-(1): ReSharper Error Highlighting: The type 'InheritedClass' does not define the field, constructor or member 'MPrivate'.
+(1): ReSharper Error Highlighting: The type 'InheritedClass' does not define a field, constructor, or member named 'MPrivate'.
 (2): ReSharper Underlined Error Highlighting: No abstract or interface member was found that corresponds to this override

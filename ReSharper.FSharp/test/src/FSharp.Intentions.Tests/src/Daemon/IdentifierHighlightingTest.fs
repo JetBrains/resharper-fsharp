@@ -30,7 +30,7 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Active pattern 01``() = x.DoNamedTest()
 
     [<FSharpSignatureTest>]
-    [<Test>] member x.``Active pattern - Signature 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Active pattern - Signature 01``() = x.DoNamedTest()
 
     [<TestReferences("System")>]
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()

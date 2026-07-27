@@ -67,7 +67,7 @@ type T() =
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
-(1): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PublicPropPrivateGetPrivateSet'.
+(1): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PublicPropPrivateGetPrivateSet'.
 (2): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
 (3): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
 (4): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
@@ -76,15 +76,15 @@ type T() =
 (7): ReSharper Underlined Error Highlighting: The member or object constructor 'PublicPropPrivateSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (8): ReSharper Underlined Error Highlighting: The member or object constructor 'PublicPropProtectedSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (9): ReSharper Underlined Error Highlighting: The member or object constructor 'PublicPropProtectedGetProtectedSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
-(10): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PublicPropPrivateGetPrivateSet'.
+(10): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PublicPropPrivateGetPrivateSet'.
 (11): ReSharper Underlined Error Highlighting: The member or object constructor 'ProtectedPropPublicGet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (12): ReSharper Underlined Error Highlighting: The member or object constructor 'ProtectedPropPrivateGet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (13): ReSharper Underlined Error Highlighting: The member or object constructor 'ProtectedPropPrivateSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (14): ReSharper Underlined Error Highlighting: The member or object constructor 'ProtectedPropProtectedSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (15): ReSharper Underlined Error Highlighting: The member or object constructor 'PrivatePropPublicGet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
 (16): ReSharper Underlined Error Highlighting: The member or object constructor 'PrivateProp' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
-(17): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PublicPropPrivateGetPrivateSet'.
+(17): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PublicPropPrivateGetPrivateSet'.
 (18): ReSharper Underlined Error Highlighting: Protected members cannot be accessed from closures
 (19): ReSharper Underlined Error Highlighting: The member or object constructor 'PublicPropPrivateSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.
-(20): ReSharper Error Highlighting: The type 'Class' does not define the field, constructor or member 'PublicPropPrivateGetPrivateSet'.
+(20): ReSharper Error Highlighting: The type 'Class' does not define a field, constructor, or member named 'PublicPropPrivateGetPrivateSet'.
 (21): ReSharper Underlined Error Highlighting: The member or object constructor 'ProtectedPropPrivateSet' is not accessible. Private members may only be accessed from within the declaring type. Protected members may only be accessed from an extending type and cannot be accessed from inner lambda expressions.

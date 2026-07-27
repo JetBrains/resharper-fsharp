@@ -29,8 +29,9 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IReferenceExpr
-              FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            IYieldOrReturnExpr
+              IReferenceExpr
+                FSharpIdentifierToken(type:IDENTIFIER, text:a)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"

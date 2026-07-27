@@ -5,9 +5,9 @@ Class.M(1)
 Class.M(1, 2)
 Class.M([|1; 2|])
 
-|Class.M(1s)|(0)
-|Class.M(1u)|(1)
-|Class.M([1; 2])|(2)
+Class.|M|(0)(1s)
+Class.|M|(1)(1u)
+Class.|M|(2)([1; 2])
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: No overloads match for method 'M'.

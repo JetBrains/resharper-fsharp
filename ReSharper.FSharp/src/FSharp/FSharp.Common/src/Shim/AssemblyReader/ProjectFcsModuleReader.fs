@@ -1095,10 +1095,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         actual.AsArray() = attrs.AsArray()
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
-        match typeDef.CustomAttrsStored with
-        | ILAttributesStored.Reader _ -> true
-        | ILAttributesStored.Given expected ->
-
+        let expected = typeDef.CustomAttrsStored.CustomAttrs
         let actual = mkTypeDefCustomAttrs typeElement
         actual = expected.AsArray()
 

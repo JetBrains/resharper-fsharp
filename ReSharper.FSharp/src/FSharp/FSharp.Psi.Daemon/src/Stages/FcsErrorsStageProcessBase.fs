@@ -254,7 +254,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | _ -> createGenericHighlighting error range
 
         | FieldNotMutable ->
-            createHighlightingFromNode FieldNotMutableError range
+            createHighlightingFromParentNode FieldNotMutableError range
 
         | IndeterminateRuntimeCoercion ->
             let isInstPat = nodeSelectionProvider.GetExpressionInRange<IIsInstPat>(fsFile, range, false, null)
@@ -474,10 +474,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createGenericHighlighting error range
 
         | PropertyIsStatic ->
-            createHighlightingFromNode PropertyIsStaticError range
+            createHighlightingFromParentNode PropertyIsStaticError range
 
         | PropertyCannotBeSet ->
-            createHighlightingFromNode PropertyCannotBeSetError range
+            createHighlightingFromParentNode PropertyCannotBeSetError range
 
         | AttributeIsNotValidOnThisElement ->
             match fsFile.GetNode<IAttribute>(range) with
@@ -531,7 +531,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
 
         | StaticFieldUsedWhenInstanceFieldExpected ->
-            createHighlightingFromNode FieldIsStaticError range
+            createHighlightingFromParentNode FieldIsStaticError range
 
         | InstanceMemberRequiresTarget ->
             match fsFile.GetNode<IMemberDeclaration>(range) with
