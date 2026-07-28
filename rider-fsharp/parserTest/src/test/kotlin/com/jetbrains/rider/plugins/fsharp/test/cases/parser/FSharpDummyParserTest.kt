@@ -11,30 +11,36 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
 import com.jetbrains.rider.test.base.psi.parsing.RiderFrontendParserTest
-import org.junit.Assert
-import org.junit.Test
+import com.jetbrains.rider.test.shared.constants.TeamCityTags
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
 abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) :
-  RiderFrontendParserTest("", fileType.defaultExtension, FSharpParserDefinition()) {
+  RiderFrontendParserTest(fileType.defaultExtension, FSharpParserDefinition()) {
 
   protected open fun assertFileImpl(file: PsiFile) {}
 
-  override fun parseFile(name: String, text: String): PsiFile {
-    val file = super.parseFile(name, text)
-    assertFileImpl(file)
-    return file
-  }
+  override val testFixture: FSharpRiderParserTextFixture by lazy { FSharpRiderParserTextFixture() }
 
-  override fun configureFromParserDefinition(definition: ParserDefinition, extension: String?) {
-    super.configureFromParserDefinition(definition, extension)
-    application.picoContainer.unregisterComponent(FileTypeManager::class.java.name)
-    application.registerService(FileTypeManager::class.java, MockFileTypeManager(fileType), testRootDisposable)
+  inner class FSharpRiderParserTextFixture : RiderParserTestFixture() {
+    override fun parseFile(name: String, text: String): PsiFile {
+      val file = super.parseFile(name, text)
+        assertFileImpl(file)
+        return file
+      }
+
+    override fun configureFromParserDefinition(definition: ParserDefinition, extension: String?) {
+      super.configureFromParserDefinition(definition, extension)
+        application.picoContainer.unregisterComponent(FileTypeManager::class.java.name)
+        application.registerService(FileTypeManager::class.java, MockFileTypeManager(fileType), testRootDisposable)
+    }
   }
 }
 
-
+@Tag(TeamCityTags.Plugins.FSharpParser)
 class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
-  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpFileImpl)
+  override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpFileImpl)
 
   @Test fun `test empty`() = doTest()
   @Test fun `test concatenation 01 - simple`() = doTest()
@@ -64,9 +70,9 @@ class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
   @Test fun `test unfinished 03 - interpolated in interpolated`() = doTest()
 }
 
-
+@Tag(TeamCityTags.Plugins.FSharpParser)
 class FSharpScriptDummyParserTest : FSharpFrontendParserTest(FSharpScriptFileType) {
-  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpScriptFileImpl)
+  override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpScriptFileImpl)
 
   @Test fun `test empty`() = doTest()
 }
