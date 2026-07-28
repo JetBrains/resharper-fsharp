@@ -137,6 +137,7 @@
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxTest.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithDotLambdaTest.fs" />
     <Compile Include="src\QuickFixes\ToObjectExprTest.fs" />
+    <Compile Include="src\QuickFixes\FSharpRemoveCodeRedundanciesTest.fs" />
     <Compile Include="src\QuickDoc\QuickDocTest.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">

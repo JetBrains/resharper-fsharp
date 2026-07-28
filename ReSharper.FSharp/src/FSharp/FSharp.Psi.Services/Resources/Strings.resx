@@ -316,4 +316,10 @@
     <data name="ValueMustBeMutableMessage" xml:space="preserve">
         <value>A value must be mutable in order to mutate the contents or take the address of a value type</value>
     </data>
+    <data name="CodeCleanupTask_RemoveCodeRedundancies" xml:space="preserve">
+        <value>Remove code redundancies</value>
+    </data>
+    <data name="CodeCleanupTask_SimplifyLambdaExpressions" xml:space="preserve">
+        <value>Simplify lambda expressions</value>
+    </data>
 </root>
