@@ -42,6 +42,7 @@
   <depends>com.intellij.rider.rdclient.spellchecker</depends>
   <depends>intellij.structureView.plugin</depends>
 
+  <content namespace="jetbrains"/>
   <content>
     <module name="intellij.rider.plugins.fsharp.injections" />
   </content>
