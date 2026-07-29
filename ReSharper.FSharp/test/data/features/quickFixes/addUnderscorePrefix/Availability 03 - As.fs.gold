@@ -8,6 +8,9 @@ do
 0: Redundant 'as' pattern
 QUICKFIXES:
 Remove redundant 'as' pattern
+--Remove redundant 'as' pattern in file
+--Remove redundant 'as' pattern in project
+--Remove redundant 'as' pattern in solution
 1: The value 'b' is unused
 QUICKFIXES:
 Remove unused 'as' pattern

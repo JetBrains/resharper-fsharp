@@ -21,7 +21,7 @@ open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
 open JetBrains.Util
 
-type Strings = JetBrains.ReSharper.Plugins.FSharp.Resources.Strings
+type private Strings = JetBrains.ReSharper.Plugins.FSharp.Resources.Strings
 
 
 [<SettingsKey(typeof<Missing>, "F# settings")>]

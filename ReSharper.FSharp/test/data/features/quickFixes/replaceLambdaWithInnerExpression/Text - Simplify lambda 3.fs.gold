@@ -8,3 +8,6 @@ let _ = |fun x -> f<int> x|(0)
 0: Lambda can be simplified
 QUICKFIXES:
 Simplify lambda
+--Simplify lambda in file
+--Simplify lambda in project
+--Simplify lambda in solution

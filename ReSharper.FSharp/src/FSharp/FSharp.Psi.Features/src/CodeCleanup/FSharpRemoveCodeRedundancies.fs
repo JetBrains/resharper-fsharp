@@ -1,13 +1,14 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpRemoveCodeRedundancies
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCleanup.FSharpRemoveCodeRedundanciesCleanupModule
 
 open System
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup.HighlightingModule
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
 
 [<CodeCleanupModule>]
-type FSharpRemoveCodeRedundancies() =
+type FSharpRemoveCodeRedundanciesCleanupModule() =
     inherit HighlightingCleanupModule()
 
     let descriptors = FSharpCodeCleanupDescriptors.descriptors
@@ -28,4 +29,4 @@ type FSharpRemoveCodeRedundancies() =
 
     override this.Descriptors = [| for descriptor in descriptors -> descriptor |]
     override this.LanguageType = FSharpLanguage.Instance
-    override this.Name = "F# Code Cleanup"
+    override this.Name = Strings.FSharpRemoveCodeRedundancies_ActionName

@@ -8,3 +8,6 @@ let _ = |fun x -> (-+>) 1 x|(0)
 0: Lambda can be simplified
 QUICKFIXES:
 Replace with '-+>' partial application
+--Replace with '-+>' partial application in file
+--Replace with '-+>' partial application in project
+--Replace with '-+>' partial application in solution

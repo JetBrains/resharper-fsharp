@@ -9,3 +9,6 @@ let _ = |fun x -> A.f x|(0)
 0: Lambda can be replaced with 'A.f'
 QUICKFIXES:
 Replace lambda with 'A.f'
+--Replace lambda with 'A.f' in file
+--Replace lambda with 'A.f' in project
+--Replace lambda with 'A.f' in solution

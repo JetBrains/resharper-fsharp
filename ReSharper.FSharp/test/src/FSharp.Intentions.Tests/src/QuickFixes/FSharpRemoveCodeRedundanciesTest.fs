@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type FSharpRemoveCodeRedundanciesTest() =
+type FSharpRemoveCodeRedundanciesCleanupModuleTest() =
     inherit CodeCleanupTestBase()
 
     override x.RelativeTestDataPath = "features/service/codeCleanup"

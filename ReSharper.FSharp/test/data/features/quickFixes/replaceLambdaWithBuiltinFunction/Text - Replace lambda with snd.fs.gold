@@ -6,3 +6,6 @@ let _ = |fun (_, y) -> y|(0)
 0: Lambda can be replaced with 'snd'
 QUICKFIXES:
 Replace lambda with 'snd'
+--Replace lambda with 'snd' in file
+--Replace lambda with 'snd' in project
+--Replace lambda with 'snd' in solution
