@@ -231,7 +231,7 @@
     <Range>getQualifierRange treeNode</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message resourceName="QualifierIsRedundantMessage"/>
-    <QuickFix cleanupTasks="REMOVE_CODE_REDUNDANCIES">RemoveRedundantQualifierFix</QuickFix>
+    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
   <Warning name="RedundantUnionCaseFieldPatterns" configurableSeverity="FSharpRedundantUnionCaseFieldPatterns">
