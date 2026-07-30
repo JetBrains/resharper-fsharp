@@ -36,7 +36,7 @@ open class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
   }
 
   override fun getHighlightingLexer() = FSharpLexer()
-  override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> = pack(ourKeys[tokenType])
+  override fun getTokenHighlights(tokenType: IElementType): Array<out TextAttributesKey> = pack(ourKeys[tokenType])
 }
 
 
@@ -45,7 +45,7 @@ class FsiOutputSyntaxHighlighter : FSharpSyntaxHighlighter() {
     val Instance = FsiOutputSyntaxHighlighter()
   }
 
-  override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
+  override fun getTokenHighlights(tokenType: IElementType): Array<out TextAttributesKey> {
     return if (tokenType == TokenType.BAD_CHARACTER) TextAttributesKey.EMPTY_ARRAY
     else super.getTokenHighlights(tokenType)
   }
