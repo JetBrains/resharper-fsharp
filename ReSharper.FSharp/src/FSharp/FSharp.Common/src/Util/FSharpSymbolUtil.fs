@@ -32,6 +32,9 @@ let isEnumMember (field: FSharpField) =
     | Some entity -> entity.IsEnum
     | _ -> false
 
+let isObsolete (symbol: FSharpSymbol) =
+    isNotNull symbol && symbol.ObsoleteDiagnosticInfo.IsSome
+
 let formatMfv addParameterNames (displayContext: FSharpDisplayContext) (mfv: FSharpMemberOrFunctionOrValue) =
     let append (stringBuilder: StringBuilder) (s: string) =
         stringBuilder.Append(s) |> ignore

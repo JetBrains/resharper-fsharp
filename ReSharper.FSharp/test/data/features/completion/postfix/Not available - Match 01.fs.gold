@@ -56,6 +56,7 @@ maxBy
 min
 minBy
 not
+nth
 ofArray
 ofSeq
 pairwise

@@ -1,15 +1,21 @@
 ﻿Completion: Basic
-Count: 3870
+Count: 3869
 Focus: Soft
 Range: "{ ♦ }"
 
 ##### RELEVANCE SORT #####
 
-                            [Keywords]
-false                       <==
+                            [FieldsAndProperties]
+F1                          int    <==
+F2                          int
+F3                          int
+F4                          int
+contents                    'T
+                            [Methods, Keywords]
+false
 null
 true
-                            [Methods^]
+                            [Methods]
 Choice1Of2                  Choice<'T1,'T2>
 Choice1Of3                  Choice<'T1,'T2,'T3>
 Choice1Of4                  Choice<'T1,'T2,'T3,'T4>
@@ -38,7 +44,6 @@ Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
 Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
-FSharpTypeFunc              FSharpTypeFunc
 KeyValue
 Lazy
 None                        'T option
@@ -234,10 +239,6 @@ voption
 #r
 #time
 #warnon
-F1                          int
-F2                          int
-F3                          int
-F4                          int
 FSharpFunc
 Failure                     exn
 abs                         ^T
@@ -253,7 +254,6 @@ byte                        byte
 ceil                        ^T
 char                        char
 compare                     int
-contents                    'T
 cos                         ^T
 cosh                        ^T
 decimal                     decimal
@@ -3969,14 +3969,13 @@ Error                       Result<'T,'TError>
 Event
 ExperimentalAttribute
 ExtraTopLevelOperators
-F1                          int
+F1                          int    <==
 F2                          int
 F3                          int
 F4                          int
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc              FSharpTypeFunc
 Failure                     exn
 Format
 FuncConvert
@@ -4099,7 +4098,7 @@ exn
 exp                         ^T
 failwith                    'T
 failwithf                   'T
-false                       <==
+false
 finally
 float                       float
 float32                     float32

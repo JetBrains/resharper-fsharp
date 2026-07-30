@@ -1,12 +1,12 @@
 ﻿Completion: Basic
-Count: 3865
+Count: 3864
 Focus: Soft
 Range: "♦"
 
 ##### RELEVANCE SORT #####
 
                             [LocalVariablesAndParameters]
-base                        int             OrderStr=``base``    <==
+``base``                    int    <==
 this                        T
                             [Methods, Keywords]
 false
@@ -41,7 +41,6 @@ Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
 Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
-FSharpTypeFunc              FSharpTypeFunc
 KeyValue
 Lazy
 None                        'T option
@@ -3968,7 +3967,6 @@ ExtraTopLevelOperators
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc              FSharpTypeFunc
 Failure                     exn
 Format
 FuncConvert
@@ -4042,7 +4040,7 @@ ValueOption
 ValueSome                   'T voption
 VolatileFieldAttribute
 WebExtensions
-base                        int             OrderStr=``base``    <==
+``base``                    int    <==
 abs                         ^T
 acos                        ^T
 and

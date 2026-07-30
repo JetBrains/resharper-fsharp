@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3870
+Count: 3869
 Focus: Soft
 Range: "if true then { F1 = 1 } else { ♦ }"
 
@@ -45,7 +45,6 @@ Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
 Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
-FSharpTypeFunc              FSharpTypeFunc
 KeyValue
 Lazy
 None                        'T option
@@ -3979,7 +3978,6 @@ F4                          int
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc              FSharpTypeFunc
 Failure                     exn
 Format
 FuncConvert
