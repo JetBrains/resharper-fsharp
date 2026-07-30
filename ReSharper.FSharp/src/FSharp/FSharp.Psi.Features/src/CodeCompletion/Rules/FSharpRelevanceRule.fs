@@ -68,9 +68,8 @@ type FSharpRelevanceRule() =
                     if mfv.IsProperty then
                         markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                     else
-                        if info.FcsSymbolUse.IsFromComputationExpression then
-                            if isCustomOperationPossible.Value then
-                                markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
+                        if info.IsFromComputationExpression || isCustomOperationPossible.Value then
+                            markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 
                         markRelevance item CLRLookupItemRelevance.Methods
 

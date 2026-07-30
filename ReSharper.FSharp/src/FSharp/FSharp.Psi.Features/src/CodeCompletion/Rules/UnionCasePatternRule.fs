@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Match
@@ -39,29 +38,15 @@ type IEnumCaseLikePatternInfo =
 
 type EnumCaseLikePatternInfo<'T when 'T :> FSharpSymbol>(text, symbol: 'T, fcsEntityInstance: FcsEntityInstance,
         context: FSharpCodeCompletionContext) =
-    inherit TextualInfo(text, UnionCasePatternInfo.Id)
+    inherit FcsSymbolInfo(text, symbol, context)
+
+    override this.MakeSafe(text) =
+        text
 
     member val Case = symbol
     member val EntityInstance = fcsEntityInstance
 
-    member this.Context = context
-
     interface IEnumCaseLikePatternInfo
-
-    interface IDescriptionProvidingLookupItem with
-        member this.GetDescription() =
-            match context.GetCheckResults() with
-            | None -> null
-            | Some(checkResults) ->
-
-            let _, range = context.ReparsedContext.TreeNode.TryGetFcsRange()
-            let toolTipText = checkResults.GetDescription(symbol, fcsEntityInstance.Substitution, false, range)
-
-            toolTipText
-            |> FcsLookupCandidate.getOverloads
-            |> List.tryHead
-            |> Option.map (FcsLookupCandidate.getDescription context.XmlDocService context.PsiModule)
-            |> Option.defaultValue null
 
     override this.IsRiderAsync = false
 

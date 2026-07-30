@@ -69,7 +69,7 @@ type FcsErrorLookupItem(item: DeclarationListItem) =
 [<AllowNullLiteral>]
 type IFcsLookupItemInfo =
     abstract FcsSymbol: FSharpSymbol
-    abstract FcsSymbolUse: FSharpSymbolUse
+    abstract IsFromComputationExpression: bool
 
 type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
@@ -87,7 +87,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     interface IFcsLookupItemInfo with
         member this.FcsSymbol = this.FcsSymbol
-        member this.FcsSymbolUse = this.FcsSymbolUse
+        member this.IsFromComputationExpression = this.FcsSymbolUse.IsFromComputationExpression
 
     member x.Candidates =
         FcsLookupCandidate.getOverloads items.Description
@@ -114,6 +114,10 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(items.Name, x.TextColor)
+
+        if isObsolete x.FcsSymbol then
+            LookupUtil.StrikeOut(name)
+
         if emphasize then
             LookupUtil.AddEmphasize(name, TextRange(0, name.Length))
 

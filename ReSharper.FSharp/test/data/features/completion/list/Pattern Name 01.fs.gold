@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 258
+Count: 257
 Focus: Soft
 Range: "| Some(♦)"
 
@@ -9,8 +9,6 @@ Range: "| Some(♦)"
 value                       <==
                             [ExpectedTypeMatch^]
 Value| |=                   'T              OrderStr=Value
-                            [FieldsAndProperties]
-Value                       'T
                             [Methods, Keywords]
 false
 null
@@ -432,7 +430,6 @@ TaskBuilderExtensions
 Unchecked
 UnverifiableAttribute
 Value| |=                   'T              OrderStr=Value
-Value                       'T
 ValueNone                   'T voption
 ValueOption
 ValueSome                   'T voption

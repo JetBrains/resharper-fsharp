@@ -6,8 +6,6 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Presentations
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.Match
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -15,7 +13,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -161,11 +158,9 @@ type RecordFieldRule() =
             if usedNames.Contains(name) then () else
 
             let item =
-                let info = TextualInfo(name, name, Ranges = context.Ranges)
+                let info = FcsSymbolInfo(name, field, context, Ranges = context.Ranges)
                 LookupItemFactory.CreateLookupItem(info)
-                    .WithPresentation(fun _ ->
-                        let typeText = field.FieldType.Format()
-                        TextPresentation(info, typeText, emphasize, PsiSymbolsThemedIcons.Field.Id) :> _)
+                    .WithPresentation(fun _ -> FcsSymbolPresentation(info, emphasize, PsiSymbolsThemedIcons.Field.Id))
                     .WithBehavior(fun _ -> TextualBehavior(info))
                     .WithMatcher(LookupItemMatcher.Literal)
 

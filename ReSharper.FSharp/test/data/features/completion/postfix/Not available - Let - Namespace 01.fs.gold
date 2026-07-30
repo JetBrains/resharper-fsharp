@@ -76,6 +76,7 @@ EnvironmentVariableTarget
 EventArgs
 EventHandler
 Exception
+ExecutionEngineException
 FieldAccessException
 FileStyleUriParser
 FlagsAttribute
@@ -209,6 +210,7 @@ Threading
 TimeOnly
 TimeProvider
 TimeSpan
+TimeZone
 TimeZoneInfo
 TimeZoneNotFoundException
 TimeoutException

@@ -1118,7 +1118,6 @@ FSharpFunc (in Microsoft.FSharp.Core.OptimizedClosures)
 FSharpInterfaceDataVersionAttribute
 FSharpReflectionExtensions (in Microsoft.FSharp.Reflection)
 FSharpType (in Microsoft.FSharp.Reflection)
-FSharpTypeFunc
 FSharpValue (in Microsoft.FSharp.Reflection)
 FUNCDESC (in System.Runtime.InteropServices.ComTypes)
 FUNCFLAGS (in System.Runtime.InteropServices.ComTypes)

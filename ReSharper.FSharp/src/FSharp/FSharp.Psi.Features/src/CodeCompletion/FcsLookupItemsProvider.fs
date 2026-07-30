@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax.PrettyNaming
@@ -24,6 +25,35 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FcsLookupItemsProvider(logger: ILogger) =
+    let fcsCodeCompletionOptions =
+        { FSharpCodeCompletionOptions.Default with
+            SuggestGeneratedOverrides = false
+            SuggestObsoleteSymbols = true
+            SuggestOverrideBodies = false
+            SuggestPatternNames = false
+        }
+
+    let isFsiModuleToSkip (item: RiderDeclarationListItems) =
+        not (Array.isEmpty item.NamespaceToOpen) &&
+        item.Name.StartsWith(FsiDynamicModulePrefix, StringComparison.Ordinal)
+
+    let builtinObsoleteNames =
+        [ "__obsoleteAnd"
+          "__obsoleteOr"
+          "ByRefKinds"
+          "FSharpTypeFunc"
+          "TaskCode"
+          "TaskResumptionFunc"
+          "TaskStateMachine"
+          "TaskStateMachineData"
+          "or"
+          "rethrow"
+          "``lazy``" ]
+        |> HashSet
+
+    let isBuiltinObsoleteName (name: string) =
+        builtinObsoleteNames.Contains(name)
+
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -80,10 +110,6 @@ type FcsLookupItemsProvider(logger: ILogger) =
                 fsFile.GetSourceFile().LanguageType.Is<FSharpScriptProjectFileType>() &&
                 fsFile.GetPsiModule() :? SandboxPsiModule
 
-            let isFsiModuleToSkip (item: RiderDeclarationListItems) =
-                not (Array.isEmpty item.NamespaceToOpen) &&
-                item.Name.StartsWith(FsiDynamicModulePrefix, StringComparison.Ordinal)
-
             let parseResults = fsFile.ParseResults
             let fcsContext = context.FcsCompletionContext
             let line = int fcsContext.Coords.Line + 1
@@ -91,12 +117,13 @@ type FcsLookupItemsProvider(logger: ILogger) =
             try
                 let itemLists =
                     checkResults.GetDeclarationListSymbols(parseResults, line, fcsContext.LineText,
-                        fcsContext.PartialName, context.IsInAttributeContext)
+                        fcsContext.PartialName, context.IsInAttributeContext, options = fcsCodeCompletionOptions)
 
                 for list in itemLists do
                     Interruption.Current.CheckAndThrow()
 
-                    if IsOperatorDisplayName list.Name then () else
+                    let name = list.Name
+                    if IsOperatorDisplayName name || isBuiltinObsoleteName name then () else
                     if skipFsiModules && isFsiModuleToSkip list then () else
 
                     let lookupItem = FcsLookupItem(list, context, Ranges = context.Ranges)

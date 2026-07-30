@@ -10,6 +10,10 @@ type R =
 { {caret} }
 
 ================
+F1
+F2
+F3
+contents
 false
 null
 true
@@ -41,7 +45,6 @@ Choice6Of6
 Choice6Of7
 Choice7Of7
 Error
-FSharpTypeFunc
 KeyValue
 Lazy
 None
@@ -233,9 +236,6 @@ voption
 #r
 #time
 #warnon
-F1
-F2
-F3
 FSharpFunc
 Failure
 abs
@@ -251,7 +251,6 @@ byte
 ceil
 char
 compare
-contents
 cos
 cosh
 decimal
