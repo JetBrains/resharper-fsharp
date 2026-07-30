@@ -6,3 +6,6 @@ let _ = |fun (x, _) -> x|(0)
 0: Lambda can be replaced with 'fst'
 QUICKFIXES:
 Replace lambda with 'fst'
+--Replace lambda with 'fst' in file
+--Replace lambda with 'fst' in project
+--Replace lambda with 'fst' in solution

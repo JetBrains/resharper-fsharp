@@ -40,3 +40,4 @@ type public Strings() =
 
     static member FSharpReformatCode_Name_Reformat_FSharp = Strings.ResourceManager.GetString("FSharpReformatCode_Name_Reformat_FSharp")
     static member CodeCleanupTask_FSharpReformatCode = Strings.ResourceManager.GetString("CodeCleanupTask_FSharpReformatCode")
+    static member FSharpRemoveCodeRedundancies_ActionName = Strings.ResourceManager.GetString("FSharpRemoveCodeRedundancies_ActionName")

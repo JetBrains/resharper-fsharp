@@ -6,6 +6,12 @@ let _ = |fun x -> |id|(1) x|(0)
 0: Lambda can be replaced with 'id'
 QUICKFIXES:
 Replace lambda with 'id'
+--Replace lambda with 'id' in file
+--Replace lambda with 'id' in project
+--Replace lambda with 'id' in solution
 1: Redundant application
 QUICKFIXES:
 Remove 'id'
+--Remove 'id' in file
+--Remove 'id' in project
+--Remove 'id' in solution

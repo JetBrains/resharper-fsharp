@@ -22,4 +22,7 @@
     <data name="CodeCleanupTask_FSharpReformatCode" xml:space="preserve">
         <value>Reformat code</value>
     </data>
+    <data name="FSharpRemoveCodeRedundancies_ActionName" xml:space="preserve">
+        <value>Processing redundancies in F# code</value>
+    </data>
 </root>

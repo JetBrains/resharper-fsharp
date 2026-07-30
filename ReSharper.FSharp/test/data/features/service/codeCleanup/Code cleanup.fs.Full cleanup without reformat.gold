@@ -1,0 +1,70 @@
+﻿module Module
+
+open System.Runtime.CompilerServices
+
+// Redundant Extension attribute
+type Extensions = class end
+
+
+// Redundant backticks
+let name = 1
+
+
+// Redundant new
+let _ = obj()
+
+
+// Redundant parens in expr
+(5 + 5)
+(5 + 5)
+
+// Redundant parens in pattern
+let x = 1
+
+// Redundant parens in type usage
+let _: int = 1
+
+// Redundant parens in attribute
+// Redundant attribute suffix
+[<AutoOpen>]
+module A = ()
+
+
+// Cons with empty list pat
+match [] with
+| [ x ] -> ()
+
+// Redundant 'as' pattern
+let y = 1
+
+
+// Redundant application
+1
+
+
+// Lambda can be replaced with builtin function
+id
+
+// Lambda can be replaced with it's body
+let f x = x
+f
+
+// Dot-lambda can be used
+_.ToString()
+
+
+// Convert to string interpolation
+printf $"Replace lambda with '{5}'"
+
+// Redundant string interpolation
+""
+
+
+// Redundant indexer dot
+[0][0]
+
+
+// Nested record update can be simplified
+type Record0 = { Foo: int }
+type Record1 = { Zoo: Record0 }
+let g item = { item with Zoo.Foo = 3 }
