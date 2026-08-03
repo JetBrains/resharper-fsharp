@@ -276,24 +276,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var stateForRead = myState.ValueForRead;
       lock (stateForRead)
       {
-        FcsModuleCapturedInfo scriptInfo;
+        FcsModuleCapturedInfo info;
 
         if (psiModule is FSharpScriptPsiModule) 
-          stateForRead.ScriptCaches.TryGetValue(psiModule, out scriptInfo);
+          stateForRead.ScriptCaches.TryGetValue(psiModule, out info);
         else 
-          stateForRead.ModuleCaches.TryGetValue(projectKey, out scriptInfo);
+          stateForRead.ModuleCaches.TryGetValue(projectKey, out info);
 
-        if (scriptInfo != null)
+        if (info != null)
         {
           if (ContentModelFork.IsCurrentlyForked)
           {
-            var resolvedSymbols = scriptInfo.TryGetResolvedSymbols(sourceFile);
+            var resolvedSymbols = info.TryGetResolvedSymbols(sourceFile);
             if (resolvedSymbols != null)
               return resolvedSymbols;
 
             // do not mutate the shared data, go do the State fork
           }
-          else return scriptInfo.GetOrCreateResolvedSymbols(sourceFile);
+          else return info.GetOrCreateResolvedSymbols(sourceFile);
         }
       }
 
