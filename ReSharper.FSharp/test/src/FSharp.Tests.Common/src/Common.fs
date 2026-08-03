@@ -288,9 +288,9 @@ type AssertCorrectTreeStructureAttribute() =
 type TestFcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks) =
     inherit FcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider, locks)
 
-    override x.Invalidate _ =
-        x.ModuleCaches.Clear()
-        x.ScriptCaches.Clear()
+    override x.Invalidate(_, state) =
+        state.ModuleCaches.Clear()
+        state.ScriptCaches.Clear()
 
     interface IHideImplementation<FcsCapturedInfoCache>
 
