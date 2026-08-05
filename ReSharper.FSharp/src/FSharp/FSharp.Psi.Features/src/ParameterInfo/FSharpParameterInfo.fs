@@ -284,8 +284,9 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                             text.Append("params", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
                             text.Append(" ", TextStyle.Default) |> ignore
 
-                    if this.IsOptionalParam(fcsParameter) && not parameter.IsOptional then
-                        text.Append("?", TextStyle.Default) |> ignore
+                    if this.IsOptionalParam(fcsParameter) then
+                        if (isNull parameter || not parameter.IsOptional) then
+                            text.Append("?", TextStyle.Default) |> ignore
 
                     match this.GetParamName(fcsParameter) with
                     | Some name ->
