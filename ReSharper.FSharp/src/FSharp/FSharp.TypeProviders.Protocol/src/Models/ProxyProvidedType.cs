@@ -85,11 +85,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
 
         return new ProvidedTypeContent(interfaces, constructors, methods, properties, fields, events);
       });
-
-      myAllNestedTypes = new InterruptibleLazy<ProxyProvidedType[]>(() =>
-        typeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
-          typeProvidersContext.Connection.ExecuteWithCatch(() =>
-            RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), TypeProvider));
     }
 
     [ContractAnnotation("type:null => null")]
@@ -135,12 +130,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public override ProvidedType DeclaringType =>
       TypeProvidersContext.ProvidedTypesCache.GetOrCreate(myRdProvidedType.DeclaringType, TypeProvider);
 
-    public override ProvidedType GetNestedType(string nm) => GetAllNestedTypes().FirstOrDefault(t => t.Name == nm);
+    public override ProvidedType GetNestedType(string nm) => 
+      GetAllNestedTypes().FirstOrDefault(t => t.Name == nm);
 
     public override ProvidedType[] GetNestedTypes() =>
       GetAllNestedTypes().Where(t => t.IsPublic || t.IsNestedPublic).ToArray();
 
-    public override ProvidedType[] GetAllNestedTypes() => myAllNestedTypes.Value;
+    [NotNull]
+    public override ProvidedType[] GetAllNestedTypes() => 
+      TypeProvidersContext.ProvidedTypesCache.GetOrCreateBatch(
+        TypeProvidersContext.Connection.ExecuteWithCatch(() =>
+          RdProvidedTypeProcessModel.GetAllNestedTypes.Sync(EntityId, RpcTimeouts.Maximal)), TypeProvider);
 
     public override ProvidedType GetGenericTypeDefinition() =>
       TypeProvidersContext.ProvidedTypesCache.GetOrCreate(
@@ -320,7 +320,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly InterruptibleLazy<ProvidedTypeContent> myContent;
-    private readonly InterruptibleLazy<ProxyProvidedType[]> myAllNestedTypes;
     private readonly InterruptibleLazy<RdCustomAttributeData[]> myCustomAttributes;
   }
 }
