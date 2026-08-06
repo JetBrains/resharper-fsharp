@@ -104,7 +104,18 @@ let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
     | None -> None
     | Some results ->
 
-    let names = 
+    let symbolUse = reference.GetSymbolUse()
+    Assertion.Assert(isNotNull symbolUse, "reference.GetSymbolUse() != null", opName)
+
+    match symbolUse.Symbol with
+    | :? FSharpMemberOrFunctionOrValue as mfv when
+        (match mfv.DeclaringEntity with
+        | None -> false
+        | Some entity -> entity.IsProvided && mfv.DisplayName.RemoveBackticks() <> mfv.DisplayNameCore) ->
+        Some (results.CheckResults, Some [symbolUse])
+    | _ ->
+
+    let names =
         match referenceOwner with
         | :? IFSharpQualifiableReferenceOwner as referenceOwner -> List.ofSeq referenceOwner.Names
         | _ -> [reference.GetName()]
