@@ -286,7 +286,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IDeclaredElement GetFSharpSourceTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] IFSharpSourceTypeElement fsTypeElement)
     {
-      var name = mfv.GetMfvCompiledName(fsTypeElement);
+      var name = mfv.GetMfvCompiledName(fsTypeElement).RemoveBackticks();
 
       var symbolTableCache = fsTypeElement.GetPsiServices().Caches.GetPsiCache<SymbolTableCache>();
       var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);

@@ -147,7 +147,10 @@ let isWhitespace (node: ITreeNode) =
 let isWhitespaceOrComment (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && (tokenType.IsWhitespace || tokenType.IsComment)
-
+    
+let isDot (node: ITreeNode) =
+    getTokenType node == FSharpTokenType.DOT
+    
 let isFiltered (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsFiltered
