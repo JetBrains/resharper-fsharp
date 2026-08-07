@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -118,6 +119,7 @@ type IFSharpQuickFixUtilComponent =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpQuickFixUtilComponent() =
     let [<Literal>] FcsOpName = "FSharpQuickFixUtilComponent.BindTo"
+    let [<Literal>] FcsImportExtensionOpName = "FSharpQuickFixUtilComponent.AddImportsForExtensionMember"
 
     member x.BindTo(reference: FSharpSymbolReference, typeElement: ITypeElement) =
         let referenceOwner = reference.GetElement()
@@ -132,7 +134,16 @@ type FSharpQuickFixUtilComponent() =
         member x.BindTo(reference, typeElement, _, _) =
             x.BindTo(reference :?> _, typeElement) :> _
 
-        member x.AddImportsForExtensionMember(reference, _) = reference
+        member x.AddImportsForExtensionMember(reference, extensionMembers) =
+            match reference with
+            | :? FSharpSymbolReference as reference ->
+                let referenceOwner = reference.GetElement()
+                use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
+                FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference extensionMembers[0] FcsImportExtensionOpName
+                reference
+
+            | _ -> null
 
         member this.BindTo(reference, typeElement) =
             this.BindTo(reference :?> _, typeElement)

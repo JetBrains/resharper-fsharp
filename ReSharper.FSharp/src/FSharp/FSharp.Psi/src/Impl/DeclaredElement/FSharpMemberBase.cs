@@ -22,6 +22,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsFSharpExtensionMember =>
       GetContainingType() is IFSharpModule && GetDeclaration() is IMemberSignatureOrDeclaration;
 
+    public override ExtensionMemberKind ExtensionMemberKind => 
+      IsFSharpExtensionMember ? FSharpExtensionMemberKind.INSTANCE : ExtensionMemberKind.NONE;
+
     protected override ITypeElement GetTypeElement(IDeclaration declaration)
     {
       var typeDeclaration = declaration.GetContainingNode<ITypeDeclaration>();
