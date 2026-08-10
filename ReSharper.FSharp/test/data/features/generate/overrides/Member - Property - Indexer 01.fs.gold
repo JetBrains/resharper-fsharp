@@ -1,12 +1,14 @@
 ﻿Provided elements:
- 0: Item():System.String
- 1: Equals(System.Object?):System.Boolean
- 2: Finalize():System.Void
- 3: GetHashCode():System.Int32
- 4: ToString():System.String?
+ 0: get_Item():System.String
+ 1: set_Item(System.String):System.Void
+ 2: Equals(System.Object?):System.Boolean
+ 3: Finalize():System.Void
+ 4: GetHashCode():System.Int32
+ 5: ToString():System.String?
 
 // ${KIND:Overrides}
-// ${SELECT0:Item():System.String}
+// ${SELECT0:get_Item():System.String}
+// ${SELECT1:set_Item(System.String):System.Void}
 
 [<AbstractClass>]
 type A() =

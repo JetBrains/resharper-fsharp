@@ -1,5 +1,6 @@
 // ${KIND:Overrides}
-// ${SELECT0:Item():System.String}
+// ${SELECT0:get_Item():System.String}
+// ${SELECT1:set_Item(System.String):System.Void}
 
 [<AbstractClass>]
 type A() =

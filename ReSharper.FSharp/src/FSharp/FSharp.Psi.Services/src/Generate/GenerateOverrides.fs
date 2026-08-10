@@ -385,7 +385,8 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
                 if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
 
                 let isAvailable =
-                    not (missingMembersOnly && isOverridden memberInstance)
+                    not (ownMembersDescriptors.Contains(xmlDocId)) &&
+                    not (isOverridden memberInstance)
 
                 addOverrides memberInstance
                 Some (memberInstance.Member, mfvInstance, isAvailable)
