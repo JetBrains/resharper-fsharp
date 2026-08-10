@@ -305,6 +305,12 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - Property 05`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - SelfId - Backticks 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr - Backticks 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Property - Accessor 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Property - Accessor 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Duplicates 01`` () = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Override member - Duplicates 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Duplicates 03`` () = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Override member - Duplicates 04`` () = x.DoNamedTest()
     [<Test; Explicit>] member x.``Override member - WildSelfId 01`` () = x.DoNamedTest()
     [<Test; Explicit>] member x.``Override member - ObjExpr - WildSelfId 01`` () = x.DoNamedTest()
     [<Test; Explicit>] member x.``Override member - Property - WildSelfId 01`` () = x.DoNamedTest()
@@ -315,7 +321,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - Interface then Override Base 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface Before Override 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface Before Override 02`` () = x.DoNamedTest()
-    
+    [<Test>] member x.``Override member - Interface - Property 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Interface - Property 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Interface - Duplicates 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Interface - Duplicates 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Interface - Duplicates 03`` () = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #nowarn 01``() = x.DoNamedTest()

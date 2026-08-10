@@ -347,6 +347,12 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
                 | _ -> state
 
             alreadyOverriden[overridableMemberInstance] <- state
+            
+    let inline hasImplGetter (state: PropertyOverrideState) =
+        state &&& PropertyOverrideState.Getter <> enum 0
+        
+    let inline hasImplSetter (state: PropertyOverrideState) =
+        state &&& PropertyOverrideState.Setter <> enum 0
 
     let isOverridden (memberInstance: OverridableMemberInstance) =
         match alreadyOverriden.TryGetValue(memberInstance) with
@@ -356,8 +362,8 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
         let prop = memberInstance.Member.As<IProperty>()
         isNull prop ||
 
-        (not prop.IsReadable || (state &&& PropertyOverrideState.Getter <> enum 0)) &&
-        (not prop.IsWritable || (state &&& PropertyOverrideState.Setter <> enum 0))
+        (not prop.IsReadable || hasImplGetter state) &&
+        (not prop.IsWritable || hasImplSetter state)
 
     for KeyValue(_, memberInstance) in memberInstances do
         let fsTypeMember = memberInstance.Member.As<IFSharpTypeMember>()
@@ -379,8 +385,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
                 if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
 
                 let isAvailable =
-                    not (ownMembersDescriptors.Contains(xmlDocId)) &&
-                    not (isOverridden memberInstance)
+                    not (missingMembersOnly && isOverridden memberInstance)
 
                 addOverrides memberInstance
                 Some (memberInstance.Member, mfvInstance, isAvailable)
@@ -404,16 +409,21 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     |> Seq.collect (fun (m, mfvInstance as i) ->
         let mfv = mfvInstance.Mfv
         let prop = m.As<IProperty>()
-        if not missingMembersOnly || isNull prop || not (mfv.IsNonCliEventProperty()) then [i] else
+        if isNull prop || not (mfv.IsNonCliEventProperty()) then [i] else
+        
+        let state =
+            match alreadyOverriden.TryGetValue(OverridableMemberInstance(prop :> IOverridableMember)) with
+            | true, state -> state
+            | _ -> PropertyOverrideState.None
 
-        [ if isNotNull prop.Getter && mfv.HasGetterMethod then
+        [ if isNotNull prop.Getter && mfv.HasGetterMethod && not (hasImplGetter state) then
               prop.Getter :> IOverridableMember, { mfvInstance with Mfv = mfv.GetterMethod }
-          if isNotNull prop.Setter && mfv.HasSetterMethod then
+          if isNotNull prop.Setter && mfv.HasSetterMethod && not (hasImplSetter state) then
               prop.Setter :> IOverridableMember, { mfvInstance with Mfv = mfv.SetterMethod } ])
     |> Seq.map (fun (m, mfvInstance) ->
         FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
     |> Seq.filter (fun i -> not (ownMembersDescriptors.Contains(i.TestDescriptor)))
-    |> Seq.distinctBy (fun i -> i.TestDescriptor) // todo: better way to check shadowing/overriding members
+    |> Seq.distinctBy _.TestDescriptor // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)    
 
 let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typeElement: ITypeElement) (psiModule: IPsiModule) =
