@@ -88,7 +88,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       InvalidateDirectReferencingScripts(scriptPsiModule, [scriptPsiModule]);
     }
 
-    private void InvalidateDirectReferencingScripts(FSharpScriptPsiModule psiModule, HashSet<FSharpScriptPsiModule> visited)
+    private void InvalidateDirectReferencingScripts(FSharpScriptPsiModule psiModule,
+      HashSet<FSharpScriptPsiModule> visited)
     {
       var referencedByScripts = myScriptPsiModulesProvider.GetDirectReferencingScripts(psiModule);
       foreach (var script in referencedByScripts)
@@ -268,6 +269,86 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
+    private static IFcsFileCapturedInfo TryGetFileCapturedInfo(IPsiSourceFile sourceFile, FcsModuleCapturedInfo moduleCapturedInfo)
+    {
+      if (moduleCapturedInfo == null)
+        return null;
+
+      if (ContentModelFork.IsCurrentlyForked)
+      {
+        var resolvedSymbols = moduleCapturedInfo.TryGetResolvedSymbols(sourceFile);
+        if (resolvedSymbols != null)
+          return resolvedSymbols;
+
+        // do not mutate the shared data, go do the State fork
+      }
+      else return moduleCapturedInfo.GetOrCreateResolvedSymbols(sourceFile);
+
+      return null;
+    }
+
+    private IFcsFileCapturedInfo GetOrCreateScriptFileCapturedInfo(IPsiSourceFile sourceFile)
+    {
+      var psiModule = sourceFile.PsiModule;
+      var stateForRead = myState.ValueForRead;
+
+      lock (stateForRead)
+      {
+        stateForRead.ScriptCaches.TryGetValue(psiModule, out var moduleInfo);
+
+        if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
+          return fileInfo;
+      }
+
+      // todo: GetOrAllocateCopyForWrite()
+      var stateForWrite = myState.ValueForWrite;
+
+      lock (stateForWrite)
+      {
+        var scriptInfo = new FcsModuleCapturedInfo(null, true);
+        stateForWrite.ScriptCaches[psiModule] = scriptInfo;
+        return scriptInfo.GetOrCreateResolvedSymbols(sourceFile);
+      }
+    }
+
+    private IFcsFileCapturedInfo GetOrCreateProjectFileCaptureInfo(IPsiSourceFile sourceFile)
+    {
+      var psiModule = sourceFile.PsiModule;
+
+      if (psiModule.ContainingProjectModule is not IProject)
+        return EmptyFcsFileCapturedInfo.Instance;
+
+      if (FcsProjectProvider.GetFcsProject(psiModule) is not { Value: { } fcsProject })
+        return EmptyFcsFileCapturedInfo.Instance;
+
+      var projectKey = FcsProjectKey.Create(psiModule);
+      var stateForRead = myState.ValueForRead;
+      lock (stateForRead)
+      {
+        stateForRead.ModuleCaches.TryGetValue(projectKey, out var moduleInfo);
+        
+        if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
+          return fileInfo;
+      }
+
+      // todo: do not trigger compiler update
+      var stateForWrite = myState.ValueForWrite;
+      lock (stateForWrite)
+      {
+        if (!stateForRead.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
+        {
+          moduleInfo = new FcsModuleCapturedInfo(fcsProject);
+          stateForWrite.ModuleCaches[projectKey] = moduleInfo;
+
+          // todo: fix invalidating F# -> C# -> F# modules
+          foreach (var referencedModule in fcsProject.ReferencedModules)
+            stateForWrite.ReferencingModules.Add(referencedModule, projectKey);
+        }
+
+        return moduleInfo.GetOrCreateResolvedSymbols(sourceFile);
+      }
+    }
+
     public IFcsFileCapturedInfo GetOrCreateFileCapturedInfo(IPsiSourceFile sourceFile)
     {
       myLocks.AssertReadAccessAllowed();
@@ -278,59 +359,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (psiModule.IsMiscFilesProjectModule() && psiModule is not SandboxPsiModule)
         return EmptyFcsFileCapturedInfo.Instance;
 
-      if (psiModule is not FSharpScriptPsiModule && psiModule.ContainingProjectModule is not IProject)
-        return EmptyFcsFileCapturedInfo.Instance;
-
-      var projectKey = FcsProjectKey.Create(psiModule);
-
-      var stateForRead = myState.ValueForRead;
-      lock (stateForRead)
-      {
-        FcsModuleCapturedInfo info;
-
-        if (psiModule is FSharpScriptPsiModule) 
-          stateForRead.ScriptCaches.TryGetValue(psiModule, out info);
-        else 
-          stateForRead.ModuleCaches.TryGetValue(projectKey, out info);
-
-        if (info != null)
-        {
-          if (ContentModelFork.IsCurrentlyForked)
-          {
-            var resolvedSymbols = info.TryGetResolvedSymbols(sourceFile);
-            if (resolvedSymbols != null)
-              return resolvedSymbols;
-
-            // do not mutate the shared data, go do the State fork
-          }
-          else return info.GetOrCreateResolvedSymbols(sourceFile);
-        }
-      }
-
-      // todo: GetOrAllocateCopyForWrite()
-      var stateForWrite = myState.ValueForWrite;
-      lock (stateForWrite)
-      {
-        if (psiModule is FSharpScriptPsiModule)
-        {
-          var scriptInfo = new FcsModuleCapturedInfo(null, true);
-          stateForWrite.ScriptCaches[psiModule] = scriptInfo;
-          return scriptInfo.GetOrCreateResolvedSymbols(sourceFile);
-        }
-        
-        // todo: do not trigger compiler update
-        if (FcsProjectProvider.GetFcsProject(psiModule) is not { Value: {} fcsProject })
-          return EmptyFcsFileCapturedInfo.Instance;
-
-        var moduleInfo = new FcsModuleCapturedInfo(fcsProject);
-        stateForWrite.ModuleCaches[projectKey] = moduleInfo;
-
-        // todo: fix invalidating F# -> C# -> F# modules
-        foreach (var referencedModule in fcsProject.ReferencedModules)
-          stateForWrite.ReferencingModules.Add(referencedModule, projectKey);
-
-        return moduleInfo.GetOrCreateResolvedSymbols(sourceFile);
-      }
+      return psiModule is FSharpScriptPsiModule 
+        ? GetOrCreateScriptFileCapturedInfo(sourceFile) 
+        : GetOrCreateProjectFileCaptureInfo(sourceFile);
     }
   }
 }
