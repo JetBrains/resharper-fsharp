@@ -21,7 +21,7 @@ type ForkedFcsCapturedInfoCacheTest() =
     override x.RelativeTestDataPath = "cache/forks"
 
     [<Test>]
-    member x.Test() = x.DoTestSolution("test.fs")
+    member x.Test() = x.DoTestSolution("test single file.fs")
 
     override x.DoTest(lifetime: Lifetime, testProject: IProject) =
         let psiServices = x.Solution.GetPsiServices()

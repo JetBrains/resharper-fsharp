@@ -336,12 +336,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         }
       }
 
-      // todo: do not trigger compiler update
       var stateForWrite = myState.ValueForWrite;
       lock (stateForWrite)
       {
         if (!stateForWrite.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
         {
+          // todo: do not trigger compiler update
           if (FcsProjectProvider.GetFcsProject(psiModule) is not { Value: { } fcsProject })
             return EmptyFcsFileCapturedInfo.Instance;
 
