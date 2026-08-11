@@ -33,6 +33,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private readonly LazyForkedCopyOnWriteContentModelData<State> myState = new
     (
       factory: static () => new State(),
+      // We intentionally create an empty State instance instead of copying the existing data. This is correct because:
+      // - During Read operations:
+      //       We only need to reuse the non-forked data from the shared state.
+      // - During Write operations:
+      //       We accept that the forked cache becomes empty and will be computed on-demand.
+      //       It should not require much time, as most of the data for resolution is cached by the FCS.
       copyFactory: static _ => new State()
     );
 
