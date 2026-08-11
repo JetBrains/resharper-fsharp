@@ -51,6 +51,7 @@
     <Compile Include="FSharpIconProviderTest.fs" />
     <Compile Include="RearrangeCodeTest.fs" />
     <Compile Include="FSharpReferenceResolveTest.fs" />
+    <Compile Include="ForkedFcsCapturedInfoCacheTest.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />
