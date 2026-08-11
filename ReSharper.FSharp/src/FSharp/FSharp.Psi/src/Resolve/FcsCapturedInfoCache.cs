@@ -290,24 +290,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private IFcsFileCapturedInfo GetOrCreateScriptFileCapturedInfo(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      var stateForRead = myState.ValueForRead;
 
-      lock (stateForRead)
       {
-        stateForRead.ScriptCaches.TryGetValue(psiModule, out var moduleInfo);
+        var stateForRead = myState.ValueForRead;
+        lock (stateForRead)
+        {
+          stateForRead.ScriptCaches.TryGetValue(psiModule, out var moduleInfo);
 
-        if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
-          return fileInfo;
+          if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
+            return fileInfo;
+        }
       }
 
       // todo: GetOrAllocateCopyForWrite()
       var stateForWrite = myState.ValueForWrite;
-
       lock (stateForWrite)
       {
-        var scriptInfo = new FcsModuleCapturedInfo(null, true);
-        stateForWrite.ScriptCaches[psiModule] = scriptInfo;
-        return scriptInfo.GetOrCreateResolvedSymbols(sourceFile);
+        if (!stateForWrite.ScriptCaches.TryGetValue(psiModule, out var moduleInfo))
+        {
+          moduleInfo = new FcsModuleCapturedInfo(null, true);
+          stateForWrite.ScriptCaches[psiModule] = moduleInfo;
+        }
+
+        return moduleInfo.GetOrCreateResolvedSymbols(sourceFile);
       }
     }
 
@@ -322,20 +327,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return EmptyFcsFileCapturedInfo.Instance;
 
       var projectKey = FcsProjectKey.Create(psiModule);
-      var stateForRead = myState.ValueForRead;
-      lock (stateForRead)
+
       {
-        stateForRead.ModuleCaches.TryGetValue(projectKey, out var moduleInfo);
-        
-        if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
-          return fileInfo;
+        var stateForRead = myState.ValueForRead;
+        lock (stateForRead)
+        {
+          stateForRead.ModuleCaches.TryGetValue(projectKey, out var moduleInfo);
+
+          if (TryGetFileCapturedInfo(sourceFile, moduleInfo) is { } fileInfo)
+            return fileInfo;
+        }
       }
 
       // todo: do not trigger compiler update
       var stateForWrite = myState.ValueForWrite;
       lock (stateForWrite)
       {
-        if (!stateForRead.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
+        if (!stateForWrite.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
         {
           moduleInfo = new FcsModuleCapturedInfo(fcsProject);
           stateForWrite.ModuleCaches[projectKey] = moduleInfo;
