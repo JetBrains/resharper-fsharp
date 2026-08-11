@@ -22,104 +22,113 @@ type ForkedFcsCapturedInfoCacheTest() =
 
     [<Test>]
     member x.Test() = x.DoTestSolution("test.fs")
-    
+
     override x.DoTest(lifetime: Lifetime, testProject: IProject) =
-      let psiServices = x.Solution.GetPsiServices()
-      psiServices.Files.CommitAllDocuments()
+        let psiServices = x.Solution.GetPsiServices()
+        psiServices.Files.CommitAllDocuments()
 
-      Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
-      Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+        Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
+        Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
 
-      let projectFile = testProject.GetAllProjectFiles().SingleItem().NotNull()
-      let sourceFile = projectFile.ToSourceFile().NotNull()
+        let projectFile = testProject.GetAllProjectFiles().SingleItem().NotNull()
+        let sourceFile = projectFile.ToSourceFile().NotNull()
 
-      let initialPersistentIndex = sourceFile.PsiStorage.PersistentIndex
-      Assert.IsTrue(initialPersistentIndex.HasValue)
+        let initialPersistentIndex = sourceFile.PsiStorage.PersistentIndex
+        Assert.IsTrue(initialPersistentIndex.HasValue)
 
-      let initialPersistentTimestamp = psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile)
-      Assert.IsTrue(initialPersistentTimestamp.HasValue)
+        let initialPersistentTimestamp =
+            psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile)
 
-      let cache = psiServices.GetComponent<FcsCapturedInfoCache>()
-      let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
-      let resolvedSymbols = info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+        Assert.IsTrue(initialPersistentTimestamp.HasValue)
 
-      Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
-      Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
+        let cache = psiServices.GetComponent<FcsCapturedInfoCache>()
+        let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
 
-      Assert.IsFalse(cache.HasDirtyFiles)
-      Assert.IsTrue(cache.UpToDate(sourceFile))
+        let resolvedSymbols =
+            info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
 
-      let locks = x.Locks
+        Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
+        Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
 
-      locks.TestInBackgroundReadThread(fun () ->
-          use fork =
-              ContentModelFork.CreateTemporaryForkForCurrentThread(
-              "ChangesInFork",
-              locks,
-              ContentModelForkCapabilities.WriteOperations ||| ContentModelForkCapabilities.CachesUpdate
-          )
+        Assert.IsFalse(cache.HasDirtyFiles)
+        Assert.IsTrue(cache.UpToDate(sourceFile))
 
-          Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
-          Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+        let locks = x.Locks
 
-          Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
-          Assert.AreEqual(initialPersistentIndex, sourceFile.PsiStorage.PersistentIndex)
+        locks.TestInBackgroundReadThread(fun () ->
+            use fork =
+                ContentModelFork.CreateTemporaryForkForCurrentThread(
+                    "ChangesInFork",
+                    locks,
+                    ContentModelForkCapabilities.WriteOperations
+                    ||| ContentModelForkCapabilities.CachesUpdate
+                )
 
-          let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
-          let resolvedSymbols = info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+            Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
+            Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
 
-          Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
-          Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
+            Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
+            Assert.AreEqual(initialPersistentIndex, sourceFile.PsiStorage.PersistentIndex)
 
-          sourceFile.Document.InsertText(
-              sourceFile.Document.GetDocumentRange().EndOffset,
-              "\n
-let y = 2")
+            let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
 
-          Assert.IsFalse(psiServices.Files.AllDocumentsAreCommitted)
-          Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+            let resolvedSymbols =
+                info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
 
-          // caches remember the old data, timestamp should reflect this
-          Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
+            Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
+            Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
 
-          Assert.IsFalse(cache.UpToDate(sourceFile))
-          Assert.IsTrue(
-              ContentModelFork.DangerousExecuteCodeOutsideOfForkedContext(fun () ->
-                  cache.UpToDate(sourceFile)))
+            sourceFile.Document.InsertText(
+                sourceFile.Document.GetDocumentRange().EndOffset,
+                "\n
+let y = 2"
+            )
 
-          Assert.IsTrue(cache.HasDirtyFiles)
-          Assert.IsFalse(
-              ContentModelFork.DangerousExecuteCodeOutsideOfForkedContext(fun () ->
-                  cache.HasDirtyFiles))
+            Assert.IsFalse(psiServices.Files.AllDocumentsAreCommitted)
+            Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
 
-          psiServices.Files.CommitAllDocuments() // updates caches
-          Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
-          Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+            // caches remember the old data, timestamp should reflect this
+            Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
+            Assert.IsFalse(cache.UpToDate(sourceFile))
 
-          // this is how persistent timestamps work, we are not persisting anything in forks
-          Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
-          Assert.IsTrue(cache.UpToDate(sourceFile))
+            Assert.IsTrue(
+                ContentModelFork.DangerousExecuteCodeOutsideOfForkedContext(fun () -> cache.UpToDate(sourceFile))
+            )
 
-          let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
-          let resolvedSymbols = info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+            Assert.IsTrue(cache.HasDirtyFiles)
+            Assert.IsFalse(ContentModelFork.DangerousExecuteCodeOutsideOfForkedContext(fun () -> cache.HasDirtyFiles))
 
-          // now the cache tells the truth
-          Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
-          Assert.IsTrue(resolvedSymbols.ContainsKey("y"))
-      )
+            psiServices.Files.CommitAllDocuments() // updates caches
+            Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
+            Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
 
-      // isolation check
-      Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
-      Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+            // this is how persistent timestamps work, we are not persisting anything in forks
+            Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
+            Assert.IsTrue(cache.UpToDate(sourceFile))
 
-      Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
-      Assert.AreEqual(initialPersistentIndex, sourceFile.PsiStorage.PersistentIndex)
+            let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
 
-      Assert.IsFalse(cache.HasDirtyFiles)
-      Assert.IsTrue(cache.UpToDate(sourceFile))
+            let resolvedSymbols =
+                info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
 
-      let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
-      let resolvedSymbols = info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+            // now the cache tells the truth
+            Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
+            Assert.IsTrue(resolvedSymbols.ContainsKey("y")))
 
-      Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
-      Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
+        // isolation check
+        Assert.IsTrue(psiServices.Files.AllDocumentsAreCommitted)
+        Assert.IsFalse(psiServices.Files.CommitDocumentsIsInProgress)
+
+        Assert.AreEqual(initialPersistentTimestamp, psiServices.PersistentIndex.GetPersistentTimestamp(sourceFile))
+        Assert.AreEqual(initialPersistentIndex, sourceFile.PsiStorage.PersistentIndex)
+
+        Assert.IsFalse(cache.HasDirtyFiles)
+        Assert.IsTrue(cache.UpToDate(sourceFile))
+
+        let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
+
+        let resolvedSymbols =
+            info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+
+        Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
+        Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
