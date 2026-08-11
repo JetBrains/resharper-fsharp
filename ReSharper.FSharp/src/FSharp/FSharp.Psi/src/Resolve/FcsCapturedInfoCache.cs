@@ -316,14 +316,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    private IFcsFileCapturedInfo GetOrCreateProjectFileCaptureInfo(IPsiSourceFile sourceFile)
+    private IFcsFileCapturedInfo GetOrCreateProjectFileCapturedInfo(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
 
       if (psiModule.ContainingProjectModule is not IProject)
-        return EmptyFcsFileCapturedInfo.Instance;
-
-      if (FcsProjectProvider.GetFcsProject(psiModule) is not { Value: { } fcsProject })
         return EmptyFcsFileCapturedInfo.Instance;
 
       var projectKey = FcsProjectKey.Create(psiModule);
@@ -345,6 +342,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         if (!stateForWrite.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
         {
+          if (FcsProjectProvider.GetFcsProject(psiModule) is not { Value: { } fcsProject })
+            return EmptyFcsFileCapturedInfo.Instance;
+
           moduleInfo = new FcsModuleCapturedInfo(fcsProject);
           stateForWrite.ModuleCaches[projectKey] = moduleInfo;
 
@@ -369,7 +369,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       return psiModule is FSharpScriptPsiModule 
         ? GetOrCreateScriptFileCapturedInfo(sourceFile) 
-        : GetOrCreateProjectFileCaptureInfo(sourceFile);
+        : GetOrCreateProjectFileCapturedInfo(sourceFile);
     }
   }
 }
