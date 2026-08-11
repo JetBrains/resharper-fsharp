@@ -58,7 +58,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return myFileResolvedSymbols[fileIndex];
     }
 
-    public IFcsFileCapturedInfo GetResolvedSymbols(IPsiSourceFile sourceFile)
+    [CanBeNull]
+    public IFcsFileCapturedInfo TryGetResolvedSymbols(IPsiSourceFile sourceFile)
+    {
+      return TryGetFileIndex(sourceFile, out var fileIndex) 
+        ? TryGetResolvedSymbols(fileIndex) 
+        : null;
+    }
+
+    public IFcsFileCapturedInfo GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile)
     {
       if (!TryGetFileIndex(sourceFile, out var fileIndex))
         return EmptyFcsFileCapturedInfo.Instance;
