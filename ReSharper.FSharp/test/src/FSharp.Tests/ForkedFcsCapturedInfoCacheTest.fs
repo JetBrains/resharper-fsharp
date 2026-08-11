@@ -42,10 +42,10 @@ type ForkedFcsCapturedInfoCacheTest() =
         Assert.IsTrue(initialPersistentTimestamp.HasValue)
 
         let cache = psiServices.GetComponent<FcsCapturedInfoCache>()
-        let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
+        let nonForkedInfo = cache.GetOrCreateFileCapturedInfo(sourceFile)
 
         let resolvedSymbols =
-            info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
+            nonForkedInfo.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
 
         Assert.IsTrue(resolvedSymbols.ContainsKey("x"))
         Assert.IsFalse(resolvedSymbols.ContainsKey("y"))
@@ -71,6 +71,8 @@ type ForkedFcsCapturedInfoCacheTest() =
             Assert.AreEqual(initialPersistentIndex, sourceFile.PsiStorage.PersistentIndex)
 
             let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
+
+            Assert.IsTrue(nonForkedInfo == info)
 
             let resolvedSymbols =
                 info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
@@ -108,6 +110,8 @@ let y = 2"
 
             let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
 
+            Assert.IsTrue(nonForkedInfo != info)
+
             let resolvedSymbols =
                 info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
 
@@ -126,6 +130,8 @@ let y = 2"
         Assert.IsTrue(cache.UpToDate(sourceFile))
 
         let info = cache.GetOrCreateFileCapturedInfo(sourceFile)
+
+        Assert.IsTrue(nonForkedInfo == info)
 
         let resolvedSymbols =
             info.GetAllDeclaredSymbols().ToDictionary(_.SymbolUse.Symbol.DisplayName)
