@@ -275,8 +275,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       var psiModule = sourceFile.PsiModule;
 
-      if (psiModule.IsMiscFilesProjectModule() && psiModule is not SandboxPsiModule || 
-          psiModule.ContainingProjectModule is not IProject)
+      if (psiModule.IsMiscFilesProjectModule() && psiModule is not SandboxPsiModule)
+        return EmptyFcsFileCapturedInfo.Instance;
+
+      if (psiModule is not FSharpScriptPsiModule && psiModule.ContainingProjectModule is not IProject)
         return EmptyFcsFileCapturedInfo.Instance;
 
       var projectKey = FcsProjectKey.Create(psiModule);
