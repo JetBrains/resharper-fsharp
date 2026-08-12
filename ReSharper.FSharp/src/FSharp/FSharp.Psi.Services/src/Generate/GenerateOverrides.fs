@@ -45,7 +45,7 @@ let getMembersNeedingTypeAnnotations (mfvInstances: FcsMfvInstance list) =
     |> Seq.concat
     |> HashSet
 
-let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSharpGeneratorElement) =
+let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: FSharpGeneratorElement) =
     let mfv = element.Mfv
     Assertion.Assert(not (mfv.IsNonCliEventProperty()))
 
@@ -123,7 +123,7 @@ let generateMember (context: ITreeNode) (mayHaveBaseCalls: bool) (element: IFSha
         else
             factory.CreateMemberDecl(isStatic, memberName, typeParams, paramGroups)
 
-    let shouldCallBase (element: IFSharpGeneratorElement) =
+    let shouldCallBase (element: FSharpGeneratorElement) =
         let fsGeneratorElement = element.As<FSharpGeneratorElement>()
         isNotNull fsGeneratorElement &&
 
@@ -222,12 +222,12 @@ let rec getAnchorNode (psiView: IPsiView) (typeDecl: IFSharpTypeElementDeclarati
 
     let memberDecl = psiView.GetSelectedTreeNode<ITypeBodyMemberDeclaration>()
     if isNotNull memberDecl && canInsertBefore (memberDecl.GetNextMeaningfulSibling()) then memberDecl else
-    
+
     let interfaceImpl = selectedTreeNode.GetPreviousMeaningfulSibling().As<IInterfaceImplementation>()
     if isNotNull interfaceImpl && not (interfaceImpl.Contains(selectedTreeNode)) then
         let psiView = PsiFileView(interfaceImpl.GetContainingFile(), interfaceImpl.GetLastTokenIn().GetTreeTextRange())
         getAnchorNode psiView typeDecl else
-    
+
     if canInsertAtNode selectedTreeNode then
         if isNull typeDecl || typeDecl.Contains(selectedTreeNode) then selectedTreeNode else
         typeDecl.FindLastTokenIn().GetPreviousMeaningfulToken(true)
@@ -425,13 +425,13 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
         FSharpGeneratorElement(m, mfvInstance, needsTypesAnnotations.Contains(mfvInstance.Mfv)))
     |> Seq.filter (fun i -> not (ownMembersDescriptors.Contains(i.TestDescriptor)))
     |> Seq.distinctBy _.TestDescriptor // todo: better way to check shadowing/overriding members
-    |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)    
+    |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
 
 let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typeElement: ITypeElement) (psiModule: IPsiModule) =
     let fcsEntity = impl.FcsEntity
     let inst = Seq.zip fcsEntity.GenericParameters fcsEntity.GenericArguments |> List.ofSeq
     let interfaceType = fcsEntity.AsType().Instantiate(inst)
-        
+
     let getMemberXmlDocId (typeMember: ITypeMember) =
         XMLDocUtil.GetTypeMemberXmlDocId(typeMember, typeMember.ShortName)
 
@@ -451,7 +451,7 @@ let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typ
             | AccessorKind.GETTER -> Some(getMemberXmlDocId implementedProp.Getter)
             | AccessorKind.SETTER -> Some(getMemberXmlDocId implementedProp.Setter)
             | _ -> None)
-        
+
     let getMfvXmlDocId (mfvInstance: FcsMfvInstance) =
         let mfv = mfvInstance.Mfv
         let declaredElement = mfv.GetDeclaredElement(psiModule)
@@ -459,26 +459,26 @@ let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typ
         | :? IProperty as prop -> getAccessorOrPropertyXmlDocId mfv prop
         | :? ITypeMember as typeMember -> getMemberXmlDocId typeMember
         | _ -> mfv.GetXmlDocId()
-        
+
     let getInterfaces (fcsType: FSharpType) =
         fcsType.AllInterfaces
         |> Seq.filter _.HasTypeDefinition
         |> Seq.map FcsEntityInstance.create
         |> Seq.filter isNotNull
         |> Seq.toList
-        
+
     let memberInstances =
         getOverridableMemberIds typeElement fcsEntity psiModule
         |> Seq.collect (fun (xmlDocId, memberInstance) ->
             let prop = memberInstance.Member.As<IProperty>()
-            if isNull prop then [xmlDocId, memberInstance] else
+            if isNull prop then [ xmlDocId, memberInstance ] else
 
             [ if isNotNull prop.Getter then
                   getMemberXmlDocId prop.Getter, OverridableMemberInstance(prop.Getter :> IOverridableMember)
               if isNotNull prop.Setter then
                   getMemberXmlDocId prop.Setter, OverridableMemberInstance(prop.Setter :> IOverridableMember) ])
         |> dict
-        
+
     let existingMemberDecls =
         impl.TypeMembers
         |> Seq.filter (fun memberDecl ->
@@ -524,11 +524,12 @@ let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typ
                         let fcsSymbol = memberDecl.GetFcsSymbol()
                         match memberInstance.Member, declaredElement with
                         | null, _ -> Seq.empty
-                        | :? IProperty as implementedProp, (:? IProperty as prop) when fcsSymbol.IsNonCliEventPropertyOrAccessor() ->
+                        | :? IProperty as implementedProp,
+                          (:? IProperty as prop) when fcsSymbol.IsNonCliEventPropertyOrAccessor() ->
                             getPropertyAccessorXmlDocIds implementedProp prop
-                        | implementedMember, _ -> [implementedMember.XMLDocId]))
+                        | implementedMember, _ -> [ implementedMember.XMLDocId ]))
                 |> HashSet
-            
+
             baseTypeMembers
             |> Seq.collect (fun memberInstance ->
                 let overridableMember = memberInstance.Member.As<IOverridableMember>()
@@ -537,35 +538,35 @@ let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typ
             |> Seq.collect (fun memberInstance ->
                 match memberInstance.Element with
                 | :? IProperty as prop -> getPropertyAccessorXmlDocIds prop prop
-                | element -> [element.XMLDocId])
+                | element -> [ element.XMLDocId ])
             |> Seq.iter (implementedMembers.Add >> ignore)
-            
+
             allInterfaceMembers
             |> List.filter (fun mfvInstance ->
                 let mfv = mfvInstance.Mfv
                 (not mfv.IsProperty || mfv.IsCliEvent()) && not (mfv.IsCliEventAccessor()) &&
-                
+
                 let xmlDocId = getMfvXmlDocId mfvInstance
                 not (implementedMembers.Contains(xmlDocId)))
         else
             allInterfaceMembers
-            
+
     let overridableMemberInstances =
         availableInterfaceMembers
         |> List.choose (fun mfvInstance ->
             let xmlDocId = getMfvXmlDocId mfvInstance
-            
+
             let mutable memberInstance = Unchecked.defaultof<_>
-            if not <| memberInstances.TryGetValue(xmlDocId, &memberInstance) then None   
+            if not <| memberInstances.TryGetValue(xmlDocId, &memberInstance) then None
             else
-                Some(memberInstance.Member, mfvInstance))   
-    
+                Some(memberInstance.Member, mfvInstance))
+
     overridableMemberInstances
     |> List.sortBy (fun (_, mfvInstance) -> mfvInstance.Mfv.DisplayNameCore) // todo: try to preserve declaration sorting?
     |> List.collect (fun (m, mfvInstance as i) ->
         let mfv = mfvInstance.Mfv
         let prop = m.As<IProperty>()
-        if isNull prop || not (mfv.IsNonCliEventProperty()) then [i] else
+        if isNull prop || not (mfv.IsNonCliEventProperty()) then [ i ] else
 
         [ if isNotNull prop.Getter && mfv.HasGetterMethod then
               prop.Getter :> IOverridableMember, { mfvInstance with Mfv = mfv.GetterMethod }
