@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -93,24 +94,16 @@ module OverrideRuleModule =
         let caretCoords = getCaretCoords context
         let caretColumn = int caretCoords.Column
 
-        let (|IsInInterfaceImplScope|_|) (impl: IInterfaceImplementation) =
-            let isInScope =
-                isNotNull impl
-                && let indent = impl.Indent in
-                   caretColumn > indent
-
-            if isInScope then Some impl else None
-
         let nearestInterfaceImpl =
             match anchor with
+            | null -> null
             | :? IMemberDeclaration as memberDecl ->
                 memberDecl.GetContainingNode<IInterfaceImplementation>()
-            | :? IInterfaceImplementation as impl -> impl
-            | null -> null
-            | _ -> anchor.GetContainingNode<IInterfaceImplementation>()
+            | _ -> anchor.GetContainingNode<IInterfaceImplementation>(true) 
 
         match nearestInterfaceImpl with
-        | IsInInterfaceImplScope interfaceImpl -> interfaceImpl, interfaceImpl.TypeMembersEnumerable |> Seq.cast
+        | interfaceImpl when isNotNull interfaceImpl && caretColumn > interfaceImpl.Indent ->
+            interfaceImpl, interfaceImpl.TypeMembersEnumerable |> Seq.cast
         | _ ->
             let repr =
                 if isNull anchor then
@@ -180,13 +173,6 @@ module OverrideRuleModule =
 
             let isAligned (memberOwner: ITreeNode) (memberDecl: IMemberDeclaration) =
                 isInsideOwnerBody memberOwner && isCorrectIndent memberOwner memberDecl
-                
-            let isOverrideDecl (memberOwner: ITreeNode) (memberDecl: IMemberDeclaration) =
-                let memberKeyword = memberDecl.MemberKeyword
-                match memberKeyword with
-                | TokenType FSharpTokenType.OVERRIDE _ -> true
-                | TokenType FSharpTokenType.MEMBER _ -> memberOwner :? IInterfaceImplementation
-                | _ -> false
 
             let anchor = generatorContext.Anchor
 
@@ -195,9 +181,8 @@ module OverrideRuleModule =
                 | :? IMemberDeclaration as decl -> decl
                 | _ -> anchor.GetContainingNode<IMemberDeclaration>()
 
-            isNotNull memberDecl
-            && isNotNull memberOwner
-            && isOverrideDecl memberOwner memberDecl
+            isNotNull memberOwner
+            && OverridableMemberDeclarationUtil.IsOverride memberDecl
             && isAligned memberOwner memberDecl
         | _ -> false
 
