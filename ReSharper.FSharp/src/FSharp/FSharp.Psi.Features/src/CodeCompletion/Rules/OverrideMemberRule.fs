@@ -273,32 +273,6 @@ module OverrideRuleModule =
             | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? OverrideBehavior)
             | _ -> true)
 
-    let addOverrideItems
-        (context: FSharpCodeCompletionContext)
-        (collector: IItemsCollector)
-        (getPresentationText: IOverridableMember -> string)
-        (getTextualInfo: IMemberDeclaration -> TextualInfo)
-        =
-        let generatorContext = getGeneratorContext context
-
-        let mayHaveBaseCalls =
-            GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
-
-        let generatorElements = getOverridableElements generatorContext
-
-        for generatorElement in generatorElements do
-            let memberDecl, types =
-                GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls generatorElement
-
-            let info = getTextualInfo memberDecl
-
-            let overrideItem =
-                createOverrideLookupItem context getPresentationText generatorElement info types
-
-            collector.Add(overrideItem)
-
-        false
-
 open OverrideRuleModule
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -314,17 +288,33 @@ type OverrideMemberRule() =
     override this.AddLookupItems(context, collector) =
         // Choose textual presentation and textual info depending on whether the node is a dot (qualified) or whitespace (unqualified)
         let node = context.NodeInFile
+        let generatorContext = getGeneratorContext context
+        let mayHaveBaseCalls =
+            GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
 
-        if isDot node then
-            addOverrideItems context collector _.ShortName (fun memberDecl ->
-                let fullText = memberDecl.GetText()
-                let selfId = memberDecl.SelfId.GetText()
-                let text = fullText.RemoveStart($"{memberDecl.MemberKeyword.GetText()} {selfId}.")
-                TextualInfo(text, text, Ranges = context.Ranges))
-        else
-            addOverrideItems context collector (fun mainMember -> $"override {mainMember.ShortName}") (fun memberDecl ->
-                let text = memberDecl.GetText()
-                TextualInfo(text, text, Ranges = context.Ranges))
+        let generatorElements = getOverridableElements generatorContext
+
+        for generatorElement in generatorElements do
+            let memberDecl, types =
+                GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls generatorElement
+
+            let overrideItem =
+                if isDot node then
+                    let info =
+                        let fullText = memberDecl.GetText()
+                        let selfId = memberDecl.SelfId.GetText()
+                        let text = fullText.RemoveStart($"{memberDecl.MemberKeyword.GetText()} {selfId}.")
+                        TextualInfo(text, text, Ranges = context.Ranges)
+                    createOverrideLookupItem context _.ShortName generatorElement info types
+                else
+                    let info =
+                        let text = memberDecl.GetText()
+                        TextualInfo(text, text, Ranges = context.Ranges)
+                    createOverrideLookupItem context (fun mainMember -> $"override {mainMember.ShortName}") generatorElement info types
+
+            collector.Add(overrideItem)
+
+        false
 
     override this.TransformItems(context, collector) =
         keepOnlyOverrideItems collector
