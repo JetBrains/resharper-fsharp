@@ -93,26 +93,24 @@ module OverrideRuleModule =
         let caretCoords = getCaretCoords context
         let caretColumn = int caretCoords.Column
 
-        let (|IsInInterfaceImplScope|_|) (memberDecl: IMemberDeclaration option) (impl: IInterfaceImplementation) =
+        let (|IsInInterfaceImplScope|_|) (impl: IInterfaceImplementation) =
             let isInScope =
                 isNotNull impl
                 && let indent = impl.Indent in
-                   caretColumn > indent && (memberDecl.IsNone || memberDecl.Value.Indent > indent)
+                   caretColumn > indent
 
             if isInScope then Some impl else None
 
         let nearestInterfaceImpl =
             match anchor with
             | :? IMemberDeclaration as memberDecl ->
-                match memberDecl.GetContainingNode<IInterfaceImplementation>() with
-                | IsInInterfaceImplScope (Some(memberDecl)) interfaceImpl -> interfaceImpl
-                | _ -> null
+                memberDecl.GetContainingNode<IInterfaceImplementation>()
             | :? IInterfaceImplementation as impl -> impl
             | null -> null
             | _ -> anchor.GetContainingNode<IInterfaceImplementation>()
 
         match nearestInterfaceImpl with
-        | IsInInterfaceImplScope None interfaceImpl -> interfaceImpl, interfaceImpl.TypeMembersEnumerable |> Seq.cast
+        | IsInInterfaceImplScope interfaceImpl -> interfaceImpl, interfaceImpl.TypeMembersEnumerable |> Seq.cast
         | _ ->
             let repr =
                 if isNull anchor then
@@ -157,7 +155,7 @@ module OverrideRuleModule =
 
             | :? IInterfaceImplementation as interfaceImpl ->
                 let interfaceKeyword = interfaceImpl.InterfaceKeyword
-                isNotNull interfaceKeyword && caretLine > interfaceKeyword.StartLine
+                caretLine > interfaceKeyword.StartLine
 
             | _ -> false
 

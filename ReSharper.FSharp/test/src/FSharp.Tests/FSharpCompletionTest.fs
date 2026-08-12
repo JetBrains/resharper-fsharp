@@ -303,6 +303,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member 11`` () = x.DoNamedTest()
     [<Test>] member x.``Override member 12`` () = x.DoNamedTest()
     [<Test>] member x.``Override member 13`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Not Overriding 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - SelfId - Backticks 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr - Backticks 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Property - Accessor 01`` () = x.DoNamedTest()
