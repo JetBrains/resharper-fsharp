@@ -305,33 +305,26 @@ open OverrideRuleModule
 type OverrideMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
+    /// The rule is available both for the whitespace case
+    /// and for the qualified case ("override self.{caret}").
     override this.IsAvailable(context) =
         context
-        |> isOverrideRuleAvailable isWhitespace (fun owner -> not (owner :? IInterfaceImplementation))
+        |> isOverrideRuleAvailable (fun node -> isWhitespace node || isDot node) (fun owner -> not (owner :? IInterfaceImplementation))
 
     override this.AddLookupItems(context, collector) =
-        addOverrideItems context collector (fun mainMember -> $"override {mainMember.ShortName}") (fun memberDecl ->
-            let text = memberDecl.GetText()
-            TextualInfo(text, text, Ranges = context.Ranges))
+        // Choose textual presentation and textual info depending on whether the node is a dot (qualified) or whitespace (unqualified)
+        let node = context.NodeInFile
 
-    override this.TransformItems(context, collector) =
-        keepOnlyOverrideItems collector
-        FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext
-
-[<Language(typeof<FSharpLanguage>)>]
-type QualifiedOverrideRule() =
-    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
-
-    override this.IsAvailable(context) =
-        context
-        |> isOverrideRuleAvailable isDot (fun owner -> not (owner :? IInterfaceImplementation))
-
-    override this.AddLookupItems(context, collector) =
-        addOverrideItems context collector _.ShortName (fun memberDecl ->
-            let fullText = memberDecl.GetText()
-            let selfId = memberDecl.SelfId.GetText()
-            let text = fullText.RemoveStart($"{memberDecl.MemberKeyword.GetText()} {selfId}.")
-            TextualInfo(text, text, Ranges = context.Ranges))
+        if isDot node then
+            addOverrideItems context collector _.ShortName (fun memberDecl ->
+                let fullText = memberDecl.GetText()
+                let selfId = memberDecl.SelfId.GetText()
+                let text = fullText.RemoveStart($"{memberDecl.MemberKeyword.GetText()} {selfId}.")
+                TextualInfo(text, text, Ranges = context.Ranges))
+        else
+            addOverrideItems context collector (fun mainMember -> $"override {mainMember.ShortName}") (fun memberDecl ->
+                let text = memberDecl.GetText()
+                TextualInfo(text, text, Ranges = context.Ranges))
 
     override this.TransformItems(context, collector) =
         keepOnlyOverrideItems collector
