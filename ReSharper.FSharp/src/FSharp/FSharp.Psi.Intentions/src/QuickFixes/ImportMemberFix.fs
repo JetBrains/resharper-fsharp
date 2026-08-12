@@ -182,7 +182,7 @@ type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FShar
         else null
 
     interface IModernManualScopedAction with
-        member this.ExecuteAction(solution, scope, sourceHighlighting, progress) =
+        member this.ExecuteAction(solution, _, _, progress) =
             this.ExecutePsiTransaction(solution, progress)
     
         member this.FileCollectorInfo = FileCollectorInfo.Empty
@@ -195,8 +195,7 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
 
     override this.CreateBulbActions() =
         let extensionMembers = this.EnumeratePossibleExtensionMembers(reference)
-        [| for KeyValue(_, extensionMembers) in extensionMembers do
-            for m in extensionMembers -> FSharpImportExtensionMemberAction(m, reference) |]
+        [| for extensionMember in extensionMembers.Values -> FSharpImportExtensionMemberAction(extensionMember, reference) |]
 
     override this.CreateBulbItems() =
         let importActions = this.CreateBulbActions().ToArray()
