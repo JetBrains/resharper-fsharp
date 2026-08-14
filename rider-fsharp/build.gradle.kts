@@ -87,6 +87,7 @@ dependencies {
   }
 
   testImplementation("org.opentest4j:opentest4j:1.3.0")
+  testImplementation("org.xmlunit:xmlunit-core:2.9.1")
 }
 
 val isMonorepo = rootProject.projectDir != projectDir
