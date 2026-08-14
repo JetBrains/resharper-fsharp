@@ -427,7 +427,8 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     |> Seq.distinctBy _.TestDescriptor // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
 
-let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typeElement: ITypeElement) (psiModule: IPsiModule) =
+let getInterfaceMembers missingMembersOnly (impl: IInterfaceImplementation) (typeElement: ITypeElement) =
+    let psiModule = typeElement.Module
     let fcsEntity = impl.FcsEntity
     let inst = Seq.zip fcsEntity.GenericParameters fcsEntity.GenericArguments |> List.ofSeq
     let interfaceType = fcsEntity.AsType().Instantiate(inst)

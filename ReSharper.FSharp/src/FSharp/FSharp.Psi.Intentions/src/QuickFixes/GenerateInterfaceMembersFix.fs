@@ -41,11 +41,10 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
         let typeDeclaration: IFSharpTypeElementDeclaration =
             getTypeDeclByImpl impl
 
-        let psiModule = typeDeclaration.GetPsiModule()
         let typeElement = typeDeclaration.DeclaredElement
 
         let membersToGenerate =
-            GenerateOverrides.getInterfaceMembers true impl typeElement psiModule
+            GenerateOverrides.getInterfaceMembers true impl typeElement
             |> GenerateOverrides.sanitizeMembers
             
         let (anchor: ITreeNode) =

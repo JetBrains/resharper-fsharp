@@ -20,11 +20,11 @@ open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.ProjectModel
-open JetBrains.Util.Extension
 open JetBrains.Util.NetFX.Media.Colors
 
 type OverrideBehavior(info, types) =
@@ -66,6 +66,12 @@ type OverrideBehavior(info, types) =
                 textControl.Selection.SetRange(range)
 
 module OverrideRuleModule =
+
+    [<Struct>]
+    type ExpectedIndent =
+        | MemberOwnerIndent of ownerIndent: int
+        | SiblingDeclIndent of declIndent: int
+
     let getCaretCoords (context: FSharpCodeCompletionContext) =
         context.BasicContext.CaretDocumentOffset.ToDocumentCoords()
 
@@ -85,10 +91,7 @@ module OverrideRuleModule =
 
             generatorContextFactory.TryCreate(GeneratorStandardKinds.Overrides, view).As<FSharpGeneratorContext>()
 
-    let getMemberOwnerAndItsMembers
-        (context: FSharpCodeCompletionContext)
-        (generatorContext: FSharpGeneratorContext)
-        : ITreeNode * ITypeBodyMemberDeclaration seq =
+    let getMemberOwner (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) : ITreeNode =
         let anchor = generatorContext.Anchor
 
         let caretCoords = getCaretCoords context
@@ -103,7 +106,7 @@ module OverrideRuleModule =
 
         match nearestInterfaceImpl with
         | interfaceImpl when isNotNull interfaceImpl && caretColumn > interfaceImpl.Indent ->
-            interfaceImpl, interfaceImpl.TypeMembersEnumerable |> Seq.cast
+            interfaceImpl
         | _ ->
             let repr =
                 if isNull anchor then
@@ -114,10 +117,23 @@ module OverrideRuleModule =
             match repr with
             | null ->
                 match generatorContext.TypeDeclaration with
-                | :? IObjExpr as objExpr -> objExpr, objExpr.MemberDeclarationsEnumerable |> Seq.cast
-                | :? IFSharpTypeDeclaration as typeDecl -> typeDecl, typeDecl.TypeMembersEnumerable
-                | _ -> null, TreeNodeEnumerable.Empty
-            | repr -> repr, repr.TypeMembersEnumerable
+                | :? IObjExpr as objExpr -> objExpr
+                | :? IFSharpTypeDeclaration as typeDecl -> typeDecl
+                | _ -> null
+            | repr -> repr
+
+    let getExpectedIndent (memberOwner: ITreeNode) =
+        let members : ITypeBodyMemberDeclaration seq =
+            match memberOwner with
+            | :? IInterfaceImplementation as impl -> impl.TypeMembersEnumerable |> Seq.cast
+            | :? IObjExpr as objExpr -> objExpr.MemberDeclarationsEnumerable |> Seq.cast
+            | :? IFSharpTypeDeclaration as typeDecl -> typeDecl.TypeMembersEnumerable
+            | :? IObjectModelTypeRepresentation as repr -> repr.TypeMembersEnumerable
+            | _ -> TreeNodeEnumerable.Empty
+
+        match Seq.tryHead members with
+        | Some memberDecl -> SiblingDeclIndent memberDecl.Indent
+        | None -> MemberOwnerIndent memberOwner.Indent
 
     let mayGenerateOverrides
         (context: FSharpCodeCompletionContext)
@@ -152,20 +168,21 @@ module OverrideRuleModule =
 
             | _ -> false
 
-        let (memberOwner: ITreeNode), (members: ITypeBodyMemberDeclaration seq) =
-            getMemberOwnerAndItsMembers context generatorContext
+        let memberOwner: ITreeNode =
+            getMemberOwner context generatorContext
 
         match node with
         | Whitespace _ ->
-            let isCorrectIndent (memberOwner: ITreeNode) (members: ITypeBodyMemberDeclaration seq) =
-                match Seq.tryHead members with
-                | Some memberDecl -> memberDecl.Indent = caretColumn
-                | None -> caretColumn > memberOwner.Indent
+            let isCorrectIndent (memberOwner: ITreeNode) =
+                let indent = getExpectedIndent memberOwner
+                match indent with
+                | SiblingDeclIndent declIndent -> declIndent = caretColumn
+                | MemberOwnerIndent ownerIndent -> caretColumn > ownerIndent
 
-            let isAligned (memberOwner: ITreeNode) (members: ITypeBodyMemberDeclaration seq) =
-                isInsideOwnerBody memberOwner && isCorrectIndent memberOwner members
+            let isAligned (memberOwner: ITreeNode) =
+                isInsideOwnerBody memberOwner && isCorrectIndent memberOwner
 
-            isNotNull memberOwner && isAligned memberOwner members
+            isNotNull memberOwner && isAligned memberOwner
         // override {selfId}.{caret}
         | TokenType FSharpTokenType.DOT _ ->
             let isCorrectIndent (memberOwner: ITreeNode) (memberDecl: IMemberDeclaration) =
@@ -186,14 +203,11 @@ module OverrideRuleModule =
             && isAligned memberOwner memberDecl
         | _ -> false
 
-    let inline getMemberOwner context =
-        (getMemberOwnerAndItsMembers context >> fst)
-
-    let isOverrideRuleAvailable (checkNode: ITreeNode -> bool) (checkOwner: ITreeNode -> bool) context =
+    let isOverrideRuleAvailable (checkOwner: ITreeNode -> bool) context =
         let generatorContext = getGeneratorContext context
         let node = context.NodeInFile
 
-        checkNode node
+        (isWhitespace node || isDot node)
         && isNotNull generatorContext
         && isNotNull generatorContext.TypeDeclaration
         && checkOwner (getMemberOwner context generatorContext)
@@ -205,12 +219,10 @@ module OverrideRuleModule =
 
     let createOverrideLookupItem
         (context: FSharpCodeCompletionContext)
-        (getPresentationText: IOverridableMember -> string)
         (generatorElement: FSharpGeneratorElement)
-        (info: TextualInfo)
-        types
+        (mayHaveBaseCalls: bool)
         =
-        let iconManager = context.NodeInFile.GetSolution().GetComponent<PsiIconManager>()
+        let node = context.NodeInFile
         let elementMember = generatorElement.Member
         let accessor = elementMember.As<IAccessor>()
 
@@ -218,9 +230,19 @@ module OverrideRuleModule =
             let owner = if isNotNull accessor then accessor.OwnerMember else null
             if isNotNull owner then owner else elementMember
 
-        let icon = iconManager.GetImage(mainMember, context.NodeInFile.Language, true)
+        let memberDecl, types =
+            GenerateOverrides.generateMember node mayHaveBaseCalls generatorElement
 
-        let presentationText = getPresentationText mainMember
+        let isDot = isDot node
+        let anchor = if isDot then memberDecl.Delimiter.NextSibling else memberDecl.MemberKeyword
+        let text = TreeRange(anchor, memberDecl.LastChild).GetText()
+        let info = TextualInfo(text, text, Ranges = context.Ranges)
+
+        let presentationText = if isDot then mainMember.ShortName else $"{memberDecl.MemberKeyword.GetText()} {mainMember.ShortName}"
+
+        let icon =
+            let iconManager = node.GetSolution().GetComponent<PsiIconManager>()
+            iconManager.GetImage(mainMember, node.Language, true)
 
         LookupItemFactory
             .CreateLookupItem(info)
@@ -279,15 +301,11 @@ open OverrideRuleModule
 type OverrideMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    /// The rule is available both for the whitespace case
-    /// and for the qualified case ("override self.{caret}").
     override this.IsAvailable(context) =
         context
-        |> isOverrideRuleAvailable (fun node -> isWhitespace node || isDot node) (fun owner -> not (owner :? IInterfaceImplementation))
+        |> isOverrideRuleAvailable (fun owner -> not (owner :? IInterfaceImplementation))
 
     override this.AddLookupItems(context, collector) =
-        // Choose textual presentation and textual info depending on whether the node is a dot (qualified) or whitespace (unqualified)
-        let node = context.NodeInFile
         let generatorContext = getGeneratorContext context
         let mayHaveBaseCalls =
             GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
@@ -295,22 +313,9 @@ type OverrideMemberRule() =
         let generatorElements = getOverridableElements generatorContext
 
         for generatorElement in generatorElements do
-            let memberDecl, types =
-                GenerateOverrides.generateMember context.NodeInFile mayHaveBaseCalls generatorElement
 
             let overrideItem =
-                if isDot node then
-                    let info =
-                        let fullText = memberDecl.GetText()
-                        let selfId = memberDecl.SelfId.GetText()
-                        let text = fullText.RemoveStart($"{memberDecl.MemberKeyword.GetText()} {selfId}.")
-                        TextualInfo(text, text, Ranges = context.Ranges)
-                    createOverrideLookupItem context _.ShortName generatorElement info types
-                else
-                    let info =
-                        let text = memberDecl.GetText()
-                        TextualInfo(text, text, Ranges = context.Ranges)
-                    createOverrideLookupItem context (fun mainMember -> $"override {mainMember.ShortName}") generatorElement info types
+                createOverrideLookupItem context generatorElement mayHaveBaseCalls
 
             collector.Add(overrideItem)
 

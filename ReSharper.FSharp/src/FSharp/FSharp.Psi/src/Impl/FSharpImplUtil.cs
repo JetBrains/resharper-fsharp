@@ -240,10 +240,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsImplicitAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       var prop = mfv.AccessorProperty;
-      var isIndexer = 
-        prop != null && 
-        FSharpOption<FSharpMemberOrFunctionOrValue>.get_IsSome(prop) && 
-        prop.Value.DisplayName == StandardMemberNames.DefaultIndexerName;
+      var isIndexer = prop?.Value.DisplayName == StandardMemberNames.DefaultIndexerName;
 
       if (mfv.IsPropertyGetterMethod)
         return isIndexer || mfv.CurriedParameterGroups[0].IsEmpty();
