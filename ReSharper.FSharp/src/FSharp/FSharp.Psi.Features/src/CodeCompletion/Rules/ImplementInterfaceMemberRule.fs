@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Psi
 type ImplementInterfaceMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    /// Available for both unqualified (whitespace) and qualified (dot) contexts inside an interface implementation owner.
     override this.IsAvailable(context) =
         context
         |> isOverrideRuleAvailable (fun owner -> (owner :? IInterfaceImplementation))
