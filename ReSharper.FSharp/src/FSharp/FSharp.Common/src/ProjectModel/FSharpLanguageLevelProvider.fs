@@ -64,6 +64,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         let languageLevel = getLanguageLevelByToolsetVersion ()
         VersionMapping(languageLevel, FSharpLanguageLevel.Preview)
 
+    // todo: more versions
     let getLanguageLevelByCompilerVersion (fscVersion: Version): VersionMapping =
         match fscVersion with
         | Version (10, 1000, _) -> VersionMapping(FSharpLanguageLevel.FSharp47, FSharpLanguageLevel.FSharp50)
@@ -78,6 +79,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
                 | _ -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
 
         | Version (13, _, _) -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
+        // TODO: Preview -> F# 11
         | Version (14 , _, _)
         | Version (15, _, _) -> VersionMapping(FSharpLanguageLevel.FSharp100, FSharpLanguageLevel.Preview)
         | _ -> null
