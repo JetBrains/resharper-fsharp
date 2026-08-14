@@ -42,6 +42,10 @@ type FSharpLanguageLevel =
     // #warnon, typed let!/use!
     | FSharp100 = 100
 
+    // #elif, record constructors
+    | FSharp110 = 110
+
+    //TODO: F# 11
     | Latest = 100
 
     | Preview = (Int32.MaxValue - 1)
@@ -57,6 +61,7 @@ type FSharpLanguageVersion =
     | FSharp80 = 80
     | FSharp90 = 90
     | FSharp100 = 100 
+    | FSharp110 = 110 
     | LatestMajor = (Int32.MaxValue - 3)
     | Latest = (Int32.MaxValue - 2)
     | Preview = (Int32.MaxValue - 1)
@@ -75,6 +80,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageLevel.FSharp81 -> FSharpLanguageVersion.FSharp80
         | FSharpLanguageLevel.FSharp90 -> FSharpLanguageVersion.FSharp90
         | FSharpLanguageLevel.FSharp100 -> FSharpLanguageVersion.FSharp100
+        | FSharpLanguageLevel.FSharp110 -> FSharpLanguageVersion.FSharp110
         | FSharpLanguageLevel.Preview -> FSharpLanguageVersion.Preview
         | _ -> failwithf $"Unexpected language level: {level}"
 
@@ -88,6 +94,7 @@ module FSharpLanguageLevel =
         | FSharpLanguageVersion.FSharp80 -> FSharpLanguageLevel.FSharp80
         | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
         | FSharpLanguageVersion.FSharp100 -> FSharpLanguageLevel.FSharp100
+        | FSharpLanguageVersion.FSharp110 -> FSharpLanguageLevel.FSharp110
         | FSharpLanguageVersion.Preview -> FSharpLanguageLevel.Preview
         | _ -> FSharpLanguageLevel.Latest
 
@@ -141,6 +148,10 @@ module FSharpLanguageLevel =
     let isFSharp100Supported (treeNode: ITreeNode) =
         ofTreeNode treeNode >= FSharpLanguageLevel.FSharp100
 
+    [<Extension; CompiledName("IsFSharp110Supported")>]
+    let isFSharp110Supported (treeNode: ITreeNode) =
+        ofTreeNode treeNode >= FSharpLanguageLevel.FSharp110
+
 
 [<RequireQualifiedAccess>]
 module FSharpLanguageVersion =
@@ -161,6 +172,7 @@ module FSharpLanguageVersion =
         | "8" | "8.0" -> Some(FSharpLanguageVersion.FSharp80)
         | "9" | "9.0" -> Some(FSharpLanguageVersion.FSharp90)
         | "10" | "10.0" -> Some(FSharpLanguageVersion.FSharp100)
+        | "11" | "11.0" -> Some(FSharpLanguageVersion.FSharp110)
 
         | _ -> None
 
@@ -179,6 +191,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp80 -> "F# 8.0"
         | FSharpLanguageVersion.FSharp90 -> "F# 9.0"
         | FSharpLanguageVersion.FSharp100 -> "F# 10.0"
+        | FSharpLanguageVersion.FSharp110 -> "F# 11.0"
         | FSharpLanguageVersion.LatestMajor -> "Latest major"
         | FSharpLanguageVersion.Latest -> "Latest"
         | FSharpLanguageVersion.Preview -> "Preview"
@@ -195,6 +208,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.FSharp80 -> "8.0"
         | FSharpLanguageVersion.FSharp90 -> "9.0"
         | FSharpLanguageVersion.FSharp100 -> "10.0"
+        | FSharpLanguageVersion.FSharp110 -> "11.0"
         | FSharpLanguageVersion.LatestMajor -> "latestmajor"
         | FSharpLanguageVersion.Latest -> "latest"
         | FSharpLanguageVersion.Preview -> "preview"
