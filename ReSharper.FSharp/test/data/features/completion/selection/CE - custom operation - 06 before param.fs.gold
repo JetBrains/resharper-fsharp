@@ -1,2 +1,185 @@
-﻿Initial selection after light completion: custom:'a, Kind: Selected
-Selection after full completion: custom:'a, Kind: Focused
+﻿Completion: Basic
+Prefix: "c"
+Count: 1055
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "c♦ ()"
+        ▲▲
+
+##### RELEVANCE SORT #####
+
+                            [ExpectedTypeMatch, Methods]
+c̣ustom                      'a    <==
+                            [Keywords]
+c̣lass
+                            [PrefixMatch^]
+c̣e                          CE
+c̣eil                        ^T
+c̣har                        char
+c̣ompare                     int
+c̣os                         ^T
+c̣osh                        ^T
+c̣tx                         Current file context
+                            [PrefixNoCaseMatch, Methods]
+C̣hoice1Of2                  Choice<'T1,'T2>
+C̣hoice1Of3                  Choice<'T1,'T2,'T3>
+C̣hoice1Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice1Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice1Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice1Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice2Of2                  Choice<'T1,'T2>
+C̣hoice2Of3                  Choice<'T1,'T2,'T3>
+C̣hoice2Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice2Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice2Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice2Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice3Of3                  Choice<'T1,'T2,'T3>
+C̣hoice3Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice3Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice3Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice3Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice4Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice4Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice4Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice4Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice5Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice5Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice5Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+                            [PrefixNoCaseMatch, TypesAndNamespaces, ImportedType]
+C̣E
+C̣LIEventAttribute
+C̣LIMutableAttribute
+C̣hecked
+C̣hoice
+C̣lassAttribute
+C̣ollections
+C̣ommonExtensions
+C̣omparisonConditionalOnAttribute
+C̣omparisonIdentity
+C̣ompilationArgumentCountsAttribute
+C̣ompilationMappingAttribute
+C̣ompilationRepresentationAttribute
+C̣ompilationRepresentationFlags
+C̣ompilationSourceNameAttribute
+C̣ompiledNameAttribute
+C̣ompilerMessageAttribute
+C̣ompilerServices
+C̣ontrol
+C̣ore
+C̣ustomComparisonAttribute
+C̣ustomEqualityAttribute
+C̣ustomOperationAttribute
+                            [FromLightEvaluation^, TypesAndNamespaces, ImportedType]
+AbstractC̣lassAttribute
+AsyncReplyC̣hannel
+EqualityC̣onditionalOnAttribute
+FuncC̣onvert
+NoC̣omparisonAttribute
+NoC̣ompilerInliningAttribute
+NonStructuralC̣omparison
+OptimizedC̣losures
+SourceC̣onstructFlags
+StructuralC̣omparisonAttribute
+TailC̣allAttribute
+                            [PrefixMatch, TypesAndNamespaces, NotImportedType, FromFullEvaluation]
+c̣andela |(in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
+                            [PrefixNoCaseMatch, TypesAndNamespaces, NotImportedType, FromFullEvaluation]
+C̣ALLCONV |(in System.Runtime.InteropServices.ComTypes)
+C̣LSCompliantAttribute |(in System)
+C̣Long |(in System.Runtime.InteropServices)
+C̣OMException |(in System.Runtime.InteropServices)
+C̣ONNECTDATA |(in System.Runtime.InteropServices.ComTypes)
+C̣SharpArgumentInfo |(in Microsoft.CSharp.RuntimeBinder)
+C̣SharpArgumentInfoFlags |(in Microsoft.CSharp.RuntimeBinder)
+C̣SharpBinderFlags |(in Microsoft.CSharp.RuntimeBinder)
+C̣ULong |(in System.Runtime.InteropServices)
+.. +1045 more items ..
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+AbstractC̣lassAttribute
+AsyncReplyC̣hannel
+C̣E
+C̣LIEventAttribute
+C̣LIMutableAttribute
+C̣hecked
+C̣hoice
+C̣hoice1Of2                  Choice<'T1,'T2>
+C̣hoice1Of3                  Choice<'T1,'T2,'T3>
+C̣hoice1Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice1Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice1Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice1Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice2Of2                  Choice<'T1,'T2>
+C̣hoice2Of3                  Choice<'T1,'T2,'T3>
+C̣hoice2Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice2Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice2Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice2Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice3Of3                  Choice<'T1,'T2,'T3>
+C̣hoice3Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice3Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice3Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice3Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice4Of4                  Choice<'T1,'T2,'T3,'T4>
+C̣hoice4Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice4Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice4Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice5Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+C̣hoice5Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice5Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+C̣hoice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣hoice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+C̣lassAttribute
+C̣ollections
+C̣ommonExtensions
+C̣omparisonConditionalOnAttribute
+C̣omparisonIdentity
+C̣ompilationArgumentCountsAttribute
+C̣ompilationMappingAttribute
+C̣ompilationRepresentationAttribute
+C̣ompilationRepresentationFlags
+C̣ompilationSourceNameAttribute
+C̣ompiledNameAttribute
+C̣ompilerMessageAttribute
+C̣ompilerServices
+C̣ontrol
+C̣ore
+C̣ustomComparisonAttribute
+C̣ustomEqualityAttribute
+C̣ustomOperationAttribute
+EqualityC̣onditionalOnAttribute
+FuncC̣onvert
+NoC̣omparisonAttribute
+NoC̣ompilerInliningAttribute
+NonStructuralC̣omparison
+OptimizedC̣losures
+SourceC̣onstructFlags
+StructuralC̣omparisonAttribute
+TailC̣allAttribute
+c̣e                          CE
+c̣eil                        ^T
+c̣har                        char
+c̣lass
+c̣ompare                     int
+c̣os                         ^T
+c̣osh                        ^T
+c̣tx                         Current file context
+c̣ustom                      'a    <==
+                            [Full, Generic]
+AccessC̣ontrolActions |(in System.Security.AccessControl)
+AccessC̣ontrolModification |(in System.Security.AccessControl)
+AccessC̣ontrolSections |(in System.Security.AccessControl)
+AccessC̣ontrolType |(in System.Security.AccessControl)
+ActivityC̣hangedEventArgs |(in System.Diagnostics)
+ActivityC̣ontext |(in System.Diagnostics)
+ActivityC̣reationOptions |(in System.Diagnostics)
+ActivityStatusC̣ode |(in System.Diagnostics)
+ActivityTagsC̣ollection |(in System.Diagnostics)
+AesC̣cm |(in System.Security.Cryptography)
+.. +1045 more items ..

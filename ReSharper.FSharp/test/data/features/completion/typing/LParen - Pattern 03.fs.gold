@@ -1,10 +1,13 @@
 ﻿// ${TEXT:(}
-// ${DUMP_LOOKUP:true}
+module Module
+
+match () with
+| Some ({caret})
+
+> Typing [(] char:
+====================================
+// ${TEXT:(}
 module Module
 
 match () with
 | Some (({caret}))
-
-================
-<no lookup>
-================

@@ -1,5 +1,356 @@
 ﻿// ${TEXT: }
-// ${DUMP_LOOKUP:true}
+module Module
+
+type R =
+    { F1: int
+      F2: int
+      F3: int }
+
+let r: R = {{caret}}
+
+> Typing [ ] char:
+====================================
+Lookup list (Focused):
+                              [ExpectedTypeMatch, ExpectedTypeMatchInitializer]
+  F1                          int    <==
+  F2                          int
+  F3                          int
+                              [FieldsAndProperties^]
+  contents                    'T
+                              [Methods, Keywords]
+  false
+  null
+  true
+                              [Methods]
+  Choice1Of2                  Choice<'T1,'T2>
+  Choice1Of3                  Choice<'T1,'T2,'T3>
+  Choice1Of4                  Choice<'T1,'T2,'T3,'T4>
+  Choice1Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+  Choice1Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice1Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice2Of2                  Choice<'T1,'T2>
+  Choice2Of3                  Choice<'T1,'T2,'T3>
+  Choice2Of4                  Choice<'T1,'T2,'T3,'T4>
+  Choice2Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+  Choice2Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice2Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice3Of3                  Choice<'T1,'T2,'T3>
+  Choice3Of4                  Choice<'T1,'T2,'T3,'T4>
+  Choice3Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+  Choice3Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice3Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice4Of4                  Choice<'T1,'T2,'T3,'T4>
+  Choice4Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+  Choice4Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice4Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice5Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
+  Choice5Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice5Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
+  Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
+  Error                       Result<'T,'TError>
+  FSharpTypeFunc              FSharpTypeFunc
+  KeyValue
+  Lazy
+  None                        'T option
+  Ok                          Result<'T,'TError>
+  Some                        'T option
+  ValueNone                   'T voption
+  ValueSome                   'T voption
+                              [Keywords]
+  and
+  as
+  assert
+  base
+  begin
+  class
+  delegate
+  do
+  done
+  downcast
+  downto
+  elif
+  else
+  end
+  finally
+  for
+  fun
+  function
+  global
+  if
+  in
+  inherit
+  interface
+  internal
+  lazy
+  let
+  match
+  new
+  not
+  or
+  private
+  public
+  rec
+  return
+  sig
+  struct
+  then
+  to
+  try
+  upcast
+  use
+  when
+  while
+  while!
+  with
+  yield
+                              [TypesAndNamespaces, ImportedType]
+  AbstractClassAttribute
+  AllowNullLiteralAttribute
+  Array
+  Array2D
+  Array3D
+  Array4D
+  ArrayExtensions
+  Async
+  AsyncActivation
+  AsyncBuilder
+  AsyncPrimitives
+  AsyncReplyChannel
+  AsyncReturn
+  AutoOpenAttribute
+  AutoSerializableAttribute
+  BackgroundTaskBuilder
+  CLIEventAttribute
+  CLIMutableAttribute
+  Checked
+  Choice
+  ClassAttribute
+  Collections
+  CommonExtensions
+  ComparisonConditionalOnAttribute
+  ComparisonIdentity
+  CompilationArgumentCountsAttribute
+  CompilationMappingAttribute
+  CompilationRepresentationAttribute
+  CompilationRepresentationFlags
+  CompilationSourceNameAttribute
+  CompiledNameAttribute
+  CompilerMessageAttribute
+  CompilerServices
+  Control
+  Core
+  CustomComparisonAttribute
+  CustomEqualityAttribute
+  CustomOperationAttribute
+  Data
+  DefaultAugmentationAttribute
+  DefaultValueAttribute
+  DelegateEvent
+  EntryPointAttribute
+  EqualityConditionalOnAttribute
+  Event
+  ExperimentalAttribute
+  ExtraTopLevelOperators
+  FSharp
+  FSharpInterfaceDataVersionAttribute
+  Format
+  FuncConvert
+  GeneralizableValueAttribute
+  Handler
+  HashIdentity
+  IDelegateEvent
+  IEvent
+  InlineIfLambdaAttribute
+  InterfaceAttribute
+  LanguagePrimitives
+  LazyExtensions
+  Linq
+  List
+  LiteralAttribute
+  MailboxProcessor
+  Map
+  MatchFailureException
+  MeasureAnnotatedAbbreviationAttribute
+  MeasureAttribute
+  Microsoft
+  NativeInterop
+  NoComparisonAttribute
+  NoCompilerInliningAttribute
+  NoDynamicInvocationAttribute
+  NoEqualityAttribute
+  NonStructuralComparison
+  NumericLiteralI
+  NumericLiterals
+  Observable
+  OperatorIntrinsics
+  Operators
+  OptimizedClosures
+  Option
+  OptionalArgumentAttribute
+  Printf
+  PrintfFormat
+  ProjectionParameterAttribute
+  Quotations
+  R
+  ReferenceEqualityAttribute
+  ReflectedDefinitionAttribute
+  Reflection
+  RequireQualifiedAccessAttribute
+  RequiresExplicitTypeArgumentsAttribute
+  ResizeArray
+  Result
+  SealedAttribute
+  Seq
+  Set
+  SourceConstructFlags
+  String
+  StructAttribute
+  StructuralComparisonAttribute
+  StructuralEqualityAttribute
+  StructuredFormatDisplayAttribute
+  System
+  TailCallAttribute
+  TaskBuilder
+  TaskBuilderBase
+  TaskBuilderExtensions
+  Unchecked
+  UnverifiableAttribute
+  ValueOption
+  VolatileFieldAttribute
+  WebExtensions
+  array
+  bigint
+  bool
+  byref
+  exn
+  ilsigptr
+  inref
+  list
+  nativeptr
+  obj
+  option
+  outref
+  unit
+  voidptr
+  voption
+                              [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+  #I
+  #else
+  #endif
+  #if
+  #load
+  #nowarn
+  #r
+  #time
+  #warnon
+  FSharpFunc
+  Failure                     exn
+  abs                         ^T
+  acos                        ^T
+  array2D                     'T array2d
+  asin                        ^T
+  async                       AsyncBuilder
+  atan                        ^T
+  atan2                       'T2
+  backgroundTask              BackgroundTaskBuilder
+  box                         obj
+  byte                        byte
+  ceil                        ^T
+  char                        char
+  compare                     int
+  cos                         ^T
+  cosh                        ^T
+  decimal                     decimal
+  decr                        unit
+  defaultArg                  'T
+  defaultValueArg             'T
+  dict                        IDictionary<'Key,'Value>
+  double                      double
+  enum                        ^U
+  eprintf                     'T
+  eprintfn                    'T
+  exit                        'T
+  exp                         ^T
+  failwith                    'T
+  failwithf                   'T
+  float                       float
+  float32                     float32
+  floor                       ^T
+  fprintf                     'T
+  fprintfn                    'T
+  fst                         'T1
+  hash                        int
+  id                          'T
+  ignore                      unit
+  incr                        unit
+  infinity                    float
+  infinityf                   float32
+  int                         int
+  int16                       int16
+  int32                       int32
+  int64                       int64
+  int8                        int8
+  invalidArg                  'T
+  invalidOp                   'T
+  isNull                      bool
+  limitedHash                 int
+  lock                        'T
+  log                         ^T
+  log10                       ^T
+  max                         'T
+  min                         'T
+  nameof                      string
+  nan                         float
+  nanf                        float32
+  nativeint                   nativeint
+  not                         bool
+  nullArg                     'T
+  pown                        ^T
+  printf                      'T
+  printfn                     'T
+  query                       QueryBuilder
+  r                           R
+  raise                       'T
+  readOnlyDict                IReadOnlyDictionary<'Key,'Value>
+  ref                         'T ref
+  reraise                     'T
+  round                       ^T
+  sbyte                       sbyte
+  seq                         'T seq
+  set                         Set<'T>
+  sign                        int
+  sin                         ^T
+  single                      single
+  sinh                        ^T
+  sizeof                      int
+  snd                         'T2
+  sprintf                     'T
+  sqrt                        ^U
+  stderr                      TextWriter
+  stdin                       TextReader
+  stdout                      TextWriter
+  string                      string
+  tan                         ^T
+  tanh                        ^T
+  task                        TaskBuilder
+  truncate                    ^T
+  tryUnbox                    'T option
+  typedefof                   Type
+  typeof                      Type
+  uint                        uint
+  uint16                      uint16
+  uint32                      uint32
+  uint64                      uint64
+  uint8                       uint8
+  unativeint                  unativeint
+  unbox                       'T
+  using                       'U
+
+> Last text control state (lookup still opened):
+====================================
+// ${TEXT: }
 module Module
 
 type R =
@@ -8,334 +359,3 @@ type R =
       F3: int }
 
 let r: R = { {caret} }
-
-================
-F1
-F2
-F3
-contents
-false
-null
-true
-Choice1Of2
-Choice1Of3
-Choice1Of4
-Choice1Of5
-Choice1Of6
-Choice1Of7
-Choice2Of2
-Choice2Of3
-Choice2Of4
-Choice2Of5
-Choice2Of6
-Choice2Of7
-Choice3Of3
-Choice3Of4
-Choice3Of5
-Choice3Of6
-Choice3Of7
-Choice4Of4
-Choice4Of5
-Choice4Of6
-Choice4Of7
-Choice5Of5
-Choice5Of6
-Choice5Of7
-Choice6Of6
-Choice6Of7
-Choice7Of7
-Error
-KeyValue
-Lazy
-None
-Ok
-Some
-ValueNone
-ValueSome
-and
-as
-assert
-base
-begin
-class
-delegate
-do
-done
-downcast
-downto
-elif
-else
-end
-finally
-for
-fun
-function
-global
-if
-in
-inherit
-interface
-internal
-lazy
-let
-match
-new
-not
-or
-private
-public
-rec
-return
-sig
-struct
-then
-to
-try
-upcast
-use
-when
-while
-while!
-with
-yield
-AbstractClassAttribute
-AllowNullLiteralAttribute
-Array
-Array2D
-Array3D
-Array4D
-ArrayExtensions
-Async
-AsyncActivation
-AsyncBuilder
-AsyncPrimitives
-AsyncReplyChannel
-AsyncReturn
-AutoOpenAttribute
-AutoSerializableAttribute
-BackgroundTaskBuilder
-CLIEventAttribute
-CLIMutableAttribute
-Checked
-Choice
-ClassAttribute
-Collections
-CommonExtensions
-ComparisonConditionalOnAttribute
-ComparisonIdentity
-CompilationArgumentCountsAttribute
-CompilationMappingAttribute
-CompilationRepresentationAttribute
-CompilationRepresentationFlags
-CompilationSourceNameAttribute
-CompiledNameAttribute
-CompilerMessageAttribute
-CompilerServices
-Control
-Core
-CustomComparisonAttribute
-CustomEqualityAttribute
-CustomOperationAttribute
-Data
-DefaultAugmentationAttribute
-DefaultValueAttribute
-DelegateEvent
-EntryPointAttribute
-EqualityConditionalOnAttribute
-Event
-ExperimentalAttribute
-ExtraTopLevelOperators
-FSharp
-FSharpInterfaceDataVersionAttribute
-Format
-FuncConvert
-GeneralizableValueAttribute
-Handler
-HashIdentity
-IDelegateEvent
-IEvent
-InlineIfLambdaAttribute
-InterfaceAttribute
-LanguagePrimitives
-LazyExtensions
-Linq
-List
-LiteralAttribute
-MailboxProcessor
-Map
-MatchFailureException
-MeasureAnnotatedAbbreviationAttribute
-MeasureAttribute
-Microsoft
-NativeInterop
-NoComparisonAttribute
-NoCompilerInliningAttribute
-NoDynamicInvocationAttribute
-NoEqualityAttribute
-NonStructuralComparison
-NumericLiteralI
-NumericLiterals
-Observable
-OperatorIntrinsics
-Operators
-OptimizedClosures
-Option
-OptionalArgumentAttribute
-Printf
-PrintfFormat
-ProjectionParameterAttribute
-Quotations
-R
-ReferenceEqualityAttribute
-ReflectedDefinitionAttribute
-Reflection
-RequireQualifiedAccessAttribute
-RequiresExplicitTypeArgumentsAttribute
-ResizeArray
-Result
-SealedAttribute
-Seq
-Set
-SourceConstructFlags
-String
-StructAttribute
-StructuralComparisonAttribute
-StructuralEqualityAttribute
-StructuredFormatDisplayAttribute
-System
-TailCallAttribute
-TaskBuilder
-TaskBuilderBase
-TaskBuilderExtensions
-Unchecked
-UnverifiableAttribute
-ValueOption
-VolatileFieldAttribute
-WebExtensions
-array
-bigint
-bool
-byref
-exn
-ilsigptr
-inref
-list
-nativeptr
-obj
-option
-outref
-unit
-voidptr
-voption
-#I
-#else
-#endif
-#if
-#load
-#nowarn
-#r
-#time
-#warnon
-FSharpFunc
-Failure
-abs
-acos
-array2D
-asin
-async
-atan
-atan2
-backgroundTask
-box
-byte
-ceil
-char
-compare
-cos
-cosh
-decimal
-decr
-defaultArg
-defaultValueArg
-dict
-double
-enum
-eprintf
-eprintfn
-exit
-exp
-failwith
-failwithf
-float
-float32
-floor
-fprintf
-fprintfn
-fst
-hash
-id
-ignore
-incr
-infinity
-infinityf
-int
-int16
-int32
-int64
-int8
-invalidArg
-invalidOp
-isNull
-limitedHash
-lock
-log
-log10
-max
-min
-nameof
-nan
-nanf
-nativeint
-not
-nullArg
-pown
-printf
-printfn
-query
-r
-raise
-readOnlyDict
-ref
-reraise
-round
-sbyte
-seq
-set
-sign
-sin
-single
-sinh
-sizeof
-snd
-sprintf
-sqrt
-stderr
-stdin
-stdout
-string
-tan
-tanh
-task
-truncate
-tryUnbox
-typedefof
-typeof
-uint
-uint16
-uint32
-uint64
-uint8
-unativeint
-unbox
-using
-================

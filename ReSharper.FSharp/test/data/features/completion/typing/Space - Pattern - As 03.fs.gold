@@ -1,13 +1,24 @@
 ﻿// ${TEXT: }
-// ${DUMP_LOOKUP:true}
+module Module
+
+open System.Text
+
+match obj() with
+| :? StringBuilder as{caret}
+
+> Typing [ ] char:
+====================================
+Lookup list (Focused):
+                              [FromLightEvaluation, LocalVariablesAndParameters, NormalSelectionPriority, Other]
+  builder                     <==
+  stringBuilder
+
+> Last text control state (lookup still opened):
+====================================
+// ${TEXT: }
 module Module
 
 open System.Text
 
 match obj() with
 | :? StringBuilder as {caret}
-
-================
-builder
-stringBuilder
-================
