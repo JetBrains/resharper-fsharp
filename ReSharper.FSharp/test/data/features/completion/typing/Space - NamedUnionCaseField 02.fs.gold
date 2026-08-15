@@ -1,5 +1,23 @@
 ﻿// ${TEXT: }
-// ${DUMP_LOOKUP:true}
+module Module
+
+type A =
+    | B
+    | C of apple: int * banana: string * citrus: char
+
+match B with
+| C(apple = 7; banana = "meh";{caret}) -> ()
+| _ -> ()
+
+> Typing [ ] char:
+====================================
+Lookup list (Focused):
+                              [FromLightEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
+  citrus| |=                  char            OrderStr=citrus    <==
+
+> Last text control state (lookup still opened):
+====================================
+// ${TEXT: }
 module Module
 
 type A =
@@ -9,7 +27,3 @@ type A =
 match B with
 | C(apple = 7; banana = "meh"; {caret}) -> ()
 | _ -> ()
-
-================
-citrus =
-================

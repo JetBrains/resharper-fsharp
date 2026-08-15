@@ -1,8 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.CodeCompletion
 
 open System
-open System.Linq.Expressions
-open JetBrains.ReSharper.Feature.Services.CSharp.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
@@ -694,15 +692,11 @@ type FSharpRegexCompletionTest() =
 
 [<FSharpTest>]
 type FSharpCodeCompletionTypingTest() =
-    inherit CodeCompletionTypingTestBase<CSharpCompletingCharactersSettingsKey, CSharpAutopopupEnabledSettingsKey>()
+    inherit CodeCompletionTestBase()
 
     override x.RelativeTestDataPath = "features/completion/typing"
-
-    member this.Quote(e:Expression<System.Func<_, _>>) = e
-
-    override this.GetCompleteOnSpaceSetting() = this.Quote(fun key -> key.CompleteOnSpace)
-    override this.GetDoNotCompleteOnSetting() = this.Quote(fun key -> key.NonCompletingCharacters)
-    override this.GetAutopopupTypeSetting() = this.Quote(fun key -> key.OnIdent)
+    
+    override x.TestType = CodeCompletionTestType.Typing
 
     [<Test>] member x.``Space - Pattern - As 01``() = x.DoNamedTest()
     [<Test>] member x.``Space - Pattern - As 02``() = x.DoNamedTest()
@@ -733,7 +727,9 @@ type FSharpSelectionCompletionTest() =
 
     override x.RelativeTestDataPath = "features/completion/selection"
 
-    override x.TestType = CodeCompletionTestType.Selection
+    // note: previously those tests were only used to assert the soft selection
+    //       via `CodeCompletionTestType.Selection` that is now removed 
+    override x.TestType = CodeCompletionTestType.ModernList
 
     [<Test>] member x.``CE - custom operation - 01 prefix`` () = x.DoNamedTest()
     [<Test>] member x.``CE - custom operation - 02 no prefix`` () = x.DoNamedTest()

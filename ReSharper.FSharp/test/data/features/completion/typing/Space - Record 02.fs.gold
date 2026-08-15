@@ -1,5 +1,140 @@
 ﻿// ${TEXT: }
-// ${DUMP_LOOKUP:true}
+module Module
+
+type R =
+    { F1: int
+      F2: int
+      F3: int }
+
+{ F1 = 1; F2 = 2;{caret} }
+
+> Typing [ ] char:
+====================================
+Lookup list (Focused):
+                              [ExpectedTypeMatch, ExpectedTypeMatchInitializer]
+  F3                          int    <==
+                              [FieldsAndProperties^]
+  contents                    'T
+                              [Methods, Keywords]
+  false
+  null
+  true
+                              [Keywords]
+  abstract
+  and
+  as
+  assert
+  base
+  begin
+  class
+  default
+  delegate
+  do
+  done
+  downcast
+  downto
+  elif
+  else
+  end
+  finally
+  for
+  fun
+  function
+  global
+  if
+  in
+  inherit
+  interface
+  internal
+  lazy
+  let
+  match
+  member
+  new
+  not
+  or
+  override
+  private
+  public
+  rec
+  return
+  sig
+  static
+  struct
+  then
+  to
+  try
+  upcast
+  use
+  val
+  void
+  when
+  while
+  while!
+  with
+  yield
+                              [TypesAndNamespaces, ImportedType]
+  Array
+  Array2D
+  Array3D
+  Array4D
+  ArrayExtensions
+  AsyncPrimitives
+  Checked
+  Collections
+  CommonExtensions
+  ComparisonIdentity
+  CompilerServices
+  Control
+  Core
+  Data
+  Event
+  ExtraTopLevelOperators
+  FSharp
+  HashIdentity
+  LanguagePrimitives
+  LazyExtensions
+  Linq
+  List
+  Map
+  Microsoft
+  NativeInterop
+  NonStructuralComparison
+  NumericLiteralI
+  NumericLiterals
+  Observable
+  OperatorIntrinsics
+  Operators
+  OptimizedClosures
+  Option
+  Printf
+  Quotations
+  R
+  Reflection
+  Result
+  Seq
+  Set
+  String
+  System
+  TaskBuilder
+  TaskBuilderExtensions
+  Unchecked
+  ValueOption
+  WebExtensions
+                              [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+  #I
+  #else
+  #endif
+  #if
+  #load
+  #nowarn
+  #r
+  #time
+  #warnon
+
+> Last text control state (lookup still opened):
+====================================
+// ${TEXT: }
 module Module
 
 type R =
@@ -8,120 +143,3 @@ type R =
       F3: int }
 
 { F1 = 1; F2 = 2; {caret} }
-
-================
-F3
-contents
-false
-null
-true
-abstract
-and
-as
-assert
-base
-begin
-class
-default
-delegate
-do
-done
-downcast
-downto
-elif
-else
-end
-finally
-for
-fun
-function
-global
-if
-in
-inherit
-interface
-internal
-lazy
-let
-match
-member
-new
-not
-or
-override
-private
-public
-rec
-return
-sig
-static
-struct
-then
-to
-try
-upcast
-use
-val
-void
-when
-while
-while!
-with
-yield
-Array
-Array2D
-Array3D
-Array4D
-ArrayExtensions
-AsyncPrimitives
-Checked
-Collections
-CommonExtensions
-ComparisonIdentity
-CompilerServices
-Control
-Core
-Data
-Event
-ExtraTopLevelOperators
-FSharp
-HashIdentity
-LanguagePrimitives
-LazyExtensions
-Linq
-List
-Map
-Microsoft
-NativeInterop
-NonStructuralComparison
-NumericLiteralI
-NumericLiterals
-Observable
-OperatorIntrinsics
-Operators
-OptimizedClosures
-Option
-Printf
-Quotations
-R
-Reflection
-Result
-Seq
-Set
-String
-System
-TaskBuilder
-TaskBuilderExtensions
-Unchecked
-ValueOption
-WebExtensions
-#I
-#else
-#endif
-#if
-#load
-#nowarn
-#r
-#time
-#warnon
-================
