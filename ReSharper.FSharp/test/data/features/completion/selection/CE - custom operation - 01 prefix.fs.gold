@@ -10,6 +10,8 @@ Range: "c♦"
 
                             [ExpectedTypeMatch, Methods]
 c̣ustom                      'a    <==
+                            [FieldsAndProperties]
+c̣ontents                    'T
                             [Keywords]
 c̣lass
                             [PrefixMatch^]
@@ -17,7 +19,6 @@ c̣e                          CE
 c̣eil                        ^T
 c̣har                        char
 c̣ompare                     int
-c̣ontents                    'T
 c̣os                         ^T
 c̣osh                        ^T
 c̣tx                         Current file context
