@@ -1,13 +1,15 @@
-Completion: Basic
-Count: 3868
+﻿Completion: Basic
+Count: 3867
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "♦"
 
 ##### RELEVANCE SORT #####
 
+                            [ExpectedTypeMatch]
+custom                      'a    <==
                             [Keywords]
-false                       <==
+false
 null
 true
                             [Methods^]
@@ -39,7 +41,6 @@ Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
 Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
-FSharpTypeFunc              FSharpTypeFunc
 KeyValue
 Lazy
 None                        'T option
@@ -47,7 +48,6 @@ Ok                          Result<'T,'TError>
 Some                        'T option
 ValueNone                   'T voption
 ValueSome                   'T voption
-custom                      'a
                             [Keywords]
 and
 as
@@ -350,7 +350,7 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3858 more items ..
+.. +3857 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -443,7 +443,6 @@ ExtraTopLevelOperators
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc              FSharpTypeFunc
 Failure                     exn
 Format
 FuncConvert
@@ -543,7 +542,7 @@ class
 compare                     int
 cos                         ^T
 cosh                        ^T
-custom                      'a
+custom                      'a    <==
 decimal                     decimal
 decr                        unit
 defaultArg                  'T
@@ -566,7 +565,7 @@ exn
 exp                         ^T
 failwith                    'T
 failwithf                   'T
-false                       <==
+false
 finally
 float                       float
 float32                     float32
@@ -694,4 +693,4 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3858 more items ..
+.. +3857 more items ..

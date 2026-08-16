@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3867
+Count: 3866
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "♦"
@@ -41,7 +41,6 @@ Choice6Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
 Choice6Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
-FSharpTypeFunc              FSharpTypeFunc
 KeyValue
 Lazy
 None                        'T option
@@ -350,7 +349,7 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3857 more items ..
+.. +3856 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -443,7 +442,6 @@ ExtraTopLevelOperators
 FSharp
 FSharpFunc
 FSharpInterfaceDataVersionAttribute
-FSharpTypeFunc              FSharpTypeFunc
 Failure                     exn
 Format
 FuncConvert
@@ -693,4 +691,4 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3857 more items ..
+.. +3856 more items ..
