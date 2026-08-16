@@ -61,6 +61,8 @@ jvm_library(
 exports_files(
     [
         "intellij.rider.plugins.fsharp.injections.iml",
+        "resources/fsharpInjections.xml",
+        "resources/intellij.rider.plugins.fsharp.injections.xml",
     ],
     visibility = ["//visibility:public"],
 )
