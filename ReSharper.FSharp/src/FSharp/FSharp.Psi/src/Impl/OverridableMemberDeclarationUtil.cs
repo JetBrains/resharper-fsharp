@@ -12,6 +12,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var tokenType = decl.MemberKeyword?.GetTokenType();
       if (tokenType == FSharpTokenType.OVERRIDE || tokenType == FSharpTokenType.DEFAULT)
         return true;
+      
+      if (tokenType == FSharpTokenType.MEMBER && InterfaceImplementationNavigator.GetByTypeMember(decl as IMemberDeclaration) != null)
+        return true;
 
       return ObjExprNavigator.GetByMemberDeclaration(decl as IMemberDeclaration) != null;
     }

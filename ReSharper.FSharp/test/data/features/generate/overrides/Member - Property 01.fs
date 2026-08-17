@@ -1,5 +1,5 @@
 // ${KIND:Overrides}
-// ${SELECT0:P():System.Int32}
+// ${SELECT0:get_P():System.Int32}
 
 type A() =
     abstract P: int

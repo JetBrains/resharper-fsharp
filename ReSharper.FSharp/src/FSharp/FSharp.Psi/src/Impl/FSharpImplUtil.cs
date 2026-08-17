@@ -219,19 +219,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (compiledName != null)
           return compiledName;
 
-        if (IsImplicitAccessor(mfv))
+        if (mfv.IsImplicitAccessor())
           return mfv.DisplayName;
 
         var isCompiled = typeElement is ICompiledTypeElement;
-        if (isCompiled)
-        {
-          var mfvCompiledName = mfv.CompiledName;
-          return mfv is { IsProperty: true, IsExtensionMember: false }
-            ? mfvCompiledName.SubstringAfter("get_").SubstringAfter("set_")
-            : mfvCompiledName;
-        }
-
-        return mfv.LogicalName;
+        var name = isCompiled ? mfv.CompiledName : mfv.LogicalName;
+        return mfv is { IsProperty: true, IsExtensionMember: false }
+          ? name.SubstringAfter("get_").SubstringAfter("set_")
+          : name;
       }
       catch (Exception e)
       {
@@ -244,11 +239,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static bool IsImplicitAccessor([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
+      var prop = mfv.AccessorProperty;
+      var isIndexer = prop?.Value.DisplayName == StandardMemberNames.DefaultIndexerName;
+
       if (mfv.IsPropertyGetterMethod)
-        return mfv.CurriedParameterGroups[0].IsEmpty();
+        return isIndexer || mfv.CurriedParameterGroups[0].IsEmpty();
 
       if (mfv.IsPropertySetterMethod)
-        return mfv.CurriedParameterGroups[0]?.Count == 1;
+        return isIndexer || mfv.CurriedParameterGroups[0]?.Count == 1;
 
       return false;
     }

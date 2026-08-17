@@ -139,6 +139,9 @@ let isInlineSpace (node: ITreeNode) =
 
 let isNewLine (node: ITreeNode) =
     getTokenType node == FSharpTokenType.NEW_LINE
+    
+let isDot (node: ITreeNode) =
+    getTokenType node == FSharpTokenType.DOT
 
 let isWhitespace (node: ITreeNode) =
     let tokenType = getTokenType node
@@ -147,7 +150,7 @@ let isWhitespace (node: ITreeNode) =
 let isWhitespaceOrComment (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && (tokenType.IsWhitespace || tokenType.IsComment)
-
+    
 let isFiltered (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsFiltered

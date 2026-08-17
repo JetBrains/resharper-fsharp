@@ -1,5 +1,5 @@
 // ${KIND:Overrides}
-// ${SELECT0:P():System.Int32}
+// ${SELECT0:set_P(System.Int32):System.Void}
 
 [<AbstractClass>]
 type A() =

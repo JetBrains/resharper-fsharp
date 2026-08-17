@@ -1,0 +1,12 @@
+// ${COMPLETE_ITEM:M(int)}
+module Module
+
+[<AbstractClass>]
+type Base<'T>() =
+    abstract M: 'T -> unit
+    abstract M: string -> unit
+
+{ new Base<int>() with
+    override this.M(s: string) = ()
+    override self.M(var0: int): unit = failwith "todo"{caret} }
+

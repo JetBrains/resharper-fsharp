@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 
 open System
-open FSharp.Compiler.Symbols
 open JetBrains.Annotations
 open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -9,14 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-
-type IFSharpGeneratorElement =
-    abstract Mfv: FSharpMemberOrFunctionOrValue
-    abstract DisplayContext: FSharpDisplayContext
-    abstract Substitution: (FSharpGenericParameter * FSharpType) list
-    abstract AddTypes: bool
-    abstract IsOverride: bool
-
 
 [<AllowNullLiteral>]
 type FSharpGeneratorContext(kind, [<NotNull>] treeNode: ITreeNode,
@@ -61,19 +52,15 @@ type PropertyOverrideState =
     | Getter = 1
     | Setter = 2
 
-type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInstance, addTypes) =
+type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInstance, addTypes: bool) =
     inherit GeneratorDeclaredElement(element)
 
     member x.AddTypes = addTypes
     member x.Mfv = mfvInstance.Mfv
     member x.MfvInstance = mfvInstance
     member x.Member = element
-
-    interface IFSharpGeneratorElement with
-        member x.Mfv = x.Mfv
-        member x.DisplayContext = mfvInstance.DisplayContext
-        member x.Substitution = mfvInstance.Substitution
-        member x.AddTypes = x.AddTypes
-        member x.IsOverride = not (element.ContainingType :? IInterface)
+    member x.DisplayContext = mfvInstance.DisplayContext
+    member x.Substitution = mfvInstance.Substitution
+    member x.IsOverride = not (element.ContainingType :? IInterface)
 
     override x.ToString() = element.ToString()

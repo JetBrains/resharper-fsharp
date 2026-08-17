@@ -1,0 +1,4 @@
+
+Equals(obj)
+Finalize()
+GetHashCode(){caret}
