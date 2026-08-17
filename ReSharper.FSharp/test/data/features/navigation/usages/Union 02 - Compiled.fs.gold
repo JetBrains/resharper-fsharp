@@ -102,21 +102,6 @@
           }
           ------------------
 
-        TO: [O] | |Some| _ -> () RANGE: (62,66) @ Union 02 - Compiled.fs
-        Menu item (enabled) :
-          icon: UsagePatternChecking
-          text: Module      <font color="FFD5A286">| **Some** _ -> ()</font><font color="06C"> (6)</font>
-          tail: <font color="FF6D6D6D">in <Root Namespace></font>
-          tooltip: | **Some** _ -> ()
-        Navigation result:
-          opened file: Union 02 - Compiled.fs
-          ------------------
-
-          match None with
-          | |CARET|Some _ -> ()
-
-          ------------------
-
         TO: [R] match |None| with RANGE: (50,54) @ Union 02 - Compiled.fs
         Menu item (enabled) :
           icon: UsageRead
@@ -130,6 +115,21 @@
 
           match |CARET|None with
           | Some _ -> ()
+
+          ------------------
+
+        TO: [O] | |Some| _ -> () RANGE: (62,66) @ Union 02 - Compiled.fs
+        Menu item (enabled) :
+          icon: UsagePatternChecking
+          text: Module      <font color="FFD5A286">| **Some** _ -> ()</font><font color="06C"> (6)</font>
+          tail: <font color="FF6D6D6D">in <Root Namespace></font>
+          tooltip: | **Some** _ -> ()
+        Navigation result:
+          opened file: Union 02 - Compiled.fs
+          ------------------
+
+          match None with
+          | |CARET|Some _ -> ()
 
           ------------------
 

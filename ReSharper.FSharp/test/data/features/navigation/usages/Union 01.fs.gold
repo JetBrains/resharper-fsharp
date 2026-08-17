@@ -1,4 +1,4 @@
-## ShowUsagesProvider activity:
+﻿## ShowUsagesProvider activity:
   Async context menu shown `Usages of 'U'`:
     TO: [O] |U| a = U.A; RANGE: (70,71) @ Union 01.cs
     Menu item (enabled) :
@@ -240,21 +240,6 @@
           var aTag = U.Tags.A;
       ------------------
 
-    TO: [O] | |B| _ -> () RANGE: (63,64) @ Union 01.fs
-    Menu item (enabled) :
-      icon: UsagePatternChecking
-      text: Module      <font color="FFD5A286">| **B** _ -> ()</font><font color="06C"> (8)</font>
-      tail: <font color="FF6D6D6D">in <Root Namespace></font>
-      tooltip: | **B** _ -> ()
-    Navigation result:
-      opened file: Union 01.fs
-      ------------------
-
-      match A with
-      | |CARET|B _ -> ()
-
-      ------------------
-
     TO: [O] match |A| with RANGE: (54,55) @ Union 01.fs
     Menu item (enabled) :
       icon: UsageInstanceCreation
@@ -268,6 +253,21 @@
 
       match |CARET|A with
       | B _ -> ()
+
+      ------------------
+
+    TO: [O] | |B| _ -> () RANGE: (63,64) @ Union 01.fs
+    Menu item (enabled) :
+      icon: UsagePatternChecking
+      text: Module      <font color="FFD5A286">| **B** _ -> ()</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: | **B** _ -> ()
+    Navigation result:
+      opened file: Union 01.fs
+      ------------------
+
+      match A with
+      | |CARET|B _ -> ()
 
       ------------------
 
