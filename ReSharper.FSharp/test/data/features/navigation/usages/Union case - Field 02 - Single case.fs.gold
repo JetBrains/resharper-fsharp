@@ -32,21 +32,6 @@
       }
       ------------------
 
-    TO: [O] | A (|a| = 123) -> () RANGE: (97,98) @ Union case - Field 02 - Single case.fs
-    Menu item (enabled) :
-      icon: UsagePatternChecking
-      text: Module      <font color="FFD5A286">| A (**a** = 123) -> ()</font><font color="06C"> (8)</font>
-      tail: <font color="FF6D6D6D">in <Root Namespace></font>
-      tooltip: | A (**a** = 123) -> ()
-    Navigation result:
-      opened file: Union case - Field 02 - Single case.fs
-      ------------------
-      module Module =
-          match A(a = 123) with
-          | A (|CARET|a = 123) -> ()
-
-      ------------------
-
     TO: [W] match A(|a| = 123) with RANGE: (74,75) @ Union case - Field 02 - Single case.fs
     Menu item (enabled) :
       icon: UsageWrite
@@ -60,6 +45,21 @@
       module Module =
           match A(|CARET|a = 123) with
           | A (a = 123) -> ()
+
+      ------------------
+
+    TO: [O] | A (|a| = 123) -> () RANGE: (97,98) @ Union case - Field 02 - Single case.fs
+    Menu item (enabled) :
+      icon: UsagePatternChecking
+      text: Module      <font color="FFD5A286">| A (**a** = 123) -> ()</font><font color="06C"> (8)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: | A (**a** = 123) -> ()
+    Navigation result:
+      opened file: Union case - Field 02 - Single case.fs
+      ------------------
+      module Module =
+          match A(a = 123) with
+          | A (|CARET|a = 123) -> ()
 
       ------------------
 
