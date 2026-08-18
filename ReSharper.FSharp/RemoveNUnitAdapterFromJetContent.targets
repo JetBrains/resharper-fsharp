@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!--
+      The ReSharper test framework packages ship the .NET Core flavour of the NUnit adapter
+      (NUnit3TestAdapter/build/netcoreapp3.1/NUnit3.TestAdapter.dll) as root-level JetContent.
+      CopyJetContent runs after CopyFilesToOutputDirectory, so it overwrites the net462 adapter
+      that the NUnit3TestAdapter package puts next to its net462 nunit.engine*.dll, and the
+      net472 test host then fails to load the adapter ("Failed to load extensions from file"),
+      discovering no tests. Keep the net462 adapter that matches the rest of the output.
+      Only the root copy is dropped: the Packages\NUnit3TestAdapter\** mirror stays intact.
+    -->
+    <Target Name="RemoveNUnitAdapterFromJetContent"
+            BeforeTargets="CopyJetContent">
+        <ItemGroup>
+            <JetContent Remove="@(JetContent)"
+                        Condition="'%(JetContent.TargetPath)' == 'NUnit3.TestAdapter.dll'" />
+        </ItemGroup>
+    </Target>
+</Project>
