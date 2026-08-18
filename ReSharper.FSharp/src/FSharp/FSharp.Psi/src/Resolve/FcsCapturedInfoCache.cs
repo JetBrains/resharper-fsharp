@@ -52,6 +52,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IFcsProjectProvider FcsProjectProvider { get; }
 
+    /// Read-only forks are used by SWA and can compute missing FCS data accessible outside the fork
+    /// since they cannot modify it further.
+    private static bool IsReadonlyFork => 
+      ContentModelFork.IsCurrentlyForked &&
+      !ContentModelFork.CurrentCapabilities.HasFlag(ContentModelForkCapabilities.WriteOperations);
+
     public FcsCapturedInfoCache(Lifetime lifetime, IFcsProjectProvider fcsProjectProvider,
       FSharpScriptPsiModulesProvider scriptPsiModulesProvider, IShellLocks locks)
     {
@@ -274,17 +280,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (moduleCapturedInfo == null)
         return null;
 
-      if (ContentModelFork.IsCurrentlyForked)
-      {
-        var resolvedSymbols = moduleCapturedInfo.TryGetResolvedSymbols(sourceFile);
-        if (resolvedSymbols != null)
-          return resolvedSymbols;
-
+      var canMutateSharedData = !ContentModelFork.IsCurrentlyForked || IsReadonlyFork;
+      return canMutateSharedData 
+        ? moduleCapturedInfo.GetOrCreateResolvedSymbols(sourceFile)
         // do not mutate the shared data, go do the State fork
-      }
-      else return moduleCapturedInfo.GetOrCreateResolvedSymbols(sourceFile);
-
-      return null;
+        : moduleCapturedInfo.TryGetResolvedSymbols(sourceFile);
     }
 
     private IFcsFileCapturedInfo GetOrCreateScriptFileCapturedInfo(IPsiSourceFile sourceFile)
@@ -302,8 +302,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         }
       }
 
-      // todo: GetOrAllocateCopyForWrite()
-      var stateForWrite = myState.ValueForWrite;
+      var stateForWrite = IsReadonlyFork ? myState.ValueForRead : myState.ValueForWrite;
       lock (stateForWrite)
       {
         if (!stateForWrite.ScriptCaches.TryGetValue(psiModule, out var moduleInfo))
@@ -336,7 +335,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         }
       }
 
-      var stateForWrite = myState.ValueForWrite;
+      var stateForWrite = IsReadonlyFork ? myState.ValueForRead : myState.ValueForWrite;
       lock (stateForWrite)
       {
         if (!stateForWrite.ModuleCaches.TryGetValue(projectKey, out var moduleInfo))
