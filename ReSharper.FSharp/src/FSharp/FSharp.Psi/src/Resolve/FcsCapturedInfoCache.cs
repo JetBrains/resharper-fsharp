@@ -281,17 +281,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return null;
 
       var canMutateSharedData = !ContentModelFork.IsCurrentlyForked || IsReadonlyFork;
-      if (canMutateSharedData)
-      {
-        var resolvedSymbols = moduleCapturedInfo.TryGetResolvedSymbols(sourceFile);
-        if (resolvedSymbols != null)
-          return resolvedSymbols;
+      if (canMutateSharedData) 
+        return moduleCapturedInfo.GetOrCreateResolvedSymbols(sourceFile);
 
-        // do not mutate the shared data, go do the State fork
-      }
-      else return moduleCapturedInfo.GetOrCreateResolvedSymbols(sourceFile);
-
-      return null;
+      // do not mutate the shared data, go do the State fork
+      var resolvedSymbols = moduleCapturedInfo.TryGetResolvedSymbols(sourceFile);
+      return resolvedSymbols;
     }
 
     private IFcsFileCapturedInfo GetOrCreateScriptFileCapturedInfo(IPsiSourceFile sourceFile)
