@@ -124,8 +124,7 @@ type internal TypeProvidersClientBase(lifetimeDef: LifetimeDefinition, connectio
     abstract member CreateTypeProviders: RdTypeProvider[] * TypeProvidersContext * ResolutionEnvironment -> IProxyTypeProvider list
     abstract member Scope: TypeProvidersHostingScope
 
-        scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
-            fun psiModule -> disposeTypeProviders psiModule.Path.FullPath)
+    interface ITypeProvidersClient with
         member x.GetOrCreate(runTimeAssemblyFileName: string, designTimeAssemblyNameString: string,
                 resolutionEnvironment: ResolutionEnvironment, isInvalidationSupported: bool, isInteractive: bool,
                 systemRuntimeContainsType: string -> bool, systemRuntimeAssemblyVersion: Version,
@@ -170,12 +169,12 @@ type internal TypeProvidersClientBase(lifetimeDef: LifetimeDefinition, connectio
                 $"[{scope} - In-Process dump]:\n\n" + $"{typeProviders.Dump()}\n\n{tpContext.Dump()}"
 
             let outOfProcessDump =
-                $"[{scope} - Out-Process dump]:\n\n{connection.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance)}"
+                $"[{scope} - Out-Process dump]:\n\n{connection.Execute(fun _ -> connection.ProtocolModel.RdTestHost.Dump.Sync(Unit.Instance))}"
 
             $"{inProcessDump}\n\n{outOfProcessDump}"
 
         member this.RuntimeVersion =
-            connection.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance)
+            connection.Execute(fun _ -> connection.ProtocolModel.RdTestHost.RuntimeVersion.Sync(Unit.Instance))
 
 
 type internal SolutionTypeProvidersClient(lifetimeDef: LifetimeDefinition,
@@ -232,8 +231,8 @@ type internal ScriptTypeProvidersClient(lifetimeDef: LifetimeDefinition, connect
     inherit TypeProvidersClientBase(lifetimeDef, connection, false)
 
     do
-        scriptPsiModulesProvider.ModuleInvalidated.Advise(this.Lifetime, fun psiModule ->
-            this.DisposeTypeProviders(psiModule.Path.FullPath))
+        scriptPsiModulesProvider.ModuleInvalidated.Advise(this.Lifetime,
+            fun event -> this.DisposeTypeProviders event.PsiModule.Path.FullPath)
 
     override this.Scope = TypeProvidersHostingScope.Scripts
 
