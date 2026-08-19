@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Exceptions;
@@ -27,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol.Models
     public RdCustomAttributeData[] Attributes => EmptyArray<RdCustomAttributeData>.Instance;
 
     public ProxyTypeProvider(RdTypeProvider rdTypeProvider, TypeProvidersContext typeProvidersContext,
-      IPsiModule module)
+      [CanBeNull] IPsiModule module)
     {
       PsiModule = module;
       myRdTypeProvider = rdTypeProvider;

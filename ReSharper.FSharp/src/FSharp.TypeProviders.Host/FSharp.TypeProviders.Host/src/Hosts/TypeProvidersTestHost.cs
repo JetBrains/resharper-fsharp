@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using JetBrains.Core;
+﻿using JetBrains.Core;
 using JetBrains.Rd.Tasks;
 using JetBrains.Rider.FSharp.TypeProviders.Protocol.Server;
 using JetBrains.Util;
