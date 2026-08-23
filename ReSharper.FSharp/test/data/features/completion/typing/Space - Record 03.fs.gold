@@ -11,14 +11,14 @@ type R =
 > Typing [ ] char:
 ====================================
 Lookup list (Focused):
-                              [Keywords]
-  false                       <==
-  null
-  true
-                              [Methods^]
-  Choice1Of2                  Choice<'T1,'T2>
-  Choice1Of3                  Choice<'T1,'T2,'T3>
-  .. +323 more items ..
+                              [FieldsAndProperties]
+  F1                          int    <==
+  F2                          int
+  F3                          int
+  contents                    'T
+                              [Methods, Keywords]
+  false
+  .. +322 more items ..
 
 > Last text control state (lookup still opened):
 ====================================
