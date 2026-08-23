@@ -11,14 +11,14 @@ Lookup list (Focused):
   value                       <==
                               [ExpectedTypeMatch^]
   Value| |=                   'T              OrderStr=Value
-                              [FieldsAndProperties]
-  Value                       'T
                               [Methods, Keywords]
   false
   null
-  .. +253 more items ..
+  true
+  .. +252 more items ..
 
 > Typing [(] char:
+> Lookup was closed
 ====================================
 // ${TEXT:((}
 module Module

@@ -11,12 +11,11 @@ Lookup list (Focused):
   value                       <==
                               [ExpectedTypeMatch^]
   Value| |=                   'T              OrderStr=Value
-                              [FieldsAndProperties]
-  Value                       'T
                               [Methods, Keywords]
   false
   null
-  .. +253 more items ..
+  true
+  .. +252 more items ..
 
 > Last text control state (lookup still opened):
 ====================================
