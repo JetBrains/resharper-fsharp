@@ -4,6 +4,7 @@ open System.Linq
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
+open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped.Popups
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
@@ -92,11 +93,9 @@ type ImportTypeAvailabilityTest() =
     [<Test>] member x.``Static member 01``() = x.DoNamedTest()
 
 
-[<FSharpTest>]
-type ImportTypePopupTest() =
-    inherit FSharpQuickFixTestBase<FSharpPopupImportTypeFix>()
-
-    override x.RelativeTestDataPath = "features/quickFixes/importType/popup"
+[<AbstractClass; FSharpTest>]
+type FSharpPopupImportFixBase<'a when 'a :> IScopedPopupAction and 'a :> IQuickFix>() =
+    inherit FSharpQuickFixTestBase<'a>()
 
     override x.ExecuteBulbAction(textControl, actionOwner, _, _) =
         let scopedPopupAction = actionOwner.QuickFix.As<IScopedPopupAction>()
@@ -104,10 +103,26 @@ type ImportTypePopupTest() =
           ScopedIntentionsManager.TryGetScopedPopupAction(scopedPopupAction, x.Solution, textControl.Document.GetDocumentRange()).NotNull();
 
         let singleAction = intentionPopup.Actions.Single().NotNull()
-        singleAction.Execute(x.Solution, textControl)
+        singleAction.Execute(x.Solution, textControl)    
+
+[<FSharpTest>]
+type ImportTypePopupTest() =
+    inherit FSharpPopupImportFixBase<FSharpPopupImportTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/importType/popup"
 
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type 02 - Multiple``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type ImportExtensionMemberPopupTest() =
+    inherit FSharpPopupImportFixBase<FSharpPopupImportExtensionMemberFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/import/extension/popup"
+
+    [<Test>] member x.``Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import missing references 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import missing references 02 - Type``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

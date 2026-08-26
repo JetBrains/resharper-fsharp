@@ -1,19 +1,26 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System
 open System.Collections.Generic
 open System.Linq
 open JetBrains.Application
 open JetBrains.Application.UI.Controls.BulbMenu.Anchors
+open JetBrains.Application.UI.Controls.JetPopupMenu
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.BulbActions
 open JetBrains.ReSharper.Feature.Services.Bulbs
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Intentions
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
+open JetBrains.ReSharper.Feature.Services.PopupActions
+open JetBrains.ReSharper.Feature.Services.QuickFixes.Scoped.Popups
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Intentions.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -24,6 +31,10 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.UI.RichText
+
+type private CommonStrings = JetBrains.ReSharper.Intentions.Resources.Strings
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExtensionMemberImportUtil() =
@@ -171,6 +182,8 @@ type FSharpImportModuleMemberFix(reference: IReference) =
 type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FSharpSymbolReference) =
     inherit ModernBulbActionBase()
 
+    member this.TypeMember = typeMember
+
     override this.Text =
         let containingTypeShortName = typeMember.ContainingType.ShortName
         $"Use {containingTypeShortName}.{reference.GetName()}"
@@ -188,7 +201,12 @@ type FSharpImportExtensionMemberAction(typeMember: ITypeMember, reference: FShar
         member this.FileCollectorInfo = FileCollectorInfo.Empty
         member this.ScopedText = this.Text
 
-type FSharpImportExtensionMemberFix(reference: IReference) =
+    interface IImportPopupBulbAction with
+        member this.EntityToImportText =
+            DeclaredElementPresenter.Format(FSharpLanguage.Instance, DeclaredElementPresenter.QUALIFIED_NAME_PRESENTER, typeMember)
+
+[<AbstractClass>]
+type FSharpImportExtensionMemberFixBase(reference: IReference) =
     inherit ScopedImportQuickFixBase(reference)
 
     let reference = reference.As<FSharpSymbolReference>()
@@ -207,3 +225,57 @@ type FSharpImportExtensionMemberFix(reference: IReference) =
                 ResolveProblemsFixAnchors.ImportFix
 
         importActions.ToQuickFixIntentions(anchor)
+
+type FSharpImportExtensionMemberFix(reference: IReference) =
+    inherit FSharpImportExtensionMemberFixBase(reference)
+
+type FSharpPopupImportExtensionMemberFix(reference: IReference) =
+    inherit FSharpImportExtensionMemberFixBase(reference)
+
+    let getPopupText (bulbActions: IReadOnlyList<IBulbAction>) =
+        let bulbActions =
+            bulbActions
+            |> Seq.map (function :? ScopedPopupAction as scopedPopupAction -> scopedPopupAction.BulbAction | action -> action)
+            |> Seq.cast<IImportPopupBulbAction>
+            |> Seq.toArray
+
+        let text =
+            match bulbActions with
+            | [| action |] -> RichText.Format(CommonStrings.Import_AndOtherMissingReferences_Text, action.EntityToImportText)
+            | _ ->
+
+            let firstExtensionMember = bulbActions[0].As<FSharpImportExtensionMemberAction>().TypeMember
+            let kind = DeclaredElementPresenter.Format(FSharpLanguage.Instance, DeclaredElementPresenter.KIND_PRESENTER, firstExtensionMember)
+            
+            let presentationPartKind =
+                match firstExtensionMember with
+                | :? IMethod -> DeclaredElementPresentationPartKind.Method
+                | :? IProperty -> DeclaredElementPresentationPartKind.Property
+                | :? ISignOperator -> DeclaredElementPresentationPartKind.SignOperator
+                | _ -> raise (ArgumentOutOfRangeException($"Unexpected extension member kind: {firstExtensionMember.GetType().Name}"))
+
+            let referenceName = reference.GetName().Colorize(presentationPartKind)
+            RichText.Format(Strings.FSharpImportExtensionMember_MultipleChoices_Text, kind, referenceName)
+
+        text.SpecifyIdentifierTooltipColorsForLanguage(FSharpLanguage.Instance)
+    
+    interface IPopupAction with
+        member this.CreateBulbActions() = this.CreateBulbActions()
+        member this.IsAvailable(cache) = this.IsAvailable(cache)
+        member this.OnPopupShown _ = ()
+        member this.PopupKey = null
+        member this.PopupMenuCaption = "Import and use..."
+        member this.FillMenuItemDescriptor(key, descriptor) =
+            let item = key.As<FSharpImportExtensionMemberAction>()
+            let psiIconManager = reference.GetTreeNode().GetSolution().GetComponent<PsiIconManager>()
+
+            descriptor.Text <- (item :> IImportPopupBulbAction).EntityToImportText
+            descriptor.Style <- MenuItemStyle.Enabled
+            descriptor.Icon <- psiIconManager.GetImage(item.TypeMember, FSharpLanguage.Instance, drawExtensions = true)
+        
+    interface IPopupActionWithCustomPopupText with
+        member this.GetPopupText(bulbActions: IReadOnlyList<IBulbAction>) = getPopupText bulbActions
+
+    interface IScopedPopupAction with
+        member this.ExecuteAction(solution, scope, highlighting, singleFileProgress) = this.ExecuteAction(solution, scope, highlighting, singleFileProgress)
+        member this.GetScopedPopupText(bulbAction) = getPopupText [| bulbAction |]

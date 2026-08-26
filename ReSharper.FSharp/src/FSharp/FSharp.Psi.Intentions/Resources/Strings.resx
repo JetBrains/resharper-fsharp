@@ -34,4 +34,7 @@
     <data name="FSharpDisableAndRestoreWithDirectives_Text" xml:space="preserve">
         <value>Disable once with '#nowarn'</value>
     </data>
+    <data name="FSharpImportExtensionMember_MultipleChoices_Text" xml:space="preserve">
+        <value>Import extension {0} '{1}' (multiple choices…)?</value>
+    </data>
 </root>

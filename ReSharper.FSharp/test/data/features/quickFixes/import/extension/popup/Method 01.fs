@@ -1,0 +1,1 @@
+"".FirstOrDefault{caret}()

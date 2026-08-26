@@ -1,0 +1,13 @@
+﻿module Main
+
+open System.Linq
+
+module Nested =
+    type System.Int32 with
+        member x.P = 3
+
+open Nested
+
+"".FirstOrDefault()
+
+(1).P{caret}

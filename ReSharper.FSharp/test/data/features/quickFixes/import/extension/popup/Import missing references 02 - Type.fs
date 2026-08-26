@@ -1,0 +1,4 @@
+"".FirstOrDefault{caret}()
+
+StreamReader()
+

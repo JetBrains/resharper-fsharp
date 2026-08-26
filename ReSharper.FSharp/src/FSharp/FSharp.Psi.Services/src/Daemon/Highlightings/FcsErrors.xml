@@ -161,6 +161,7 @@
     <QuickFix arguments="h.Reference">FSharpPopupImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpImportExtensionMemberFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpPopupImportExtensionMemberFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpImportModuleMemberFix</QuickFix>
   </Error>
 

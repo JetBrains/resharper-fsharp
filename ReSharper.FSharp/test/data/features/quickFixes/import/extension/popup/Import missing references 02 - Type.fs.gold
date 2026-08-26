@@ -1,0 +1,7 @@
+﻿open System.IO
+open System.Linq
+
+"".FirstOrDefault{caret}()
+
+StreamReader()
+
