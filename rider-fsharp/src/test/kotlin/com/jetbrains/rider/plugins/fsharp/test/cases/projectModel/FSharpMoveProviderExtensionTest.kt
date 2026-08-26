@@ -9,22 +9,20 @@ import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
-import com.jetbrains.rider.test.junit5.base.ProjectModelBaseTest
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.framework.TestProjectModelDumpFilesProfile
-import com.jetbrains.rider.test.framework.executeWithGold
-import com.jetbrains.rider.test.maskAllAccordingDumpFilesProfile
+import com.jetbrains.rider.test.junit5.base.PerTestProjectModelTestBase
 import com.jetbrains.rider.test.scriptingApi.createDataContextFor
-import com.jetbrains.rider.test.scriptingApi.dumpSolutionExplorerTree
+import com.jetbrains.rider.test.scriptingApi.dump
 import com.jetbrains.rider.test.scriptingApi.prepareProjectView
+import com.jetbrains.rider.test.scriptingApi.testProjectModel
 import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
-class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
+class FSharpMoveProviderExtensionTest : PerTestProjectModelTestBase() {
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution1")
@@ -147,8 +145,8 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
 
   private fun doTest(action: (FSharpMoveProviderExtension) -> Unit) {
     prepareProjectView(project)
-    executeWithGold(testGoldFile) {
-      it.append(dumpSolutionExplorerTree(project).maskAllAccordingDumpFilesProfile(TestProjectModelDumpFilesProfile()))
+    testProjectModel({ dumpSolutionExplorerTree = true; dumpFilesContent = false }) {
+      dump("")
     }
     action(FSharpMoveProviderExtension(project))
   }
