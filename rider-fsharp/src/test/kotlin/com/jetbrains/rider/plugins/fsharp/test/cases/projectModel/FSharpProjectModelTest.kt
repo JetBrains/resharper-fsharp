@@ -7,10 +7,11 @@ import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Issue
 import com.jetbrains.rider.test.annotations.report.Issues
-import com.jetbrains.rider.test.junit5.base.ProjectModelBaseTest
+import com.jetbrains.rider.test.junit5.base.PerTestProjectModelTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.framework.TestProjectModelContext
+import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade
+import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade.CompareProjFileOptions.XmlNodes
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
 import com.jetbrains.rider.test.scriptingApi.addNewFolder
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
 @Solution("EmptySolution")
-class FSharpProjectModelTest : ProjectModelBaseTest() {
+class FSharpProjectModelTest : PerTestProjectModelTestBase() {
   override fun modifyOpenSolutionParams(params: OpenSolutionParams) {
     super.modifyOpenSolutionParams(params)
     params.restoreNuGetPackages = true
@@ -52,50 +53,46 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     }
   }
 
-  private fun TestProjectModelContext.dump2(
-    caption: String,
-    checkSlnFile: Boolean,
-    compareProjFile: Boolean,
-    action: () -> Unit
-  ) {
-    dump(caption, checkSlnFile, compareProjFile, action)
-    treeOutput.append(project.fcsHost.dumpSingleProjectMapping.sync(Unit))
+  private fun ProjectModelDumpApiFacade.dumpWithSingleProjectMapping(caption: String, action: () -> Unit) {
+    dumpAfterAction(caption, action)
+    dump.treeOutput.append(project.fcsHost.dumpSingleProjectMapping.sync(Unit))
   }
 
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) {
+    withDump(
+        {
+            checkSlnFile = false
+            compareProjFilesOptions = XmlNodes()
+        }
+    ) {
+      dumpWithSingleProjectMapping("Init") {
       }
-      dump2(
-        "1. Move file 'Folder(1)/File1.fs' inside other part of the same folder after 'Folder(2)/File4.fs'",
-        false,
-        true
+      dumpWithSingleProjectMapping(
+        "1. Move file 'Folder(1)/File1.fs' inside other part of the same folder after 'Folder(2)/File4.fs'"
       ) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File1.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File4.fs")
         )
       }
-      dump2(
-        "2. Move file 'Folder(2)/File3.fs' inside other part of the same folder before 'Folder(1)/File2.fs'",
-        false,
-        true
+      dumpWithSingleProjectMapping(
+        "2. Move file 'Folder(2)/File3.fs' inside other part of the same folder before 'Folder(1)/File2.fs'"
       ) {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File3.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"), RdDndOrderType.Before
         )
       }
-      dump2("3. Move file 'Folder(2)/File1.fs' before folder 'Folder(2)'", false, true) {
+      dumpWithSingleProjectMapping("3. Move file 'Folder(2)/File1.fs' before folder 'Folder(2)'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "File1.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"), RdDndOrderType.Before
         )
       }
-      dump2("4. Move file 'File3.fs' and 'File1.fs' in folder 'Folder(2)/Sub(1)' before 'Class1.fs'", false, true) {
+      dumpWithSingleProjectMapping("4. Move file 'File3.fs' and 'File1.fs' in folder 'Folder(2)/Sub(1)' before 'Class1.fs'") {
         moveItem(
           arrayOf(
             arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
@@ -104,54 +101,54 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "Class1.fs"), RdDndOrderType.Before
         )
       }
-      dump2("5. Move 'Folder/Sub/File3.fs' to project folder before EmptyFolder", false, true) {
+      dumpWithSingleProjectMapping("5. Move 'Folder/Sub/File3.fs' to project folder before EmptyFolder") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File3.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.Before
         )
       }
-      dump2("6. Move 'Folder/Sub/File3.fs' to project folder after EmptyFolder", false, true) {
+      dumpWithSingleProjectMapping("6. Move 'Folder/Sub/File3.fs' to project folder after EmptyFolder") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.After
         )
       }
-      dump2("7. Move file 'Class2.fs' in folder 'Folder(2)' before 'Sub(2)'", false, true) {
+      dumpWithSingleProjectMapping("7. Move file 'Class2.fs' in folder 'Folder(2)' before 'Sub(2)'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2", "Class2.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?2"), RdDndOrderType.Before
         )
       }
-      dump2("8. Move file 'Folder(1)/File2.fs' before folder 'Folder(1)/File3.fs'", false, true) {
+      dumpWithSingleProjectMapping("8. Move file 'Folder(1)/File2.fs' before folder 'Folder(1)/File3.fs'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File3.fs"), RdDndOrderType.Before
         )
       }
-      dump2("9. Move file 'Folder/File2.fs' before 'Folder(1)'", false, true) {
+      dumpWithSingleProjectMapping("9. Move file 'Folder/File2.fs' before 'Folder(1)'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1", "File2.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), RdDndOrderType.Before
         )
       }
-      dump2("10. Rename file 'File3.fs' to 'Foo.fs'", false, true) {
+      dumpWithSingleProjectMapping("10. Rename file 'File3.fs' to 'Foo.fs'") {
         renameItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), "Foo.fs"
         )
       }
-      dump2("11. Move file 'Foo.fs' to 'EmptyFolder(1)'", false, true) {
+      dumpWithSingleProjectMapping("11. Move file 'Foo.fs' to 'EmptyFolder(1)'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Foo.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1")
         )
       }
-      dump2("12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'", false, true) {
+      dumpWithSingleProjectMapping("12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1", "Foo.fs"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder?1"), RdDndOrderType.Before
         )
       }
-      dump2("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'", false, true) {
+      dumpWithSingleProjectMapping("13. Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'") {
         moveItem(
           arrayOf(
             arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2", "Sub?1", "File1.fs"),
@@ -167,23 +164,23 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
   @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
   fun testFSharpDirectoryManipulation() {
-    doTestDumpProjectsView {
-      dump2("1. Create project", checkSlnFile = false, compareProjFile = true) {
+    withDump {
+      dumpWithSingleProjectMapping("1. Create project") {
         addProject(project, arrayOf("Solution"), "ClassLibrary", ProjectTemplates.Sdk.Net9.FSharp.classLibrary, targetFramework = "netstandard2.1")
       }
-      dump2("2. Create folder 'NewFolder'", checkSlnFile = false, compareProjFile = true) {
+      dumpWithSingleProjectMapping("2. Create folder 'NewFolder'") {
         addNewFolder(arrayOf("Solution", "ClassLibrary"), "NewFolder")
       }
-      dump2("3. Create subfolder 'NewFolder/NewSub'", checkSlnFile = false, compareProjFile = true) {
+      dumpWithSingleProjectMapping("3. Create subfolder 'NewFolder/NewSub'") {
         addNewFolder(arrayOf("Solution", "ClassLibrary", "NewFolder"), "NewSub")
       }
-      dump2("4. Move folder 'NewFolder/NewSub' to project root", checkSlnFile = false, compareProjFile = true) {
+      dumpWithSingleProjectMapping("4. Move folder 'NewFolder/NewSub' to project root") {
         moveItem(
           arrayOf("Solution", "ClassLibrary", "NewFolder", "NewSub"),
           arrayOf("Solution", "ClassLibrary")
         )
       }
-      dump2("5. Delete folder 'NewSub'", checkSlnFile = false, compareProjFile = true) {
+      dumpWithSingleProjectMapping("5. Delete folder 'NewSub'") {
         deleteElement(arrayOf("Solution", "ClassLibrary", "NewSub"))
       }
     }
@@ -193,10 +190,10 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FsprojWithTwoFiles")
   fun testManualFsprojChange() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
 
-      dump2("Move File1 and File2 lines", false, true) {
+      dumpWithSingleProjectMapping("Move File1 and File2 lines") {
         val fsprojFile = activeSolutionDirectory.resolve("ClassLibrary1/ClassLibrary1.fsproj")
         changeFileContent(project, fsprojFile) { content ->
           content
@@ -212,8 +209,8 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SolutionWithDuplicateTargets")
   fun doNoneItemDuplicatesTest() {
-    doTestDumpProjectsView {
-      dump2("Init", checkSlnFile = false, compareProjFile = false) { }
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
     }
   }
 
@@ -221,12 +218,12 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpMoveFolder() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
 
       // Move a whole folder part to a new position among top level items. Its items move
       // sequentially, like individual files.
-      dump2("1. Move folder 'Folder(1)' after 'File3.fs'", false, true) {
+      dumpWithSingleProjectMapping("1. Move folder 'Folder(1)' after 'File3.fs'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), RdDndOrderType.After
@@ -239,12 +236,12 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpMoveFolderJoinParts() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
 
       // Move a folder part next to another part of the same folder: the parts should join
       // into a single folder.
-      dump2("1. Move folder 'Folder(2)' before 'Folder(1)' (join parts)", false, true) {
+      dumpWithSingleProjectMapping("1. Move folder 'Folder(2)' before 'Folder(1)' (join parts)") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?1"), RdDndOrderType.Before
@@ -257,12 +254,12 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpMoveNestedFolder() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
 
       // Move a folder part that contains a nested (split) subfolder 'Sub'. The nested structure
       // and item order must be preserved at the destination.
-      dump2("1. Move folder 'Folder(2)' (with nested 'Sub') before 'EmptyFolder'", false, true) {
+      dumpWithSingleProjectMapping("1. Move folder 'Folder(2)' (with nested 'Sub') before 'EmptyFolder'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "Folder?2"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"), RdDndOrderType.Before
@@ -278,9 +275,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("InterleavedFolder")
   fun testFSharpMoveWholeFolderKeepsOrder() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move folder 'Folder' before 'File0.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move folder 'Folder' before 'File0.fs'") {
         moveItem(
           arrayOf("InterleavedFolder", "ClassLibrary1", "Folder"),
           arrayOf("InterleavedFolder", "ClassLibrary1", "File0.fs"), RdDndOrderType.Before
@@ -296,9 +293,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpMoveEmptyFolder() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move empty folder 'EmptyFolder' before 'File3.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move empty folder 'EmptyFolder' before 'File3.fs'") {
         moveItem(
           arrayOf("FSharpProjectTree", "ClassLibrary1", "EmptyFolder"),
           arrayOf("FSharpProjectTree", "ClassLibrary1", "File3.fs"), RdDndOrderType.Before
@@ -313,9 +310,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("EmptyFolders")
   fun testFSharpMoveEmptyFolderNextToAnother() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move empty folder 'FolderA' after 'FolderB'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move empty folder 'FolderA' after 'FolderB'") {
         moveItem(
           arrayOf("EmptyFolders", "ClassLibrary1", "FolderA"),
           arrayOf("EmptyFolders", "ClassLibrary1", "FolderB"), RdDndOrderType.After
@@ -330,9 +327,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FolderWithEmptySub")
   fun testFSharpMoveFolderWithEmptySubfolder() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move folder 'Outer' after 'Sibling.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move folder 'Outer' after 'Sibling.fs'") {
         moveItem(
           arrayOf("FolderWithEmptySub", "ClassLibrary1", "Outer"),
           arrayOf("FolderWithEmptySub", "ClassLibrary1", "Sibling.fs"), RdDndOrderType.After
@@ -347,9 +344,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SplitNested")
   fun testFSharpMergeSplitFolderWithNested() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move folder 'Folder1(2)' before 'Folder2'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move folder 'Folder1(2)' before 'Folder2'") {
         moveItem(
           arrayOf("SplitNested", "ClassLibrary1", "Folder1?2"),
           arrayOf("SplitNested", "ClassLibrary1", "Folder2"), RdDndOrderType.Before
@@ -364,9 +361,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SplitNestedWithFile")
   fun testFSharpMergeNestedFolderOuterPartRemains() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'") {
         moveItem(
           arrayOf("SplitNestedWithFile", "ClassLibrary1", "Folder1?2", "Nested"),
           arrayOf("SplitNestedWithFile", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
@@ -382,9 +379,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SplitNested")
   fun testFSharpMergeNestedFolderEmptyOuterPartRemoved() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'") {
         moveItem(
           arrayOf("SplitNested", "ClassLibrary1", "Folder1?2", "Nested"),
           arrayOf("SplitNested", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
@@ -400,9 +397,9 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SplitNestedTwoFolders")
   fun testFSharpMergeNestedFolderJoinsBothFolders() {
-    doTestDumpProjectsView {
-      dump2("Init", false, false) { }
-      dump2("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'", false, true) {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'") {
         moveItem(
           arrayOf("SplitNestedTwoFolders", "ClassLibrary1", "Folder1?2", "Nested"),
           arrayOf("SplitNestedTwoFolders", "ClassLibrary1", "Folder1?1", "Nested", "File1.fs"),
