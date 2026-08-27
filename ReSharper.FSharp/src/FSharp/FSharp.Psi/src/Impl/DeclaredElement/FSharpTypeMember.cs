@@ -118,7 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool CanNavigateTo => IsVisibleFromFSharp;
 
     public virtual IList<ITypeParameter> AllTypeParameters =>
-      GetContainingType().GetAllTypeParameters().ResultingList().Reverse();
+      GetContainingType().GetAllTypeParameters().ResultingList().ReverseAsList();
 
     [CanBeNull]
     protected virtual FSharpSymbol GetActualSymbol([NotNull] FSharpSymbol symbol) => symbol;
