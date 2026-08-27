@@ -957,7 +957,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
-      typeElement.GetAllTypeParameters().ResultingList().Reverse();
+      typeElement.GetAllTypeParameters().ResultingList().ReverseAsList();
 
     [CanBeNull]
     public static IDeclaredElement TryCreateOperator<TDeclaration>([NotNull] this TDeclaration decl)
