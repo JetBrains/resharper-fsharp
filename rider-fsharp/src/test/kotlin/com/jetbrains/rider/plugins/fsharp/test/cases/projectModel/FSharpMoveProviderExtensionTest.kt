@@ -145,8 +145,8 @@ class FSharpMoveProviderExtensionTest : PerTestProjectModelTestBase() {
 
   private fun doTest(action: (FSharpMoveProviderExtension) -> Unit) {
     prepareProjectView(project)
-    testProjectModel({ dumpSolutionExplorerTree = true; dumpFilesContent = false }) {
-      dump("")
+    testProjectModel {
+      dumpSolutionExplorerTree("")
     }
     action(FSharpMoveProviderExtension(project))
   }
