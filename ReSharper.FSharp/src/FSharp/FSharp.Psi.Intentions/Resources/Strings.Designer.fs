@@ -45,3 +45,4 @@ type public Strings() =
     static member FSharpDisableInFileWithDirective_Text = Strings.ResourceManager.GetString("FSharpDisableInFileWithDirective_Text")
     static member FSharpDisableAndRestoreWithDirectives_Text = Strings.ResourceManager.GetString("FSharpDisableAndRestoreWithDirectives_Text")
     static member FSharpImportExtensionMember_MultipleChoices_Text = Strings.ResourceManager.GetString("FSharpImportExtensionMember_MultipleChoices_Text")
+    static member FSharpImportModule_Text = Strings.ResourceManager.GetString("FSharpImportModule_Text")

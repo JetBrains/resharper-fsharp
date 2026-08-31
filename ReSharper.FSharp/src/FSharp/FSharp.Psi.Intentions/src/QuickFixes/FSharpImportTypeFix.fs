@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
@@ -18,6 +19,10 @@ module FSharpImportTypeFix =
 
 type FSharpImportTypeFix(reference) =
     inherit ImportTypeFix(reference)
+
+    override this.Format(typeElement: ITypeElement) =
+        if typeElement :? IFSharpModule then Strings.FSharpImportModule_Text
+        else base.Format(typeElement)
 
     override this.GetSymbolScope(context) =
         let symbolCache = context.GetPsiServices().Symbols
