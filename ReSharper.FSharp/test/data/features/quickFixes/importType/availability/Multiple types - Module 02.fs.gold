@@ -1,0 +1,22 @@
+﻿module Test
+
+module A = 
+    module T =
+        ()
+
+module B =
+    type T = class end
+
+let x = |T|(0)
+
+------------------------------------------------
+0: The value or constructor 'T' is not defined.
+QUICKFIXES:
+Import type 'Test.B.T'
+--Import type 'T' in file
+--Import type 'T' in project
+--Import type 'T' in solution
+Import type 'Test.A.T'
+--Import type 'T' in file
+--Import type 'T' in project
+--Import type 'T' in solution

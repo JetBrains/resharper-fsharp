@@ -91,7 +91,10 @@ type ImportTypeAvailabilityTest() =
     override x.RelativeTestDataPath = "features/quickFixes/importType/availability"
 
     [<Test>] member x.``Static member 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple types - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple types - Module 02``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple types - Module 03 - nameof``() = x.DoNamedTest()
+    //[<Test>] member x.``Multiple types - Module 03 - nameof``() = x.DoNamedTest()
 
 
 [<AbstractClass; FSharpTest>]
@@ -124,6 +127,22 @@ type ImportExtensionMemberPopupTest() =
     [<Test>] member x.``Method 01``() = x.DoNamedTest()
     [<Test>] member x.``Import missing references 01``() = x.DoNamedTest()
     [<Test>] member x.``Import missing references 02 - Type``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ImportTypePopupAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase<FSharpPopupImportTypeFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/importType/popup/availability"
+
+    [<Test>] member x.``Static type``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Type extension``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 02 - nameof``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 03 - Qualifier``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 04 - Module abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 05 - Generic``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 06 - Type extension``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
