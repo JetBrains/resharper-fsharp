@@ -63,7 +63,6 @@ dependencies {
     bundledPlugin("intellij.problemView.plugin")
     bundledPlugin("intellij.ssh.plugin")
     bundledPlugin("intellij.bookmarks.plugin")
-    bundledPlugin("intellij.libraries.misc.plugin")
     bundledModule("intellij.rd.client")
     bundledModule("intellij.rider")
     bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
