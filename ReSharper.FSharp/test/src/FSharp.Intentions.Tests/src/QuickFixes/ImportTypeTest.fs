@@ -144,6 +144,7 @@ type ImportTypePopupAvailabilityTest() =
     [<Test>] member x.``Static type - Module 04 - Module abbreviation``() = x.DoNamedTest()
     [<Test>] member x.``Static type - Module 05 - Generic``() = x.DoNamedTest()
     [<Test>] member x.``Static type - Module 06 - Type extension``() = x.DoNamedTest()
+    [<Test>] member x.``Static type - Module 07 - Custom nameof``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
