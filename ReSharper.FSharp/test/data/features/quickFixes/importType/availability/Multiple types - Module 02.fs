@@ -1,10 +1,7 @@
 module Test
 
 module A = 
-    module T =
+    module StreamReader =
         ()
 
-module B =
-    type T = class end
-
-let x = T
+nameof StreamReader{caret}

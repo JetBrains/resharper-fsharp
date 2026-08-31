@@ -1,0 +1,22 @@
+﻿module Test
+
+module A = 
+    module MyModuleOrType =
+        ()
+
+module B = 
+    type MyModuleOrType = class end
+
+|MyModuleOrType|(0)
+
+------------------------------------------------
+0: The value or constructor 'MyModuleOrType' is not defined.
+QUICKFIXES:
+Import type 'Test.B.MyModuleOrType'
+--Import type 'MyModuleOrType' in file
+--Import type 'MyModuleOrType' in project
+--Import type 'MyModuleOrType' in solution
+Import type 'Test.A.MyModuleOrType'
+--Import type 'MyModuleOrType' in file
+--Import type 'MyModuleOrType' in project
+--Import type 'MyModuleOrType' in solution

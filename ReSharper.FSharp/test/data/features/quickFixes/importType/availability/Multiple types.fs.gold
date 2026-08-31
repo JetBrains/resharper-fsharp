@@ -1,19 +1,18 @@
 ﻿module Test
 
 module A = 
-    module StreamReader =
-        ()
+    type StreamReader = class end
 
 |StreamReader|(0)
 
 ------------------------------------------------
 0: The value or constructor 'StreamReader' is not defined.
 QUICKFIXES:
-Import type 'System.IO.StreamReader'
+Import type 'Test.A.StreamReader'
 --Import type 'StreamReader' in file
 --Import type 'StreamReader' in project
 --Import type 'StreamReader' in solution
-Import type 'Test.A.StreamReader'
+Import type 'System.IO.StreamReader'
 --Import type 'StreamReader' in file
 --Import type 'StreamReader' in project
 --Import type 'StreamReader' in solution

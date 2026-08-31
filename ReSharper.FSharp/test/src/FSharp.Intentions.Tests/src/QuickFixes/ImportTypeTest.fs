@@ -91,11 +91,12 @@ type ImportTypeAvailabilityTest() =
     override x.RelativeTestDataPath = "features/quickFixes/importType/availability"
 
     [<Test>] member x.``Static member 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Multiple types``() = x.DoNamedTest()
     [<Test>] member x.``Multiple types - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiple types - Module 02``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple types - Module 03 - nameof``() = x.DoNamedTest()
-    //[<Test>] member x.``Multiple types - Module 03 - nameof``() = x.DoNamedTest()
-
+    [<Test>] member x.``Multiple types - Module 03``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple types - Module 04``() = x.DoNamedTest()
 
 [<AbstractClass; FSharpTest>]
 type FSharpPopupImportFixBase<'a when 'a :> IScopedPopupAction and 'a :> IQuickFix>() =

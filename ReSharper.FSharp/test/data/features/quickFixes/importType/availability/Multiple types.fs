@@ -1,7 +1,6 @@
 module Test
 
 module A = 
-    module StreamReader =
-        ()
+    type StreamReader = class end
 
 StreamReader{caret}

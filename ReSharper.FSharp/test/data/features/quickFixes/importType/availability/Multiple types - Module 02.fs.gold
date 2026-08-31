@@ -1,22 +1,19 @@
 ﻿module Test
 
 module A = 
-    module T =
+    module StreamReader =
         ()
 
-module B =
-    type T = class end
-
-let x = |T|(0)
+nameof |StreamReader|(0)
 
 ------------------------------------------------
-0: The value or constructor 'T' is not defined.
+0: The value or constructor 'StreamReader' is not defined.
 QUICKFIXES:
-Import type 'Test.B.T'
---Import type 'T' in file
---Import type 'T' in project
---Import type 'T' in solution
-Import type 'Test.A.T'
---Import type 'T' in file
---Import type 'T' in project
---Import type 'T' in solution
+Import type 'Test.A.StreamReader'
+--Import type 'StreamReader' in file
+--Import type 'StreamReader' in project
+--Import type 'StreamReader' in solution
+Import type 'System.IO.StreamReader'
+--Import type 'StreamReader' in file
+--Import type 'StreamReader' in project
+--Import type 'StreamReader' in solution
