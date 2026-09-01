@@ -31,7 +31,36 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 
+[<AutoOpen>]
 module ProjectFcsModuleReader =
+    /// Pairs the first collection with the first `count` items of the second one.
+    let inline forallPairedUpTo ([<InlineIfLambda>] isSame: 'a -> 'b -> bool) (first: seq<'a>) (second: seq<'b>) count =
+        use firstItems = first.GetEnumerator()
+        use secondItems = second.GetEnumerator()
+
+        let mutable index = 0
+        let mutable result = true
+        let mutable goOn = true
+
+        while goOn do
+            let hasFirst = firstItems.MoveNext()
+            let hasSecond = index < count && secondItems.MoveNext()
+
+            if hasFirst <> hasSecond then
+                result <- false
+                goOn <- false
+            elif not hasFirst then
+                goOn <- false
+            else
+                result <- isSame firstItems.Current secondItems.Current
+                index <- index + 1
+                goOn <- result
+
+        result
+
+    let inline forallPaired ([<InlineIfLambda>] isSame: 'a -> 'b -> bool) first second =
+        forallPairedUpTo isSame first second Int32.MaxValue
+
     module DummyValues =
         let subsystemVersion = 4, 0
         let useHighEntropyVA = false
@@ -260,7 +289,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         kind ||| accessRights
 
-    let createAssemblyScopeRef (assemblyName: AssemblyNameInfo): ILAssemblyRef =
+    let createAssemblyRef (assemblyName: AssemblyNameInfo): ILAssemblyRef =
         let name = assemblyName.Name
         let hash = None // todo: is assembly hash used in FCS?
         let retargetable = assemblyName.IsRetargetable
@@ -285,13 +314,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         ILAssemblyRef.Create(name, hash, publicKey, retargetable, version, locale)
 
-    let getAssemblyScopeRef (assemblyName: AssemblyNameInfo): ILScopeRef =
+    let mkAssemblyScopeRef (assemblyName: AssemblyNameInfo): ILScopeRef =
         let mutable scopeRef = Unchecked.defaultof<_>
         match cache.AssemblyRefs.TryGetValue(assemblyName, &scopeRef) with
         | true -> scopeRef
         | _ ->
 
-        let assemblyRef = ILScopeRef.Assembly(createAssemblyScopeRef assemblyName)
+        let assemblyRef = ILScopeRef.Assembly(createAssemblyRef assemblyName)
         cache.AssemblyRefs[assemblyName] <- assemblyRef
         assemblyRef
 
@@ -304,7 +333,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | :? IProject as project -> project.GetOutputAssemblyNameInfo(targetModule.TargetFrameworkId)
             | _ -> failwithf $"mkIlScopeRef: {psiModule} -> {targetModule}"
 
-        getAssemblyScopeRef assemblyName
+        mkAssemblyScopeRef assemblyName
 
 
     let internTypeRef (typeRefCache: IDictionary<_, _>) scopeRef (clrTypeName: IClrTypeName) enclosing name =
@@ -369,7 +398,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let mutable index = typeParameter.Index
         let mutable parent = typeParameter.Owner.GetContainingType()
         while isNotNull parent do
-            index <- index + parent.TypeParameters.Count
+            index <- index + parent.TypeParametersCount
             parent <- parent.GetContainingType()
         index
 
@@ -442,6 +471,78 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             // todo: make a typeRef to System.Object in primary assembly
             ILType.Void
 
+    /// Follows `mkType` case by case, so a change there needs the same change here.
+    let rec isSameType (t: IType) (ilType: ILType) =
+        if t.IsVoid() then ilType = ILType.Void else
+
+        if not t.IsResolved then isUnresolvedType ilType else
+
+        match t with
+        | :? IDeclaredType as declaredType ->
+            match declaredType.Resolve() with
+            | :? EmptyResolveResult -> isObjectType ilType
+            | resolveResult ->
+
+            match resolveResult.DeclaredElement with
+            | :? ITypeParameter as typeParameter ->
+                match typeParameter.Owner with
+                | null -> isObjectType ilType
+                | _ ->
+
+                match ilType with
+                | ILType.TypeVar index -> index = uint16 (getGlobalIndex typeParameter)
+                | _ -> false
+
+            | :? ITypeElement as typeElement ->
+                let isValueType =
+                    match typeElement with
+                    | :? IEnum
+                    | :? IStruct -> true
+                    | _ -> false
+
+                match ilType, isValueType with
+                | ILType.Value typeSpec, true
+                | ILType.Boxed typeSpec, false ->
+                    mkTypeRef typeElement = typeSpec.TypeRef &&
+
+                    let substitution = resolveResult.Substitution
+                    let domain = substitution.Domain
+                    if domain.IsEmpty() then List.isEmpty typeSpec.GenericArgs else
+
+                    // `mkType` orders the arguments by the global index.
+                    let genericArgs = typeSpec.GenericArgs
+                    domain.Count = genericArgs.Length &&
+
+                    domain |> Seq.forall (fun typeParameter ->
+                        let index = getGlobalIndex typeParameter
+                        index < genericArgs.Length &&
+                        isSameType substitution[typeParameter] genericArgs[index])
+
+                | _ -> false
+
+            | _ -> false
+
+        | :? IArrayType as arrayType ->
+            match ilType with
+            | ILType.Array(shape, elementType) ->
+                shape.Rank = arrayType.Rank &&
+                isSameType arrayType.ElementType elementType
+            | _ -> false
+
+        | :? IPointerType as pointerType ->
+            match ilType with
+            | ILType.Ptr elementType -> isSameType pointerType.ElementType elementType
+            | _ -> false
+
+        | _ -> false
+
+    and isObjectType ilType =
+        isSameType (psiModule.GetPredefinedType().Object) ilType
+
+    and isUnresolvedType ilType =
+        let objType = psiModule.GetPredefinedType().Object
+        if objType.IsResolved then isObjectType ilType else ilType = ILType.Void
+
     let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
     let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
 
@@ -507,26 +608,35 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         ILMethodRef.Create(typeRef, callingConv, name, typeParamsCount, paramTypes, returnType)
 
-    let mkTypeDefExtends (typeElement: ITypeElement): ILType option =
-        // todo: intern
+    let getBaseType (typeElement: ITypeElement): IType =
+        let predefinedType = psiModule.GetPredefinedType()
+
         match typeElement with
         | :? IClass as c ->
             match c.GetBaseClassType() with
-            | null -> Some(mkType (psiModule.GetPredefinedType().Object))
-            | baseType -> Some(mkType baseType)
+            | null -> predefinedType.Object
+            | baseType -> baseType
 
-        | :? IEnum -> Some(mkType (psiModule.GetPredefinedType().Enum))
-        | :? IStruct -> Some(mkType (psiModule.GetPredefinedType().ValueType))
-        | :? IDelegate -> Some(mkType (psiModule.GetPredefinedType().MulticastDelegate))
+        | :? IEnum -> predefinedType.Enum
+        | :? IStruct -> predefinedType.ValueType
+        | :? IDelegate -> predefinedType.MulticastDelegate
+        | _ -> null
 
-        | _ -> None
+    let getInterfaces (typeElement: ITypeElement) =
+        typeElement.GetSuperTypesWithoutCircularDependent()
+        |> Seq.filter (fun declaredType -> declaredType.GetTypeElement() :? IInterface)
+
+    let mkTypeDefExtends (typeElement: ITypeElement): ILType option =
+        // todo: intern
+        match getBaseType typeElement with
+        | null -> None
+        | baseType -> Some(mkType baseType)
 
     let mkTypeDefImplements (typeElement: ITypeElement) =
-        [ for declaredType in typeElement.GetSuperTypesWithoutCircularDependent() do
-            if declaredType.GetTypeElement() :? IInterface then
-                // TODO: Interface implementation can have attributes on it (not expressible in F#/C#, but in IL it is)
-                // and C# nullness metadata export makes use of it.
-                InterfaceImpl.Create(mkType declaredType) ]
+        // TODO: Interface implementation can have attributes on it (not expressible in F#/C#, but in IL it is)
+        // and C# nullness metadata export makes use of it.
+        [ for declaredType in getInterfaces typeElement do
+            InterfaceImpl.Create(mkType declaredType) ]
 
     let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list) : ILAttribute option =
         let attrType = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule)
@@ -544,6 +654,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkCompilerGeneratedAttributeNoArgs (attrTypeName: IClrTypeName): ILAttribute option =
         mkCompilerGeneratedAttribute attrTypeName []
 
+    let isCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (ilAttr: ILAttribute) =
+        match ilAttr with
+        | ILAttribute.Decoded(methodSpec, [], []) ->
+            methodSpec.MethodRef.DeclaringTypeRef.Name = attrTypeName.FullName
+        | _ -> false
+
     let paramArrayAttribute () =
         mkCompilerGeneratedAttributeNoArgs PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS
 
@@ -555,6 +671,23 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let internalsVisibleToAttribute arg =
         mkCompilerGeneratedAttribute PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS [ ILAttribElem.String(Some(arg)) ]
+
+    let internalsVisibleToNames () =
+        psiModule.GetPsiServices().Symbols
+            .GetModuleAttributes(psiModule)
+            .GetAttributeInstances(PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS, false)
+        |> Seq.choose (fun instance ->
+            match instance.PositionParameter(0).ConstantValue.AsString() with
+            | null -> None
+            | name -> Some name)
+
+    let isUnknownValueType (valueTypes: IDictionary<IClrTypeName, _>) (valueType: IType) =
+        // The builders take a string before the table, so a string type is not unknown.
+        not (valueType.IsString()) &&
+
+        match valueType.As<IDeclaredType>() with
+        | null -> true
+        | declaredType -> not (valueTypes.ContainsKey(declaredType.GetClrName()))
 
     // todo: typeof, arrays
     let attributeValueTypes =
@@ -572,46 +705,80 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
            PredefinedType.DOUBLE_FQN,  fun (c: ConstantValue) -> ILAttribElem.Double c.DoubleValue |]
         |> dict
 
+    let mkAttribElement (attrValue: AttributeValue) =
+        let constantValue = attrValue.ConstantValue
+
+        // todo: use default value for type from parameter/property?
+        if constantValue.IsBadValue() || constantValue.IsNull() then ILAttribElem.Null else
+
+        if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
+
+        let valueType =
+            if constantValue.IsEnum() then
+                constantValue.Type.GetEnumUnderlying()
+            else
+                constantValue.Type
+
+        let declaredType = valueType.As<IDeclaredType>()
+
+        let mutable literalType = Unchecked.defaultof<_>
+        match attributeValueTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
+        | true -> cache.AttributeValues.Intern(literalType constantValue)
+        | _ -> ILAttribElem.Null
+
+    let isSameAttributeValue (valueType: IType) (c: ConstantValue) (ilElem: ILAttribElem) =
+        match ilElem with
+        | ILAttribElem.String(Some value) -> valueType.IsString() && c.StringValue = value
+        | ILAttribElem.Bool value   -> valueType.IsBool()   && c.BoolValue = value
+        | ILAttribElem.Char value   -> valueType.IsChar()   && c.CharValue = value
+        | ILAttribElem.SByte value  -> valueType.IsSbyte()  && c.SbyteValue = value
+        | ILAttribElem.Byte value   -> valueType.IsByte()   && c.ByteValue = value
+        | ILAttribElem.Int16 value  -> valueType.IsShort()  && c.ShortValue = value
+        | ILAttribElem.UInt16 value -> valueType.IsUshort() && c.UshortValue = value
+        | ILAttribElem.Int32 value  -> valueType.IsInt()    && c.IntValue = value
+        | ILAttribElem.UInt32 value -> valueType.IsUint()   && c.UintValue = value
+        | ILAttribElem.Int64 value  -> valueType.IsLong()   && c.LongValue = value
+        | ILAttribElem.UInt64 value -> valueType.IsUlong()  && c.UlongValue = value
+        | ILAttribElem.Single value -> valueType.IsFloat()  && c.FloatValue = value
+        | ILAttribElem.Double value -> valueType.IsDouble() && c.DoubleValue = value
+        | _ -> false
+
+    let isSameAttribElement (attrValue: AttributeValue) (ilElem: ILAttribElem) =
+        let constantValue = attrValue.ConstantValue
+        if constantValue.IsBadValue() || constantValue.IsNull() then ilElem = ILAttribElem.Null else
+
+        let valueType =
+            if constantValue.IsEnum() then
+                constantValue.Type.GetEnumUnderlying()
+            else
+                constantValue.Type
+
+        match ilElem with
+        | ILAttribElem.Null -> isUnknownValueType attributeValueTypes valueType
+        | _ -> isSameAttributeValue valueType constantValue ilElem
+
+    let attributeNamedParameters (attrInstance: IAttributeInstance) =
+        attrInstance.NamedParameters()
+        |> Seq.filter (fun (Pair(_, attributeValue)) -> attributeValue.IsConstant)
+
     let mkCustomAttribute (attrInstance: IAttributeInstance) =
         let ctor = attrInstance.Constructor
 
         let attrType = TypeFactory.CreateType(ctor.ContainingType)
         let methodSpec = ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, [])
 
-        let mkAttribElement (attrValue: AttributeValue) =
-            let constantValue = attrValue.ConstantValue
-
-            // todo: use default value for type from parameter/property?
-            if constantValue.IsBadValue() || constantValue.IsNull() then ILAttribElem.Null else
-
-            if constantValue.IsString() then ILAttribElem.String(Some constantValue.StringValue) else
-
-            let valueType = 
-                if constantValue.IsEnum() then
-                    constantValue.Type.GetEnumUnderlying()
-                else
-                    constantValue.Type
-
-            let declaredType = valueType.As<IDeclaredType>()
-
-            let mutable literalType = Unchecked.defaultof<_>
-            match attributeValueTypes.TryGetValue(declaredType.GetClrName(), &literalType) with
-            | true -> cache.AttributeValues.Intern(literalType constantValue)
-            | _ -> ILAttribElem.Null
-
-        let positionalArgs = 
+        let positionalArgs =
             attrInstance.PositionParameters()
             |> List.ofSeq
             |> List.map mkAttribElement
 
         let namedArgs =
-            attrInstance.NamedParameters()
-            |> List.ofSeq
-            |> List.filter (fun (Pair(_, attributeValue)) -> attributeValue.IsConstant)
-            |> List.map (fun (Pair(name, attributeValue)) ->
+            attributeNamedParameters attrInstance
+            |> Seq.map (fun (Pair(name, attributeValue)) ->
                 let attribElement = mkAttribElement attributeValue
                 let valueType = mkType attributeValue.ConstantValue.Type
                 name, valueType, true, attribElement)
+            |> List.ofSeq
 
         ILAttribute.Decoded(methodSpec, positionalArgs, namedArgs)
 
@@ -646,10 +813,14 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
           MetadataIndex = NoMetadataIdx
           HasAllowsRefStruct = false } // todo
 
-    let mkGenericParamDefs (typeElement: ITypeElement) =
+    /// `GetAllTypeParameters` gives the innermost first, and FCS needs the outermost first.
+    let getGenericParameters (typeElement: ITypeElement) =
         let typeParameters = typeElement.GetAllTypeParameters().ResultingList()
         [ for i in typeParameters.Count - 1 .. -1 .. 0 do
-            mkGenericParameterDef typeParameters[i] ]
+            typeParameters[i] ]
+
+    let mkGenericParamDefs (typeElement: ITypeElement) =
+        getGenericParameters typeElement |> List.map mkGenericParameterDef
 
     let rec hasExtensions (typeElement: ITypeElement) =
         let typeElement = typeElement.As<TypeElement>()
@@ -716,7 +887,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     // todo: cache
 
-    let getLiteralValue (value: ConstantValue) (valueType: IType): ILFieldInit option =
+    let mkLiteralValue (value: ConstantValue) (valueType: IType): ILFieldInit option =
         if value.IsBadValue() then None else
         if value.IsNull() then nullLiteralValue else
 
@@ -731,13 +902,47 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | _ -> None
         | _ -> None
 
+    let isSameLiteralValue (valueType: IType) (c: ConstantValue) (ilValue: ILFieldInit) =
+        match ilValue with
+        | ILFieldInit.String value -> valueType.IsString() && c.StringValue = value
+        | ILFieldInit.Bool value   -> valueType.IsBool()   && c.BoolValue = value
+        | ILFieldInit.Char value   -> valueType.IsChar()   && uint16 c.CharValue = value
+        | ILFieldInit.Int8 value   -> valueType.IsSbyte()  && c.SbyteValue = value
+        | ILFieldInit.UInt8 value  -> valueType.IsByte()   && c.ByteValue = value
+        | ILFieldInit.Int16 value  -> valueType.IsShort()  && c.ShortValue = value
+        | ILFieldInit.UInt16 value -> valueType.IsUshort() && c.UshortValue = value
+        | ILFieldInit.Int32 value  -> valueType.IsInt()    && c.IntValue = value
+        | ILFieldInit.UInt32 value -> valueType.IsUint()   && c.UintValue = value
+        | ILFieldInit.Int64 value  -> valueType.IsLong()   && c.LongValue = value
+        | ILFieldInit.UInt64 value -> valueType.IsUlong()  && c.UlongValue = value
+        | ILFieldInit.Single value -> valueType.IsFloat()  && c.FloatValue = value
+        | ILFieldInit.Double value -> valueType.IsDouble() && c.DoubleValue = value
+        | _ -> false
+
+    let isSameOptionalLiteralValue (c: ConstantValue) (valueType: IType) (ilValue: ILFieldInit option) =
+        if c.IsBadValue() then ilValue.IsNone else
+        if c.IsNull() then ilValue = nullLiteralValue else
+
+        match ilValue with
+        | Some ilValue -> isSameLiteralValue valueType c ilValue
+        | None -> isUnknownValueType literalTypes valueType
+
     let mkFieldLiteralValue (field: IField) =
         let valueType =
             let underlyingType = field.Type.GetEnumUnderlying()
             if isNotNull underlyingType then underlyingType else field.Type
 
         let value = field.ConstantValue
-        getLiteralValue value valueType
+        mkLiteralValue value valueType
+
+    let isSameFieldLiteralValue (field: IField) (ilValue: ILFieldInit option) =
+        if not (field.IsConstant || field.IsEnumMember) then ilValue.IsNone else
+
+        let valueType =
+            let underlyingType = field.Type.GetEnumUnderlying()
+            if isNotNull underlyingType then underlyingType else field.Type
+
+        isSameOptionalLiteralValue field.ConstantValue valueType ilValue
 
     // todo: unfinished field test (e.g. missing `;`)
 
@@ -779,22 +984,39 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let mkParamDefaultValue (param: IParameter) =
         let defaultValue = param.GetDefaultValue()
         if defaultValue.IsBadValue then None else
-        getLiteralValue defaultValue.ConstantValue defaultValue.DefaultTypeValue
+        mkLiteralValue defaultValue.ConstantValue defaultValue.DefaultTypeValue
+
+    let isSameParamDefaultValue (param: IParameter) (ilValue: ILFieldInit option) =
+        if not param.IsOptional then ilValue.IsNone else
+
+        let defaultValue = param.GetDefaultValue()
+        if defaultValue.IsBadValue then ilValue.IsNone else
+
+        isSameOptionalLiteralValue defaultValue.ConstantValue defaultValue.DefaultTypeValue ilValue
+
+    let isRefParameter (param: IParameter) =
+        match param.Kind with
+        | ParameterKind.INPUT
+        | ParameterKind.OUTPUT
+        | ParameterKind.REFERENCE -> true
+        | _ -> false
+
+    let mkParamType (param: IParameter) =
+        let paramType = mkType param.Type
+        if isRefParameter param then ILType.Byref paramType else paramType
+
+    let isSameParamType (param: IParameter) (ilType: ILType) =
+        if isRefParameter param then
+            match ilType with
+            | ILType.Byref elementType -> isSameType param.Type elementType
+            | _ -> false
+        else
+            isSameType param.Type ilType
 
     let mkParam (param: IParameter): ILParameter =
         let name = param.ShortName
-        let paramType = mkType param.Type
+        let paramType = mkParamType param
         let defaultValue = mkParamDefaultValue param
-
-        let isRef =
-            match param.Kind with
-            | ParameterKind.INPUT
-            | ParameterKind.OUTPUT
-            | ParameterKind.REFERENCE -> true
-            | _ -> false
-
-        let paramType =
-            if isRef then ILType.Byref paramType else paramType
 
         let customAttributes = mkCustomAttributes param
         let attrs =
@@ -804,7 +1026,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 match paramArrayAttribute () with
                 | Some attribute -> attribute
                 | _ -> ()
-            
+
               if param.Kind = ParameterKind.INPUT then
                  match isReadonlyAttribute () with
                  | Some attribute -> attribute
@@ -827,11 +1049,18 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let voidReturn = mkILReturn ILType.Void
     let methodBodyUnavailable = InterruptibleLazy.FromValue(MethodBody.NotAvailable)
 
+    let isExtensionMethod (method: IFunction) =
+        match method with
+        | :? IMethod as method -> method.IsExtensionMethod
+        | _ -> false
+
     let mkMethodReturn (method: IFunction) =
         let returnType = method.ReturnType
-        if returnType.IsVoid() then voidReturn else
+        let ret = if returnType.IsVoid() then voidReturn else mkILReturn (mkType returnType)
 
-        mkType returnType |> mkILReturn
+        match mkCustomAttributes method.ReturnTypeAttributes with
+        | [] -> ret
+        | attrs -> ret.WithCustomAttrs(mkILCustomAttrs attrs)
 
     let mkMethodDef (method: IFunction): ILMethodDef =
         let name = method.ShortName
@@ -848,14 +1077,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             | _ -> []
 
         let customAttrs =
-            let isExtension = 
-                match method with
-                | :? IMethod as method -> method.IsExtensionMethod
-                | _ -> false
-
             let customAttributes = mkCustomAttributes method
             [ yield! customAttributes
-              if isExtension then
+              if isExtensionMethod method then
                   match extensionAttribute () with
                   | Some attribute -> attribute
                   | _ -> () ]
@@ -869,20 +1093,28 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         ILMethodDef(name, methodAttrs, implAttributes, callingConv, parameters, ret, body, isEntryPoint, genericParams,
              securityDecls, customAttrs)
 
-    let mkEventDefType (event: IEvent) =
+    let getEventType (event: IEvent): IType =
         let eventType = event.Type
-        if eventType.IsUnknown then None else
-        Some(mkType eventType)
+        if eventType.IsUnknown then null else eventType
 
-    let mkEventAddMethod (event: IEvent) =
+    let mkEventDefType (event: IEvent) =
+        match getEventType event with
+        | null -> None
+        | eventType -> Some(mkType eventType)
+
+    let getAddAccessor (event: IEvent): IFunction =
         let adder = event.Adder
         if isNotNull adder then adder else ImplicitAccessor(event, AccessorKind.ADDER) :> _
-        |> mkMethodRef
 
-    let mkEventRemoveMethod (event: IEvent) =
+    let getRemoveAccessor (event: IEvent): IFunction =
         let remover = event.Remover
         if isNotNull remover then remover else ImplicitAccessor(event, AccessorKind.REMOVER) :> _
-        |> mkMethodRef
+
+    let mkEventAddMethod (event: IEvent) =
+        getAddAccessor event |> mkMethodRef
+
+    let mkEventRemoveMethod (event: IEvent) =
+        getRemoveAccessor event |> mkMethodRef
 
     let mkEventFireMethod (event: IEvent) =
         match event.Raiser with
@@ -956,39 +1188,48 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let getSignature (parametersOwner: IParametersOwner) =
         parametersOwner.GetSignature(parametersOwner.IdSubstitution)
 
+    let getMethods (typeElement: ITypeElement) =
+        seq {
+            let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
+            for method in typeElement.GetMembers().OfType<IFunction>() do
+                if not (isInaccessibleExplicitImpl method) && seenMethods.Add(getSignature method) then
+                    method
+        }
+
+    let getFields (typeElement: ITypeElement): seq<IField> =
+        match typeElement with
+        | :? IEnum as e -> e.EnumMembers
+        | _ -> typeElement.GetMembers().OfType<IField>()
+
+    let getProperties (typeElement: ITypeElement) =
+        seq {
+            let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
+            for property in typeElement.Properties do
+                if not (isInaccessibleExplicitImpl property) && seenProperties.Add(getSignature property) then
+                    property
+        }
+
+    let getEvents (typeElement: ITypeElement) =
+        typeElement.Events
+        |> Seq.filter (fun event -> not (isInaccessibleExplicitImpl event))
+
     let mkMethods (typeElement: ITypeElement) =
-        let seenMethods = HashSet(CSharpInvocableSignatureComparer.Overload)
-        [| for method in typeElement.GetMembers().OfType<IFunction>() do
-            if not (isInaccessibleExplicitImpl method) && seenMethods.Add(getSignature method) then
-                yield mkMethodDef method |]
+        getMethods typeElement |> Seq.map mkMethodDef |> Array.ofSeq
 
     let mkFields (typeElement: ITypeElement) =
         let fields =
-            match typeElement with
-            | :? IEnum as e -> e.EnumMembers
-            | _ -> typeElement.GetMembers().OfType<IField>()
-
-        let fields =
-            [ for field in fields do
+            [ for field in getFields typeElement do
                 yield mkFieldDef field ]
 
-        let fields = 
-            match typeElement with
-            | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
-            | _ -> fields
-
-        fields
+        match typeElement with
+        | :? IEnum as enum -> mkEnumInstanceValue enum :: fields
+        | _ -> fields
 
     let mkProperties (typeElement: ITypeElement) =
-        let seenProperties = HashSet(CSharpInvocableSignatureComparer.Overload)
-        [ for property in typeElement.Properties do
-            if not (isInaccessibleExplicitImpl property) && seenProperties.Add(getSignature property) then
-                yield mkPropertyDef property ]
+        getProperties typeElement |> Seq.map mkPropertyDef |> List.ofSeq
 
     let mkEvents (typeElement: ITypeElement) =
-        [ for event in typeElement.Events do
-            if not (isInaccessibleExplicitImpl event) then
-                yield mkEventDef event ]
+        getEvents typeElement |> Seq.map mkEventDef |> List.ofSeq
 
     let mkNestedTypes reader (typeElement: ITypeElement) =
         [| for typeElement in typeElement.NestedTypes do
@@ -999,18 +1240,24 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> clrTypeName.FullName
         | _ -> ProjectFcsModuleReader.mkNameFromClrTypeName clrTypeName
 
+    let moduleTypeElements () =
+        getSymbolScope().GetAllTypeElementsGroupedByName()
+        |> Seq.filter (fun typeElement -> isNull (typeElement.GetContainingType()))
+
     let mkPreTypeDefs reader =
-        let symbolScope = getSymbolScope ()
         // todo: make inner types computed on demand, needs an Fcs patch
         let result = List<ILPreTypeDef>()
 
-        for typeElement in symbolScope.GetAllTypeElementsGroupedByName() do
-            if isNull (typeElement.GetContainingType()) then
-                result.Add(PreTypeDef(typeElement, reader))
+        for typeElement in moduleTypeElements () do
+            result.Add(PreTypeDef(typeElement, reader))
 
         result.ToArray()
 
-    
+    let cacheMembersTable (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
+        let fcsTypeDef = typeDefs.TryGetValue(typeName)
+        if isNotNull fcsTypeDef && isNull fcsTypeDef.Members then
+            fcsTypeDef.Members <- table
+
     let getOrCreateNestedTypes (table: FcsTypeDefMembers) (typeName: IClrTypeName) defaultValue reader =
         use _ = usingWriteLock ()
 
@@ -1020,11 +1267,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         lock table (fun _ ->
             usingTypeElement typeName () (fun typeElement ->
                 table.NestedTypes <- mkNestedTypes reader typeElement
-
-                // Cache on the first access by FCS, so these table could later be used in isUpToDate checks
-                let fcsTypeDef = typeDefs.TryGetValue(typeName)
-                if isNotNull fcsTypeDef && isNull fcsTypeDef.Members then
-                    fcsTypeDef.Members <- table
+                cacheMembersTable table typeName
             )
 
             let memberTables = table.NestedTypes
@@ -1050,11 +1293,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                       Properties = mkProperties typeElement }
 
                 table.MemberTables <- memberTables
-
-                // Cache on the first access by FCS, so these table could later be used in isUpToDate checks
-                let fcsTypeDef = typeDefs.TryGetValue(typeName)
-                if isNotNull fcsTypeDef && isNull fcsTypeDef.Members then
-                    fcsTypeDef.Members <- table
+                cacheMembersTable table typeName
             )
 
             let memberTables = table.MemberTables
@@ -1083,132 +1322,244 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
 
     let isUpToDateTypeParamDef (typeParameter: ITypeParameter) (genericParameterDef: ILGenericParameterDef) =
-        let constraints = typeParameter.TypeConstraints |> Seq.map mkType |> List.ofSeq
-        constraints = genericParameterDef.Constraints
+        typeParameter.ShortName = genericParameterDef.Name &&
+        mkGenericVariance typeParameter.Variance = genericParameterDef.Variance &&
+        typeParameter.IsReferenceType = genericParameterDef.HasReferenceTypeConstraint &&
+        typeParameter.IsValueType = genericParameterDef.HasNotNullableValueTypeConstraint &&
+        typeParameter.HasDefaultConstructor = genericParameterDef.HasDefaultConstructorConstraint &&
 
-    let isUpToDateTypeParamDefs (typeParameters: IList<ITypeParameter>) (paramDefs: ILGenericParameterDefs) =
-        typeParameters.Count = paramDefs.Length &&
-        Seq.forall2 isUpToDateTypeParamDef typeParameters paramDefs
+        forallPaired isSameType typeParameter.TypeConstraints genericParameterDef.Constraints
+
+    let rec typeParametersCount (typeElement: ITypeElement) =
+        typeElement.TypeParametersCount +
+
+        match typeElement.GetContainingType() with
+        | null -> 0
+        | containingType -> typeParametersCount containingType
+
+    let rec isIdentityTypeArgs (ilTypeArgs: ILType list) index count =
+        match ilTypeArgs with
+        | [] -> index = count
+        | ilTypeArg :: rest ->
+
+        match ilTypeArg with
+        | ILType.TypeVar ilIndex -> ilIndex = uint16 index && isIdentityTypeArgs rest (index + 1) count
+        | _ -> false
+
+    /// `mkCustomAttribute` uses the identity substitution, so each argument is its type variable.
+    let isSameDeclaringType (typeElement: ITypeElement) (ilType: ILType) =
+        match ilType with
+        | ILType.Boxed typeSpec ->
+            mkTypeRef typeElement = typeSpec.TypeRef &&
+            isIdentityTypeArgs typeSpec.GenericArgs 0 (typeParametersCount typeElement)
+
+        | _ -> false
+
+    /// The owning property or event compares the accessor types, so the name and the count are enough.
+    let isSameAccessor (accessor: IFunction) (methodRef: ILMethodRef) =
+        accessor.ShortName = methodRef.Name &&
+        accessor.Parameters.Count = methodRef.ArgCount
+
+    let isSameOptionalAccessor (accessor: IFunction) (methodRef: ILMethodRef option) =
+        match methodRef with
+        | None -> isNull accessor
+        | Some methodRef -> isNotNull accessor && isSameAccessor accessor methodRef
+
+    let isUpToDateTypeParamDefs (typeParameters: seq<ITypeParameter>) (paramDefs: ILGenericParameterDefs) =
+        forallPaired isUpToDateTypeParamDef typeParameters paramDefs
+
+    let customAttributeInstances (attributesSet: IAttributesSet) =
+        attributesSet.GetAttributeInstances(AttributesSource.Self)
+        |> Seq.filter (fun attributeInstance -> isNotNull attributeInstance.Constructor)
+
+    let isSameCustomAttribute (attrInstance: IAttributeInstance) (ilAttr: ILAttribute) =
+        match ilAttr with
+        | ILAttribute.Encoded _ -> false
+        | ILAttribute.Decoded(methodSpec, fixedArgs, namedArgs) ->
+
+        let ctor = attrInstance.Constructor
+        isSameDeclaringType ctor.ContainingType methodSpec.DeclaringType &&
+        isSameAccessor ctor methodSpec.MethodRef &&
+        forallPaired isSameAttribElement (attrInstance.PositionParameters()) fixedArgs &&
+
+        (attributeNamedParameters attrInstance, namedArgs) ||> forallPaired (fun (Pair(name, attributeValue)) (ilName, ilType, ilIsField, ilElem) ->
+            name = ilName &&
+            ilIsField &&
+            isSameAttribElement attributeValue ilElem &&
+            isSameType attributeValue.ConstantValue.Type ilType)
+
+    /// The builder appends none when the attribute type does not resolve, so check before dropping.
+    let dropAppendedAttribute (attrTypeName: IClrTypeName) (attrs: ILAttribute[]) count =
+        if count > 0 && isCompilerGeneratedAttribute attrTypeName attrs[count - 1] then count - 1 else count
 
     let isUpToDateCustomAttributes (actual: IAttributesSet) (attrs: ILAttributes) =
-        let actual = mkCustomAttributes actual
-        actual.AsArray() = attrs.AsArray()
+        forallPaired isSameCustomAttribute (customAttributeInstances actual) (attrs.AsArray())
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
-        let expected = typeDef.CustomAttrsStored.CustomAttrs
-        let actual = mkTypeDefCustomAttrs typeElement
-        actual = expected.AsArray()
+        let expected = typeDef.CustomAttrsStored.CustomAttrs.AsArray()
+
+        let count =
+            if hasExtensions typeElement then
+                dropAppendedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS expected expected.Length
+            else
+                expected.Length
+
+        forallPairedUpTo isSameCustomAttribute (customAttributeInstances typeElement) expected count
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
-        mkType param.Type = paramDef.Type &&
+        // `IsIn` and `IsOut` hold the `in`, `out`, and `ref` modifiers.
+        Some(param.ShortName) = paramDef.Name &&
+        (param.Kind = ParameterKind.INPUT) = paramDef.IsIn &&
+        (param.Kind = ParameterKind.OUTPUT) = paramDef.IsOut &&
+        param.IsOptional = paramDef.IsOptional &&
 
-        let defaultValue = mkParamDefaultValue param
-        defaultValue = paramDef.Default
+        isSameParamType param paramDef.Type &&
+        isSameParamDefaultValue param paramDef.Default &&
+
+        let expected = paramDef.CustomAttrs.AsArray()
+        let count = expected.Length
+
+        let count =
+            if param.Kind = ParameterKind.INPUT then
+                dropAppendedAttribute PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN expected count
+            else count
+
+        let count =
+            if param.IsParameterArray then
+                dropAppendedAttribute PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS expected count
+            else count
+
+        forallPairedUpTo isSameCustomAttribute (customAttributeInstances param) expected count
 
     let isUpToDateReturn (method: IFunction) (methodDef: ILMethodDef) =
-        let ret = mkMethodReturn method
         let methodDefReturn = methodDef.Return
 
-        ret.Type = methodDefReturn.Type &&
+        let returnType = method.ReturnType
+        isSameType returnType methodDefReturn.Type &&
         isUpToDateCustomAttributes method.ReturnTypeAttributes methodDefReturn.CustomAttrs
+
+    let isUpToDateMethodCustomAttributes (method: IFunction) (attrs: ILAttributes) =
+        let expected = attrs.AsArray()
+
+        let count =
+            if isExtensionMethod method then
+                dropAppendedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS expected expected.Length
+            else
+                expected.Length
+
+        forallPairedUpTo isSameCustomAttribute (customAttributeInstances method) expected count
 
     let isUpToDateMethodDef (method: IFunction) (methodDef: ILMethodDef) =
         method.ShortName = methodDef.Name &&
         mkMethodAttributes method = methodDef.Attributes &&
+        mkCallingConv method = methodDef.CallingConv &&
 
         let parameters = method.Parameters
         parameters.Count = methodDef.Parameters.Length &&
+
+        let asMethod = method.As<IMethod>()
+        (isNull asMethod || isUpToDateTypeParamDefs asMethod.TypeParameters methodDef.GenericParams) &&
+
         Seq.forall2 isUpToDateParameterDef parameters methodDef.Parameters &&
 
         isUpToDateReturn method methodDef &&
-
-        isUpToDateCustomAttributes method methodDef.CustomAttrs &&
-        
-        let method = method.As<IMethod>()
-        isNull method || isUpToDateTypeParamDefs method.TypeParameters methodDef.GenericParams
+        isUpToDateMethodCustomAttributes method methodDef.CustomAttrs
 
     let isUpToDateMethodsDefs (typeElement: ITypeElement) (methodDefs: ILMethodDef[]) =
         isNull methodDefs ||
-
-        let methods = typeElement.GetMembers().OfType<IFunction>().AsArray()
-        methods.Length = methodDefs.Length &&
-
-        Array.forall2 isUpToDateMethodDef methods methodDefs
+        forallPaired isUpToDateMethodDef (getMethods typeElement) methodDefs
 
     let isUpToDateFieldDef (field: IField) (fieldDef: ILFieldDef) =
         field.ShortName = fieldDef.Name &&
-        mkType field.Type = fieldDef.FieldType &&
-        mkFieldLiteralValue field = fieldDef.LiteralValue &&
+
+        mkFieldAttributes field = fieldDef.Attributes &&
+        isSameType field.Type fieldDef.FieldType &&
+        isSameFieldLiteralValue field fieldDef.LiteralValue &&
         isUpToDateCustomAttributes field fieldDef.CustomAttrs
 
     let isUpToDateFieldDefs (typeElement: ITypeElement) (fieldDefs: ILFieldDef list) =
         isNull fieldDefs ||
 
-        let fields = List.ofSeq typeElement.Fields
-        fields.Length = fieldDefs.Length &&
+        // An enum gets a leading `value__` field, which no declared element gives.
+        let fieldDefs =
+            match typeElement, fieldDefs with
+            | :? IEnum, _ :: rest -> rest
+            | _ -> fieldDefs
 
-        List.forall2 isUpToDateFieldDef fields fieldDefs
+        forallPaired isUpToDateFieldDef (getFields typeElement) fieldDefs
+
+    let isSameEventType (event: IEvent) (ilEventType: ILType option) =
+        match getEventType event, ilEventType with
+        | null, ilEventType -> ilEventType.IsNone
+        | _, None -> false
+        | eventType, Some ilType -> isSameType eventType ilType
 
     let isUpToDateEventDef (event: IEvent) (eventDef: ILEventDef) =
         event.ShortName = eventDef.Name &&
-        mkEventDefType event = eventDef.EventType &&
-        mkEventAddMethod event = eventDef.AddMethod &&
-        mkEventRemoveMethod event = eventDef.RemoveMethod &&
-        mkEventFireMethod event = eventDef.FireMethod &&
+        isSameAccessor (getAddAccessor event) eventDef.AddMethod &&
+        isSameAccessor (getRemoveAccessor event) eventDef.RemoveMethod &&
+        isSameOptionalAccessor event.Raiser eventDef.FireMethod &&
+        isSameEventType event eventDef.EventType &&
         isUpToDateCustomAttributes event eventDef.CustomAttrs
 
     let isUpToDateEventDefs (typeElement: ITypeElement) (eventDefs: ILEventDef list) =
         isNull eventDefs ||
 
-        let events = List.ofSeq typeElement.Events
-        events.Length = eventDefs.Length &&
-
-        List.forall2 isUpToDateEventDef events eventDefs
+        forallPaired isUpToDateEventDef (getEvents typeElement) eventDefs
 
     let isUpToDatePropertyDef (property: IProperty) (propertyDef: ILPropertyDef) =
         property.ShortName = propertyDef.Name &&
-        mkPropertyParams property = propertyDef.Args &&
-        mkPropertySetter property = propertyDef.SetMethod &&
-        mkPropertyGetter property = propertyDef.GetMethod &&
+        mkCallingThisConv property = propertyDef.CallingConv &&
+        isSameOptionalAccessor property.Setter propertyDef.SetMethod &&
+        isSameOptionalAccessor property.Getter propertyDef.GetMethod &&
+        property.Parameters.Count = propertyDef.Args.Length &&
+
+        isSameType property.Type propertyDef.PropertyType &&
+
+        (property.Parameters, propertyDef.Args)
+        ||> forallPaired (fun (parameter: IParameter) ilType -> isSameType parameter.Type ilType) &&
+
         isUpToDateCustomAttributes property propertyDef.CustomAttrs
 
     let isUpToDatePropertyDefs (typeElement: ITypeElement) (propertyDefs: ILPropertyDef list) =
         isNull propertyDefs ||
 
-        let properties = List.ofSeq typeElement.Properties
-        properties.Length = properties.Length &&
-
-        List.forall2 isUpToDatePropertyDef properties propertyDefs
+        forallPaired isUpToDatePropertyDef (getProperties typeElement) propertyDefs
 
     let isUpToDateInterfaceImpls (typeElement: ITypeElement) (typeDef: ILTypeDef) =
         let expected = typeDef.Implements
-        if not expected.IsValueCreated then true else
+        not expected.IsValueCreated ||
 
-        let actual = mkTypeDefImplements typeElement
-        expected.Value.Length = actual.Length &&
+        (getInterfaces typeElement, expected.Value)
+        ||> forallPaired (fun declaredType impl -> isSameType declaredType impl.Type)
 
-        (expected.Value, actual)
-        ||> List.forall2 (fun i1 i2 -> i1.Type = i2.Type)
-
-    let isUpToDateBaseType (typeDef: ILTypeDef) typeElement =
+    let isUpToDateBaseType (typeDef: ILTypeDef) (typeElement: ITypeElement) =
         not typeDef.Extends.IsValueCreated ||
 
-        let actualBaseType = mkTypeDefExtends typeElement
-        actualBaseType = typeDef.Extends.Value
+        match getBaseType typeElement, typeDef.Extends.Value with
+        | null, extends -> extends.IsNone
+        | _, None -> false
+        | baseType, Some ilType -> isSameType baseType ilType
 
     let rec isUpToDateTypeDef (typeElement: ITypeElement) (fcsTypeDef: FcsTypeDef) =
         let typeDef = fcsTypeDef.TypeDef
 
+        mkTypeAttributes typeElement = typeDef.Attributes &&
         isUpToDateBaseType typeDef typeElement &&
         isUpToDateInterfaceImpls typeElement typeDef &&
-        isUpToDateTypeParamDefs typeElement.TypeParameters typeDef.GenericParams &&
+        isUpToDateTypeParamDefs (getGenericParameters typeElement) typeDef.GenericParams &&
         isUpToDateTypeDefCustomAttributes typeElement typeDef &&
         isUpToDateNestedTypesAndMembers typeElement fcsTypeDef.Members
 
     and isUpToDateNestedTypeDefs (typeElement: ITypeElement) (preTypeDefs: ILPreTypeDef[]) =
         isNull preTypeDefs ||
 
-        preTypeDefs.Length = typeElement.NestedTypes.Count &&
+        forallPaired (fun (nestedType: ITypeElement) (preTypeDef: ILPreTypeDef) ->
+            let clrTypeName: IClrTypeName = (preTypeDef :?> PreTypeDef).ClrTypeName
+            clrTypeName.ShortName = nestedType.ShortName &&
+            clrTypeName.TypeParametersCount = nestedType.TypeParametersCount)
+            typeElement.NestedTypes preTypeDefs &&
+
         preTypeDefs |> Array.forall (fun preTypeDef ->
             let preTypeDef = preTypeDef :?> PreTypeDef
             let clrTypeName = preTypeDef.ClrTypeName
@@ -1239,10 +1590,30 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> false
         | typeElement -> isUpToDateTypeDef typeElement fcsTypeDef
 
+    let isUpToDatePreTypeDefs (preTypeDefs: ILPreTypeDef[]) =
+        // todo: can the order change? Do we want to support it, if yes?
+        (moduleTypeElements (), preTypeDefs)
+        ||> forallPaired (fun typeElement preTypeDef ->
+            let clrTypeName: IClrTypeName = (preTypeDef :?> PreTypeDef).ClrTypeName
+            clrTypeName.ShortName = typeElement.ShortName &&
+            clrTypeName.TypeParametersCount = typeElement.TypeParametersCount &&
+            clrTypeName.GetNamespaceName() = typeElement.GetContainingNamespace().QualifiedName)
+
+    /// `mkILSimpleModule` gives the manifest no attribute, so only `InternalsVisibleTo` is there.
+    let isUpToDateManifestCustomAttributes (attrs: ILAttributes) =
+        (internalsVisibleToNames (), attrs.AsArray())
+        ||> forallPaired (fun name ilAttr ->
+            match ilAttr with
+            | ILAttribute.Decoded(methodSpec, [ ILAttribElem.String(Some ilName) ], []) ->
+                name = ilName &&
+                methodSpec.MethodRef.DeclaringTypeRef.Name =
+                    PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS.FullName
+            | _ -> false)
+
     // todo: check added/removed types
     /// Checks if any external change has lead to a metadata change,
     /// e.g. a super type resolves to a different thing.
-    let isUpToDate reader =
+    let isUpToDate () =
         locks.AssertReadAccessAllowed()
         use lock = usingWriteLock ()
 
@@ -1256,18 +1627,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         match moduleDef with
         | None -> ()
-        | Some(_, oldPreTypeDefs) ->
-            let newPreTypeDefs = mkPreTypeDefs reader
-            let preTypeDefsUpToDate =
-                oldPreTypeDefs.Length = newPreTypeDefs.Length &&
+        | Some(moduleDef, oldPreTypeDefs) ->
+            let upToDate =
+                isUpToDatePreTypeDefs oldPreTypeDefs &&
 
-                // todo: can the order change? Do we want to support it, if yes? 
-                (oldPreTypeDefs, newPreTypeDefs) ||> Array.forall2 (fun oldPreTypeDef newPreTypeDef ->
-                    oldPreTypeDef.Name = newPreTypeDef.Name &&
-                    oldPreTypeDef.Namespace = newPreTypeDef.Namespace
-                )
+                match moduleDef.Manifest with
+                | Some manifest -> isUpToDateManifestCustomAttributes manifest.CustomAttrsStored.CustomAttrs
+                | None -> true
 
-            if not preTypeDefsUpToDate then
+            if not upToDate then
                 seenOutdatedTypes <- true
 
         for KeyValue(clrTypeName, fcsTypeDef) in List.ofSeq typeDefs do
@@ -1401,18 +1769,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                         ProjectFcsModuleReader.DummyValues.metadataVersion
 
                 let ivtAttributes =
-                    let psiServices = psiModule.GetPsiServices()
-                    let attributeInstances =
-                        psiServices.Symbols
-                            .GetModuleAttributes(psiModule)
-                            .GetAttributeInstances(PredefinedType.INTERNALS_VISIBLE_TO_ATTRIBUTE_CLASS, false)
-
-                    [| for instance in attributeInstances do
-                         match instance.PositionParameter(0).ConstantValue.AsString() with
-                         | null -> ()
-                         | s ->
-
-                         match internalsVisibleToAttribute s with
+                    [| for name in internalsVisibleToNames () do
+                         match internalsVisibleToAttribute name with
                          | Some attribute -> attribute
                          | _ -> () |]
 
@@ -1451,7 +1809,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         member this.UpdateTimestamp() =
             use _ = usingWriteLock ()
             shim.Logger.Trace("Checking up to date: {0}", path)
-            if isUpToDate this then
+            if isUpToDate () then
                 shim.Logger.Trace("Up to date: {0}", path)
             else
                 upToDateCheckedTypes <- null
