@@ -37,4 +37,7 @@
     <data name="FSharpImportExtensionMember_MultipleChoices_Text" xml:space="preserve">
         <value>Import extension {0} '{1}' (multiple choices…)?</value>
     </data>
+    <data name="FSharpImportModule_Text" xml:space="preserve">
+        <value>Import module '{0}'</value>
+    </data>
 </root>

@@ -91,6 +91,7 @@ type ImportTypeAvailabilityTest() =
     override x.RelativeTestDataPath = "features/quickFixes/importType/availability"
 
     [<Test>] member x.``Static member 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module 01``() = x.DoNamedTest()
 
 
 [<AbstractClass; FSharpTest>]

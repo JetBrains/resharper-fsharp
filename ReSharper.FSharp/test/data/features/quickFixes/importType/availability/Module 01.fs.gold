@@ -1,0 +1,17 @@
+﻿module Test
+
+module A =
+    module M = ()
+
+|M|(0)
+
+------------------------------------------------
+0: The value or constructor 'M' is not defined.
+QUICKFIXES:
+Import missing references in file
+--Import missing references in project
+--Import missing references in solution
+Import module 'Test.A.M'
+--Import module 'M' in file
+--Import module 'M' in project
+--Import module 'M' in solution
