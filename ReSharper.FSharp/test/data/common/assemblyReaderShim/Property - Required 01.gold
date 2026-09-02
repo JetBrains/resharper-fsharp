@@ -1,0 +1,15 @@
+﻿module Module
+
+let _ = Class(Req = 1)
+let _ = Class(Req = 1, Opt = 2)
+
+let _ = |Class()|(0)
+let _ = |Class(Opt = 2)|(1)
+
+let _ = WithCtor(1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The following required properties have to be initialized:
+   property Class.Req: int with get, set
+(1): ReSharper Underlined Error Highlighting: The following required properties have to be initialized:
+   property Class.Req: int with get, set

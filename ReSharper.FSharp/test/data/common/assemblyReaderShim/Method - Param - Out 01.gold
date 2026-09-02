@@ -1,0 +1,14 @@
+﻿module Module
+
+let mutable x = 1
+Class.M(&x)
+
+let _: int = Class.M()
+
+Class.M(|""|(0))
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int ref'    
+but here has type
+    'string'    

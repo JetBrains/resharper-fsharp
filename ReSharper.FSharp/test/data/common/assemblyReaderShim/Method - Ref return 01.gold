@@ -1,0 +1,12 @@
+﻿module Module
+
+Class.M() <- 5
+
+let _: string = |Class.M()|(0)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'int'    
+is not compatible with type
+    'string'    
+

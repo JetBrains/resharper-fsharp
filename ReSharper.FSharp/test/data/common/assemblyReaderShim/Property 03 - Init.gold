@@ -1,0 +1,23 @@
+﻿module Module
+
+let c = Class(GetInit = 1, Init = 1)
+
+let _: int = c.Get
+let _: int = c.GetSet
+let _: int = c.|Set|(0)
+let _: int = c.GetInit
+let _: int = c.|Init|(1)
+
+|c.|Get|(2)|(3) <- 1
+c.GetSet <- 1
+c.Set <- 1
+c.|GetInit|(4) <- 1
+c.|Init|(5) <- 1
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Property 'Set' is not readable
+(1): ReSharper Underlined Error Highlighting: Property 'Init' is not readable
+(2): ReSharper Underlined Error Highlighting: Property 'Get' cannot be set
+(3): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(4): ReSharper Underlined Error Highlighting: Init-only property 'GetInit' cannot be set outside the initialization code. See https://aka.ms/fsharp-assigning-values-to-properties-at-initialization
+(5): ReSharper Underlined Error Highlighting: Init-only property 'Init' cannot be set outside the initialization code. See https://aka.ms/fsharp-assigning-values-to-properties-at-initialization

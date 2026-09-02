@@ -1,0 +1,13 @@
+﻿module Module
+
+let c = Class()
+let mutable x = 1
+let _: int = c[&x]
+
+let _: int = c[|1|(0)]
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'inref<int>'    
+but here has type
+    'int'    

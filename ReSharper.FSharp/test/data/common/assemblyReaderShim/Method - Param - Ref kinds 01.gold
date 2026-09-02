@@ -1,0 +1,24 @@
+﻿module Module
+
+let mutable x = 1
+Class.Ref(&x)
+Class.In(&x)
+Class.RefRo(&x)
+
+Class.Ref(|""|(0))
+Class.In(|""|(1))
+Class.RefRo(|""|(2))
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int ref'    
+but here has type
+    'string'    
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'inref<int>'    
+but here has type
+    'string'    
+(2): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'inref<int>'    
+but here has type
+    'string'    

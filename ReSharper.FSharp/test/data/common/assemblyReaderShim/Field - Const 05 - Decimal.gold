@@ -1,0 +1,15 @@
+﻿module Module
+
+let a: decimal = Class.Dec
+let b: int = Class.Int
+let c: decimal = Class.Ro
+
+[<Literal>]
+let L = ||Class.Dec|(0)|(1)
+
+let d x = match x with | |Class.Dec|(2) -> 1 | _ -> 2
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This is not a valid constant expression
+(1): ReSharper Underlined Error Highlighting: This is not a valid constant expression or custom attribute value
+(2): ReSharper Underlined Error Highlighting: This field is not a literal and cannot be used in a pattern

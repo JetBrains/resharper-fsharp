@@ -1,0 +1,21 @@
+﻿module Module
+
+Class.Unmanaged(1)
+Class.Struct(1)
+Class.New(1)
+Class.Plain(1)
+
+Class.Struct(ManagedStruct())
+Class.New(ManagedStruct())
+Class.Plain(ManagedStruct())
+
+Class.Unmanaged(ManagedStruct())
+
+Class.Unmanaged(|""|(0))
+Class.Struct(|""|(1))
+Class.New(|""|(2))
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'string' is an unmanaged type
+(1): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'string' have a public default constructor
+(2): ReSharper Underlined Error Highlighting: A generic construct requires that the type 'string' have a public default constructor

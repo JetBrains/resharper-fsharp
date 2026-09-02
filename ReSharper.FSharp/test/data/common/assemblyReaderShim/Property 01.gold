@@ -27,24 +27,24 @@ let _: int = c.|Init|(5)
 |c.|Get|(6)|(7) <- 1
 c.GetSet <- 1
 |c.|GetGet|(8)|(9) <- 1
-c.GetInit <- 1
-c.Init <- 1
+c.|GetInit|(10) <- 1
+c.|Init|(11) <- 1
 
 
-let _: int = Class.|SetWithoutBody|(10)
+let _: int = Class.|SetWithoutBody|(12)
 Class.SetWithoutBody <- 1
 
-let _: int = Class.|InitWithoutBody|(11)
+let _: int = Class.|InitWithoutBody|(13)
 Class.InitWithoutBody <- 1
 
-let _: int = Class.|WrongAccessorName1|(12)
-Class.||WrongAccessorName1|(13)|(14) <- 1
+let _: int = Class.|WrongAccessorName1|(14)
+Class.||WrongAccessorName1|(15)|(16) <- 1
 
 let _: int = Class.WrongAccessorName2
-|Class.|WrongAccessorName2|(15)|(16) <- 1
+|Class.|WrongAccessorName2|(17)|(18) <- 1
 
-let _: int = Class.|NoAccessors|(17)
-Class.||NoAccessors|(18)|(19) <- 1
+let _: int = Class.|NoAccessors|(19)
+Class.||NoAccessors|(20)|(21) <- 1
 
 ---------------------------------------------------------
 (0): ReSharper Underlined Error Highlighting: Property 'StaticSet' is not readable
@@ -57,13 +57,15 @@ Class.||NoAccessors|(18)|(19) <- 1
 (7): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
 (8): ReSharper Underlined Error Highlighting: Property 'GetGet' cannot be set
 (9): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(10): ReSharper Underlined Error Highlighting: Property 'SetWithoutBody' is not readable
-(11): ReSharper Underlined Error Highlighting: Property 'InitWithoutBody' is not readable
-(12): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
-(13): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' cannot be set
+(10): ReSharper Underlined Error Highlighting: Init-only property 'GetInit' cannot be set outside the initialization code. See https://aka.ms/fsharp-assigning-values-to-properties-at-initialization
+(11): ReSharper Underlined Error Highlighting: Init-only property 'Init' cannot be set outside the initialization code. See https://aka.ms/fsharp-assigning-values-to-properties-at-initialization
+(12): ReSharper Underlined Error Highlighting: Property 'SetWithoutBody' is not readable
+(13): ReSharper Underlined Error Highlighting: Property 'InitWithoutBody' is not readable
 (14): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
-(15): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName2' cannot be set
-(16): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
-(17): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
-(18): ReSharper Underlined Error Highlighting: Property 'NoAccessors' cannot be set
+(15): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' cannot be set
+(16): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName1' is not readable
+(17): ReSharper Underlined Error Highlighting: Property 'WrongAccessorName2' cannot be set
+(18): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
 (19): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
+(20): ReSharper Underlined Error Highlighting: Property 'NoAccessors' cannot be set
+(21): ReSharper Underlined Error Highlighting: Property 'NoAccessors' is not readable
