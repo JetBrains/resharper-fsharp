@@ -499,7 +499,8 @@
 
   <Error staticGroup="FSharpErrors" name="PropertyCannotBeSet" ID="FS0810: Property cannot be set">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Message resourceName="PropertyCannotBeSetMessage">refExpr.ShortName</Message>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message>fcsMessage</Message>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
     <QuickFix>AddSetterFix</QuickFix>
   </Error>

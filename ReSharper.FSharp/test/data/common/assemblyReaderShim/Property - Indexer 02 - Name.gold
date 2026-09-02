@@ -1,0 +1,13 @@
+﻿module Module
+
+let named = Named()
+let plain = Plain()
+
+let a = named[0]
+let b = plain[0]
+
+let c = named.Foo(0)
+let d = named.|Item|(0)(0)
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'Named' does not define a field, constructor, or member named 'Item'.

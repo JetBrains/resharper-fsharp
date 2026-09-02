@@ -477,7 +477,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromParentNode PropertyIsStaticError range
 
         | PropertyCannotBeSet ->
-            createHighlightingFromParentNode PropertyCannotBeSetError range
+            createHighlightingFromParentNodeWithMessage PropertyCannotBeSetError range error
 
         | AttributeIsNotValidOnThisElement ->
             match fsFile.GetNode<IAttribute>(range) with

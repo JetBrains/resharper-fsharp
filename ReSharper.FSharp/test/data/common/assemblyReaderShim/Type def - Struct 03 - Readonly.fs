@@ -1,0 +1,16 @@
+module Module
+
+let inRefRo (s: inref<RoStruct>) = s.Get()
+let inRefMut (s: inref<MutStruct>) = s.Get()
+let inRefMutRo (s: inref<MutStruct>) = s.GetRo()
+
+let roVal = RoStruct(1)
+let mutVal = MutStruct(1)
+
+let _: int = roVal.Get()
+let _: int = mutVal.Get()
+let _: int = mutVal.GetRo()
+
+let localRo () =
+    let s = RoStruct(1)
+    s.Get()

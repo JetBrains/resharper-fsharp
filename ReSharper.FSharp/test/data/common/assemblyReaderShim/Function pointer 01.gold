@@ -1,0 +1,36 @@
+﻿module Module
+
+let c = Class()
+
+let _: nativeint = c.Field
+let _: nativeint = c.Property
+let _: nativeint = Class.N()
+
+Class.M(0n)
+
+
+let _: int = |c.Field|(0)
+let _: int = |c.Property|(1)
+let _: int = |Class.N()|(2)
+
+Class.M(|""|(3))
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'nativeint'    
+(1): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'nativeint'    
+is not compatible with type
+    'int'    
+
+(2): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'nativeint'    
+is not compatible with type
+    'int'    
+
+(3): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'nativeint'    
+but here has type
+    'string'    

@@ -84,7 +84,6 @@ type public Strings() =
     static member ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage = Strings.ResourceManager.GetString("ParenthesesAreRedundantIfAttributeHasNoArgumentsMessage")
     static member ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics = Strings.ResourceManager.GetString("ParenthesesCanBeSafelyRemovedWithoutChangingCodeSemantics")
     static member PatternCanBeSimplifiedMessage = Strings.ResourceManager.GetString("PatternCanBeSimplifiedMessage")
-    static member PropertyCannotBeSetMessage = Strings.ResourceManager.GetString("PropertyCannotBeSetMessage")
     static member ProtectedMembersCannotBeAccessedFromClosuresMessage = Strings.ResourceManager.GetString("ProtectedMembersCannotBeAccessedFromClosuresMessage")
     static member QualifierIsRedundantMessage = Strings.ResourceManager.GetString("QualifierIsRedundantMessage")
     static member RedundantApplication = Strings.ResourceManager.GetString("RedundantApplication")

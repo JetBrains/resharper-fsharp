@@ -1,0 +1,39 @@
+﻿module Module
+
+let singleIndexer = SingleIndexer()
+let pointerAndString = PointerAndString()
+
+let _: int = singleIndexer[0n]
+let _: int = pointerAndString[0n]
+let _: int = pointerAndString[""]
+
+let argTypes = ArgTypes()
+let byrefArg = ByrefArg()
+let byrefReturn = ByrefReturn()
+
+let _: int = |argTypes[0n]|(0)
+let _: int = |byrefArg[0n]|(1)
+let _: int = |byrefReturn[0n]|(2)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: A unique overload for method 'Item' could not be determined based on type information prior to this program point. A type annotation may be needed.
+
+Known type of argument: nativeint
+
+Candidates:
+ - ArgTypes.get_Item(f: nativeint) : int
+ - ArgTypes.get_Item(f: nativeint) : int
+(1): ReSharper Underlined Error Highlighting: A unique overload for method 'Item' could not be determined based on type information prior to this program point. A type annotation may be needed.
+
+Known type of argument: nativeint
+
+Candidates:
+ - ByrefArg.get_Item(f: nativeint) : int
+ - ByrefArg.get_Item(f: nativeint) : int
+(2): ReSharper Underlined Error Highlighting: A unique overload for method 'Item' could not be determined based on type information prior to this program point. A type annotation may be needed.
+
+Known type of argument: nativeint
+
+Candidates:
+ - ByrefReturn.get_Item(f: nativeint) : int
+ - ByrefReturn.get_Item(f: nativeint) : int

@@ -154,9 +154,6 @@
     <data name="PatternCanBeSimplifiedMessage" xml:space="preserve">
         <value>Pattern can be simplified</value>
     </data>
-    <data name="PropertyCannotBeSetMessage" xml:space="preserve">
-        <value>Property '{0}' cannot be set</value>
-    </data>
     <data name="ProtectedMembersCannotBeAccessedFromClosuresMessage" xml:space="preserve">
         <value>Protected members cannot be accessed from closures</value>
     </data>

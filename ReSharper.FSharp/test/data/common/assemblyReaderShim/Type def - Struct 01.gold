@@ -1,0 +1,10 @@
+﻿module Module
+
+let _: Class = null
+let _: Struct = |null|(0)
+
+let struct_ = Struct()
+let class_ = Class()
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'Struct' does not have 'null' as a proper value

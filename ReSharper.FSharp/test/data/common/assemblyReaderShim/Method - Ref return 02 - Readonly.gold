@@ -1,0 +1,15 @@
+﻿module Module
+
+|Class.M() <- 5|(0)
+
+let _: int = Class.M()
+
+let _: string = |Class.M()|(1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Invalid mutation of a constant expression. Consider copying the expression to a mutable local, e.g. 'let mutable x = ...'.
+(1): ReSharper Underlined Error Highlighting: Type constraint mismatch. The type 
+    'int'    
+is not compatible with type
+    'string'    
+

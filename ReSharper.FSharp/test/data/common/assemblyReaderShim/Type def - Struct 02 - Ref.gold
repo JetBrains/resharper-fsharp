@@ -1,0 +1,13 @@
+﻿module Module
+
+let boxRef (s: RefStruct) = |box s|(0)
+let boxPlain (s: PlainStruct) = box s
+
+let |listRef|(1) (s: RefStruct) = |[ |s|(2) ]|(3)
+let listPlain (s: PlainStruct) = [ s ]
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: A type instantiation involves a byref type. This is not permitted by the rules of Common IL.
+(1): ReSharper Underlined Error Highlighting: The function or method has an invalid return type 'RefStruct list'. This is not permitted by the rules of Common IL.
+(2): ReSharper Underlined Error Highlighting: The byref typed value 's' cannot be used at this point
+(3): ReSharper Underlined Error Highlighting: A type instantiation involves a byref type. This is not permitted by the rules of Common IL.

@@ -92,10 +92,14 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Field - Const 02 - Wrong type``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 03 - Same name``() = x.DoNamedTest()
     [<Test>] member x.``Field - Const 04 - Enum of another type``() = x.DoNamedTest()
+    [<Test>] member x.``Field - Const 05 - Decimal``() = x.DoNamedTest()
     [<Test>] member x.``Field - Same name 01``() = x.DoNamedTest()
     [<Test>] member x.``Field - Same name 02 - Static``() = x.DoNamedTest()
     [<Test>] member x.``Field 01``() = x.DoNamedTest()
     [<Test>] member x.``Field 02 - Inherit``() = x.DoNamedTest()
+
+    [<Test>] member x.``Function pointer 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function pointer 02 - Indexer overloads``() = x.DoNamedTest()
 
     [<Test>] member x.``Method - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Ctor 02 - Param array``() = x.DoNamedTest()
@@ -106,13 +110,21 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Method - Extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Extern 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Override 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Ref return 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Ref return 02 - Readonly``() = x.DoNamedTest()
     [<Test>] member x.``Method - Param - Optional 01``() = x.DoNamedTest()
     [<Test>] member x.``Method - Param - Optional 02``() = x.DoNamedTest()
     [<Test>] member x.``Method - Param - Optional 03``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Out 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Ref kinds 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param - Ref readonly 01``() = x.DoNamedTest()
+    [<Test>] member x.``Method - Param 01``() = x.DoNamedTest()
 
-    [<Test; Explicit "Can't reference attribute in net451">]
-    member x.``Method - Param 01``() = x.DoNamedTest()
-
+    [<Test>] member x.``Property - Indexer 01 - In param``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Indexer 02 - Name``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Ref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Required 01``() = x.DoNamedTest()
+    [<Test>] member x.``Property 03 - Init``() = x.DoNamedTest()
     [<Test>] member x.``Property - Implementation 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Duplicate 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Explicit impl 01``() = x.DoNamedTest()
@@ -122,7 +134,7 @@ type AssemblyReaderCSharpTest() =
 
     [<Test>] member x.``Type def - Class 01``() = x.DoNamedTest()
     [<Test>] member x.``Type def - Class 02 - Nested``() = x.DoNamedTest()
-    [<Test; Explicit>] member x.``Type def - Class 03 - Abstract``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Class 03 - Abstract``() = x.DoNamedTest()
     [<Test>] member x.``Type def - Class 04 - Interface impl``() = x.DoNamedTest()
 
     [<Test>] member x.``Type def - Delegate 01``() = x.DoNamedTest()
@@ -138,7 +150,12 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Type def - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Type def - Nested 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type def - Struct 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Struct 02 - Ref``() = x.DoNamedTest()
+    [<Test>] member x.``Type def - Struct 03 - Readonly``() = x.DoNamedTest()
+
     [<Test>] member x.``Type parameter 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameter 02 - Unmanaged``() = x.DoNamedTest()
 
 
 type AssemblyReaderVbTest() =
