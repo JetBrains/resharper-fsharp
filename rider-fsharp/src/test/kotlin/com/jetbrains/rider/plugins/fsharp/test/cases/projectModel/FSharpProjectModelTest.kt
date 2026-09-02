@@ -62,12 +62,7 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpProjectStructure() {
-    withDump(
-        {
-            checkSlnFile = false
-            compareProjFilesOptions = XmlNodes()
-        }
-    ) {
+    withDump({ checkSlnFile = false; compareProjFilesOptions = XmlNodes() }) {
       dumpWithSingleProjectMapping("Init") {
       }
       dumpWithSingleProjectMapping(

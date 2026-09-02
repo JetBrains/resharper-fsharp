@@ -5,14 +5,14 @@ Init
  -SolutionWithDuplicateTargets * 1 project
   -Library
    -Dependencies
-    -.NETStandard 2.1
+    -.NET 10.0
      -Assemblies
       -Implicit
        ...
      -Packages
-      FSharp.Core/8.0.403
+      FSharp.Core/10.1.202
      -Frameworks
-      NETStandard.Library
+      Microsoft.NETCore.App
    Library.fs
    host.json
 
@@ -30,8 +30,9 @@ Project [Name:Library, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:netstandard2.1, IsHidden:true]
+            Folder [Name:net10.0, IsHidden:true]
               Child items:
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
                 ProjectFileImpl(Path : Library.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
@@ -45,19 +46,25 @@ Content roots:
   SolutionWithDuplicateTargets/Library.fs
   SolutionWithDuplicateTargets/Library.fsproj
   SolutionWithDuplicateTargets/host.json
-  SolutionWithDuplicateTargets/obj/Debug/netstandard2.1/Library.AssemblyInfo.fs
+  SolutionWithDuplicateTargets/obj/Debug/net10.0/ILLink.Substitutions.xml
+  SolutionWithDuplicateTargets/obj/Debug/net10.0/Library.AssemblyInfo.fs
 
 1:obj[1]
   1:Debug[1]
-    1:netstandard2.1[1]
+    1:net10.0[1]
       1:Library.AssemblyInfo.fs
-      2:.NETStandard,Version=v2.1.AssemblyAttributes.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 2:Library.fs
 3:host.json (None)
+4:obj[2]
+  1:Debug[2]
+    1:net10.0[2]
+      1:ILLink.Substitutions.xml (EmbeddedResource)
 
-.NETStandard,Version=v2.1
-obj/Debug/netstandard2.1/Library.AssemblyInfo.fs
-obj/Debug/netstandard2.1/.NETStandard,Version=v2.1.AssemblyAttributes.fs
+net10.0
+obj/Debug/net10.0/Library.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 Library.fs
 host.json
+obj/Debug/net10.0/ILLink.Substitutions.xml
 
