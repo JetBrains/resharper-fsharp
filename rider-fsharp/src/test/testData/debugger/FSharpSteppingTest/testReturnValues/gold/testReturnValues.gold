@@ -75,7 +75,6 @@ $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
 Stepped over i4:
 --> Program.fs:28(322,334) // let i5 = g 1
 $Program.main@() in <StartupCode$ReturnValueTest>, ReturnValueTest.dll
-    System.Math.Max(1, 2) = {int} 2
     f (System.Math.Max(1, 2)) = {int} 3
     i1 = {int} 3
     i2 = {int} 2
