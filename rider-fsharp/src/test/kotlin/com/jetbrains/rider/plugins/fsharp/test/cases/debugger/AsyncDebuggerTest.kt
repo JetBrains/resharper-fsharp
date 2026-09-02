@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
-@TestSettings(sdkVersion = SdkVersion.DOT_NET_6, buildTool = BuildTool.SDK)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("AsyncProgram")
 class AsyncDebuggerTest : DebuggerTestBase() {
   override val projectName = "AsyncProgram"

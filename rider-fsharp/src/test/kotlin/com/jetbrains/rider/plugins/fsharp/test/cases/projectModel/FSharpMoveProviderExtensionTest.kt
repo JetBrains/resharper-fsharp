@@ -45,7 +45,7 @@ class FSharpMoveProviderExtensionTest : PerTestProjectModelTestBase() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution2")
   fun testAllowPaste02_DifferentFiles() {
     doTest { provider ->
@@ -106,7 +106,7 @@ class FSharpMoveProviderExtensionTest : PerTestProjectModelTestBase() {
   }
 
   @Test
-  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @TestSettings(sdkVersion = SdkVersion.DOT_NET_8, buildTool = BuildTool.SDK)
   @Solution("MoveProviderSolution3")
   fun testAllowPaste03_DifferentFilesInFolders() {
     doTest { provider ->
