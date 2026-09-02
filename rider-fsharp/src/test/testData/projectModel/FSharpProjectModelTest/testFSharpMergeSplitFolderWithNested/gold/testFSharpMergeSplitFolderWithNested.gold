@@ -5,7 +5,7 @@ Init
  -SplitNested * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NET 5.0
+    -.NET 10.0
      -Assemblies
       -Implicit
        ...
@@ -43,9 +43,10 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net5.0, IsHidden:true]
+            Folder [Name:net10.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -58,14 +59,15 @@ Content roots:
   ClassLibrary1/Folder1/Nested/File1.fs
   ClassLibrary1/Folder1/Nested/File3.fs
   ClassLibrary1/Folder2/File2.fs
-  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
   SplitNested.sln
 
 1:obj[1]
   1:Debug[1]
-    1:net5.0[1]
+    1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
-      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
@@ -74,13 +76,18 @@ Content roots:
 4:Folder1[2]
   1:Nested[2]
     1:File3.fs
+5:obj[2]
+  1:Debug[2]
+    1:net10.0[2]
+      1:ILLink.Substitutions.xml (EmbeddedResource)
 
-net5.0
-obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+net10.0
+obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 Folder1/Nested/File1.fs
 Folder2/File2.fs
 Folder1/Nested/File3.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 
 ===================
 1. Move folder 'Folder1(2)' before 'Folder2'
@@ -89,7 +96,7 @@ Folder1/Nested/File3.fs
  -SplitNested * 1 project
   -ClassLibrary1
    -Dependencies
-    -.NET 5.0
+    -.NET 10.0
      -Assemblies
       -Implicit
        ...
@@ -125,9 +132,10 @@ Project [Name:ClassLibrary1, GUID:GUID]
       Child items:
         Folder [Name:Debug, IsHidden:true]
           Child items:
-            Folder [Name:net5.0, IsHidden:true]
+            Folder [Name:net10.0, IsHidden:true]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
 
 Project [Name:Miscellaneous Files, GUID:GUID]
 
@@ -140,25 +148,31 @@ Content roots:
   ClassLibrary1/Folder1/Nested/File1.fs
   ClassLibrary1/Folder1/Nested/File3.fs
   ClassLibrary1/Folder2/File2.fs
-  ClassLibrary1/obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
   SplitNested.sln
 
 1:obj[1]
   1:Debug[1]
-    1:net5.0[1]
+    1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
-      2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
     2:File3.fs
 3:Folder2[1]
   1:File2.fs
+4:obj[2]
+  1:Debug[2]
+    1:net10.0[2]
+      1:ILLink.Substitutions.xml (EmbeddedResource)
 
-net5.0
-obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
-obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+net10.0
+obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
 Folder1/Nested/File1.fs
 Folder1/Nested/File3.fs
 Folder2/File2.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 

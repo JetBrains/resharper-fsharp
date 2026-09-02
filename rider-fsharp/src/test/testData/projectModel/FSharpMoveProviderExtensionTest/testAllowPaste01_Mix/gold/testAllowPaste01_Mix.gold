@@ -5,12 +5,12 @@
  -MoveProviderSolution1 * 1 project
   -Project
    -Dependencies
-    -.NET 8.0
+    -.NET 10.0
      -Assemblies
       -Implicit
        ...
      -Packages
-      FSharp.Core/8.0.403
+      FSharp.Core/10.1.202
      -Frameworks
       Microsoft.NETCore.App
    CompileBeforeFile.fs [CompileBefore]
