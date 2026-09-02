@@ -5,6 +5,7 @@
     <PackageLock Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2026.3.0" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.3.0" />
+    <PackageLock Include="JetBrains.NetFxBridge" Version="0.0.3" />
     <PackageLock Include="JetBrains.RdFramework" Version="2026.3.0" />
     <PackageLock Include="Microsoft.NETCore.Platforms" Version="3.1.0" />
     <PackageLock Include="Microsoft.NETCore.Targets" Version="1.1.3" />

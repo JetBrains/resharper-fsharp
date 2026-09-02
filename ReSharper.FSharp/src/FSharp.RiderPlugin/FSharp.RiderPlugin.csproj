@@ -12,6 +12,9 @@
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.RiderPlugin</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
+  <ItemGroup Label="PackageReference">
+    <PackageReference Include="JetBrains.NetFxBridge" />
+  </ItemGroup>
   <Import Project="$(RiderBackendSubplatform)" Condition="Exists('$(RiderBackendSubplatform)')" />
   <Import Project="$(SolutionDir)/GitHubActions.targets" Condition="$(RunningOnGitHubActions) == 'true'" />
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
