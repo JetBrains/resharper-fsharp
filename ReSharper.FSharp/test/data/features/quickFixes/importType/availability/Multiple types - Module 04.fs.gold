@@ -16,7 +16,7 @@ Import type 'Test.B.MyModuleOrType'
 --Import type 'MyModuleOrType' in file
 --Import type 'MyModuleOrType' in project
 --Import type 'MyModuleOrType' in solution
-Import type 'Test.A.MyModuleOrType'
---Import type 'MyModuleOrType' in file
---Import type 'MyModuleOrType' in project
---Import type 'MyModuleOrType' in solution
+Import module 'Test.A.MyModuleOrType'
+--Import module 'MyModuleOrType' in file
+--Import module 'MyModuleOrType' in project
+--Import module 'MyModuleOrType' in solution

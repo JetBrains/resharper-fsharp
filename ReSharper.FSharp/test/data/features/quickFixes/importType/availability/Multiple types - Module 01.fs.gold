@@ -13,7 +13,7 @@ Import type 'System.IO.StreamReader'
 --Import type 'StreamReader' in file
 --Import type 'StreamReader' in project
 --Import type 'StreamReader' in solution
-Import type 'Test.A.StreamReader'
---Import type 'StreamReader' in file
---Import type 'StreamReader' in project
---Import type 'StreamReader' in solution
+Import module 'Test.A.StreamReader'
+--Import module 'StreamReader' in file
+--Import module 'StreamReader' in project
+--Import module 'StreamReader' in solution
