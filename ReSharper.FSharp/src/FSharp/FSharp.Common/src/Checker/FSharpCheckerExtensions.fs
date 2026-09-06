@@ -8,12 +8,6 @@ open FSharp.Compiler.Text
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Util.Logging
 
-let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
-    async {
-        let! a = a
-        return f a
-    }
-
 type CheckResults =
     | Ready of (FSharpParseFileResults * FSharpCheckFileResults) option
     | StillRunning of Task<(FSharpParseFileResults * FSharpCheckFileResults) option>
@@ -54,12 +48,6 @@ type FSharpChecker with
                     return StillRunning t
             }
 
-        let bindParsedInput(results: (FSharpParseFileResults * FSharpCheckFileResults) option) =
-            match results with
-            | Some(parseResults, checkResults) ->
-                Some (parseResults, checkResults)
-            | _ -> None
-
         async {
             match x.TryGetRecentCheckResultsForFile(path, options, source) with
             | None ->
@@ -84,4 +72,3 @@ type FSharpChecker with
             | StillRunning worker ->
                 return! Async.AwaitTask worker
         }
-        |> map bindParsedInput
