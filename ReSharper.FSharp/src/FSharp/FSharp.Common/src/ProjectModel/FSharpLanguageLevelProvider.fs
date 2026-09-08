@@ -57,6 +57,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         | 14 -> FSharpLanguageLevel.FSharp45
         | 15 -> FSharpLanguageLevel.FSharp47
         | 16 -> FSharpLanguageLevel.FSharp50
+        | 17 -> FSharpLanguageLevel.FSharp90
         | _ -> FSharpLanguageLevel.Latest
 
     let getVersionMappingByToolset () =
@@ -74,8 +75,12 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
                 match minor with
                 | 8 when build < 200 -> VersionMapping(FSharpLanguageLevel.FSharp80, FSharpLanguageLevel.FSharp90)
                 | 8 -> VersionMapping(FSharpLanguageLevel.FSharp81, FSharpLanguageLevel.FSharp90)
-                | 9 -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
-                | _ -> VersionMapping(FSharpLanguageLevel.FSharp100, FSharpLanguageLevel.Preview)
+                | _ -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
+
+        | Version (13, _, _) -> VersionMapping(FSharpLanguageLevel.FSharp90, FSharpLanguageLevel.FSharp100)
+        // TODO: Preview -> F# 11
+        | Version (14 , _, _)
+        | Version (15, _, _) -> VersionMapping(FSharpLanguageLevel.FSharp100, FSharpLanguageLevel.Preview)
         | _ -> null
 
     let getCompilerVersion (fscPath: VirtualFileSystemPath) =
@@ -116,6 +121,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
         | FSharpLanguageVersion.FSharp90 -> FSharpLanguageLevel.FSharp90
         | FSharpLanguageVersion.FSharp100 -> FSharpLanguageLevel.FSharp100
+        | FSharpLanguageVersion.FSharp110 -> FSharpLanguageLevel.FSharp110
         | FSharpLanguageVersion.Default -> (getFscPath configuration |> getLanguageLevelByCompiler).DefaultVersion
         | FSharpLanguageVersion.LatestMajor -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMajor
         | FSharpLanguageVersion.Latest -> (getFscPath configuration |> getLanguageLevelByCompiler).LatestMinor
