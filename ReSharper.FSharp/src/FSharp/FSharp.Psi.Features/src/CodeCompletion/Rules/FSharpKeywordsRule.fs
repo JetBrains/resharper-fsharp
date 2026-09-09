@@ -302,12 +302,18 @@ module FSharpKeywordsProvider =
 type FSharpKeywordsRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
-    let hashDirectives isFSharp9Supported =
+    let hashDirectives (fsharpLanguageLevel: FSharpLanguageLevel) =
+        let isFSharp9Supported = fsharpLanguageLevel >= FSharpLanguageLevel.FSharp90
+        let isFSharp11Supported = fsharpLanguageLevel >= FSharpLanguageLevel.FSharp110
+
         let spaceOrQuotesSuffix = if isFSharp9Supported then KeywordSuffix.Space else KeywordSuffix.Quotes
 
         [| spaceOrQuotesSuffix, [| "#nowarn"; "#warnon"; "#time" |]
            KeywordSuffix.Quotes, [| "#load"; "#r"; "#I" |]
-           KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
+           KeywordSuffix.None, [| "#if"
+                                  if isFSharp11Supported then "#elif"
+                                  "#else"
+                                  "#endif" |] |]
 
     let scriptKeywords =
         [| "__SOURCE_DIRECTORY__"
@@ -377,8 +383,8 @@ type FSharpKeywordsRule() =
                 item.InitializeRanges(context.Ranges, context.BasicContext)
                 collector.Add(item)
 
-        let isFSharp9Supported = FSharpLanguageLevel.isFSharp90Supported context.BasicContext.File
-        for suffix, keywords in hashDirectives isFSharp9Supported do
+        let languageLevel = FSharpLanguageLevel.ofTreeNode context.BasicContext.File
+        for suffix, keywords in hashDirectives languageLevel do
             for keyword in keywords do
                 let item = FSharpHashDirectiveLookupItem(keyword, suffix)
                 item.InitializeRanges(context.Ranges, context.BasicContext)

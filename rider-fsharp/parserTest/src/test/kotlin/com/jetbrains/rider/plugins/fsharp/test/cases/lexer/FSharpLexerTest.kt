@@ -607,6 +607,39 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
   }
 
   @Test
+  fun testElifDirective() {
+    doTest(
+      """
+            |#elif
+            |#elif (symbol || symbol) && symbol
+            |#elifs symbol
+            """.trimMargin(),
+      """
+                    |PP_ELIF_SECTION ('#elif')
+                    |NEW_LINE ('\n')
+                    |PP_ELIF_SECTION ('#elif')
+                    |WHITESPACE (' ')
+                    |PP_LPAR ('(')
+                    |PP_CONDITIONAL_SYMBOL ('symbol')
+                    |WHITESPACE (' ')
+                    |PP_OR ('||')
+                    |WHITESPACE (' ')
+                    |PP_CONDITIONAL_SYMBOL ('symbol')
+                    |PP_RPAR (')')
+                    |WHITESPACE (' ')
+                    |PP_AND ('&&')
+                    |WHITESPACE (' ')
+                    |PP_CONDITIONAL_SYMBOL ('symbol')
+                    |NEW_LINE ('\n')
+                    |PP_DIRECTIVE ('#elif')
+                    |PP_CONDITIONAL_SYMBOL ('s')
+                    |WHITESPACE (' ')
+                    |PP_CONDITIONAL_SYMBOL ('symbol')
+                    """.trimMargin()
+    )
+  }
+
+  @Test
   fun testElseDirective() {
     doTest(
       """

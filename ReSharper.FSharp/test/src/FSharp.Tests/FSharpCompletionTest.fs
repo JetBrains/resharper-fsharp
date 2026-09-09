@@ -341,6 +341,9 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Hash directive - #r 02``() = x.DoNamedTest()
 
+    [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp110)>]
+    [<Test>] member x.``Hash directive - #elif 01``() = x.DoNamedTest()
+
 [<FSharpTest; FSharpExperimentalFeature(ExperimentalFeature.PostfixTemplates)>]
 type FSharpPostfixCompletionTest() =
     inherit CodeCompletionTestBase()

@@ -209,8 +209,8 @@ KEYWORD_STRING_SOURCE_DIRECTORY="__SOURCE_DIRECTORY__"
 KEYWORD_STRING_SOURCE_FILE="__SOURCE_FILE__"
 KEYWORD_STRING_LINE="__LINE__"
 
-PP_COMPILER_DIRECTIVE=({HASH}("if"|"else"|"endif"))
-PP_BAD_COMPILER_DIRECTIVE=({HASH}("if"|"else"|"endif"){TAIL_IDENT})
+PP_COMPILER_DIRECTIVE=({HASH}("if"|"elif"|"else"|"endif"))
+PP_BAD_COMPILER_DIRECTIVE=({HASH}("if"|"elif"|"else"|"endif"){TAIL_IDENT})
 PP_DIRECTIVE=(({ANYWHITE})*({HASH}({IDENT}|({ANYWHITE})*([0-9])+)))
 PP_CONDITIONAL_SYMBOL={IDENT}
 
@@ -646,10 +646,14 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPDIRECTIVE> {HASH}"warnon"                     { yybegin(LINE); return MakeToken(PP_WARNON); }
 
 <PPDIRECTIVE> {HASH}"if"                         { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
+<PPDIRECTIVE> {HASH}"elif"                       { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"else"                       { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"endif"                      { yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 
 <PPDIRECTIVE> {HASH}"if"{TAIL_IDENT}             {
+  // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
+  yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
+<PPDIRECTIVE> {HASH}"elif"{TAIL_IDENT}           {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
   yypushback(yylength()); yybegin(PPSHARP); Clear(); break; }
 <PPDIRECTIVE> {HASH}"else"{TAIL_IDENT}           {
@@ -662,16 +666,21 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPDIRECTIVE> {HASH}{IDENT}                      { yypushback(yylength()); yybegin(LINE); Clear(); break; }
 
 <PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return MakeToken(PP_IF_SECTION); }
+<PPSHARP> {HASH}"elif"  { yybegin(PPSYMBOL); return MakeToken(PP_ELIF_SECTION); }
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return MakeToken(PP_ELSE_SECTION); }
 <PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return MakeToken(PP_ENDIF); }
 
 <BAD_PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
+<BAD_PPSHARP> {HASH}"elif"  { yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 <BAD_PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 <BAD_PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 
 <PPSHARP, BAD_PPSHARP> {HASH}"if"{TAIL_IDENT}    {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
   yypushback(yylength() - 3); yybegin(LINE); return MakeToken(PP_DIRECTIVE); }
+<PPSHARP, BAD_PPSHARP> {HASH}"elif"{TAIL_IDENT}  {
+  // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
+  yypushback(yylength() - 5); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
 <PPSHARP, BAD_PPSHARP> {HASH}"else"{TAIL_IDENT}  {
   // TODO: delete this line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
   yypushback(yylength() - 5); yybegin(PPSYMBOL); return MakeToken(PP_DIRECTIVE); }
