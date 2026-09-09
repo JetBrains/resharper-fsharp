@@ -89,7 +89,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       private static readonly NodeTypeSet ourSkippedTokens = new(
         FSharpTokenType.WHITESPACE,
-        FSharpTokenType.PP_IF_SECTION);
+        FSharpTokenType.PP_IF_SECTION,
+        FSharpTokenType.PP_ELIF_SECTION);
 
       private TokenNodeType TokenType()
       {

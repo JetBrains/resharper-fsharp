@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
@@ -33,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public FSharpPreprocessedLexer(ILexer lexer, FSharpPreprocessor preprocessor, HashSet<string> definedConstants)
     {
-      myLexer = lexer is CachingLexer cachingLexer ? cachingLexer : lexer.ToCachingLexer();
+      myLexer = lexer as CachingLexer ?? lexer.ToCachingLexer();
       myPreprocessor = preprocessor;
       myDefinedConstants = definedConstants;
     }
@@ -71,10 +72,52 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     private LexerState DeadCodeToken(int dumpStart) =>
       new(FSharpTokenType.DEAD_CODE, dumpStart, myLexer.TokenStart, myLexer.CurrentPosition);
+  
+    private bool EvaluateBranchCondition()
+    {
+      using (LexerStateCookie.Create(myLexer))
+        return myPreprocessor.Preprocess(myLexer, myDefinedConstants);
+    }
+
+    private bool TryApplyDirective(TokenNodeType tokenType, out bool lineIsActive)
+    {
+      if (tokenType == FSharpTokenType.PP_IF_SECTION)
+        lineIsActive = myState.StartIfSection(EvaluateBranchCondition);
+
+      else if (tokenType == FSharpTokenType.PP_ELIF_SECTION)
+        lineIsActive = myState.ElifBranch(EvaluateBranchCondition);
+
+      else if (tokenType == FSharpTokenType.PP_ELSE_SECTION)
+        lineIsActive = myState.ElseBranch();
+
+      else if (tokenType == FSharpTokenType.PP_ENDIF)
+        lineIsActive = myState.EndIfSection();
+
+      else
+      {
+        lineIsActive = false;
+        return false;
+      }
+
+      return true;
+    }
+
+    private TokenNodeType PreprocessActiveBranch()
+    {
+      var tokenType = myLexer.TokenType;
+
+      if (!TryApplyDirective(tokenType, out var lineIsActive))
+        return tokenType;
+
+      return lineIsActive 
+        ? PreprocessLine() 
+        : PreprocessInactiveLine();
+    }
 
     private TokenNodeType PreprocessInactiveBranch()
     {
       TokenNodeType tokenType;
+
       using (LexerStateCookie.Create(myLexer))
       {
         while (myLexer.TokenType == FSharpTokenType.WHITESPACE)
@@ -83,32 +126,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         tokenType = myLexer.TokenType;
       }
 
-      if (tokenType == FSharpTokenType.PP_IF_SECTION)
-      {
-        myState.InIfBlock(false, false);
-        return PreprocessInactiveLine();
-      }
-
-      if (tokenType == FSharpTokenType.PP_ENDIF)
-      {
-        myState.FromIfBlock();
-        return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
-      }
-
-      if (tokenType == FSharpTokenType.PP_ELSE_SECTION)
-      {
-        myState.SwitchBranch();
-        return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
-      }
-
-      return PreprocessInactiveLine();
-    }
-
-    private TokenNodeType PreprocessIfSection()
-    {
-      using (LexerStateCookie.Create(myLexer))
-        myState.InIfBlock(myPreprocessor.Preprocess(myLexer, myDefinedConstants), true);
-      return PreprocessLine();
+      return TryApplyDirective(tokenType, out var lineIsActive) && lineIsActive
+        ? PreprocessLine()
+        : PreprocessInactiveLine();
     }
 
     private TokenNodeType PreprocessLine()
@@ -139,27 +159,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         myLexer.Advance();
       } while (tokenType != FSharpTokenType.NEW_LINE && tokenType != null);
       return TokenType;
-    }
-
-    private TokenNodeType PreprocessActiveBranch()
-    {
-      var tokenType = myLexer.TokenType;
-      if (tokenType == FSharpTokenType.PP_IF_SECTION)
-        return PreprocessIfSection();
-
-      if (tokenType == FSharpTokenType.PP_ENDIF)
-      {
-        myState.FromIfBlock();
-        return PreprocessLine();
-      }
-
-      if (tokenType == FSharpTokenType.PP_ELSE_SECTION)
-      {
-        myState.SwitchBranch();
-        return PreprocessLine();
-      }
-
-      return tokenType;
     }
 
     public void Advance()
@@ -228,55 +227,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     private class PreprocessorState
     {
-      private enum PreprocessorElseState
-      {
-        BeforeElse,
-        AfterElse,
-        InactiveBeforeElse,
-        InactiveAfterElse,
-        Error
-      }
-
       private struct PreprocessorBlockState
       {
-        private PreprocessorElseState myElseState;
-        private readonly bool myCondition;
+        private bool myAnyBranchTaken;
+        private bool myAfterElse;
 
-        public PreprocessorBlockState(bool condition, bool hasActiveBranch)
+        public PreprocessorBlockState(Func<bool> condition, bool outerCondition)
         {
-          myCondition = condition;
-          myElseState = hasActiveBranch ? PreprocessorElseState.BeforeElse : PreprocessorElseState.InactiveBeforeElse;
+          OuterCondition = outerCondition;
+          Condition = outerCondition && condition();
+          myAnyBranchTaken = Condition;
+          myAfterElse = false;
         }
 
-        public bool Condition
-        {
-          get
-          {
-            switch (myElseState)
-            {
-              case PreprocessorElseState.BeforeElse: return myCondition;
-              case PreprocessorElseState.AfterElse: return !myCondition;
-              case PreprocessorElseState.Error: return true;
-              default: return false;
-            }
-          }
-        }
+        public bool Condition { get; private set; }
 
-        public PreprocessorElseState SwitchBranch()
+        public bool OuterCondition { get; }
+
+        public bool SwitchBranch(Func<bool> condition, bool isElse)
         {
-          switch (myElseState)
-          {
-            case PreprocessorElseState.BeforeElse:
-              myElseState = PreprocessorElseState.AfterElse;
-              break;
-            case PreprocessorElseState.InactiveBeforeElse:
-              myElseState = PreprocessorElseState.InactiveAfterElse;
-              break;
-            default:
-              myElseState = PreprocessorElseState.Error;
-              break;
-          }
-          return myElseState;
+          if (myAfterElse)
+            return false;
+
+          Condition = OuterCondition && !myAnyBranchTaken && condition();
+          myAnyBranchTaken |= Condition;
+          myAfterElse = isElse;
+          return true;
         }
       }
 
@@ -291,24 +267,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       public LexerState DequeueLexerState() =>
         myQueue.Dequeue();
 
-      public void InIfBlock(bool condition, bool hasActiveBranch) =>
-        myStack.Push(new PreprocessorBlockState(condition, hasActiveBranch));
+      public bool StartIfSection(Func<bool> condition)
+      {
+        var outerCondition = Condition;
+        myStack.Push(new PreprocessorBlockState(condition, outerCondition));
+        return outerCondition;
+      }
 
-      public void FromIfBlock()
+      public bool EndIfSection()
       {
         if (!myStack.IsEmpty())
           myStack.Pop();
+        return Condition;
       }
 
-      public void SwitchBranch()
+      public bool ElifBranch(Func<bool> condition) => SwitchBranch(condition, isElse: false);
+      public bool ElseBranch() => SwitchBranch(static () => true, isElse: true);
+
+      private bool SwitchBranch(Func<bool> condition, bool isElse)
       {
         if (myStack.IsEmpty())
-          return;
+          return true;
+
         var state = myStack.Pop();
-        if (state.SwitchBranch() == PreprocessorElseState.Error)
+        if (!state.SwitchBranch(condition, isElse))
+        {
           myStack.Clear();
-        else
-          myStack.Push(state);
+          return true;
+        }
+        myStack.Push(state);
+
+        return state.OuterCondition;
       }
 
       public bool Condition => myStack.IsEmpty() || myStack.Peek().Condition;

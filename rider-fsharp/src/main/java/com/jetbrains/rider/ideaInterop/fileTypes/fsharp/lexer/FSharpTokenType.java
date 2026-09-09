@@ -238,6 +238,7 @@ public interface FSharpTokenType {
   IElementType VOLATILE = createKeywordToken("VOLATILE", "volatile");
 
   IElementType PP_LIGHT = createToken("PP_LIGHT");
+  IElementType PP_ELIF_SECTION = createToken("PP_ELIF_SECTION");
   IElementType PP_ELSE_SECTION = createToken("PP_ELSE_SECTION");
   IElementType PP_ENDIF = createToken("PP_ENDIF");
   IElementType PP_LINE = createToken("PP_LINE");
@@ -447,6 +448,7 @@ public interface FSharpTokenType {
 
   TokenSet PP_KEYWORDS = TokenSet.create(
     PP_IF_SECTION,
+    PP_ELIF_SECTION,
     PP_ELSE_SECTION,
     PP_ENDIF,
     PP_LIGHT,

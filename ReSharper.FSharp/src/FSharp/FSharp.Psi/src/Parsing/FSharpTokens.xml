@@ -121,6 +121,7 @@
         <Token name="PP_TIME" representation="#time" />
         <Token name="PP_I" representation="#i" />
         <Token name="PP_IF_SECTION" representation="#if" />
+        <Token name="PP_ELIF_SECTION" representation="#elif" />
         <Token name="PP_ELSE_SECTION" representation="#else" />
         <Token name="PP_ENDIF" representation="#endif" />
         <Token name="PP_NOWARN" representation="#nowarn" />
