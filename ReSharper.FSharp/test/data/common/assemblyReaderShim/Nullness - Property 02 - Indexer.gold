@@ -1,0 +1,12 @@
+﻿module Module
+
+let c = Class()
+
+let a: string = ||c[""]|(0)|(1)
+let b: string | null = c[""]
+let d: string | null = c[|null|(2)]
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: The types 'string' and 'string | null' do not have compatible nullability.
+(2): ReSharper Warning: Nullness warning: The type 'string' does not support 'null'.

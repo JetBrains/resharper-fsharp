@@ -1,0 +1,15 @@
+﻿module Module
+
+let notNull = ""
+let nullable: string | null = null
+
+let a: string = notNull.NotNull()
+let b: string = |nullable|(0).NotNull()
+
+let c: string | null = notNull.Nullable()
+let d: string = ||notNull.Nullable()|(1)|(2)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: Possible dereference of a null value when accessing member 'NotNull' on the nullable value 'nullable' of type 'string | null'.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(2): ReSharper Warning: Nullness warning: The types 'string' and 'string | null' do not have compatible nullability.

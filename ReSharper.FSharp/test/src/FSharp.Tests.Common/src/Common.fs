@@ -73,13 +73,16 @@ module FSharpTestAttribute =
 
 [<AutoOpen>]
 module PackageReferences =
-    let [<Literal>] FSharpCorePackage = "FSharp.Core/8.0.101"
+    let [<Literal>] FSharpCorePackage = "FSharp.Core/10.0.103"
     let [<Literal>] JetBrainsAnnotationsPackage = "JetBrains.Annotations/2022.1.0"
     let [<Literal>] FSharpDataTypeProvidersPackage = "FSharp.Data/6.6.0"
     let [<Literal>] FsPickler = "FsPickler/5.3.2"
 
 type ITestAssemblyReaderShim =
     abstract CreateReferencedProjectCookie: IProject -> IDisposable
+
+    abstract EnableNullness: unit -> unit
+
     abstract Dispose: unit -> unit
 
 
@@ -213,6 +216,20 @@ type TestDefinesAttribute(defines: string) =
             let oldDefines = projectConfiguration.DefineConstants
             projectConfiguration.DefineConstants <- defines
             context.TestLifetime.OnTermination(fun _ -> projectConfiguration.DefineConstants <- oldDefines) |> ignore
+
+
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
+type FSharpNullableAttribute() =
+    inherit TestAspectAttribute()
+
+    override this.OnBeforeTestExecute(context) =
+        let projectProperties = context.TestProject.ProjectProperties
+        for projectConfiguration in projectProperties.GetActiveConfigurations<IFSharpProjectConfiguration>() do
+            let oldNullable = projectConfiguration.Nullable
+            projectConfiguration.Nullable <- Some(true)
+            context.TestLifetime.OnTermination(fun _ -> projectConfiguration.Nullable <- oldNullable) |> ignore
+
+        context.TestProject.GetSolution().GetComponent<ITestAssemblyReaderShim>().EnableNullness()
 
 
 [<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
@@ -450,7 +467,8 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
 
     let mutable projectPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
     let mutable referencedProject = Unchecked.defaultof<_>
-    let mutable reader = Unchecked.defaultof<_>
+    let mutable reader = Unchecked.defaultof<ProjectFcsModuleReader>
+    let mutable isNullnessEnabled = false
 
     member this.ReferencedProject = referencedProject
     member this.Path = projectPath
@@ -461,6 +479,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
             projectPath <- VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
             referencedProject <- Unchecked.defaultof<_>
             reader <- Unchecked.defaultof<_>
+            isNullnessEnabled <- false
 
     interface ITestAssemblyReaderShim with
         member this.CreateReferencedProjectCookie(project: IProject) =
@@ -472,10 +491,17 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
             projectPath <- path
             referencedProject <- project
             reader <- new ProjectFcsModuleReader(psiModule, cache, path, this, None)
+            if isNullnessEnabled then
+                (reader :> IProjectFcsModuleReader).EnableNullness()
 
             { new IDisposable with
                 member x.Dispose() =
                     this.Dispose() }
+
+        member this.EnableNullness() =
+            isNullnessEnabled <- true
+            if isNotNull reader then
+                (reader :> IProjectFcsModuleReader).EnableNullness()
 
         member this.Dispose() = this.Dispose()
 

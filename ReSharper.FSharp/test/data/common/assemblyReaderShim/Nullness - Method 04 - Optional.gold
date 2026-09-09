@@ -1,0 +1,12 @@
+﻿module Module
+
+Class.Optional()
+Class.Optional(null)
+Class.Optional("")
+
+Class.OptionalNotNull()
+Class.OptionalNotNull(|null|(0))
+Class.OptionalNotNull("")
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: The type 'string' does not support 'null'.

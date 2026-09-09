@@ -1,0 +1,12 @@
+﻿module Module
+
+let nullable: string | null = null
+
+Class.NotNullConstraint(|nullable|(0))
+Class.ClassConstraint(|nullable|(1))
+Class.NullableClassConstraint(nullable)
+Class.NoConstraint(nullable)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: The type 'string | null' supports 'null' but a non-null type is expected.
+(1): ReSharper Warning: Nullness warning: The type 'string | null' supports 'null' but a non-null type is expected.

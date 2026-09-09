@@ -1,0 +1,14 @@
+﻿module Module
+
+Class.NotNull.Add(fun (e: Args) -> ignore e)
+Class.NotNull.Add(fun (|e: Args | null|(0)) -> ignore e)
+
+Class.Nullable.Add(fun (e: Args) -> ignore e)
+Class.Nullable.Add(fun (e: Args | null) -> ignore e)
+
+Class.NotNull.Add(fun e -> e.ToString() |> ignore)
+Class.Nullable.Add(fun e -> |e|(1).ToString() |> ignore)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'Args' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: Possible dereference of a null value when accessing member 'ToString' on the nullable value 'e' of type 'Args | null'.

@@ -1,0 +1,8 @@
+﻿module Module
+
+let a: string = WithoutNull().Value
+let b: string = |WithNull().Value|(0)
+let c: string | null = WithNull().Value
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

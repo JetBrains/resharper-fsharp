@@ -1,0 +1,16 @@
+﻿module Module
+
+open System.Collections.Generic
+
+let a: List<string> = Class.NotNull()
+let b: List<string> = |Class.NullableItem()|(0)
+let c: List<string> = ||Class.NullableList()|(1)|(2)
+let d: Dictionary<string, string> = |Class.Pairs()|(3)
+let e: List<List<string>> = |Class.Nested()|(4)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'List<string>' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(2): ReSharper Warning: Nullness warning: The types 'List<string>' and 'List<string> | null' do not have compatible nullability.
+(3): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(4): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

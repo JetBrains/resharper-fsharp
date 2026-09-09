@@ -1,6 +1,6 @@
 ﻿Completion: Basic
 Prefix: "c"
-Count: 1055
+Count: 1056
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "c♦ ()"
@@ -72,7 +72,7 @@ C̣ore
 C̣ustomComparisonAttribute
 C̣ustomEqualityAttribute
 C̣ustomOperationAttribute
-                            [FromLightEvaluation^, TypesAndNamespaces, ImportedType]
+                            [TypesAndNamespaces, ImportedType]
 AbstractC̣lassAttribute
 AsyncReplyC̣hannel
 EqualityC̣onditionalOnAttribute
@@ -84,6 +84,8 @@ OptimizedC̣losures
 SourceC̣onstructFlags
 StructuralC̣omparisonAttribute
 TailC̣allAttribute
+                            [FromLightEvaluation^]
+nullArgC̣heck                'T
                             [PrefixMatch, TypesAndNamespaces, NotImportedType, FromFullEvaluation]
 c̣andela |(in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
                             [PrefixNoCaseMatch, TypesAndNamespaces, NotImportedType, FromFullEvaluation]
@@ -96,7 +98,7 @@ C̣SharpArgumentInfo |(in Microsoft.CSharp.RuntimeBinder)
 C̣SharpArgumentInfoFlags |(in Microsoft.CSharp.RuntimeBinder)
 C̣SharpBinderFlags |(in Microsoft.CSharp.RuntimeBinder)
 C̣ULong |(in System.Runtime.InteropServices)
-.. +1045 more items ..
+.. +1046 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -171,6 +173,7 @@ c̣os                         ^T
 c̣osh                        ^T
 c̣tx                         Current file context
 c̣ustom                      'a    <==
+nullArgC̣heck                'T
                             [Full, Generic]
 AccessC̣ontrolActions |(in System.Security.AccessControl)
 AccessC̣ontrolModification |(in System.Security.AccessControl)
@@ -182,4 +185,4 @@ ActivityC̣reationOptions |(in System.Diagnostics)
 ActivityStatusC̣ode |(in System.Diagnostics)
 ActivityTagsC̣ollection |(in System.Diagnostics)
 AesC̣cm |(in System.Security.Cryptography)
-.. +1045 more items ..
+.. +1046 more items ..

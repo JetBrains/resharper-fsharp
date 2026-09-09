@@ -386,7 +386,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     /// Not fully correct, since type parameter count doesn't fully follow logic used for source elements.
     /// Current implementation allows good enough results in FSharpResolveUtil.resolvesToAssociatedModule.
-    public static ITypeElement TryGetAssociatedType([NotNull] this CompiledTypeElement moduleTypeElement, string sourceName)
+    public static ITypeElement TryGetAssociatedType([NotNull] this CompiledTypeElement moduleTypeElement, string sourceName, int? typeParameterCount = null)
     {
       Assertion.Assert(moduleTypeElement is FSharpCompiledModule, "moduleTypeElement.IsCompiledModule()");
 
@@ -399,11 +399,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (possiblyAssociatedTypes.Count == 1)
           return possiblyAssociatedTypes[0];
 
-        var typeWithoutTypeParams = possiblyAssociatedTypes.SingleItem(element => element.TypeParametersCount == 0);
-        if (typeWithoutTypeParams != null)
-          return typeWithoutTypeParams;
+        if (typeParameterCount != null)
+          return possiblyAssociatedTypes.FirstOrDefault(element => element.TypeParametersCount == typeParameterCount);
 
-        return possiblyAssociatedTypes.FirstOrDefault();
+        var typeWithoutTypeParams = possiblyAssociatedTypes.SingleItem(element => element.TypeParametersCount == 0);
+        return typeWithoutTypeParams ?? possiblyAssociatedTypes.FirstOrDefault();
       }
 
       var containingType = moduleTypeElement.GetContainingType();

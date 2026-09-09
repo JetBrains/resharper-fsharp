@@ -251,8 +251,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 if fcsProjects.ContainsKey(projectKey) && projectKey <> initialProjectKey then () else
 
                 let fcsProject = fcsProjectBuilder.BuildFcsProject(projectKey)
+                let isNullnessEnabled =
+                    FcsProjectBuilder.getProjectConfiguration projectKey.TargetFrameworkId projectKey.Project
+                    |> FcsProjectBuilder.isNullnessEnabled
 
-                let referencedFcsProjects = 
+                let referencedFcsProjects =
                     moduleReferences
                     |> Seq.choose tryGetReferencedProject
                     |> Seq.choose (fun referencedProjectKey ->
@@ -265,6 +268,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         elif fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
                             fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey)
                             |> Option.map (fun reader ->
+                                if isNullnessEnabled then
+                                    reader.EnableNullness()
+
                                 let getTimestamp () = reader.Timestamp
                                 let getReader () = reader :> ILModuleReader
                                 FSharpReferencedProject.ILModuleReference(reader.Path.FullPath, getTimestamp, getReader)

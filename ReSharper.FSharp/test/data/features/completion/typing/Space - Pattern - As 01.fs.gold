@@ -13,7 +13,7 @@ Lookup list (Focused):
   Choice1Of4                  Choice<'T1,'T2,'T3,'T4>
   Choice1Of5                  Choice<'T1,'T2,'T3,'T4,'T5>
   Choice1Of6                  Choice<'T1,'T2,'T3,'T4,'T5,'T6>
-  .. +183 more items ..
+  .. +191 more items ..
 
 > Last text control state (lookup still opened):
 ====================================

@@ -1,0 +1,12 @@
+﻿module Module
+
+let a: string = Class.NotNull
+let b: string = |Class.Nullable|(0)
+let c: string | null = Class.Nullable
+
+let d: string = |Class().ReadonlyNullable|(1)
+let e: string = Class.StaticReadonlyNotNull
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

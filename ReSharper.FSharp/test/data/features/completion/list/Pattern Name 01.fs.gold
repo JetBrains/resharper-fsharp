@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 257
+Count: 265
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "| Some(♦)"
@@ -46,7 +46,13 @@ Error                       Result<'T,'TError>
 Failure
 KeyValue
 Lazy
+NonNull
+NonNullQuick
+NonNullQuickV
+NonNullV
 None                        'T option
+Null
+NullV
 Ok                          Result<'T,'TError>
 Some                        'T option
 ValueNone                   'T voption
@@ -218,6 +224,7 @@ Unchecked
 UnverifiableAttribute
 ValueOption
 VolatileFieldAttribute
+WarnOnWithoutNullArgumentAttribute
 WebExtensions
 array
 bigint
@@ -241,6 +248,7 @@ list
 nativeint
 nativeptr
 obj
+objnull
 option
 outref
 ref
@@ -391,8 +399,14 @@ NoComparisonAttribute
 NoCompilerInliningAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
+NonNull
+NonNullQuick
+NonNullQuickV
+NonNullV
 NonStructuralComparison
 None                        'T option
+Null
+NullV
 NumericLiteralI
 NumericLiterals
 Observable
@@ -435,6 +449,7 @@ ValueNone                   'T voption
 ValueOption
 ValueSome                   'T voption
 VolatileFieldAttribute
+WarnOnWithoutNullArgumentAttribute
 WebExtensions
 abstract
 and
@@ -494,6 +509,7 @@ nguid                       Insert new GUID
 not
 null
 obj
+objnull
 option
 or
 outref

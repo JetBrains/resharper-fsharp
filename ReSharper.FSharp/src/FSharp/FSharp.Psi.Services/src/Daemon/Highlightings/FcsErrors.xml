@@ -527,6 +527,24 @@
     <QuickFix>ReplaceWithAbbreviatedTypeFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="InvalidModuleExprType" ID="FS1123: Invalid module, expression, or type">
+    <Parameter type="FSharpSymbolReference" name="reference"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message>fcsMessage</Message>
+    <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
+    <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="NoConstructorsAvailableForType" ID="FS1133: No constructors available for type">
+    <Parameter type="FSharpSymbolReference" name="reference"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message>fcsMessage</Message>
+    <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
+    <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
+  </Error>
+
   <Warning compilerGroup="FSharpErrors" name="UnusedValue" ID="FS1182: Unused value">
     <Parameter type="IReferencePat" name="pat"/>
     <Message resourceName="TheValueIsUnusedMessage">pat.SourceName</Message>

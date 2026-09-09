@@ -16,6 +16,7 @@ Microsoft.FSharp.Control.AsyncBuilderImpl
 Microsoft.FSharp.Control.ExceptionDispatchInfoHelpers
 Microsoft.FSharp.Control.LazyExtensions
 Microsoft.FSharp.Control.TaskBuilderExtensions.LowPriority
+Microsoft.FSharp.Control.TaskBuilderExtensions.LowPlusPriority
 Microsoft.FSharp.Control.TaskBuilderExtensions.MediumPriority
 Microsoft.FSharp.Control.TaskBuilderExtensions.HighPriority
 Microsoft.FSharp.Linq.QueryRunExtensions.LowPriority

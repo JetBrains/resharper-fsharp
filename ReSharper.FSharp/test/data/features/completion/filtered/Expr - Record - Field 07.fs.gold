@@ -1,6 +1,6 @@
 ﻿Completion: Basic
 Prefix: "S"
-Count: 938
+Count: 939
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "S♦"
@@ -34,7 +34,7 @@ ṢHA256 |(in System.Security.Cryptography)
 ṢHA256CryptoServiceProvider |(in System.Security.Cryptography)
 ṢHA256Managed |(in System.Security.Cryptography)
 ṢHA384 |(in System.Security.Cryptography)
-.. +928 more items ..
+.. +929 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -62,4 +62,4 @@ AesCryptoṢerviceProvider |(in System.Security.Cryptography)
 AnonymousPipeClientṢtream |(in System.IO.Pipes)
 AnonymousPipeṢerverStream |(in System.IO.Pipes)
 AnonymousPipeṢerverStreamAcl |(in System.IO.Pipes)
-.. +928 more items ..
+.. +929 more items ..

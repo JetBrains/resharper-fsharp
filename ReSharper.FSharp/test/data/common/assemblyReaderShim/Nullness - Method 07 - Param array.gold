@@ -1,0 +1,10 @@
+﻿module Module
+
+Class.NotNull("", "")
+Class.NotNull("", |null|(0))
+
+Class.Nullable("", "")
+Class.Nullable("", null)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: The type 'string' does not support 'null'.
