@@ -4,4 +4,4 @@
 ()
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: This attribute cannot be applied to assembly, module, method. Valid targets are: class
+(0): ReSharper Underlined Error Highlighting: This attribute cannot be applied to assembly, module, method. Valid targets are: class, struct, enum

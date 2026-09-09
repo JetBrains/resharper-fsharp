@@ -58,6 +58,9 @@ module FcsProjectBuilder =
         | Some true -> "NULLABLE" :: defines
         | _ -> defines
 
+    let isNullnessEnabled (configuration: IFSharpProjectConfiguration) =
+        isNotNull configuration && configuration.Nullable = Some true
+
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,

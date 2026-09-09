@@ -158,6 +158,40 @@ type AssemblyReaderCSharpTest() =
     [<Test>] member x.``Type parameter 02 - Unmanaged``() = x.DoNamedTest()
 
 
+[<FSharpNullable; FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+type AssemblyReaderNullnessCSharpTest() =
+    inherit AssemblyReaderTestBase(FSharpProjectFileType.FsExtension, CSharpProjectFileType.CS_EXTENSION)
+
+    [<Test>] member x.``Nullness - Array 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Context 01 - Disabled``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Event 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Field 02 - Const``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Generic 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 02 - Ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 03 - Byref``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 04 - Optional``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 05 - Extension``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 06 - Generic``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Method 07 - Param array``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Property 01``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Property 02 - Indexer``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Type def 01 - Base type``() = x.DoNamedTest()
+    [<Test>] member x.``Nullness - Type def 02 - Interface``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Type parameter 01 - Constraints``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nullness - Value type 01``() = x.DoNamedTest()
+
+
 type AssemblyReaderVbTest() =
     inherit AssemblyReaderTestBase(FSharpProjectFileType.FsExtension, VBProjectFileType.VB_EXTENSION)
 

@@ -1,0 +1,8 @@
+﻿module Module
+
+let a: IBase<string> = WithoutNull()
+let b: IBase<string> = |WithNull()|(0)
+let c: IBase<string | null> = WithNull()
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

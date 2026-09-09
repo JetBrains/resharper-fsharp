@@ -3,6 +3,6 @@
 open System
 
 async {
-    use! x: IDisposable{caret} = failwith ""
+    use! x: IDisposable | null{caret} = failwith ""
     ()
 }

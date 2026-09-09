@@ -127,6 +127,7 @@ type FcsModuleReaderCompilerGeneratedType(clrTypeName, psiModule) =
 
         match frameworkCandidates with
         | [| candidate |] -> candidate
+        | [||] -> base.ChooseBestCandidate(candidates)
         | _ ->
 
         match base.ChooseBestCandidate(frameworkCandidates) with
@@ -158,6 +159,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mutable isDirty = false
 
+    let mutable isNullnessEnabled = false
+
     /// The types that have already been checked in isUpToDate check 
     let mutable upToDateCheckedTypes = null
 
@@ -174,6 +177,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     /// Type definitions imported by FCS.
     let typeDefs = ConcurrentDictionary<IClrTypeName, FcsTypeDef>() // todo: use non-concurrent, add locks
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
+
+    let markDirty () =
+        shim.Logger.Trace("Mark dirty: {0}", path)
+        isDirty <- true
+        upToDateCheckedTypes <- null
+        seenOutdatedTypes <- false
 
     let readData f =
         FSharpAsyncUtil.CheckAndThrow()
@@ -396,6 +405,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             parent <- parent.GetContainingType()
         index
 
+    let getTypeArgs (resolveResult: IResolveResult) =
+        let substitution = resolveResult.Substitution
+        let domain = substitution.Domain
+        if domain.IsEmpty() then [] else
+
+        domain
+        |> List.ofSeq
+        |> List.sortBy getGlobalIndex
+        |> List.map (fun typeParameter -> substitution[typeParameter])
+
     let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
     let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
 
@@ -429,16 +448,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 ILType.TypeVar (uint16 index)
 
             | :? ITypeElement as typeElement ->
-                let typeArgs =
-                    let substitution = resolveResult.Substitution
-                    let domain = substitution.Domain
-                    if domain.IsEmpty() then [] else
-
-                    domain
-                    |> List.ofSeq
-                    |> List.sortBy getGlobalIndex
-                    |> List.map (fun typeParameter -> mkType substitution[typeParameter])
-
+                let typeArgs = getTypeArgs resolveResult |> List.map mkType
                 let typeRef = mkTypeRef typeElement
                 let typeSpec = ILTypeSpec.Create(typeRef, typeArgs)
 
@@ -598,12 +608,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> None
         | baseType -> Some(mkType baseType)
 
-    let mkTypeDefImplements (typeElement: ITypeElement) =
-        // TODO: Interface implementation can have attributes on it (not expressible in F#/C#, but in IL it is)
-        // and C# nullness metadata export makes use of it.
-        [ for declaredType in getInterfaces typeElement do
-            InterfaceImpl.Create(mkType declaredType) ]
-
     let mkCompilerGeneratedAttribute (attrTypeName: IClrTypeName) (args: ILAttribElem list) : ILAttribute option =
         let attrType = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule)
 
@@ -612,7 +616,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | typeElement ->
 
         typeElement.Constructors
-        |> Seq.tryFind (fun ctor -> args.IsEmpty = ctor.IsParameterless)
+        |> Seq.tryFind (fun ctor -> ctor.Parameters.Count = args.Length)
         |> Option.map (fun ctor ->
             ILAttribute.Decoded(ILMethodSpec.Create(mkType attrType, mkMethodRef ctor, []), args, [])
         )
@@ -640,6 +644,90 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let mkRequiredMemberAttribute () =
         mkCompilerGeneratedAttributeNoArgs PredefinedType.REQUIRED_MEMBER_ATTRIBUTE_FQN
+
+    let getNullnessByte (t: IType) =
+        match t.NullableAnnotation with
+        | NullableAnnotation.NotAnnotated -> 1uy
+        | NullableAnnotation.Annotated -> 2uy
+        | _ -> 0uy
+
+    let rec addNullnessFlags (flags: List<byte>) (t: IType) =
+        if t.IsVoid() then () else
+
+        if not t.IsResolved then flags.Add(getNullnessByte t) else
+
+        match t with
+        | :? IDeclaredType as declaredType ->
+            let resolveResult = declaredType.Resolve()
+
+            match resolveResult.DeclaredElement with
+            | :? ITypeParameter -> flags.Add(getNullnessByte t)
+            | :? ITypeElement as typeElement ->
+                let typeArgs = getTypeArgs resolveResult
+
+                match typeElement with
+                | :? IEnum
+                | :? IStruct ->
+                    if not (List.isEmpty typeArgs) && not (declaredType.IsNullable()) then
+                        flags.Add(0uy)
+                | _ -> flags.Add(getNullnessByte t)
+
+                for typeArg in typeArgs do
+                    addNullnessFlags flags typeArg
+
+            | _ -> ()
+
+        | :? IArrayType as arrayType ->
+            flags.Add(getNullnessByte t)
+            addNullnessFlags flags arrayType.ElementType
+
+        | :? IPointerType as pointerType ->
+            addNullnessFlags flags pointerType.ElementType
+
+        | _ -> ()
+
+    let nullableAttributes =
+        [| for value in 0uy .. 2uy ->
+            InterruptibleLazy(fun _ ->
+                mkCompilerGeneratedAttribute PredefinedType.NULLABLE_ATTRIBUTE_FQN [ ILAttribElem.Byte value ]) |]
+
+    let getNullness (t: IType) =
+        if not isNullnessEnabled || isNull t then None else
+
+        let flags = List<byte>()
+        addNullnessFlags flags t
+
+        if flags.Count = 0 then None else
+
+        let first = flags[0]
+        if Seq.forall (fun flag -> flag = first) flags then
+            if first = 0uy then None else Some(ILAttribElem.Byte first)
+        else
+
+        let byteIlType = mkType (psiModule.GetPredefinedType().Byte)
+        Some(ILAttribElem.Array(byteIlType, [ for flag in flags -> ILAttribElem.Byte flag ]))
+
+    let getTypeParameterNullness (typeParameter: ITypeParameter) =
+        if not isNullnessEnabled then None else
+
+        match typeParameter.Nullability with
+        | TypeParameterNullability.NotNullableReferenceType
+        | TypeParameterNullability.NotNullableValueOrReferenceType -> Some(ILAttribElem.Byte 1uy)
+        | _ -> None
+
+    let mkNullableAttribute (nullness: ILAttribElem option) =
+        match nullness with
+        | Some(ILAttribElem.Byte value) -> nullableAttributes[int value].Value
+        | Some arg -> mkCompilerGeneratedAttribute PredefinedType.NULLABLE_ATTRIBUTE_FQN [arg]
+        | None -> None
+
+    let mkTypeDefImplements (typeElement: ITypeElement) =
+        [ for declaredType in getInterfaces typeElement do
+            match mkNullableAttribute (getNullness declaredType) with
+            | None -> InterfaceImpl.Create(mkType declaredType)
+            | Some attribute ->
+                let attrs = storeILCustomAttrs (mkILCustomAttrs [attribute])
+                InterfaceImpl.Create(mkType declaredType, attrs) ]
 
     let mkIsUnmanagedAttribute () =
         mkCompilerGeneratedAttributeNoArgs PredefinedType.IS_UNMANAGED_ATTRIBUTE_FQN
@@ -735,6 +823,13 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         |> List.filter (fun attributeInstance -> isNotNull attributeInstance.Constructor)
         |> List.map mkCustomAttribute
 
+    let mkCustomAttributesWithNullness (attributesSet: IAttributesSet) (t: IType) =
+        [ match mkNullableAttribute (getNullness t) with
+          | Some attribute -> attribute
+          | _ -> ()
+
+          yield! mkCustomAttributes attributesSet ]
+
     let mkGenericVariance (variance: TypeParameterVariance): ILGenericVariance =
         match variance with
         | TypeParameterVariance.IN -> ILGenericVariance.ContraVariant
@@ -752,11 +847,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 mkType typeConstraint ]
 
         let attributes =
-            if not typeParameter.IsUnmanagedType then emptyILCustomAttrsStored else
+            let attrs =
+                [ if typeParameter.IsUnmanagedType then
+                      match mkIsUnmanagedAttribute () with
+                      | Some attribute -> attribute
+                      | _ -> ()
 
-            match mkIsUnmanagedAttribute () with
-            | Some attribute -> storeILCustomAttrs (mkILCustomAttrs [attribute])
-            | None -> emptyILCustomAttrsStored
+                  match mkNullableAttribute (getTypeParameterNullness typeParameter) with
+                  | Some attribute -> attribute
+                  | _ -> () ]
+
+            match attrs with
+            | [] -> emptyILCustomAttrsStored
+            | attrs -> storeILCustomAttrs (mkILCustomAttrs attrs)
 
         { Name = typeParameter.ShortName
           Constraints = typeConstraints
@@ -815,7 +918,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                | Some attribute -> attribute
                | _ -> ()
 
-           yield! mkCustomAttributes typeElement |]
+           yield! mkCustomAttributesWithNullness typeElement (getBaseType typeElement) |]
 
     let mkEnumInstanceValue (enum: IEnum): ILFieldDef =
         let name = "value__"
@@ -896,7 +999,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let offset = None
         let literalValue = mkFieldLiteralValue field
         let marshal = None
-        let customAttrs = mkCustomAttributes field |> mkILCustomAttrs
+        let customAttrs = mkCustomAttributesWithNullness field field.Type |> mkILCustomAttrs
 
         ILFieldDef(name, fieldType, attributes, data, literalValue, offset, marshal, customAttrs)
 
@@ -943,7 +1046,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let paramType = mkParamType param
         let defaultValue = mkParamDefaultValue param
 
-        let customAttributes = mkCustomAttributes param
         let attrs =
             [ if param.IsParameterArray then
                   match mkParamArrayAttribute () with
@@ -955,7 +1057,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                   | Some attribute -> attribute
                   | _ -> ()
 
-              yield! customAttributes ]
+              yield! mkCustomAttributesWithNullness param param.Type ]
 
         { Name = Some(name) // todo: intern?
           Type = paramType
@@ -990,7 +1092,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                   match mkIsReadOnlyAttribute () with
                   | Some attribute -> attribute
                   | _ -> ()
-              yield! mkCustomAttributes method.ReturnTypeAttributes ]
+              yield! mkCustomAttributesWithNullness method.ReturnTypeAttributes method.ReturnType ]
 
         match attrs with
         | [] -> ret
@@ -1031,11 +1133,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let eventType = event.Type
         if eventType.IsUnknown then null else eventType
 
-    let mkEventDefType (event: IEvent) =
-        match getEventType event with
-        | null -> None
-        | eventType -> Some(mkType eventType)
-
     let getAddAccessor (event: IEvent): IFunction =
         let adder = event.Adder
         if isNotNull adder then adder else ImplicitAccessor(event, AccessorKind.ADDER) :> _
@@ -1056,16 +1153,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | adder -> Some(mkMethodRef adder)
 
     let mkEventDef (event: IEvent): ILEventDef =
-        let eventType = mkEventDefType event
+        let eventType = getEventType event
+        let ilEventType = if isNull eventType then None else Some(mkType eventType)
         let name = event.ShortName
         let attributes = enum 0 // Not used by FCS.
         let addMethod = mkEventAddMethod event
         let removeMethod = mkEventRemoveMethod event
         let fireMethod = mkEventFireMethod event
         let otherMethods = []
-        let customAttrs = mkCustomAttributes event |> mkILCustomAttrs
+        let customAttrs = mkCustomAttributesWithNullness event eventType |> mkILCustomAttrs
 
-        ILEventDef(eventType, name, attributes, addMethod, removeMethod, fireMethod, otherMethods, customAttrs)
+        ILEventDef(ilEventType, name, attributes, addMethod, removeMethod, fireMethod, otherMethods, customAttrs)
 
     let mkPropertyParams (property: IProperty) =
         [ for parameter in property.Parameters do
@@ -1097,7 +1195,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                   | Some attribute -> attribute
                   | _ -> ()
 
-              yield! mkCustomAttributes property ]
+              yield! mkCustomAttributesWithNullness property property.ReturnType ]
             |> mkILCustomAttrs
 
         ILPropertyDef(name, attrs, setter, getter, callConv, propertyType, init, args, customAttrs)
@@ -1505,11 +1603,40 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         let typeElement = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule).GetTypeElement()
         isNull typeElement || typeElement.Constructors |> Seq.exists _.IsParameterless |> not
 
+    let isNullableAttribute (expected: ILAttribElem) (ilAttr: ILAttribute) =
+        match ilAttr with
+        | ILAttribute.Decoded(methodSpec, [ actual ], []) ->
+            actual = expected &&
+            methodSpec.MethodRef.DeclaringTypeRef.Name = PredefinedType.NULLABLE_ATTRIBUTE_FQN.FullName
+        | _ -> false
+
+    let isSameNullness (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
+        match nullness with
+        | None -> true
+        | Some expected ->
+
+        match Seq.tryHead attrs with
+        | Some attr when isNullableAttribute expected attr -> true
+        | _ ->
+
+        let attrTypeName = PredefinedType.NULLABLE_ATTRIBUTE_FQN
+        let typeElement = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule).GetTypeElement()
+        isNull typeElement || typeElement.Constructors |> Seq.exists (fun ctor -> ctor.Parameters.Count = 1) |> not
+
+    let skipNullableAttribute (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
+        if nullness.IsSome then Seq.tail attrs else attrs
+
+    let isSameNullnessAttributes (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
+        isSameNullness nullness attrs &&
+        Seq.isEmpty (skipNullableAttribute nullness attrs)
+
     let isSameCustomAttributes (attributesSet: IAttributesSet) (attrs: ILAttribute seq) =
         forallPaired isSameCustomAttribute (customAttributeInstances attributesSet) attrs
 
-    let isUpToDateCustomAttributes (attributesSet: IAttributesSet) (attrs: ILAttributes) =
-        isSameCustomAttributes attributesSet (attrs.AsArray())
+    let isSameCustomAttributesWithNullness (attributesSet: IAttributesSet) (t: IType) (attrs: ILAttribute seq) =
+        let nullness = getNullness t
+        isSameNullness nullness attrs &&
+        isSameCustomAttributes attributesSet (skipNullableAttribute nullness attrs)
 
     let isUpToDateTypeParamDef (typeParameter: ITypeParameter) (genericParameterDef: ILGenericParameterDef) =
         typeParameter.ShortName = genericParameterDef.Name &&
@@ -1524,7 +1651,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (not isUnmanaged || hasGeneratedAttribute PredefinedType.IS_UNMANAGED_ATTRIBUTE_FQN attrs) &&
 
         let attrs = if isUnmanaged then Seq.tail attrs else attrs
-        Seq.isEmpty attrs
+        isSameNullnessAttributes (getTypeParameterNullness typeParameter) attrs
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
         let attrs = typeDef.CustomAttrsStored.CustomAttrs.AsArray()
@@ -1541,7 +1668,14 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (not hasExtensions || hasGeneratedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS attrs) &&
 
         let attrs = if hasExtensions then Seq.tail attrs else attrs
-        isSameCustomAttributes typeElement attrs
+        isSameCustomAttributesWithNullness typeElement (getBaseType typeElement) attrs
+
+    let isSameParameterOrReturnAttributes (attributesSet: IAttributesSet) isReadonlyRef (t: IType)
+            (attrs: ILAttribute seq) =
+        (not isReadonlyRef || hasGeneratedAttribute PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN attrs) &&
+
+        let attrs = if isReadonlyRef then Seq.tail attrs else attrs
+        isSameCustomAttributesWithNullness attributesSet t attrs
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
         // `IsIn` and `IsOut` hold the `in`, `out`, and `ref` modifiers.
@@ -1558,22 +1692,14 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (not isParameterArray || hasGeneratedAttribute PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS attrs) &&
 
         let attrs = if isParameterArray then Seq.tail attrs else attrs
-        let isReadonlyRef = isReadonlyRefParameter param
-        (not isReadonlyRef || hasGeneratedAttribute PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN attrs) &&
-
-        let attrs = if isReadonlyRef then Seq.tail attrs else attrs
-        isSameCustomAttributes param attrs
+        isSameParameterOrReturnAttributes param (isReadonlyRefParameter param) param.Type attrs
 
     let isUpToDateReturn (method: IFunction) (methodDef: ILMethodDef) =
         let methodDefReturn = methodDef.Return
         isSameReturnType method methodDefReturn.Type &&
 
         let attrs = methodDefReturn.CustomAttrs.AsArray()
-        let isReadonlyRef = isReadonlyRefReturn method
-        (not isReadonlyRef || hasGeneratedAttribute PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN attrs) &&
-
-        let attrs = if isReadonlyRef then Seq.tail attrs else attrs
-        isSameCustomAttributes method.ReturnTypeAttributes attrs
+        isSameParameterOrReturnAttributes method.ReturnTypeAttributes (isReadonlyRefReturn method) method.ReturnType attrs
 
     let isUpToDateMethodCustomAttributes (method: IFunction) (ilAttrs: ILAttributes) =
         let attrs = ilAttrs.AsArray()
@@ -1605,11 +1731,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let isUpToDateFieldDef (field: IField) (fieldDef: ILFieldDef) =
         field.ShortName = fieldDef.Name &&
-
         mkFieldAttributes field = fieldDef.Attributes &&
         isSameType field.Type fieldDef.FieldType &&
         isSameFieldLiteralValue field fieldDef.LiteralValue &&
-        isUpToDateCustomAttributes field fieldDef.CustomAttrs
+        isSameCustomAttributesWithNullness field field.Type (fieldDef.CustomAttrs.AsArray())
 
     let isUpToDateFieldDefs (typeElement: ITypeElement) (fieldDefs: ILFieldDef list) =
         isNull fieldDefs ||
@@ -1622,8 +1747,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         forallPaired isUpToDateFieldDef (getFields typeElement) fieldDefs
 
-    let isSameEventType (event: IEvent) (ilEventType: ILType option) =
-        match getEventType event, ilEventType with
+    let isSameEventType (eventType: IType) (ilEventType: ILType option) =
+        match eventType, ilEventType with
         | null, ilEventType -> ilEventType.IsNone
         | _, None -> false
         | eventType, Some ilType -> isSameType eventType ilType
@@ -1633,8 +1758,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         isSameAccessor (getAddAccessor event) eventDef.AddMethod &&
         isSameAccessor (getRemoveAccessor event) eventDef.RemoveMethod &&
         isSameOptionalAccessor event.Raiser eventDef.FireMethod &&
-        isSameEventType event eventDef.EventType &&
-        isUpToDateCustomAttributes event eventDef.CustomAttrs
+
+        let eventType = getEventType event
+        isSameEventType eventType eventDef.EventType &&
+        isSameCustomAttributesWithNullness event eventType (eventDef.CustomAttrs.AsArray())
 
     let isUpToDateEventDefs (typeElement: ITypeElement) (eventDefs: ILEventDef list) =
         isNull eventDefs ||
@@ -1658,7 +1785,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         (not isRequired || hasGeneratedAttribute PredefinedType.REQUIRED_MEMBER_ATTRIBUTE_FQN attrs) &&
 
         let attrs = if isRequired then Seq.tail attrs else attrs
-        isSameCustomAttributes property attrs
+        isSameCustomAttributesWithNullness property property.ReturnType attrs
 
     let isUpToDatePropertyDefs (typeElement: ITypeElement) (propertyDefs: ILPropertyDef list) =
         isNull propertyDefs ||
@@ -1670,7 +1797,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         not expected.IsValueCreated ||
 
         (getInterfaces typeElement, expected.Value)
-        ||> forallPaired (fun declaredType impl -> isSameType declaredType impl.Type)
+        ||> forallPaired (fun declaredType (impl: InterfaceImpl) ->
+            isSameType declaredType impl.Type &&
+            isSameNullnessAttributes (getNullness declaredType) (impl.CustomAttrs.AsArray()))
 
     let isUpToDateBaseType (typeDef: ILTypeDef) (typeElement: ITypeElement) =
         not typeDef.Extends.IsValueCreated ||
@@ -1876,6 +2005,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         mkType t
 
     interface IProjectFcsModuleReader with
+        member this.EnableNullness() =
+            if isNullnessEnabled then () else
+
+            use lock = usingWriteLock ()
+            isNullnessEnabled <- true
+            shim.Logger.Trace("Enable nullness: {0}", path)
+
+            markDirty ()
+
         member this.ILModuleDef =
             FSharpAsyncUtil.CheckAndThrow()
             use lock = usingWriteLock ()
@@ -1959,10 +2097,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         member this.MarkDirty() =
             use _ = usingWriteLock ()
-            shim.Logger.Trace("Mark dirty: {0}", path)
-            isDirty <- true
-            upToDateCheckedTypes <- null
-            seenOutdatedTypes <- false
+            markDirty ()
 
 
 type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =

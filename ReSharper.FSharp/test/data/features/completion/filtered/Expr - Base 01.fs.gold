@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3863
+Count: 3882
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "♦"
@@ -43,7 +43,13 @@ Choice7Of7                  Choice<'T1,'T2,'T3,'T4,'T5,'T6,'T7>
 Error                       Result<'T,'TError>
 KeyValue
 Lazy
+NonNull
+NonNullQuick
+NonNullQuickV
+NonNullV
 None                        'T option
+Null
+NullV
 Ok                          Result<'T,'TError>
 Some                        'T option
 ValueNone                   'T voption
@@ -208,6 +214,7 @@ Unchecked
 UnverifiableAttribute
 ValueOption
 VolatileFieldAttribute
+WarnOnWithoutNullArgumentAttribute
 WebExtensions
 array
 bigint
@@ -219,6 +226,7 @@ inref
 list
 nativeptr
 obj
+objnull
 option
 outref
 unit
@@ -244,7 +252,7 @@ async                       AsyncBuilder
 atan                        ^T
 atan2                       'T2
 backgroundTask              BackgroundTaskBuilder
-box                         obj
+box                         objnull
 byte                        byte
 ceil                        ^T
 char                        char
@@ -254,6 +262,8 @@ cosh                        ^T
 decimal                     decimal
 decr                        unit
 defaultArg                  'T
+defaultIfNull               'T
+defaultIfNullV              'T
 defaultValueArg             'T
 dict                        IDictionary<'Key,'Value>
 double                      double
@@ -284,6 +294,7 @@ int8                        int8
 invalidArg                  'T
 invalidOp                   'T
 isNull                      bool
+isNullV                     bool
 limitedHash                 int
 lock                        'T
 log                         ^T
@@ -294,8 +305,12 @@ nameof                      string
 nan                         float
 nanf                        float32
 nativeint                   nativeint
+nonNull                     'T
+nonNullV                    'T
 not                         bool
 nullArg                     'T
+nullArgCheck                'T
+nullV                       Nullable<'T>
 pown                        ^T
 printf                      'T
 printfn                     'T
@@ -335,6 +350,8 @@ uint8                       uint8
 unativeint                  unativeint
 unbox                       'T
 using                       'U
+withNull                    'T | null
+withNullV                   Nullable<'T>
                             [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
 ASCIIEncoding |(in System.Text)
@@ -346,7 +363,7 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3853 more items ..
+.. +3872 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -466,8 +483,14 @@ NoComparisonAttribute
 NoCompilerInliningAttribute
 NoDynamicInvocationAttribute
 NoEqualityAttribute
+NonNull
+NonNullQuick
+NonNullQuickV
+NonNullV
 NonStructuralComparison
 None                        'T option
+Null
+NullV
 NumericLiteralI
 NumericLiterals
 Observable
@@ -510,6 +533,7 @@ ValueNone                   'T voption
 ValueOption
 ValueSome                   'T voption
 VolatileFieldAttribute
+WarnOnWithoutNullArgumentAttribute
 WebExtensions
 abs                         ^T
 acos                        ^T
@@ -527,7 +551,7 @@ base
 begin
 bigint
 bool
-box                         obj
+box                         objnull
 byref
 byte                        byte
 ceil                        ^T
@@ -539,6 +563,8 @@ cosh                        ^T
 decimal                     decimal
 decr                        unit
 defaultArg                  'T
+defaultIfNull               'T
+defaultIfNullV              'T
 defaultValueArg             'T
 delegate
 dict                        IDictionary<'Key,'Value>
@@ -590,6 +616,7 @@ internal
 invalidArg                  'T
 invalidOp                   'T
 isNull                      bool
+isNullV                     bool
 lazy
 let
 limitedHash                 int
@@ -606,11 +633,16 @@ nanf                        float32
 nativeint                   nativeint
 nativeptr
 new
+nonNull                     'T
+nonNullV                    'T
 not
 not                         bool
 null
 nullArg                     'T
+nullArgCheck                'T
+nullV                       Nullable<'T>
 obj
+objnull
 option
 or
 outref
@@ -673,6 +705,8 @@ when
 while
 while!
 with
+withNull                    'T | null
+withNullV                   Nullable<'T>
 yield
                             [Full, Generic]
 ADVF |(in System.Runtime.InteropServices.ComTypes)
@@ -685,4 +719,4 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3853 more items ..
+.. +3872 more items ..

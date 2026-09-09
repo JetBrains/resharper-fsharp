@@ -1,0 +1,7 @@
+﻿module Module
+
+let a: string = Disabled.Method(null)
+let b: string = Enabled.Method(|null|(0))
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: The type 'string' does not support 'null'.

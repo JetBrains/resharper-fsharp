@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 3608
+Count: 3610
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "♦ }"
@@ -89,7 +89,7 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3598 more items ..
+.. +3600 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -174,4 +174,4 @@ AccessControlSections |(in System.Security.AccessControl)
 AccessControlType |(in System.Security.AccessControl)
 AccessRule |(in System.Security.AccessControl)
 AccessViolationException |(in System)
-.. +3598 more items ..
+.. +3600 more items ..

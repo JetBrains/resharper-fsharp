@@ -1,0 +1,22 @@
+﻿module Module
+
+let mutable notNull = ""
+let mutable nullable: string | null = null
+
+Class.Out(&nullable)
+Class.Out(&notNull)
+
+Class.OutNotNull(&notNull)
+Class.OutNotNull(|&|nullable|(0)|(1))
+
+Class.Ref(&notNull)
+Class.Ref(|&|nullable|(2)|(3))
+
+Class.In(&nullable)
+Class.In(&notNull)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(2): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(3): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

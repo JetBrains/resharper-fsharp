@@ -1992,6 +1992,7 @@ LongType (in Microsoft.VisualBasic.CompilerServices)
 Lookup (in System.Linq)
 LookupBindingPropertiesAttribute (in System.ComponentModel)
 LoopExpression (in System.Linq.Expressions)
+LowPlusPriority (in Microsoft.FSharp.Control.TaskBuilderExtensions)
 LowPriority (in Microsoft.FSharp.Control.TaskBuilderExtensions)
 LowPriority (in Microsoft.FSharp.Linq.QueryRunExtensions)
 Lzcnt (in System.Runtime.Intrinsics.X86)
@@ -2237,6 +2238,10 @@ NoEagerConstraintApplicationAttribute (in Microsoft.FSharp.Core.CompilerServices
 NoEqualityAttribute
 NoNullAllowedException (in System.Data)
 NonEventAttribute (in System.Diagnostics.Tracing)
+NonNull
+NonNullQuick
+NonNullQuickV
+NonNullV
 NonSerializedAttribute (in System)
 NonStructuralComparison
 None
@@ -2253,7 +2258,9 @@ NotifyCollectionChangedEventArgs (in System.Collections.Specialized)
 NotifyCollectionChangedEventHandler (in System.Collections.Specialized)
 NotifyFilters (in System.IO)
 NotifyParentPropertyAttribute (in System.ComponentModel)
+Null
 NullReferenceException (in System)
+NullV
 NullabilityInfo (in System.Reflection)
 NullabilityInfoContext (in System.Reflection)
 NullabilityState (in System.Reflection)
@@ -2989,6 +2996,7 @@ SuffixOrigin (in System.Net.NetworkInformation)
 SupportedJoinOperators (in System.Data.Common)
 SupportedOSPlatformAttribute (in System.Runtime.Versioning)
 SupportedOSPlatformGuardAttribute (in System.Runtime.Versioning)
+SupportsWhenTEnum (in Microsoft.FSharp.Core.CompilerServices)
 SuppressGCTransitionAttribute (in System.Runtime.InteropServices)
 SuppressIldasmAttribute (in System.Runtime.CompilerServices)
 SuppressMessageAttribute (in System.Diagnostics.CodeAnalysis)
@@ -3362,6 +3370,7 @@ WaitHandle (in System.Threading)
 WaitHandleCannotBeOpenedException (in System.Threading)
 WaitHandleExtensions (in System.Threading)
 WaitOrTimerCallback (in System.Threading)
+WarnOnWithoutNullArgumentAttribute
 WarningException (in System.ComponentModel)
 WarningHeaderValue (in System.Net.Http.Headers)
 WatcherChangeTypes (in System.IO)
@@ -3722,6 +3731,8 @@ cosh
 decimal
 decr
 defaultArg
+defaultIfNull
+defaultIfNullV
 defaultValueArg
 delegate
 dict
@@ -3775,6 +3786,7 @@ internal
 invalidArg
 invalidOp
 isNull
+isNullV
 kelvin (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 kilogram (in Microsoft.FSharp.Data.UnitSystems.SI.UnitNames)
 lazy
@@ -3796,11 +3808,16 @@ nanf
 nativeint
 nativeptr
 new
+nonNull
+nonNullV
 not
 not
 null
 nullArg
+nullArgCheck
+nullV
 obj
+objnull
 open
 option
 or
@@ -3865,4 +3882,6 @@ when
 while
 while!
 with
+withNull
+withNullV
 yield{caret}

@@ -15,6 +15,8 @@ type IProjectFcsModuleReader =
     /// Marks as possibly needing the timestamp update
     abstract MarkDirty: unit -> unit
 
+    abstract EnableNullness: unit -> unit
+
     /// Removes outdated type defs and updates module timestamp if needed
     abstract UpdateTimestamp: unit -> unit
 

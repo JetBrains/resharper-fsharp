@@ -17,6 +17,9 @@ open JetBrains.ReSharper.Psi.Tree
 
 /// Workaround for case where unqualified resolve may return module with implicit suffix instead of type.
 let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqualifiedElement: IDeclaredElement) (reference: FSharpSymbolReference) =
+    let declaredElement = declaredElement.As<ITypeElement>()
+    isNotNull declaredElement &&
+
     let unqualifiedTypeElement = unqualifiedElement.As<CompiledTypeElement>()
     if isNull unqualifiedTypeElement then false else
 
@@ -24,7 +27,7 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     if not (unqualifiedTypeElement.ShortName.HasModuleSuffix() && not (shortName.HasModuleSuffix())) then false else
     if not (unqualifiedTypeElement :? FSharpCompiledModule) then false else
 
-    let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName)
+    let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName, declaredElement.TypeParametersCount)
     declaredElement.Equals(typeElement)
 
 let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified resolveExpr opName =

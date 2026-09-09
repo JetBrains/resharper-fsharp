@@ -1,0 +1,18 @@
+﻿module Module
+
+let a: string[] = Class.NotNull()
+let b: string[] = |Class.NullableElement()|(0)
+let c: string[] = ||Class.NullableArray()|(1)|(2)
+let d: string[] = |||Class.NullableBoth()|(3)|(4)|(5)
+let e: string[][] = |Class.Jagged()|(6)
+let f: string[,] = |Class.Rank2()|(7)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'string array' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(2): ReSharper Warning: Nullness warning: The types 'string array' and 'string array | null' do not have compatible nullability.
+(3): ReSharper Warning: Nullness warning: A non-nullable 'string array' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(4): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(5): ReSharper Warning: Nullness warning: The types 'string array' and '(string | null) array | null' do not have compatible nullability.
+(6): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(7): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.

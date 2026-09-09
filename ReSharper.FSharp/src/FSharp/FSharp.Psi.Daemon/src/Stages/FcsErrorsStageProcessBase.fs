@@ -94,6 +94,8 @@ module FSharpErrors =
     let [<Literal>] AttributeIsNotValidOnThisElement = 842
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] TypeAbbreviationsCannotHaveAugmentations = 964
+    let [<Literal>] InvalidModuleExprType = 1123
+    let [<Literal>] NoConstructorsAvailableForType = 1133
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
     let [<Literal>] LiteralPatternDoesNotTakeArguments = 3191
@@ -191,7 +193,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
         if isNull refExpr then createGenericHighlighting error range else
-        
+
         highlightingCtor refExpr :> _ 
 
     /// Finds the smallest node of the corresponding type at offset.
@@ -203,6 +205,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match token.GetContainingNode() with
         | null -> null
         | node -> highlightingCtor node :> _
+
+    let createHighlightingFromIdentifier highlightingCtor (error: FSharpDiagnostic) (range: DocumentRange) : IHighlighting =
+        let identifier = fsFile.GetNode(range)
+        let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
+        if isNull referenceOwner then null else
+
+        highlightingCtor (referenceOwner.Reference, error.Message) :> _
 
     let createHighlightingFromMappedExpression mapping highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
@@ -284,22 +293,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 UndefinedIndexerError(indexerExpr, error.Message)
 
             | _ ->
-
-            let identifier = fsFile.GetNode(range)
-            let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
-
-            UnresolvedHighlighting(error.Message, range) :> _
+                createHighlightingFromIdentifier UndefinedNameError error range
 
         | ErrorFromAddingConstraint ->
             createHighlightingFromNodeWithMessage AddingConstraintError range error
 
         | UpperCaseIdentifierInPattern ->
-            let identifier = fsFile.GetNode(range)
-            let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNull referenceOwner then null else
-
-            UpperCaseIdentifierInPatternWarning(referenceOwner.Reference, error.Message) :> _
+            createHighlightingFromIdentifier UndefinedNameError error range
 
         | UpcastUnnecessary ->
             createHighlightingFromNode UpcastUnnecessaryWarning range
@@ -309,6 +309,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | IndeterminateType ->
             createHighlightingFromNode IndeterminateTypeError range
+
+        | InvalidModuleExprType ->
+            createHighlightingFromIdentifier InvalidModuleExprTypeError error range
+
+        | NoConstructorsAvailableForType ->
+            createHighlightingFromIdentifier NoConstructorsAvailableForTypeError error range
 
         | UnusedValue ->
             match fsFile.GetNode<IReferencePat>(range) with
@@ -366,7 +372,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | Some (:? ValueNotContainedDiagnosticExtendedData) ->
                 createHighlightingFromNodeWithMessage ValueNotContainedMutabilityAttributesDifferError range error
             | _ -> createGenericHighlighting error range
-        
+
         | UnitTypeExpected ->
             createHighlightingFromMappedExpression getResultNode UnitTypeExpectedWarning range error
 
@@ -396,7 +402,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecifiedError
                 range
                 error
-        
+
         | NoImplementationGiven ->
             let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
@@ -467,11 +473,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
 
         | InvalidUseOfTypeName ->
-            let identifier = fsFile.GetNode(range)
-            let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
-            if isNotNull referenceOwner then InvalidUseOfTypeNameError(referenceOwner.Reference, error.Message) :> _ else
-
-            createGenericHighlighting error range
+            createHighlightingFromIdentifier InvalidUseOfTypeNameError error range
 
         | PropertyIsStatic ->
             createHighlightingFromParentNode PropertyIsStaticError range
@@ -496,7 +498,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UnusedThisVariable ->
             createHighlightingFromParentNode UnusedThisVariableWarning range
-            
+
         | LiteralPatternDoesNotTakeArguments ->
             createHighlightingFromNode LiteralPatternDoesNotTakeArgumentsError range
 
@@ -563,7 +565,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             | Some (:? FieldNotContainedDiagnosticExtendedData) ->
                 createHighlightingFromParentNodeWithMessage FieldNotContainedTypesDifferError range error
-            
+
             | Some (:? TypeMismatchDiagnosticExtendedData as data) ->
                 if data.ExpectedType.IsUnitType then
                     createHighlightingFromMappedExpression getResultNode UnitTypeExpectedError range error else

@@ -1,0 +1,10 @@
+﻿module Module
+
+let a = NotNullCtor("")
+let b = NotNullCtor(|null|(0))
+
+let c = NullableCtor("")
+let d = NullableCtor(null)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: The type 'string' does not support 'null'.

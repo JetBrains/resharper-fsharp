@@ -1,0 +1,13 @@
+﻿module Module
+
+open System
+open System.Collections.Generic
+
+let a: Nullable<int> = Class.NullableInt()
+let b: List<int> = Class.Ints()
+let c: KeyValuePair<string, int> = |Class.Pair()|(0)
+let d: Nullable<KeyValuePair<int, string>> = |Class.NullablePair()|(1)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
+(1): ReSharper Warning: Nullness warning: A non-nullable 'string' was expected but this expression is nullable. Consider either changing the target to also be nullable, or use pattern matching to safely handle the null case of this expression.
