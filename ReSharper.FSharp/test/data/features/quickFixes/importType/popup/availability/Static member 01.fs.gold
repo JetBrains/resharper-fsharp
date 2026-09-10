@@ -1,0 +1,12 @@
+﻿let _ = String.|Empty|(0)
+
+------------------------------------------------
+0: The value, constructor, namespace or type 'Empty' is not defined.
+QUICKFIXES:
+Import missing references in file
+--Import missing references in project
+--Import missing references in solution
+Import type 'System.String'
+--Import type 'String' in file
+--Import type 'String' in project
+--Import type 'String' in solution

@@ -1,0 +1,9 @@
+﻿module Test
+
+type |Enumerable|(0) with
+    static member P = 5
+
+------------------------------------------------
+0: The type 'Enumerable' is not defined.
+QUICKFIXES:
+System.Linq.Enumerable

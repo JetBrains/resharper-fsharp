@@ -90,7 +90,7 @@ let entryPointAttrTypeName = clrTypeName "Microsoft.FSharp.Core.EntryPointAttrib
 
 
 let predefinedFunctionTypes =
-    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd"; "&&&"; "|||"; "^^^" |]
+    [| operatorsModuleTypeName, [| "not"; "id"; "ignore"; "|>"; "<|"; "<>"; "="; "fst"; "snd"; "&&&"; "|||"; "^^^"; "nameof" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |]
        extraTopLevelOperatorsTypeName, [| "sprintf" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])

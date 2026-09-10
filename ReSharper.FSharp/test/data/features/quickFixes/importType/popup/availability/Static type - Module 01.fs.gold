@@ -1,0 +1,12 @@
+﻿module Test
+
+module A = 
+    module StreamReader =
+        ()
+
+|StreamReader|(0)
+
+------------------------------------------------
+0: The value or constructor 'StreamReader' is not defined.
+QUICKFIXES:
+System.IO.StreamReader
