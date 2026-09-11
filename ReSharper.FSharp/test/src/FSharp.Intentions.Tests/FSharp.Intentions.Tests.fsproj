@@ -9,6 +9,8 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <OtherFlags>$(OtherFlags) --parallelcompilation</OtherFlags>
+    <NoWarn>FS0075</NoWarn>
     <JetTestProject>true</JetTestProject>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Intentions.Tests</RootNamespace>
     <TargetFramework>net472</TargetFramework>
