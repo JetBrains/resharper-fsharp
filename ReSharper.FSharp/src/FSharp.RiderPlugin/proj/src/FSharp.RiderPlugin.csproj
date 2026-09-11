@@ -9,6 +9,7 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.RiderPlugin</AssemblyName>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.RiderPlugin</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>

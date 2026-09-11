@@ -10,6 +10,7 @@
     <PackageLock Include="JetBrains.RdFramework" Version="2026.3.0" />
     <PackageLock Include="JetBrains.SharpGen.Runtime" Version="2.0.20260715.131" />
     <PackageLock Include="JetBrains.SharpGen.Runtime.COM" Version="2.0.20260715.131" />
+    <PackageLock Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" IsDevelopmentDependency="True" />
     <PackageLock Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageLock Include="System.Collections.Immutable" Version="8.0.0" />
   </ItemGroup>

@@ -10,7 +10,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <OtherFlags>$(OtherFlags) --parallelcompilation</OtherFlags>
-    <NoWarn>FS0075</NoWarn>
+    <NoWarn>FS0075;MSB3277</NoWarn>
     <JetTestProject>true</JetTestProject>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</RootNamespace>
     <TargetFramework>net472</TargetFramework>
