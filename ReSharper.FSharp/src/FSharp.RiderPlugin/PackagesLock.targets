@@ -2,5 +2,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <PackageLock Include="JetBrains.NetFxBridge" Version="0.0.3" />
+    <PackageLock Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" IsDevelopmentDependency="True" />
   </ItemGroup>
 </Project>

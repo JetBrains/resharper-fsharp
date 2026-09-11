@@ -9,6 +9,7 @@
   <PropertyGroup>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi</AssemblyName>
     <LangVersion>$(CSharpLanguageVersion)</LangVersion>
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>

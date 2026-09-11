@@ -10,7 +10,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</AssemblyName>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <OtherFlags>$(OtherFlags) --parallelcompilation</OtherFlags>
-    <NoWarn>FS0057;FS0075</NoWarn>
+    <NoWarn>FS0057;FS0075;MSB3277</NoWarn>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Services</RootNamespace>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
