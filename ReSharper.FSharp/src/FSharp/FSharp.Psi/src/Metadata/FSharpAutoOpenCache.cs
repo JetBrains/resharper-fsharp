@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Application.ContentModel;
 using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Diagnostics;
@@ -144,6 +145,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     private void AfterTypePartAdded(TypePart addedTypePart)
     {
+      if (ContentModelFork.IsCurrentlyForked)
+        return;
+
       if (!IsApplicable(addedTypePart))
         return;
 
@@ -157,6 +161,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     private void BeforeTypePartRemoved(TypePart removedTypePart)
     {
+      if (ContentModelFork.IsCurrentlyForked)
+        return;
+
       if (!IsApplicable(removedTypePart))
         return;
 

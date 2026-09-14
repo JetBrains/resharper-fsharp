@@ -1,3 +1,4 @@
+using JetBrains.Application.ContentModel;
 using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -24,6 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.TypeProviders
 
     private void InvalidateTypePart(TypePart typePart)
     {
+      if (ContentModelFork.IsCurrentlyForked) return;
       if (typePart is not TypeAbbreviationOrDeclarationPart) return;
       if (myTypeProvidersShim.SolutionTypeProvidersClient is not { } tpManager) return;
       if (typePart.TypeElement is not { } typeElement) return;

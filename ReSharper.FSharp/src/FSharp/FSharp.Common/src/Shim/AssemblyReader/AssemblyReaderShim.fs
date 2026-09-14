@@ -4,6 +4,7 @@ open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Text
 open FSharp.Compiler.AbstractIL.ILBinaryReader
+open JetBrains.Application.ContentModel
 open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
@@ -183,6 +184,8 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
         dirtyModules.Clear()
 
     let markTypePartDirty (typePart: TypePart) =
+        if ContentModelFork.IsCurrentlyForked then () else
+
         if isEnabled () && assemblyReadersByModule.Count <> 0 then
             dirtyModules.Add(typePart.TypeElement.Module) |> ignore
 
