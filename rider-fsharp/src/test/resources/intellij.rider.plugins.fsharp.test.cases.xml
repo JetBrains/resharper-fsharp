@@ -35,7 +35,7 @@
       <module name="intellij.rd.client"/>
       <module name="intellij.rider.languages"/>
       <module name="intellij.rider.test.build.shared"/>
-      <module name="intellij.rider.test.framework.integration.junit"/>
+      <module name="intellij.rider.test.framework.integration"/>
       <module name="intellij.xml.impl"/>
     </dependencies>
     <!-- endregion -->
