@@ -185,7 +185,7 @@ type UnionCasePatternRule() =
             let item =
                 LookupItemFactory.CreateLookupItem(info)
                     .WithPresentation(fun _ ->
-                        let typeText = fcsType.Format()
+                        let typeText = fcsType.Format(referenceName)
                         TextPresentation(info, typeText, matchesType, PsiSymbolsThemedIcons.EnumMember.Id) :> _)
                     .WithBehavior(fun _ -> behavior)
                     .WithMatcher(LookupItemMatcher.Literal)

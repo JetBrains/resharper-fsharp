@@ -339,6 +339,168 @@ class FcsModuleReaderTest : PerTestProjectModelTestBase() {
     }
   }
 
+  private fun fsharpModuleWithOpen(namespace: String, expression: String) =
+    """
+    module FSharpProject
+
+    open $namespace
+
+    let x = $expression
+    """.trimIndent()
+
+  private fun csharpClass(name: String) =
+    "public class $name { public static readonly int Prop = 1; }"
+
+  private val csharpNsFile =
+    """
+    namespace Ns
+    {
+        public class CSharpClass
+        {
+            public static readonly int Prop = 1;
+        }
+    }
+    """.trimIndent()
+
+  private fun csharpNsAndOtherFile(nsMember: String, otherMember: String) =
+    """
+    namespace Ns
+    {
+        public class CSharpClass
+        {
+            public static readonly int Prop = 1;
+        }
+
+        $nsMember
+    }
+
+    namespace Other
+    {
+        public class OtherClass
+        {
+        }
+
+        $otherMember
+    }
+    """.trimIndent()
+
+  private fun assertCSharpEditAndUndo(fsharpText: String, oldText: String, newText: String) {
+    withNonFSharpProjectReferences {
+      assertAllProjectsWereLoaded()
+
+      writeSolutionFiles(
+        "CSharpProject/Class1.cs" to csharpNsFile,
+        "FSharpProject/Library.fs" to fsharpText
+      )
+      openFsFileAssertErrors("Init: before the C# edit", true)
+
+      editCSharpFile(oldText, newText)
+      openFsFileAssertErrors("After the C# edit", false)
+
+      editCSharpFile(newText, oldText)
+      openFsFileAssertErrors("After the C# edit is undone", true)
+    }
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testAddRemoveTypeInGlobalNamespace() {
+    assertCSharpEditAndUndo(
+      fsharpModule("NewClass.Prop"),
+      "namespace Ns",
+      "${csharpClass("NewClass")}\n\nnamespace Ns"
+    )
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testAddRemoveTypeInOpenedNamespace() {
+    assertCSharpEditAndUndo(
+      fsharpModuleWithOpen("Ns", "NewClass.Prop"),
+      "public class CSharpClass",
+      "${csharpClass("NewClass")}\n\npublic class CSharpClass"
+    )
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testAddRemoveNestedNamespace() {
+    assertCSharpEditAndUndo(
+      fsharpModule("Ns.Inner.NewClass.Prop"),
+      "namespace Ns",
+      "namespace Ns.Inner { ${csharpClass("NewClass")} }\n\nnamespace Ns"
+    )
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testRenameTypeInNamespace() {
+    assertCSharpEditAndUndo(fsharpModuleWithOpen("Ns", "NewClass.Prop"), "class CSharpClass", "class NewClass")
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testChangeTypeArityInNamespace() {
+    assertCSharpEditAndUndo(fsharpModuleWithOpen("Ns", "CSharpClass<int>.Prop"), "class CSharpClass", "class CSharpClass<T>")
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testRenameNamespace() {
+    assertCSharpEditAndUndo(fsharpModuleWithOpen("Ns2", "CSharpClass.Prop"), "namespace Ns", "namespace Ns2")
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testAddRemoveTypeInNotImportedNamespace() {
+    withNonFSharpProjectReferences {
+      assertAllProjectsWereLoaded()
+
+      writeSolutionFiles(
+        "CSharpProject/Class1.cs" to csharpNsAndOtherFile("", ""),
+        "FSharpProject/Library.fs" to fsharpModule("Ns.CSharpClass.Prop")
+      )
+      openFsFileAssertErrors("Init: F# does not use the Other namespace", false)
+
+      writeSolutionFiles(
+        "CSharpProject/Class1.cs" to csharpNsAndOtherFile("", csharpClass("NewClass")),
+        "FSharpProject/Library.fs" to fsharpModule("Other.NewClass.Prop")
+      )
+      openFsFileAssertErrors("After adding a type to the Other namespace", false)
+
+      writeSolutionFile("CSharpProject", "Class1.cs", csharpNsAndOtherFile("", ""))
+      openFsFileAssertErrors("After removing the type from the Other namespace", true)
+    }
+  }
+
+  @Solution("ProjectReferencesCSharp2")
+  @Test
+  fun testMoveTypeToAnotherNamespace() {
+    withNonFSharpProjectReferences {
+      assertAllProjectsWereLoaded()
+
+      fun fsharpText(movedClassNamespace: String) =
+        """
+        module FSharpProject
+
+        let x = $movedClassNamespace.MovedClass.Prop
+        let y = Other.OtherClass()
+        """.trimIndent()
+
+      writeSolutionFiles(
+        "CSharpProject/Class1.cs" to csharpNsAndOtherFile(csharpClass("MovedClass"), ""),
+        "FSharpProject/Library.fs" to fsharpText("Ns")
+      )
+      openFsFileAssertErrors("Init: F# uses both namespaces", false)
+
+      writeSolutionFile("CSharpProject", "Class1.cs", csharpNsAndOtherFile("", csharpClass("MovedClass")))
+      openFsFileAssertErrors("After the move: the old namespace", true)
+
+      writeSolutionFile("FSharpProject", "Library.fs", fsharpText("Other"))
+      openFsFileAssertErrors("After the move: the new namespace", false)
+    }
+  }
+
   @Solution("ProjectReferencesCSharp2")
   @Test
   fun testAddMemberToReferencedType() {

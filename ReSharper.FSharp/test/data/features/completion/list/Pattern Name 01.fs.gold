@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 265
+Count: 267
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "| Some(♦)"
@@ -195,6 +195,7 @@ Operators
 OptimizedClosures
 Option
 OptionalArgumentAttribute
+Primitives
 Printf
 PrintfFormat
 ProjectionParameterAttribute
@@ -220,6 +221,7 @@ TailCallAttribute
 TaskBuilder
 TaskBuilderBase
 TaskBuilderExtensions
+Text
 Unchecked
 UnverifiableAttribute
 ValueOption
@@ -416,6 +418,7 @@ Operators
 OptimizedClosures
 Option
 OptionalArgumentAttribute
+Primitives
 Printf
 PrintfFormat
 ProjectionParameterAttribute
@@ -442,6 +445,7 @@ TailCallAttribute
 TaskBuilder
 TaskBuilderBase
 TaskBuilderExtensions
+Text
 Unchecked
 UnverifiableAttribute
 Value| |=                   'T              OrderStr=Value

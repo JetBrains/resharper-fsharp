@@ -147,7 +147,7 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
         if isNull symbol then ValueNone else
 
         let symbol = symbol.AccessorProperty |> Option.defaultValue symbol
-        let typeString = symbol.ReturnParameter.Type.Format()
+        let typeString = symbol.ReturnParameter.Type.Format(decl)
 
         match decl with
         | :? IBinding as binding ->
@@ -178,14 +178,14 @@ type private PatternsHighlightingProcess(fsFile, settingsStore: IContextBoundSet
             if isNull symbol then ValueNone else
 
             let fcsType = symbol.FullType
-            let typeString = fcsType.Format()
+            let typeString = fcsType.Format(refPat)
             TypeHintHighlighting(typeString, pattern, pushToHintMode, actionsProvider) |> ValueSome
 
         | pattern ->
             let fcsType = pattern.TryGetFcsType()
             if isNull fcsType then ValueNone else
 
-            let typeString = fcsType.Format()
+            let typeString = fcsType.Format(pattern)
             TypeHintHighlighting(typeString, pattern, pushToHintMode, actionsProvider) |> ValueSome
 
     let rec getHighlighting (node: ITreeNode) pushToHintMode actionsProvider =

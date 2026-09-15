@@ -21,7 +21,7 @@ open JetBrains.Util
 
 [<AllowNullLiteral>]
 type FcsLookupCandidate(fcsTooltip: ToolTipElementData, xmlDocService: FSharpXmlDocService, psiModule: IPsiModule) =
-    member x.Description = richText fcsTooltip.MainDescription
+    member x.Description = ofFcsRichText fcsTooltip.MainDescription
     member x.XmlDoc = fcsTooltip.XmlDoc
 
     member x.FcsTooltip = fcsTooltip
@@ -42,7 +42,7 @@ module FcsLookupCandidate =
         tooltips |> List.collect (function ToolTipElement.Group(overloads) -> overloads | _ -> [])
 
     let getDescription (xmlDocService: FSharpXmlDocService) (psiModule: IPsiModule) (fcsTooltip: ToolTipElementData) =
-        let mainDescription = RichTextBlock(richText fcsTooltip.MainDescription)
+        let mainDescription = RichTextBlock(ofFcsRichText fcsTooltip.MainDescription)
         match xmlDocService.GetXmlDocSummary(fcsTooltip.XmlDoc, fcsTooltip.Symbol, psiModule) with
         | null -> ()
         | xmlDoc ->
@@ -108,7 +108,7 @@ type FcsLookupItem(items: RiderDeclarationListItems, context: FSharpCodeCompleti
     override x.DisplayTypeName =
         try
             match getReturnType x.FcsSymbol with
-            | Some t -> RichText(t.Format())
+            | Some t -> RichText(t.Format(context.NodeInFile))
             | _ -> null
         with _ -> null
 

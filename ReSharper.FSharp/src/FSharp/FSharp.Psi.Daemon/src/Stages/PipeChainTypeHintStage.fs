@@ -131,7 +131,7 @@ type PipeChainHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, 
 
             if not isApplicable then () else
             let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
-            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(), range))
+            highlightingConsumer.AddHighlighting(TypeHintHighlighting(fcsType.Format(exprToAdorn), range))
 
         highlightingConsumer.CollectHighlightings()
 

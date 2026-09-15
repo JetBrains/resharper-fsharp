@@ -93,6 +93,8 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings 07 - Backslash``() = x.DoNamedTest()
     [<Test>] member x.``Strings 08 - Quotes``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type - Spread 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Multiline strings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Multiline strings 02 - Triple quoted``() = x.DoNamedTest()
     [<Test>] member x.``Multiline strings 03 - Verbatim``() = x.DoNamedTest()

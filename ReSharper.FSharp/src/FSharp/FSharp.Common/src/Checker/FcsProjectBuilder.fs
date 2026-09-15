@@ -14,6 +14,7 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 
@@ -60,6 +61,11 @@ module FcsProjectBuilder =
 
     let isNullnessEnabled (configuration: IFSharpProjectConfiguration) =
         isNotNull configuration && configuration.Nullable = Some true
+
+    let isNullnessEnabledInModule (psiModule: IPsiModule) =
+        match psiModule.ContainingProjectModule with
+        | :? IProject as project -> getProjectConfiguration psiModule.TargetFrameworkId project |> isNullnessEnabled
+        | _ -> false
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>)>]

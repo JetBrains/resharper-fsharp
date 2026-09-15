@@ -38,7 +38,8 @@ type NamedUnionCaseFieldsPatRule() =
 
         let fieldNames =
             fcsUnionCase.Fields
-            |> Seq.choose (fun field -> if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format()))
+            |> Seq.choose (fun field ->
+                if field.IsNameGenerated then None else Some (field.Name, field.FieldType.Format(parametersOwnerPat)))
             |> Seq.toArray
 
         if Set.isEmpty filterFields then Some fieldNames else

@@ -55,14 +55,14 @@ type ReplaceReturnTypeFix(node: IFSharpTypeOwnerNode, diagnosticInfo: FcsCachedD
 
     override this.Text =
         if not path.IsEmpty then
-            $"Change type to '{actualFcsType.Format()}'"
+            $"Change type to '{actualFcsType.Format(expr)}'"
         else
             let nameSubstring =
                 match decl.SourceName with
                 | SharedImplUtil.MISSING_DECLARATION_NAME -> " of binding"
                 | name -> $" of '{name}'"
 
-            $"Change type{nameSubstring} to '{actualFcsType.Format()}'"
+            $"Change type{nameSubstring} to '{actualFcsType.Format(expr)}'"
 
     override this.IsAvailable _ =
         let canUpdateReturnType (typeUsage: ITypeUsage) =

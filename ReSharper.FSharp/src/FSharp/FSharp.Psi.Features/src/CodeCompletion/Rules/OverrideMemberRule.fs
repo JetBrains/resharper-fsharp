@@ -271,7 +271,7 @@ module OverrideRuleModule =
                         mfvInstance.Mfv.CurriedParameterGroups
                         |> Seq.map (fun group ->
                             group
-                            |> Seq.map _.Type.Instantiate(substitution).Format()
+                            |> Seq.map _.Type.Instantiate(substitution).Format(node)
                             |> String.concat ", "
                             |> sprintf "(%s)")
                         |> String.concat " "

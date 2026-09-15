@@ -48,9 +48,9 @@ let toTextStyle (tag: TextTag) =
 let emptyPresentation = RichTextBlock()
 
 [<Extension; CompiledName("ToRichText")>]
-let richText (taggedText: TaggedText[]) =
+let ofFcsRichText (text: FSharp.Compiler.Text.RichText) =
     let result = RichText()
-    for text in taggedText do
+    for text in text.Parts do
         result.Append(text.Text, toTextStyle text.Tag) |> ignore
     result
 

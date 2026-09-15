@@ -29,7 +29,7 @@ type FcsSymbolInfo(text, symbol: FSharpSymbol, isFromComputationExpression: bool
         if isNull symbol then null else
 
         match getReturnType symbol with
-        | Some t -> t.Format()
+        | Some t -> t.Format(context.NodeInFile)
         | _ -> null
 
     interface IFcsLookupItemInfo with

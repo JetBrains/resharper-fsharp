@@ -1,6 +1,7 @@
 ﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 
 open FSharp.Compiler.Symbols
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -34,10 +35,17 @@ let getFunctionTypeArgs includeReturnType fcsType =
 let emptyDisplayContext =
     FSharpDisplayContext.Empty.WithShortTypeNames(true)
 
+let emptyNullableDisplayContext =
+    emptyDisplayContext.WithNullnessAnnotations(true)
+
+let getEmptyDisplayContext (context: ITreeNode) =
+    if FcsProjectBuilder.isNullnessEnabledInModule (context.GetPsiModule()) then emptyNullableDisplayContext
+    else emptyDisplayContext
+
 
 type FSharpType with
-    member this.Format() =
-        this.Format(emptyDisplayContext)
+    member this.Format(context: ITreeNode) =
+        this.Format(getEmptyDisplayContext context)
 
 
 let rec isFcsTypeAccessible (context: ITreeNode) (fcsType: FSharpType) =

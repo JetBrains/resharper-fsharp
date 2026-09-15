@@ -22,8 +22,8 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 
 module FSharpQuickDoc =
-    let createFcsTooltipText textTag text =
-        ToolTipText([ToolTipElement.Single([|TaggedText(textTag, text)|], FSharpXmlDoc.None)])
+    let createKeywordTooltipText textTag text =
+        RichText(text, toTextStyle textTag)
 
     let getKeywordTooltipText (token: IFSharpIdentifier) =
         let tokenType = token.GetTokenType()
@@ -35,26 +35,22 @@ module FSharpQuickDoc =
             let path = sourceFile.Document.TryGetFilePath()
             if path.IsEmpty then None else
 
-            createFcsTooltipText TextTag.StringLiteral $"\"{path.Directory.FullPath}\""
+            createKeywordTooltipText TextTag.StringLiteral $"\"{path.Directory.FullPath}\""
             |> Some
 
         elif tokenType == FSharpTokenType.KEYWORD_STRING_SOURCE_FILE then
              token.FSharpFile.GetSourceFile()
              |> Option.ofObj
-             |> Option.map (fun x -> createFcsTooltipText TextTag.StringLiteral $"\"{x.Name}\"")
+             |> Option.map (fun x -> createKeywordTooltipText TextTag.StringLiteral $"\"{x.Name}\"")
 
         elif tokenType == FSharpTokenType.KEYWORD_STRING_LINE then
             token.GetStartLine().Plus1().ToString()
-            |> createFcsTooltipText TextTag.NumericLiteral
+            |> createKeywordTooltipText TextTag.NumericLiteral
             |> Some
         
         else None
 
     let getFSharpToolTipText (token: IFSharpIdentifier) : ToolTipText option =
-        match getKeywordTooltipText token with
-        | Some _ as text -> text
-        | None ->
-
         match token.FSharpFile.GetParseAndCheckResults(true, "FSharpQuickDoc") with
         | None -> None
         | Some results ->
@@ -87,6 +83,10 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         "</pre></div>"
 
     member x.CreateRichTextTooltip() =
+        match FSharpQuickDoc.getKeywordTooltipText identifier with
+        | Some keywordText -> asDefinition keywordText
+        | None ->
+
         FSharpQuickDoc.getFSharpToolTipText identifier
         |> Option.map (fun (ToolTipText layouts) ->
             if layouts.IsEmpty then null else
@@ -98,11 +98,11 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                 | ToolTipElement.Group(overloads) ->
                     overloads |> List.map (fun overload ->
                         let header =
-                            [ if not (isEmpty overload.MainDescription) then
-                                yield overload.MainDescription |> richText
+                            [ if not overload.MainDescription.IsEmpty then
+                                yield overload.MainDescription |> ofFcsRichText
 
                               if not overload.TypeMapping.IsEmpty then
-                                yield overload.TypeMapping |> List.map richText |> richTextJoin "\n" ]
+                                yield overload.TypeMapping |> List.map ofFcsRichText |> richTextJoin "\n" ]
                             |> richTextJoin "\n\n"
                             |> asDefinition
 
@@ -112,8 +112,8 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
                               | xmlDocText -> yield xmlDocText.RichText
 
                               match overload.Remarks with
-                              | Some remarks when not (isEmpty remarks) ->
-                                yield remarks |> richText |> asContent
+                              | Some remarks when not remarks.IsEmpty ->
+                                yield remarks |> ofFcsRichText |> asContent
                               | _ -> () ]
                             |> richTextJoin "\n\n"
 
@@ -165,8 +165,13 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
 
     interface IQuickDocProvider with
         member this.CanNavigate(context) =
-            tryFindToken context
-            |> Option.bind FSharpQuickDoc.getFSharpToolTipText
+            match tryFindToken context with
+            | None -> false
+            | Some token ->
+
+            FSharpQuickDoc.getKeywordTooltipText token |> Option.isSome ||
+
+            FSharpQuickDoc.getFSharpToolTipText token
             |> Option.map (fun (ToolTipText layouts) -> not layouts.IsEmpty)
             |> Option.defaultValue false
 

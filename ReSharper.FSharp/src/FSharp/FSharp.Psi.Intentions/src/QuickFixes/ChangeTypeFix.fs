@@ -96,7 +96,7 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
         | _ -> ()
 
     override this.Text =
-        $"Change type of '{this.DeclaredElement.GetSourceName()}' to '{this.TargetFcsType.Format()}'"
+        $"Change type of '{this.DeclaredElement.GetSourceName()}' to '{this.TargetFcsType.Format(node)}'"
 
     override this.IsAvailable _ =
         let declaredElement = this.DeclaredElement.As<IClrDeclaredElement>()
@@ -143,7 +143,7 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
         ChangeParameterTypeFromArgumentFix(error.Node, error.DiagnosticInfo)
 
     override this.Text =
-        $"Change type of parameter to '{this.TargetFcsType.Format()}'"
+        $"Change type of parameter to '{this.TargetFcsType.Format(node)}'"
 
     override this.GetTargetFcsType(data) =
         data.ActualType

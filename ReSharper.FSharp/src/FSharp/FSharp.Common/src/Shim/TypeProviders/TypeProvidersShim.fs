@@ -118,7 +118,7 @@ type TypeProvidersShim(solution: ISolution, toolset: ISolutionToolset,
                         resolutionEnvironment, isInvalidationSupported, isInteractive, systemRuntimeContainsType,
                         systemRuntimeAssemblyVersion, compilerToolsPath, m)
                 with :? TypeProvidersInstantiationException as e  ->
-                    logError (TypeProviderError(e.FcsNumber, "", m, [e.Message]))
+                    logError (TypeProviderErrors.ofStrings e.FcsNumber "" m [e.Message])
                     []
 
         member this.GetProvidedTypes(pn: IProvidedNamespace) =

@@ -470,6 +470,8 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
     let mutable reader = Unchecked.defaultof<ProjectFcsModuleReader>
     let mutable isNullnessEnabled = false
 
+    let mutable stamp = DateTime.MinValue
+
     member this.ReferencedProject = referencedProject
     member this.Path = projectPath
 
@@ -490,6 +492,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
 
             projectPath <- path
             referencedProject <- project
+            stamp <- DateTime.UtcNow
             reader <- new ProjectFcsModuleReader(psiModule, cache, path, this, None)
             if isNullnessEnabled then
                 (reader :> IProjectFcsModuleReader).EnableNullness()
@@ -509,7 +512,7 @@ type TestAssemblyReaderShim(lifetime, changeManager, psiModules, cache, assembly
         path = projectPath || base.ExistsFile(path)
 
     override this.GetLastWriteTime(path) =
-        if path = projectPath then DateTime.MinValue else base.GetLastWriteTime(path)
+        if path = projectPath then stamp else base.GetLastWriteTime(path)
 
     override this.GetModuleReader(path, readerOptions) =
         if path = projectPath then reader :> _ else base.GetModuleReader(path, readerOptions)
