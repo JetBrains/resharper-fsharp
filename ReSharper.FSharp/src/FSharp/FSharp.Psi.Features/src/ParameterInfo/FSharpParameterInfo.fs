@@ -266,7 +266,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                     match this.ExtendedType with
                     | Some extendedType ->
                         // todo: type arg is not provided by FCS, add it to the symbols API
-                        text.Append(extendedType.FormatLayout(displayContext) |> richText) |> ignore
+                        text.Append(extendedType.FormatRichText(displayContext) |> ofFcsRichText) |> ignore
                         if paramGroup.Count > 0 then
                             text.Append(", ", TextStyle.Default) |> ignore
                     | _ -> ()
@@ -304,7 +304,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                         else
                             fcsParameterType
 
-                    text.Append(fcsParameterType.FormatLayout(displayContext) |> richText) |> ignore
+                    text.Append(fcsParameterType.FormatRichText(displayContext) |> ofFcsRichText) |> ignore
 
                     if isNotNull parameter && parameter.IsOptional then
                         let constantValue = parameter.GetDefaultValue().ConstantValue
@@ -336,7 +336,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 if isNotNull parametersOwner then
                     appendNullabilityAttribute parametersOwner |> ignore
 
-                text.Append(returnType.FormatLayout(displayContext) |> richText) |> ignore
+                text.Append(returnType.FormatRichText(displayContext) |> ofFcsRichText) |> ignore
             | _ -> ()
 
             text

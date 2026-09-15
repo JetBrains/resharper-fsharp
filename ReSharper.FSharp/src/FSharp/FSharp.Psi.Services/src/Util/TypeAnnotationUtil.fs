@@ -124,7 +124,7 @@ let specifyPatternTypeImpl (fcsType: FSharpType) (pattern: IFSharpPattern) =
     let listConsParenPat = getOutermostListConstPat oldPattern |> _.IgnoreParentParens()
 
     let typedPat =
-        let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
+        let typeUsage = factory.CreateTypeUsage(fcsType.Format(oldPattern), TypeUsageContext.TopLevel)
         setPatternTypeUsage oldPattern typeUsage
 
     // In the case `x :: _: Type` add parens to the whole listConsPat
@@ -142,5 +142,5 @@ let specifyPatternType (fcsType: FSharpType) (pattern: IFSharpPattern) =
 
 let setTypeOwnerType (fcsType: FSharpType) (decl: IFSharpTypeUsageOwnerNode) =
     let factory = decl.CreateElementFactory()
-    let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel))
+    let typeUsage = decl.SetTypeUsage(factory.CreateTypeUsage(fcsType.Format(decl), TypeUsageContext.TopLevel))
     bindAnnotations [ fcsType, typeUsage ]

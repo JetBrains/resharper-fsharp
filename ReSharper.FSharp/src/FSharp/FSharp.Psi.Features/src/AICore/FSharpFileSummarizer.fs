@@ -46,9 +46,8 @@ type private SummarizerContext() =
 type private FileSummarizerVisitor() =
     inherit TreeNodeVisitor<SummarizerContext>()
 
-    static let displayContext = emptyDisplayContext
-
-    let formatFcsSymbolType (fcsSymbol: FSharpSymbol) =
+    let formatFcsSymbolType (node: ITreeNode) (fcsSymbol: FSharpSymbol) =
+        let displayContext = getEmptyDisplayContext node
         match fcsSymbol with
         | :? FSharpEntity as entity ->
             let typars =
@@ -66,17 +65,17 @@ type private FileSummarizerVisitor() =
         let referencePat = binding.HeadPattern.As<IReferencePat>()
         if isNull referencePat then () else
 
-        let typeRepr = referencePat.GetFcsSymbol() |> formatFcsSymbolType
+        let typeRepr = referencePat.GetFcsSymbol() |> formatFcsSymbolType binding
         let representation = $"val {referencePat.GetFcsSymbol().DisplayName}: {typeRepr}"
         context.AddEntity(binding, representation)
 
     let addConstructor (constructor: IConstructorSignatureOrDeclaration) (context: SummarizerContext) =
-        let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbolType
+        let typeRepr = constructor.GetFcsSymbol() |> formatFcsSymbolType constructor
         let representation = $"new: {typeRepr}"
         context.AddEntity(constructor, representation)
 
     let addMember (memberDecl: IOverridableMemberDeclaration) (context: SummarizerContext) =
-        let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType
+        let typeRepr = memberDecl.GetFcsSymbol() |> formatFcsSymbolType memberDecl
         let accessorNames =
             memberDecl.AccessorDeclarations |> Seq.map _.AccessorName
 
@@ -126,7 +125,7 @@ type private FileSummarizerVisitor() =
             typeDecl.TypeOrInterfaceInheritMembers
             |> Seq.map _.TypeName
             |> Seq.filter isNotNull
-            |> Seq.map (fun x -> formatFcsSymbolType (x.Reference.GetFcsSymbol()))
+            |> Seq.map (fun x -> formatFcsSymbolType x (x.Reference.GetFcsSymbol()))
             |> String.concat ", "
 
         let inheritsRepr =
@@ -149,7 +148,7 @@ type private FileSummarizerVisitor() =
         x.VisitNode(exceptionDecl, context)
 
     override x.VisitTypeExtensionDeclaration(extensionDecl, context) =
-        let extensionRepr = extensionDecl.GetFcsSymbol() |> formatFcsSymbolType
+        let extensionRepr = extensionDecl.GetFcsSymbol() |> formatFcsSymbolType extensionDecl
 
         use _ = context.OpenScope(extensionDecl, $"type {extensionRepr}", "with")
         x.VisitNode(extensionDecl, context)
@@ -158,7 +157,7 @@ type private FileSummarizerVisitor() =
         let typeName = interfaceImpl.TypeName
         if isNull typeName then () else
 
-        let interfaceRepr = typeName.Reference.GetFcsSymbol() |> formatFcsSymbolType
+        let interfaceRepr = typeName.Reference.GetFcsSymbol() |> formatFcsSymbolType typeName
 
         use _ = context.OpenScope(interfaceImpl, $"interface {interfaceRepr}")
         x.VisitNode(interfaceImpl, context)

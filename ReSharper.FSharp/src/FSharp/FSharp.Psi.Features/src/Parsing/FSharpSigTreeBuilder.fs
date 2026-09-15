@@ -79,7 +79,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, warnDirectives, life
         | _ -> ()
 
     member x.ProcessTypeSignature(SynTypeDefnSig(info, repr, memberSigs, range, _) as defnSig, typeKeywordType) =
-        let (SynComponentInfo(attrs, typeParams, constraints, lid, XmlDoc xmlDoc, _, _, _)) = info
+        let (SynComponentInfo(attrs, typeParams, constraints, _, XmlDoc xmlDoc, _, _, _)) = info
 
         // Representation for type augmentation in signatures
         // workaround over https://github.com/dotnet/fsharp/issues/13861
@@ -88,7 +88,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, warnDirectives, life
             x.ProcessTypeExtensionSignature(defnSig, attrs)
         | _ ->
 
-        let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, lid, range, typeKeywordType)
+        let mark = x.StartType(attrs, xmlDoc, typeParams, constraints, info.LongIdent, range, typeKeywordType)
         match repr with
         | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
             x.ProcessSimpleTypeRepresentation(simpleRepr)
@@ -120,9 +120,10 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, warnDirectives, life
             x.ProcessTypeMemberSignature(m)
 
     member x.ProcessTypeExtensionSignature(SynTypeDefnSig(info, _, memberSigs, range, _), attrs) =
-        let (SynComponentInfo(_, typeParams, constraints, lid , XmlDoc xmlDoc, _, _, _)) = info
+        let (SynComponentInfo(_, typeParams, constraints, _, XmlDoc xmlDoc, _, _, _)) = info
         let mark = x.MarkAndProcessIntro(attrs, xmlDoc, null, range)
 
-        x.ProcessTypeParametersAndConstraints(typeParams, constraints, lid)
+        // todo: a type extension target that is not a long ident gets an empty lid
+        x.ProcessTypeParametersAndConstraints(typeParams, constraints, info.LongIdent)
         x.ProcessTypeMembers(memberSigs)
         x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)

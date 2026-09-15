@@ -50,6 +50,12 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Return - Function 05 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return 01``() = x.DoNamedTest()
 
+    [<Test; FSharpNullable; FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    member x.``Function - Return 02 - Nullable``() = x.DoNamedTest()
+
+    [<Test; FSharpLanguageLevel(FSharpLanguageLevel.FSharp90)>]
+    member x.``Function - Return 03 - Nullable disabled``() = x.DoNamedTest()
+
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeColon", "true")>]
     [<Test>] member x.``Function - Formatting - Add space``() = x.DoNamedTest()
 

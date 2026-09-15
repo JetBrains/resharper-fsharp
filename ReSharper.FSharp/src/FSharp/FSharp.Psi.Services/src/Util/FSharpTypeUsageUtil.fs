@@ -16,7 +16,7 @@ let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
         | :? IParameterSignatureTypeUsage -> TypeUsageContext.ParameterSignature
         | _ -> TypeUsageContext.TopLevel
 
-    let newTypeUsage = factory.CreateTypeUsage(fcsType.Format(), context)
+    let newTypeUsage = factory.CreateTypeUsage(fcsType.Format(typeUsage), context)
     let newTypeUsage = ModificationUtil.ReplaceChild(typeUsage, newTypeUsage)
     let typeUsage =
         if RedundantParenTypeUsageAnalyzer.needsParens newTypeUsage newTypeUsage then
@@ -30,7 +30,7 @@ let updateTypeUsage (fcsType: FSharpType) (typeUsage: ITypeUsage) =
 
 let setParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (fcsType: FSharpType) =
     let factory = decl.CreateElementFactory()
-    let typeUsage = factory.CreateTypeUsage(fcsType.Format(), TypeUsageContext.TopLevel)
+    let typeUsage = factory.CreateTypeUsage(fcsType.Format(decl), TypeUsageContext.TopLevel)
     fcsType, decl.SetTypeUsage(typeUsage)
 
 let setFcsParametersOwnerReturnTypeNoBind (decl: IFSharpTypeOwnerDeclaration) (mfv: FSharpMemberOrFunctionOrValue) =

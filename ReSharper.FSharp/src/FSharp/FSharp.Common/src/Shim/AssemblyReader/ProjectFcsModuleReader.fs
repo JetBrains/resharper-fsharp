@@ -18,6 +18,7 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Impl.Special
@@ -112,6 +113,12 @@ type FcsTypeDef =
       mutable Members: FcsTypeDefMembers }
 
 
+/// Both halves are realised together, so a recorded level is one FCS has fully seen.
+type FcsNamespace =
+    { Types: ILPreTypeDef[]
+      NestedNamespaces: ILPreNamespace[] }
+
+
 type FcsModuleReaderCompilerGeneratedType(clrTypeName, psiModule) =
     inherit DeclaredTypeFromCLRName(clrTypeName, psiModule)
 
@@ -168,7 +175,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     /// It's placed outside `isUpToDate` to keep its state if an interruption happens during checking. 
     let mutable seenOutdatedTypes = false
 
-    let mutable moduleDef: (ILModuleDef * ILPreTypeDef[]) option = None
+    let mutable moduleDef: ILModuleDef option = None
     let mutable realModuleReader: ILModuleReader option = realReader
 
     // Initial timestamp should be earlier than any modifications observed by FCS.
@@ -176,6 +183,9 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     /// Type definitions imported by FCS.
     let typeDefs = ConcurrentDictionary<IClrTypeName, FcsTypeDef>() // todo: use non-concurrent, add locks
+
+    let namespaces = ConcurrentDictionary<string, FcsNamespace>()
+
     let clrNamesByShortNames = CompactOneToSetMap<string, IClrTypeName>()
 
     let markDirty () =
@@ -415,8 +425,8 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         |> List.sortBy getGlobalIndex
         |> List.map (fun typeParameter -> substitution[typeParameter])
 
-    let staticCallingConv = Callconv(ILThisConvention.Static, ILArgConvention.Default)
-    let instanceCallingConv = Callconv(ILThisConvention.Instance, ILArgConvention.Default)
+    let staticCallingConv = ILCallingConv.Static
+    let instanceCallingConv = ILCallingConv.Instance
 
     let rec mkType (t: IType): ILType =
         if t.IsVoid() then ILType.Void else
@@ -1214,6 +1224,23 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         result
 
+    let usingNamespace (qualifiedName: string) defaultValue f =
+        let mutable result = defaultValue
+        readData (fun _ ->
+            if not (psiModule.IsValid()) then () else
+
+            let symbolScope = getSymbolScope ()
+            let ns =
+                match qualifiedName with
+                | "" -> symbolScope.GlobalNamespace
+                | _ -> symbolScope.GetNamespace(qualifiedName)
+
+            if isNotNull ns then
+                result <- f symbolScope ns
+        )
+
+        result
+
     let isInaccessibleExplicitImpl (typeMember: ITypeMember) =
         let overridableMember = typeMember.As<IOverridableMember>()
         isNotNull overridableMember && overridableMember.IsExplicitImplementation &&
@@ -1280,18 +1307,17 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> clrTypeName.FullName
         | _ -> mkNameFromClrTypeName clrTypeName
 
-    let moduleTypeElements () =
-        getSymbolScope().GetAllTypeElementsGroupedByName()
+    let namespaceTypeElements (symbolScope: ISymbolScope) (ns: INamespace) =
+        ns.GetNestedTypeElements(symbolScope)
         |> Seq.filter (fun typeElement -> isNull (typeElement.GetContainingType()))
 
-    let mkPreTypeDefs reader =
-        // todo: make inner types computed on demand, needs an Fcs patch
-        let result = List<ILPreTypeDef>()
+    let mkNamespaceTypes reader symbolScope ns =
+        [| for typeElement in namespaceTypeElements symbolScope ns ->
+            PreTypeDef(typeElement, reader) :> ILPreTypeDef |]
 
-        for typeElement in moduleTypeElements () do
-            result.Add(PreTypeDef(typeElement, reader))
-
-        result.ToArray()
+    let mkNestedNamespaces reader (symbolScope: ISymbolScope) (ns: INamespace) =
+        [| for nested in ns.GetNestedNamespaces(symbolScope) ->
+            PreNamespace(nested, reader) :> ILPreNamespace |]
 
     let cacheMembersTable (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
         let fcsTypeDef = typeDefs.TryGetValue(typeName)
@@ -1360,6 +1386,25 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let getOrCreateNestedTypes (table: FcsTypeDefMembers) reader (typeName: IClrTypeName) =
         getOrCreateNestedTypes table typeName [||] reader
 
+    let getOrCreateNamespaceContents (preNamespace: PreNamespace) getContents =
+        use _ = usingWriteLock ()
+
+        let qualifiedName = preNamespace.QualifiedName
+
+        match namespaces.TryGetValue(qualifiedName) with
+        | NotNull fcsNamespace -> getContents fcsNamespace
+        | _ ->
+
+        let reader = preNamespace.Reader
+        let fcsNamespace =
+            usingNamespace qualifiedName Unchecked.defaultof<FcsNamespace> (fun symbolScope ns ->
+                { Types = mkNamespaceTypes reader symbolScope ns
+                  NestedNamespaces = mkNestedNamespaces reader symbolScope ns }
+            )
+
+        if isNull fcsNamespace then [||] else
+
+        getContents (namespaces.GetOrAdd(qualifiedName, fcsNamespace))
 
     let rec typeParametersCount (typeElement: ITypeElement) =
         typeElement.TypeParametersCount +
@@ -1858,14 +1903,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | null -> false
         | typeElement -> isUpToDateTypeDef typeElement fcsTypeDef
 
-    let isUpToDatePreTypeDefs (preTypeDefs: ILPreTypeDef[]) =
-        // todo: can the order change? Do we want to support it, if yes?
-        (moduleTypeElements (), preTypeDefs)
-        ||> forallPaired (fun typeElement preTypeDef ->
-            let clrTypeName: IClrTypeName = (preTypeDef :?> PreTypeDef).ClrTypeName
-            clrTypeName.ShortName = typeElement.ShortName &&
-            clrTypeName.TypeParametersCount = typeElement.TypeParametersCount &&
-            clrTypeName.GetNamespaceName() = typeElement.GetContainingNamespace().QualifiedName)
+    /// Only the namespaces FCS has imported are recorded, so the rest are never checked.
+    let isUpToDateNamespace (qualifiedName: string) (fcsNamespace: FcsNamespace) =
+        usingNamespace qualifiedName false (fun symbolScope ns ->
+            // todo: can the order change? Do we want to support it, if yes?
+            (namespaceTypeElements symbolScope ns, fcsNamespace.Types)
+            ||> forallPaired (fun typeElement preTypeDef ->
+                let clrTypeName = (preTypeDef :?> PreTypeDef).ClrTypeName
+                clrTypeName.ShortName = typeElement.ShortName &&
+                clrTypeName.TypeParametersCount = typeElement.TypeParametersCount) &&
+
+            (ns.GetNestedNamespaces(symbolScope), fcsNamespace.NestedNamespaces)
+            ||> forallPaired (fun nested preNamespace -> nested.ShortName = preNamespace.Name)
+        )
 
     /// `mkILSimpleModule` gives the manifest no attribute, so only `InternalsVisibleTo` is there.
     let isUpToDateManifestCustomAttributes (attrs: ILAttributes) =
@@ -1893,12 +1943,16 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         use compilationCookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
 
+        for KeyValue(qualifiedName, fcsNamespace) in List.ofSeq namespaces do
+            Interruption.Current.CheckAndThrow()
+
+            if not (isUpToDateNamespace qualifiedName fcsNamespace) then
+                seenOutdatedTypes <- true
+
         match moduleDef with
         | None -> ()
-        | Some(moduleDef, oldPreTypeDefs) ->
+        | Some moduleDef ->
             let upToDate =
-                isUpToDatePreTypeDefs oldPreTypeDefs &&
-
                 match moduleDef.Manifest with
                 | Some manifest -> isUpToDateManifestCustomAttributes manifest.CustomAttrsStored.CustomAttrs
                 | None -> true
@@ -1990,6 +2044,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | NotNull typeDef -> typeDef.TypeDef
         | _ -> mkDummyTypeDef clrTypeName.ShortName
 
+    member this.GetNamespaceTypes(preNamespace: PreNamespace) =
+        getOrCreateNamespaceContents preNamespace _.Types
+
+    member this.GetNestedNamespaces(preNamespace: PreNamespace) =
+        getOrCreateNamespaceContents preNamespace _.NestedNamespaces
+
     member this.InvalidateTypeDef(clrTypeName: IClrTypeName) =
         use lock = usingWriteLock ()
         typeDefs.TryRemove(clrTypeName) |> ignore
@@ -1998,6 +2058,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         // todo: invalidate timestamp on seen-by-FCS type changes only
         // todo: add test for adding/removing not-seen-by-FCS types
         moduleDef <- None
+        namespaces.Clear()
         timestamp <- DateTime.UtcNow
         shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
@@ -2019,7 +2080,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             use lock = usingWriteLock ()
 
             match moduleDef with
-            | Some(moduleDef, _) -> moduleDef
+            | Some moduleDef -> moduleDef
             | None ->
 
             readData (fun _ ->
@@ -2030,8 +2091,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 let assemblyName = project.GetOutputAssemblyName(psiModule.TargetFrameworkId)
                 let isDll = isDll project psiModule.TargetFrameworkId
 
-                let preTypeDefs = mkPreTypeDefs this
-                let typeDefs = mkILTypeDefsComputed (fun _ -> preTypeDefs)
+                let typeDefs = mkILTypeDefsOfNamespace (PreNamespace.CreateGlobal(this))
 
                 let flags = 0 // todo
                 let exportedTypes = mkILExportedTypes []
@@ -2058,12 +2118,12 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                     let manifest = { newModuleDef.Manifest.Value with CustomAttrsStored = attrs }
                     { newModuleDef with Manifest = Some(manifest) }
 
-                moduleDef <- Some(newModuleDef, preTypeDefs)
+                moduleDef <- Some(newModuleDef)
             )
 
             match moduleDef with
             | None -> mkDummyModuleDef ()
-            | Some(moduleDef, _) -> moduleDef
+            | Some moduleDef -> moduleDef
 
         member this.Dispose() =
             match realModuleReader with
@@ -2092,6 +2152,7 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
                 upToDateCheckedTypes <- null
                 seenOutdatedTypes <- false
                 moduleDef <- None
+                namespaces.Clear()
                 timestamp <- DateTime.UtcNow
                 shim.Logger.Trace("New timestamp: {0}: {1}", path, timestamp)
 
@@ -2111,9 +2172,21 @@ type PreTypeDef(clrTypeName: IClrTypeName, reader: ProjectFcsModuleReader) =
             let typeName = clrTypeName.TypeNames.Last() // todo: use clrTypeName.ShortName ? (check type params)
             mkNameFromTypeNameAndParamsNumber typeName
 
-        member x.Namespace =
-            if not (clrTypeName.TypeNames.IsSingle()) then [] else
-            clrTypeName.NamespaceNames |> List.ofSeq
-
         member x.GetTypeDef() =
             reader.CreateTypeDef(clrTypeName)
+
+
+type PreNamespace(qualifiedName: string, shortName: string, reader: ProjectFcsModuleReader) =
+    inherit ILPreNamespace(shortName)
+
+    new (ns: INamespace, reader: ProjectFcsModuleReader) =
+        PreNamespace(ns.QualifiedName, ns.ShortName, reader)
+
+    static member CreateGlobal(reader: ProjectFcsModuleReader) : PreNamespace =
+        PreNamespace(String.Empty, String.Empty, reader)
+
+    member this.QualifiedName = qualifiedName
+    member this.Reader = reader
+
+    override this.ComputeTypes() = reader.GetNamespaceTypes(this)
+    override this.ComputeNamespaces() = reader.GetNestedNamespaces(this)

@@ -416,13 +416,22 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
             let representationMark = x.Mark(range)
 
             if not fields.IsEmpty then
-                let (SynField(range = firstFieldRange)) as firstField = fields.Head
-                let (SynField(range = lastFieldRange)) = List.last fields
+                // todo: give a type spread - `type T2 = { ...T1 }` - a declaration of its own
+                let fieldOrSpreadRange fieldOrSpread =
+                    match fieldOrSpread with
+                    | SynFieldOrSpread.Field(SynField(range = range)) -> range
+                    | SynFieldOrSpread.Spread(SynTypeSpread(range = range)) -> range
+
+                let firstFieldRange = fieldOrSpreadRange fields.Head
+                let lastFieldRange = fieldOrSpreadRange (List.last fields)
 
                 let fieldListMark = x.Mark(firstFieldRange)
 
-                for field in fields do
-                    x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                for fieldOrSpread in fields do
+                    match fieldOrSpread with
+                    | SynFieldOrSpread.Field field -> x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                    | SynFieldOrSpread.Spread _ -> ()
+
                 x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_DECLARATION_LIST)
 
             x.Done(range, representationMark, ElementType.RECORD_REPRESENTATION)
