@@ -1640,13 +1640,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             isSameAttribElement attributeValue ilElem &&
             isSameType attributeValue.ConstantValue.Type ilType)
 
-    let hasGeneratedAttribute (attrTypeName: IClrTypeName) (attrs: ILAttribute seq) =
+    let skipGeneratedAttribute (isExpected: bool) (attrTypeName: IClrTypeName) (attrs: ILAttribute seq) =
+        if not isExpected then Some attrs else
+
         match Seq.tryHead attrs with
-        | Some attr when isCompilerGeneratedAttribute attrTypeName attr -> true
+        | Some attr when isCompilerGeneratedAttribute attrTypeName attr -> Some(Seq.tail attrs)
         | _ ->
 
         let typeElement = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule).GetTypeElement()
-        isNull typeElement || typeElement.Constructors |> Seq.exists _.IsParameterless |> not
+        if isNull typeElement || typeElement.Constructors |> Seq.exists _.IsParameterless |> not then Some attrs else None
 
     let isNullableAttribute (expected: ILAttribElem) (ilAttr: ILAttribute) =
         match ilAttr with
@@ -1655,33 +1657,31 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             methodSpec.MethodRef.DeclaringTypeRef.Name = PredefinedType.NULLABLE_ATTRIBUTE_FQN.FullName
         | _ -> false
 
-    let isSameNullness (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
+    let skipNullableAttribute (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
         match nullness with
-        | None -> true
+        | None -> Some attrs
         | Some expected ->
 
         match Seq.tryHead attrs with
-        | Some attr when isNullableAttribute expected attr -> true
+        | Some attr when isNullableAttribute expected attr -> Some(Seq.tail attrs)
         | _ ->
 
         let attrTypeName = PredefinedType.NULLABLE_ATTRIBUTE_FQN
         let typeElement = FcsModuleReaderCompilerGeneratedType(attrTypeName, psiModule).GetTypeElement()
-        isNull typeElement || typeElement.Constructors |> Seq.exists (fun ctor -> ctor.Parameters.Count = 1) |> not
-
-    let skipNullableAttribute (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
-        if nullness.IsSome then Seq.tail attrs else attrs
+        if isNull typeElement || typeElement.Constructors |> Seq.exists (fun ctor -> ctor.Parameters.Count = 1) |> not then Some attrs else None
 
     let isSameNullnessAttributes (nullness: ILAttribElem option) (attrs: ILAttribute seq) =
-        isSameNullness nullness attrs &&
-        Seq.isEmpty (skipNullableAttribute nullness attrs)
+        match skipNullableAttribute nullness attrs with
+        | None -> false
+        | Some attrs -> Seq.isEmpty attrs
 
     let isSameCustomAttributes (attributesSet: IAttributesSet) (attrs: ILAttribute seq) =
         forallPaired isSameCustomAttribute (customAttributeInstances attributesSet) attrs
 
     let isSameCustomAttributesWithNullness (attributesSet: IAttributesSet) (t: IType) (attrs: ILAttribute seq) =
-        let nullness = getNullness t
-        isSameNullness nullness attrs &&
-        isSameCustomAttributes attributesSet (skipNullableAttribute nullness attrs)
+        match skipNullableAttribute (getNullness t) attrs with
+        | None -> false
+        | Some attrs -> isSameCustomAttributes attributesSet attrs
 
     let isUpToDateTypeParamDef (typeParameter: ITypeParameter) (genericParameterDef: ILGenericParameterDef) =
         typeParameter.ShortName = genericParameterDef.Name &&
@@ -1693,33 +1693,38 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         let attrs = genericParameterDef.CustomAttrs.AsArray()
         let isUnmanaged = typeParameter.IsUnmanagedType
-        (not isUnmanaged || hasGeneratedAttribute PredefinedType.IS_UNMANAGED_ATTRIBUTE_FQN attrs) &&
+        match skipGeneratedAttribute isUnmanaged PredefinedType.IS_UNMANAGED_ATTRIBUTE_FQN attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isUnmanaged then Seq.tail attrs else attrs
         isSameNullnessAttributes (getTypeParameterNullness typeParameter) attrs
 
     let isUpToDateTypeDefCustomAttributes (typeElement: ITypeElement) (typeDef: ILTypeDef) =
         let attrs = typeDef.CustomAttrsStored.CustomAttrs.AsArray()
 
-        let indexerName = getIndexerName typeElement
-        (indexerName.IsNone || hasGeneratedAttribute PredefinedType.DEFAULT_MEMBER_ATTRIBUTE_CLASS attrs) &&
+        let hasIndexer = (getIndexerName typeElement).IsSome
+        match skipGeneratedAttribute hasIndexer PredefinedType.DEFAULT_MEMBER_ATTRIBUTE_CLASS attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if indexerName.IsSome then Seq.tail attrs else attrs
         let isByRefLike = isByRefLikeType typeElement
-        (not isByRefLike || hasGeneratedAttribute PredefinedType.IS_BY_REF_LIKE_ATTRIBUTE_FQN attrs) &&
+        match skipGeneratedAttribute isByRefLike PredefinedType.IS_BY_REF_LIKE_ATTRIBUTE_FQN attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isByRefLike then Seq.tail attrs else attrs
         let hasExtensions = hasExtensions typeElement
-        (not hasExtensions || hasGeneratedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS attrs) &&
+        match skipGeneratedAttribute hasExtensions PredefinedType.EXTENSION_ATTRIBUTE_CLASS attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if hasExtensions then Seq.tail attrs else attrs
         isSameCustomAttributesWithNullness typeElement (getBaseType typeElement) attrs
 
     let isSameParameterOrReturnAttributes (attributesSet: IAttributesSet) isReadonlyRef (t: IType)
             (attrs: ILAttribute seq) =
-        (not isReadonlyRef || hasGeneratedAttribute PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN attrs) &&
+        match skipGeneratedAttribute isReadonlyRef PredefinedType.IS_READ_ONLY_ATTRIBUTE_FQN attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isReadonlyRef then Seq.tail attrs else attrs
         isSameCustomAttributesWithNullness attributesSet t attrs
 
     let isUpToDateParameterDef (param: IParameter) (paramDef: ILParameter) =
@@ -1734,9 +1739,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         let attrs = paramDef.CustomAttrs.AsArray()
         let isParameterArray = param.IsParameterArray
-        (not isParameterArray || hasGeneratedAttribute PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS attrs) &&
+        match skipGeneratedAttribute isParameterArray PredefinedType.PARAM_ARRAY_ATTRIBUTE_CLASS attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isParameterArray then Seq.tail attrs else attrs
         isSameParameterOrReturnAttributes param (isReadonlyRefParameter param) param.Type attrs
 
     let isUpToDateReturn (method: IFunction) (methodDef: ILMethodDef) =
@@ -1749,9 +1755,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
     let isUpToDateMethodCustomAttributes (method: IFunction) (ilAttrs: ILAttributes) =
         let attrs = ilAttrs.AsArray()
         let isExtension = isExtensionMethod method
-        (not isExtension || hasGeneratedAttribute PredefinedType.EXTENSION_ATTRIBUTE_CLASS attrs) &&
+        match skipGeneratedAttribute isExtension PredefinedType.EXTENSION_ATTRIBUTE_CLASS attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isExtension then Seq.tail attrs else attrs
         isSameCustomAttributes method attrs
 
     let isUpToDateMethodDef (method: IFunction) (methodDef: ILMethodDef) =
@@ -1827,9 +1834,10 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         let attrs = propertyDef.CustomAttrs.AsArray()
         let isRequired = property.IsRequired
-        (not isRequired || hasGeneratedAttribute PredefinedType.REQUIRED_MEMBER_ATTRIBUTE_FQN attrs) &&
+        match skipGeneratedAttribute isRequired PredefinedType.REQUIRED_MEMBER_ATTRIBUTE_FQN attrs with
+        | None -> false
+        | Some attrs ->
 
-        let attrs = if isRequired then Seq.tail attrs else attrs
         isSameCustomAttributesWithNullness property property.ReturnType attrs
 
     let isUpToDatePropertyDefs (typeElement: ITypeElement) (propertyDefs: ILPropertyDef list) =
