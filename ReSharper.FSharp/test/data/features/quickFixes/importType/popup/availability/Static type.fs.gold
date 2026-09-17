@@ -1,0 +1,7 @@
+﻿module Test
+
+List<|Enumerable|(0)>
+
+------------------------------------------------
+0: The type 'Enumerable' is not defined.
+NO QUICKFIXES

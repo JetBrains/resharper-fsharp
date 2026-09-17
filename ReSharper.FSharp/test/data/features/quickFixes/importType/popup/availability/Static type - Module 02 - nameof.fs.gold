@@ -1,0 +1,12 @@
+﻿module Test
+
+module A = 
+    module MyModule =
+        ()
+
+nameof(|MyModule|(0))
+
+------------------------------------------------
+0: The value or constructor 'MyModule' is not defined.
+QUICKFIXES:
+Test.A.MyModule

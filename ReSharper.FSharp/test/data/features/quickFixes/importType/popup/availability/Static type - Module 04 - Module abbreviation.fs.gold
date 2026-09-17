@@ -1,0 +1,12 @@
+﻿module Test
+
+module A = 
+    module MyModule =
+        ()
+
+module A = |MyModule|(0)
+
+------------------------------------------------
+0: The namespace or module 'MyModule' is not defined.
+QUICKFIXES:
+Test.A.MyModule

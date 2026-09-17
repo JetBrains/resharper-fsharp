@@ -1,0 +1,22 @@
+﻿module Test
+
+module A = 
+    module MyModuleOrType =
+        ()
+
+module B = 
+    type MyModuleOrType = class end
+
+|MyModuleOrType|(0).M()
+
+------------------------------------------------
+0: The value, namespace, type or module 'MyModuleOrType' is not defined.
+QUICKFIXES:
+Import module 'Test.A.MyModuleOrType'
+--Import module 'MyModuleOrType' in file
+--Import module 'MyModuleOrType' in project
+--Import module 'MyModuleOrType' in solution
+Import type 'Test.B.MyModuleOrType'
+--Import type 'MyModuleOrType' in file
+--Import type 'MyModuleOrType' in project
+--Import type 'MyModuleOrType' in solution

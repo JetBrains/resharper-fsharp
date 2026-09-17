@@ -1,0 +1,16 @@
+﻿module Test
+
+module A = 
+    module ModuleOrType =
+        ()
+
+module B =
+    type ModuleOrType<'a> = class end
+
+
+nameof(|ModuleOrType|(0)<int>)
+
+------------------------------------------------
+0: The value or constructor 'ModuleOrType' is not defined.
+QUICKFIXES:
+Test.B.ModuleOrType<a>
