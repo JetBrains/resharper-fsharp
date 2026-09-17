@@ -65,8 +65,7 @@ type OverrideBehavior(info, types) =
                 textControl.Caret.MoveTo(range.EndOffset, CaretVisualPlacement.DontScrollIfVisible)
                 textControl.Selection.SetRange(range)
 
-module OverrideRuleModule =
-
+module OverrideMemberRule =
     [<Struct>]
     type ExpectedIndent =
         | MemberOwnerIndent of ownerIndent: int
@@ -135,11 +134,8 @@ module OverrideRuleModule =
         | Some memberDecl -> SiblingDeclIndent memberDecl.Indent
         | None -> MemberOwnerIndent memberOwner.Indent
 
-    let mayGenerateOverrides
-        (context: FSharpCodeCompletionContext)
-        (generatorContext: FSharpGeneratorContext)
-        (node: ITreeNode)
-        =
+    let mayGenerateOverrides (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext)
+            (node: ITreeNode) =
         let caretCoords = getCaretCoords context
         let caretLine = caretCoords.Line
         let caretColumn = int caretCoords.Column
@@ -183,8 +179,9 @@ module OverrideRuleModule =
                 isInsideOwnerBody memberOwner && isCorrectIndent memberOwner
 
             isNotNull memberOwner && isAligned memberOwner
+
         // override {selfId}.{caret}
-        | TokenType FSharpTokenType.DOT _ ->
+        | TokenType FSharpTokenType.DOT token ->
             let isCorrectIndent (memberOwner: ITreeNode) (memberDecl: IMemberDeclaration) =
                 memberDecl.Indent >= memberOwner.Indent
 
@@ -193,14 +190,17 @@ module OverrideRuleModule =
 
             let anchor = generatorContext.Anchor
 
-            let memberDecl =
+            let memberDecl: IMemberDeclaration =
                 match anchor with
                 | :? IMemberDeclaration as decl -> decl
                 | _ -> anchor.GetContainingNode<IMemberDeclaration>()
 
+            (token == memberDecl.Delimiter || isNull memberDecl.Delimiter) &&
+
             isNotNull memberOwner
             && OverridableMemberDeclarationUtil.IsOverride memberDecl
             && isAligned memberOwner memberDecl
+
         | _ -> false
 
     let isOverrideRuleAvailable (checkOwner: ITreeNode -> bool) context =
@@ -217,11 +217,8 @@ module OverrideRuleModule =
         GenerateOverrides.getOverridableMembers false generatorContext.TypeDeclaration
         |> GenerateOverrides.sanitizeMembers
 
-    let createOverrideLookupItem
-        (context: FSharpCodeCompletionContext)
-        (generatorElement: FSharpGeneratorElement)
-        (mayHaveBaseCalls: bool)
-        =
+    let createOverrideLookupItem (context: FSharpCodeCompletionContext) (generatorElement: FSharpGeneratorElement)
+            (mayHaveBaseCalls: bool) =
         let node = context.NodeInFile
         let elementMember = generatorElement.Member
         let accessor = elementMember.As<IAccessor>()
@@ -295,32 +292,30 @@ module OverrideRuleModule =
             | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? OverrideBehavior)
             | _ -> true)
 
-open OverrideRuleModule
-
 [<Language(typeof<FSharpLanguage>)>]
 type OverrideMemberRule() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     override this.IsAvailable(context) =
         context
-        |> isOverrideRuleAvailable (fun owner -> not (owner :? IInterfaceImplementation))
+        |> OverrideMemberRule.isOverrideRuleAvailable (fun owner -> not (owner :? IInterfaceImplementation))
 
     override this.AddLookupItems(context, collector) =
-        let generatorContext = getGeneratorContext context
+        let generatorContext = OverrideMemberRule.getGeneratorContext context
         let mayHaveBaseCalls =
             GenerateOverrides.mayHaveBaseCalls generatorContext.TypeDeclaration
 
-        let generatorElements = getOverridableElements generatorContext
+        let generatorElements = OverrideMemberRule.getOverridableElements generatorContext
 
         for generatorElement in generatorElements do
 
             let overrideItem =
-                createOverrideLookupItem context generatorElement mayHaveBaseCalls
+                OverrideMemberRule.createOverrideLookupItem context generatorElement mayHaveBaseCalls
 
             collector.Add(overrideItem)
 
         false
 
     override this.TransformItems(context, collector) =
-        keepOnlyOverrideItems collector
+        OverrideMemberRule.keepOnlyOverrideItems collector
         FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext
