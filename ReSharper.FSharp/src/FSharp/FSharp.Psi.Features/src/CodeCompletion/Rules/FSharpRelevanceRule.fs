@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open System
 open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
@@ -65,13 +66,16 @@ type FSharpRelevanceRule() =
                     markRelevance item CLRLookupItemRelevance.ExtensionMethods else
 
                 if mfv.IsMember then
+                    let isOperator = mfv.LogicalName.StartsWith("op_", StringComparison.Ordinal)
+
                     if mfv.IsProperty then
                         markRelevance item CLRLookupItemRelevance.FieldsAndProperties
                     else
                         if info.IsFromComputationExpression || isCustomOperationPossible.Value then
                             markRelevance item CLRLookupItemRelevance.ExpectedTypeMatch
 
-                        markRelevance item CLRLookupItemRelevance.Methods
+                        if not isOperator then
+                            markRelevance item CLRLookupItemRelevance.Methods
 
                     if isNull fcsType then () else
 
@@ -83,7 +87,7 @@ type FSharpRelevanceRule() =
                         | None -> ()
                         | Some fcsEntity ->
 
-                        if fcsEntity.Equals(contextFcsEntity) then
+                        if fcsEntity.Equals(contextFcsEntity) && not isOperator then
                             markRelevance item CLRLookupItemRelevance.MemberOfCurrentType
                             emphasize item
 
@@ -107,6 +111,10 @@ type FSharpRelevanceRule() =
             | :? FSharpUnionCase
             | :? FSharpActivePatternCase ->
                 markRelevance item CLRLookupItemRelevance.Methods
+                if isNotNull fcsType then
+                    markRelevance item CLRLookupItemRelevance.EnumMembers
+                    markRelevance item CLRLookupItemRelevance.MemberOfCurrentType
+                    emphasize item
 
             | :? FSharpParameter -> markRelevance item CLRLookupItemRelevance.LocalVariablesAndParameters
 
