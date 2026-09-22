@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -21,8 +22,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile);
 
+      var fsFile = file as IFSharpFile;
+      Assertion.AssertNotNull(fsFile);
+
+      var objExprs = FSharpCacheDeclarationProcessor.GetObjectExpressions(fsFile);
+      using var objectExpressions = new EnumeratorWithEnd<IObjExpr>(objExprs.GetEnumerator());
+      objectExpressions.MoveNext();
+
       var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, checkerService);
-      (file as IFSharpFile)?.Accept(declarationProcessor);
+      fsFile.Accept(declarationProcessor, objectExpressions);
     }
 
     public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader) =>

@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
+using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 
@@ -122,6 +123,7 @@ public static class FSharpAccessRightUtil
     return GetOwners(context).Contains(owner);
   }
 
+  [CanBeNull]
   private static IPsiSourceFile GetDefiningSourceFile(IFSharpSourceTypeElement fsSourceTypeElement)
   {
     return fsSourceTypeElement.DefiningDeclaration?.GetSourceFile();
@@ -134,7 +136,6 @@ public static class FSharpAccessRightUtil
     if (decl == null)
       return false;
 
-    
     if (decl.GetDocumentStartOffset() < context.GetDocumentStartOffset())
       return true;
 
@@ -174,7 +175,10 @@ public static class FSharpAccessRightUtil
 
         var contextSourceFile = context.GetSourceFile();
         var definingSourceFile = GetDefiningSourceFile(fsSourceTypeElement);
-        if (contextSourceFile != definingSourceFile)
+        if (definingSourceFile == null)
+          Logger.GetLogger<FSharpAccessRights>().Warn($"No source file for {fsSourceTypeElement.SourceName}");
+
+        if (definingSourceFile != null && contextSourceFile != definingSourceFile)
         {
           var fcsProjectProvider = typeModule.GetSolution().GetComponent<IFcsProjectProvider>();
 

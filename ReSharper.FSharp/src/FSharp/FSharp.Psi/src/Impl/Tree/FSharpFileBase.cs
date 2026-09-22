@@ -7,10 +7,12 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.Util;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -34,6 +36,42 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get => myParseResults.GetValue(this, static fsFile => fsFile.FcsCheckerService.ParseFile(fsFile.SourceFile));
       set => myParseResults.SetValue(this, value);
+    }
+
+    private readonly CachedPsiValue<IReadOnlyList<TreeOffset>> myObjectExpressionOffsets =
+      new FileCachedPsiValue<IReadOnlyList<TreeOffset>>();
+
+    public IReadOnlyList<TreeOffset> ObjectExpressionOffsets =>
+      myObjectExpressionOffsets.GetValue(this, static fsFile => fsFile.CalcObjectExpressionOffsets());
+
+    private IReadOnlyList<TreeOffset> CalcObjectExpressionOffsets()
+    {
+      if (FSharpFile.CachingLexer.TokenBuffer.CachedTokens is not { } tokens)
+        return EmptyList<TreeOffset>.Instance;
+
+      var offsets = new List<TreeOffset>();
+
+      var seenLBrace = false;
+      for (var i = 0; i < tokens.Count; i++)
+      {
+        var token = tokens[i];
+        var tokenType = token.Type;
+        if (tokenType.IsFiltered)
+          continue;
+
+        if (tokenType == FSharpTokenType.LBRACE)
+        {
+          seenLBrace = true;
+          continue;
+        }
+
+        if (seenLBrace && tokenType == FSharpTokenType.NEW)
+          offsets.Add(new TreeOffset(token.Start));
+
+        seenLBrace = false;
+      }
+
+      return offsets;
     }
 
     public FSharpOption<ParsedInput> ParseTree =>
