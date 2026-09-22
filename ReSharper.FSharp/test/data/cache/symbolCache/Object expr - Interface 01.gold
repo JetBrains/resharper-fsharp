@@ -1,7 +1,7 @@
 ﻿Project Files:Object expr - Interface 01.fs:
 FSharpProjectFilePart:ImplFile
  NamedModulePart:Module->Module
- ObjectExpressionTypePart:Object expression in Object expr - Interface 01.fs@15 (???, none)->Object expression in Object expr - Interface 01.fs@15
+  ObjectExpressionTypePart:Object expression in Object expr - Interface 01.fs@15 (???, private)->Module+Object expression in Object expr - Interface 01.fs@15
 []: Namespace:
  [Module]: FSharpModule:Module[TestProject]
- [Object expression in Object expr - Interface 01.fs@15]: FSharpObjectExpressionClass:Object expression in Object expr - Interface 01.fs@15 (none, compiled: internal, erased)[TestProject]
+  [Object expression in Object expr - Interface 01.fs@15]: FSharpObjectExpressionClass:Module+Object expression in Object expr - Interface 01.fs@15 (private, compiled: internal, erased)[TestProject]

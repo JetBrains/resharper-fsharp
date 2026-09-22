@@ -24,6 +24,7 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
+open JetBrains.Util.DataStructures
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService(languageType, constantValueService, cacheProvider: FSharpCacheProvider,
@@ -59,13 +60,26 @@ type FSharpLanguageService(languageType, constantValueService, cacheProvider: FS
 
     override x.FindTypeDeclarations _ = EmptyList.Instance :> _
 
-    override x.CanContainCachableDeclarations(node) =
-        not (node :? IExpression || node :? IChameleonExpression) || node :? IObjExpr
+    override x.CreateCachableDeclarationsContext(file) =
+        match file with
+        | :? IFSharpFile as fsFile ->
+            let objExprOffsets = new EnumeratorWithEnd<TreeOffset>(fsFile.ObjectExpressionOffsets.GetEnumerator())
+            objExprOffsets.MoveNext() |> ignore
+            objExprOffsets
 
-    override x.GetAdditionalCachableDeclarations(file) =
-        let fsFile = file.As<IFSharpFile>()
-        let sourceFile = fsFile.GetSourceFile()
-        FSharpCacheDeclarationProcessor.GetObjectExpressions(fsFile, sourceFile) |> Seq.cast
+        | _ -> null
+
+    override x.CanContainCachableDeclarations(node: ITreeNode, context: obj) =
+        not (node :? IExpression || node :? IChameleonExpression) ||
+
+        match context with
+        | :? IEnumeratorWithEnd<TreeOffset> as objExprOffsets ->
+            let range = node.GetTreeTextRange()
+            while not objExprOffsets.AtEnd && objExprOffsets.Current.Offset < range.StartOffset.Offset do
+                objExprOffsets.MoveNext() |> ignore
+
+            not objExprOffsets.AtEnd && range.Contains(objExprOffsets.Current)
+        | _ -> false
 
     member x.GetDefaultAccessType(declaredElement: IDeclaredElement) =
         // todo: invocations, partial applications

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -19,7 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (mfvTypeParams.Count == 0)
         return EmptyList<ITypeParameter>.Instance;
 
-      var outerTypeParamsCount = GetContainingType()?.GetAllTypeParameters().Count ?? 0;
+      var outerTypeParamsCount = GetContainingType() is { } containingType and not FSharpObjectExpressionClass
+        ? containingType.GetAllTypeParameters().Count
+        : 0;
       var typeParamsCount = mfvTypeParams.Count - outerTypeParamsCount;
 
       if (typeParamsCount == 0)
@@ -37,18 +40,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       {
         var mfvTypeParams = MfvTypeParameters;
         var mfvParametersCount = mfvTypeParams.Count;
-        if (mfvParametersCount == 0)
+        var isObjExprMember = GetContainingType() is FSharpObjectExpressionClass;
+        if (mfvParametersCount == 0 && !isObjExprMember)
           return EmptyList<ITypeParameter>.Instance;
 
         var outerTypeParameters = base.AllTypeParameters;
         var outerTypeParametersCount = outerTypeParameters.Count;
+        var mfvOuterTypeParametersCount = isObjExprMember ? 0 : outerTypeParametersCount;
 
-        var typeParams = new ITypeParameter[mfvParametersCount];
+        var typeParams = new ITypeParameter[outerTypeParametersCount + mfvParametersCount - mfvOuterTypeParametersCount];
         for (var i = 0; i < outerTypeParametersCount; i++)
           typeParams[i] = outerTypeParameters[i];
 
-        for (var i = outerTypeParametersCount; i < mfvParametersCount; i++)
-          typeParams[i] = new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].Name, i - outerTypeParametersCount);
+        for (var i = mfvOuterTypeParametersCount; i < mfvParametersCount; i++)
+          typeParams[outerTypeParametersCount + i - mfvOuterTypeParametersCount] =
+            new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].Name, i - mfvOuterTypeParametersCount);
         return typeParams;
       }
     }

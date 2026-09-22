@@ -13,8 +13,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   public class ObjectExpressionTypePart : FSharpTypePart<IObjExpr>, IFSharpClassPart
   {
+    private static readonly MemberDecoration ourMemberDecoration =
+      MemberDecoration.FromModifiers(ReSharper.Psi.Modifiers.PRIVATE);
+
     public ObjectExpressionTypePart([NotNull] IObjExpr declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, declaration.DeclaredName, MemberDecoration.DefaultValue, 0, cacheBuilder)
+      : base(declaration, declaration.DeclaredName, ourMemberDecoration, 0, cacheBuilder)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
 

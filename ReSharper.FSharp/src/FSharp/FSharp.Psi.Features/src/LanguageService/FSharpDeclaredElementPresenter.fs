@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
 
@@ -19,6 +20,12 @@ type FSharpDeclaredElementPresenter() =
 
     override this.Format(style, declaredElement, substitution, marking) =
         let element = unwrapGenerated declaredElement
+        let style =
+            match element with
+            | :? FSharpObjectExpressionClass when style.ShowName = NameStyle.FULL_NESTED_TYPE ->
+                style.WithShowName(NameStyle.SHORT)
+            | _ -> style
+
         base.Format(style, element, substitution, &marking)
 
     override this.GetEntityKind(declaredElement) =
