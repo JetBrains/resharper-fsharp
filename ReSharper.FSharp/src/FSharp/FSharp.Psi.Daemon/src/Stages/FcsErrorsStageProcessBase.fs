@@ -17,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
@@ -175,7 +176,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
     let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-        if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
+        if isNotNull expr then highlightingCtor (expr, ofFcsRichText error.RichMessage) :> _ else
         null
 
     let createHighlightingFromParentNodeWithMessage highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
@@ -185,7 +186,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         match node.GetContainingNode() with
         | null -> null
-        | parent -> highlightingCtor (parent, error.Message) :> _
+        | parent -> highlightingCtor (parent, ofFcsRichText error.RichMessage) :> _
 
     let createSetExprTargetHighlighting highlightingCtor (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         let setExpr = fsFile.GetNode<ISetExpr>(range)
@@ -211,13 +212,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
         if isNull referenceOwner then null else
 
-        highlightingCtor (referenceOwner.Reference, error.Message) :> _
+        highlightingCtor (referenceOwner.Reference, ofFcsRichText error.RichMessage) :> _
 
     let createHighlightingFromMappedExpression mapping highlightingCtor range (error: FSharpDiagnostic): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) |> mapping
-        if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else null
+        if isNotNull expr then highlightingCtor (expr, ofFcsRichText error.RichMessage) :> _ else null
 
-    let createCachedDiagnostic (error: FSharpDiagnostic) range =
+    let createCachedDiagnostic (error: FSharpDiagnostic) =
         let pos = error.Range.Start
         let diagnosticInfo = FcsCachedDiagnosticInfo(error, fsFile, pos)
         cachedFcsDiagnostics[pos] <- error
@@ -227,8 +228,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
         | expr ->
-            let diagnosticInfo = createCachedDiagnostic error range
-            highlightingCtor (diagnosticInfo, expr, error.Message) :> _
+            let diagnosticInfo = createCachedDiagnostic error
+            highlightingCtor (diagnosticInfo, expr, ofFcsRichText error.RichMessage) :> _
 
     let createHighlighting (error: FSharpDiagnostic) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
@@ -268,11 +269,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | IndeterminateRuntimeCoercion ->
             let isInstPat = nodeSelectionProvider.GetExpressionInRange<IIsInstPat>(fsFile, range, false, null)
             if isNotNull isInstPat then
-                IndeterminateTypeRuntimeCoercionPatternError(isInstPat, error.Message) else
+                IndeterminateTypeRuntimeCoercionPatternError(isInstPat, ofFcsRichText error.RichMessage) else
 
             let typeTestExpr = nodeSelectionProvider.GetExpressionInRange<ITypeTestExpr>(fsFile, range, false, null)
             if isNotNull typeTestExpr then
-                IndeterminateTypeRuntimeCoercionExpressionError(typeTestExpr, error.Message) else
+                IndeterminateTypeRuntimeCoercionExpressionError(typeTestExpr, ofFcsRichText error.RichMessage) else
 
             createGenericHighlighting error range
 
@@ -287,10 +288,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UndefinedName ->
             match nodeSelectionProvider.GetExpressionInRange<IFSharpExpression>(fsFile, range, false, null) with
             | :? IPrefixAppExpr as prefixAppExpr when prefixAppExpr.IsIndexerLike ->
-                UndefinedIndexerLikeExprError(prefixAppExpr, error.Message) :> _
+                UndefinedIndexerLikeExprError(prefixAppExpr, ofFcsRichText error.RichMessage) :> _
 
             | :? IItemIndexerExpr as indexerExpr ->
-                UndefinedIndexerError(indexerExpr, error.Message)
+                UndefinedIndexerError(indexerExpr, ofFcsRichText error.RichMessage)
 
             | _ ->
                 createHighlightingFromIdentifier UndefinedNameError error range
@@ -321,7 +322,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null ->
                 match fsFile.GetNode<IReferenceExpr>(range) with
                 | null ->
-                    UnusedHighlighting(error.Message, range) :> _
+                    UnusedHighlighting(ofFcsRichText error.RichMessage, range) :> _
 
                 | refExpr ->
                     let tryGetSymbol (refExpr: IReferenceExpr) =
@@ -338,7 +339,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsReferencedValue ->
                         IgnoredHighlighting.Instance :> _
                     | _ ->
-                        UnusedHighlighting(error.Message, range) :> _
+                        UnusedHighlighting(ofFcsRichText error.RichMessage, range) :> _
 
             | refPat ->
 
@@ -407,20 +408,20 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
-                NoImplementationGivenInTypeError(typeDecl, error.Message) :> _
+                NoImplementationGivenInTypeError(typeDecl, ofFcsRichText error.RichMessage) :> _
 
             | :? IInterfaceImplementation as impl when impl.TypeName == node ->
-                NoImplementationGivenInInterfaceError(impl, error.Message) :> _
+                NoImplementationGivenInInterfaceError(impl, ofFcsRichText error.RichMessage) :> _
 
             | :? ITypeReferenceName as typeName when
                     isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
                 let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
-                NoImplementationGivenInInterfaceError(impl, error.Message) :> _
+                NoImplementationGivenInInterfaceError(impl, ofFcsRichText error.RichMessage) :> _
 
             | _ ->
                 
             match node with
-            | :? IObjExpr as objExpr -> NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
+            | :? IObjExpr as objExpr -> NoImplementationGivenInTypeWithSuggestionError(objExpr, ofFcsRichText error.RichMessage) :> _
             | _ -> createGenericHighlighting error range
 
         | NoImplementationGivenWithSuggestion ->
@@ -428,29 +429,29 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let impl = (getParent token).As<IInterfaceImplementation>()
             if getTokenType token == FSharpTokenType.INTERFACE &&
                     isNotNull (ObjExprNavigator.GetByInterfaceImplementation(impl)) then
-                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _ else
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, ofFcsRichText error.RichMessage) :> _ else
 
             let node = nodeSelectionProvider.GetExpressionInRange<ITreeNode>(fsFile, range, false, null)
             match node.Parent with
             | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == node ->
-                NoImplementationGivenInTypeWithSuggestionError(typeDecl, error.Message) :> _
+                NoImplementationGivenInTypeWithSuggestionError(typeDecl, ofFcsRichText error.RichMessage) :> _
 
             | :? IInterfaceImplementation as impl when impl.TypeName == node ->
-                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, ofFcsRichText error.RichMessage) :> _
 
             | :? ITypeReferenceName as typeName when
                     isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeName)) ->
                 let impl = InterfaceImplementationNavigator.GetByTypeName(typeName)
-                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, ofFcsRichText error.RichMessage) :> _
 
             | _ ->
 
             match node with
             | :? IInterfaceImplementation as impl when
                     isNotNull (ObjExprNavigator.GetByInterfaceImplementation(impl)) ->
-                NoImplementationGivenInInterfaceWithSuggestionError(impl, error.Message) :> _
+                NoImplementationGivenInInterfaceWithSuggestionError(impl, ofFcsRichText error.RichMessage) :> _
             | :? IObjExpr as objExpr ->
-                NoImplementationGivenInTypeWithSuggestionError(objExpr, error.Message) :> _
+                NoImplementationGivenInTypeWithSuggestionError(objExpr, ofFcsRichText error.RichMessage) :> _
             | _ ->
                 createGenericHighlighting error range
 
@@ -484,7 +485,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | AttributeIsNotValidOnThisElement ->
             match fsFile.GetNode<IAttribute>(range) with
             | null -> null
-            | attribute -> AttributeIsNotValidOnThisElementError(attribute, error.Message)
+            | attribute -> AttributeIsNotValidOnThisElementError(attribute, ofFcsRichText error.RichMessage)
 
         | LocalClassBindingsCannotBeInline ->
             createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
@@ -507,7 +508,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | Some (:? ArgumentsInSigAndImplMismatchExtendedData as data) ->
                 match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
                 | null -> null
-                | expr -> ArgumentNameMismatchWarning(expr, data.SignatureName, data.ImplementationName, error.Message) :> _
+                | expr -> ArgumentNameMismatchWarning(expr, data.SignatureName, data.ImplementationName, ofFcsRichText error.RichMessage) :> _
 
             | _ -> null
 

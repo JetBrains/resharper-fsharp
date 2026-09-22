@@ -4,16 +4,21 @@ open System
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.UI.RichText
 
 [<RegisterStaticHighlightingsGroup("F# Errors", true)>]
 type FSharpErrors() =
     class end
 
 [<AbstractClass>]
-type FSharpErrorHighlightingBase(message, range: DocumentRange) =
-    interface IHighlighting with
-        member x.ToolTip = message
-        member x.ErrorStripeToolTip = message
+type FSharpErrorHighlightingBase(message: RichText, range: DocumentRange) =
+    interface IRichTextToolTipHighlighting with
+        member this.TryGetTooltip(where) =
+            HighlightingToolTipHelper.CreateRichTextBlock(message, FSharpLanguage.Instance, where)
+
+        member x.ToolTip = message.Text
+        member x.ErrorStripeToolTip = message.Text
         member x.IsValid() = range.IsValid()
         member x.CalculateRange() = range
 

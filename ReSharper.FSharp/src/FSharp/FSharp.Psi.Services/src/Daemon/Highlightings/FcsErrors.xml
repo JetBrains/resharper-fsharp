@@ -3,7 +3,8 @@
         implementationLanguage="F#"
         defaultResourceType="Strings"
         defaultOverlapResolvePolicy="NONE"
-        forkTranslationForAllHighlightings="true">
+        forkTranslationForAllHighlightings="true"
+        defaultHighlightingLanguageTypeExpression="FSharpLanguage.Instance">>
   <Usings>
     FSharp.Compiler.Symbols;
     JetBrains.ReSharper.Intentions.QuickFixes;
@@ -25,8 +26,8 @@
   <Error staticGroup="FSharpErrors" name="TypeEquation" ID="FS0001: Type equation error">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpTypeOwnerNode" name="node"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>node.GetHighlightingRange()</Range>
     <QuickFix>ConvertTupleToArrayOrListElementsFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
@@ -39,8 +40,8 @@
 
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0001: 'unit' type expected">
     <Parameter type="IFSharpTypeOwnerNode" name="node"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>node.GetHighlightingRange()</Range>
     <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -50,8 +51,8 @@
   <Error staticGroup="FSharpErrors" name="MatchClauseWrongType" ID="FS0001: 'match' clause has wrong type">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
   </Error>
@@ -75,32 +76,32 @@
 
   <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercionPattern" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
     <Parameter type="IIsInstPat" name="isInstPat"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>isInstPat.GetHighlightingRange()</Range>
     <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="IndeterminateTypeRuntimeCoercionExpression" ID="FS0008: Runtime coercion or type test involves an indeterminate type">
     <Parameter type="ITypeTestExpr" name="typeTestExpr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeTestExpr.GetHighlightingRange()</Range>
     <QuickFix>SpecifyParameterBaseTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="RuntimeCoercionSourceSealed" ID="FS0016: Can't coerce sealed type">
     <Parameter type="ITypedLikeExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
   </Error>
 
   <Warning compilerGroup="FSharpErrors" name="UnitTypeExpected" ID="FS0020: 'unit' type expected">
     <Parameter type="IFSharpTypeOwnerNode" name="node"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>node.GetHighlightingRange()</Range>
     <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -110,8 +111,8 @@
 
   <Warning compilerGroup="FSharpErrors" name="MatchIncomplete" ID="FS0025: Match incomplete">
     <Parameter type="IMatchLikeExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>getMatchLikeExprIncompleteRange expr</Range>
     <QuickFix>AddMissingPatternsFix</QuickFix>
     <QuickFix>AddMissingInnerPatternsFix</QuickFix>
@@ -135,9 +136,9 @@
 
   <Error staticGroup="FSharpErrors" name="ValueNotContainedMutabilityAttributesDiffer" ID="FS0034: Module contains but its signature specifies The mutability attributes differ">
     <Parameter type="ITopReferencePat" name="pat"/>
-    <Parameter type="string" name="fcsMessage"/>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>pat.GetNavigationRange()</Range>
-    <Message>fcsMessage</Message>
     <QuickFix>UpdateMutabilityInSignatureFix</QuickFix>
   </Error>
 
@@ -151,8 +152,8 @@
   <Error staticGroup="FSharpErrors" name="UndefinedName" ID="FS0039: Undefined name">
     <Parameter type="FSharpSymbolReference" name="reference"/>
     <!-- todo: change to IReference? -->
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <!--todo: identifier null check-->
     <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
@@ -167,22 +168,22 @@
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer" ID="FS0039: Undefined indexer">
     <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>indexerExpr.IndexerArgList.GetHighlightingRange()</Range>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexerLikeExpr" ID="FS0039: Undefined indexer">
     <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>prefixAppExpr.ArgumentExpression.GetHighlightingRange()</Range>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="AddingConstraint" ID="FS0043: Error from adding type constraint">
     <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>ReplaceWithPredefinedOperatorFix</QuickFix>
   </Error>
@@ -190,8 +191,8 @@
   <Warning staticGroup="FSharpErrors" name="UpperCaseIdentifierInPattern" ID="FS0049: Upper case identifier in pattern">
     <Parameter type="FSharpSymbolReference" name="reference"/>
     <!-- todo: change to IReference? -->
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <!--todo: identifier null check-->
     <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <QuickFix arguments="h.Reference">FSharpImportModuleMemberFix</QuickFix>
@@ -207,8 +208,8 @@
 
   <Warning compilerGroup="FSharpErrors" name="TypeTestUnnecessary" ID="FS0067: Type test is unnecessary">
     <Parameter type="IDowncastExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>ToUpcastFix</QuickFix>
   </Warning>
@@ -223,16 +224,16 @@
 
   <Warning compilerGroup="FSharpErrors" name="EnumMatchIncomplete" ID="FS0104: Match incomplete for enum">
     <Parameter type="IMatchLikeExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>getMatchLikeExprIncompleteRange expr</Range>
     <QuickFix>AddMatchAllClauseFix</QuickFix>
   </Warning>
 
   <Warning compilerGroup="FSharpErrors" name="FunctionValueUnexpected" ID="FS0193: Function type expected">
     <Parameter type="IFSharpTypeOwnerNode" name="node"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>node.GetHighlightingRange()</Range>
     <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>AddIgnoreFix</QuickFix>
@@ -242,8 +243,8 @@
   <Error staticGroup="FSharpErrors" name="TypeConstraintMismatch" ID="FS0193: Type constraint mismatch">
     <Parameter type="FcsCachedDiagnosticInfo" name="diagnosticInfo" isValid="skip"/>
     <Parameter type="IFSharpTypeOwnerNode" name="node"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>node.GetHighlightingRange()</Range>
     <QuickFix>AddParensToTypedLikeExprFix</QuickFix>
     <QuickFix>ReplaceReturnTypeFix</QuickFix>
@@ -256,8 +257,8 @@
 
   <Error staticGroup="FSharpErrors" name="FieldNotContainedTypesDiffer" ID="FS0193: The module contains the field but its signature specifies The types differ">
     <Parameter type="IRecordFieldDeclaration" name="recordFieldDeclaration"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>recordFieldDeclaration.GetHighlightingRange()</Range>
     <QuickFix>UpdateRecordFieldTypeInSignatureFix</QuickFix>
   </Error>
@@ -285,32 +286,32 @@
 
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldWasPresent" ID="FS0311: The type definitions for type in the signature and implementation are not compatible because the field was present in the implementation but not in the signature">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
     <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldOrderDiffer" ID="FS0312: The type definitions for type in the signature and implementation are not compatible because the order of the fields is different in the signature and implementation">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
     <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="DefinitionsInSigAndImplNotCompatibleFieldRequiredButNotSpecified" ID="FS0313: The type definitions for type in the signature and implementation are not compatible because the field Field2 was required by the signature but was not specified by the implementation">
     <Parameter type="IFSharpTypeDeclaration" name="typeDeclaration"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeDeclaration.GetHighlightingRange()</Range>
     <QuickFix>UpdateRecordFieldsInSignatureFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInType" ID="FS0365: No implementation given">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <QuickFix>GenerateMissingOverridesFix</QuickFix>
     <QuickFix>ToAbstractFix</QuickFix>
@@ -318,16 +319,16 @@
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterface" ID="FS0365: No implementation given">
     <Parameter type="IInterfaceImplementation" name="impl"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>getInterfaceImplHeaderRange impl</Range>
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInTypeWithSuggestion" ID="FS0366: No implementation given">
     <Parameter type="IFSharpTypeElementDeclaration" name="typeDecl"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>typeDecl.GetNameDocumentRange()</Range>
     <QuickFix>GenerateMissingOverridesFix</QuickFix>
     <QuickFix>ToAbstractFix</QuickFix>
@@ -335,8 +336,8 @@
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGivenInInterfaceWithSuggestion" ID="FS0366: No implementation given">
     <Parameter type="IInterfaceImplementation" name="impl"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>getInterfaceImplHeaderRange impl</Range>
     <QuickFix>GenerateInterfaceMembersFix</QuickFix>
   </Error>
@@ -421,8 +422,8 @@
 
   <Error staticGroup="FSharpErrors" name="UnionCaseExpectsTupledArguments" ID="FS0727: Union case expects tupled arguments">
     <Parameter type="IParametersOwnerPat" name="pat"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>getParameterOwnerPatParametersRange pat</Range>
     <QuickFix>DeconstructPatternFix</QuickFix>
   </Error>
@@ -458,24 +459,24 @@
 
   <Error staticGroup="FSharpErrors" name="AbstractTypeCannotBeInstantiated" ID="FS0759: Abstract type cannot be instantiated">
     <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>ToObjectExpressionFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment" ID="FS0764: Field requires assignment">
     <Parameter type="IRecordExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid" ID="FS0789: '{}' is not a valid expression">
     <Parameter type="IRecordExpr" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
@@ -483,8 +484,8 @@
   <Error staticGroup="FSharpErrors" name="InvalidUseOfTypeName" ID="FS0800: Invalid use of type name">
     <Parameter type="FSharpSymbolReference" name="reference"/>
     <!-- todo: change to IReference? -->
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <!--todo: identifier null check-->
     <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
@@ -499,16 +500,16 @@
 
   <Error staticGroup="FSharpErrors" name="PropertyCannotBeSet" ID="FS0810: Property cannot be set">
     <Parameter type="IReferenceExpr" name="refExpr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>refExpr.Identifier.GetHighlightingRange()</Range>
     <QuickFix>AddSetterFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="AttributeIsNotValidOnThisElement" ID="FS0842: This attribute is not valid for use on this language element">
     <Parameter type="IAttribute" name="attribute"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>attribute.GetHighlightingRange()</Range>
     <QuickFix>RemoveRedundantAttributeFix</QuickFix>
   </Error>
@@ -529,8 +530,8 @@
 
   <Error staticGroup="FSharpErrors" name="InvalidModuleExprType" ID="FS1123: Invalid module, expression, or type">
     <Parameter type="FSharpSymbolReference" name="reference"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
@@ -538,8 +539,8 @@
 
   <Error staticGroup="FSharpErrors" name="NoConstructorsAvailableForType" ID="FS1133: No constructors available for type">
     <Parameter type="FSharpSymbolReference" name="reference"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>reference.GetElement().NameIdentifier.GetHighlightingRange()</Range>
     <QuickFix arguments="h.Reference">FSharpImportTypeFix</QuickFix>
     <QuickFix arguments="h.Reference">FSharpReferenceModuleAndTypeFix</QuickFix>
@@ -576,8 +577,8 @@
     <Parameter type="IFSharpPattern" name="pattern"/>
     <Parameter type="string" name="signatureParameterName"/>
     <Parameter type="string" name="implementationParameterName"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>pattern.GetHighlightingRange()</Range>
     <QuickFix>UpdateParameterNameInSignatureFix</QuickFix>
   </Warning>
@@ -591,8 +592,8 @@
 
   <Error staticGroup="FSharpErrors" name="SingleQuoteInSingleQuote" ID="FS3373: Invalid interpolated string. Single quote or verbatim string literals may not be used in interpolated expressions in single quote or verbatim strings. Consider using an explicit 'let' binding for the interpolation expression or use a triple quote string as the outer string literal.">
     <Parameter type="IFSharpExpression" name="expr"/>
-    <Parameter type="string" name="fcsMessage"/>
-    <Message>fcsMessage</Message>
+    <Parameter type="RichText" name="fcsMessage"/>
+    <RichMessage>fcsMessage</RichMessage>
     <Range>expr.GetHighlightingRange()</Range>
     <QuickFix>ReplaceWithTripleQuotedInterpolatedStringFix</QuickFix>
   </Error>
