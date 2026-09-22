@@ -25,7 +25,7 @@ using JetBrains.Util.Concurrency.Threading;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   [SolutionComponent(InstantiationEx.LegacyDefault)]
-  public class FcsCapturedInfoCache : IPsiSourceFileCacheWithForksSupport, IFcsCapturedInfoCache
+  public class FcsCapturedInfoCache : IPsiSourceFileCacheWithForksSupport, IPsiSourceFileInvalidatingCache, IFcsCapturedInfoCache
   {
     private readonly FSharpScriptPsiModulesProvider myScriptPsiModulesProvider;
     private readonly IShellLocks myLocks;
@@ -66,7 +66,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       FcsProjectProvider = fcsProjectProvider;
 
       fcsProjectProvider.ProjectRemoved.Advise(lifetime, RemoveProject);
-      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime, x => InvalidateScript(x.PsiModule, x.IsRemoved));
+      scriptPsiModulesProvider.ModuleInvalidated.Advise(lifetime,
+        x => InvalidateScript(x.PsiModule, x.IsRemoved, myState.ValueForWrite));
     }
 
     private static bool IsFSharpFile(IPsiSourceFile sourceFile) =>
@@ -78,10 +79,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       Invalidate(projectKey);
     }
 
-    private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved)
+    private void InvalidateScript(FSharpScriptPsiModule scriptPsiModule, bool isRemoved, State state)
     {
-      var state = myState.ValueForWrite;
-
       if (isRemoved)
       {
         myLocks.AssertWriteAccessAllowed();
@@ -91,21 +90,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       else if (state.ScriptCaches.TryGetValue(scriptPsiModule, out var symbols))
         symbols.Invalidate(scriptPsiModule.SourceFile);
 
-      InvalidateDirectReferencingScripts(scriptPsiModule, [scriptPsiModule]);
+      InvalidateDirectReferencingScripts(scriptPsiModule, [scriptPsiModule], state);
     }
 
     private void InvalidateDirectReferencingScripts(FSharpScriptPsiModule psiModule,
-      HashSet<FSharpScriptPsiModule> visited)
+      HashSet<FSharpScriptPsiModule> visited, State state)
     {
       var referencedByScripts = myScriptPsiModulesProvider.GetDirectReferencingScripts(psiModule);
       foreach (var script in referencedByScripts)
       {
         if (!visited.Add(script)) continue;
 
-        if (!myState.ValueForWrite.ScriptCaches.TryGetValue(script, out var symbols)) continue;
+        if (!state.ScriptCaches.TryGetValue(script, out var symbols)) continue;
         symbols.Invalidate(psiModule.SourceFile);
 
-        InvalidateDirectReferencingScripts(script, visited);
+        InvalidateDirectReferencingScripts(script, visited, state);
       }
     }
 
@@ -143,7 +142,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var psiModule = sourceFile.PsiModule;
       if (psiModule is FSharpScriptPsiModule scriptPsiModule)
       {
-        InvalidateScript(scriptPsiModule, isRemoved: false);
+        InvalidateScript(scriptPsiModule, isRemoved: false, state);
         return;
       }
 
@@ -171,6 +170,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       myLocks.AssertWriteAccessAllowed();
 
       myState.ValueForWrite.DirtyFiles.Add(sourceFile);
+    }
+
+    public void Invalidate(IEnumerable<IPsiSourceFile> sourceFiles)
+    {
+      myLocks.AssertWriteAccessAllowed();
+      var state = myState.ValueForWrite;
+
+      foreach (var sourceFile in sourceFiles)
+        InvalidateChangedFile(sourceFile, state);
+    }
+
+    private void InvalidateChangedFile(IPsiSourceFile sourceFile, State state)
+    {
+      if (!sourceFile.IsValid())
+        return;
+
+      if (IsFSharpFile(sourceFile))
+      {
+        Invalidate(sourceFile, state);
+        return;
+      }
+
+      var psiModule = sourceFile.PsiModule;
+      if (psiModule.ContainingProjectModule is IProject)
+        InvalidateReferencingModules(FcsProjectKey.Create(psiModule), state);
     }
 
     public object Load(IProgressIndicator progress, bool enablePersistence) => null;
@@ -229,7 +253,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (myState.ValueForRead.DirtyFiles.IsEmpty())
         return;
 
-      var state = myState.ValueForWrite;
+      var state = IsReadonlyFork ? myState.ValueForRead : myState.ValueForWrite;
       using var writeCookie = WriteLockCookie.Create(takeLock: underTransaction);
       using var lockCookie = MonitorInterruptibleCookie.EnterOrThrow(state);
 
@@ -240,24 +264,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
 
       foreach (var sourceFile in state.DirtyFiles)
-      {
-        if (!sourceFile.IsValid())
-          continue;
-
-        if (IsFSharpFile(sourceFile))
-        {
-          Invalidate(sourceFile, state);
-        }
-        else
-        {
-          var psiModule = sourceFile.PsiModule;
-          if (psiModule.ContainingProjectModule is IProject)
-          {
-            var projectKey = FcsProjectKey.Create(psiModule);
-            InvalidateReferencingModules(projectKey, state);
-          }
-        }
-      }
+        InvalidateChangedFile(sourceFile, state);
 
       state.DirtyFiles.Clear();
     }
