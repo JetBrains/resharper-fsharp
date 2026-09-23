@@ -32,6 +32,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -118,13 +119,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             (projectFileExtensions, projectFileTypeCoordinator, psiModule, path, (fun _ -> psiModule.IsValid),
              (fun _ -> ScriptFileProperties.Instance), documentManager, psiModule.ResolveContext) :> IPsiSourceFile
 
-    let rec createPsiModule path id sourceFileCtor (changeBuilder: PsiModuleChangeBuilder) =
+    let createPsiModule path id sourceFileCtor (changeBuilder: PsiModuleChangeBuilder) =
         let psiModule = FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, id, assemblyFactory, this)
         changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added)
         changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Added)
         psiModule
 
-    and createPsiModuleForPath (path: VirtualFileSystemPath) changeBuilder =
+    let createPsiModuleForPath (path: VirtualFileSystemPath) changeBuilder =
         let modulesForPath = getPsiModulesForPath path
         if modulesForPath.IsEmpty() then
             let sourceFileCtor = createSourceFileForPath path
@@ -133,13 +134,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             scriptsFromPaths[path] <- psiModule
             addPsiModule psiModule
 
-    and updateReferences path references addedReferences removedReferences changeBuilder =
+    let updateReferences path references addedReferences removedReferences changeBuilder =
         use cookie = WriteLockCookie.Create()
         scriptsReferences[path] <- references
 
         for filePath in references.Files do
             createPsiModuleForPath filePath changeBuilder
-        
+
         for added in addedReferences.Files do
             scriptToDirectReferencingScripts.InitAndAdd(added, path, fun () -> HashSet())
 
@@ -162,8 +163,13 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             locks.QueueReadLock(lifetime, "AssemblyGC after removing F# script reference", fun _ ->
                 solution.GetComponent<AssemblyGC>().ForceGC())
 
-    and queueUpdateReferences (path: VirtualFileSystemPath) (newOptions: FSharpProjectOptions) =
-        locks.QueueReadLock(lifetime, "Request new F# script references", fun _ ->
+    let queueUpdateReferences (path: VirtualFileSystemPath, newOptions: FSharpProjectOptions) =
+        let getDiff oldPaths newPaths =
+            let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
+            let filterChanges = Seq.filter (notChanged.Contains >> not) >> ResizeArray
+            filterChanges newPaths, filterChanges oldPaths
+
+        lifetime.StartReadAndMainThreadActionAsync(fun scope ->
             let oldReferences =
                 let mutable oldReferences = Unchecked.defaultof<ScriptReferences>
                 if scriptsReferences.TryGetValue(path, &oldReferences) then
@@ -171,37 +177,22 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 else
                     ScriptReferences.Empty
 
-            let ira = InterruptableReadActivityThe(lifetime, locks)
+            let newReferences = getScriptReferences path newOptions
+            Interruption.Current.CheckAndThrow()
 
-            ira.FuncRun <-
-                fun _ ->
-                    let newReferences = getScriptReferences path newOptions
-                    Interruption.Current.CheckAndThrow()
+            let addedReferences, removedReferences =
+                let addedAssemblies, removedAssemblies = getDiff oldReferences.Assemblies newReferences.Assemblies 
+                let addedFiles, removedFiles = getDiff oldReferences.Files newReferences.Files
+                { Assemblies = addedAssemblies; Files = addedFiles }, { Assemblies = removedAssemblies; Files = removedFiles }
 
-                    let getDiff oldPaths newPaths =
-                        let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
-                        let filterChanges = Seq.filter (notChanged.Contains >> not) >> ResizeArray
-                        filterChanges newPaths, filterChanges oldPaths
+            if addedReferences.Assemblies.IsEmpty() && addedReferences.Files.IsEmpty() &&
+               removedReferences.Assemblies.IsEmpty() && removedReferences.Files.IsEmpty() then scope.Nothing() else
 
-                    let addedReferences, removedReferences =
-                        let addedAssemblies, removedAssemblies = getDiff oldReferences.Assemblies newReferences.Assemblies 
-                        let addedFiles, removedFiles = getDiff oldReferences.Files newReferences.Files
-                        { Assemblies = addedAssemblies; Files = addedFiles }, { Assemblies = removedAssemblies; Files = removedFiles }
-
-                    if addedReferences.Assemblies.IsEmpty() && addedReferences.Files.IsEmpty() &&
-                       removedReferences.Assemblies.IsEmpty() && removedReferences.Files.IsEmpty() then () else
-
-                    Interruption.Current.CheckAndThrow()
-                    locks.ExecuteOrQueue(lifetime, "Update F# script references", fun _ ->
-                        let changeBuilder = PsiModuleChangeBuilder()
-                        updateReferences path newReferences addedReferences removedReferences changeBuilder
-                    )
-
-            ira.FuncCancelled <-
-                // Reschedule again
-                fun _ -> queueUpdateReferences path newOptions
-
-            ira.DoStart() |> ignore
+            Interruption.Current.CheckAndThrow()
+            scope.WriteAction(fun _ ->
+                let changeBuilder = PsiModuleChangeBuilder()
+                updateReferences path newReferences addedReferences removedReferences changeBuilder
+            )
         )
 
     let tryGetScriptModuleFromTheSameProject (contextModule: FSharpScriptPsiModule) path =
@@ -222,9 +213,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
 
     do
         if not scriptOptionsProvider.SyncUpdate then
-            scriptOptionsProvider.OptionsUpdated.Advise(lifetime, fun (path, options) ->
-                queueUpdateReferences path options
-            )
+            scriptOptionsProvider.OptionsUpdated.Advise(lifetime, queueUpdateReferences >> _.NoAwait())
 
     member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder,
             [<Out>] resultModule: byref<FSharpScriptPsiModule>) =
