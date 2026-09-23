@@ -179,7 +179,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     }
 
     [CanBeNull]
-    public static TResult RunAsTask<TResult>([NotNull] this FSharpAsync<TResult> async)
+    public static TResult RunAsTask<TResult>([NotNull] this FSharpAsync<TResult> async, bool processFcsQueue = false)
     {
       var logger = Logger.GetLogger(typeof(FSharpAsyncUtil));
 
@@ -189,27 +189,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp
       var task = FSharpAsync.StartAsTask(async, null, cancellationSource.Token);
       logger.Trace("RunAsTask: after StartAsTask");
 
-      task.ContinueWith(_ =>
-        {
-          logger.Trace("RunAsTask: Inside ContinueWith");
-          ReadRequests.WakeUp();
-        }, CancellationToken.None,
-        TaskContinuationOptions.ExecuteSynchronously, SynchronousScheduler.Instance);
+      if (processFcsQueue)
+      {
+        task.ContinueWith(_ =>
+          {
+            logger.Trace("RunAsTask: Inside ContinueWith");
+            ReadRequests.WakeUp();
+          }, CancellationToken.None,
+          TaskContinuationOptions.ExecuteSynchronously, SynchronousScheduler.Instance);
 
-      if (Shell.Instance.GetComponent<IShellLocks>().IsReadAccessAllowed())
-        ShellLifetimes.ReadActivityLifetime.TryOnTermination(() =>
-        {
-          logger.Trace("RunAsTask: Inside ReadActivityLifetime.TryOnTermination");
-          ReadRequests.WakeUp();
-        });
+        if (Shell.Instance.GetComponent<IShellLocks>().IsReadAccessAllowed())
+          ShellLifetimes.ReadActivityLifetime.TryOnTermination(() =>
+          {
+            logger.Trace("RunAsTask: Inside ReadActivityLifetime.TryOnTermination");
+            ReadRequests.WakeUp();
+          });  
+      }
 
       logger.Trace("RunAsTask: before loop");
       while (!task.IsCompleted)
       {
         CheckAndThrow();
 
-        var action = ReadRequests.ExtractOrBlock(InterruptCheckTimeout, task);
-        if (action != null)
+        if (processFcsQueue && ReadRequests.ExtractOrBlock(InterruptCheckTimeout, task) is { } action)
         {
           logger.Trace("RunAsTask: got metadata request, before Invoke");
           action();
