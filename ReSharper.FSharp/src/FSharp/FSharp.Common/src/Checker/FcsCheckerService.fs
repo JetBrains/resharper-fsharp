@@ -160,11 +160,11 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         if checker.IsValueCreated then
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
-                logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
-                checker.Value.ClearCache(Seq.singleton projectOptions)
-            | FcsProjectInvalidationType.Remove ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
                 checker.Value.InvalidateConfiguration(projectOptions)
+            | FcsProjectInvalidationType.Remove ->
+                logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
+                checker.Value.ClearCache(Seq.singleton projectOptions)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
