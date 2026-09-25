@@ -131,7 +131,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
         let path = sourceFile.GetLocation().FullPath
-        let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
