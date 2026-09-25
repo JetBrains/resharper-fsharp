@@ -71,14 +71,16 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
-    member x.Checker = checker.Value
     member x.UseTransparentCompiler = useTransparentCompiler.Value
+
+    member x.GetParsingOptionsFromCommandLineArgs(projectOptions: FSharpProjectOptions) =
+        checker.Value.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
 
     member x.GetProjectConfigFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
         let source = SourceTextNew.ofString(source)
 
         if useTransparentCompiler.Value then
-            let options, errors = x.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            let options, errors = checker.Value.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             let parsingOptions =
                 { FSharpParsingOptions.Default with
                     SourceFiles = [| path |]
@@ -88,7 +90,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
             FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
         else
-            let options, errors = x.Checker.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             FcsProjectOptions.FcsProjectSnapshot(options), errors
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
@@ -96,7 +98,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
             locks.AssertReadAccessAllowed()
             let source = FcsCheckerService.getSourceText document
             let fullPath = getFullPath path
-            let parseAsync = x.Checker.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
+            let parseAsync = checker.Value.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
             let parseResults = parseAsync.RunAsTask()
             Some parseResults
         with
@@ -134,7 +136,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(sourceFile, fcsProject, allowStaleResults, opName).RunAsTask() with
+        match checker.Value.ParseAndCheckDocument(sourceFile, fcsProject, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -166,12 +168,12 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         let result =
             match options with
             | FcsProjectOptions(projectOptions, _) ->
-                match x.Checker.TryGetRecentCheckResultsForFile(path, projectOptions) with
+                match checker.Value.TryGetRecentCheckResultsForFile(path, projectOptions) with
                 | Some (_, checkResults, _) -> Some checkResults
                 | _ -> None
 
             | FcsProjectSnapshot projectSnapshot ->
-                match x.Checker.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
+                match checker.Value.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
                 | Some (_, checkResults) -> Some checkResults
                 | _ -> None
         
