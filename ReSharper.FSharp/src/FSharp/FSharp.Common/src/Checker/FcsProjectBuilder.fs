@@ -230,7 +230,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = None }
         
-        let config = 
+        let options = 
             if not checkerService.UseTransparentCompiler then
                 let parsingOptions, errors =
                     checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
@@ -250,7 +250,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 |> FcsProjectOptions.FcsProjectSnapshot
 
         { OutputPath = outPath
-          Options = config
+          Options = options
           FileIndices = fileIndices
           ImplementationFilesWithSignatures = implsWithSig
           ReferencedModules = HashSet() }
