@@ -71,7 +71,10 @@ module OverrideMemberRule =
         | MemberOwnerIndent of ownerIndent: int
         | SiblingDeclIndent of declIndent: int
 
-    let getCaretCoords (context: FSharpCodeCompletionContext) =
+    let inline getCaretTreeOffset (context: FSharpCodeCompletionContext) =
+        context.BasicContext.CaretTreeOffset
+
+    let inline getCaretCoords (context: FSharpCodeCompletionContext) =
         context.BasicContext.CaretDocumentOffset.ToDocumentCoords()
 
     let getGeneratorContext (context: FSharpCodeCompletionContext) : FSharpGeneratorContext =
@@ -99,9 +102,7 @@ module OverrideMemberRule =
         let nearestInterfaceImpl =
             match anchor with
             | null -> null
-            | :? IMemberDeclaration as memberDecl ->
-                memberDecl.GetContainingNode<IInterfaceImplementation>()
-            | _ -> anchor.GetContainingNode<IInterfaceImplementation>(true) 
+            | anchor -> anchor.GetContainingNode<IInterfaceImplementation>(true) 
 
         match nearestInterfaceImpl with
         | interfaceImpl when isNotNull interfaceImpl && caretColumn > interfaceImpl.Indent ->
@@ -120,6 +121,20 @@ module OverrideMemberRule =
                 | :? IFSharpTypeDeclaration as typeDecl -> typeDecl
                 | _ -> null
             | repr -> repr
+
+    let isObjExprInterfaceImpl (objExpr: IObjExpr) =
+        let resolvedType = objExpr.TypeName.Reference.Resolve()
+        (isNotNull resolvedType && isNotNull (resolvedType.DeclaredElement.As<IInterface>()))
+
+    let isImplementation (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) =
+        if getMemberOwner context generatorContext :? IInterfaceImplementation then
+            true
+        else
+
+        match generatorContext.TypeDeclaration with
+        | :? IObjExpr as objExpr ->
+            isObjExprInterfaceImpl objExpr
+        | _ -> false
 
     let getExpectedIndent (memberOwner: ITreeNode) =
         let members : ITypeBodyMemberDeclaration seq =
@@ -155,8 +170,11 @@ module OverrideMemberRule =
                 isNotNull equalsToken && caretLine > equalsToken.StartLine
 
             | :? IObjExpr as objExpr ->
+                let caretOffset = getCaretTreeOffset context
                 let withKeyword = objExpr.WithKeyword
-                isNotNull withKeyword && caretLine > withKeyword.StartLine
+                isNotNull withKeyword &&
+                caretOffset.Offset >= withKeyword.GetTreeEndOffset().Offset &&
+                caretOffset.Offset <= objExpr.GetTreeEndOffset().Offset
 
             | :? IInterfaceImplementation as interfaceImpl ->
                 let interfaceKeyword = interfaceImpl.InterfaceKeyword
@@ -191,26 +209,28 @@ module OverrideMemberRule =
             let anchor = generatorContext.Anchor
 
             let memberDecl: IMemberDeclaration =
-                match anchor with
-                | :? IMemberDeclaration as decl -> decl
-                | _ -> anchor.GetContainingNode<IMemberDeclaration>()
+                anchor.GetContainingNode<IMemberDeclaration>(true)
 
             (token == memberDecl.Delimiter || isNull memberDecl.Delimiter) &&
 
-            isNotNull memberOwner
+            isNotNull memberOwner && isNotNull memberDecl
             && OverridableMemberDeclarationUtil.IsOverride memberDecl
             && isAligned memberOwner memberDecl
 
         | _ -> false
 
-    let isOverrideRuleAvailable (checkOwner: ITreeNode -> bool) context =
+    let isOverrideRuleAvailable (kind: string) context =
         let generatorContext = getGeneratorContext context
         let node = context.NodeInFile
+        let inline getExpectedKind() =
+            if isImplementation context generatorContext then
+                GeneratorStandardKinds.MissingMembers
+            else GeneratorStandardKinds.Overrides
 
         (isWhitespace node || isDot node)
         && isNotNull generatorContext
         && isNotNull generatorContext.TypeDeclaration
-        && checkOwner (getMemberOwner context generatorContext)
+        && (kind = getExpectedKind())
         && mayGenerateOverrides context generatorContext node
 
     let getOverridableElements (generatorContext: FSharpGeneratorContext) =
@@ -298,7 +318,7 @@ type OverrideMemberRule() =
 
     override this.IsAvailable(context) =
         context
-        |> OverrideMemberRule.isOverrideRuleAvailable (fun owner -> not (owner :? IInterfaceImplementation))
+        |> OverrideMemberRule.isOverrideRuleAvailable GeneratorStandardKinds.Overrides
 
     override this.AddLookupItems(context, collector) =
         let generatorContext = OverrideMemberRule.getGeneratorContext context
