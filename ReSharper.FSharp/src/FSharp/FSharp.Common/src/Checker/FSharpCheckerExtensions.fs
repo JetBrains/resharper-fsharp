@@ -6,6 +6,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 open System.Threading
 open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open FSharp.Compiler.Text
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -18,12 +19,21 @@ type CheckResults =
 type FSharpChecker with
     member x.ParseAndCheckDocument(sourceFile: IPsiSourceFile, fcsProject: FcsProject, allowStale, opName) =
         let path = sourceFile.GetLocation().FullPath
+        let source = sourceFile.Document.GetText()
+
+        let options =
+            match fcsProject.Options with
+            | FcsProjectSnapshot projectSnapshot ->
+                let currentFileSnapshot = FSharpFileSnapshot.CreateFromString(path, source)
+                FcsProjectSnapshot(projectSnapshot.Replace([currentFileSnapshot]))
+            | options -> options
+
         let parseAndCheckFile =
             async {
                 let! parseResults, checkFileAnswer =
-                    match fcsProject.Options with
+                    match options with
                     | FcsProjectOptions.FcsProjectOptions(options, _) ->
-                        let source = SourceText.ofString(sourceFile.Document.GetText())
+                        let source = SourceText.ofString(source)
                         //TODO: getHashCode is not required 
                         x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
 
@@ -58,7 +68,7 @@ type FSharpChecker with
             }
 
         async {
-            match fcsProject.Options with
+            match options with
             | FcsProjectOptions(options, _) ->
                 let source = SourceText.ofString(sourceFile.Document.GetText())
                 let version = source.GetHashCode()
