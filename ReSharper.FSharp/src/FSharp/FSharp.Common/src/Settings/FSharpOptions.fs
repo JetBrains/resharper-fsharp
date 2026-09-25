@@ -232,8 +232,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         if configurations.IsInternalMode() then
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
-
-        this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), FSharpExperimentalFeatures.useTransparentCompiler, "Requires restart") |> ignore
+            this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), FSharpExperimentalFeatures.useTransparentCompiler, "Requires restart") |> ignore
 
 
 
