@@ -262,6 +262,7 @@ type FSharpDeclaredElementForRenameProvider() =
             | :? IProvidedSecondaryDeclaredElement -> null
             | SecondaryElementOrigin origin -> origin
             | FSharpParameter fsParam -> fsParam
+            | :? IAccessor as accessor when (accessor.OwnerMember :? IEvent) -> accessor.OwnerMember
             | _ -> element
 
 

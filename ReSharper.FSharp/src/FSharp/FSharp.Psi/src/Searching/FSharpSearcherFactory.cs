@@ -118,6 +118,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override NavigateTargets GetNavigateToTargets(IDeclaredElement element)
     {
+      if (element is IAccessor { OwnerMember: { } ownerMember })
+        return new NavigateTargets(ownerMember, false);
+
       if (element is IFSharpGeneratedParameterFromPattern fsParameter)
         return new NavigateTargets(fsParameter.GetParameterOriginElements().AsIReadOnlyCollection(), false);
 
