@@ -9,6 +9,7 @@ open JetBrains.DocumentModel.Impl
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -66,7 +67,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         let stamp = document.LastModificationStamp
         let modificationSide = TextModificationSide.NotSpecified
         let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-        let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
+        let parsingOptions, _ = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
 
         try
             if isNotNull rangeMarker then
