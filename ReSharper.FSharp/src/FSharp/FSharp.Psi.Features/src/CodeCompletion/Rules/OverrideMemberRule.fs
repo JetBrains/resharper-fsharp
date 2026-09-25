@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Behaviors
@@ -25,9 +26,10 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.ProjectModel
+open JetBrains.Util
 open JetBrains.Util.NetFX.Media.Colors
 
-type OverrideBehavior(info, types) =
+type OverrideBehavior(info, types, oldSigRange) =
     inherit TextualBehavior<TextualInfo>(info)
 
     let getExpr (memberDecl: IMemberDeclaration) : IFSharpExpression =
@@ -41,7 +43,15 @@ type OverrideBehavior(info, types) =
         | expr -> expr
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        let rangeMarker =
+            oldSigRange |> Option.map (fun r -> RangeMarker(textControl.Document, r))
+
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
+
+        rangeMarker |> Option.iter (fun marker ->
+            if marker.IsValid then
+                textControl.Document.ReplaceText(marker.Range, " ")
+        )
 
         let psiServices = solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()
@@ -237,7 +247,7 @@ module OverrideMemberRule =
         GenerateOverrides.getOverridableMembers false generatorContext.TypeDeclaration
         |> GenerateOverrides.sanitizeMembers
 
-    let createOverrideLookupItem (context: FSharpCodeCompletionContext) (generatorElement: FSharpGeneratorElement)
+    let createOverrideLookupItem (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) (generatorElement: FSharpGeneratorElement)
             (mayHaveBaseCalls: bool) =
         let node = context.NodeInFile
         let elementMember = generatorElement.Member
@@ -252,7 +262,23 @@ module OverrideMemberRule =
 
         let isDot = isDot node
         let anchor = if isDot then memberDecl.Delimiter.NextSibling else memberDecl.MemberKeyword
-        let text = TreeRange(anchor, memberDecl.LastChild).GetText()
+        let last, oldSigRange =
+            if not isDot || isNull generatorContext.Anchor then
+                memberDecl.LastChild, None else
+
+            let originalMemberDecl: IMemberDeclaration =
+                generatorContext.Anchor.GetContainingNode<IMemberDeclaration>(true)
+
+            if isNotNull originalMemberDecl && isNotNull originalMemberDecl.EqualsToken then
+                memberDecl.EqualsToken.GetPreviousMeaningfulSibling(),
+
+                let sigStart = node.NextSibling.GetDocumentRange().TextRange.StartOffset
+                let sigEnd = originalMemberDecl.EqualsToken.PrevSibling.GetDocumentRange().TextRange.EndOffset
+                Some (TextRange(sigStart, sigEnd))
+            else
+                memberDecl.LastChild, None
+
+        let text = TreeRange(anchor, last).GetText()
         let info = TextualInfo(text, text, Ranges = context.Ranges)
 
         let presentationText = if isDot then mainMember.ShortName else $"{memberDecl.MemberKeyword.GetText()} {mainMember.ShortName}"
@@ -302,7 +328,7 @@ module OverrideMemberRule =
                 |> ignore
 
                 TextualPresentation(text, info, image = icon))
-            .WithBehavior(fun _ -> OverrideBehavior(info, types))
+            .WithBehavior(fun _ -> OverrideBehavior(info, types, oldSigRange))
             .WithTextToMatch(presentationText)
 
     let keepOnlyOverrideItems (collector: IItemsCollector) =
@@ -330,7 +356,7 @@ type OverrideMemberRule() =
         for generatorElement in generatorElements do
 
             let overrideItem =
-                OverrideMemberRule.createOverrideLookupItem context generatorElement mayHaveBaseCalls
+                OverrideMemberRule.createOverrideLookupItem context generatorContext generatorElement mayHaveBaseCalls
 
             collector.Add(overrideItem)
 

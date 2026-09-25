@@ -1,0 +1,6 @@
+// ${COMPLETE_ITEM:ToString()}
+module Module
+
+type A() =
+    member _.Bar = 1
+    override x.ToString() = failwith "preserved"{caret}

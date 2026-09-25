@@ -348,6 +348,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - Interface - Duplicates 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface - Duplicates 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface - Duplicates 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 04`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 05`` () = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #nowarn 01``() = x.DoNamedTest()
