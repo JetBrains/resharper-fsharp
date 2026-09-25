@@ -65,6 +65,17 @@ type FcsProjectOptions =
         | FcsProjectOptions(options, _) -> options.OtherOptions
         | FcsProjectSnapshot(snapshot) -> snapshot.OtherOptions
 
+    member x.ParsingOptions: FSharpParsingOptions =
+        match x with
+        | FcsProjectOptions(_, parsingOptions) -> parsingOptions
+        | FcsProjectSnapshot snapshot ->
+        { FSharpParsingOptions.Default with
+            SourceFiles = x.SourceFiles
+            ConditionalDefines = x.ConditionalDefines
+            IsInteractive = false
+            //LangVersionText = TODO
+            IsExe = false } //TODO: is exe
+
     member x.ConditionalDefines: string list =
         match x with
         | FcsProjectOptions(_, options) -> options.ConditionalDefines
