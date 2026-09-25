@@ -498,17 +498,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some fcsProject ->
 
             let path = sourceFile.GetLocation()
-            if fcsProject.IsKnownFile(sourceFile) then
-                match fcsProject.Options with
-                | FcsProjectOptions(_, parsingOptions) -> parsingOptions, path
-                | FcsProjectSnapshot projectSnapshot ->
-                    { FSharpParsingOptions.Default with
-                        SourceFiles = fcsProject.Options.SourceFiles
-                        ConditionalDefines = ImplicitDefines.sourceDefines
-                        IsInteractive = false
-                        IsExe = false }, path //TODO: is exe
-            else
-                getParsingOptionsForSingleFile sourceFile false
+            if fcsProject.IsKnownFile(sourceFile) then fcsProject.Options.ParsingOptions, path
+            else getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =
             locks.AssertReadAccessAllowed()
