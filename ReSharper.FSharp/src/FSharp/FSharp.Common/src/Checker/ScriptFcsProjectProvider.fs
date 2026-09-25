@@ -71,9 +71,9 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             Some sdkFolderPath.FullPath
 
         try
-            let config, errors = checkerService.GetProjectConfigFromScript(path, source, otherFlags.Value.Value, targetNetFramework, sdkDirOverride)
+            let options, errors = checkerService.GetProjectConfigFromScript(path, source, otherFlags.Value.Value, targetNetFramework, sdkDirOverride)
             if not errors.IsEmpty then logErrors logger $"Script options for %s{path}" errors
-            Some config
+            Some options
         with
         | OperationCanceled -> reraise()
         | exn ->
@@ -109,11 +109,11 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             newOptions
         )
 
-    let createFcsProject (path: VirtualFileSystemPath) config =
-        config
-        |> Option.map (fun config ->
+    let createFcsProject (path: VirtualFileSystemPath) options =
+        options
+        |> Option.map (fun options ->
             { OutputPath = path
-              Options = config
+              Options = options
               FileIndices = dict [path, 0]
               ImplementationFilesWithSignatures = EmptySet.Instance
               ReferencedModules = EmptySet.Instance }

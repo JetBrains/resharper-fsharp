@@ -139,9 +139,9 @@ type FcsProject =
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
       ReferencedModules: ISet<FcsProjectKey> }
 
-    static member Create(config) = {
+    static member Create(options) = {
         OutputPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.Local) //TODO: remove as a redundant
-        Options = config
+        Options = options
         FileIndices = Dictionary()
         ImplementationFilesWithSignatures = HashSet()
         ReferencedModules = HashSet()
@@ -161,7 +161,7 @@ type FcsProject =
     member x.WithReferences(moduleReferences: FcsProjectKey seq, mapper) =
         let moduleReferences = moduleReferences.ToArray()
 
-        let config =
+        let options =
             match x.Options with
             | FcsProjectOptions(projectOptions, parsingOptions) ->
                 let references =
@@ -211,26 +211,26 @@ type FcsProject =
                     projectSnapshot.Stamp)
                 |> FcsProjectSnapshot
 
-        { x with ReferencedModules = HashSet(moduleReferences); Options = config }
+        { x with ReferencedModules = HashSet(moduleReferences); Options = options }
 
     member x.TestDump(writer: TextWriter) =
-        let config = x.Options
+        let options = x.Options
 
-        writer.WriteLine($"Project file: {config.ProjectFileName}")
-        writer.WriteLine($"Stamp: {config.Stamp}")
-        writer.WriteLine($"Load time: {config.LoadTime}")
+        writer.WriteLine($"Project file: {options.ProjectFileName}")
+        writer.WriteLine($"Stamp: {options.Stamp}")
+        writer.WriteLine($"Load time: {options.LoadTime}")
 
         writer.WriteLine("Source files:")
-        for sourceFile in config.SourceFiles do
+        for sourceFile in options.SourceFiles do
             writer.WriteLine($"  {sourceFile}")
 
         writer.WriteLine("Other options:")
-        for option in config.OtherOptions do
+        for option in options.OtherOptions do
             writer.WriteLine($"  {option}")
 
         writer.WriteLine("Referenced projects:")
         
-        match config with
+        match options with
         | FcsProjectOptions(options, _) ->
             for referencedProject in options.ReferencedProjects do
                 let stamp =
