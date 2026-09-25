@@ -9,11 +9,19 @@ on:
 
 jobs:
   test-backend:
+    name: Tests (${{ matrix.compiler_name }})
     runs-on: ${{ matrix.image }}
+
     strategy:
       matrix:
-        image: [windows-latest]
-        use-transparent-compiler: [false, true]
+        include:
+          - image: windows-latest
+            compiler_name: Default
+            use_transparent_compiler: false
+
+          - image: windows-latest
+            compiler_name: Transparent Compiler
+            use_transparent_compiler: true
 
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
