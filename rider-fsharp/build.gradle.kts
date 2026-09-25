@@ -58,11 +58,11 @@ dependencies {
       rider("$riderBaseVersion-SNAPSHOT") { useInstaller = false }
     }
     jetbrainsRuntime()
-    bundledPlugin("intellij.vcs.plugin")
+    bundledPlugin("com.intellij.platform.vcs")
     bundledPlugin("Git4Idea")
-    bundledPlugin("intellij.problemView.plugin")
-    bundledPlugin("intellij.ssh.plugin")
-    bundledPlugin("intellij.bookmarks.plugin")
+    bundledPlugin("com.intellij.problemsView")
+    bundledPlugin("com.intellij.platform.ssh")
+    bundledPlugin("com.intellij.bookmarks")
     bundledModule("intellij.rd.client")
     bundledModule("intellij.rider")
     bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
@@ -78,7 +78,7 @@ dependencies {
     bundledModule("intellij.platform.debugger")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
-    bundledPlugin("intellij.structureView.plugin")
+    bundledPlugin("com.intellij.structureView")
     bundledModule("intellij.resharper.assist")
     // TODO: Temporary I hope hope hope
     bundledLibrary(provider {
