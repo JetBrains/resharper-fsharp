@@ -125,6 +125,23 @@ type FSharpTestFormatterSettings(settingsSchema, logger: ILogger) =
         this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.INDENT_SIZE), 4)
         this.SetValue(mountPoint, (fun (settings: FSharpFormatSettingsKey) -> settings.USE_INDENT_FROM_VS), false)
 
+type FSharpExperimentalFeatures = JetBrains.ReSharper.Plugins.FSharp.Settings.FSharpExperimentalFeatures
+
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
+type FSharpTestExperimentalSettings(settingsSchema, logger: ILogger) =
+    inherit HaveDefaultSettings<FSharpExperimentalFeatures>(settingsSchema, logger)
+
+    override this.Name = "F# default experimental settings"
+
+    override this.InitDefaultSettings(mountPoint) =
+        let useTransparentCompiler = Environment.GetEnvironmentVariable("UseTransparentCompiler")
+        if isNull useTransparentCompiler then () else
+
+        logger.Info("Set UseTransparentCompiler = " + useTransparentCompiler)
+        this.SetValue(mountPoint,
+                      (fun (settings: FSharpExperimentalFeatures) -> settings.UseTransparentCompiler),
+                      Boolean.Parse(useTransparentCompiler))
+
 
 type FSharpTestAttribute(extension) =
     inherit TestAspectAttribute()
