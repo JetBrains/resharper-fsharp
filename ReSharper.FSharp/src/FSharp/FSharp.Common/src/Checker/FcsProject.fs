@@ -63,6 +63,7 @@ type FcsProjectOptions =
     member x.OtherOptions: string seq =
         match x with
         | FcsProjectOptions(options, _) -> options.OtherOptions
+        //TODO: change type to array in FCS 
         | FcsProjectSnapshot(snapshot) -> snapshot.OtherOptions
 
     member x.ParsingOptions: FSharpParsingOptions =
@@ -88,14 +89,14 @@ type FcsProjectOptions =
         ]
 
     member x.AreSameForChecking(y: FcsProjectOptions) =
-        // let arrayEq a1 a2 =
-        //     Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
+        let inline arrayEq a1 a2 = Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
-        x.ProjectFileName = y.ProjectFileName &&
-        x.SourceFiles = y.SourceFiles &&
-        x.OtherOptions = y.OtherOptions &&
+        if x.ProjectFileName <> y.ProjectFileName ||
+           not (arrayEq x.SourceFiles y.SourceFiles) ||
+           x.OtherOptions <> y.OtherOptions
+           then false else
         
-        (x.UseScriptResolutionRules && x.OriginalLoadReferences = y.OriginalLoadReferences ||
+        if x.UseScriptResolutionRules then x.OriginalLoadReferences = y.OriginalLoadReferences else
 
         match x, y with
         | FcsProjectOptions(x, _), FcsProjectOptions(y, _) ->
@@ -130,7 +131,7 @@ type FcsProjectOptions =
                 | _ -> false
             )
 
-        | _ -> false)
+        | _ -> false
 
 type FcsProject =
     { OutputPath: VirtualFileSystemPath
