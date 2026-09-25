@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public FcsModuleCapturedInfo([CanBeNull] FcsProject fcsProject, bool isScript = false)
     {
-      var filesCount = fcsProject?.ParsingOptions.SourceFiles.Length ?? (isScript ? 1 : 0);
+      var filesCount = fcsProject?.Options.SourceFiles.Length ?? (isScript ? 1 : 0);
       myFileResolvedSymbols = new FcsFileCapturedInfo[filesCount];
 
       FcsProject = fcsProject;

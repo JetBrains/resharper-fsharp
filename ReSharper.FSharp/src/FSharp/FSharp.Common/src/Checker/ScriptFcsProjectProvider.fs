@@ -1,16 +1,17 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
+﻿#nowarn FS0057
+
+namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Concurrent
 open FSharp.Compiler.CodeAnalysis
-open FSharp.Compiler.Text
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -27,10 +28,10 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
     let scriptFcsProjects = ConcurrentDictionary<VirtualFileSystemPath, FcsProject option>()
     let scriptsUpdateLifetimes = ConcurrentDictionary<VirtualFileSystemPath, SequentialLifetimes>()
 
-    let mutable defaultOptions: FSharpProjectOptions option option = None
+    let mutable defaultOptions: FcsProjectOptions option option = None
 
     let optionsUpdated =
-        new Signal<VirtualFileSystemPath * FSharpProjectOptions>("ScriptFcsProjectProvider.optionsUpdated")
+        new Signal<VirtualFileSystemPath * FcsProjectOptions>("ScriptFcsProjectProvider.optionsUpdated")
 
     let isHeadless =
         let var = Environment.GetEnvironmentVariable("JET_HEADLESS_MODE") |> Option.ofObj |> Option.defaultValue "false"
@@ -59,7 +60,6 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
     let getOptionsImpl (path: VirtualFileSystemPath) source =
         let path = path.FullPath
-        let source = SourceText.ofString source
         let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
 
         let toolset = toolset.GetDotNetCoreToolset()
@@ -70,17 +70,10 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
             Some sdkFolderPath.FullPath
 
-        let getScriptOptionsAsync =
-            checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                otherFlags = otherFlags.Value.Value,
-                assumeDotNetFramework = targetNetFramework,
-                ?sdkDirOverride = sdkDirOverride)
-
         try
-            let options, errors = getScriptOptionsAsync.RunAsTask()
-            if not errors.IsEmpty then
-                logErrors logger (sprintf "Script options for %s" path) errors
-            Some options
+            let config, errors = checkerService.GetProjectConfigFromScript(path, source, otherFlags.Value.Value, targetNetFramework, sdkDirOverride)
+            if not errors.IsEmpty then logErrors logger $"Script options for %s{path}" errors
+            Some config
         with
         | OperationCanceled -> reraise()
         | exn ->
@@ -89,9 +82,17 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             None
 
     let getDefaultOptions (path: VirtualFileSystemPath) =
-        let withPath (options: FSharpProjectOptions option) =
+        let withPath (options: FcsProjectOptions option) =
             match options with
-            | Some options -> Some { options with SourceFiles = [| path.FullPath |] }
+            | Some (FcsProjectOptions.FcsProjectOptions(options, parsingOptions)) ->
+                Some (FcsProjectOptions.FcsProjectOptions(
+                          { options with SourceFiles = [| path.FullPath |] },
+                          { parsingOptions with SourceFiles = [| path.FullPath |] }))
+
+            | Some (FcsProjectOptions.FcsProjectSnapshot(snapshot)) ->
+                let fileSnapshot = FSharpFileSnapshot.CreateFromFileSystem(path.FullPath)
+                Some (FcsProjectOptions.FcsProjectSnapshot(snapshot.Replace([fileSnapshot])))
+
             | _ -> None
 
         match defaultOptions with
@@ -108,19 +109,11 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             newOptions
         )
 
-    let createFcsProject (path: VirtualFileSystemPath) options =
-        options
-        |> Option.map (fun options ->
-            let parsingOptions = 
-                { FSharpParsingOptions.Default with
-                    SourceFiles = [| path.FullPath |]
-                    ConditionalDefines = ImplicitDefines.scriptDefines
-                    IsInteractive = true
-                    IsExe = true }
-
+    let createFcsProject (path: VirtualFileSystemPath) config =
+        config
+        |> Option.map (fun config ->
             { OutputPath = path
-              ProjectOptions = options
-              ParsingOptions = parsingOptions
+              Options = config
               FileIndices = dict [path, 0]
               ImplementationFilesWithSignatures = EmptySet.Instance
               ReferencedModules = EmptySet.Instance }
@@ -134,7 +127,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             if not currentLifetime.IsAlive then () else
 
             let newOptions = getOptionsImpl path source
-            let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id
+            let oldOptions = tryGetValue path scriptFcsProjects |> Option.bind id |> Option.map _.Options
 
             if not currentLifetime.IsAlive then () else
 
@@ -144,17 +137,8 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                 else optionsUpdated.Fire((path, newOptions))
 
             match oldOptions, newOptions with
-            | Some oldOptions, Some newOptions ->
-                let areEqualForChecking (options1: FSharpProjectOptions) (options2: FSharpProjectOptions) =
-                    let arrayEq a1 a2 =
-                        Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
-
-                    options1.OriginalLoadReferences = options2.OriginalLoadReferences &&
-                    arrayEq options1.OtherOptions options2.OtherOptions &&
-                    arrayEq options1.SourceFiles options2.SourceFiles
-
-                if not (areEqualForChecking oldOptions.ProjectOptions newOptions) then
-                    update path newOptions
+            | Some oldOptions, Some newOptions when not (oldOptions.AreSameForChecking(newOptions)) ->
+                update path newOptions
 
             | _, Some newOptions -> update path newOptions
             | _ -> ()
@@ -172,18 +156,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             else
                 getDefaultOptions path |> createFcsProject path
 
-    let getOptions path source : FSharpProjectOptions option =
-        getFcsProject path source true |> Option.map (fun fcsProject -> fcsProject.ProjectOptions)
-
     interface IScriptFcsProjectProvider with
-        member x.GetScriptOptions(path: VirtualFileSystemPath, source) =
-            getOptions path source
-
-        member x.GetScriptOptions(file: IPsiSourceFile) =
-            let path = file.GetLocation()
-            let source = file.Document.GetText()
-            getOptions path source
-
         member this.GetFcsProject(sourceFile) =
             let path = sourceFile.GetLocation()
             let source = sourceFile.Document.GetText()
