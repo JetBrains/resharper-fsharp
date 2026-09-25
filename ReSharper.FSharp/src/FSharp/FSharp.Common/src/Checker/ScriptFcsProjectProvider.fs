@@ -63,18 +63,18 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
         let targetNetFramework = not PlatformUtil.IsRunningOnCore && scriptSettings.TargetNetFramework.Value
 
         let toolset = toolset.GetDotNetCoreToolset()
+        let sdkDirOverride =
+            if isNull toolset || isNull toolset.Sdk then None else
+
+            let sdkRootFolder = toolset.Cli.NotNull("cli").SdkRootFolder.NotNull("sdkRootFolder")
+            let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
+            Some sdkFolderPath.FullPath
+
         let getScriptOptionsAsync =
-            if isNotNull toolset && isNotNull toolset.Sdk then
-                let sdkRootFolder = toolset.Cli.NotNull("cli").SdkRootFolder.NotNull("sdkRootFolder")
-                let sdkFolderPath = sdkRootFolder / toolset.Sdk.NotNull("sdk").FolderName.NotNull("sdkFolderName")
-                checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                    otherFlags = otherFlags.Value.Value,
-                    assumeDotNetFramework = targetNetFramework,
-                    sdkDirOverride = sdkFolderPath.FullPath)
-            else
-                checkerService.Checker.GetProjectOptionsFromScript(path, source,
-                    otherFlags = otherFlags.Value.Value,
-                    assumeDotNetFramework = targetNetFramework)
+            checkerService.Checker.GetProjectOptionsFromScript(path, source,
+                otherFlags = otherFlags.Value.Value,
+                assumeDotNetFramework = targetNetFramework,
+                ?sdkDirOverride = sdkDirOverride)
 
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
