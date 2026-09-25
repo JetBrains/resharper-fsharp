@@ -73,7 +73,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         )
         
 
-    let getScriptReferences (scriptPath: VirtualFileSystemPath) scriptOptions =
+    let getScriptReferences (scriptPath: VirtualFileSystemPath) (scriptOptions: FcsProjectOptions) =
         let assembliesPaths = HashSet<VirtualFileSystemPath>()
         for o in scriptOptions.OtherOptions do
             if o.StartsWith("-r:", StringComparison.Ordinal) then
@@ -163,7 +163,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             locks.QueueReadLock(lifetime, "AssemblyGC after removing F# script reference", fun _ ->
                 solution.GetComponent<AssemblyGC>().ForceGC())
 
-    let queueUpdateReferences (path: VirtualFileSystemPath, newOptions: FSharpProjectOptions) =
+    let queueUpdateReferences (path: VirtualFileSystemPath, newOptions: FcsProjectOptions) =
         let getDiff oldPaths newPaths =
             let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
             let filterChanges = Seq.filter (notChanged.Contains >> not) >> ResizeArray
@@ -251,7 +251,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         if scriptOptionsProvider.SyncUpdate then
             scriptOptionsProvider.GetFcsProject(psiModule.SourceFile)
             |> Option.iter (fun fcsProject ->
-                let references = getScriptReferences path fcsProject.ProjectOptions
+                let references = getScriptReferences path fcsProject.Options
                 updateReferences path references references ScriptReferences.Empty changeBuilder 
             )
 
@@ -278,8 +278,15 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun psiModule -> psiModule.Path = moduleToRemove.Path)
         |> Option.iter (fun psiModule ->
-            match checkerService.GetCachedScriptOptions(path.FullPath) with
-            | Some options -> checkerService.InvalidateFcsProject(options, FcsProjectInvalidationType.Remove)
+            let fcsProject =
+                if checkerService.UseTransparentCompiler then
+                    scriptOptionsProvider.GetFcsProject(moduleToRemove.SourceFile)
+                else
+                    checkerService.GetCachedScriptOptions(path.FullPath)
+                    |> Option.map (fun options -> FcsProject.Create(FcsProjectOptions(options, FSharpParsingOptions.Default)))
+            
+            match fcsProject with
+            | Some fcsProject -> checkerService.InvalidateFcsProject(fcsProject, FcsProjectInvalidationType.Remove)
             | None -> ()
 
             scriptsFromProjectFiles.RemoveValue(path, psiModule) |> ignore
