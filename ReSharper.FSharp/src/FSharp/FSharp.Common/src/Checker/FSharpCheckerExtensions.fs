@@ -24,7 +24,8 @@ type FSharpChecker with
                     match fcsProject.Options with
                     | FcsProjectOptions.FcsProjectOptions(options, _) ->
                         let source = SourceText.ofString(sourceFile.Document.GetText())
-                        x.ParseAndCheckFileInProject(path, 1, source, options, userOpName = opName)
+                        //TODO: getHashCode is not required 
+                        x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
 
                     | FcsProjectSnapshot projectSnapshot ->
                         x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
