@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-backend:
-    name: Tests (${{ matrix.compiler_name }})
+    name: ${{ matrix.compiler_name }}
     runs-on: ${{ matrix.image }}
 
     strategy:
