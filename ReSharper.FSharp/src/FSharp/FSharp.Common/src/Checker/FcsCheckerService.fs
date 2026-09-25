@@ -78,7 +78,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         let source = SourceTextNew.ofString(source)
 
         if useTransparentCompiler.Value then
-            let config, errors = x.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            let options, errors = x.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             let parsingOptions =
                 { FSharpParsingOptions.Default with
                     SourceFiles = [| path |]
@@ -86,10 +86,10 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                     IsInteractive = true
                     IsExe = true }
 
-            FcsProjectOptions.FcsProjectOptions(config, parsingOptions), errors
+            FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
         else
-            let config, errors = x.Checker.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
-            FcsProjectOptions.FcsProjectSnapshot(config), errors
+            let options, errors = x.Checker.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            FcsProjectOptions.FcsProjectSnapshot(options), errors
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
@@ -125,8 +125,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         | None -> None
         | Some fcsProject ->
 
-        let config = fcsProject.Options
-        if not (fcsProject.IsKnownFile(sourceFile)) && not config.UseScriptResolutionRules then None else
+        let options = fcsProject.Options
+        if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
