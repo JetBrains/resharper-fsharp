@@ -22,6 +22,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -352,21 +353,22 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
     let getNewFcsProject (psiModule: IPsiModule) =
         let projectKey = FcsProjectKey.Create(psiModule)
-        fcsProjectBuilder.BuildFcsProject(projectKey)
+        fcsProjectBuilder.BuildFcsProjectCore(projectKey)
 
     // todo: referenced projects
     // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        let getReferencedProjectOutputs (options: FSharpProjectOptions) =
-            options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
-
-        let newOptions = newProject.ProjectOptions
-        let oldOptions = oldProject.ProjectOptions
-
-        newOptions.ProjectFileName = oldOptions.ProjectFileName &&
-        newOptions.SourceFiles = oldOptions.SourceFiles &&
-        newOptions.OtherOptions = oldOptions.OtherOptions &&
-        getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
+        // let getReferencedProjectOutputs (options: FSharpProjectOptions) =
+        //     options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
+        //
+        // let newOptions = newProject.ProjectOptions
+        // let oldOptions = oldProject.ProjectOptions
+        //
+        // newOptions.ProjectFileName = oldOptions.ProjectFileName &&
+        // newOptions.SourceFiles = oldOptions.SourceFiles &&
+        // newOptions.OtherOptions = oldOptions.OtherOptions &&
+        // getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
+        oldProject.AreSameForChecking(newProject)
 
     let getFcsProject (psiModule: IPsiModule) =
         lock this (fun _ ->
@@ -381,7 +383,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
         let fcsProject = getFcsProject sourceFile.PsiModule
-        Some fcsProject.ProjectOptions
+        Some fcsProject.Options
 
     interface IHideImplementation<FcsProjectProvider>
 
@@ -392,12 +394,12 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
         member x.GetProjectOptions(sourceFile: IPsiSourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile) else
-
-            getProjectOptions sourceFile
+                scriptFcsProjectProvider.GetFcsProject(sourceFile) |> Option.map _.Options
+            else
+                getProjectOptions sourceFile
 
         member x.GetParsingOptions(sourceFile) =
-            if isNull sourceFile then sandboxParsingOptions else
+            if isNull sourceFile then sandboxParsingOptions, FSharpParser.SandBoxPath else
 
             let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
             let targetFrameworkId = sourceFile.PsiModule.TargetFrameworkId
@@ -433,7 +435,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 ConditionalDefines = defines
                 IsExe = isExe
                 IsInteractive = isScript
-                LangVersionText = "preview" } // todo: fix language level attribute is not applied
+                LangVersionText = "preview" }, sourceFile.GetLocation() // todo: fix language level attribute is not applied
 
         member x.GetFileIndex(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
@@ -449,7 +451,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.HasFcsProjects = false
         member this.GetAllFcsProjects() = []
 
-        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = failwith "todo"
+        member this.GetProjectOptions(_: IPsiModule): FcsProjectOptions option = failwith "todo"
         member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
         member this.PrepareAssemblyShim _ = ()
         member this.GetReferencedModule _ = None
