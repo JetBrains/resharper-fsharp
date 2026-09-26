@@ -1,11 +1,15 @@
+#nowarn FS0057
+
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 
 open System.Threading
 open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open FSharp.Compiler.Text
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.Util.Logging
 
 type CheckResults =
@@ -13,13 +17,28 @@ type CheckResults =
     | StillRunning of Task<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
 type FSharpChecker with
-    member internal x.ParseAndCheckDocument(path, source: ISourceText, options, allowStale: bool, opName) =
-        let version = source.GetHashCode()
+    member x.ParseAndCheckDocument(sourceFile: IPsiSourceFile, fcsProject: FcsProject, allowStale, opName) =
+        let path = sourceFile.GetLocation().FullPath
+        let source = sourceFile.Document.GetText()
+
+        let options =
+            match fcsProject.Options with
+            | FcsProjectSnapshot projectSnapshot ->
+                let currentFileSnapshot = FSharpFileSnapshot.CreateFromString(path, source)
+                FcsProjectSnapshot(projectSnapshot.Replace([currentFileSnapshot]))
+            | options -> options
 
         let parseAndCheckFile =
             async {
                 let! parseResults, checkFileAnswer =
-                    x.ParseAndCheckFileInProject(path, version, source, options, userOpName = opName)
+                    match options with
+                    | FcsProjectOptions.FcsProjectOptions(options, _) ->
+                        let source = SourceText.ofString(source)
+                        //TODO: getHashCode is not required 
+                        x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
+
+                    | FcsProjectSnapshot projectSnapshot ->
+                        x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
 
                 return
                     match checkFileAnswer with
@@ -49,26 +68,40 @@ type FSharpChecker with
             }
 
         async {
-            match x.TryGetRecentCheckResultsForFile(path, options, source) with
-            | None ->
-                // No stale results available, wait for fresh results
-                return! parseAndCheckFile
+            match options with
+            | FcsProjectOptions(options, _) ->
+                let source = SourceText.ofString(sourceFile.Document.GetText())
+                let version = source.GetHashCode()
+                match x.TryGetRecentCheckResultsForFile(path, options, source) with
+                | None ->
+                    // No stale results available, wait for fresh results
+                    return! parseAndCheckFile
 
-            | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
-                // Avoid queueing on the reactor thread by using the recent results
-                return Some (parseResults, checkFileResults)
+                //TODO: allowStale?
+                | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
+                    // Avoid queueing on the reactor thread by using the recent results
+                    return Some (parseResults, checkFileResults)
 
-            | Some (staleParseResults, staleCheckFileResults, _) ->
+                | Some (staleParseResults, staleCheckFileResults, _) ->
 
-            match! tryGetFreshResultsWithTimeout() with
-            | Ready x ->
-                // Fresh results were ready quickly enough
-                return x
+                match! tryGetFreshResultsWithTimeout() with
+                | Ready x ->
+                    // Fresh results were ready quickly enough
+                    return x
 
-            | StillRunning _ when allowStale ->
-                // Still waiting for fresh results - just use the stale ones for now
-                return Some (staleParseResults, staleCheckFileResults)
+                | StillRunning _ when allowStale ->
+                    // Still waiting for fresh results - just use the stale ones for now
+                    return Some (staleParseResults, staleCheckFileResults)
 
-            | StillRunning worker ->
-                return! Async.AwaitTask worker
+                | StillRunning worker ->
+                    return! Async.AwaitTask worker
+
+            | FcsProjectSnapshot projectSnapshot ->
+                match x.TryGetRecentCheckResultsForFile(path, projectSnapshot, userOpName = opName) with
+                | None ->
+                    // No stale results available, wait for fresh results
+                    return! parseAndCheckFile
+
+                | result ->
+                    return result
         }

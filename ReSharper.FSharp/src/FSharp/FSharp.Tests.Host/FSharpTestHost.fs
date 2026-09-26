@@ -1,3 +1,5 @@
+#nowarn FS0057
+
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic
@@ -56,10 +58,10 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         projectProvider.GetProjectOptions(sourceFile)
         |> Option.map (fun options ->
             options.OtherOptions
-            |> Array.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
-            |> Array.map (fun p -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
-            |> Array.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
-            |> Array.map (fun p -> p.Name)
+            |> Seq.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
+            |> Seq.map (fun p -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
+            |> Seq.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
+            |> Seq.map _.Name
             |> List)
         |> Option.defaultWith (fun _ -> List())
 
@@ -76,9 +78,14 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 
     let dumpFcsProjectReferences (projectModelId: int) =
         let projectOptions = getProjectOptions projectModelId
-        projectOptions.ReferencedProjects
-        |> Array.map (fun project ->
-            let outputPath = VirtualFileSystemPath.Parse(project.OutputFile, InteractionContext.SolutionContext)
+        let outputPaths =
+            match projectOptions with
+            | FcsProjectOptions(projectOptions, _) -> projectOptions.ReferencedProjects |> Seq.map _.OutputFile
+            | FcsProjectSnapshot projectSnapshot -> projectSnapshot.ReferencedProjects |> Seq.map _.OutputFile
+
+        outputPaths
+        |> Seq.map (fun outputPath ->
+            let outputPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
             outputPath.NameWithoutExtension)
         |> List
 

@@ -9,16 +9,27 @@ on:
 
 jobs:
   test-backend:
+    name: ${{ matrix.compiler_name }}
     runs-on: ${{ matrix.image }}
+
     strategy:
       matrix:
-        image: [windows-latest]
+        include:
+          - image: windows-latest
+            compiler_name: Default
+            use_transparent_compiler: false
+
+          - image: windows-latest
+            compiler_name: Transparent Compiler
+            use_transparent_compiler: true
+
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.github/nuget-packages
       GRADLE_USER_HOME: ${{ github.workspace }}/.github/gradle
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       DOTNET_NOLOGO: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
+      UseTransparentCompiler: ${{ matrix.use-transparent-compiler }}
     steps:
       - uses: actions/checkout@v4
 

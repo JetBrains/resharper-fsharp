@@ -1,3 +1,5 @@
+#nowarn FS0057
+
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
@@ -16,7 +18,6 @@ open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.impl
-open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -42,6 +43,8 @@ type FcsProjectInvalidationType =
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISettingsStore, locks: IShellLocks) =
+    let useTransparentCompiler =
+        lazy SettingsUtil.getValue<FSharpExperimentalFeatures, bool> settingsStore "UseTransparentCompiler"
 
     let checker =
         lazy
@@ -61,20 +64,41 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
                                      enablePartialTypeChecking = skipImpl.Value,
-                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value)
+                                     parallelReferenceResolution = analyzerProjectReferencesInParallel.Value,
+                                     useTransparentCompiler = useTransparentCompiler.Value)
 
             checker
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
-    member x.Checker = checker.Value
+    member x.UseTransparentCompiler = useTransparentCompiler.Value
+
+    member x.GetParsingOptionsFromCommandLineArgs(projectOptions: FSharpProjectOptions) =
+        checker.Value.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+
+    member x.GetProjectConfigFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
+        let source = SourceTextNew.ofString(source)
+
+        if useTransparentCompiler.Value then
+            let options, errors = checker.Value.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            let parsingOptions =
+                { FSharpParsingOptions.Default with
+                    SourceFiles = [| path |]
+                    ConditionalDefines = ImplicitDefines.scriptDefines
+                    IsInteractive = true
+                    IsExe = true }
+
+            FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
+        else
+            let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            FcsProjectOptions.FcsProjectSnapshot(options), errors
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
             locks.AssertReadAccessAllowed()
             let source = FcsCheckerService.getSourceText document
             let fullPath = getFullPath path
-            let parseAsync = x.Checker.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
+            let parseAsync = checker.Value.ParseFile(fullPath, source, parsingOptions, cache = not noCache)
             let parseResults = parseAsync.RunAsTask()
             Some parseResults
         with
@@ -85,8 +109,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
             None
 
     member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
-        let parsingOptions = x.FcsProjectProvider.GetParsingOptions(sourceFile)
-        x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
+        let parsingOptions, fileLocation = x.FcsProjectProvider.GetParsingOptions(sourceFile)
+        x.ParseFile(fileLocation, sourceFile.Document, parsingOptions)
 
     // todo: assert that no modification was done? force pin check results or allow via cookie?
     member x.ParseAndCheckFile([<NotNull>] sourceFile: IPsiSourceFile, opName,
@@ -103,17 +127,16 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         | None -> None
         | Some fcsProject ->
 
-        let options = fcsProject.ProjectOptions
+        let options = fcsProject.Options
         if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
         let path = sourceFile.GetLocation().FullPath
-        let source = FcsCheckerService.getSourceText sourceFile.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match checker.Value.ParseAndCheckDocument(sourceFile, fcsProject, allowStaleResults, opName).RunAsTask() with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -142,22 +165,33 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         let path = file.GetLocation().FullPath
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
-        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
-        | Some (_, checkResults, _) ->
-            logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
-            Some checkResults
+        let result =
+            match options with
+            | FcsProjectOptions(projectOptions, _) ->
+                match checker.Value.TryGetRecentCheckResultsForFile(path, projectOptions) with
+                | Some (_, checkResults, _) -> Some checkResults
+                | _ -> None
 
-        | _ ->
-            logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
-            None
+            | FcsProjectSnapshot projectSnapshot ->
+                match checker.Value.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
+                | Some (_, checkResults) -> Some checkResults
+                | _ -> None
+        
+        match result with
+        | Some _ -> logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
+        | None -> logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
+
+        result
 
     member x.GetCachedScriptOptions(path) =
-        if checker.IsValueCreated then
-            checker.Value.GetCachedScriptOptions(path)
-        else None
+        if not checker.IsValueCreated then None else
+        checker.Value.GetCachedScriptOptions(path)
     
-    member x.InvalidateFcsProject(projectOptions: FSharpProjectOptions, invalidationType: FcsProjectInvalidationType) =
-        if checker.IsValueCreated then
+    member x.InvalidateFcsProject(fcsProject: FcsProject, invalidationType: FcsProjectInvalidationType) =
+        if not checker.IsValueCreated then () else
+
+        match fcsProject.Options with
+        | FcsProjectOptions(projectOptions, parsingOptions) ->
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
@@ -165,6 +199,16 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
             | FcsProjectInvalidationType.Remove ->
                 logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
                 checker.Value.ClearCache(Seq.singleton projectOptions)
+
+        | FcsProjectSnapshot projectSnapshot ->
+            match invalidationType with
+            | FcsProjectInvalidationType.Invalidate ->
+                logger.Trace("Invalidate FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                checker.Value.InvalidateConfiguration(projectSnapshot)
+            | FcsProjectInvalidationType.Remove ->
+                logger.Trace("Remove FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)
+                checker.Value.ClearCache(Seq.singleton projectSnapshot.Identifier)
+
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, resolveExpr: bool, opName) =
@@ -220,11 +264,11 @@ type IFcsProjectProvider =
 
     abstract IsProjectOutput: outputPath: VirtualFileSystemPath -> bool
 
-    abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetProjectOptions: psiModule: IPsiModule -> FSharpProjectOptions option
+    abstract GetProjectOptions: sourceFile: IPsiSourceFile -> FcsProjectOptions option
+    abstract GetProjectOptions: psiModule: IPsiModule -> FcsProjectOptions option
 
     abstract GetFileIndex: IPsiSourceFile -> int
-    abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions
+    abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions * VirtualFileSystemPath
 
     // Indicates if implementation file has an associated signature file.
     abstract HasPairFile: IPsiSourceFile -> bool
@@ -246,9 +290,7 @@ type IFcsProjectProvider =
 
 type IScriptFcsProjectProvider =
     abstract GetFcsProject: IPsiSourceFile -> FcsProject option
-    abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract GetScriptOptions: VirtualFileSystemPath * string -> FSharpProjectOptions option
-    abstract OptionsUpdated: Signal<VirtualFileSystemPath * FSharpProjectOptions>
+    abstract OptionsUpdated: Signal<VirtualFileSystemPath * FcsProjectOptions>
     abstract SyncUpdate: bool
 
 
@@ -267,4 +309,4 @@ module ProjectOptions =
         // todo: use script defines in interactive?
         { FSharpParsingOptions.Default with
             ConditionalDefines = ImplicitDefines.sourceDefines
-            SourceFiles = [| "Sandbox.fs" |] }
+            SourceFiles = [| "Sandbox.fs" |] } //TODO: check
