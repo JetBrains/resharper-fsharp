@@ -6,8 +6,7 @@ type Base<'T>() =
     abstract M: 'T -> unit
     abstract M: string -> unit
 
-type A() =
-    inherit Base<int>()
-
-    override this.M(s: string) = ()
-    override this.{caret}
+let x =
+    { new Base<int>() with
+        override this.M(s: string) = ()
+        override this.{caret} }

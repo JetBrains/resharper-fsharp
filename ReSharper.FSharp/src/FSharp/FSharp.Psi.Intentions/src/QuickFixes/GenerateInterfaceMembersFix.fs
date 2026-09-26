@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -43,8 +44,10 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
         let typeElement = typeDeclaration.DeclaredElement
 
+        let implContext = InterfaceImplementationContext.Create(impl)
+
         let membersToGenerate =
-            GenerateOverrides.getInterfaceMembers true impl typeElement
+            GenerateOverrides.getInterfaceMembers true implContext typeElement
             |> GenerateOverrides.sanitizeMembers
             
         let (anchor: ITreeNode) =
