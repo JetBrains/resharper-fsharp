@@ -1,6 +1,5 @@
 ﻿#nowarn FS0057
 
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
