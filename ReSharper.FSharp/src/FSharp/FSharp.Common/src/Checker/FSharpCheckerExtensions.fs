@@ -34,7 +34,7 @@ type FSharpChecker with
                     match options with
                     | FcsProjectOptions.FcsProjectOptions(options, _) ->
                         let source = SourceText.ofString(source)
-                        //TODO: getHashCode is not required 
+                        //TODO: getHashCode is not required here
                         x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
 
                     | FcsProjectSnapshot projectSnapshot ->
@@ -70,7 +70,7 @@ type FSharpChecker with
         async {
             match options with
             | FcsProjectOptions(options, _) ->
-                let source = SourceText.ofString(sourceFile.Document.GetText())
+                let source = SourceText.ofString(source)
                 let version = source.GetHashCode()
                 match x.TryGetRecentCheckResultsForFile(path, options, source) with
                 | None ->
