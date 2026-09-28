@@ -1,15 +1,12 @@
 #nowarn FS0057
 
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
-open System
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.IO
 open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
-open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open JetBrains.Annotations
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
@@ -276,7 +273,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         match psiModule with
         | :? FSharpScriptPsiModule as scriptModule ->
-            let path = scriptModule.Path
             let sourceFile = scriptModule.SourceFile
             scriptFcsProjectProvider.GetFcsProject(sourceFile)
 
