@@ -4,10 +4,12 @@ open System.Threading
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.TestFramework
+open JetBrains.TestFramework.Build.Nunit
 open NUnit.Framework
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 [<assembly: Apartment(ApartmentState.STA)>]
+[<assembly: NUnitRunTestsOnNetFrameworkOrMonoRuntime>]
 do()
 
 [<SetUpFixture>]

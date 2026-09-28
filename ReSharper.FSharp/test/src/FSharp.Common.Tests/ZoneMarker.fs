@@ -10,9 +10,11 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Application.Zones
+open JetBrains.TestFramework.Build.Nunit
 open NUnit.Framework
 
 [<assembly: Apartment(ApartmentState.STA)>]
+[<assembly: NUnitRunTestsOnNetFrameworkOrMonoRuntime>]
 do()
 
 [<ZoneDefinition>]
