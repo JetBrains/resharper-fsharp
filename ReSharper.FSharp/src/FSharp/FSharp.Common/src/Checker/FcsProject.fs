@@ -73,7 +73,7 @@ type FcsProjectOptions =
         { FSharpParsingOptions.Default with
             SourceFiles = x.SourceFiles
             ConditionalDefines = x.ConditionalDefines
-            IsInteractive = false
+            IsInteractive = snapshot.UseScriptResolutionRules
             //LangVersionText = TODO
             IsExe = false } //TODO: is exe
 
