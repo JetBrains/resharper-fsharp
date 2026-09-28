@@ -95,7 +95,7 @@ type FcsProjectOptions =
            not (arrayEq x.SourceFiles y.SourceFiles) ||
            x.OtherOptions <> y.OtherOptions
            then false else
-        
+
         if x.UseScriptResolutionRules then x.OriginalLoadReferences = y.OriginalLoadReferences else
 
         match x, y with
@@ -116,6 +116,7 @@ type FcsProjectOptions =
             )
 
         | FcsProjectSnapshot(x), FcsProjectSnapshot(y) ->
+            x.ReferencesOnDisk = y.ReferencesOnDisk && //TODO: array
             x.ReferencedProjects.Length = x.ReferencedProjects.Length &&
             (y.ReferencedProjects, y.ReferencedProjects)
             ||> List.forall2 (fun r1 r2 ->
