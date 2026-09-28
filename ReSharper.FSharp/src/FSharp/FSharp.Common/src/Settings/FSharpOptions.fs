@@ -111,7 +111,7 @@ type FSharpExperimentalFeatures =
       [<SettingsEntry(true, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis); DefaultValue>]
       mutable GenerativeTypeProvidersInMemoryAnalysis: bool
 
-      [<SettingsEntry(true, FSharpExperimentalFeatures.useTransparentCompiler); DefaultValue>]
+      [<SettingsEntry(false, FSharpExperimentalFeatures.useTransparentCompiler); DefaultValue>]
       mutable UseTransparentCompiler: bool }
 
 
