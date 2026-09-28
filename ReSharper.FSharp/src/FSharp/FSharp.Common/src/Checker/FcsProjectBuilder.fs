@@ -228,7 +228,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               OriginalLoadReferences = List.empty
               UnresolvedReferences = None
               Stamp = None }
-        
+
         let options = 
             if not checkerService.UseTransparentCompiler then
                 let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(projectOptions)
