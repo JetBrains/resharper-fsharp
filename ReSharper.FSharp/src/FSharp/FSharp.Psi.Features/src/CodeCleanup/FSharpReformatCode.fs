@@ -9,7 +9,6 @@ open JetBrains.DocumentModel.Impl
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Settings
