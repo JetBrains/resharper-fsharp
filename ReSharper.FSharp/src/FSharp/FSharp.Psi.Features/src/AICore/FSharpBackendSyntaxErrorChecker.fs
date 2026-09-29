@@ -11,6 +11,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
+open JetBrains.ReSharper.Psi
 open JetBrains.Rider.Model
 open JetBrains.Util
 
@@ -25,8 +26,8 @@ type FSharpBackendSyntaxErrorChecker(checkerService: FcsCheckerService, document
         
         member this.CheckSyntaxErrors(lifetime, psiModule, modifiedContent, sourceFile)=
             let parsingOptions, path =
-                if isNotNull sourceFile then checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
-                else sandboxParsingOptions, FSharpParser.SandBoxPath
+                if isNull sourceFile then sandboxParsingOptions, FSharpParser.SandBoxPath
+                else checkerService.FcsProjectProvider.GetParsingOptions(sourceFile), sourceFile.GetLocation()
 
             let document = documentFactory.CreateSimpleDocumentFromText(modifiedContent, "F# Sandbox File for Syntax Check")
             let parsingResult = checkerService.ParseFile(path, document, parsingOptions, noCache = true)

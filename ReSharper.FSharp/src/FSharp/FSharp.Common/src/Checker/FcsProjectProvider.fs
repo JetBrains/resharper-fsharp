@@ -289,8 +289,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
             ConditionalDefines = ImplicitDefines.scriptDefines
             IsInteractive = isScript
-            IsExe = isScript },
-        sourceFile.GetLocation()
+            IsExe = isScript }
 
     /// Checks whether existing FCS project options can be reused for the project.
     /// Dependencies are known to already have been checked due to the processing order inside `invalidateDirtyModules`.
@@ -486,15 +485,14 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             locks.AssertReadAccessAllowed()
             processInvalidatedFcsProjects ()
 
-            //if isNull sourceFile then sandboxParsingOptions else
+            if isNull sourceFile then sandboxParsingOptions else
             if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
             match tryGetFcsProject sourceFile.PsiModule with
             | None -> getParsingOptionsForSingleFile sourceFile false
             | Some fcsProject ->
 
-            let path = sourceFile.GetLocation()
-            if fcsProject.IsKnownFile(sourceFile) then fcsProject.Options.ParsingOptions, path
+            if fcsProject.IsKnownFile(sourceFile) then fcsProject.Options.ParsingOptions
             else getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =

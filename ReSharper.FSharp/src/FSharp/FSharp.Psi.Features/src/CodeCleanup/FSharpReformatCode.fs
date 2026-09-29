@@ -67,7 +67,7 @@ type FSharpReformatCode(textControlManager: ITextControlManager) =
         let stamp = document.LastModificationStamp
         let modificationSide = TextModificationSide.NotSpecified
         let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-        let parsingOptions, _ = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
+        let parsingOptions = fsFile.CheckerService.FcsProjectProvider.GetParsingOptions(sourceFile)
 
         try
             if isNotNull rangeMarker then
