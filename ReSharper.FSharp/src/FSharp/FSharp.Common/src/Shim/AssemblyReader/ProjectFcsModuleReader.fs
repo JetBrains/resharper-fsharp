@@ -80,13 +80,6 @@ module ProjectFcsModuleReader =
         mkTypeName clrTypeName.ShortName clrTypeName.TypeParametersCount
 
 
-    [<Struct>]
-    type LocalReadWriteLockCookie(locker: JetFastSemiReenterableRWLock) =
-        interface IDisposable with
-            member this.Dispose() =
-                locker.Release()
-
-
 type FcsTypeDefMemberTables =
     { Methods: ILMethodDef[]
       Fields: ILFieldDef list
@@ -153,16 +146,11 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     let locker = JetFastSemiReenterableRWLock()
 
+    /// Take this lock inside `readData`, never around it. `readData` waits for the read access, and
+    /// a holder that waits blocks every other thread here, including one that holds the write lock.
     let usingWriteLock () =
-        let mutable cookie = ValueNone
-
-        while cookie.IsNone do
-            if locker.TryAcquireWrite() then
-                cookie <- ValueSome(new LocalReadWriteLockCookie(locker))
-            elif locks.IsReadAccessAllowed() then
-                FSharpAsyncUtil.ProcessEnqueuedReadRequests()
-
-        cookie.Value
+        locks.AssertReadAccessAllowed()
+        locker.UsingWriteLock()
 
     let mutable isDirty = false
 
@@ -1325,50 +1313,52 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
             fcsTypeDef.Members <- table
 
     let getOrCreateNestedTypes (table: FcsTypeDefMembers) (typeName: IClrTypeName) defaultValue reader =
-        use _ = usingWriteLock ()
-
         let typeTable = table.NestedTypes
         if isNotNull typeTable then typeTable else
 
-        lock table (fun _ ->
-            usingTypeElement typeName () (fun typeElement ->
-                table.NestedTypes <- mkNestedTypes reader typeElement
-                cacheMembersTable table typeName
+        usingTypeElement typeName () (fun typeElement ->
+            use _ = usingWriteLock ()
+
+            lock table (fun _ ->
+                if isNull table.NestedTypes then
+                    table.NestedTypes <- mkNestedTypes reader typeElement
+                    cacheMembersTable table typeName
             )
-
-            let memberTables = table.NestedTypes
-
-            // false when could not get the type element
-            if isNull memberTables then defaultValue else
-
-            memberTables
         )
 
-    let getOrCreateMembers (table: FcsTypeDefMembers) (typeName: IClrTypeName) (defaultValue: 'Table) (getMemberTable: FcsTypeDefMemberTables -> 'Table) =
-        use _ = usingWriteLock ()
+        let memberTables = table.NestedTypes
 
+        // false when could not get the type element
+        if isNull memberTables then defaultValue else
+
+        memberTables
+
+    let getOrCreateMembers (table: FcsTypeDefMembers) (typeName: IClrTypeName) (defaultValue: 'Table) (getMemberTable: FcsTypeDefMemberTables -> 'Table) =
         let memberTables = table.MemberTables
         if isNotNull memberTables then getMemberTable memberTables else
 
-        lock table (fun _ ->
-            usingTypeElement typeName () (fun typeElement ->
-                let memberTables =
-                    { Methods = mkMethods typeElement
-                      Fields = mkFields typeElement
-                      Events = mkEvents typeElement
-                      Properties = mkProperties typeElement }
+        usingTypeElement typeName () (fun typeElement ->
+            use _ = usingWriteLock ()
 
-                table.MemberTables <- memberTables
-                cacheMembersTable table typeName
+            lock table (fun _ ->
+                if isNull table.MemberTables then
+                    let memberTables =
+                        { Methods = mkMethods typeElement
+                          Fields = mkFields typeElement
+                          Events = mkEvents typeElement
+                          Properties = mkProperties typeElement }
+
+                    table.MemberTables <- memberTables
+                    cacheMembersTable table typeName
             )
-
-            let memberTables = table.MemberTables
-
-            // false when could not get the type element
-            if isNull memberTables then defaultValue else
-
-            getMemberTable memberTables
         )
+
+        let memberTables = table.MemberTables
+
+        // false when could not get the type element
+        if isNull memberTables then defaultValue else
+
+        getMemberTable memberTables
 
 
     let getOrCreateMethods (table: FcsTypeDefMembers) (typeName: IClrTypeName) =
@@ -1387,8 +1377,6 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         getOrCreateNestedTypes table typeName [||] reader
 
     let getOrCreateNamespaceContents (preNamespace: PreNamespace) getContents =
-        use _ = usingWriteLock ()
-
         let qualifiedName = preNamespace.QualifiedName
 
         match namespaces.TryGetValue(qualifiedName) with
@@ -1396,15 +1384,19 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
         | _ ->
 
         let reader = preNamespace.Reader
-        let fcsNamespace =
-            usingNamespace qualifiedName Unchecked.defaultof<FcsNamespace> (fun symbolScope ns ->
+        let mutable contents = [||]
+
+        usingNamespace qualifiedName () (fun symbolScope ns ->
+            use _ = usingWriteLock ()
+
+            let fcsNamespace =
                 { Types = mkNamespaceTypes reader symbolScope ns
                   NestedNamespaces = mkNestedNamespaces reader symbolScope ns }
-            )
 
-        if isNull fcsNamespace then [||] else
+            contents <- getContents (namespaces.GetOrAdd(qualifiedName, fcsNamespace))
+        )
 
-        getContents (namespaces.GetOrAdd(qualifiedName, fcsNamespace))
+        contents
 
     let rec typeParametersCount (typeElement: ITypeElement) =
         typeElement.TypeParametersCount +
@@ -1985,13 +1977,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
     member this.CreateTypeDef(clrTypeName: IClrTypeName) =
         FSharpAsyncUtil.CheckAndThrow()
-        use lock = usingWriteLock ()
 
         match typeDefs.TryGetValue(clrTypeName) with
         | NotNull typeDef -> typeDef.TypeDef
         | _ ->
 
         readData (fun _ ->
+            use lock = usingWriteLock ()
+
+            if isNotNull (typeDefs.TryGetValue(clrTypeName)) then () else
             if not (psiModule.IsValid()) then () else
 
             let symbolScope = getSymbolScope ()
@@ -2085,13 +2079,15 @@ type ProjectFcsModuleReader(psiModule: IPsiModule, cache: FcsModuleReaderCommonC
 
         member this.ILModuleDef =
             FSharpAsyncUtil.CheckAndThrow()
-            use lock = usingWriteLock ()
 
             match moduleDef with
             | Some moduleDef -> moduleDef
             | None ->
 
             readData (fun _ ->
+                use lock = usingWriteLock ()
+
+                if moduleDef.IsSome then () else
                 if not (psiModule.IsValid()) then () else
 
                 let project = psiModule.ContainingProjectModule :?> IProject

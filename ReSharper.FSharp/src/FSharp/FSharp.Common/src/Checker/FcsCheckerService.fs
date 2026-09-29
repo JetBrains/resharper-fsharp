@@ -113,7 +113,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask(true) with
         | Some (parseResults, checkResults) ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
