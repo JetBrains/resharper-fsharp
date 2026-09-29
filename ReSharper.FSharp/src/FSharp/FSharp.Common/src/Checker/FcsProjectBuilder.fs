@@ -230,7 +230,11 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               Stamp = None }
 
         let options = 
-            if not checkerService.UseTransparentCompiler then
+            if checkerService.UseTransparentCompiler then
+                let getFileSnapshot _ fileName = async {return FSharpFileSnapshot.CreateFromFileSystem(fileName)}
+                FSharpProjectSnapshot.FromOptions(projectOptions, getFileSnapshot).RunAsTask()
+                |> FcsProjectOptions.FcsProjectSnapshot
+            else
                 let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(projectOptions)
                 let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
                 let parsingOptions = { parsingOptions with
@@ -239,11 +243,6 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
                 if not errors.IsEmpty then logger.Warn("Getting parsing options: {0}", concatErrors errors)
                 FcsProjectOptions.FcsProjectOptions(projectOptions, parsingOptions)
-
-            else
-                let getFileSnapshot _ fileName = async {return FSharpFileSnapshot.CreateFromFileSystem(fileName)}
-                FSharpProjectSnapshot.FromOptions(projectOptions, getFileSnapshot).RunAsTask()
-                |> FcsProjectOptions.FcsProjectSnapshot
 
         { OutputPath = outPath
           Options = options

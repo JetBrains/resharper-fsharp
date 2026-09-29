@@ -283,7 +283,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                     scriptOptionsProvider.GetFcsProject(moduleToRemove.SourceFile)
                 else
                     checkerService.GetCachedScriptOptions(path.FullPath)
-                    |> Option.map (fun options -> FcsProject.Create(FcsProjectOptions(options, FSharpParsingOptions.Default)))
+                    |> Option.map FcsProject.CreateStubFrom
             
             match fcsProject with
             | Some fcsProject -> checkerService.InvalidateFcsProject(fcsProject, FcsProjectInvalidationType.Remove)

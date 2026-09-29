@@ -141,9 +141,9 @@ type FcsProject =
       ImplementationFilesWithSignatures: ISet<VirtualFileSystemPath>
       ReferencedModules: ISet<FcsProjectKey> }
 
-    static member Create(options) = {
-        OutputPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.Local) //TODO: remove as a redundant
-        Options = options
+    static member CreateStubFrom(options: FSharpProjectOptions) = {
+        OutputPath = VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.Local)
+        Options = FcsProjectOptions.FcsProjectOptions(options, FSharpParsingOptions.Default)
         FileIndices = Dictionary()
         ImplementationFilesWithSignatures = HashSet()
         ReferencedModules = HashSet()

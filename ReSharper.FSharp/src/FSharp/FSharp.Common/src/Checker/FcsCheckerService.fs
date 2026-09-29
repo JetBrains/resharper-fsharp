@@ -86,7 +86,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                     SourceFiles = [| path |]
                     ConditionalDefines = ImplicitDefines.scriptDefines
                     IsInteractive = true
-                    IsExe = true }
+                    IsExe = true } //TODO: language version
 
             FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
         else
@@ -109,8 +109,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
             None
 
     member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
-        let parsingOptions, fileLocation = x.FcsProjectProvider.GetParsingOptions(sourceFile)
-        x.ParseFile(fileLocation, sourceFile.Document, parsingOptions)
+        let parsingOptions = x.FcsProjectProvider.GetParsingOptions(sourceFile)
+        x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
 
     // todo: assert that no modification was done? force pin check results or allow via cookie?
     member x.ParseAndCheckFile([<NotNull>] sourceFile: IPsiSourceFile, opName,
@@ -268,7 +268,7 @@ type IFcsProjectProvider =
     abstract GetProjectOptions: psiModule: IPsiModule -> FcsProjectOptions option
 
     abstract GetFileIndex: IPsiSourceFile -> int
-    abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions * VirtualFileSystemPath
+    abstract GetParsingOptions: sourceFile: IPsiSourceFile -> FSharpParsingOptions
 
     // Indicates if implementation file has an associated signature file.
     abstract HasPairFile: IPsiSourceFile -> bool

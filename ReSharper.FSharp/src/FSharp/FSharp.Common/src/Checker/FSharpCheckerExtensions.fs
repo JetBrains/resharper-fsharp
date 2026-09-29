@@ -17,7 +17,7 @@ type CheckResults =
     | StillRunning of Task<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
 type FSharpChecker with
-    member x.ParseAndCheckDocument(sourceFile: IPsiSourceFile, fcsProject: FcsProject, allowStale, opName) =
+    member internal x.ParseAndCheckDocument(sourceFile: IPsiSourceFile, fcsProject: FcsProject, allowStale, opName) =
         let path = sourceFile.GetLocation().FullPath
         let source = sourceFile.Document.GetText()
 
@@ -73,11 +73,8 @@ type FSharpChecker with
                 let source = SourceText.ofString(source)
                 let version = source.GetHashCode()
                 match x.TryGetRecentCheckResultsForFile(path, options, source) with
-                | None ->
-                    // No stale results available, wait for fresh results
-                    return! parseAndCheckFile
-
-                //TODO: allowStale?
+                | None -> return! parseAndCheckFile
+                //TODO: allowStale really required?
                 | Some (parseResults, checkFileResults, cachedVersion) when allowStale && cachedVersion = int64 version ->
                     // Avoid queueing on the reactor thread by using the recent results
                     return Some (parseResults, checkFileResults)
@@ -85,10 +82,7 @@ type FSharpChecker with
                 | Some (staleParseResults, staleCheckFileResults, _) ->
 
                 match! tryGetFreshResultsWithTimeout() with
-                | Ready x ->
-                    // Fresh results were ready quickly enough
-                    return x
-
+                | Ready x -> return x
                 | StillRunning _ when allowStale ->
                     // Still waiting for fresh results - just use the stale ones for now
                     return Some (staleParseResults, staleCheckFileResults)
@@ -98,10 +92,6 @@ type FSharpChecker with
 
             | FcsProjectSnapshot projectSnapshot ->
                 match x.TryGetRecentCheckResultsForFile(path, projectSnapshot, userOpName = opName) with
-                | None ->
-                    // No stale results available, wait for fresh results
-                    return! parseAndCheckFile
-
-                | result ->
-                    return result
+                | None -> return! parseAndCheckFile
+                | result -> return result
         }
