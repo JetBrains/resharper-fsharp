@@ -119,18 +119,7 @@ type FcsProjectOptions =
             x.ReferencesOnDisk = y.ReferencesOnDisk && //TODO: array
             x.ReferencedProjects.Length = x.ReferencedProjects.Length &&
             (y.ReferencedProjects, y.ReferencedProjects)
-            ||> List.forall2 (fun r1 r2 ->
-                match r1, r2 with
-                | FSharpReferencedProjectSnapshot.FSharpReference (_, r1),
-                  FSharpReferencedProjectSnapshot.FSharpReference (_, r2) ->
-                    r1.Stamp = r2.Stamp
-
-                | FSharpReferencedProjectSnapshot.ILModuleReference(_, _, getReader1),
-                  FSharpReferencedProjectSnapshot.ILModuleReference(_, _, getReader2) ->
-                    getReader1 () = getReader2 ()
-
-                | _ -> false
-            )
+            ||> List.forall2 (fun r1 r2 -> arrayEq r1.Version r2.Version)
 
         | _ -> false
 
@@ -197,6 +186,7 @@ type FcsProject =
                     )
                     |> Seq.toList
 
+                //TODO: add a simpler ctor in FCS 
                 FSharpProjectSnapshot.Create(
                     projectSnapshot.ProjectFileName,
                     projectSnapshot.OutputFileName,
@@ -245,6 +235,7 @@ type FcsProject =
             for referencedProject in projectSnapshot.ReferencedProjects do
                 let stamp =
                     match referencedProject with
+                    // TODO: always None for now
                     | FSharpReferencedProjectSnapshot.FSharpReference(_, options) -> $"{options.Stamp}: "
                     | _ -> ""
                 writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
