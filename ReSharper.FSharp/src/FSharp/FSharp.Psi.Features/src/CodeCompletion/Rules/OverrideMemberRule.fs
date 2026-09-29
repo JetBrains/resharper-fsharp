@@ -26,10 +26,9 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.ProjectModel
-open JetBrains.Util
 open JetBrains.Util.NetFX.Media.Colors
 
-type OverrideBehavior(info, types, oldSigRange) =
+type OverrideBehavior(info, types) =
     inherit TextualBehavior<TextualInfo>(info)
 
     let getExpr (memberDecl: IMemberDeclaration) : IFSharpExpression =
@@ -43,15 +42,7 @@ type OverrideBehavior(info, types, oldSigRange) =
         | expr -> expr
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
-        let rangeMarker =
-            oldSigRange |> Option.map (fun r -> RangeMarker(textControl.Document, r))
-
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
-
-        rangeMarker |> Option.iter (fun marker ->
-            if marker.IsValid then
-                textControl.Document.ReplaceText(marker.Range, " ")
-        )
 
         let psiServices = solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()
@@ -264,7 +255,7 @@ module OverrideMemberRule =
 
         let isDot = isDot node
         let anchor = if isDot then memberDecl.Delimiter.NextSibling else memberDecl.MemberKeyword
-        let last, oldSigRange =
+        let last, oldSigRanges =
             if not isDot || isNull generatorContext.Anchor then
                 memberDecl.LastChild, None else
 
@@ -274,14 +265,16 @@ module OverrideMemberRule =
             if isNotNull originalMemberDecl && isNotNull originalMemberDecl.EqualsToken then
                 memberDecl.EqualsToken.GetPreviousMeaningfulSibling(),
 
-                let sigStart = node.NextSibling.GetDocumentRange().TextRange.StartOffset
-                let sigEnd = originalMemberDecl.EqualsToken.PrevSibling.GetDocumentRange().TextRange.EndOffset
-                Some (TextRange(sigStart, sigEnd))
+                let sigStart = node.NextSibling.GetDocumentRange().StartOffset
+                let sigEnd = originalMemberDecl.EqualsToken.GetPreviousMeaningfulSibling().GetDocumentRange().EndOffset
+                let sigRange = DocumentRange(&sigStart, &sigEnd)
+
+                Some (TextLookupRanges(context.Ranges.InsertRange, sigRange))
             else
                 memberDecl.LastChild, None
 
         let text = TreeRange(anchor, last).GetText()
-        let info = TextualInfo(text, text, Ranges = context.Ranges)
+        let info = TextualInfo(text, text, Ranges = (oldSigRanges |> Option.defaultValue context.Ranges))
 
         let presentationText = if isDot then mainMember.ShortName else $"{memberDecl.MemberKeyword.GetText()} {mainMember.ShortName}"
 
@@ -330,7 +323,7 @@ module OverrideMemberRule =
                 |> ignore
 
                 TextualPresentation(text, info, image = icon))
-            .WithBehavior(fun _ -> OverrideBehavior(info, types, oldSigRange))
+            .WithBehavior(fun _ -> OverrideBehavior(info, types))
             .WithTextToMatch(presentationText)
 
     let keepOnlyOverrideItems (collector: IItemsCollector) =
