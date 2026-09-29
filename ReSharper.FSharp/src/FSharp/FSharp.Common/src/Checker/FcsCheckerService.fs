@@ -74,8 +74,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
     member x.UseTransparentCompiler = useTransparentCompiler.Value
 
-    member x.GetParsingOptionsFromCommandLineArgs(projectOptions: FSharpProjectOptions) =
-        checker.Value.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+    member x.GetParsingOptionsFromCommandLineArgs(args: string list) =
+        checker.Value.GetParsingOptionsFromCommandLineArgs(args)
 
     member x.GetProjectOptionsFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
         let source = SourceTextNew.ofString(source)

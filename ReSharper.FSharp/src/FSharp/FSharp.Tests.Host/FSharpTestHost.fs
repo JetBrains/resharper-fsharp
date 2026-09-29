@@ -84,9 +84,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
             | FcsProjectSnapshot projectSnapshot -> projectSnapshot.ReferencedProjects |> Seq.map _.OutputFile
 
         outputPaths
-        |> Seq.map (fun outputPath ->
-            let outputPath = VirtualFileSystemPath.Parse(outputPath, InteractionContext.SolutionContext)
-            outputPath.NameWithoutExtension)
+        |> Seq.map (fun path -> VirtualFileSystemPath.Parse(path, InteractionContext.SolutionContext).NameWithoutExtension)
         |> List
 
     let dumpFcsModuleReader _ = assemblyReaderShim.TestDump
