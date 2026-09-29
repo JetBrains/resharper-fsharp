@@ -22,7 +22,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
@@ -366,32 +365,21 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
-    let mutable currentFcsProject = None
+    let mutable currentFcsProject: FcsProject option = None
 
     let getNewFcsProject (psiModule: IPsiModule) =
         let projectKey = FcsProjectKey.Create(psiModule)
         fcsProjectBuilder.BuildFcsProjectCore(projectKey)
 
     // todo: referenced projects
-    // todo: unify with FcsProjectProvider check
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        // let getReferencedProjectOutputs (options: FSharpProjectOptions) =
-        //     options.ReferencedProjects |> Array.map (fun project -> project.OutputFile)
-        //
-        // let newOptions = newProject.ProjectOptions
-        // let oldOptions = oldProject.ProjectOptions
-        //
-        // newOptions.ProjectFileName = oldOptions.ProjectFileName &&
-        // newOptions.SourceFiles = oldOptions.SourceFiles &&
-        // newOptions.OtherOptions = oldOptions.OtherOptions &&
-        // getReferencedProjectOutputs newOptions = getReferencedProjectOutputs oldOptions
         oldProject.AreSameForChecking(newProject)
 
     let getFcsProject (psiModule: IPsiModule) =
         lock this (fun _ ->
             let newFcsProject = getNewFcsProject psiModule
             match currentFcsProject with
-            | Some oldFcsProject when areSameForChecking newFcsProject oldFcsProject ->
+            | Some oldFcsProject when oldFcsProject.AreSameForChecking(newFcsProject) ->
                 oldFcsProject
             | _ ->
                 currentFcsProject <- Some(newFcsProject)

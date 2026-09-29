@@ -183,7 +183,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         let fcsProject =
             match fcsProject.Options with
-            | FcsProjectSnapshot _ -> fcsProject
+            | FcsProjectSnapshot _ -> fcsProject //TODO: change we change a stamp? 
             | FcsProjectOptions(projectOptions, parsingOptions) ->
 
             let stamp = Some(getNextStamp ())

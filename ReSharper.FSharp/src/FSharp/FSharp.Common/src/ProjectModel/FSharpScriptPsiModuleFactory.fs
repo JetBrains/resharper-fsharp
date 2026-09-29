@@ -280,6 +280,7 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
         |> Option.iter (fun psiModule ->
             let fcsProject =
                 if checkerService.UseTransparentCompiler then
+                    // Since ScriptFcsProjectProvider does not remove projects
                     scriptOptionsProvider.GetFcsProject(moduleToRemove.SourceFile)
                 else
                     checkerService.GetCachedScriptOptions(path.FullPath)

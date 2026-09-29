@@ -23,8 +23,8 @@ type FSharpProjectFileLanguageService(projectFileType, fsFileService: IFSharpFil
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
         | _ ->
 
-        let options = solution.GetComponent<IFcsProjectProvider>().GetParsingOptions(sourceFile)
-        FSharpPreprocessedLexerFactory(options.ConditionalDefines) :> _
+        let defines = solution.GetComponent<IFcsProjectProvider>().GetParsingOptions(sourceFile).ConditionalDefines
+        FSharpPreprocessedLexerFactory(defines) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =
