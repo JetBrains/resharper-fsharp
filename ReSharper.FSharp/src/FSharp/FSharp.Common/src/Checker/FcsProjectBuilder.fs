@@ -208,6 +208,8 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let fileIndices = Dictionary<VirtualFileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
+        let basicOptions = List.ofSeq otherOptions
+
         let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
         let paths =
             references
@@ -235,7 +237,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                 FSharpProjectSnapshot.FromOptions(projectOptions, getFileSnapshot).RunAsTask()
                 |> FcsProjectOptions.FcsProjectSnapshot
             else
-                let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(projectOptions)
+                let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(basicOptions)
                 let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
                 let parsingOptions = { parsingOptions with
                                          SourceFiles = projectOptions.SourceFiles
