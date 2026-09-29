@@ -38,8 +38,7 @@ type FSharpChecker with
                         x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
 
                     | FcsProjectSnapshot projectSnapshot ->
-                        failwith "TEST"
-                        //x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
+                        x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
 
                 return
                     match checkFileAnswer with
