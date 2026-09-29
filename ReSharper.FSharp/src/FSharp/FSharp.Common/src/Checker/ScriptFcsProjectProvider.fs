@@ -71,7 +71,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             Some sdkFolderPath.FullPath
 
         try
-            let options, errors = checkerService.GetProjectConfigFromScript(path, source, otherFlags.Value.Value, targetNetFramework, sdkDirOverride)
+            let options, errors = checkerService.GetProjectOptionsFromScript(path, source, otherFlags.Value.Value, targetNetFramework, sdkDirOverride)
             if not errors.IsEmpty then logErrors logger $"Script options for %s{path}" errors
             Some options
         with
