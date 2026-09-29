@@ -416,7 +416,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 getProjectOptions sourceFile
 
         member x.GetParsingOptions(sourceFile) =
-            if isNull sourceFile then sandboxParsingOptions, FSharpParser.SandBoxPath else
+            if isNull sourceFile then sandboxParsingOptions else
 
             let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
             let targetFrameworkId = sourceFile.PsiModule.TargetFrameworkId
@@ -452,7 +452,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
                 ConditionalDefines = defines
                 IsExe = isExe
                 IsInteractive = isScript
-                LangVersionText = "preview" }, sourceFile.GetLocation() // todo: fix language level attribute is not applied
+                LangVersionText = "preview" } // todo: fix language level attribute is not applied
 
         member x.GetFileIndex(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then 0 else
