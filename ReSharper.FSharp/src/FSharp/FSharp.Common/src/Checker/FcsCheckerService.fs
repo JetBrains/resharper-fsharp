@@ -6,6 +6,7 @@ open System
 open System.Collections.Generic
 open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
@@ -76,10 +77,13 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
     member x.GetParsingOptionsFromCommandLineArgs(projectOptions: FSharpProjectOptions) =
         checker.Value.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
 
-    member x.GetProjectConfigFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
+    member x.GetProjectOptionsFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
         let source = SourceTextNew.ofString(source)
 
         if useTransparentCompiler.Value then
+            let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            FcsProjectOptions.FcsProjectSnapshot(options), errors
+        else
             let options, errors = checker.Value.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             let parsingOptions =
                 { FSharpParsingOptions.Default with
@@ -89,9 +93,6 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                     IsExe = true } //TODO: language version
 
             FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
-        else
-            let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
-            FcsProjectOptions.FcsProjectSnapshot(options), errors
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
@@ -163,16 +164,18 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         | Some options ->
 
         let path = file.GetLocation().FullPath
+        let content = file.Document.GetText()
         logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
 
         let result =
             match options with
             | FcsProjectOptions(projectOptions, _) ->
-                match checker.Value.TryGetRecentCheckResultsForFile(path, projectOptions) with
+                match checker.Value.TryGetRecentCheckResultsForFile(path, projectOptions, SourceText.ofString(content)) with
                 | Some (_, checkResults, _) -> Some checkResults
                 | _ -> None
 
             | FcsProjectSnapshot projectSnapshot ->
+                let projectSnapshot = projectSnapshot.Replace([FSharpFileSnapshot.CreateFromString(path, content)])
                 match checker.Value.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
                 | Some (_, checkResults) -> Some checkResults
                 | _ -> None
@@ -191,7 +194,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         if not checker.IsValueCreated then () else
 
         match fcsProject.Options with
-        | FcsProjectOptions(projectOptions, parsingOptions) ->
+        | FcsProjectOptions(projectOptions, _) ->
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectOptions.ProjectFileName)
