@@ -133,8 +133,10 @@ module OverrideMemberRule =
             | repr -> repr
 
     let isObjExprInterfaceImpl (objExpr: IObjExpr) =
+        isNotNull objExpr.TypeName &&
+
         let resolvedType = objExpr.TypeName.Reference.Resolve()
-        (isNotNull resolvedType && isNotNull (resolvedType.DeclaredElement.As<IInterface>()))
+        isNotNull resolvedType && resolvedType.DeclaredElement :? IInterface
 
     let isImplementation (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) =
         if getMemberOwner context generatorContext :? IInterfaceImplementation then
@@ -232,7 +234,7 @@ module OverrideMemberRule =
     let isOverrideRuleAvailable (kind: string) context =
         let generatorContext = getGeneratorContext context
         let node = context.NodeInFile
-        let inline getExpectedKind() =
+        let getExpectedKind() =
             if isImplementation context generatorContext then
                 GeneratorStandardKinds.MissingMembers
             else GeneratorStandardKinds.Overrides
@@ -240,7 +242,7 @@ module OverrideMemberRule =
         (isWhitespace node || isDot node)
         && isNotNull generatorContext
         && isNotNull generatorContext.TypeDeclaration
-        && (kind = getExpectedKind())
+        && kind = getExpectedKind()
         && mayGenerateOverrides context generatorContext node
 
     let getOverridableElements (generatorContext: FSharpGeneratorContext) =

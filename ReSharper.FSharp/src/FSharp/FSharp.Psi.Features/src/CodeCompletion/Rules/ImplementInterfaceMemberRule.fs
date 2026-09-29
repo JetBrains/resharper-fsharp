@@ -24,18 +24,18 @@ type ImplementInterfaceMemberRule() =
         let typeElement = typeDecl.DeclaredElement
         let interfaceImpl = (getMemberOwner context generatorContext).As<IInterfaceImplementation>()
 
-        let implContext : IInterfaceImplementationContext | null =
+        let implContext =
             if isNull interfaceImpl then
                 match typeDecl with
                 | :? IObjExpr as objExpr ->
-                    InterfaceImplementationContext.Create(objExpr)
-                | _ -> null
+                    ValueSome (InterfaceImplementationContext.Create(objExpr))
+                | _ -> ValueNone
             else
-                InterfaceImplementationContext.Create(interfaceImpl)
+                ValueSome (InterfaceImplementationContext.Create(interfaceImpl))
 
         match implContext with
-        | null -> false
-        | _ ->
+        | ValueNone -> false
+        | ValueSome implContext ->
 
         let generatorElements =
             GenerateOverrides.getInterfaceMembers true implContext typeElement

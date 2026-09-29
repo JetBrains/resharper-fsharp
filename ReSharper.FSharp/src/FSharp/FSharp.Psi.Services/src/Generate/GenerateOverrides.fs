@@ -232,13 +232,8 @@ let rec getAnchorNodeInObjExpr (psiView: IPsiView) (objExpr: IObjExpr): ITreeNod
     if selectedTreeNode.GetTreeEndOffset().Offset <= withKeyword.GetTreeEndOffset().Offset then
         withKeyword else
 
-    let inline isOutOfObjExpr (node: ITreeNode) =
-        node.Contains(objExpr) ||
-        node.GetTreeStartOffset().Offset > objExpr.GetTreeEndOffset().Offset ||
-        node.GetTreeEndOffset().Offset < objExpr.GetTreeStartOffset().Offset
-
     let memberDecl = psiView.GetSelectedTreeNode<ITypeBodyMemberDeclaration>()
-    if isNotNull memberDecl && not(isOutOfObjExpr memberDecl) then
+    if isNotNull memberDecl && objExpr.Contains(memberDecl) then
         memberDecl else
 
     let interfaceImplAnchor = getAnchorNodeInInterfaceImpl psiView (flip(getAnchorNodeInObjExpr) objExpr)
@@ -494,7 +489,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     |> Seq.distinctBy _.TestDescriptor // todo: better way to check shadowing/overriding members
     |> Seq.filter (fun i -> not missingMembersOnly || i.Member.IsAbstract)
 
-let getInterfaceMembers missingMembersOnly (implContext: IInterfaceImplementationContext) (typeElement: ITypeElement) =
+let getInterfaceMembers missingMembersOnly (implContext: InterfaceImplementationContext) (typeElement: ITypeElement) =
     let psiModule = typeElement.Module
     let fcsEntity = implContext.FcsEntity
     let inst = Seq.zip fcsEntity.GenericParameters fcsEntity.GenericArguments |> List.ofSeq
