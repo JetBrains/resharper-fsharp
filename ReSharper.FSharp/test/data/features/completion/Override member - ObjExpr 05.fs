@@ -9,4 +9,3 @@ type Base<'T>() =
 { new Base<int>() with
     override this.M(s: string) = ()
     override self.{caret} }
-
