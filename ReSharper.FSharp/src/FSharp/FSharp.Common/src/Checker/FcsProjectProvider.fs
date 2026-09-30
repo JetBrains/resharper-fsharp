@@ -182,12 +182,31 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | None ->
 
         let fcsProject =
-            match fcsProject.Options with
-            | FcsProjectSnapshot _ -> fcsProject //TODO: should we change a stamp? 
-            | FcsProjectOptions(projectOptions, parsingOptions) ->
-
             let stamp = Some(getNextStamp ())
-            { fcsProject with Options = FcsProjectOptions({ projectOptions with Stamp = stamp }, parsingOptions) }
+
+            let options =
+                match fcsProject.Options with
+                | FcsProjectSnapshot snapshot ->
+                    FSharpProjectSnapshot.Create(
+                        snapshot.ProjectFileName,
+                        snapshot.OutputFileName,
+                        snapshot.ProjectId,
+                        snapshot.SourceFiles,
+                        snapshot.ReferencesOnDisk,
+                        snapshot.OtherOptions,
+                        snapshot.ReferencedProjects,
+                        snapshot.IsIncompleteTypeCheckEnvironment,
+                        snapshot.UseScriptResolutionRules,
+                        snapshot.LoadTime,
+                        snapshot.UnresolvedReferences,
+                        snapshot.OriginalLoadReferences,
+                        stamp) //TODO: put a stamp on the creating?
+                        |> FcsProjectSnapshot
+
+                | FcsProjectOptions(projectOptions, parsingOptions) ->
+                    FcsProjectOptions({ projectOptions with Stamp = stamp }, parsingOptions)
+            
+            { fcsProject with Options = options }
 
         if logger.IsTraceEnabled() then
             use writer = new StringWriter()
