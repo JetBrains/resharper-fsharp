@@ -24,6 +24,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -128,9 +129,9 @@ type FSharpExperimentalFeatures = JetBrains.ReSharper.Plugins.FSharp.Settings.FS
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpTestExperimentalSettings(settingsSchema, logger: ILogger) =
-    inherit HaveDefaultSettings<FSharpExperimentalFeatures>(settingsSchema, logger)
+    inherit HaveDefaultSettings<FSharpOptions>(settingsSchema, logger)
 
-    override this.Name = "F# default experimental settings"
+    override this.Name = "F# default FCS settings"
 
     override this.InitDefaultSettings(mountPoint) =
         let useTransparentCompiler = Environment.GetEnvironmentVariable("UseTransparentCompiler")
@@ -138,7 +139,7 @@ type FSharpTestExperimentalSettings(settingsSchema, logger: ILogger) =
 
         logger.Info("Set UseTransparentCompiler = " + useTransparentCompiler)
         this.SetValue(mountPoint,
-                      (fun (settings: FSharpExperimentalFeatures) -> settings.UseTransparentCompiler),
+                      (fun (settings: FSharpOptions) -> settings.UseTransparentCompiler),
                       Boolean.Parse(useTransparentCompiler))
 
 
