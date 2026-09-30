@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 
+open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
@@ -11,6 +12,7 @@ open JetBrains.DocumentModel
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
+open JetBrains.ReSharper.Feature.Services.ParameterInfo.Sorting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -122,6 +124,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
 
     member this.IsExtensionMember = this.ExtendedType.IsSome
     member this.Symbol = symbol
+    member this.DeclaredElement = getElement ()
 
     abstract ParameterGroups: IList<IList<'TParameter>>
     abstract XmlDoc: FSharpXmlDoc
@@ -354,6 +357,11 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
         member this.PositionalParameterCount = 0
         member this.IsFilteredOut with set _ = ()
 
+// keeps the original symbol order
+type FallbackCandidateSortStrategy private() =
+    inherit CandidateSortStrategy(Int32.MaxValue)
+    static member Instance = FallbackCandidateSortStrategy()    
+    override this.Sort(items) = ()
 
 type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
     inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, FSharpParameter>(mfv, symbolUse, fsContext)
@@ -380,6 +388,15 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
     override this.GetParamType(parameter) = parameter.Type
     override this.IsOptionalParam(parameter) = parameter.IsOptionalArg
 
+    interface ISupportsStructuredSortCandidate with
+        member this.GetStrategyAndSortItem() =
+            match this.DeclaredElement with
+            | :? IClrDeclaredElement as element ->
+                let declaredElementInstance = DeclaredElementInstance(element, element.IdSubstitution)
+                CandidateSortStrategy.GetStrategyAndSortItem(declaredElementInstance, this, FallbackCandidateSortStrategy.Instance)
+            | _ ->
+                let sortItem = SortItem("", this)
+                (FallbackCandidateSortStrategy.Instance, sortItem)
 
 [<AbstractClass>]
 type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymbol>(unionCase, symbolUse, fsContext) =
@@ -489,7 +506,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
     let documentRange = DocumentRange(&referenceEndOffset)
     let fcsRange = FSharpRangeUtil.ofDocumentRange documentRange
 
-    let candidates =
+    let mutable candidatesSource =
         let fsContext = this :> IFSharpParameterInfoContext
         symbolUses
         |> List.choose (fun item ->
@@ -548,6 +565,12 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             | :? FcsActivePatternMfvParameterInfoCandidate as c -> c.ParameterGroups.Count > 0
             | _ -> true)
         |> Array.ofList
+    
+    // StructuredSort will call the context instance back; therefore, sorting should happen after construction
+    let candidatesLazy =
+        lazy
+            CandidateSort.StructuredSort(candidatesSource, FallbackCandidateSortStrategy.Instance)
+            candidatesSource
 
     abstract ArgGroups: ParameterInfoArgument list
     abstract NamedArgs: string[]
@@ -640,11 +663,11 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             loop 0 0 args
 
         member this.ArgGroups = this.ArgGroups
-        member this.Candidates = candidates
+        member this.Candidates = candidatesLazy.Value
 
         member this.DefaultCandidate =
             let tryToFindCandidate matches =
-                candidates
+                candidatesLazy.Value
                 |> Array.tryFind (function
                     | :? IFcsParameterInfoCandidate as candidate -> matches candidate.Symbol
                     | _ -> false)
@@ -682,7 +705,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 let expr = argGroups[0].Node
                 (expr :? IParenExpr || expr :? IUnitExpr) &&
 
-                candidates
+                candidatesLazy.Value
                 |> Array.forall (function
                     :? IFcsParameterInfoCandidate as c ->
                         c.ParameterGroupCounts.Count = 1 &&
@@ -702,7 +725,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             else
                 if allowAtLastArgEnd && offset <= lastArgEnd || offset < lastArgEnd then true else
 
-                candidates
+                candidatesLazy.Value
                 |> Array.exists (function
                     | :? IFcsParameterInfoCandidate as c -> c.ParameterGroupCounts.Count > argGroupsLength
                     | _ -> false)

@@ -1,0 +1,27 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(a: uint32) : unit
+Parameter: 0 'a: uint32'
+
+(a: uint32, b: int) : unit
+Parameter: 0 'a: uint32'
+
+(a: uint32, b: int, c: int) : unit
+Parameter: 0 'a: uint32'
+
+(a: string) : unit
+Parameter: 0 'a: string'
+
+(a: string, b: int) : unit
+Parameter: 0 'a: string'
+
+(a: string, b: double) : unit
+Parameter: 0 'a: string'
+
+--- Accepted invocables: ---
+(a: uint32) : unit
+(a: uint32, b: int) : unit
+(a: uint32, b: int, c: int) : unit
+(a: string) : unit
+(a: string, b: int) : unit
+(a: string, b: double) : unit
