@@ -288,6 +288,9 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - ObjExpr - Interface 09`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr - Interface 10`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr - Interface 11`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr - Nesting 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr - Nesting 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - ObjExpr - Nesting 03`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - ObjExpr 03`` () = x.DoNamedTest()
@@ -353,6 +356,8 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - Change Overridden Member 03`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Change Overridden Member 04`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Change Overridden Member 05`` () = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Override member - Change Overridden Member 06`` () = x.DoNamedTest()
+    [<Test>] member x.``Override member - Change Overridden Member 07`` () = x.DoNamedTest()
 
     [<FSharpLanguageLevel(FSharpLanguageLevel.FSharp80)>]
     [<Test>] member x.``Hash directive - #nowarn 01``() = x.DoNamedTest()

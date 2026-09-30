@@ -100,10 +100,16 @@ module OverrideMemberRule =
         let caretCoords = getCaretCoords context
         let caretColumn = int caretCoords.Column
 
+        let typeDecl = generatorContext.TypeDeclaration
+
         let nearestInterfaceImpl =
-            match anchor with
-            | null -> null
-            | anchor -> anchor.GetContainingNode<IInterfaceImplementation>(true) 
+            let impl =
+                match anchor with
+                | null -> null
+                | anchor -> anchor.GetContainingNode<IInterfaceImplementation>(true)
+            match typeDecl with
+            | :? IObjExpr as objExpr when not(objExpr.Contains(impl)) -> null
+            | _ -> impl
 
         match nearestInterfaceImpl with
         | interfaceImpl when isNotNull interfaceImpl && caretColumn > interfaceImpl.Indent ->
@@ -117,7 +123,7 @@ module OverrideMemberRule =
 
             match repr with
             | null ->
-                match generatorContext.TypeDeclaration with
+                match typeDecl with
                 | :? IObjExpr as objExpr -> objExpr
                 | :? IFSharpTypeDeclaration as typeDecl -> typeDecl
                 | _ -> null
@@ -166,7 +172,7 @@ module OverrideMemberRule =
             | :? IFSharpTypeDeclaration as typeDecl ->
                 let repr = typeDecl.TypeRepresentation
 
-                (isNull repr || isNotNull repr && caretLine > repr.EndLine)
+                (isNull repr || caretLine > repr.EndLine)
                 &&
 
                 let equalsToken = typeDecl.EqualsToken in
@@ -214,9 +220,8 @@ module OverrideMemberRule =
             let memberDecl: IMemberDeclaration =
                 anchor.GetContainingNode<IMemberDeclaration>(true)
 
-            (token == memberDecl.Delimiter || isNull memberDecl.Delimiter) &&
-
             isNotNull memberOwner && isNotNull memberDecl
+            && (token == memberDecl.Delimiter || isNull memberDecl.Delimiter)
             && OverridableMemberDeclarationUtil.IsOverride memberDecl
             && isAligned memberOwner memberDecl
 
