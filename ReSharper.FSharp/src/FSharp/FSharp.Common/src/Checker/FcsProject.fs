@@ -2,9 +2,10 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
+open System
 open System.Collections.Generic
 open System.IO
-open System.Linq
+open FSharp.Compiler.AbstractIL.ILBinaryReader
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open JetBrains.ProjectModel
@@ -26,7 +27,11 @@ type FcsProjectKey =
         { Project = project
           TargetFrameworkId = targetFrameworkId }
 
-type FcsProjectOptions =
+type FcsReferencedProject =
+    | FcsReference of FcsProject
+    | FcsILModuleReference of x: (string * (unit -> DateTime) * (unit -> ILModuleReader))
+
+and FcsProjectOptions =
     | FcsProjectOptions of FSharpProjectOptions * FSharpParsingOptions
     | FcsProjectSnapshot of FSharpProjectSnapshot
 
@@ -123,7 +128,7 @@ type FcsProjectOptions =
 
         | _ -> false
 
-type FcsProject =
+and FcsProject =
     { OutputPath: VirtualFileSystemPath
       Options: FcsProjectOptions
       FileIndices: IDictionary<VirtualFileSystemPath, int>
@@ -149,23 +154,19 @@ type FcsProject =
     member x.AreSameForChecking(y: FcsProject) =
         x.Options.AreSameForChecking(y.Options)
 
-    member x.WithReferences(moduleReferences: FcsProjectKey seq, mapper) =
-        let moduleReferences = moduleReferences.ToArray()
+    member x.WithReferences(moduleReferences: FcsProjectKey array, mapper: FcsProjectKey -> FcsReferencedProject option) =
+        let applicableReferences = moduleReferences |> Seq.choose mapper
 
         let options =
             match x.Options with
             | FcsProjectOptions(projectOptions, parsingOptions) ->
                 let references =
-                    moduleReferences
-                    |> Seq.choose (fun x ->
-                        match mapper x with
-                        | Choice1Of3 fcsProject ->
-                            match fcsProject.Options with
-                            | FcsProjectOptions(projectOptions, _) ->
-                                FSharpReferencedProject.FSharpReference(fcsProject.OutputPath.FullPath, projectOptions) |> Some
-                            | _ -> None
-                        | Choice2Of3 foo -> FSharpReferencedProject.ILModuleReference foo |> Some
-                        | _ -> None
+                    applicableReferences
+                    |> Seq.map (function
+                        | FcsILModuleReference foo -> FSharpReferencedProject.ILModuleReference foo
+                        | FcsReference { Options = FcsProjectOptions(options, _); OutputPath = outputPath } ->
+                            FSharpReferencedProject.FSharpReference(outputPath.FullPath, options)
+                        | _ -> failwith "Expecting FcsReference with FcsProjectOptions"
                     )
                     |> Seq.toArray
 
@@ -173,16 +174,12 @@ type FcsProject =
 
             | FcsProjectSnapshot projectSnapshot ->
                 let references =
-                    moduleReferences
-                    |> Seq.choose (fun x ->
-                        match mapper x with
-                        | Choice1Of3 fcsProject ->
-                            match fcsProject.Options with
-                            | FcsProjectSnapshot(snapshot) ->
-                                FSharpReferencedProjectSnapshot.FSharpReference(fcsProject.OutputPath.FullPath, snapshot) |> Some
-                            | _ -> None
-                        | Choice2Of3 foo -> FSharpReferencedProjectSnapshot.ILModuleReference foo |> Some
-                        | _ -> None
+                    applicableReferences
+                    |> Seq.map (function
+                        | FcsILModuleReference foo -> FSharpReferencedProjectSnapshot.ILModuleReference foo
+                        | FcsReference { Options = FcsProjectSnapshot(snapshot); OutputPath = outputPath } ->
+                            FSharpReferencedProjectSnapshot.FSharpReference(outputPath.FullPath, snapshot)
+                        | _ -> failwith "Expecting FcsReference with FcsProjectSnapshot"
                     )
                     |> Seq.toList
 
@@ -235,7 +232,7 @@ type FcsProject =
             for referencedProject in projectSnapshot.ReferencedProjects do
                 let stamp =
                     match referencedProject with
-                    // TODO: always None for now
+                    // TODO: Stamp is always None for now
                     | FSharpReferencedProjectSnapshot.FSharpReference(_, options) -> $"{options.Stamp}: "
                     | _ -> ""
                 writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
