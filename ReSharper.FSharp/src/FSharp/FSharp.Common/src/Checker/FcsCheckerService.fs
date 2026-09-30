@@ -44,9 +44,6 @@ type FcsProjectInvalidationType =
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISettingsStore, locks: IShellLocks) =
-    let useTransparentCompiler =
-        lazy SettingsUtil.getValue<FSharpExperimentalFeatures, bool> settingsStore "UseTransparentCompiler"
-
     let checker =
         lazy
             Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -59,6 +56,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
             let skipImpl = getSettingProperty "SkipImplementationAnalysis"
             let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
+            let useTransparentCompiler = getSettingProperty "UseTransparentCompiler"
 
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
@@ -72,7 +70,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
-    member x.UseTransparentCompiler = useTransparentCompiler.Value
+    member x.UseTransparentCompiler = checker.Value.UsesTransparentCompiler
 
     member x.GetParsingOptionsFromCommandLineArgs(args: string list) =
         checker.Value.GetParsingOptionsFromCommandLineArgs(args)
@@ -80,7 +78,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
     member x.GetProjectOptionsFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
         let source = SourceTextNew.ofString(source)
 
-        if useTransparentCompiler.Value then
+        if x.UseTransparentCompiler then
             let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             FcsProjectOptions.FcsProjectSnapshot(options), errors
         else
