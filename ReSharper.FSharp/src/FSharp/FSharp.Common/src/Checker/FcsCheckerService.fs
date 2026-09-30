@@ -312,4 +312,4 @@ module ProjectOptions =
         // todo: use script defines in interactive?
         { FSharpParsingOptions.Default with
             ConditionalDefines = ImplicitDefines.sourceDefines
-            SourceFiles = [| "Sandbox.fs" |] } //TODO: check
+            SourceFiles = [| "Sandbox.fs" |] }

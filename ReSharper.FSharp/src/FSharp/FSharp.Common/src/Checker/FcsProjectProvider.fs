@@ -183,7 +183,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         let fcsProject =
             match fcsProject.Options with
-            | FcsProjectSnapshot _ -> fcsProject //TODO: change we change a stamp? 
+            | FcsProjectSnapshot _ -> fcsProject //TODO: should we change a stamp? 
             | FcsProjectOptions(projectOptions, parsingOptions) ->
 
             let stamp = Some(getNextStamp ())
@@ -239,26 +239,27 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     FcsProjectBuilder.getProjectConfiguration projectKey.TargetFrameworkId projectKey.Project
                     |> FcsProjectBuilder.isNullnessEnabled
 
-                let moduleReferences = moduleReferences |> Seq.choose tryGetReferencedProject
+                let moduleReferences = moduleReferences |> Seq.choose tryGetReferencedProject |> Seq.toArray
                 let fcsProject =
                     fcsProject.WithReferences(moduleReferences, fun referencedProjectKey ->
                         let referencedProject = referencedProjectKey.Project
                         if isFSharpProject referencedProject then
                             let referencedFcsProject = getOrCreateFcsProject referencedProjectKey
-                            Choice1Of3(referencedFcsProject)
+                            Some (FcsReference(referencedFcsProject))
 
                         elif fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
                             match fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey) with
-                            | None -> Choice3Of3()
+                            | None -> None
                             | Some reader ->
-                                if isNullnessEnabled then
-                                    reader.EnableNullness()
 
-                                let getTimestamp () = reader.Timestamp
-                                let getReader () = reader :> ILModuleReader
-                                Choice2Of3(reader.Path.FullPath, getTimestamp, getReader)
+                            if isNullnessEnabled then
+                                reader.EnableNullness()
 
-                        else Choice3Of3()
+                            let getTimestamp () = reader.Timestamp
+                            let getReader () = reader :> ILModuleReader
+                            Some (FcsILModuleReference(reader.Path.FullPath, getTimestamp, getReader))
+
+                        else None
                     )
 
                 if projectKey <> initialProjectKey then
