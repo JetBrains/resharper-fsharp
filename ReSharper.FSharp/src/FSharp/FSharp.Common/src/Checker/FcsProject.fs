@@ -27,11 +27,7 @@ type FcsProjectKey =
         { Project = project
           TargetFrameworkId = targetFrameworkId }
 
-type FcsReferencedProject =
-    | FcsReference of FcsProject
-    | FcsILModuleReference of x: (string * (unit -> DateTime) * (unit -> ILModuleReader))
-
-and FcsProjectOptions =
+type FcsProjectOptions =
     | FcsProjectOptions of FSharpProjectOptions * FSharpParsingOptions
     | FcsProjectSnapshot of FSharpProjectSnapshot
 
@@ -127,6 +123,10 @@ and FcsProjectOptions =
             ||> List.forall2 (fun r1 r2 -> arrayEq r1.Version r2.Version)
 
         | _ -> false
+
+type FcsReferencedProject =
+    | FcsReference of FcsProject
+    | FcsILModuleReference of x: (string * (unit -> DateTime) * (unit -> ILModuleReader))
 
 and FcsProject =
     { OutputPath: VirtualFileSystemPath
@@ -232,7 +232,6 @@ and FcsProject =
             for referencedProject in projectSnapshot.ReferencedProjects do
                 let stamp =
                     match referencedProject with
-                    // TODO: Stamp is always None for now
                     | FSharpReferencedProjectSnapshot.FSharpReference(_, options) -> $"{options.Stamp}: "
                     | _ -> ""
                 writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
