@@ -7,7 +7,7 @@
     <PackageLock Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageLock Include="JetBrains.Build.Platform.DistributedCache" Version="1.1.20250717.260" />
     <PackageLock Include="JetBrains.FSharp.Compiler.Service" Version="2026.3.2" />
-    <PackageLock Include="JetBrains.HabitatDetector" Version="1.5.0" />
+    <PackageLock Include="JetBrains.HabitatDetector" Version="1.5.1-preview.2" />
     <PackageLock Include="JetBrains.Lifetimes" Version="2026.3.2" />
     <PackageLock Include="JetBrains.NetFxBridge" Version="0.0.6" />
     <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.11.20261006.180" />
