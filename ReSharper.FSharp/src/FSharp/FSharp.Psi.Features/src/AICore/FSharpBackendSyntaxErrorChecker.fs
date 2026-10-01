@@ -25,10 +25,11 @@ type FSharpBackendSyntaxErrorChecker(checkerService: FcsCheckerService, document
         member this.IsAvailable(language) = language :? FSharpLanguage
         
         member this.CheckSyntaxErrors(lifetime, psiModule, modifiedContent, sourceFile)=
-            let parsingOptions = if isNotNull sourceFile then checkerService.FcsProjectProvider.GetParsingOptions(sourceFile) else sandboxParsingOptions
-            let path = if isNotNull sourceFile then sourceFile.GetLocation() else FSharpParser.SandBoxPath
+            let parsingOptions, path =
+                if isNull sourceFile then sandboxParsingOptions, FSharpParser.SandBoxPath
+                else checkerService.FcsProjectProvider.GetParsingOptions(sourceFile), sourceFile.GetLocation()
+
             let document = documentFactory.CreateSimpleDocumentFromText(modifiedContent, "F# Sandbox File for Syntax Check")
-            
             let parsingResult = checkerService.ParseFile(path, document, parsingOptions, noCache = true)
             
             match parsingResult with

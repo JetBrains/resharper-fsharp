@@ -1,3 +1,5 @@
+#nowarn FS0057
+
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System.Collections.Concurrent
@@ -134,29 +136,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         referencedModules.Remove(projectKey) |> ignore
         projectsToProjectKeys.Remove(projectKey.Project, projectKey) |> ignore
 
-    let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        let rec loop (newOptions: FSharpProjectOptions) (oldOptions: FSharpProjectOptions) =
-            newOptions.ProjectFileName = oldOptions.ProjectFileName &&
-            newOptions.SourceFiles = oldOptions.SourceFiles &&
-            newOptions.OtherOptions = oldOptions.OtherOptions &&
-
-            newOptions.ReferencedProjects.Length = oldOptions.ReferencedProjects.Length &&
-            (newOptions.ReferencedProjects, oldOptions.ReferencedProjects)
-            ||> Array.forall2 (fun r1 r2 ->
-                match r1, r2 with
-                | FSharpReferencedProject.FSharpReference (_, r1),
-                  FSharpReferencedProject.FSharpReference (_, r2) ->
-                    r1.Stamp = r2.Stamp
-
-                | FSharpReferencedProject.ILModuleReference(_, _, getReader1),
-                  FSharpReferencedProject.ILModuleReference(_, _, getReader2) ->
-                    getReader1 () = getReader2 ()
-
-                | _ -> false
-            )
-
-        loop newProject.ProjectOptions oldProject.ProjectOptions
-
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
         locks.AssertReadAccessAllowed()
         let projectKey = FcsProjectKey.Create(psiModule)
@@ -202,8 +181,32 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | Some fcsProject -> fcsProject
         | None ->
 
-        let stamp = Some(getNextStamp ())
-        let fcsProject = { fcsProject with ProjectOptions = { fcsProject.ProjectOptions with Stamp = stamp } }
+        let fcsProject =
+            let stamp = Some(getNextStamp ())
+
+            let options =
+                match fcsProject.Options with
+                | FcsProjectSnapshot snapshot ->
+                    FSharpProjectSnapshot.Create(
+                        snapshot.ProjectFileName,
+                        snapshot.OutputFileName,
+                        snapshot.ProjectId,
+                        snapshot.SourceFiles,
+                        snapshot.ReferencesOnDisk,
+                        snapshot.OtherOptions,
+                        snapshot.ReferencedProjects,
+                        snapshot.IsIncompleteTypeCheckEnvironment,
+                        snapshot.UseScriptResolutionRules,
+                        snapshot.LoadTime,
+                        snapshot.UnresolvedReferences,
+                        snapshot.OriginalLoadReferences,
+                        stamp) //TODO: put a stamp on the creating?
+                        |> FcsProjectSnapshot
+
+                | FcsProjectOptions(projectOptions, parsingOptions) ->
+                    FcsProjectOptions({ projectOptions with Stamp = stamp }, parsingOptions)
+            
+            { fcsProject with Options = options }
 
         if logger.IsTraceEnabled() then
             use writer = new StringWriter()
@@ -250,40 +253,33 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some moduleReferences ->
                 if fcsProjects.ContainsKey(projectKey) && projectKey <> initialProjectKey then () else
 
-                let fcsProject = fcsProjectBuilder.BuildFcsProject(projectKey)
+                let fcsProject = fcsProjectBuilder.BuildFcsProjectCore(projectKey)
                 let isNullnessEnabled =
                     FcsProjectBuilder.getProjectConfiguration projectKey.TargetFrameworkId projectKey.Project
                     |> FcsProjectBuilder.isNullnessEnabled
 
-                let referencedFcsProjects =
-                    moduleReferences
-                    |> Seq.choose tryGetReferencedProject
-                    |> Seq.choose (fun referencedProjectKey ->
+                let moduleReferences = moduleReferences |> Seq.choose tryGetReferencedProject |> Seq.toArray
+                let fcsProject =
+                    fcsProject.WithReferences(moduleReferences, fun referencedProjectKey ->
                         let referencedProject = referencedProjectKey.Project
                         if isFSharpProject referencedProject then
                             let referencedFcsProject = getOrCreateFcsProject referencedProjectKey
-                            let path = referencedFcsProject.OutputPath.FullPath
-                            Some(FSharpReferencedProject.FSharpReference(path, referencedFcsProject.ProjectOptions))
+                            Some (FcsReference(referencedFcsProject))
 
                         elif fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
-                            fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey)
-                            |> Option.map (fun reader ->
-                                if isNullnessEnabled then
-                                    reader.EnableNullness()
+                            match fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey) with
+                            | None -> None
+                            | Some reader ->
 
-                                let getTimestamp () = reader.Timestamp
-                                let getReader () = reader :> ILModuleReader
-                                FSharpReferencedProject.ILModuleReference(reader.Path.FullPath, getTimestamp, getReader)
-                            )
-                        else
-                            None
+                            if isNullnessEnabled then
+                                reader.EnableNullness()
+
+                            let getTimestamp () = reader.Timestamp
+                            let getReader () = reader :> ILModuleReader
+                            Some (FcsILModuleReference(reader.Path.FullPath, getTimestamp, getReader))
+
+                        else None
                     )
-                    |> Seq.toArray
-
-                fcsProject.ReferencedModules.AddRange(moduleReferences |> Seq.choose tryGetReferencedProject)
-
-                let optionsWithReferences = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
-                let fcsProject = { fcsProject with ProjectOptions = optionsWithReferences }
 
                 if projectKey <> initialProjectKey then
                     addProject projectKey fcsProject |> ignore
@@ -297,32 +293,10 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
         match psiModule with
         | :? FSharpScriptPsiModule as scriptModule ->
-            let path = scriptModule.Path
             let sourceFile = scriptModule.SourceFile
-            match scriptFcsProjectProvider.GetScriptOptions(sourceFile) with
-            | None -> None
-            | Some projectOptions ->
+            scriptFcsProjectProvider.GetFcsProject(sourceFile)
 
-            let parsingOptions = 
-                { FSharpParsingOptions.Default with
-                    SourceFiles = [| sourceFile.GetLocation().FullPath |]
-                    ConditionalDefines = ImplicitDefines.scriptDefines
-                    IsInteractive = true
-                    IsExe = true }
-
-            let indices = Dictionary()
-
-            { OutputPath = path
-              ProjectOptions = projectOptions
-              ParsingOptions = parsingOptions
-              FileIndices = indices
-              ImplementationFilesWithSignatures = EmptySet.Instance
-              ReferencedModules = EmptySet.Instance }
-            |> Some
-
-        | _ ->
-            tryGetFcsProject psiModule
-
+        | _ -> tryGetFcsProject psiModule
 
     let isScriptLike (file: IPsiSourceFile) =
         not file.Properties.ProvidesCodeModel ||
@@ -348,7 +322,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         | Some existingFcsProject ->
             let fcsProject = createProject projectKey
 
-            if not (areSameForChecking fcsProject existingFcsProject) then
+            if not (fcsProject.AreSameForChecking(existingFcsProject)) then
                 removeProject projectKey
                 addProject projectKey fcsProject |> ignore
 
@@ -416,7 +390,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 if invalidated.Contains(fcsProjectToInvalidate) then () else
 
                 let fcsProject, invalidationType = fcsProjectToInvalidate
-                checkerService.InvalidateFcsProject(fcsProject.ProjectOptions, invalidationType)
+                checkerService.InvalidateFcsProject(fcsProject, invalidationType)
 
                 invalidated.Add(fcsProjectToInvalidate) |> ignore
         )
@@ -495,18 +469,18 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             let psiModule = sourceFile.PsiModule
             match psiModule with
             | :? FSharpScriptPsiModule ->
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+                scriptFcsProjectProvider.GetFcsProject(sourceFile) |> Option.map _.Options
 
             | :? SandboxPsiModule ->
                 let settings = sourceFile.GetSettingsStore()
                 if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
 
-                scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+                scriptFcsProjectProvider.GetFcsProject(sourceFile) |> Option.map _.Options
 
             | _ ->
 
             match tryGetFcsProject psiModule with
-            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
+            | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.Options
             | _ -> None
 
         member x.GetProjectOptions(psiModule: IPsiModule) =
@@ -514,7 +488,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             processInvalidatedFcsProjects ()
 
             match tryGetFcsProject psiModule with
-            | Some fcsProject -> Some fcsProject.ProjectOptions
+            | Some fcsProject -> Some fcsProject.Options
             | _ -> None
 
         member x.HasPairFile(sourceFile) =
@@ -538,11 +512,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | None -> getParsingOptionsForSingleFile sourceFile false
             | Some fcsProject ->
 
-            let path = sourceFile.GetLocation().FullPath
-            if Array.contains path fcsProject.ParsingOptions.SourceFiles then
-                fcsProject.ParsingOptions
-            else
-                getParsingOptionsForSingleFile sourceFile false
+            if fcsProject.IsKnownFile(sourceFile) then fcsProject.Options.ParsingOptions
+            else getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =
             locks.AssertReadAccessAllowed()
