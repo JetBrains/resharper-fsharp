@@ -10,5 +10,4 @@ type A() =
     inherit Base<int>()
 
     override this.M(s: string) = ()
-    override _this.{caret}
-
+    override this.{caret}

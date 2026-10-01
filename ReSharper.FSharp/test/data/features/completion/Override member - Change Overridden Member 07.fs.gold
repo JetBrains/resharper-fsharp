@@ -1,0 +1,7 @@
+﻿// ${COMPLETE_ITEM:ToString()}
+// ${COMPLETION_TYPE:Insert}
+module Module
+
+type A() =
+    member _.Bar = 1
+    override x.ToString()Foo : int = failwith "preserved"{caret}

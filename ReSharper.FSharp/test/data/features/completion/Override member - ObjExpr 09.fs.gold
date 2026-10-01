@@ -1,0 +1,13 @@
+// ${COMPLETE_ITEM:override P}
+module Module
+
+[<AbstractClass>]
+type Base() =
+    abstract P: int
+    default this.P = 1
+
+type A =
+    override member x.ToString() =
+        { new Base() with
+            override this.P = base.P{caret} }
+        failwith "..."

@@ -1,0 +1,10 @@
+﻿// ${COMPLETE_ITEM:MoveNext()}
+module Module
+
+let a =
+    { new obj() with
+        override x.ToString() = "..." 
+      interface System.Collections.IEnumerator with
+        member this.Current = new obj()
+        member this.Reset() = () 
+        member this.MoveNext() = failwith "todo"{caret} }

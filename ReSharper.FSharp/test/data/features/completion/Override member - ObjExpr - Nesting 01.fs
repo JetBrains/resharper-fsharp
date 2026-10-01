@@ -1,0 +1,17 @@
+// ${COMPLETE_ITEM:override P}
+module Module
+
+[<Interface>]
+type ITest =
+    abstract Foo: unit -> obj
+
+[<AbstractClass>]
+type Base() =
+    abstract P: int
+    default this.P = 1
+
+type A =
+    interface ITest with
+        member x.Foo() =
+            { new Base() with
+                {caret} }

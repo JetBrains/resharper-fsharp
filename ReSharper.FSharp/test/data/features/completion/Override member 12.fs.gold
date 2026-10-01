@@ -10,5 +10,4 @@ type A() =
     inherit Base<int>()
 
     override this.M(s: string) = ()
-    override _this.M(var0: int): unit = failwith "todo"{caret}
-
+    override this.M(var0: int): unit = failwith "todo"{caret}
