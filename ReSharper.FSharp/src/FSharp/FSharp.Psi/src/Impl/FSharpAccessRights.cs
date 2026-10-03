@@ -170,8 +170,8 @@ public static class FSharpAccessRightUtil
         var typeModule = fsSourceTypeElement.Module;
         var contextModule = context.GetPsiModule();
         if (!typeModule.Equals(contextModule))
-          return accessRights == AccessRights.PUBLIC ||
-                 accessRights == AccessRights.INTERNAL && typeModule.AreInternalsVisibleTo(contextModule);
+          // internals visibility is already checked above by AccessUtil.IsInternalSymbolAccessible
+          return accessRights == AccessRights.PUBLIC || accessRights == AccessRights.INTERNAL;
 
         var contextSourceFile = context.GetSourceFile();
         var definingSourceFile = GetDefiningSourceFile(fsSourceTypeElement);
