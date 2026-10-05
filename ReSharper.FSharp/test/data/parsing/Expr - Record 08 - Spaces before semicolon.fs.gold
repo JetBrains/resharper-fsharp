@@ -5,7 +5,7 @@ IFSharpImplFile
       IChameleonExpression
         IRecordExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-          IRecordFieldBindingList
+          IRecordMemberBindingList
             IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)

@@ -59,6 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool CanBeMutable => true;
+    public bool IsOwnField => true;
 
     public override bool IsWritable => IsMutable;
 

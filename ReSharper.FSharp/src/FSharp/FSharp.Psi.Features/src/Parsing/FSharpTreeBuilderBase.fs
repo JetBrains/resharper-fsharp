@@ -412,27 +412,28 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, warnDirectives: W
 
     member x.ProcessSimpleTypeRepresentation(repr) =
         match repr with
-        | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
+        | SynTypeDefnSimpleRepr.Record(_, memberDecls, range) ->
             let representationMark = x.Mark(range)
 
-            if not fields.IsEmpty then
-                // todo: give a type spread - `type T2 = { ...T1 }` - a declaration of its own
-                let fieldOrSpreadRange fieldOrSpread =
-                    match fieldOrSpread with
+            if not memberDecls.IsEmpty then
+                let getMemberDeclRange memberDecl =
+                    match memberDecl with
                     | SynFieldOrSpread.Field(SynField(range = range)) -> range
                     | SynFieldOrSpread.Spread(SynTypeSpread(range = range)) -> range
 
-                let firstFieldRange = fieldOrSpreadRange fields.Head
-                let lastFieldRange = fieldOrSpreadRange (List.last fields)
+                let memberListMark = x.Mark(getMemberDeclRange memberDecls.Head)
 
-                let fieldListMark = x.Mark(firstFieldRange)
+                for memberDecl in memberDecls do
+                    match memberDecl with
+                    | SynFieldOrSpread.Field field ->
+                        x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
 
-                for fieldOrSpread in fields do
-                    match fieldOrSpread with
-                    | SynFieldOrSpread.Field field -> x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
-                    | SynFieldOrSpread.Spread _ -> ()
+                    | SynFieldOrSpread.Spread(SynTypeSpread(_, synType, range)) ->
+                        let mark = x.Mark(range)
+                        x.ProcessTypeAsTypeReferenceName(synType)
+                        x.Done(range, mark, ElementType.DECLARATION_TYPE_SPREAD)
 
-                x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_DECLARATION_LIST)
+                x.Done(memberListMark, ElementType.RECORD_MEMBER_DECLARATION_LIST)
 
             x.Done(range, representationMark, ElementType.RECORD_REPRESENTATION)
 

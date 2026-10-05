@@ -18,6 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ENUM_CASE_LIKE_DECLARATION = "";
     public const string IDS_UNION_CASE_LIKE_DECLARATION = "";
     public const string IDS_CASE_FIELD_DECLARATION = "";
+    public const string IDS_RECORD_MEMBER_DECLARATION = "";
     public const string IDS_DO_LIKE_STATEMENT = "";
     public const string IDS_OVERRIDABLE_MEMBER_DECLARATION = "";
     public const string IDS_INHERIT_MEMBER = "";
@@ -79,6 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_IF_EXPR = "";
     public const string IDS_ELSE_CLAUSE = "";
     public const string IDS_RECORD_LIKE_EXPR = "";
+    public const string IDS_RECORD_EXPR_MEMBER = "";
     public const string IDS_RANGE_LIKE_EXPR = "";
     public const string IDS_PAREN_OR_BEGIN_END_EXPR = "";
     public const string IDS_LITERAL_TOKEN = "";

@@ -78,29 +78,28 @@ let updateSignatureFieldDecl (implFieldDecl: IRecordFieldDeclaration) (signature
         ModificationUtil.ReplaceChild(signatureFieldDecl.TypeUsage, updatedTypeUsage)
         |> ignore
 
-let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
-    let signatureFieldCount = signatureRecordRepr.FieldDeclarations.Count
+let updateSignatureTypeSpread (implSpread: IDeclarationTypeSpread) (signatureSpread: IDeclarationTypeSpread) =
+    let implTypeName = implSpread.TypeName
+    let signatureTypeName = signatureSpread.TypeName
 
-    implementationRecordRepr.FieldDeclarations
-    |> Seq.iter (fun implFieldDecl ->
-        let index = implementationRecordRepr.FieldDeclarations.IndexOf(implFieldDecl)
-        
-        if index < signatureFieldCount then
-            // The signature record definition has a field at the current index
-            // The name or type might be wrong
-            let signatureFieldDecl = signatureRecordRepr.FieldDeclarations[index]
-            updateSignatureFieldDecl implFieldDecl signatureFieldDecl
-        else
-        // The signature record definition is out of fields.
-        // New ones from the implementation should be added.
+    if isNull implTypeName || isNull signatureTypeName then () else
+    if implTypeName.GetText() = signatureTypeName.GetText() then () else
+
+    ModificationUtil.ReplaceChild(signatureTypeName, implTypeName.Copy()) |> ignore
+
+let private mkSignatureMemberDecl (signatureRecordRepr: IRecordRepresentation) (implMemberDecl: IRecordMemberDeclaration) =
+    match implMemberDecl with
+    | :? IDeclarationTypeSpread as implSpread -> Some(implSpread.Copy() :> ITreeNode)
+    | :? IRecordFieldDeclaration as implFieldDecl ->
         let implementationFieldType = getFieldType implFieldDecl
         let displayContext =
             signatureRecordRepr.FieldDeclarations
             |> Seq.tryHead
             |> Option.bind getDisplayPlayContext
+            |> Option.orElseWith (fun _ -> getDisplayPlayContext implFieldDecl)
 
         match Option.both implementationFieldType displayContext with
-        | None -> ()
+        | None -> None
         | Some (implementationFieldType, displayContext) ->
 
         let recordFieldBinding =
@@ -110,16 +109,37 @@ let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) 
                 implementationFieldType
                 displayContext
 
-        let lastSignatureFieldDecl = signatureRecordRepr.FieldDeclarations.Last() :> ITreeNode
-        let newlineNode = NewLine(lastSignatureFieldDecl.GetLineEnding()) :> ITreeNode
+        Some(recordFieldBinding :> ITreeNode)
+
+    | _ -> None
+
+let updateSignatureFieldDecls (implementationRecordRepr: IRecordRepresentation) (signatureRecordRepr: IRecordRepresentation) =
+    let signatureMemberCount = signatureRecordRepr.MemberDeclarations.Count
+
+    implementationRecordRepr.MemberDeclarations
+    |> Seq.iteri (fun index implMemberDecl ->
+        if index < signatureMemberCount then
+            match implMemberDecl, signatureRecordRepr.MemberDeclarations[index] with
+            | (:? IRecordFieldDeclaration as implFieldDecl), (:? IRecordFieldDeclaration as signatureFieldDecl) ->
+                updateSignatureFieldDecl implFieldDecl signatureFieldDecl
+            | (:? IDeclarationTypeSpread as implSpread), (:? IDeclarationTypeSpread as signatureSpread) ->
+                updateSignatureTypeSpread implSpread signatureSpread
+            | _ -> ()
+        else
+        match mkSignatureMemberDecl signatureRecordRepr implMemberDecl with
+        | None -> ()
+        | Some newMemberDecl ->
+
+        let lastSignatureMemberDecl = signatureRecordRepr.MemberDeclarations.Last() :> ITreeNode
+        let newlineNode = NewLine(lastSignatureMemberDecl.GetLineEnding()) :> ITreeNode
         let spaces =
-            let startPos = lastSignatureFieldDecl.GetDocumentStartOffset().ToDocumentCoords()
+            let startPos = lastSignatureMemberDecl.GetDocumentStartOffset().ToDocumentCoords()
             Whitespace(Convert.ToInt32(startPos.Column))
 
-        addNodesAfter lastSignatureFieldDecl [| newlineNode; spaces; recordFieldBinding |]
+        addNodesAfter lastSignatureMemberDecl [| newlineNode; spaces; newMemberDecl |]
         |> ignore
     )
 
-    if signatureFieldCount > implementationRecordRepr.FieldDeclarations.Count then
-        [ implementationRecordRepr.FieldDeclarations.Count .. (signatureFieldCount - 1) ]
-        |> List.iter (fun idx -> signatureRecordRepr.FieldDeclarations.Item idx |> deleteChild)
+    if signatureMemberCount > implementationRecordRepr.MemberDeclarations.Count then
+        [ implementationRecordRepr.MemberDeclarations.Count .. (signatureMemberCount - 1) ]
+        |> List.iter (fun idx -> signatureRecordRepr.MemberDeclarations.Item idx |> deleteChild)

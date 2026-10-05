@@ -21,6 +21,11 @@ type CSharpResolveTest() =
     [<Test>] member x.``Records 07 - Field compiled name ignored``() = x.DoNamedTest()
     [<Test>] member x.``Records 08 - Interfaces``() = x.DoNamedTest()
     [<Test>] member x.``Records 09 - Private representation``() = x.DoNamedTest()
+    [<Test>] member x.``Records 10 - Spread``() = x.DoNamedTest()
+    [<Test>] member x.``Records 11 - Spread abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Records 12 - Spread generic``() = x.DoNamedTest()
+    [<Test>] member x.``Records 13 - Spread generic abbreviation``() = x.DoNamedTest()
+    [<Test>] member x.``Records 14 - Spread cycle``() = x.DoNamedTest()
 
     [<Test>] member x.``Exceptions 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 02 - Single field``() = x.DoNamedTest()

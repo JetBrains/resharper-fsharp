@@ -314,3 +314,5 @@ type FSharpRenameTest() =
     [<Test>] member x.``Dot lambda 01 - Property``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash type usage 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Record - Field 01``() = x.DoNamedTest()

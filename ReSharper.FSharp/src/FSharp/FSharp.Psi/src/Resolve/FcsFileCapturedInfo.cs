@@ -226,6 +226,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           if (IsPropertyGetter(resolvedSymbols.Declarations.TryGetValue(startOffset)?.SymbolUse))
             continue;
 
+          if (symbol is FSharpField && resolvedSymbols.Uses.TryGetValue(startOffset) is { SymbolUse.Symbol: FSharpEntity })
+            continue;
+
           resolvedSymbols.Declarations[startOffset] = new FcsResolvedSymbolUse(symbolUse, textRange);
           resolvedSymbols.Uses.Remove(startOffset);
         }
