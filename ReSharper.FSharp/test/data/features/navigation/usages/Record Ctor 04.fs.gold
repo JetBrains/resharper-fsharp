@@ -1,0 +1,34 @@
+﻿## ShowUsagesProvider activity:
+  Async context menu shown `Usages of 'R3'`:
+    TO: [O] let _ = |{ r with A = 1 }| RANGE: (161,177) @ Record Ctor 04.fs
+    Menu item (enabled) :
+      icon: UsageInstanceCreation
+      text: Module      <font color="FFD5A286">let _ = **{ r with A = 1 }</font>**<font color="06C"> (16)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let _ = **{ r with A = 1 }**
+    Navigation result:
+      opened file: Record Ctor 04.fs
+      ------------------
+
+      let r: R3 = Unchecked.defaultof<_>
+      let _ = |CARET|{ r with A = 1 }
+
+      ------------------
+
+    TO: [O] let r: |R3| = Unchecked.defaultof<_> RANGE: (125,127) @ Record Ctor 04.fs
+    Menu item (enabled) :
+      icon: UsageOther
+      text: Module.r      <font color="FFD5A286">let r: **R3** = Unchecked.defaultof<_></font><font color="06C"> (15)</font>
+      tail: <font color="FF6D6D6D">in <Root Namespace></font>
+      tooltip: let r: **R3** = Unchecked.defaultof<_>
+    Navigation result:
+      opened file: Record Ctor 04.fs
+      ------------------
+
+
+      let r: |CARET|R3 = Unchecked.defaultof<_>
+      let _ = { r with A = 1 }
+
+      ------------------
+
+

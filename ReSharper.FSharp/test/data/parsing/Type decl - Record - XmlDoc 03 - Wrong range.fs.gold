@@ -17,7 +17,7 @@ IFSharpImplFile
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
-          IRecordFieldDeclarationList
+          IRecordMemberDeclarationList
             IRecordFieldDeclaration
               XmlDocBlock
                 DocComment(type:LINE_COMMENT, text:/// F2)

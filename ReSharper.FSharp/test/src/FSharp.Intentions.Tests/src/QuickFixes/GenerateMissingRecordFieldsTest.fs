@@ -36,6 +36,11 @@ type GenerateMissingRecordFieldsTest() =
     [<Test>] member x.``Multiline 09 - Only middle``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 10``() = x.DoNamedTest()
 
+    [<Test>] member x.``Spread 01``() = x.DoNamedTest()
+    [<Test>] member x.``Spread 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Spread 03 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Spread 04 - Argument``() = x.DoNamedTest()
+
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
 
     [<Test>] member x.``Unresolved field 01``() = x.DoNamedTest()

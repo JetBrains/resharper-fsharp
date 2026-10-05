@@ -173,7 +173,7 @@ let getMatchLikeExprIncompleteRange (expr: IMatchLikeExpr) =
     treeNode.GetHighlightingRange()
 
 let getNestedRecordUpdateRange (outer: IRecordFieldBinding) (inner: IRecordFieldBinding) =
-    let recordExpr = RecordExprNavigator.GetByFieldBinding(inner)
+    let recordExpr = RecordExprNavigator.GetByMember(inner)
     getTreeNodesDocumentRange outer.EqualsToken recordExpr.WithKeyword
 
 let getQualifierExprOrThisRange (expr: IFSharpExpression) =

@@ -1,0 +1,3 @@
+module Module
+
+{ A = 1; ...r }{caret}
