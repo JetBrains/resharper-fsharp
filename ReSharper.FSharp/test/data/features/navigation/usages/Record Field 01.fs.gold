@@ -1,0 +1,13 @@
+﻿## ShowUsagesProvider activity:
+  Immediate result:
+    TO: [W] let _ = { r with |A| = 1 } RANGE: (170,171) @ Record Field 01.fs
+    Navigation result:
+      opened file: Record Field 01.fs
+      ------------------
+
+      let r: R3 = Unchecked.defaultof<_>
+      let _ = { r with |CARET|A = 1 }
+
+      ------------------
+
+

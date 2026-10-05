@@ -585,8 +585,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           ElementType.EXPRESSION_REFERENCE_NAME,
           ElementType.TYPE_REFERENCE_NAME,
 
-          ElementType.RECORD_FIELD_BINDING_LIST,
-          ElementType.RECORD_FIELD_DECLARATION_LIST,
+          ElementType.RECORD_MEMBER_BINDING_LIST,
+          ElementType.RECORD_MEMBER_DECLARATION_LIST,
 
           ElementType.UNION_CASE_FIELD_DECLARATION,
 
@@ -1074,6 +1074,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             .HasType(ElementType.RECORD_FIELD_BINDING)
             .Satisfies((node, _) => ((IRecordFieldBinding) node.Node).Semicolon != null),
           Right().HasType(ElementType.RECORD_FIELD_BINDING))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      // todo: drop when FCS reports the block separator of a spread
+      Describe<FormattingRule>()
+        .Name("SpaceAfterRecordMemberSemicolon")
+        .Where(
+          Parent().HasType(ElementType.RECORD_MEMBER_BINDING_LIST),
+          Left().In(FSharpTokenType.SEMICOLON),
+          Right().In(ElementBitsets.RECORD_EXPR_MEMBER_BIT_SET))
         .Return(IntervalFormatType.Space)
         .Build();
 

@@ -12,7 +12,7 @@ IFSharpImplFile
         IRecordRepresentation
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldDeclarationList
+          IRecordMemberDeclarationList
             IRecordFieldDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:F)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
@@ -44,7 +44,7 @@ IFSharpImplFile
           IRecordExpr
             FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IRecordFieldBindingList
+            IRecordMemberBindingList
               IRecordFieldBinding
                 IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:F)

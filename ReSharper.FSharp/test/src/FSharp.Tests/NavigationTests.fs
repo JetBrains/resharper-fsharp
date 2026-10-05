@@ -41,9 +41,11 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Custom op 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Record Ctor 01 - Source``() = x.DoNamedTest()
-
     [<TestReferenceProjectOutput("FSharpRecord")>]
     [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
+    [<Test>] member x.``Record Ctor 03``() = x.DoNamedTest()
+    [<Test>] member x.``Record Ctor 04``() = x.DoNamedTest()
+    [<Test>] member x.``Record Field 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Anon record 01 - Ctor``() = x.DoNamedTest()
     [<Test>] member x.``Anon record 02 - Type``() = x.DoNamedTest()
@@ -197,6 +199,7 @@ type FSharpGoToDeclarationTest() =
 
     [<Test>] member x.``Record - Field 01``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Record - Field 02``() = x.DoNamedTestWithSignature()
+    [<Test>] member x.``Record - Field 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Union - Case - Empty 01 - Expr``() = x.DoNamedTestWithSignature()
     [<Test>] member x.``Union - Case - Empty 02 - Pattern``() = x.DoNamedTestWithSignature()

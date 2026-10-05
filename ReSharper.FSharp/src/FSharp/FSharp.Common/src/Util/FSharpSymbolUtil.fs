@@ -263,6 +263,11 @@ module FcsEntityInstance =
         { Entity = fcsEntity
           Substitution = substitution }
 
+    [<CompiledName("OfEntity")>]
+    let ofEntity (fcsEntity: FSharpEntity) =
+        { Entity = fcsEntity
+          Substitution = Seq.zip fcsEntity.GenericParameters fcsEntity.GenericArguments |> Seq.toList }
+
 
 type FcsMfvInstance =
     { Mfv: FSharpMemberOrFunctionOrValue

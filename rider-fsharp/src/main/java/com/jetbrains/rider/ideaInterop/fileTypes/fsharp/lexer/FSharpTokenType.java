@@ -96,6 +96,7 @@ public interface FSharpTokenType {
   IElementType COLON_QMARK = createToken("COLON_QMARK");
   IElementType COLON_GREATER = createToken("COLON_GREATER");
   IElementType DOT_DOT = createToken("DOT_DOT");
+  IElementType DOT_DOT_DOT = createToken("DOT_DOT_DOT");
   IElementType COLON_COLON = createToken("COLON_COLON");
   IElementType COLON_EQUALS = createToken("COLON_EQUALS");
   IElementType SEMICOLON_SEMICOLON = createToken("SEMICOLON_SEMICOLON");

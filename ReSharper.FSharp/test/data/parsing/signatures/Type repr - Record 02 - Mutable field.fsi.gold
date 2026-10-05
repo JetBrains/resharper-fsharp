@@ -18,7 +18,7 @@ IFSharpSigFile
         IRecordRepresentation
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldDeclarationList
+          IRecordMemberDeclarationList
             IRecordFieldDeclaration
               FSharpTokenType+MutableTokenElement(type:MUTABLE, text:mutable)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

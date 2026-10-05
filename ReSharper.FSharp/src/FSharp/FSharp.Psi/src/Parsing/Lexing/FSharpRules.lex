@@ -148,6 +148,7 @@ COLON_QMARK_GREATER=":?>"
 COLON_QMARK=":?"
 COLON_GREATER=":>"
 DOT_DOT=\.\.
+DOT_DOT_DOT=\.\.\.
 COLON_COLON="::"
 COLON_EQUALS=":="
 SEMICOLON_SEMICOLON=";;"
@@ -310,6 +311,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {QUOTE}               { RiseFromParenLevel(0); return MakeToken(QUOTE); }
 <SYMBOLIC_OPERATOR> {COLON_GREATER}       { RiseFromParenLevel(0); return MakeToken(COLON_GREATER); }
 <SYMBOLIC_OPERATOR> {DOT_DOT}             { RiseFromParenLevel(0); return MakeToken(DOT_DOT); }
+<SYMBOLIC_OPERATOR> {DOT_DOT_DOT}         { RiseFromParenLevel(0); return MakeToken(DOT_DOT_DOT); }
 <SYMBOLIC_OPERATOR> {EQUALS}              { RiseFromParenLevel(0); return MakeToken(EQUALS); }
 <SYMBOLIC_OPERATOR> {UNDERSCORE}          { RiseFromParenLevel(0); return MakeToken(UNDERSCORE); }
 <SYMBOLIC_OPERATOR> {MINUS}               { RiseFromParenLevel(0); return MakeToken(MINUS); }
@@ -465,6 +467,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, TYPE_APP, INIT_TYPE_APP> {HASH}          { return MakeToken(HASH); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {COLON_GREATER} { return MakeToken(COLON_GREATER); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {DOT_DOT}       { return MakeToken(DOT_DOT); }
+<LINE, TYPE_APP, INIT_TYPE_APP> {DOT_DOT_DOT}   { return MakeToken(DOT_DOT_DOT); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {EQUALS}        { return MakeToken(EQUALS); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {UNDERSCORE}    { return MakeToken(UNDERSCORE); }
 <LINE, TYPE_APP, INIT_TYPE_APP> {MINUS}         { return MakeToken(MINUS); }

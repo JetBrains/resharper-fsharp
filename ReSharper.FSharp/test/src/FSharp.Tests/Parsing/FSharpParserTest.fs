@@ -130,6 +130,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Union 07 - FullType 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 07 - FullType 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Record - Spread 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 03``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 04``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 05``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - XmlDoc 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - XmlDoc 02 - Attribute``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - XmlDoc 03 - Wrong range``() = x.DoNamedTest()
@@ -239,6 +244,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Anon record 03 - With copy info``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Record - Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 01 - Single Line``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 02 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
@@ -495,6 +504,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Paren - App 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Paren - App 02``() = x.DoNamedTest()
     [<Test>] member x.``Types - Paren - App 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Record - Anon - Spread 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Type app 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Type app 02 - ML-style``() = x.DoNamedTest()
@@ -853,6 +864,8 @@ type FSharpErrorsParserTest() =
 
     [<Test>] member x.``Expr - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Spread 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Yield 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Yield - Seq 01``() = x.DoNamedTest() // Parsed as application by FCS
@@ -899,6 +912,8 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Type decl - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Record - Ctor 02 - As``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record - Spread 02``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union - No bar - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl 01``() = x.DoNamedTest()

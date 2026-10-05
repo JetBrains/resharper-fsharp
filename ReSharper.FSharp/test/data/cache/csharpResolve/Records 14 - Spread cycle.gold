@@ -1,0 +1,13 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    Module.A a = null;
+    var x = a.X;
+    var y = a.Y;
+  }
+}
+
+---------------------------------------------------------
+P:Module.A.X
+P:Module.A.Y

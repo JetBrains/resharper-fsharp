@@ -10,7 +10,7 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
     inherit FSharpQuickFixBase()
     
     let recordFieldDeclaration =
-        let recordRepresentation = RecordRepresentationNavigator.GetByFieldDeclaration(error.RecordFieldDeclaration)
+        let recordRepresentation = RecordRepresentationNavigator.GetByMemberDeclaration(error.RecordFieldDeclaration)
         if isNull recordRepresentation then None else
         Some recordRepresentation
 
@@ -28,7 +28,7 @@ type UpdateRecordFieldTypeInSignatureFix(error: FieldNotContainedTypesDifferErro
         | None -> ()
         | Some signatureRecordRepr ->
 
-        if implementationRecordRepr.FieldDeclarations.Count <> signatureRecordRepr.FieldDeclarations.Count then
+        if implementationRecordRepr.MemberDeclarations.Count <> signatureRecordRepr.MemberDeclarations.Count then
             updateSignatureFieldDecls implementationRecordRepr signatureRecordRepr
         else
 

@@ -47,6 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           result.Add(new FSharpGeneratedConstructorFromFields(typePart));
           if (recordPart.CliMutable && typePart is Class.IClassPart)
             result.Add(new DefaultConstructor(typeElement));
+          result.AddRange(recordPart.Fields.OfType<IFSharpRecordField>().Where(field => !field.IsOwnField));
           break;
 
         case IFSharpExceptionPart exceptionPart:

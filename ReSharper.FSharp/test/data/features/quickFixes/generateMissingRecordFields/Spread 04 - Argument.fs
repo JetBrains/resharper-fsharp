@@ -1,0 +1,7 @@
+type R1 = { A: int; B: int }
+type R2 = { ...R1; C: int }
+
+let f (r: R2) = ()
+
+let r1: R1 = Unchecked.defaultof<_>
+f {caret}{ ...r1 }

@@ -940,10 +940,10 @@ type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-        | SynExpr.Record(baseInfo, copyInfo, fields, _) ->
+        | SynExpr.Record(baseInfo, copyInfo, recordMembers, _) ->
             x.PushRange(range, ElementType.RECORD_EXPR)
-            if not fields.IsEmpty then
-                x.PushStep(fields, recordBindingListRepresentationProcessor)
+            if not recordMembers.IsEmpty then
+                x.PushStep(recordMembers, recordBindingListRepresentationProcessor)
 
             match baseInfo, copyInfo with
             | Some(typeName, expr, _, _, _), _ ->
@@ -1388,65 +1388,73 @@ type FSharpExpressionTreeBuilder(lexer, document, warnDirectives, lifetime, path
         withKeyword |> Option.iter x.AdvanceToEnd
         x.PushStepList(memberDefns, objectExpressionMemberListProcessor)
 
-    member x.ProcessRecordFieldBindingList(fields: SynExprRecordFieldOrSpread list) =
-        let fieldsRange =
-            match fields.Head, List.last fields with
-            | SynExprRecordFieldOrSpread.Field(SynExprRecordField((lid, _), _, _, _), _),
-              SynExprRecordFieldOrSpread.Field(SynExprRecordField(_, _, Some(fieldValue), _), _) ->
-                Range.unionRanges lid.Range fieldValue.Range
+    member x.ProcessRecordFieldBindingList(recordMembers: SynExprRecordFieldOrSpread list) =
+        let memberStartRange recordMember =
+            match recordMember with
+            | SynExprRecordFieldOrSpread.Field(SynExprRecordField(fieldName = (lid, _)), _) -> lid.Range
+            | SynExprRecordFieldOrSpread.Spread(SynExprSpread(range = range), _) -> range
 
-            | SynExprRecordFieldOrSpread.Field(SynExprRecordField((lid, _), _, _, _), _), _ -> lid.Range
+        let memberEndRange recordMember =
+            match recordMember with
+            | SynExprRecordFieldOrSpread.Field(SynExprRecordField(expr = Some(ExprRange range)), _) -> range
+            | recordMember -> memberStartRange recordMember
 
-            // todo: give a spread expression - `{ ...expr }` - a binding of its own
-            | SynExprRecordFieldOrSpread.Spread(SynExprSpread(range = range), _), _ -> range
+        let membersRange =
+            Range.unionRanges (memberStartRange recordMembers.Head) (memberEndRange (List.last recordMembers))
 
-        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
-        x.PushStepList(fields, recordFieldBindingListProcessor)
+        x.PushRange(membersRange, ElementType.RECORD_MEMBER_BINDING_LIST)
+        x.PushStepList(recordMembers, recordFieldBindingListProcessor)
 
     member x.ProcessAnonRecordFieldBindingList(fields: SynExprAnonRecordFieldOrSpread list) =
         let fieldsRange = Range.unionRanges fields.Head.Range (List.last fields).Range
 
-        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
+        x.PushRange(fieldsRange, ElementType.RECORD_MEMBER_BINDING_LIST)
         x.PushStepList(fields, anonRecordFieldBindingListProcessor)
 
     member x.ProcessAnonRecordFieldBinding(fieldOrSpread: SynExprAnonRecordFieldOrSpread) =
         match fieldOrSpread with
-        // todo: give a spread expression - `{| ...expr |}` - a binding of its own
-        | SynExprAnonRecordFieldOrSpread.Spread _ -> ()
-        | SynExprAnonRecordFieldOrSpread.Field(SynExprAnonRecordField(lid, _, (ExprRange range as expr), _), _) ->
+        | SynExprAnonRecordFieldOrSpread.Spread(SynExprSpread(_, expr, range), blockSep) ->
+            let mark = x.Mark(range)
+            x.PushRangeForMark(range, mark, ElementType.EXPR_TYPE_SPREAD)
+            x.PushRecordBlockSep(blockSep)
+            x.ProcessExpression(expr)
 
-        // Start node at id range, end at expr range.
-        let mark = x.Mark(lid.Range)
-        x.PushRangeForMark(range, mark, ElementType.RECORD_FIELD_BINDING)
-        x.MarkAndDone(lid.Range, ElementType.EXPRESSION_REFERENCE_NAME)
-        x.ProcessExpression(expr)
+        | SynExprAnonRecordFieldOrSpread.Field(SynExprAnonRecordField(lid, _, (ExprRange range as expr), _), _) ->
+            // Start node at id range, end at expr range.
+            let mark = x.Mark(lid.Range)
+            x.PushRangeForMark(range, mark, ElementType.RECORD_FIELD_BINDING)
+            x.MarkAndDone(lid.Range, ElementType.EXPRESSION_REFERENCE_NAME)
+            x.ProcessExpression(expr)
 
     member x.ProcessRecordFieldBinding(fieldOrSpread: SynExprRecordFieldOrSpread) =
         match fieldOrSpread with
-        // todo: give a spread expression - `{ ...expr }` - a binding of its own
-        | SynExprRecordFieldOrSpread.Spread _ -> ()
-        | SynExprRecordFieldOrSpread.Field(SynExprRecordField((lid, _), equalsRange, expr, _), blockSep) ->
-
-        let (LidWithTrivia lid) = lid
-        match lid, expr with
-        | SynIdentWithTriviaRange headRange :: _, Some(ExprRange exprRange as expr) ->
-            let mark = x.Mark(headRange)
-            x.PushRangeForMark(exprRange, mark, ElementType.RECORD_FIELD_BINDING)
+        | SynExprRecordFieldOrSpread.Spread(SynExprSpread(_, expr, range), blockSep) ->
+            let mark = x.Mark(range)
+            x.PushRangeForMark(range, mark, ElementType.EXPR_TYPE_SPREAD)
             x.PushRecordBlockSep(blockSep)
-            x.ProcessReferenceName(lid)
             x.ProcessExpression(expr)
 
-        | SynIdentWithTriviaRange headRange :: _, _ ->
-            let mark = x.Mark(headRange)
-            let bindingRange = 
-                match equalsRange with
-                | Some range -> range
-                | _ -> headRange
-            x.PushRangeForMark(bindingRange, mark, ElementType.RECORD_FIELD_BINDING)
-            x.PushRecordBlockSep(blockSep)
-            x.ProcessReferenceName(lid)
+        | SynExprRecordFieldOrSpread.Field(SynExprRecordField((lid, _), equalsRange, expr, _), blockSep) ->
+            let (LidWithTrivia lid) = lid
+            match lid, expr with
+            | SynIdentWithTriviaRange headRange :: _, Some(ExprRange exprRange as expr) ->
+                let mark = x.Mark(headRange)
+                x.PushRangeForMark(exprRange, mark, ElementType.RECORD_FIELD_BINDING)
+                x.PushRecordBlockSep(blockSep)
+                x.ProcessReferenceName(lid)
+                x.ProcessExpression(expr)
 
-        | _ -> ()
+            | SynIdentWithTriviaRange headRange :: _, _ ->
+                let mark = x.Mark(headRange)
+                let bindingRange = 
+                    match equalsRange with
+                    | Some range -> range
+                    | _ -> headRange
+                x.PushRangeForMark(bindingRange, mark, ElementType.RECORD_FIELD_BINDING)
+                x.PushRecordBlockSep(blockSep)
+                x.ProcessReferenceName(lid)
+
+            | _ -> ()
 
     member x.PushRecordBlockSep(blockSep) =
         match blockSep with

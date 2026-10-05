@@ -103,7 +103,7 @@ module FSharpIntroduceVariable =
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
         | :? IRecordFieldBinding as fieldBinding ->
-            let recordExpr = RecordLikeExprNavigator.GetByFieldBinding(fieldBinding)
+            let recordExpr = RecordLikeExprNavigator.GetByMember(fieldBinding)
             getExprToInsertBefore recordExpr
 
         | :? ILocalBinding as binding when
