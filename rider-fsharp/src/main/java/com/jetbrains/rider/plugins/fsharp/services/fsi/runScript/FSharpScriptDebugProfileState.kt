@@ -11,6 +11,8 @@ import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost
 import com.jetbrains.rider.plugins.fsharp.services.fsi.FsiProcessHandler
 import com.jetbrains.rider.run.DebugProfileStateBase
 import com.jetbrains.rider.run.IDotNetDebugProfileState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class FSharpScriptDebugProfileState(
     private val environment: ExecutionEnvironment,
@@ -28,10 +30,11 @@ class FSharpScriptDebugProfileState(
         val presentableCommandLineString =
             if (wrappedState is DebugProfileStateBase) wrappedState.createPresentableCommandLine() else null
 
-        val fsiRunner = fsiHost.createConsoleRunner(
-            "", environment.project, environment.executor, workerCmd, presentableCommandLineString
-        )
-
+        val fsiRunner = withContext(Dispatchers.IO) {
+            fsiHost.createConsoleRunner(
+                "", environment.project, environment.executor, workerCmd, presentableCommandLineString
+            )
+        }
         return DebuggerWorkerProcessHandler(fsiRunner.processHandler, protocolModel, attached, workerCmd.commandLineString, projectLifetime)
     }
 
