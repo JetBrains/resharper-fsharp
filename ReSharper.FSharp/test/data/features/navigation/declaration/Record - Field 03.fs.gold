@@ -1,0 +1,18 @@
+﻿Running test case at line 4 col 8
+=================================================
+Running test case at line 16 col 19
+=================================================
+  ## GotoDeclarationProvider activity:
+    Immediate result:
+      TO: [O] { |A|: int } RANGE: (31,32) @ Record - Field 03.fs
+      Navigation result:
+        opened file: Record - Field 03.fs
+        ------------------
+
+        type R1 =
+            { |CARET|A: int }
+
+        type R2 =
+        ------------------
+
+

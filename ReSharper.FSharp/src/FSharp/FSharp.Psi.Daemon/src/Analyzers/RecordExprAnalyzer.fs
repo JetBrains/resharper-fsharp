@@ -46,7 +46,7 @@ type RecordExprAnalyzer() =
         if isNull copyExpr then produceHighlighting fieldsChainMatch previousFieldBinding consumer else
 
         let fieldBindings = recordExpr.FieldBindings
-        let singleField = fieldBindings.SingleItem
+        let singleField = if recordExpr.Members.Count = 1 then fieldBindings.SingleItem else null
         let hasFieldsMatch =
             isNotNull previousFieldBinding &&
             compareFieldWithNextCopyExpr previousCopyExpr previousFieldBinding.ReferenceName copyExpr

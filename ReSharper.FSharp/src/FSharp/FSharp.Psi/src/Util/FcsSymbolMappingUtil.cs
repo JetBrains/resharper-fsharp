@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -178,7 +179,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
 
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is { } fieldEntity)
-          return GetTypeElement(fieldEntity, psiModule)?.EnumerateOwnMembersWithName(field.Name, true).FirstOrDefault();
+        {
+          var typeElement = fieldEntity.GetTypeElement(psiModule);
+          var fieldMember = typeElement?.EnumerateOwnMembersWithName(field.Name, true).FirstOrDefault();
+          if (fieldMember is FSharpRecordFieldFromSpread fieldFromSpread)
+            return fieldFromSpread.OriginElement;
+
+          return fieldMember;
+        }
       }
 
       if (symbol is FSharpActivePatternCase patternCase)

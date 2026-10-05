@@ -678,18 +678,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static IList<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
     {
+      return GetRecordFields(typeElement).Select(p => p.ShortName).AsIList();
+    }
+
+    public static IEnumerable<IProperty> GetRecordFields([NotNull] this ITypeElement typeElement)
+    {
       switch (typeElement)
       {
         case IFSharpSourceTypeElement fsTypeElement:
-          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsIList() ??
-                 EmptyList<string>.InstanceList;
+          return fsTypeElement.GetPart<IRecordPart>()?.Fields.OfType<IProperty>() ?? EmptyList<IProperty>.Instance;
 
-        case ICompiledElement _:
-          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsIList();
+        case ICompiledTypeElement compiledTypeElement:
+          return GetCompiledRecordFields(compiledTypeElement);
 
         default:
-          return EmptyArray<string>.Instance;
+          return EmptyList<IProperty>.Instance;
       }
+    }
+
+    public static IList<IProperty> GetCompiledRecordFields([NotNull] this ICompiledTypeElement compiledTypeElement)
+    {
+      return compiledTypeElement.Properties.Where(p => p.IsCompiledFSharpField()).AsIList();
     }
 
     public static bool IsModule(this ITypeElement typeElement) => typeElement is IFSharpModule;

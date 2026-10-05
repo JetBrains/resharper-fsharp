@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public int Index =>
-      RecordFieldDeclarationListNavigator.GetByFieldDeclaration(this)?.FieldDeclarationsEnumerable.IndexOf(this) ?? -1;
+      RecordMemberDeclarationListNavigator.GetByMemberDeclaration(this)?.MemberDeclarationsEnumerable.IndexOf(this) ?? -1;
 
     public void SetType(IType type)
     {

@@ -168,6 +168,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Binary expr alignment 02 - Pipe operator``() = x.DoNamedTest()
     [<Test>] member x.``Record expr alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Record expr alignment 02 - Copy``() = x.DoNamedTest()
+    [<Test>] member x.``Record expr alignment 03 - Spread``() = x.DoNamedTest()
+    [<Test>] member x.``Record expr spread 01 - Single line``() = x.DoNamedTest()
     [<Test>] member x.``Anon record expr alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Anon record expr alignment 02 - Copy``() = x.DoNamedTest()
 

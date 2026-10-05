@@ -11,7 +11,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WithTokenElement(type:WITH, text:with)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldBindingList
+          IRecordMemberBindingList
             IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)

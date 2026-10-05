@@ -675,6 +675,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Record - Field 05``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 06``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record - Field 07``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record - Field 08 - Spread``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Module 01``() = x.DoNamedTest()
 

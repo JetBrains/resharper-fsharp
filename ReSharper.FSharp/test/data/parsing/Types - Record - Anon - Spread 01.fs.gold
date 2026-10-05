@@ -1,0 +1,33 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ILetBindingsDeclaration
+      ITopBinding
+        FSharpTokenType+LetTokenElement(type:LET, text:let)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IWildPat
+          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        IReturnTypeInfo
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAnonRecordTypeUsage
+            FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+DotDotDotTokenElement(type:DOT_DOT_DOT, text:...)
+            FSharpIdentifierToken(type:IDENTIFIER, text:A)
+            FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IAnonRecordField
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+BarRbraceTokenElement(type:BAR_RBRACE, text:|})
+        IChameleonExpression
+          IFromErrorExpr
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

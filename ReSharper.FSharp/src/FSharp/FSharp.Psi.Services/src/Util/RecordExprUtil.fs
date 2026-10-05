@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -16,29 +17,49 @@ open JetBrains.ReSharper.Resources.Shell
 
 let [<Literal>] MaxBindingsAmountOnSingleLine = 4
 
+// todo: drop the sibling case when FCS reports the block separator of a spread
+let private getSemicolon (recordMember: IRecordExprMember): ITreeNode =
+    match recordMember.Semicolon with
+    | null ->
+        match recordMember.NextSibling with
+        | node when getTokenType node == FSharpTokenType.SEMICOLON -> node
+        | _ -> null
+    | semicolon -> semicolon
+
 let toMultiline (recordExpr: IRecordExpr) =
     let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
     use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
 
-    let bindings = recordExpr.FieldBindings
-    let firstBinding = bindings[0]
+    let recordMembers = recordExpr.Members
+    let firstMember = recordMembers[0]
 
-    for binding in bindings do
-        if binding != firstBinding then
-            match binding.PrevSibling with
-            | Whitespace node -> ModificationUtil.ReplaceChild(node, NewLine(lineEnding)) |> ignore
-            | node -> ModificationUtil.AddChildAfter(node, NewLine(lineEnding)) |> ignore
-
-            ModificationUtil.AddChildBefore(binding, Whitespace(firstBinding.Indent)) |> ignore
-
-        match binding.Semicolon with
+    for recordMember in recordMembers do
+        match getSemicolon recordMember with
         | null -> ()
         | semicolon -> ModificationUtil.DeleteChild(semicolon)
 
-let private addSemicolon (binding: IRecordFieldBinding) =
-    if isNull binding.Semicolon then
-        match binding.Expression with
+    for recordMember in recordMembers do
+        if recordMember != firstMember then
+            match recordMember.PrevSibling with
+            | Whitespace node -> ModificationUtil.ReplaceChild(node, NewLine(lineEnding)) |> ignore
+            | node when getTokenType node == FSharpTokenType.NEW_LINE -> ()
+            | node -> ModificationUtil.AddChildAfter(node, NewLine(lineEnding)) |> ignore
+
+            ModificationUtil.AddChildBefore(recordMember, Whitespace(firstMember.Indent)) |> ignore
+
+let getSpreadFieldNames (spread: IExprTypeSpread) =
+    match spread.Expression with
+    | null -> Seq.empty
+    | expr ->
+
+    match expr.TryGetFcsType() |> Option.ofObj |> Option.bind tryGetAbbreviatedTypeEntity with
+    | Some fcsEntity when fcsEntity.IsFSharpRecord -> fcsEntity.FSharpFields |> Seq.map (fun field -> field.Name)
+    | _ -> Seq.empty
+
+let private addSemicolon (recordMember: IRecordExprMember) =
+    if isNull (getSemicolon recordMember) then
+        match recordMember.Expression with
         | null -> failwith "Could not get expr"
         | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
 
@@ -85,6 +106,41 @@ let private createUnorderedIndexedBindings (bindings: TreeNodeCollection<IRecord
 
     bindingsIndexed
 
+let private getLastLeadingSpread (recordExpr: IRecordExpr) =
+    recordExpr.Members
+    |> Seq.takeWhile (fun recordMember -> recordMember :? IExprTypeSpread)
+    |> Seq.tryLast
+    |> Option.toObj
+
+let private addBindingAfter (previousMember: IRecordExprMember) (binding: IRecordFieldBinding) generateSingleLine =
+    if generateSingleLine then
+        addSemicolon previousMember
+
+    let anchor: ITreeNode =
+        if generateSingleLine then
+            previousMember
+        else
+            getLastMatchingNodeAfter isInlineSpaceOrComment previousMember
+
+    let addedBinding =
+        // Nodes after block comments are not automatically moved to the new line, fixing it
+        if (not generateSingleLine) && anchor.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
+            let newLineNode = NewLine(binding.GetLineEnding())
+            let insertedNewLine = ModificationUtil.AddChildAfter(anchor, newLineNode)
+            ModificationUtil.AddChildAfter(insertedNewLine, binding)
+        else
+            ModificationUtil.AddChildAfter(anchor, binding)
+
+    if not generateSingleLine && previousMember :? IExprTypeSpread &&
+            getTokenType addedBinding.PrevSibling != FSharpTokenType.NEW_LINE then
+        match addedBinding.PrevSibling with
+        | Whitespace node -> ModificationUtil.ReplaceChild(node, NewLine(addedBinding.GetLineEnding())) |> ignore
+        | _ -> ModificationUtil.AddChildBefore(addedBinding, NewLine(addedBinding.GetLineEnding())) |> ignore
+
+        ModificationUtil.AddChildBefore(addedBinding, Whitespace(previousMember.Indent)) |> ignore
+
+    addedBinding
+
 let private generateBindingsImpl (recordExpr: IRecordExpr) (indexedBindings: IRecordFieldBinding[]) (declaredFields: IList<string>)
         (generateSingleLine: bool) (elementFactory: IFSharpElementFactory) : seq<IRecordFieldBinding> =
 
@@ -99,31 +155,19 @@ let private generateBindingsImpl (recordExpr: IRecordExpr) (indexedBindings: IRe
 
             let actualBinding =
                 if fieldIndex = 0 then
-                    if isNull recordExpr.FieldBindingList then
-                        let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
+                    if isNull recordExpr.MemberList then
+                        let bindingList = RecordMemberBindingListNavigator.GetByMember(binding)
                         let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
-                        actualList.FieldBindings.First()
+                        actualList.Members.First() :?> IRecordFieldBinding
                     else
-                        let anchor = recordExpr.FieldBindingList.FieldBindings.First()
-                        ModificationUtil.AddChildBefore(anchor, binding)
+                        match getLastLeadingSpread recordExpr with
+                        | null ->
+                            let anchor = recordExpr.MemberList.Members.First()
+                            ModificationUtil.AddChildBefore(anchor, binding)
+                        | spread ->
+                            addBindingAfter spread binding generateSingleLine
                 else
-                    let anchor: ITreeNode =
-                        let indexedBinding = indexedBindings[fieldIndex - 1]
-                        if generateSingleLine then
-                            indexedBinding
-                        else
-                            getLastMatchingNodeAfter isInlineSpaceOrComment indexedBinding
-
-                    let resultingNode =
-                        // Nodes after block comments are not automatically moved to the new line, fixing it
-                        if (not generateSingleLine) && anchor.GetTokenType() == FSharpTokenType.BLOCK_COMMENT then
-                            let newLineNode = NewLine(binding.GetLineEnding())
-                            let insertedNewLine = ModificationUtil.AddChildAfter(anchor, newLineNode)
-                            ModificationUtil.AddChildAfter(insertedNewLine, binding)
-                        else
-                            ModificationUtil.AddChildAfter(anchor, binding)
-
-                    resultingNode
+                    addBindingAfter indexedBindings[fieldIndex - 1] binding generateSingleLine
 
             indexedBindings[fieldIndex] <- actualBinding
             generatedBindings.AddLast(actualBinding) |> ignore
@@ -149,7 +193,17 @@ let private generateUnorderedBindings recordExpr (existingBindings: TreeNodeColl
 let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr) : IRecordFieldBinding seq =
     Assertion.Assert(recordTypeElement.IsFSharpRecord(), "Expecting record type")
 
-    let fieldNames = recordTypeElement.GetRecordFieldNames()
+    let spreads = recordExpr.TypeSpreads
+
+    let spreadFieldNames = HashSet<string>()
+    for spread in spreads do
+        spreadFieldNames.UnionWith(getSpreadFieldNames spread)
+
+    let fieldNames =
+        recordTypeElement.GetRecordFieldNames()
+        |> Seq.filter (spreadFieldNames.Contains >> not)
+        |> Array.ofSeq
+
     let existingBindings = recordExpr.FieldBindings
 
     let fieldsToAdd = HashSet(fieldNames)
@@ -162,13 +216,14 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
     use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
 
     let isSingleLine = recordExpr.IsSingleLine
+    let memberCount = recordExpr.Members.Count
 
     let generateSingleLine =
         isSingleLine &&
-        existingBindings.Count > 1 &&
-        fieldNames.Count <= MaxBindingsAmountOnSingleLine
+        memberCount > 1 &&
+        fieldNames.Length + spreads.Count <= MaxBindingsAmountOnSingleLine
 
-    if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
+    if isSingleLine && not generateSingleLine && memberCount > 0 then
         toMultiline recordExpr
 
     let areBindingsOrdered = areBindingsOrdered existingBindings fieldNames
@@ -179,39 +234,40 @@ let generateBindings (recordTypeElement: ITypeElement) (recordExpr: IRecordExpr)
         else
             generateUnorderedBindings recordExpr existingBindings fieldsToAdd generateSingleLine elementFactory
 
-    let existingBindings = recordExpr.FieldBindings
+    let recordMembers = recordExpr.Members
 
     if generateSingleLine then
-        let lastBinding = existingBindings.Last()
-        ModificationUtil.DeleteChild(lastBinding.Semicolon)
+        match getSemicolon (recordMembers.Last()) with
+        | null -> ()
+        | semicolon -> ModificationUtil.DeleteChild(semicolon)
 
-        for binding in existingBindings do
-            if binding.NextSibling :? IRecordFieldBinding then
-                ModificationUtil.AddChildAfter(binding, Whitespace()) |> ignore
+        for recordMember in recordMembers do
+            if recordMember.NextSibling :? IRecordExprMember then
+                ModificationUtil.AddChildAfter(recordMember, Whitespace()) |> ignore
     else
         let mutable isFirstBinding = true
         for binding in generatedBindings do
-            if isFirstBinding && generatedBindings.First() == existingBindings.FirstOrDefault() then
+            if isFirstBinding && generatedBindings.First() == recordMembers.FirstOrDefault() then
                 isFirstBinding <- false
             else
                 if getTokenType binding.PrevSibling == FSharpTokenType.NEW_LINE then
-                    ModificationUtil.AddChildBefore(binding, Whitespace(existingBindings[0].Indent)) |> ignore
+                    ModificationUtil.AddChildBefore(binding, Whitespace(recordMembers[0].Indent)) |> ignore
 
             let nextMeaningfulSibling = binding.GetNextMeaningfulSibling()
-            if nextMeaningfulSibling :? IRecordFieldBinding &&
+            if nextMeaningfulSibling :? IRecordExprMember &&
                     getTokenType binding.NextSibling != FSharpTokenType.NEW_LINE then
                 addNodesAfter binding [
                     NewLine(binding.GetLineEnding())
-                    Whitespace(existingBindings[0].Indent)
+                    Whitespace(recordMembers[0].Indent)
                 ] |> ignore
 
     let rightBrace = recordExpr.RightBrace
 
     match rightBrace.PrevSibling with
-    | :? IRecordFieldBindingList ->
+    | :? IRecordMemberBindingList ->
         ModificationUtil.AddChildBefore(rightBrace, Whitespace()) |> ignore
     | :? Whitespace as ws when ws.GetTextLength() > 1 ->
-        if skipMatchingNodesBefore isInlineSpace rightBrace :? IRecordFieldBindingList then
+        if skipMatchingNodesBefore isInlineSpace rightBrace :? IRecordMemberBindingList then
             let first = getFirstMatchingNodeBefore isInlineSpace rightBrace
             replaceRangeWithNode first rightBrace.PrevSibling (Whitespace())
     | _ -> ()

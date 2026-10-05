@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.FSharpCompletionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -31,7 +32,7 @@ type RecordFieldRule() =
     let getRecordExprFromFieldReference (reference: FSharpSymbolReference) =
         let referenceName = reference.GetElement().As<IExpressionReferenceName>()
         let fieldBinding = RecordFieldBindingNavigator.GetByReferenceName(referenceName)
-        RecordExprNavigator.GetByFieldBinding(fieldBinding)
+        RecordExprNavigator.GetByMember(fieldBinding)
 
     let getRecordReference (context: FSharpCodeCompletionContext) =
         match context.FcsCompletionContext.CompletionContext with
@@ -113,15 +114,20 @@ type RecordFieldRule() =
             )
 
         let usedNames =
-            let bindings = 
-                match expr with
-                | :? IRecordExpr as recordExpr -> recordExpr.FieldBindings
-                | _ -> TreeNodeCollection.Empty
+            match expr with
+            | :? IRecordExpr as recordExpr ->
+                let usedNames =
+                    recordExpr.FieldBindings
+                    |> Seq.choose (fun fieldBinding -> Option.ofObj fieldBinding.ReferenceName)
+                    |> Seq.map (fun referenceName -> referenceName.ShortName)
+                    |> HashSet
 
-            bindings
-            |> Seq.choose (fun fieldBinding -> Option.ofObj fieldBinding.ReferenceName)
-            |> Seq.map (fun referenceName -> referenceName.ShortName)
-            |> HashSet
+                for spread in recordExpr.TypeSpreads do
+                    usedNames.UnionWith(RecordExprUtil.getSpreadFieldNames spread)
+
+                usedNames
+
+            | _ -> HashSet()
 
         let removedFields = List()
 

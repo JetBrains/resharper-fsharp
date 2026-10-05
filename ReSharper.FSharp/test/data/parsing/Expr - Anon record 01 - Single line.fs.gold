@@ -6,7 +6,7 @@ IFSharpImplFile
         IAnonRecordExpr
           FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldBindingList
+          IRecordMemberBindingList
             IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:F)

@@ -104,6 +104,7 @@
         <Token name="COMMA" representation="," />
         <Token name="RARROW" representation="->" />
         <Token name="DOT_DOT" representation=".." />
+        <Token name="DOT_DOT_DOT" representation="..." />
         <Token name="DOT" representation="." />
         <Token name="COLON" representation=":" />
         <Token name="COLON_GREATER" representation=":>" />

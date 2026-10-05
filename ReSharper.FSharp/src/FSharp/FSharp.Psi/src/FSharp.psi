@@ -646,7 +646,9 @@ interface recordLikeExpr:
   recordExpr;
 
 anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="FieldBindings" path=<anonRecordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
+  get { methodName="Members" path=<anonRecordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> };
+  get { methodName="FieldBindings" path=<anonRecordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> returnType="IRecordFieldBinding" };
+  get { methodName="TypeSpreads" path=<anonRecordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> returnType="IExprTypeSpread" };
 }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
@@ -654,7 +656,7 @@ anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
     fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordFieldBindingList<BINDING_LIST, FieldBindingList>
+  recordMemberBindingList<MEMBER_LIST, MemberList>
   BAR_RBRACE;
 
 arrayExpr options { stubBase="FSharpExpressionBase"; }:
@@ -668,7 +670,9 @@ listExpr options { stubBase="FSharpExpressionBase"; }:
   RBRACK;
 
 recordExpr options { stubBase="ReferenceOwnerExprBase"; } extras {
-  get { methodName="FieldBindings" path=<recordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
+  get { methodName="Members" path=<recordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> };
+  get { methodName="FieldBindings" path=<recordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> returnType="IRecordFieldBinding" };
+  get { methodName="TypeSpreads" path=<recordExpr:MEMBER_LIST/recordMemberBindingList:BINDING> returnType="IExprTypeSpread" };
 }:
   LBRACE<LBRACE, LeftBrace>
   (
@@ -683,15 +687,24 @@ recordExpr options { stubBase="ReferenceOwnerExprBase"; } extras {
        fSharpExpression<EXPR, InheritCtorArgExpression>
      )
   )?
-  recordFieldBindingList<BINDING_LIST, FieldBindingList>
+  recordMemberBindingList<MEMBER_LIST, MemberList>
   RBRACE<RBRACE, RightBrace>;
 
-recordFieldBindingList:
-  recordFieldBinding<BINDING, FieldBindings>*;
+recordMemberBindingList:
+  recordExprMember<BINDING, Members>*;
+
+interface recordExprMember:
+  recordFieldBinding |
+  exprTypeSpread;
 
 recordFieldBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS<FSHARP_EQUALS, EqualsToken>
+  fSharpExpression<EXPR, Expression>
+  SEMICOLON<FSHARP_SEMI, Semicolon>?;
+
+exprTypeSpread:
+  DOT_DOT_DOT
   fSharpExpression<EXPR, Expression>
   SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
@@ -1127,15 +1140,21 @@ enumCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; 
 
 
 recordRepresentation options { stubBase="TypeRepresentationBase"; } extras {
-  get { methodName="FieldDeclarations" path=<recordRepresentation:FIELD_DECLARATION_LIST/recordFieldDeclarationList:FIELD_DECLARATION> };
+  get { methodName="MemberDeclarations" path=<recordRepresentation:MEMBER_DECLARATION_LIST/recordMemberDeclarationList:MEMBER_DECLARATION> };
+  get { methodName="FieldDeclarations" path=<recordRepresentation:MEMBER_DECLARATION_LIST/recordMemberDeclarationList:MEMBER_DECLARATION> returnType="IRecordFieldDeclaration" };
+  get { methodName="TypeSpreads" path=<recordRepresentation:MEMBER_DECLARATION_LIST/recordMemberDeclarationList:MEMBER_DECLARATION> returnType="IDeclarationTypeSpread" };
 }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   LBRACE<LEFT_BRACE, LeftBrace>
-  recordFieldDeclarationList<FIELD_DECLARATION_LIST, FieldDeclarationList>
+  recordMemberDeclarationList<MEMBER_DECLARATION_LIST, MemberDeclarationList>
   RBRACE<RIGHT_BRACE, RightBrace>;
 
-recordFieldDeclarationList:
-  recordFieldDeclaration<FIELD_DECLARATION, FieldDeclarations>*;
+recordMemberDeclarationList:
+  recordMemberDeclaration<MEMBER_DECLARATION, MemberDeclarations>*;
+
+interface recordMemberDeclaration:
+  recordFieldDeclaration |
+  declarationTypeSpread;
 
 recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1146,6 +1165,10 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   COLON<FSHARP_COLON, Colon>
   typeUsage<TYPE, TypeUsage>;
 
+declarationTypeSpread:
+  DOT_DOT_DOT
+  typeReferenceName<TYPE_REFERENCE, TypeName>
+  SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
 unionRepresentation options { stubBase="TypeRepresentationBase"; }:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?

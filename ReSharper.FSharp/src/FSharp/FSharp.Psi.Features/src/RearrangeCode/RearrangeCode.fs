@@ -140,9 +140,9 @@ type RearrangeableLambdaParamPatternProvider() =
 
 [<RearrangeableElementType>]
 type RearrangeableRecordFieldDeclarationProvider() =
-    inherit FSharpRearrangeableSimpleSwap<IRecordFieldDeclaration, IRecordFieldDeclarationList>(
-        "record field declaration", Direction.All, RecordFieldDeclarationListNavigator.GetByFieldDeclaration,
-        fun l -> l.FieldDeclarationsEnumerable)
+    inherit FSharpRearrangeableSimpleSwap<IRecordMemberDeclaration, IRecordMemberDeclarationList>(
+        "record field declaration", Direction.All, RecordMemberDeclarationListNavigator.GetByMemberDeclaration,
+        fun l -> l.MemberDeclarationsEnumerable)
 
 [<RearrangeableElementType>]
 type RearrangeableFunctionParameterProvider() =
