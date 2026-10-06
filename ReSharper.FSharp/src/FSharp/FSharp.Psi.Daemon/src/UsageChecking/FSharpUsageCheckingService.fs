@@ -18,6 +18,7 @@ type FSharpUsageCheckingServices(lifetime, suppressors) =
     let _ = FSharpLanguage.Instance // workaround to create assembly reference (dotnet/fsharp#3522)
 
     override x.CreateUnusedLocalDeclarationAnalyzer(_, _, _) = null
+    override this.UseUnknownLanguageStage = false
 
 
 type FSharpCollectUsagesPsiFileProcessor(collectUsagesStageProcess, daemonProcess, settingsStore,
