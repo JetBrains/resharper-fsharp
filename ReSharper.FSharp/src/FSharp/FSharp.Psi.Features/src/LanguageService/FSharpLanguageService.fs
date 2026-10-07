@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Symbols
@@ -8,7 +8,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Compiled

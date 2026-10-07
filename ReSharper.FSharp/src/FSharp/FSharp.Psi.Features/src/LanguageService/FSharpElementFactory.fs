@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open System.Runtime.InteropServices
 open FSharp.Compiler.Syntax
@@ -37,7 +37,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, [<NotNull>] c
 
         let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         let context = if context.IsValid() then context else null
-        SandBox.CreateSandBoxWithContextFor(fsFile, psiModule, context)
+        SandBox.CreateSandBoxWithContextFor(fsFile, psiModule, context) |> ignore
         fsFile
 
     let createFileWithModule source =

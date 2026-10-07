@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open JetBrains.ReSharper.Feature.Services.Clipboard
 open JetBrains.ReSharper.Plugins.FSharp.Psi

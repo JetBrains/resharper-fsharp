@@ -69,7 +69,7 @@ module FcsProjectProvider =
         ProjectModelChangeType.REFERENCE_TARGET
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
-[<ZoneMarker(typeof<ISinceClr4HostZone>)>]
+[<ZoneMarker(typeof<ISinceClr4HostZone>, typeof<IFSharpPluginZone>)>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
         checkerService: FcsCheckerService, fcsProjectBuilder: FcsProjectBuilder,
         scriptFcsProjectProvider: IScriptFcsProjectProvider,
@@ -616,6 +616,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 /// Invalidates psi caches when either a non-F# project or F# project containing generative type providers is built
 /// which makes FCS cached resolve results stale
 [<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
 type OutputAssemblyChangeInvalidator(lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon,
         psiFiles: IPsiFiles, fcsProjectProvider: IFcsProjectProvider, typeProvidersShim: ITypeProvidersShim,
         fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>) =

@@ -59,8 +59,10 @@
     <Compile Include="src\Shim\AssemblyReader\IFcsAssemblyReaderShim.fs" />
     <Compile Include="src\Shim\AssemblyReader\FcsModuleReaderCommonCache.fs" />
     <Compile Include="src\Shim\AssemblyReader\ProjectFcsModuleReader.fs" />
+    <Compile Include="src\Shim\AssemblyReader\ZoneMarker.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FcsCheckerService.fs" />
+    <Compile Include="src\Checker\LightweightFcsProjectProvider.fs" />
     <Compile Include="src\Checker\ZoneMarker.fs" />
     <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
@@ -69,6 +71,7 @@
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
+    <Compile Include="src\Shim\FileSystem\ZoneMarker.fs" />
     <Compile Include="src\Shim\AssemblyReader\AssemblyReaderShim.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersClient.fs" />
     <Compile Include="src\Shim\TypeProviders\TypeProvidersShim.fs" />

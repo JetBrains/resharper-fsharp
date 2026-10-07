@@ -8,6 +8,7 @@ open System.Runtime.InteropServices
 open FSharp.Compiler.CodeAnalysis
 open Internal.Utilities.Library
 open JetBrains.Application
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
@@ -36,6 +37,10 @@ open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
+type ZoneMarker() = class end
+
 
 type FSharpScriptInvalidationEvent = { PsiModule: FSharpScriptPsiModule; IsRemoved: bool }
 

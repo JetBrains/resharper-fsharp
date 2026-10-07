@@ -1,6 +1,7 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open System.Runtime.InteropServices
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Resources
 
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
 [<DeclaredElementIconProvider>]
 type FSharpDeclaredElementIconProvider() =
     let privateCase = compose PsiSymbolsThemedIcons.EnumMember.Id PsiSymbolsThemedIcons.ModifiersPrivate.Id

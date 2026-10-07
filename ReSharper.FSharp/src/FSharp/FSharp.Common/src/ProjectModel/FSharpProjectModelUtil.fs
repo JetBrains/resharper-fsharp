@@ -1,9 +1,11 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.FSharpProjectModelUtil
 
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -29,6 +31,7 @@ let getReferencedModules (psiModule: IPsiModule) =
 module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")
 
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type ModulePathProvider(moduleReferencesResolveStore: IModuleReferencesResolveStore) =
     abstract GetModulePath: reference: IProjectToModuleReference -> VirtualFileSystemPath option

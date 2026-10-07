@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Application;
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Properties;
@@ -8,6 +9,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi;
 
+[ZoneMarker(typeof(IFSharpPluginZone))]
 [ShellComponent(Instantiation.DemandAnyThreadSafe)]
 public class FSharpViewPresenterExtension : ProjectModelViewPresenterExtension
 {

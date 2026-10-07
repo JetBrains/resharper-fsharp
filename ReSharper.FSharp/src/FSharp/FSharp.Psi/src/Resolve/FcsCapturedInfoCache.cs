@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 using JetBrains.Application.ContentModel;
+using JetBrains.Application.BuildScript.Application.Zones;
 using JetBrains.Application.Parts;
 using JetBrains.Application.Progress;
 using JetBrains.Application.Threading;
@@ -24,6 +25,7 @@ using JetBrains.Util.Concurrency.Threading;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
+  [ZoneMarker(typeof(IFSharpPluginZone))]
   [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class FcsCapturedInfoCache : IPsiSourceFileCacheWithForksSupport, IPsiSourceFileInvalidatingCache, IFcsCapturedInfoCache
   {

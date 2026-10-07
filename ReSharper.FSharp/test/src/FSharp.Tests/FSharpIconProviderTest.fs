@@ -3,7 +3,7 @@
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
