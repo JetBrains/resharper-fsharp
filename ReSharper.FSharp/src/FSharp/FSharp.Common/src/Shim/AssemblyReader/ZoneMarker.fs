@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Host
+namespace JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
 
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ReSharper.Plugins.FSharp

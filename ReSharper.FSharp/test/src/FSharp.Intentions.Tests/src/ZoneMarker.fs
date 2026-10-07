@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Build.Nunit
 open NUnit.Framework
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 [<assembly: Apartment(ApartmentState.STA)>]
 [<assembly: NUnitRunTestsOnNetFrameworkOrMonoRuntime>]

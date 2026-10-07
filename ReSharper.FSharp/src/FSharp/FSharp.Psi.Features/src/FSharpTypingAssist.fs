@@ -1,4 +1,4 @@
-module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
+module rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.TypingAssist
 
 open System
 open System.Collections.Generic
@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

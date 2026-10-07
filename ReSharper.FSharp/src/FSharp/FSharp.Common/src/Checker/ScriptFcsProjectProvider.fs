@@ -4,6 +4,7 @@ open System
 open System.Collections.Concurrent
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
@@ -18,6 +19,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.Util
 
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
 [<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerService: FcsCheckerService,
         scriptSettings: FSharpScriptSettingsProvider, toolset: ISolutionToolset, locks: IShellLocks) =

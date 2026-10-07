@@ -195,8 +195,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     public override string Name => "Todo";
   }
 
-  [ZoneMarker]
-  public class ZoneMarker : IRequire<IProjectModelZone>, IRequire<ILanguageFSharpZone>
+  [ZoneMarker(typeof(IFSharpPsiZone))]
+  public class ZoneMarker : IRequire<IProjectModelZone>
   {
   }
 }

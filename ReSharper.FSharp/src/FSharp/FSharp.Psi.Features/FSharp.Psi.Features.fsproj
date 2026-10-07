@@ -104,6 +104,7 @@
     <Compile Include="src\PostfixTemplates\WithPostfixTemplate.fs" />
     <Compile Include="src\RearrangeCode\RearrangeCode.fs" />
     <Compile Include="src\RunMarkers\FSharpRunMarkerProvider.fs" />
+    <Compile Include="src\LanguageService\ZoneMarker.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />

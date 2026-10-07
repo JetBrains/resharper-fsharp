@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Comment
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Comment
 
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Comment

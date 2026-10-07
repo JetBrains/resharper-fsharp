@@ -1,6 +1,7 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open System.Runtime.InteropServices
+open JetBrains.Application
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Plugins.FSharp
@@ -28,6 +29,7 @@ type FSharpProjectFileLanguageService(projectFileType, fsFileService: IFSharpFil
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =
+            BackendMode.IsLightweight ||
             // todo: use items container instead
             isCompileService.IsCompile(projectFile, sourceFile) ||
             fsFileService.IsScriptLike(sourceFile) ||

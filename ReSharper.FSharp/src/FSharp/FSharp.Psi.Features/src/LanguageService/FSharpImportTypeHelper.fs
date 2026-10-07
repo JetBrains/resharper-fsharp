@@ -1,8 +1,10 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open System.Collections.Generic
+open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
@@ -17,6 +19,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
+[<ZoneMarker(typeof<IFSharpPluginZone>)>]
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
     let isApplicable (context: IFSharpReferenceOwner) =
