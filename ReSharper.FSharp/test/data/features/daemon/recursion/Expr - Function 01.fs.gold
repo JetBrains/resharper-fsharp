@@ -1,0 +1,18 @@
+﻿module Module
+
+let rec f1 x = function
+    | 0 -> ()
+    | n -> |f1|(0) x (n - 1)
+
+let rec f2 x =
+    fun y -> |f2|(1) x y
+
+let rec f3 x =
+    match x with
+    | 0 -> ()
+    | n -> |f3|(2) (n - 1)
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Recursion: Recursion in tail position
+(2): Recursion: Recursion in tail position

@@ -102,7 +102,7 @@ type RecursiveInvocationAnalyzer() =
                         else
                             FSharpRecursionGutterHighlighting.CreatePartialRecursion(refExpr)
                     else
-                        let appExpr = getOutermostPrefixAppExpr refExpr
+                        let appExpr = getOutermostAppExpr refExpr
                         if FSharpResolveUtil.isInTailRecursivePosition context.DeclaredElement appExpr then
                             FSharpRecursionGutterHighlighting.CreateRecursion(refExpr) else
 

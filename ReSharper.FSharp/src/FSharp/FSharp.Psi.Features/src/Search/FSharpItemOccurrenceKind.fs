@@ -173,7 +173,7 @@ type FSharpItemOccurenceKindProvider() =
                     | false, true -> [| FSharpOccurrenceKinds.partialRecursiveApplication |] :> _
 
                     | true, true ->
-                        let appExpr = getOutermostPrefixAppExpr refExpr
+                        let appExpr = getOutermostAppExpr refExpr
                         if FSharpResolveUtil.isInTailRecursivePosition element appExpr then
                             [| FSharpOccurrenceKinds.recursiveInvocation |] :> _
                         else

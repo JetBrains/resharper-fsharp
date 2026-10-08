@@ -1,0 +1,30 @@
+﻿Other
+---
+UsageOther TO: [O] let rec |f| x = RANGE: (23,24) @ Recursion 12.fs
+UsageOther TO: [O] let rec f |x| = RANGE: (25,26) @ Recursion 12.fs
+UsageOther TO: [O] |x| > 0 && f (x - 1) RANGE: (33,34) @ Recursion 12.fs
+UsageOther TO: [O] x |>| 0 && f (x - 1) RANGE: (35,36) @ Recursion 12.fs
+UsageOther TO: [O] x > 0 |&&| f (x - 1) RANGE: (39,41) @ Recursion 12.fs
+UsageOther TO: [O] x > 0 && |f| (x - 1) RANGE: (42,43) @ Recursion 12.fs
+UsageOther TO: [O] x > 0 && f (|x| - 1) RANGE: (45,46) @ Recursion 12.fs
+UsageOther TO: [O] x > 0 && f (x |-| 1) RANGE: (47,48) @ Recursion 12.fs
+
+
+Read access
+---
+UsageRead TO: [R] |x| > 0 && f (x - 1) RANGE: (33,34) @ Recursion 12.fs
+UsageRead TO: [R] x > 0 && f (|x| - 1) RANGE: (45,46) @ Recursion 12.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] x |>| 0 && f (x - 1) RANGE: (35,36) @ Recursion 12.fs
+UsageInvocation TO: [O] x > 0 |&&| f (x - 1) RANGE: (39,41) @ Recursion 12.fs
+UsageInvocation TO: [O] x > 0 && f (x |-| 1) RANGE: (47,48) @ Recursion 12.fs
+
+
+Recursive invocation
+---
+UsageRecursion TO: [O] x > 0 && |f| (x - 1) RANGE: (42,43) @ Recursion 12.fs
+
+

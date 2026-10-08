@@ -217,6 +217,11 @@ let isOperatorReferenceExpr (expr: IFSharpExpression) =
     name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
     PrettyNaming.IsOperatorDisplayName name
 
+let isPipeOpApp (binaryAppExpr: IBinaryAppExpr) =
+    isPredefinedInfixOpApp "|>" binaryAppExpr ||
+    isPredefinedInfixOpApp "||>" binaryAppExpr ||
+    isPredefinedInfixOpApp "|||>" binaryAppExpr
+
 let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
     seq {
@@ -229,9 +234,13 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
                 yield prefixApp.ArgumentExpression else
 
             let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
-            if isNotNull binaryAppExpr && isPredefinedInfixOpApp "|>" binaryAppExpr then
+            if isPipeOpApp binaryAppExpr then
                 currentExpr <- binaryAppExpr
-                yield binaryAppExpr.LeftArgument else
+                match binaryAppExpr.LeftArgument.IgnoreInnerParens() with
+                | :? ITupleExpr as tupleExpr when binaryAppExpr.ShortName <> "|>" ->
+                    yield! tupleExpr.Expressions
+                | _ -> yield binaryAppExpr.LeftArgument
+            else
 
             let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
             if isNotNull binaryAppExpr && isPredefinedInfixOpApp "<|" binaryAppExpr then
@@ -240,6 +249,20 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
 
             currentExpr <- null
     }
+
+let rec getOutermostAppExpr (expr: IFSharpExpression) =
+    let expr = expr.IgnoreParentParens()
+
+    let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(expr)
+    if isNotNull prefixAppExpr && isNotNull prefixAppExpr.ArgumentExpression then getOutermostAppExpr prefixAppExpr else
+
+    let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
+    if isPipeOpApp binaryAppExpr then getOutermostAppExpr binaryAppExpr else
+
+    let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
+    if isPredefinedInfixOpApp "<|" binaryAppExpr then getOutermostAppExpr binaryAppExpr else
+
+    expr
 
 let rec isStaticContext (expr: IFSharpExpression) =
     let isTypeReferenceOrUnresolved (fsReference: FSharpSymbolReference) =

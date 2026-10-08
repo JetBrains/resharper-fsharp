@@ -1,0 +1,41 @@
+﻿module Module
+
+let rec f1 () = async {
+    return! |f1|(0) ()
+}
+
+let rec f2 () = async {
+    do! |f2|(1) ()
+}
+
+let rec f3 () = seq {
+    yield 1
+    yield! |f3|(2) ()
+}
+
+let rec f4 () = async {
+    let! x = async { return 1 }
+    return! |f4|(3) ()
+}
+
+let rec f5 () = async {
+    use! d = async { return new System.IO.MemoryStream() }
+    return! |f5|(4) ()
+}
+
+let rec f6 () = async {
+    return! |f6|(5) ()
+    return ()
+}
+
+let rec f7 () =
+    [ 1 ] |> List.map (fun _ -> async { return! |f7|(6) () })
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Non-tail recursion: Recursion in non-tail position
+(2): Recursion: Recursion in tail position
+(3): Recursion: Recursion in tail position
+(4): Non-tail recursion: Recursion in non-tail position
+(5): Non-tail recursion: Recursion in non-tail position
+(6): Non-tail recursion: Recursion in non-tail position

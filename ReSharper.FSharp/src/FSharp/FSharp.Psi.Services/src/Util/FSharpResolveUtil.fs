@@ -158,18 +158,49 @@ let isRecursiveApplication (declaredElement: IDeclaredElement) (refExpr: IRefere
     isNotNull decl && declaredElement = decl.DeclaredElement
 
 let isInTailRecursivePosition (declaredElement: IDeclaredElement) (expr: IFSharpExpression) =
-    let outermostExpr =
-        let rec loop (expr: IFSharpExpression) =
-            let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
-            if isNotNull ifExpr then
-                loop ifExpr else
+    let rec isDeclarationBodyLambda (lambdaExpr: ILambdaExpr) =
+        let expr = lambdaExpr.IgnoreParentParens()
+        isNotNull (ParameterOwnerMemberDeclarationNavigator.GetByExpression(expr)) ||
 
-            expr
+        let outerLambdaExpr = LambdaExprNavigator.GetByExpression(expr)
+        isNotNull outerLambdaExpr && isDeclarationBodyLambda outerLambdaExpr
 
-        let expr = expr.GetOutermostParentExpressionFromItsReturn()
-        loop expr
+    let rec getOutermostExpr (expr: IFSharpExpression) =
+        let expr = expr.IgnoreParentParens()
 
-    let decl = ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr.IgnoreParentParens())
+        let matchExpr = MatchExprNavigator.GetByClauseExpression(expr)
+        if isNotNull matchExpr then getOutermostExpr matchExpr else
+
+        let matchLambdaExpr = MatchLambdaExprNavigator.GetByClauseExpression(expr)
+        if isNotNull matchLambdaExpr then getOutermostExpr matchLambdaExpr else
+
+        let seqExpr = SequentialExprNavigator.GetByLastExpression(expr)
+        if isNotNull seqExpr then getOutermostExpr seqExpr else
+
+        let ifExpr = IfExprNavigator.GetByBranchExpression(expr)
+        if isNotNull ifExpr then getOutermostExpr ifExpr else
+
+        let letExpr = LetOrUseExprNavigator.GetByInExpression(expr)
+        if isNotNull letExpr && not letExpr.IsUse then getOutermostExpr letExpr else
+
+        let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
+        if isPredefinedInfixOpApp "&&" binaryAppExpr || isPredefinedInfixOpApp "||" binaryAppExpr then
+            getOutermostExpr binaryAppExpr else
+
+        let lambdaExpr = LambdaExprNavigator.GetByExpression(expr)
+        if isNotNull lambdaExpr && isDeclarationBodyLambda lambdaExpr then getOutermostExpr lambdaExpr else
+
+        let yieldExpr = YieldOrReturnExprNavigator.GetByExpression(expr)
+        if isNotNull yieldExpr && yieldExpr.IsComputed then getOutermostExpr yieldExpr else
+
+        let computationExpr = ComputationExprNavigator.GetByExpression(expr)
+        let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(computationExpr)
+        if isNotNull appExpr then getOutermostExpr appExpr else
+
+        expr
+
+    let outermostExpr = getOutermostExpr expr
+    let decl = ParameterOwnerMemberDeclarationNavigator.GetByExpression(outermostExpr)
     isNotNull decl && decl.DeclaredElement = declaredElement
 
 let isPreceding (context: ITreeNode) (declaredElement: IDeclaredElement) =
