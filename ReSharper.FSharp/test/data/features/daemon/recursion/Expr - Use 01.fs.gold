@@ -1,0 +1,13 @@
+﻿module Module
+
+let rec f1 x =
+    use d = new System.IO.MemoryStream()
+    |f1|(0) x
+
+let rec f2 x =
+    let d = new System.IO.MemoryStream()
+    |f2|(1) x
+
+---------------------------------------------------------
+(0): Non-tail recursion: Recursion in non-tail position
+(1): Recursion: Recursion in tail position

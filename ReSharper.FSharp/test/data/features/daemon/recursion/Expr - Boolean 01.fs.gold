@@ -1,0 +1,34 @@
+﻿module Module
+
+let rec f1 x =
+    x > 0 && |f1|(0) (x - 1)
+
+let rec f2 x =
+    x > 0 || |f2|(1) (x - 1)
+
+let rec f3 x =
+    |f3|(2) (x - 1) && x > 0
+
+let rec f4 x =
+    x > 0 && x < 10 && |f4|(3) (x - 1)
+
+let rec f5 x =
+    x > 0 && (if x > 1 then |f5|(4) (x - 1) else true)
+
+let rec f6 x =
+    x > 0 && |f6|(5) (x - 1)
+    true
+
+let rec f7 x =
+    match x with
+    | 0 -> true
+    | _ -> x > 0 && |f7|(6) (x - 1)
+
+---------------------------------------------------------
+(0): Recursion: Recursion in tail position
+(1): Recursion: Recursion in tail position
+(2): Non-tail recursion: Recursion in non-tail position
+(3): Recursion: Recursion in tail position
+(4): Recursion: Recursion in tail position
+(5): Non-tail recursion: Recursion in non-tail position
+(6): Recursion: Recursion in tail position

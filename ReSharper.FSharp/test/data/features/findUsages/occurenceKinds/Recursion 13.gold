@@ -1,0 +1,34 @@
+﻿Other
+---
+UsageOther TO: [O] let rec |f| acc xs = RANGE: (23,24) @ Recursion 13.fs
+UsageOther TO: [O] let rec f |acc| xs = RANGE: (25,28) @ Recursion 13.fs
+UsageOther TO: [O] let rec f acc |xs| = RANGE: (29,31) @ Recursion 13.fs
+UsageOther TO: [O] match |xs| with RANGE: (44,46) @ Recursion 13.fs
+UsageOther TO: [O] | [] -> |acc| RANGE: (64,67) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: |tail| -> tail |> f (acc + 1) RANGE: (79,83) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: tail -> |tail| |> f (acc + 1) RANGE: (87,91) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: tail -> tail ||>| f (acc + 1) RANGE: (92,94) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: tail -> tail |> |f| (acc + 1) RANGE: (95,96) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: tail -> tail |> f (|acc| + 1) RANGE: (98,101) @ Recursion 13.fs
+UsageOther TO: [O] | _ :: tail -> tail |> f (acc |+| 1) RANGE: (102,103) @ Recursion 13.fs
+
+
+Read access
+---
+UsageRead TO: [R] match |xs| with RANGE: (44,46) @ Recursion 13.fs
+UsageRead TO: [R] | [] -> |acc| RANGE: (64,67) @ Recursion 13.fs
+UsageRead TO: [R] | _ :: tail -> |tail| |> f (acc + 1) RANGE: (87,91) @ Recursion 13.fs
+UsageRead TO: [R] | _ :: tail -> tail |> f (|acc| + 1) RANGE: (98,101) @ Recursion 13.fs
+
+
+Invocation
+---
+UsageInvocation TO: [O] | _ :: tail -> tail ||>| f (acc + 1) RANGE: (92,94) @ Recursion 13.fs
+UsageInvocation TO: [O] | _ :: tail -> tail |> f (acc |+| 1) RANGE: (102,103) @ Recursion 13.fs
+
+
+Recursive invocation
+---
+UsageRecursion TO: [O] | _ :: tail -> tail |> |f| (acc + 1) RANGE: (95,96) @ Recursion 13.fs
+
+
