@@ -4,6 +4,7 @@ open FSharp.Compiler.Symbols
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
@@ -20,7 +21,7 @@ let getFunctionTypeArgs includeReturnType fcsType =
         let args = fcsType.GenericArguments
         let acc = args[0] :: acc
 
-        let argType = args[1]
+        let argType = getAbbreviatedType args[1]
         if argType.IsFunctionType then
             loop argType acc
         else
