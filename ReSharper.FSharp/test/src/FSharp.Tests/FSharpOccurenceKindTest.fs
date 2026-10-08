@@ -66,6 +66,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Recursion 08``() = x.DoNamedTest()
     [<Test>] member x.``Recursion 09``() = x.DoNamedTest()
     [<Test>] member x.``Recursion 10``() = x.DoNamedTest()
+    [<Test>] member x.``Recursion 11``() = x.DoNamedTest()
 
     [<Test>] member x.``Write - Expr 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Write - Expr 02 - Paren``() = x.DoNamedTest()

@@ -1,0 +1,25 @@
+﻿Other
+---
+UsageOther TO: [O] type F = |int| -> int RANGE: (24,27) @ Recursion 11.fs
+UsageOther TO: [O] type F = int -> |int| RANGE: (31,34) @ Recursion 11.fs
+UsageOther TO: [O] let rec |f| x : F = RANGE: (44,45) @ Recursion 11.fs
+UsageOther TO: [O] let rec f |x| : F = RANGE: (46,47) @ Recursion 11.fs
+UsageOther TO: [O] |f| x RANGE: (58,59) @ Recursion 11.fs
+UsageOther TO: [O] f |x| RANGE: (60,61) @ Recursion 11.fs
+
+
+Type specification
+---
+UsageOther TO: [O] let rec f x : |F| = RANGE: (50,51) @ Recursion 11.fs
+
+
+Partial recursive application
+---
+UsageRecursionPartialCall TO: [O] |f| x RANGE: (58,59) @ Recursion 11.fs
+
+
+Read access
+---
+UsageRead TO: [R] f |x| RANGE: (60,61) @ Recursion 11.fs
+
+
