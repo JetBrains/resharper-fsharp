@@ -1,15 +1,17 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.lexer
 
+import com.intellij.testFramework.junit5.fixture.TestFixtures
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
-import com.jetbrains.rider.test.base.psi.lexer.RiderFrontendLexerTest
-import org.junit.Test
+import com.jetbrains.rider.test.base.psi.lexer.riderFrontendLexerFixture
+import org.junit.jupiter.api.Test
 
-class FSharpLexerTest : RiderFrontendLexerTest("fs") {
-  override fun createLexer() = FSharpLexer()
+@TestFixtures
+class FSharpLexerTest {
+  private val lexer by riderFrontendLexerFixture { FSharpLexer() }
 
   @Test
   fun testDigit() {
-    doTest(
+    lexer.doTest(
       "1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 0x0000_0000_0000_0000LF 34742626263193832612536171N 0o7 0b1 0o1___1 1F",
       """
                 |INT32 ('1234567890')
@@ -43,7 +45,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testString() {
-    doTest(
+    lexer.doTest(
       "\"STRING\n \\ NEW_LINE\n\"",
       """STRING ('"STRING\n \ NEW_LINE\n"')"""
     )
@@ -51,7 +53,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testVerbatimString() {
-    doTest(
+    lexer.doTest(
       "@\"VERBATIM STRING\"",
       """VERBATIM_STRING ('@"VERBATIM STRING"')"""
     )
@@ -59,7 +61,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testByteArray() {
-    doTest(
+    lexer.doTest(
       "\"ByteArray\"B",
       """BYTEARRAY ('"ByteArray"B')"""
     )
@@ -67,7 +69,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testTripleQuotedString() {
-    doTest(
+    lexer.doTest(
       "\"\"\"triple-quoted-string \ntriple-quoted-string\"\"\"",
       "TRIPLE_QUOTED_STRING ('\"\"\"triple-quoted-string \\ntriple-quoted-string\"\"\"')"
     )
@@ -75,7 +77,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testSymbolicOperator() {
-    doTest(
+    lexer.doTest(
       "&&& ||| ?<- @-><-= ?-> >-> >>= >>- |> .>>. .>> >>",
       """
                 |SYMBOLIC_OP ('&&&')
@@ -107,12 +109,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testSimpleBlockComment() {
-    doTest("(* HAHA *)", "BLOCK_COMMENT ('(* HAHA *)')")
+    lexer.doTest("(* HAHA *)", "BLOCK_COMMENT ('(* HAHA *)')")
   }
 
   @Test
   fun testBlockComment() {
-    doTest(
+    lexer.doTest(
       "(* Here's a code snippet: let s = \"*)\" *)",
       """BLOCK_COMMENT ('(* Here's a code snippet: let s = "*)" *)')"""
     )
@@ -120,7 +122,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testBlockCommentError() {
-    doTest(
+    lexer.doTest(
       "(* \" *)",
       "BLOCK_COMMENT ('(* \" *)')"
     )
@@ -128,7 +130,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testSymbolicKeyword() {
-    doTest(
+    lexer.doTest(
       "let! use! do! yield! return! match! and! while! | -> <- . : ( ) [ ] [< >] " +
         "[| |] { } ' # :?> :? :> .. :: := ;; ; = _ ? ?? (*) <@ @> <@@ @@>",
       """
@@ -221,12 +223,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testStringEscapeChar() {
-    doTest("\"\\n\\t\\b\\r\\a\\f\\v\"", "STRING ('\"\\n\\t\\b\\r\\a\\f\\v\"')")
+    lexer.doTest("\"\\n\\t\\b\\r\\a\\f\\v\"", "STRING ('\"\\n\\t\\b\\r\\a\\f\\v\"')")
   }
 
   @Test
   fun testEscapeChar() {
-    doTest(
+    lexer.doTest(
       "'\\n' '\\t' '\\b' '\\r' '\"' '\\a' '\\f' '\\v'",
       """
                 |CHARACTER_LITERAL (''\n'')
@@ -250,7 +252,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testKeywordString() {
-    doTest(
+    lexer.doTest(
       "__SOURCE_FILE__ __SOURCE_DIRECTORY__ __LINE__",
       """
                 |KEYWORD_STRING_SOURCE_FILE ('__SOURCE_FILE__')
@@ -264,7 +266,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testUnfinishedTripleQuoteStringInComment() {
-    doTest(
+    lexer.doTest(
       "(* \"\"\" *)\n" +
         """
                 |let str = "STRING
@@ -277,7 +279,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testIntDotDot() {
-    doTest(
+    lexer.doTest(
       "1..20",
       """
                 |INT32 ('1')
@@ -289,7 +291,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testIdent() {
-    doTest(
+    lexer.doTest(
       "``value.with odd#name``",
       "IDENT ('``value.with odd#name``')"
     )
@@ -297,7 +299,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testUnfinishedIdent() {
-    doTest(
+    lexer.doTest(
       "``value \n\"\"",
       """
             |RESERVED_SYMBOLIC_SEQUENCE ('``value ')
@@ -309,7 +311,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testUnfinishedIdent2() {
-    doTest(
+    lexer.doTest(
       "```` \n ``` \n \"\"",
       """
             |RESERVED_SYMBOLIC_SEQUENCE ('````')
@@ -326,7 +328,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testEndOfLineComment() {
-    doTest(
+    lexer.doTest(
       "//hello world!\n//hello second world!",
       """
                 |LINE_COMMENT ('//hello world!')
@@ -338,7 +340,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testUnfinishedString() {
-    doTest(
+    lexer.doTest(
       "(* \"\"\"hello\"\"\" *)\n" +
         "        let str = \"STRING\n",
       "BLOCK_COMMENT ('(* \"\"\"hello\"\"\" *)')\n" +
@@ -358,7 +360,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCodeQuotation() {
-    doTest(
+    lexer.doTest(
       "<@ 1 + 1 @>.ToString() <@@ 1 + 1 @@>.ToString()",
       """
                 |LQUOTE_TYPED ('<@')
@@ -394,7 +396,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testBadOperator() {
-    doTest(
+    lexer.doTest(
       ".?:%? .?$%?",
       """
                 |BAD_SYMBOLIC_OP ('.?:%?')
@@ -406,7 +408,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testAttribute() {
-    doTest(
+    lexer.doTest(
       "[<SomeAttribute>]",
       """
                 |LBRACK_LESS ('[<')
@@ -418,7 +420,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testTypeApp() {
-    doTest(
+    lexer.doTest(
       "let typeApp = typeof<Map<Map<Map<Map<_,_>[],Map<_,_[]>>,_>,_>>.FullName",
       """
                 |LET ('let')
@@ -468,7 +470,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCorrectTypeApp() {
-    doTest(
+    lexer.doTest(
       "[typeof<int>] [typeof<int >]",
       """
                 |LBRACK ('[')
@@ -491,7 +493,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testIncorrectTypeApp() {
-    doTest(
+    lexer.doTest(
       "C<M<int >] >>> C<M<int >] > >>",
       """
                 |IDENT ('C')
@@ -525,7 +527,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testGenericDeclaration() {
-    doTest(
+    lexer.doTest(
       """
             |type U<'a> = Choice1 of 'a
             |type 'a F = | F of 'a
@@ -571,7 +573,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testIfDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#if
             |#if (symbol || symbol) && symbol
@@ -608,7 +610,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testElifDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#elif
             |#elif (symbol || symbol) && symbol
@@ -641,7 +643,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testElseDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#else (symbol || symbol) && symbol
             |#else
@@ -674,7 +676,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testEndIfDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#endif
             |#endif (symbol || symbol) && symbol
@@ -707,7 +709,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testLightDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#light
             |#light "on"
@@ -763,7 +765,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testLineDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#line
             |#line "string"
@@ -811,7 +813,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testBadCommentInDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#if asdfasdf /*asdfasdfasdfasdfasdfasdf*/ asdfasdf
             |sadfsadf
@@ -845,7 +847,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testEscapeCharacterInString() {
-    doTest(
+    lexer.doTest(
       """"\\" ()""",
       """
                 |STRING ('"\\"')
@@ -858,7 +860,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testEscapeCharacterInTripleQuotedString() {
-    doTest(
+    lexer.doTest(
       """""${'"'}\""${'"'} ()""",
       """
                 |TRIPLE_QUOTED_STRING ('""${'"'}\""${'"'}')
@@ -871,7 +873,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testEscapeCharacterInVerbatimString() {
-    doTest(
+    lexer.doTest(
       """@"\" ()""",
       """
                 |VERBATIM_STRING ('@"\"')
@@ -884,7 +886,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testInteractiveDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#r "file.dll";;
             |#I "path";;
@@ -929,7 +931,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testHelpQuitDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#help
             |#quit
@@ -944,7 +946,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testLoadDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#l
             |#l "string"
@@ -979,7 +981,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testReferenceDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#r
             |#r "string"
@@ -1014,7 +1016,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testTimeDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#time
             |#time "string"
@@ -1036,7 +1038,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testIDirective() {
-    doTest(
+    lexer.doTest(
       """
             |#I
             |#I "string"
@@ -1058,7 +1060,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testSpaceDirective() {
-    doTest(
+    lexer.doTest(
       " #r \"on\"",
       """
                 |WHITESPACE (' ')
@@ -1071,7 +1073,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testFlexibleType() {
-    doTest(
+    lexer.doTest(
       "let app : #r\nlet app1 : #if_",
       """
                 |LET ('let')
@@ -1097,7 +1099,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCharInString() {
-    doTest(
+    lexer.doTest(
       """"string 'c'" ()""",
       """
                 |STRING ('"string 'c'"')
@@ -1110,7 +1112,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCharVerbatimString() {
-    doTest(
+    lexer.doTest(
       """@"string 'c'" ()""",
       """
                 |VERBATIM_STRING ('@"string 'c'"')
@@ -1123,7 +1125,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCharTripleQuoteString() {
-    doTest(
+    lexer.doTest(
       """""${'"'}string 'c'""${'"'} ()""",
       """
                 |TRIPLE_QUOTED_STRING ('""${'"'}string 'c'""${'"'}')
@@ -1136,7 +1138,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testLeftArrow() {
-    doTest(
+    lexer.doTest(
       "ident<-ident",
       """
                 |IDENT ('ident')
@@ -1148,7 +1150,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testRightArrow() {
-    doTest(
+    lexer.doTest(
       "t< -> t< ->>",
       """
                 |IDENT ('t')
@@ -1166,7 +1168,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testBackslashInString() {
-    doTest(
+    lexer.doTest(
       """
         |"a\
           b\
@@ -1183,7 +1185,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCommentInTypeApp() {
-    doTest(
+    lexer.doTest(
       "typeof<int//>",
       """
                 |IDENT ('typeof')
@@ -1196,7 +1198,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testBlockCommentInTypeApp() {
-    doTest(
+    lexer.doTest(
       "typeof<int(*comment*)> typeof<int<int(*comment*)>>",
       """
                 |IDENT ('typeof')
@@ -1219,12 +1221,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testValidIdentifiers() {
-    doTest("``s<>,.;':\"`~!@#\$%^&*()_+-=``", "IDENT ('``s<>,.;':\"`~!@#\$%^&*()_+-=``')")
+    lexer.doTest("``s<>,.;':\"`~!@#\$%^&*()_+-=``", "IDENT ('``s<>,.;':\"`~!@#\$%^&*()_+-=``')")
   }
 
   @Test
   fun testSmashingGreaterBarRBrack() {
-    doTest(
+    lexer.doTest(
       "let t = [|typeof<string>|]",
       """
                 |LET ('let')
@@ -1245,7 +1247,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testAnonymousRecords() {
-    doTest(
+    lexer.doTest(
       "f<{| C : int |}>x",
       """
                 |IDENT ('f')
@@ -1267,7 +1269,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testAttributeInsideGeneric() {
-    doTest(
+    lexer.doTest(
       "[<MeasureAnnotatedAbbreviation>] type bool<[<Measure>] 'm> = bool",
       """
                 |LBRACK_LESS ('[<')
@@ -1295,12 +1297,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun testCharQuote() {
-    doTest("'''", "CHARACTER_LITERAL (''''')")
+    lexer.doTest("'''", "CHARACTER_LITERAL (''''')")
   }
 
   @Test
   fun `testStrings - Interpolated - Raw 01`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"{{ 1 }}\"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
             |WHITESPACE (' ')
@@ -1312,7 +1314,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 02`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"{{ 1 }} 2 {{ 3 }}\"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
             |WHITESPACE (' ')
@@ -1328,7 +1330,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 03`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"{{ $\"{1}\" }}\"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
             |WHITESPACE (' ')
@@ -1342,7 +1344,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 04`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"{{ $$\"\"\"{{1}}\"\"\" }}\"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""}{{')
             |WHITESPACE (' ')
@@ -1356,7 +1358,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 05`() {
-    doTest(
+    lexer.doTest(
       "$$$\"\"\" { {{ {{{ 1 }}} }} } \"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$$${"\"\"\""} { {{ {{{')
             |WHITESPACE (' ')
@@ -1368,7 +1370,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 06`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"\"\"\"",
       """RAW_INTERPOLATED_STRING ('$$${"\"\"\"\"\"\""}')""".trimMargin()
     )
@@ -1376,7 +1378,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 07`() {
-    doTest(
+    lexer.doTest(
       "$",
       """DOLLAR ('${'$'}')""".trimMargin()
     )
@@ -1384,7 +1386,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 08`() {
-    doTest(
+    lexer.doTest(
       "$$",
       """BAD_SYMBOLIC_OP ('$$')""".trimMargin()
     )
@@ -1392,7 +1394,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 09`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\"\"\"\" $$ \"\"",
       """RAW_INTERPOLATED_STRING ('$$${"\"\"\"\"\"\""}')
         |WHITESPACE (' ')
@@ -1405,7 +1407,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Raw 10`() {
-    doTest(
+    lexer.doTest(
       "$$\"\"\" \"{{x}}\"\"\"",
       """RAW_INTERPOLATED_STRING_START ('$$${"\"\"\""} "{{')
         |IDENT ('x')
@@ -1418,12 +1420,12 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Regular 01 - No interpolation`() {
-    doTest("$\"\"", "REGULAR_INTERPOLATED_STRING ('\$\"\"')")
+    lexer.doTest("$\"\"", "REGULAR_INTERPOLATED_STRING ('\$\"\"')")
   }
 
   @Test
   fun `testStrings - Interpolated - Regular 02`() {
-    doTest(
+    lexer.doTest(
       "$\"{1} hello {2 + 3}\"",
       """REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
             |INT32 ('1')
@@ -1439,7 +1441,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Regular 03 - Record`() {
-    doTest(
+    lexer.doTest(
       "$\"{ {F=1} }\"",
       """REGULAR_INTERPOLATED_STRING_START ('$"{')
             |WHITESPACE (' ')
@@ -1455,7 +1457,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Triple quote - Nested 01`() {
-    doTest(
+    lexer.doTest(
       "$\"\"\"{\$\"{1}\"}\"\"\"",
       """TRIPLE_QUOTE_INTERPOLATED_STRING_START ('${'$'}""${'"'}{')
             |REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
@@ -1467,17 +1469,17 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `testStrings - Interpolated - Triple quote 01`() {
-    doTest("$\"\"\" \"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} "}} ""${'"'}')""");
+    lexer.doTest("$\"\"\" \"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} "}} ""${'"'}')""");
   }
 
   @Test
   fun `testStrings - Interpolated - Triple quote 02`() {
-    doTest("$\"\"\" \"\"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} ""}} ""${'"'}')""");
+    lexer.doTest("$\"\"\" \"\"}} \"\"\"", """TRIPLE_QUOTE_INTERPOLATED_STRING ('${'$'}""${'"'} ""}} ""${'"'}')""");
   }
 
   @Test
   fun `test shebang 01`() {
-    doTest("#!/bin/sh\nopen System",
+    lexer.doTest("#!/bin/sh\nopen System",
       """
       SHEBANG ('#!/bin/sh')
       NEW_LINE ('\n')
@@ -1489,7 +1491,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
   @Test
   fun `test ident directive`() {
-    doTest("#Ident",
+    lexer.doTest("#Ident",
       """
       HASH ('#')
       IDENT ('Ident')
@@ -1498,7 +1500,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
     @Test
     fun `test nowarn directive`() {
-        doTest("#nowarn 1 \n #nowarn \"1\"",
+        lexer.doTest("#nowarn 1 \n #nowarn \"1\"",
             """
       PP_NOWARN ('#nowarn')
       WHITESPACE (' ')
@@ -1514,7 +1516,7 @@ class FSharpLexerTest : RiderFrontendLexerTest("fs") {
 
     @Test
     fun `test warnon directive`() {
-        doTest("#warnon 1 \n #warnon \"1\"",
+        lexer.doTest("#warnon 1 \n #warnon \"1\"",
             """
       PP_WARNON ('#warnon')
       WHITESPACE (' ')
