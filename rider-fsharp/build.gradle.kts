@@ -76,6 +76,7 @@ dependencies {
     bundledModule("intellij.spellchecker")
     bundledModule("intellij.platform.langInjection")
     bundledModule("intellij.platform.debugger")
+    bundledModule("intellij.platform.execution.impl")
     bundledPlugin("org.jetbrains.plugins.textmate")
     bundledPlugin("rider.intellij.plugin.appender")
     bundledPlugin("com.intellij.structureView")
