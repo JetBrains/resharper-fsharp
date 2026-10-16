@@ -18,7 +18,6 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.parentOfType
 import com.intellij.psi.util.startOffset
 import com.intellij.util.text.CharArrayUtil
-import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.editors.getPsiFile
 import com.jetbrains.rider.editors.offsetToDocCoordinates
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
@@ -737,7 +736,6 @@ class FSharpEnterHandlerDelegate : EnterHandlerDelegateAdapter() {
     originalHandler: EditorActionHandler?
   ): Result {
     if (file.language != FSharpLanguage) return Result.Continue
-    if (!isPatchEngineEnabled) return Result.Stop
     runCatching {
       handleEnter(editor, caretOffset.get())
       return Result.Stop

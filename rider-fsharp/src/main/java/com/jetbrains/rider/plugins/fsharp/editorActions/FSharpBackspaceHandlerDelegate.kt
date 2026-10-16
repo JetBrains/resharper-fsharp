@@ -9,15 +9,13 @@ import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import com.intellij.psi.tree.IElementType
-import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.editors.offsetToDocCoordinates
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
 
 class FSharpBackspaceHandlerDelegate(originalHandler: EditorActionHandler) : BackspaceHandler(originalHandler) {
   override fun executeWriteAction(editor: Editor, caret: Caret, dataContext: DataContext?) {
-    if (!isPatchEngineEnabled ||
-      dataContext == null ||
+    if (dataContext == null ||
       dataContext.getData(CommonDataKeys.PSI_FILE)?.language !is FSharpLanguage ||
       editor.caretModel.caretCount != 1 ||
       caret.offset <= 0 ||
