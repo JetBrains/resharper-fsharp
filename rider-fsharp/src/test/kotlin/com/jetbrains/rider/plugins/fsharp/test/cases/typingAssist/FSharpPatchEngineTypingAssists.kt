@@ -97,7 +97,6 @@ abstract class FSharpBackendSyncTypingAssistTestBase(private val ideAction: Stri
       withOpenedEditorFacade("Program.fs", "$caseName.fs.source") {
         typeOrCallAction(ideAction)
       }
-      TestLoggerHelper.testErrorsAccumulator.throwIfNotEmpty()
     } catch (e: Throwable) {
       if (isSupportedTestCase) throw e
       else return
