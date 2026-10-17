@@ -39,6 +39,8 @@ type FSharpBreakpointVariantsProvider() =
             | Some parseResults ->
 
             let document = file.ToSourceFile().Document
+            if docLine line >= document.GetLineCount() then null else
+
             let lineStart = document.GetLineStartDocumentOffset(docLine line)
             let lineEnd = document.GetLineEndDocumentOffsetWithLineBreak(docLine line)
 

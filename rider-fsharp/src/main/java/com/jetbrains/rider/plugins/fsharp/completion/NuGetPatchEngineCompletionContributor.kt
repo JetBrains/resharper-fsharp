@@ -6,18 +6,28 @@ import com.intellij.psi.ElementManipulators
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.startOffset
 import com.jetbrains.rdclient.document.editorSynchronizer
-import com.jetbrains.rdclient.patches.isPatchEngineEnabled
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineCompletionContributor
 import com.jetbrains.rider.completion.patchEngine.RiderPatchEngineProtocolProvider
 import com.jetbrains.rider.completion.patchEngine.isPreemptiveCompletionEnabled
 import com.jetbrains.rider.editors.startOffset
+
+internal const val KEY_NAME = "NuGet:name"
+internal const val KEY_VERSION = "NuGet:version"
+
+internal const val GROUP_PACKAGE = "package"
+internal const val GROUP_PACKAGE_ZONE = "packageZone"
+internal const val GROUP_VERSION = "version"
+internal const val GROUP_VERSION_ZONE = "versionZone"
+
+internal val PACKAGE_REFERENCE_REGEX =
+  Regex("""^nuget:(?<packageZone>\s*(?<package>[a-zA-Z_0-9\-\\.]*)\s*)(,(?<versionZone>\s*(?<version>[a-zA-Z_0-9\-\\.]*)\s*))?""")
 
 class NuGetPatchEngineCompletionContributor : RiderPatchEngineCompletionContributor() {
 
   override fun isAvailable(file: PsiFile, offset: Int): Boolean = insideReferenceDirective(file, offset)
 
   override fun beforeCompletion(context: CompletionInitializationContext) {
-    if (!isPatchEngineEnabled || !isPreemptiveCompletionEnabled)
+    if (!isPreemptiveCompletionEnabled)
       return
 
     val psiElement = getStringInsideReferenceDirective(context.file, context.startOffset) ?: return
