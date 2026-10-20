@@ -1,5 +1,3 @@
-#nowarn FS0057
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
@@ -26,6 +24,27 @@ type FcsProjectKey =
     static member Create(project, targetFrameworkId) =
         { Project = project
           TargetFrameworkId = targetFrameworkId }
+
+[<AutoOpen>]
+module FSharpProjectSnapshotExtensions =
+    type FSharpProjectSnapshot with
+        //TODO: add a simpler ctor in FCS
+        member x.With(?referencedProjects: FSharpReferencedProjectSnapshot list,
+                      ?stamp: int64 option) =
+            FSharpProjectSnapshot.Create(
+                x.ProjectFileName,
+                x.OutputFileName,
+                x.ProjectId,
+                x.SourceFiles,
+                x.ReferencesOnDisk,
+                x.OtherOptions,
+                defaultArg referencedProjects x.ReferencedProjects,
+                x.IsIncompleteTypeCheckEnvironment,
+                x.UseScriptResolutionRules,
+                x.LoadTime,
+                x.UnresolvedReferences,
+                x.OriginalLoadReferences,
+                defaultArg stamp x.Stamp)
 
 type FcsProjectOptions =
     | FcsProjectOptions of FSharpProjectOptions * FSharpParsingOptions
@@ -101,8 +120,8 @@ type FcsProjectOptions =
 
         match x, y with
         | FcsProjectOptions(x, _), FcsProjectOptions(y, _) ->
-            x.ReferencedProjects.Length = x.ReferencedProjects.Length &&
-            (y.ReferencedProjects, y.ReferencedProjects)
+            x.ReferencedProjects.Length = y.ReferencedProjects.Length &&
+            (x.ReferencedProjects, y.ReferencedProjects)
             ||> Array.forall2 (fun r1 r2 ->
                 match r1, r2 with
                 | FSharpReferencedProject.FSharpReference (_, r1),
@@ -118,15 +137,16 @@ type FcsProjectOptions =
 
         | FcsProjectSnapshot(x), FcsProjectSnapshot(y) ->
             x.ReferencesOnDisk = y.ReferencesOnDisk && //TODO: array
-            x.ReferencedProjects.Length = x.ReferencedProjects.Length &&
-            (y.ReferencedProjects, y.ReferencedProjects)
+            x.ReferencedProjects.Length = y.ReferencedProjects.Length &&
+            (x.ReferencedProjects, y.ReferencedProjects)
             ||> List.forall2 (fun r1 r2 -> arrayEq r1.Version r2.Version)
 
         | _ -> false
 
-type FcsReferencedProject =
-    | FcsReference of FcsProject
-    | FcsILModuleReference of x: (string * (unit -> DateTime) * (unit -> ILModuleReader))
+[<RequireQualifiedAccess>]
+type FcsReferencedModule =
+    | Project of FcsProject
+    | OutputAssembly of path: string * getTimestamp: (unit -> DateTime) * getReader: (unit -> ILModuleReader)
 
 and FcsProject =
     { OutputPath: VirtualFileSystemPath
@@ -154,7 +174,7 @@ and FcsProject =
     member x.AreSameForChecking(y: FcsProject) =
         x.Options.AreSameForChecking(y.Options)
 
-    member x.WithReferences(moduleReferences: FcsProjectKey array, mapper: FcsProjectKey -> FcsReferencedProject option) =
+    member x.WithReferences(moduleReferences: FcsProjectKey array, mapper: FcsProjectKey -> FcsReferencedModule option) =
         let applicableReferences = moduleReferences |> Seq.choose mapper
 
         let options =
@@ -163,10 +183,11 @@ and FcsProject =
                 let references =
                     applicableReferences
                     |> Seq.map (function
-                        | FcsILModuleReference foo -> FSharpReferencedProject.ILModuleReference foo
-                        | FcsReference { Options = FcsProjectOptions(options, _); OutputPath = outputPath } ->
+                        | FcsReferencedModule.OutputAssembly(path, getTimestamp, getReader) ->
+                            FSharpReferencedProject.ILModuleReference(path, getTimestamp, getReader)
+                        | FcsReferencedModule.Project { Options = FcsProjectOptions(options, _); OutputPath = outputPath } ->
                             FSharpReferencedProject.FSharpReference(outputPath.FullPath, options)
-                        | _ -> failwith "Expecting FcsReference with FcsProjectOptions"
+                        | _ -> failwith "Expecting referenced project with FcsProjectOptions"
                     )
                     |> Seq.toArray
 
@@ -176,29 +197,15 @@ and FcsProject =
                 let references =
                     applicableReferences
                     |> Seq.map (function
-                        | FcsILModuleReference foo -> FSharpReferencedProjectSnapshot.ILModuleReference foo
-                        | FcsReference { Options = FcsProjectSnapshot(snapshot); OutputPath = outputPath } ->
+                        | FcsReferencedModule.OutputAssembly(path, getTimestamp, getReader) ->
+                            FSharpReferencedProjectSnapshot.ILModuleReference(path, getTimestamp, getReader)
+                        | FcsReferencedModule.Project { Options = FcsProjectSnapshot(snapshot); OutputPath = outputPath } ->
                             FSharpReferencedProjectSnapshot.FSharpReference(outputPath.FullPath, snapshot)
-                        | _ -> failwith "Expecting FcsReference with FcsProjectSnapshot"
+                        | _ -> failwith "Expecting referenced project with FcsProjectSnapshot"
                     )
                     |> Seq.toList
 
-                //TODO: add a simpler ctor in FCS 
-                FSharpProjectSnapshot.Create(
-                    projectSnapshot.ProjectFileName,
-                    projectSnapshot.OutputFileName,
-                    projectSnapshot.ProjectId,
-                    projectSnapshot.SourceFiles,
-                    projectSnapshot.ReferencesOnDisk,
-                    projectSnapshot.OtherOptions,
-                    references,
-                    projectSnapshot.IsIncompleteTypeCheckEnvironment,
-                    projectSnapshot.UseScriptResolutionRules,
-                    projectSnapshot.LoadTime,
-                    projectSnapshot.UnresolvedReferences,
-                    projectSnapshot.OriginalLoadReferences,
-                    projectSnapshot.Stamp)
-                |> FcsProjectSnapshot
+                FcsProjectSnapshot(projectSnapshot.With(referencedProjects = references))
 
         { x with ReferencedModules = HashSet(moduleReferences); Options = options }
 
