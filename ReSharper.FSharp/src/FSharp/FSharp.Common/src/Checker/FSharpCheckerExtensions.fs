@@ -1,5 +1,3 @@
-#nowarn FS0057
-
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 

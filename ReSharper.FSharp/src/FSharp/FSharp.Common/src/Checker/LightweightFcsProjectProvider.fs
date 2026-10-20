@@ -39,8 +39,8 @@ type LightweightFcsProjectProvider(lifetime: Lifetime, checkerService: FcsChecke
         member this.GetFcsProject _ = None
         member this.GetPsiModule _ = None
         member this.IsProjectOutput _ = false
-        member this.GetProjectOptions(_: IPsiSourceFile): FSharpProjectOptions option = None
-        member this.GetProjectOptions(_: IPsiModule): FSharpProjectOptions option = None
+        member this.GetProjectOptions(_: IPsiSourceFile): FcsProjectOptions option = None
+        member this.GetProjectOptions(_: IPsiModule): FcsProjectOptions option = None
         member this.GetFileIndex _ = 0
         member this.HasPairFile _ = false
         member this.InvalidateReferencesToProject _ = false
