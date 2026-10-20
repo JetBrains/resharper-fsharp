@@ -1,11 +1,10 @@
-﻿#nowarn FS0057
-
-namespace JetBrains.ReSharper.Plugins.FSharp.Checker
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
+open FSharp.Compiler.IO
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Diagnostics
@@ -135,7 +134,7 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
 
         sourceFiles.ToArray(), implsWithSigs, resources
 
-    member x.BuildFcsProjectCore(projectKey: FcsProjectKey): FcsProject =
+    member x.BuildFcsProject(projectKey: FcsProjectKey): FcsProject =
         let project = projectKey.Project
         let targetFrameworkId = projectKey.TargetFrameworkId
 
@@ -211,12 +210,13 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let basicOptions = List.ofSeq otherOptions
 
         let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
-        let paths =
+        let referencePaths =
             references
             |> Seq.choose modulePathProvider.GetModulePath
-            |> Seq.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
+            |> Seq.filter (fun path -> not path.IsEmpty)
+            |> Seq.toList
 
-        otherOptions.AddRange(paths)
+        otherOptions.AddRange(referencePaths |> Seq.map (fun path -> "-r:" + path.FullPath))
 
         let projectOptions =
             { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
@@ -231,10 +231,31 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = None }
 
-        let options = 
+        let options =
             if checkerService.UseTransparentCompiler then
-                let getFileSnapshot _ fileName = async {return FSharpFileSnapshot.CreateFromFileSystem(fileName)}
-                FSharpProjectSnapshot.FromOptions(projectOptions, getFileSnapshot).RunAsTask()
+                let sourceFiles =
+                    [for file in projectOptions.SourceFiles -> FSharpFileSnapshot.CreateFromFileSystem(file)]
+
+                let referencesOnDisk =
+                    referencePaths
+                    |> List.map (fun path ->
+                        { ReferenceOnDisk.Path = path.FullPath
+                          LastModified = FileSystem.GetLastWriteTimeShim(path.FullPath) })
+
+                FSharpProjectSnapshot.Create(
+                    projectOptions.ProjectFileName,
+                    None,
+                    projectOptions.ProjectId,
+                    sourceFiles,
+                    referencesOnDisk,
+                    basicOptions,
+                    [],
+                    projectOptions.IsIncompleteTypeCheckEnvironment,
+                    projectOptions.UseScriptResolutionRules,
+                    projectOptions.LoadTime,
+                    projectOptions.UnresolvedReferences,
+                    projectOptions.OriginalLoadReferences,
+                    projectOptions.Stamp)
                 |> FcsProjectOptions.FcsProjectSnapshot
             else
                 let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(basicOptions)

@@ -129,9 +129,9 @@ type FSharpExperimentalFeatures = JetBrains.ReSharper.Plugins.FSharp.Settings.FS
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpTestExperimentalSettings(settingsSchema, logger: ILogger) =
-    inherit HaveDefaultSettings<FSharpOptions>(settingsSchema, logger)
+    inherit HaveDefaultSettings<FSharpExperimentalFeatures>(settingsSchema, logger)
 
-    override this.Name = "F# default FCS settings"
+    override this.Name = "F# experimental features default settings"
 
     override this.InitDefaultSettings(mountPoint) =
         let useTransparentCompiler = Environment.GetEnvironmentVariable("UseTransparentCompiler")
@@ -139,7 +139,7 @@ type FSharpTestExperimentalSettings(settingsSchema, logger: ILogger) =
 
         logger.Info("Set UseTransparentCompiler = " + useTransparentCompiler)
         this.SetValue(mountPoint,
-                      (fun (settings: FSharpOptions) -> settings.UseTransparentCompiler),
+                      (fun (settings: FSharpExperimentalFeatures) -> settings.UseTransparentCompiler),
                       Boolean.Parse(useTransparentCompiler))
 
 
@@ -370,7 +370,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
     let getNewFcsProject (psiModule: IPsiModule) =
         let projectKey = FcsProjectKey.Create(psiModule)
-        fcsProjectBuilder.BuildFcsProjectCore(projectKey)
+        fcsProjectBuilder.BuildFcsProject(projectKey)
 
     // todo: referenced projects
     let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =

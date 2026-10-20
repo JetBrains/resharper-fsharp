@@ -35,7 +35,6 @@ module private FSharpOptions =
     let [<Literal>] nonFSharpProjectInMemoryReferences = "Analyze C# and VB.NET project references in-memory"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
-    let [<Literal>] useTransparentCompiler = "Use FCS transparent compiler"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -50,10 +49,7 @@ type FSharpOptions =
       mutable NonFSharpProjectInMemoryReferences: bool
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-      mutable TopLevelOpenCompletion: bool
-      
-      [<SettingsEntry(false, useTransparentCompiler); DefaultValue>]
-      mutable UseTransparentCompiler: bool }
+      mutable TopLevelOpenCompletion: bool }
 
 type FantomasLocationSettings =
     | AutoDetected = 0
@@ -92,6 +88,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
     let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Enable generative type providers analysis in C#/VB.NET projects"
+    let [<Literal>] useTransparentCompiler = "Use FCS transparent compiler"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -112,7 +109,10 @@ type FSharpExperimentalFeatures =
       mutable OutOfProcessTypeProviders: bool
 
       [<SettingsEntry(true, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis); DefaultValue>]
-      mutable GenerativeTypeProvidersInMemoryAnalysis: bool }
+      mutable GenerativeTypeProvidersInMemoryAnalysis: bool
+
+      [<SettingsEntry(false, FSharpExperimentalFeatures.useTransparentCompiler); DefaultValue>]
+      mutable UseTransparentCompiler: bool }
 
 
 [<AllowNullLiteral>]
@@ -226,15 +226,13 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
 
         this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryReferences), nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
-        if configurations.IsInternalMode() then
-            this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), useTransparentCompiler, "Requires restart") |> ignore
 
         this.AddHeader("Experimental features")
         this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
         if configurations.IsInternalMode() then
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
-
+            this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), FSharpExperimentalFeatures.useTransparentCompiler, "Requires restart") |> ignore
 
 
 [<ShellComponent>]

@@ -1,5 +1,3 @@
-#nowarn FS0057
-
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
@@ -50,13 +48,15 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
             let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
 
-            let getSettingProperty name =
-                let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
+            let getSettingProperty setting =
                 settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
 
-            let skipImpl = getSettingProperty "SkipImplementationAnalysis"
-            let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
-            let useTransparentCompiler = getSettingProperty "UseTransparentCompiler"
+            let getOptionsProperty name = getSettingProperty (SettingsUtil.getEntry<FSharpOptions> settingsStore name)
+
+            let skipImpl = getOptionsProperty "SkipImplementationAnalysis"
+            let analyzerProjectReferencesInParallel = getOptionsProperty "ParallelProjectReferencesAnalysis"
+            let useTransparentCompiler =
+                getSettingProperty (SettingsUtil.getEntry<FSharpExperimentalFeatures> settingsStore "UseTransparentCompiler")
 
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,

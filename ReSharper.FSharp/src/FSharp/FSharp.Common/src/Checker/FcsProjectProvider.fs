@@ -1,5 +1,3 @@
-#nowarn FS0057
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System.Collections.Concurrent
@@ -187,21 +185,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             let options =
                 match fcsProject.Options with
                 | FcsProjectSnapshot snapshot ->
-                    FSharpProjectSnapshot.Create(
-                        snapshot.ProjectFileName,
-                        snapshot.OutputFileName,
-                        snapshot.ProjectId,
-                        snapshot.SourceFiles,
-                        snapshot.ReferencesOnDisk,
-                        snapshot.OtherOptions,
-                        snapshot.ReferencedProjects,
-                        snapshot.IsIncompleteTypeCheckEnvironment,
-                        snapshot.UseScriptResolutionRules,
-                        snapshot.LoadTime,
-                        snapshot.UnresolvedReferences,
-                        snapshot.OriginalLoadReferences,
-                        stamp) //TODO: put a stamp on the creating?
-                        |> FcsProjectSnapshot
+                    //TODO: put a stamp on the creating?
+                    FcsProjectSnapshot(snapshot.With(stamp = stamp))
 
                 | FcsProjectOptions(projectOptions, parsingOptions) ->
                     FcsProjectOptions({ projectOptions with Stamp = stamp }, parsingOptions)
@@ -253,7 +238,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             | Some moduleReferences ->
                 if fcsProjects.ContainsKey(projectKey) && projectKey <> initialProjectKey then () else
 
-                let fcsProject = fcsProjectBuilder.BuildFcsProjectCore(projectKey)
+                let fcsProject = fcsProjectBuilder.BuildFcsProject(projectKey)
                 let isNullnessEnabled =
                     FcsProjectBuilder.getProjectConfiguration projectKey.TargetFrameworkId projectKey.Project
                     |> FcsProjectBuilder.isNullnessEnabled
@@ -264,7 +249,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                         let referencedProject = referencedProjectKey.Project
                         if isFSharpProject referencedProject then
                             let referencedFcsProject = getOrCreateFcsProject referencedProjectKey
-                            Some (FcsReference(referencedFcsProject))
+                            Some (FcsReferencedModule.Project(referencedFcsProject))
 
                         elif fcsAssemblyReaderShim.Value.IsEnabled && AssemblyReaderShim.isSupportedProject referencedProject then
                             match fcsAssemblyReaderShim.Value.TryGetModuleReader(referencedProjectKey) with
@@ -276,7 +261,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
                             let getTimestamp () = reader.Timestamp
                             let getReader () = reader :> ILModuleReader
-                            Some (FcsILModuleReference(reader.Path.FullPath, getTimestamp, getReader))
+                            Some (FcsReferencedModule.OutputAssembly(reader.Path.FullPath, getTimestamp, getReader))
 
                         else None
                     )

@@ -1,5 +1,3 @@
-#nowarn FS0057
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Collections.Generic

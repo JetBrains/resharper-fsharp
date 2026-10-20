@@ -1,6 +1,4 @@
-﻿#nowarn FS0057
-
-namespace JetBrains.ReSharper.Plugins.FSharp.Checker
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Concurrent
