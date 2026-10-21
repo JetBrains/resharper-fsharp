@@ -89,6 +89,8 @@ type FSharpChecker with
                     return! Async.AwaitTask worker
 
             | FcsProjectSnapshot projectSnapshot ->
+                if not allowStale then return! parseAndCheckFile else
+
                 match x.TryGetRecentCheckResultsForFile(path, projectSnapshot, userOpName = opName) with
                 | None -> return! parseAndCheckFile
                 | result -> return result
