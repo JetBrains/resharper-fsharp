@@ -68,6 +68,7 @@ dependencies {
     bundledModule("intellij.rider.rdclient.dotnet.spellchecker")
     bundledModule("intellij.rider.rdclient.dotnet")
     bundledModule("intellij.rider.languages")
+    bundledModule("intellij.rider.languages.psi")
     bundledPlugin("com.intellij.modules.json")
     bundledPlugin("com.intellij.modules.jcef")
     bundledPlugin("JavaScript")
