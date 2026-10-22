@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Concurrent
+open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open JetBrains.Application.BuildScript.Application.Zones
@@ -131,19 +132,34 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
               ReferencedModules = EmptySet.Instance }
         )
 
-    let updateFile (path: VirtualFileSystemPath) =
-        if not checkerService.UseTransparentCompiler then () else
+    let changedFiles = HashSet<VirtualFileSystemPath>()
 
+    let updateFile (path: VirtualFileSystemPath) =
         for KeyValue(scriptPath, fcsProject) in scriptFcsProjects do
             match fcsProject with
             | Some ({ Options = FcsProjectOptions.FcsProjectSnapshot _ } as fcsProject) when fcsProject.FileIndices.ContainsKey(path) ->
                 scriptFcsProjects[scriptPath] <- Some (fcsProject.WithUpdatedFile(path))
             | _ -> ()
 
+    let processChangedFiles () =
+        if changedFiles.Count = 0 then () else
+
+        lock changedFiles (fun _ ->
+            for path in changedFiles do
+                updateFile path
+
+            changedFiles.Clear()
+        )
+
     do
-        sourceCache.FileUpdated.Advise(lifetime, updateFile)
+        sourceCache.FileUpdated.Advise(lifetime, fun path ->
+            if checkerService.UseTransparentCompiler then
+                lock changedFiles (fun _ -> changedFiles.Add(path) |> ignore)
+        )
 
     let rec updateOptionsIfNeeded path (document: IDocument) =
+        processChangedFiles ()
+
         let sequentialLifetimes = scriptsUpdateLifetimes.GetOrAdd(path, SequentialLifetimes(lifetime))
         let currentLifetime = sequentialLifetimes.Next()
 
@@ -157,7 +173,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
 
             let inline update path newOptions =
                 let fcsProject = createFcsProject path (Some newOptions)
-                if not (currentLifetime.TryExecute(fun () -> scriptFcsProjects[path] <- fcsProject).Succeed) then ()
+                if not (currentLifetime.TryExecute(fun () -> lock changedFiles (fun _ -> scriptFcsProjects[path] <- fcsProject)).Succeed) then ()
                 else optionsUpdated.Fire((path, newOptions))
 
             match oldOptions, newOptions with
