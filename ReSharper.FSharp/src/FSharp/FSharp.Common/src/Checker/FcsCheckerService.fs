@@ -43,6 +43,7 @@ type FcsProjectInvalidationType =
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISettingsStore, locks: IShellLocks) =
+
     let checker =
         lazy
             Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")

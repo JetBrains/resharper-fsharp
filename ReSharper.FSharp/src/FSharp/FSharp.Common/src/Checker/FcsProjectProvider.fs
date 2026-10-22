@@ -127,7 +127,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 match tryGetValue referencingProjectKey fcsProjects with
                 | None -> ()
                 | Some referencingFcsProject ->
-                    updateProject referencingProjectKey (referencingFcsProject.WithReferencedProject(outputPath, snapshot))
+                    updateProject referencingProjectKey (referencingFcsProject.WithUpdateReferencedProject(outputPath, snapshot))
         | _ -> ()
 
     let updateFile (path: VirtualFileSystemPath) =
@@ -224,7 +224,6 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             let options =
                 match fcsProject.Options with
                 | FcsProjectSnapshot snapshot ->
-                    //TODO: put a stamp on the creating?
                     FcsProjectSnapshot(snapshot.With(stamp = stamp))
 
                 | FcsProjectOptions(projectOptions, parsingOptions) ->
