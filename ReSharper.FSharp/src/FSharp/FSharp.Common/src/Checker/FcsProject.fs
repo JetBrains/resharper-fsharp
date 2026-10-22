@@ -87,6 +87,14 @@ type FcsProjectOptions =
         //TODO: change type to array in FCS 
         | FcsProjectSnapshot(snapshot) -> snapshot.OtherOptions
 
+    member x.ReferencePaths: string seq =
+        match x with
+        | FcsProjectOptions(options, _) ->
+            options.OtherOptions
+            |> Seq.choose (fun o -> if o.StartsWith("-r:", StringComparison.Ordinal) then Some(o.Substring(3)) else None)
+
+        | FcsProjectSnapshot(snapshot) -> snapshot.ReferencesOnDisk |> Seq.map _.Path
+
     member x.ParsingOptions: FSharpParsingOptions =
         match x with
         | FcsProjectOptions(_, parsingOptions) -> parsingOptions
@@ -112,12 +120,19 @@ type FcsProjectOptions =
     member x.AreSameForChecking(y: FcsProjectOptions) =
         let inline arrayEq a1 a2 = Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
+        let referencesOnDisk (options: FcsProjectOptions) =
+            match options with
+            | FcsProjectSnapshot(snapshot) -> snapshot.ReferencesOnDisk
+            | _ -> []
+
         if x.ProjectFileName <> y.ProjectFileName ||
            not (arrayEq x.SourceFiles y.SourceFiles) ||
            x.OtherOptions <> y.OtherOptions
            then false else
 
-        if x.UseScriptResolutionRules then x.OriginalLoadReferences = y.OriginalLoadReferences else
+        if x.UseScriptResolutionRules then
+            x.OriginalLoadReferences = y.OriginalLoadReferences &&
+            referencesOnDisk x = referencesOnDisk y else
 
         match x, y with
         | FcsProjectOptions(x, _), FcsProjectOptions(y, _) ->
