@@ -6,6 +6,7 @@ open System.Threading.Tasks
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
 open FSharp.Compiler.Text
+open JetBrains.Application.ContentModel
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.Util.Logging
@@ -20,8 +21,10 @@ type FSharpChecker with
         let source = sourceFile.Document.GetText()
 
         let options =
+            // Todo: workaround for document forks: the forked file content isn't visible through the project snapshot,
+            //  so it is replaced explicitly here; support forks in FSharpSourceCache and AssemblyReaderShim instead
             match fcsProject.Options with
-            | FcsProjectSnapshot projectSnapshot ->
+            | FcsProjectSnapshot projectSnapshot when ContentModelFork.IsCurrentlyForked ->
                 let currentFileSnapshot = FSharpFileSnapshot.CreateFromString(path, source)
                 FcsProjectSnapshot(projectSnapshot.Replace([currentFileSnapshot]))
             | options -> options
