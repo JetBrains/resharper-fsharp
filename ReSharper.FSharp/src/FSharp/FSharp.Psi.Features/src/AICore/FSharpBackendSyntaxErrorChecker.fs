@@ -30,6 +30,7 @@ type FSharpBackendSyntaxErrorChecker(checkerService: FcsCheckerService, document
                 else checkerService.FcsProjectProvider.GetParsingOptions(sourceFile), sourceFile.GetLocation()
 
             let document = documentFactory.CreateSimpleDocumentFromText(modifiedContent, "F# Sandbox File for Syntax Check")
+
             let parsingResult = checkerService.ParseFile(path, document, parsingOptions, noCache = true)
             
             match parsingResult with

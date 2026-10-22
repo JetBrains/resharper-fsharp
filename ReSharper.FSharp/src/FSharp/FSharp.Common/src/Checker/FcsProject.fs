@@ -190,7 +190,7 @@ and FcsProject =
 
         | _ -> x
 
-    member x.WithReferencedProject(outputPath: string, referencedSnapshot: FSharpProjectSnapshot) =
+    member x.WithUpdateReferencedProject(outputPath: string, referencedSnapshot: FSharpProjectSnapshot) =
         match x.Options with
         | FcsProjectSnapshot(snapshot) ->
             let referencedProjects =
