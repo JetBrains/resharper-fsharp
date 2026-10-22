@@ -9,6 +9,7 @@ open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Application.ContentModel
 open JetBrains.Application.Parts
 open JetBrains.Application.Settings
 open JetBrains.Application.Threading
@@ -172,7 +173,10 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                 | _ -> None
 
             | FcsProjectSnapshot projectSnapshot ->
-                let projectSnapshot = projectSnapshot.Replace([FSharpFileSnapshot.CreateFromString(path, content)])
+                let projectSnapshot =
+                    if not ContentModelFork.IsCurrentlyForked then projectSnapshot
+                    else projectSnapshot.Replace([FSharpFileSnapshot.CreateFromString(path, content)])
+
                 match checker.Value.TryGetRecentCheckResultsForFile(path, projectSnapshot) with
                 | Some (_, checkResults) -> Some checkResults
                 | _ -> None
