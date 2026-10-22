@@ -29,13 +29,14 @@ type FcsProjectKey =
 module FSharpProjectSnapshotExtensions =
     type FSharpProjectSnapshot with
         //TODO: add a simpler ctor in FCS
-        member x.With(?referencedProjects: FSharpReferencedProjectSnapshot list,
+        member x.With(?sourceFiles: FSharpFileSnapshot list,
+                      ?referencedProjects: FSharpReferencedProjectSnapshot list,
                       ?stamp: int64 option) =
             FSharpProjectSnapshot.Create(
                 x.ProjectFileName,
                 x.OutputFileName,
                 x.ProjectId,
-                x.SourceFiles,
+                defaultArg sourceFiles x.SourceFiles,
                 x.ReferencesOnDisk,
                 x.OtherOptions,
                 defaultArg referencedProjects x.ReferencedProjects,
@@ -136,10 +137,17 @@ type FcsProjectOptions =
             )
 
         | FcsProjectSnapshot(x), FcsProjectSnapshot(y) ->
-            x.ReferencesOnDisk = y.ReferencesOnDisk && //TODO: array
+            x.ReferencesOnDisk = y.ReferencesOnDisk &&
             x.ReferencedProjects.Length = y.ReferencedProjects.Length &&
             (x.ReferencedProjects, y.ReferencedProjects)
-            ||> List.forall2 (fun r1 r2 -> arrayEq r1.Version r2.Version)
+            ||> List.forall2 (fun r1 r2 ->
+                match r1, r2 with
+                | FSharpReferencedProjectSnapshot.FSharpReference(_, r1),
+                  FSharpReferencedProjectSnapshot.FSharpReference(_, r2) ->
+                    r1.Stamp = r2.Stamp
+
+                | _ -> r1 = r2
+            )
 
         | _ -> false
 
@@ -173,6 +181,28 @@ and FcsProject =
 
     member x.AreSameForChecking(y: FcsProject) =
         x.Options.AreSameForChecking(y.Options)
+
+    member x.WithUpdatedFile(path: VirtualFileSystemPath) =
+        match x.Options with
+        | FcsProjectSnapshot(snapshot) when x.FileIndices.ContainsKey(path) ->
+            let snapshot = snapshot.Replace([FSharpFileSnapshot.CreateFromFileSystem(path.FullPath)])
+            { x with Options = FcsProjectSnapshot(snapshot) }
+
+        | _ -> x
+
+    member x.WithReferencedProject(outputPath: string, referencedSnapshot: FSharpProjectSnapshot) =
+        match x.Options with
+        | FcsProjectSnapshot(snapshot) ->
+            let referencedProjects =
+                snapshot.ReferencedProjects
+                |> List.map (function
+                    | FSharpReferencedProjectSnapshot.FSharpReference(path, _) when path = outputPath ->
+                        FSharpReferencedProjectSnapshot.FSharpReference(path, referencedSnapshot)
+                    | reference -> reference)
+
+            { x with Options = FcsProjectSnapshot(snapshot.With(referencedProjects = referencedProjects)) }
+
+        | _ -> x
 
     member x.WithReferences(moduleReferences: FcsProjectKey array, mapper: FcsProjectKey -> FcsReferencedModule option) =
         let applicableReferences = moduleReferences |> Seq.choose mapper
@@ -239,7 +269,7 @@ and FcsProject =
             for referencedProject in projectSnapshot.ReferencedProjects do
                 let stamp =
                     match referencedProject with
-                    | FSharpReferencedProjectSnapshot.FSharpReference(_, options) -> $"{options.Stamp}: "
+                    | FSharpReferencedProjectSnapshot.FSharpReference(_, snapshot) -> $"{snapshot.Stamp}: "
                     | _ -> ""
                 writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
 

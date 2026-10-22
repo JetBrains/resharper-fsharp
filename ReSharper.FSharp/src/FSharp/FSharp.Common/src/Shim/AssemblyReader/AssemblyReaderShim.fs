@@ -84,6 +84,9 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     /// Readers need to check up to date before new FCS requests.
     let dirtyModules = HashSet<IPsiModule>()
 
+    /// Changed modules already reported to FcsProjectProvider since the last FCS request.
+    let changedModules = HashSet<IPsiModule>()
+
     let mutable lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp
 
     do
@@ -182,12 +185,19 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     modulesToInvalidate.Push(referencingModule)
 
         dirtyModules.Clear()
+        changedModules.Clear()
+
+    /// Marks the module dirty after its contents change and notifies the referencing F# projects.
+    let markModuleChanged (psiModule: IPsiModule) =
+        dirtyModules.Add(psiModule) |> ignore
+        if changedModules.Add(psiModule) && isKnownModule psiModule then
+            getFcsProjectProvider().ReferencedModuleChanged(psiModule)
 
     let markTypePartDirty (typePart: TypePart) =
         if ContentModelFork.IsCurrentlyForked then () else
 
         if isEnabled () && assemblyReadersByModule.Count <> 0 then
-            dirtyModules.Add(typePart.TypeElement.Module) |> ignore
+            markModuleChanged typePart.TypeElement.Module
 
     do
         lifetime.Bracket(
@@ -290,7 +300,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 match change.Type with
                 | PsiModuleChange.ChangeType.Modified
                 | PsiModuleChange.ChangeType.Invalidated ->
-                    dirtyModules.Add(change.Item) |> ignore
+                    markModuleChanged change.Item
 
                 | PsiModuleChange.ChangeType.Removed ->
                     removeModule change.Item

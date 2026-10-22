@@ -26,6 +26,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
+open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -361,12 +362,17 @@ type TestFcsProjectBuilder(checkerService, modulePathProvider, logger, languageL
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerService,
-        fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
+        fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider,
+        sourceCache: FSharpSourceCache) as this =
+
+    let mutable currentFcsProject: FcsProject option = None
+
     do
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
-
-    let mutable currentFcsProject: FcsProject option = None
+        sourceCache.FileUpdated.Advise(lifetime, fun path ->
+            currentFcsProject <-
+                currentFcsProject |> Option.map _.WithUpdatedFile(path))
 
     let getNewFcsProject (psiModule: IPsiModule) =
         let projectKey = FcsProjectKey.Create(psiModule)
@@ -454,6 +460,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         member x.ProjectRemoved = new Signal<_>("Todo") :> _
 
         member x.InvalidateReferencesToProject _ = false
+        member x.ReferencedModuleChanged _ = ()
         member x.HasFcsProjects = false
         member this.GetAllFcsProjects() = []
 

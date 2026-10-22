@@ -79,8 +79,8 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         let source = SourceTextNew.ofString(source)
 
         if x.UseTransparentCompiler then
-            let options, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
-            FcsProjectOptions.FcsProjectSnapshot(options), errors
+            let snapshot, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
+            FcsProjectOptions.FcsProjectSnapshot(snapshot), errors
         else
             let options, errors = checker.Value.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
             let parsingOptions =
@@ -126,8 +126,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         | None -> None
         | Some fcsProject ->
 
-        let options = fcsProject.Options
-        if not (fcsProject.IsKnownFile(sourceFile)) && not options.UseScriptResolutionRules then None else
+        if not (fcsProject.IsKnownFile(sourceFile)) && not fcsProject.Options.UseScriptResolutionRules then None else
 
         x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
 
@@ -276,6 +275,9 @@ type IFcsProjectProvider =
 
     /// Returns True when the project has been invalidated.
     abstract InvalidateReferencesToProject: IProject -> bool
+
+    /// Recreates snapshots of F# projects referencing the changed module, so FCS gets its actual timestamp.
+    abstract ReferencedModuleChanged: psiModule: IPsiModule -> unit
 
     abstract ProjectRemoved: ISignal<FcsProjectKey * FcsProject>
 

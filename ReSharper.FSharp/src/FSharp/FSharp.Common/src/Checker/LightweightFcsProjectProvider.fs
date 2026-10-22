@@ -44,6 +44,7 @@ type LightweightFcsProjectProvider(lifetime: Lifetime, checkerService: FcsChecke
         member this.GetFileIndex _ = 0
         member this.HasPairFile _ = false
         member this.InvalidateReferencesToProject _ = false
+        member this.ReferencedModuleChanged _ = ()
         member this.ProjectRemoved = projectRemoved :> _
         member this.PrepareAssemblyShim _ = ()
         member this.GetReferencedModule _ = None

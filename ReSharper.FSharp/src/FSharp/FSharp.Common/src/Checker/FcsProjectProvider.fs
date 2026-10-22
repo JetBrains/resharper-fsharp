@@ -27,6 +27,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Shim.AssemblyReader
+open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
@@ -68,6 +69,12 @@ module FcsProjectProvider =
         ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
         ProjectModelChangeType.REFERENCE_TARGET
 
+[<RequireQualifiedAccess>]
+type FcsProjectChange =
+    | Invalidate of fcsProject: FcsProject * invalidationType: FcsProjectInvalidationType
+    | FileUpdated of path: VirtualFileSystemPath
+    | ReferencedModuleChanged of projectKey: FcsProjectKey
+
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>, typeof<IFSharpPluginZone>)>]
 type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
@@ -75,16 +82,16 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         scriptFcsProjectProvider: IScriptFcsProjectProvider,
         fsFileService: IFSharpFileService, fsItemsContainer: IFSharpItemsContainer,
         locks: IShellLocks, logger: ILogger, fcsAssemblyReaderShim: ILazy<IFcsAssemblyReaderShim>, psiModules: IPsiModules,
-        moduleReferencesResolveStore: IModuleReferencesResolveStore) as this =
+        moduleReferencesResolveStore: IModuleReferencesResolveStore, sourceCache: FSharpSourceCache) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     /// The main cache for FCS project model and related things.
-    let fcsProjects = Dictionary<FcsProjectKey, FcsProject>()
+    let fcsProjects = ConcurrentDictionary<FcsProjectKey, FcsProject>()
 
     /// Prevents invalidating and removing projects that were already seen by FCS.
     /// This allows reusing them if the project is considered unchanged by FCS after the changes.
     /// This collection is emptied on the first FCS request, i.e. after the project model changes are processed.
-    let invalidatedFcsProjects = ConcurrentQueue<FcsProject * FcsProjectInvalidationType>()
+    let fcsProjectChanges = ConcurrentQueue<FcsProjectChange>()
 
     let referencedModules = Dictionary<FcsProjectKey, ReferencedModule>()
 
@@ -101,6 +108,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         changeManager.Changed.Advise(lifetime, this.ProcessChange)
         fsItemsContainer.ProjectLoaded.Advise(lifetime, this.ProcessItemsContainerUpdate)
         fsItemsContainer.ProjectUpdated.Advise(lifetime, this.ProcessItemsContainerUpdate)
+        sourceCache.FileUpdated.Advise(lifetime, this.ProcessFileUpdate)
         checkerService.FcsProjectProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
@@ -108,6 +116,37 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         match tryGetValue projectKey referencedModules with
         | None -> Seq.empty
         | Some referencedModule -> referencedModule.ReferencingProjects :> _
+
+    let rec updateProject (projectKey: FcsProjectKey) (fcsProject: FcsProject) =
+        fcsProjects[projectKey] <- fcsProject
+
+        match fcsProject.Options with
+        | FcsProjectSnapshot snapshot ->
+            let outputPath = fcsProject.OutputPath.FullPath
+            for referencingProjectKey in getReferencingModules projectKey do
+                match tryGetValue referencingProjectKey fcsProjects with
+                | None -> ()
+                | Some referencingFcsProject ->
+                    updateProject referencingProjectKey (referencingFcsProject.WithReferencedProject(outputPath, snapshot))
+        | _ -> ()
+
+    let updateFile (path: VirtualFileSystemPath) =
+        for projectItem in solution.FindProjectItemsByLocation(path) do
+            for projectKey in projectsToProjectKeys[projectItem.GetProject()] do
+                match tryGetValue projectKey fcsProjects with
+                | None -> ()
+                | Some fcsProject ->
+
+                let updatedFcsProject = fcsProject.WithUpdatedFile(path)
+                if updatedFcsProject != fcsProject then
+                    updateProject projectKey updatedFcsProject
+
+    let updateReferencingProjects (projectKey: FcsProjectKey) =
+        for referencingProjectKey in getReferencingModules projectKey do
+            match tryGetValue referencingProjectKey fcsProjects with
+            | Some({ Options = FcsProjectSnapshot snapshot } as fcsProject) ->
+                updateProject referencingProjectKey { fcsProject with Options = FcsProjectSnapshot(snapshot.With()) }
+            | _ -> ()
 
     let rec removeProject (projectKey: FcsProjectKey) =
         locks.AssertWriteAccessAllowed()
@@ -126,9 +165,9 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     if referencedModule.ReferencingProjects.Count = 0 then
                         referencedModules.Remove(referencedProjectKey) |> ignore
 
-            fcsProjects.Remove(projectKey) |> ignore
+            fcsProjects.TryRemove(projectKey) |> ignore
             outputPathToProjectKey.Remove(fcsProject.OutputPath) |> ignore
-            invalidatedFcsProjects.Enqueue(fcsProject, FcsProjectInvalidationType.Remove)
+            fcsProjectChanges.Enqueue(FcsProjectChange.Invalidate(fcsProject, FcsProjectInvalidationType.Remove))
             fcsProjectInvalidated.Fire((projectKey, fcsProject))
 
         referencedModules.Remove(projectKey) |> ignore
@@ -365,19 +404,28 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                 loop dirtyProject
 
     let processInvalidatedFcsProjects () =
-        if invalidatedFcsProjects.IsEmpty then () else
+        if fcsProjectChanges.IsEmpty then () else
 
-        lock invalidatedFcsProjects (fun _ ->
+        lock fcsProjectChanges (fun _ ->
             let invalidated = HashSet()
-            
-            let mutable fcsProjectToInvalidate = Unchecked.defaultof<_>
-            while invalidatedFcsProjects.TryDequeue(&fcsProjectToInvalidate) do
-                if invalidated.Contains(fcsProjectToInvalidate) then () else
 
-                let fcsProject, invalidationType = fcsProjectToInvalidate
-                checkerService.InvalidateFcsProject(fcsProject, invalidationType)
+            let mutable change = Unchecked.defaultof<_>
+            while fcsProjectChanges.TryPeek(&change) do
+                try
+                    match change with
+                    | FcsProjectChange.Invalidate(fcsProject, invalidationType) ->
+                        if invalidated.Contains((fcsProject, invalidationType)) then () else
 
-                invalidated.Add(fcsProjectToInvalidate) |> ignore
+                        checkerService.InvalidateFcsProject(fcsProject, invalidationType)
+                        invalidated.Add((fcsProject, invalidationType)) |> ignore
+
+                    | FcsProjectChange.FileUpdated path ->
+                        updateFile path
+
+                    | FcsProjectChange.ReferencedModuleChanged projectKey ->
+                        updateReferencingProjects projectKey
+                finally
+                    fcsProjectChanges.TryDequeue(&change) |> ignore
         )
 
         // fcsProjectInvalidated.Fire((psiModule, fcsProject))
@@ -439,6 +487,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         let project = change.GetOldProject()
         if isNotNull project then
             dirtyProjects.Add(project) |> ignore
+
+    member this.ProcessFileUpdate(path: VirtualFileSystemPath) =
+        if not checkerService.UseTransparentCompiler then () else
+
+        fcsProjectChanges.Enqueue(FcsProjectChange.FileUpdated(path))
 
     member this.ProcessItemsContainerUpdate(projectMark: IProjectMark) =
         let project = solution.GetProjectByMark(projectMark)
@@ -524,17 +577,26 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
                     for referencingProjectKey in referencedModule.ReferencingProjects do
                         tryGetValue referencingProjectKey fcsProjects
                         |> Option.iter (fun referencingProject ->
-                            invalidatedFcsProjects.Enqueue(referencingProject, FcsProjectInvalidationType.Invalidate))
+                            fcsProjectChanges.Enqueue(FcsProjectChange.Invalidate(referencingProject, FcsProjectInvalidationType.Invalidate)))
 
                     true
             )
 
-        member x.HasFcsProjects = not (fcsProjects.IsEmpty())
+        member x.ReferencedModuleChanged(psiModule) =
+            if not checkerService.UseTransparentCompiler then () else
+
+            let projectKey = FcsProjectKey.Create(psiModule)
+            fcsProjectChanges.Enqueue(FcsProjectChange.ReferencedModuleChanged(projectKey))
+
+        member x.HasFcsProjects = not fcsProjects.IsEmpty
 
         member this.GetAllFcsProjects() =
             fcsProjects.Values
 
         member this.GetFcsProject(psiModule) =
+            locks.AssertReadAccessAllowed()
+            processInvalidatedFcsProjects ()
+
             tryGetFcsProjectForProjectOrScript psiModule
 
         member this.GetPsiModule(outputPath) =
