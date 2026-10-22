@@ -55,8 +55,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
 
         projectProvider.GetProjectOptions(sourceFile)
         |> Option.map (fun options ->
-            options.OtherOptions
-            |> Seq.choose (fun o -> if o.StartsWith("-r:") then Some (o.Substring("-r:".Length)) else None)
+            options.ReferencePaths
             |> Seq.map (fun p -> VirtualFileSystemPath.TryParse(p, InteractionContext.SolutionContext))
             |> Seq.filter (fun p -> not p.IsEmpty && directory.IsPrefixOf(p))
             |> Seq.map _.Name
