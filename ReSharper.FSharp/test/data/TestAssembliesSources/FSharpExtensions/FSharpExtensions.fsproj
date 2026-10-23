@@ -10,6 +10,7 @@
     <Compile Include="TypeDecl.fs" />
     <Compile Include="Extensions.fs" />
     <Compile Include="PropertyAndType.fs" />
+    <Compile Include="InterfaceExtensions.fs" />
   </ItemGroup>
 
   <ItemGroup>

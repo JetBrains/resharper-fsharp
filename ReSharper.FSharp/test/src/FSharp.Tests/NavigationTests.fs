@@ -188,6 +188,10 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Member - Virtual - Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Member - Virtual - Property 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Extension - Interface 01``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
+    member x.``Extension - Interface 02 - Compiled``() = x.DoNamedTest()
+
     [<Test>] member x.``Signature 01``() = x.DoTestSolution("Signature 01.fsi", "Signature 01.fs")
     [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
 

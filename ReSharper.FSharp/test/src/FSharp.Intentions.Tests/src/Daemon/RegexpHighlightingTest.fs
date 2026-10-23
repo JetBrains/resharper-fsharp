@@ -31,6 +31,7 @@ type RegexpHighlightingTest() =
     [<Test>] member x.``Detection 03 - Active pattern``() = x.DoNamedTest()
     [<Test>] member x.``Detection 04``() = x.DoNamedTest()
     [<Test>] member x.``Detection 05 - Wrong arg - Not available``() = x.DoNamedTest()
+    [<Test>] member x.``Detection 06 - Interface augmentation``() = x.DoNamedTest()
 
     [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
     member x.``Detection - Compiled 01``() = x.DoNamedTest()

@@ -1,0 +1,32 @@
+﻿Running test case at line 5 col 11
+=================================================
+  ## GotoDeclarationProvider activity:
+    Immediate result:
+      DEO: Envoy: Method:InterfaceExtensions.I.set_Prop(InterfaceExtensions+I _,System.String _arg1), PsiLanguageType:UNKNOWN as Envoy: Method:InterfaceExtensions.I.set_Prop(InterfaceExtensions+I _,System.String _arg1), PsiLanguageType:UNKNOWN RANGE: (0,0) @ FSharpExtensions
+      Navigation result:
+        opened file: InterfaceExtensions.cs
+        ------------------
+        {
+          [CompilationArgumentCounts(new int[] {1, 1})]
+          public static void |CARET|I\u002Eset_Prop(InterfaceExtensions.I _, string _arg1)
+          {
+          }
+        ------------------
+
+
+Running test case at line 6 col 16
+=================================================
+  ## GotoDeclarationProvider activity:
+    Immediate result:
+      DEO: Envoy: Method:InterfaceExtensions.IDisposable.set_Prop(System.IDisposable _,System.String _arg1), PsiLanguageType:UNKNOWN as Envoy: Method:InterfaceExtensions.IDisposable.set_Prop(System.IDisposable _,System.String _arg1), PsiLanguageType:UNKNOWN RANGE: (0,0) @ FSharpExtensions
+      Navigation result:
+        opened file: InterfaceExtensions.cs
+        ------------------
+
+          [CompilationArgumentCounts(new int[] {1, 1})]
+          public static void |CARET|IDisposable\u002Eset_Prop(IDisposable _, string _arg1)
+          {
+          }
+        ------------------
+
+

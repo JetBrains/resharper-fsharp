@@ -1,0 +1,32 @@
+﻿Running test case at line 12 col 11
+=================================================
+  ## GotoDeclarationProvider activity:
+    Immediate result:
+      TO: [O] member _.|Prop| with set _ = () RANGE: (68,72) @ Extension - Interface 01.fs
+      Navigation result:
+        opened file: Extension - Interface 01.fs
+        ------------------
+
+        type I with
+            member _.|CARET|Prop with set _ = ()
+
+        type Class() =
+        ------------------
+
+
+Running test case at line 25 col 16
+=================================================
+  ## GotoDeclarationProvider activity:
+    Immediate result:
+      TO: [O] member _.|Prop| with set _ = () RANGE: (190,194) @ Extension - Interface 01.fs
+      Navigation result:
+        opened file: Extension - Interface 01.fs
+        ------------------
+
+        type IDisposable with
+            member _.|CARET|Prop with set _ = ()
+
+        type Class2() =
+        ------------------
+
+
