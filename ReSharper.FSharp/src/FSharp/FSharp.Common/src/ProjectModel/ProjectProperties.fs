@@ -10,6 +10,7 @@ open JetBrains.Application.Parts
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
+open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
@@ -131,7 +132,7 @@ and FSharpBuildSettings() =
 
 
 [<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
-[<ZoneMarker(typeof<IHostSolutionZone>)>]
+[<ZoneMarker(typeof<IHostSolutionZone>, typeof<IMsBuildZone>)>]
 type FSharpProjectApplicableProvider() =
     interface ProjectConfigurationValidator.IApplicableProvider with
         member x.IsApplicable(projectMark) =
