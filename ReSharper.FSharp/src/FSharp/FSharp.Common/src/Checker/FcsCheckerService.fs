@@ -44,21 +44,21 @@ type FcsProjectInvalidationType =
 [<ShellComponent(Instantiation.DemandAnyThreadSafe); AllowNullLiteral>]
 type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISettingsStore, locks: IShellLocks) =
 
+    let useTransparentCompiler =
+        lazy SettingsUtil.getValue<FSharpExperimentalFeatures, bool> settingsStore "UseTransparentCompiler"
+
     let checker =
         lazy
             Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
 
             let settingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
 
-            let getSettingProperty setting =
+            let getSettingProperty name =
+                let setting = SettingsUtil.getEntry<FSharpOptions> settingsStore name
                 settingsStoreLive.GetValueProperty2(lifetime, setting, null, ApartmentForNotifications.Primary(locks))
 
-            let getOptionsProperty name = getSettingProperty (SettingsUtil.getEntry<FSharpOptions> settingsStore name)
-
-            let skipImpl = getOptionsProperty "SkipImplementationAnalysis"
-            let analyzerProjectReferencesInParallel = getOptionsProperty "ParallelProjectReferencesAnalysis"
-            let useTransparentCompiler =
-                getSettingProperty (SettingsUtil.getEntry<FSharpExperimentalFeatures> settingsStore "UseTransparentCompiler")
+            let skipImpl = getSettingProperty "SkipImplementationAnalysis"
+            let analyzerProjectReferencesInParallel = getSettingProperty "ParallelProjectReferencesAnalysis"
 
             let checker =
                 FSharpChecker.Create(projectCacheSize = 200,
@@ -72,7 +72,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
-    member x.UseTransparentCompiler = checker.Value.UsesTransparentCompiler
+    member x.UseTransparentCompiler = useTransparentCompiler.Value
 
     member x.GetParsingOptionsFromCommandLineArgs(args: string list) =
         checker.Value.GetParsingOptionsFromCommandLineArgs(args)
