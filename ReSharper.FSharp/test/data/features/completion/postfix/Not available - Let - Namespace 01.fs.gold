@@ -157,7 +157,6 @@ Net
 NetPipeStyleUriParser
 NetTcpStyleUriParser
 NewsStyleUriParser
-NonSerializedAttribute
 NotFiniteNumberException
 NotImplementedException
 NotSupportedException
@@ -194,7 +193,6 @@ SByte
 STAThreadAttribute
 Security
 SequencePosition
-SerializableAttribute
 Single
 Span
 StackOverflowException
