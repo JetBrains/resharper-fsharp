@@ -378,10 +378,6 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
         let projectKey = FcsProjectKey.Create(psiModule)
         fcsProjectBuilder.BuildFcsProject(projectKey)
 
-    // todo: referenced projects
-    let areSameForChecking (newProject: FcsProject) (oldProject: FcsProject) =
-        oldProject.AreSameForChecking(newProject)
-
     let getFcsProject (psiModule: IPsiModule) =
         lock this (fun _ ->
             let newFcsProject = getNewFcsProject psiModule
