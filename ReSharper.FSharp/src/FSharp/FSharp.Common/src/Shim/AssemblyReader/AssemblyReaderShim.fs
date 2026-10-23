@@ -84,9 +84,6 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
     /// Readers need to check up to date before new FCS requests.
     let dirtyModules = HashSet<IPsiModule>()
 
-    /// Changed modules already reported to FcsProjectProvider since the last FCS request.
-    let changedModules = HashSet<IPsiModule>()
-
     let mutable lastSyncedWriteLockTimestamp = locks.ContentModelLocks.WriteLockTimestamp
 
     do
@@ -185,19 +182,12 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     modulesToInvalidate.Push(referencingModule)
 
         dirtyModules.Clear()
-        changedModules.Clear()
-
-    /// Marks the module dirty after its contents change and notifies the referencing F# projects.
-    let markModuleChanged (psiModule: IPsiModule) =
-        dirtyModules.Add(psiModule) |> ignore
-        if changedModules.Add(psiModule) && isKnownModule psiModule then
-            getFcsProjectProvider().ReferencedModuleChanged(psiModule)
 
     let markTypePartDirty (typePart: TypePart) =
         if ContentModelFork.IsCurrentlyForked then () else
 
         if isEnabled () && assemblyReadersByModule.Count <> 0 then
-            markModuleChanged typePart.TypeElement.Module
+            dirtyModules.Add(typePart.TypeElement.Module) |> ignore
 
     do
         lifetime.Bracket(
@@ -280,7 +270,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     let referencedModule = projectKeyToPsiModules.TryGetValue(referencedProjectKey)
                     if isNotNull referencedModule && assemblyReadersByModule.ContainsKey(referencedModule) then
                         barrier.EnqueueJob(fun _ ->
-                            tryGetReaderFromModule referencedModule |> Option.iter _.UpdateTimestamp()
+                            tryGetReaderFromModule referencedModule |> Option.iter (fun reader ->
+                                let timestamp = reader.Timestamp
+                                reader.UpdateTimestamp()
+                                if reader.Timestamp <> timestamp then
+                                    getFcsProjectProvider().ReferencedModuleChanged(referencedModule))
                         )
 
                 lastSyncedWriteLockTimestamp <- locks.ContentModelLocks.WriteLockTimestamp
@@ -300,7 +294,7 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                 match change.Type with
                 | PsiModuleChange.ChangeType.Modified
                 | PsiModuleChange.ChangeType.Invalidated ->
-                    markModuleChanged change.Item
+                    dirtyModules.Add(change.Item) |> ignore
 
                 | PsiModuleChange.ChangeType.Removed ->
                     removeModule change.Item
