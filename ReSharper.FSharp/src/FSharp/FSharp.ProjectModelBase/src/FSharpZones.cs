@@ -1,4 +1,5 @@
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.ProjectModel.MSBuild;
 using JetBrains.ProjectModel.NuGet;
 using JetBrains.ReSharper.Daemon.Syntax;
 using JetBrains.ReSharper.Feature.Services;
@@ -22,6 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     IRequire<IFSharpPsiZone>,
     IRequire<DaemonZone>,
     IRequire<INuGetZone>,
+    IRequire<IMsBuildZone>,
     IRequire<IReSpellerZone>,
     IRequire<ISyntaxHighlightingZone>,
     IRequire<NavigationZone>;
