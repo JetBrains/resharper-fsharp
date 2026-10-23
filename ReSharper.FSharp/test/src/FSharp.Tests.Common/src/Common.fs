@@ -462,7 +462,7 @@ type TestFcsProjectProvider(lifetime: Lifetime, checkerService: FcsCheckerServic
 
         member this.GetProjectOptions(_: IPsiModule): FcsProjectOptions option = failwith "todo"
         member this.GetFcsProject(psiModule) = Some (getFcsProject psiModule)
-        member this.PrepareAssemblyShim _ = ()
+        member this.PrepareAssemblyShim _ = None
         member this.GetReferencedModule _ = None
         member this.GetPsiModule _ = failwith "todo"
         member this.GetAllReferencedModules() = failwith "todo"

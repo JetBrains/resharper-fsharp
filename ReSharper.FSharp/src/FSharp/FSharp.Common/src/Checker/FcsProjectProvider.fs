@@ -613,10 +613,13 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member this.PrepareAssemblyShim(psiModule) =
             locks.AssertReadAccessAllowed()
 
-            if psiModule :? FSharpScriptPsiModule then () else
+            if psiModule :? FSharpScriptPsiModule then None else
 
             match tryGetFcsProject psiModule with
-            | None -> logger.Trace("Could not get fcs project; exiting")
+            | None ->
+                logger.Trace("Could not get fcs project; exiting")
+                None
+
             | Some fcsProject ->
 
             // todo: remove this
@@ -625,6 +628,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
             logger.Trace("Finish processing FCS requests")
 
             fcsAssemblyReaderShim.Value.PrepareForFcsRequest(fcsProject)
+
+            if checkerService.UseTransparentCompiler then
+                (this :> IFcsProjectProvider).GetFcsProject(psiModule)
+            else
+                Some fcsProject
 
         member this.IsProjectOutput(outputPath) =
             outputPathToProjectKey.ContainsKey(outputPath)
