@@ -46,7 +46,7 @@ type LightweightFcsProjectProvider(lifetime: Lifetime, checkerService: FcsChecke
         member this.InvalidateReferencesToProject _ = false
         member this.ReferencedModuleChanged _ = ()
         member this.ProjectRemoved = projectRemoved :> _
-        member this.PrepareAssemblyShim _ = ()
+        member this.PrepareAssemblyShim _ = None
         member this.GetReferencedModule _ = None
         member this.GetAllReferencedModules() = Seq.empty
         member this.HasFcsProjects = false
