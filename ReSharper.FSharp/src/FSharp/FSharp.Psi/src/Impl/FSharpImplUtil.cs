@@ -551,9 +551,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (compiledName == SharedImplUtil.MISSING_DECLARATION_NAME)
           return;
 
+        var partKind = typeDeclaration.TypePartKind;
+        if (partKind is PartKind.Interface or PartKind.Enum or PartKind.Delegate)
+          return;
+
         var parametersCount = typeDeclaration.TypeParameterDeclarations.Count;
         var augmentationInfo =
-          TypeAugmentation.NewTypePart(compiledName, parametersCount, typeDeclaration.TypePartKind);
+          TypeAugmentation.NewTypePart(compiledName, parametersCount, partKind);
 
         var nameInfo = new NameAndParametersCount(sourceName, parametersCount);
         declaredTypeNames[nameInfo] = augmentationInfo;
