@@ -1,5 +1,5 @@
 ﻿Completion: Basic
-Count: 123
+Count: 122
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "|> List.map _.♦"
@@ -19,7 +19,6 @@ EnumerateRunes              StringRuneEnumerator
 Equals                      bool
 GetEnumerator               CharEnumerator
 GetHashCode                 int
-GetPinnableReference        inref<char>
 GetTypeCode                 TypeCode
 IndexOf                     int
 IndexOfAny                  int
@@ -61,7 +60,7 @@ AsMemory |(in System)
 AsParallel |(in System.Linq)
 AsQueryable |(in System.Linq)
 AsSpan |(in System)
-.. +113 more items ..
+.. +112 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -76,7 +75,6 @@ EnumerateRunes              StringRuneEnumerator
 Equals                      bool
 GetEnumerator               CharEnumerator
 GetHashCode                 int
-GetPinnableReference        inref<char>
 GetReverseIndex             int
 GetType                     Type
 GetTypeCode                 TypeCode
@@ -117,4 +115,4 @@ AsMemory |(in System)
 AsParallel |(in System.Linq)
 AsQueryable |(in System.Linq)
 AsSpan |(in System)
-.. +113 more items ..
+.. +112 more items ..
