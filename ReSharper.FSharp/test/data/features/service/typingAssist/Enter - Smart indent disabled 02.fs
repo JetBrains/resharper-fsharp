@@ -1,0 +1,6 @@
+// ${CHAR:Enter}
+// ${SMART_INDENT_ON_ENTER:false}
+module Module
+
+let _ =
+    begin {caret} end
