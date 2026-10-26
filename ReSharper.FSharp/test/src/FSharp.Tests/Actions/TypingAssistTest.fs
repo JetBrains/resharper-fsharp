@@ -2,7 +2,9 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features.TypingAssist
 
 open System.IO
 open JetBrains.Lifetimes
+open JetBrains.Application.Settings
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.Options
 open JetBrains.ReSharper.FeaturesTestFramework.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -17,7 +19,15 @@ open NUnit.Framework
 type FSharpTypingAssistTest() =
     inherit TypingAssistTestBase()
 
+    let mutable smartIndentOnEnter = true
+
     override x.RelativeTestDataPath = "features/service/typingAssist"
+
+    override x.BeforeModification(textControl, _) =
+        smartIndentOnEnter <- TypingAssistTestBase.GetBoolSetting(textControl.Document.Buffer, "SMART_INDENT_ON_ENTER", true).Value
+
+    override x.SetExtraTypingAssistOptions(settingsStore) =
+        settingsStore.SetValue(TypingAssistOptions.SmartIndentOnEnterExpression, smartIndentOnEnter)
 
     [<Test>] member x.``Enter - Parens - Begin 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Parens - Begin 02``() = x.DoNamedTest()
@@ -176,6 +186,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter - Continue line - String 08``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 09``() = x.DoNamedTest()
     [<Test>] member x.``Enter - Continue line - String 10``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter - Smart indent disabled 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter - Smart indent disabled 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter - String 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter - String 02``() = x.DoNamedTest()

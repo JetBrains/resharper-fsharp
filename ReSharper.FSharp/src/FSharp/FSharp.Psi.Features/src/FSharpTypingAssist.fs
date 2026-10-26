@@ -558,13 +558,14 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if this.HandlerEnterInTripleQuotedString(textControl) then true else
         if this.HandleEnterInLineComment(textControl) then true else
-        if this.HandleEnterAfterSingleLineIf(textControl) then true else
-        if this.HandleEnterAddIndent(textControl) then true else
-        if this.HandleEnterAfterErrorAndInfixOp(textControl) then true else
-        if this.HandleEnterInApp(textControl) then true else
-        if this.HandleEnterBeforeDot(textControl) then true else
-        if this.HandleEnterFindLeftBracket(textControl) then true else
-        if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
+        if this.IsSmartIndentOnEnterEnabled(textControl) &&
+           (this.HandleEnterAfterSingleLineIf(textControl) ||
+            this.HandleEnterAddIndent(textControl) ||
+            this.HandleEnterAfterErrorAndInfixOp(textControl) ||
+            this.HandleEnterInApp(textControl) ||
+            this.HandleEnterBeforeDot(textControl) ||
+            this.HandleEnterFindLeftBracket(textControl) ||
+            this.HandleEnterAddBiggerIndentFromBelow(textControl)) then true else
 
         let trimSpacesAfterCaret =
             let lexer = this.GetCachingLexer(textControl)
@@ -643,6 +644,9 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
         textControl.Caret.MoveTo(lineEndOffset, CaretVisualPlacement.DontScrollIfVisible)
 
         handleEnter(context)
+
+    member x.IsSmartIndentOnEnterEnabled(textControl) =
+        x.GetTypingAssistOption<TypingAssistSettings, bool>(textControl, TypingAssistOptions.SmartIndentOnEnterExpression)
 
     member x.HandleEnterAddBiggerIndentFromBelow(textControl) =
         let document = textControl.Document
