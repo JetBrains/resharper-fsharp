@@ -1,0 +1,6 @@
+// ${CHAR:"}
+// ${CHAR:"}
+// ${CHAR:"}
+module Module
+
+let s = """ {caret}

@@ -1493,7 +1493,7 @@ type FSharpTypingAssist(lifetime, dependencies) as this =
 
         if offset = document.GetDocumentEndOffset().Offset then
             if lexer.FindTokenAt(offset - 1) &&
-               lexer.TokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTED_STRING then false else
+               FSharpTokenType.UnfinishedStrings[lexer.TokenType] then false else
 
             textControl.Document.InsertText(offset, emptyString)
             textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)

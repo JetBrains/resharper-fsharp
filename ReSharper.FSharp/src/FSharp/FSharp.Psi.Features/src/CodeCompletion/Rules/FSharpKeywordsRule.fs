@@ -344,6 +344,7 @@ type FSharpKeywordsRule() =
            tokenBeforeType == FSharpTokenType.DOT ||
            tokenBeforeType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
            isNotNull tokenBeforeType && tokenBeforeType.IsConstantLiteral ||
+           isNotNull tokenBeforeType && FSharpTokenType.UnfinishedStrings[tokenBeforeType] ||
            tokenBeforeCaret == context.TokenAtCaret && isNotNull tokenBeforeType &&
                (tokenBeforeType.IsComment || FSharpTokenType.Strings[tokenBeforeType] || tokenBeforeType.IsConstantLiteral)
         then false else

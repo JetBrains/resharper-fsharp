@@ -161,6 +161,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet InterpolatedStringsStart;
     public static readonly NodeTypeSet InterpolatedStringsMiddle;
     public static readonly NodeTypeSet InterpolatedStringsEnd;
+    public static readonly NodeTypeSet UnfinishedStrings;
     public static readonly NodeTypeSet Strings;
     public static readonly NodeTypeSet Literals;
     public static readonly NodeTypeSet CreateIdentifierTokenTypes;
@@ -337,7 +338,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         VERBATIM_INTERPOLATED_STRING_END,
         TRIPLE_QUOTE_INTERPOLATED_STRING_END);
 
-      Strings = StringsLiterals.Union(InterpolatedStrings);
+      UnfinishedStrings = new NodeTypeSet(
+        UNFINISHED_STRING,
+        UNFINISHED_VERBATIM_STRING,
+        UNFINISHED_TRIPLE_QUOTED_STRING,
+        UNFINISHED_REGULAR_INTERPOLATED_STRING,
+        UNFINISHED_VERBATIM_INTERPOLATED_STRING,
+        UNFINISHED_TRIPLE_QUOTE_INTERPOLATED_STRING,
+        UNFINISHED_RAW_INTERPOLATED_STRING);
+
+      Strings = StringsLiterals.Union(InterpolatedStrings).Union(UnfinishedStrings);
 
       Literals = new NodeTypeSet(
         IEEE32,

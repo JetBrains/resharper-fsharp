@@ -20,6 +20,7 @@ open JetBrains.Text
 type FSharpLiteralInjectionTarget() =
     let isInjectionAllowed tokenType =
         FSharpTokenType.Strings[tokenType] &&
+        not FSharpTokenType.UnfinishedStrings[tokenType] &&
         tokenType <> FSharpTokenType.CHARACTER_LITERAL &&
         tokenType <> FSharpTokenType.VERBATIM_BYTEARRAY &&
         tokenType <> FSharpTokenType.BYTEARRAY
