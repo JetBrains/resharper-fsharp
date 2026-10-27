@@ -43,3 +43,4 @@ type RegexpHighlightingTest() =
     member x.``Detection - Compiled 03 - Extension``() = x.DoNamedTest()
 
     [<Test>] member x.``Injection 01 - Comments``() = x.DoNamedTest()
+    [<Test>] member x.``Injection 02 - Unfinished string``() = x.DoNamedTest()

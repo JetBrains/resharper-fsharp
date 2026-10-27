@@ -148,6 +148,8 @@ let getStringEndingQuote tokenType =
     if tokenType == FSharpTokenType.CHARACTER_LITERAL then '\'' else '\"'
 
 let getDefaultStringEndingQuotesLength (tokenType: TokenNodeType) =
+    if FSharpTokenType.UnfinishedStrings[tokenType] then 0 else
+
     match tokenType.GetLiteralType() with
     | Character
     | RegularString
@@ -175,6 +177,8 @@ let getDefaultStringEndingQuotesLength (tokenType: TokenNodeType) =
 let getStringEndingQuotesLength (token: ITokenNode) =
     let tokenType = token.GetTokenType()
     assertStringTokenType tokenType
+
+    if FSharpTokenType.UnfinishedStrings[tokenType] then 0 else
 
     match tokenType.GetLiteralType() with
     | Character
@@ -215,6 +219,8 @@ let getStringEndingQuotes (token: ITokenNode) =
 let isUnfinishedString (token: ITokenNode) =
     let tokenType = token.GetTokenType()
     assertStringTokenType tokenType
+    if FSharpTokenType.UnfinishedStrings[tokenType] then true else
+
     let startingQuotesLength = getStringStartingQuotesLength token
     let endingQuotesLength = getStringEndingQuotesLength token
 

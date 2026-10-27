@@ -18,6 +18,7 @@ type StringAnalyzerTest() =
     [<Test>] member x.``Regular - Interpolated 01``() = x.DoNamedTest()
     [<Test>] member x.``Regular - Interpolated 02``() = x.DoNamedTest()
     [<Test>] member x.``Regular - Interpolated 03``() = x.DoNamedTest()
+    [<Test>] member x.``Regular - Unfinished 01``() = x.DoNamedTest()
     [<Test>] member x.``Triple quote - Interpolated 01``() = x.DoNamedTest()
     [<Test>] member x.``Triple quote - Interpolated 02``() = x.DoNamedTest()
     [<Test>] member x.``Triple quote 01``() = x.DoNamedTest()

@@ -844,3 +844,5 @@ type FSharpCompletionModernListTest() =
     [<Test>] member x.``Pattern Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Record Property 01``() = x.DoNamedTest()
     [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Unfinished string 01``() = x.DoNamedTest()
+    [<Test>] member x.``Unfinished string 02 - Eof``() = x.DoNamedTest()

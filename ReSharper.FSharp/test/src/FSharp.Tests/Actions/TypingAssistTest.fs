@@ -233,6 +233,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 03 - Inside triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 04 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in string 05 - Unfinished string``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter before dot 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter before dot 02``() = x.DoNamedTest()
@@ -339,6 +340,12 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Skip end 09 - No skip``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 10 - No skip``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 11 - No skip``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 12 - No skip, unfinished triple-quote``() = x.DoNamedTest()
+
+    [<Test>] member x.``Quotes - Unfinished 01 - Regular``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Unfinished 02 - Regular, eof``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Unfinished 03 - Triple quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Unfinished 04 - Triple quote, eof``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Comment 01 - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Comment 02 - Before comment``() = x.DoNamedTest()

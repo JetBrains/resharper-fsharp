@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Prefix: "ngu"
+Count: 1
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let s = "ngu♦"
+                 ▲▲▲▲
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, PrefixMatch, NormalSelectionPriority, Other]
+ṇg̣ụid                       Insert new GUID    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+ṇg̣ụid                       Insert new GUID    <==
