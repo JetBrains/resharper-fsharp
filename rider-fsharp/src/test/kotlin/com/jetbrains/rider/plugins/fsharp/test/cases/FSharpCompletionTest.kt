@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.annotations.report.Issue
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
@@ -100,6 +101,31 @@ abstract class FSharpCompletionTestBase(mode: PatchEngineEditorTestMode) : Patch
     dumpOpenedEditorFacade("Program.fs", "Program.fs") {
       waitForDaemon()
       callBasicCompletion()
+      ensureThereIsNoLookup()
+    }
+  }
+
+  @Test
+  fun `autopopup - expression`() {
+    dumpOpenedEditorFacade("Program.fs", "Program.fs") {
+      waitForDaemon()
+      type("ngu")
+      assertLookupContains("nguid")
+    }
+  }
+
+  @Issue("RIDER-65328")
+  @Test
+  fun `autopopup - interpolated string`() = doTestNoAutopopup("ngu")
+
+  @Issue("RIDER-65328")
+  @Test
+  fun `autopopup - unfinished string`() = doTestNoAutopopup("ngu")
+
+  private fun doTestNoAutopopup(typed: String) {
+    dumpOpenedEditorFacade("Program.fs", "Program.fs") {
+      waitForDaemon()
+      type(typed)
       ensureThereIsNoLookup()
     }
   }

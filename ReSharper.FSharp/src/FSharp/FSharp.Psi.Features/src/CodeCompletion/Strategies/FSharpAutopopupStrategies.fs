@@ -40,6 +40,12 @@ type FSharpAutocompletionStrategy() =
     override x.AcceptTyping(char, _, _) = char.IsLetterFast() || char = '.'
     override x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()
 
+    override this.AcceptsFile(file, textControl) =
+        base.AcceptsFile(file, textControl) &&
+
+        not (AutomaticCodeCompletionStrategyEx.MatchTokenType(this, file, textControl, fun tokenType ->
+            FSharpTokenType.Strings[tokenType]))
+
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type FSharpOnSpaceAutopopupStrategy() =
