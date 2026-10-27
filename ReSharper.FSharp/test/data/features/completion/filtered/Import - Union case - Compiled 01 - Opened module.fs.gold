@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let x = ♦"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, Methods, NormalSelectionPriority, Other]
+CaseB                       Union
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+CaseB                       Union

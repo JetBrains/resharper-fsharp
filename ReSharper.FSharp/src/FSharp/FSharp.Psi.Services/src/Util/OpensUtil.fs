@@ -382,6 +382,27 @@ type OpenedModulesProvider(context: ITreeNode) =
 
     let symbolScope = getSymbolScope psiModule false
 
+    let contextFile = context.GetContainingFile()
+    let isSandbox = contextFile != fsFile
+
+    let getScopeEnd (startOffset: TreeOffset) (physicalEndOffset: TreeOffset) =
+        if not isSandbox then physicalEndOffset else
+
+        let node = contextFile.FindNodeAt(TreeTextRange(startOffset, TreeOffset(startOffset.Offset + 1)))
+        if isNull node then physicalEndOffset else
+
+        match node.GetContainingNode<IModuleLikeDeclaration>(true) with
+        | null -> physicalEndOffset
+        | decl -> decl.GetTreeEndOffset()
+
+    let getNodeEnd (node: ITreeNode) =
+        if not isSandbox then node.GetTreeEndOffset() else
+        if node :? IFile then contextFile.GetTreeEndOffset() else
+        getScopeEnd (node.GetTreeStartOffset()) (node.GetTreeEndOffset())
+
+    let getRangeScope (startOffset: TreeOffset) (physicalEndOffset: TreeOffset) =
+        OpenScope.Range(TreeTextRange(startOffset, getScopeEnd startOffset physicalEndOffset))
+
     let importQualifiedName scope (qualifiedName: string) =
         if qualifiedName = SharedImplUtil.MISSING_DECLARATION_NAME then () else
 
@@ -397,13 +418,14 @@ type OpenedModulesProvider(context: ITreeNode) =
     let rec importDecl containingScope (moduleDecl: IModuleLikeDeclaration) =
         if isNull moduleDecl then () else
 
-        let scope = OpenScope.Range(moduleDecl.GetTreeTextRange())
+        let moduleDeclEnd = getNodeEnd moduleDecl
+        let scope = OpenScope.Range(TreeTextRange(moduleDecl.GetTreeStartOffset(), moduleDeclEnd))
         importQualifiedName scope moduleDecl.ClrName
 
         let fsModule = moduleDecl.DeclaredElement.As<IFSharpModule>()
         if isNotNull fsModule && fsModule.IsAutoOpen then
             let parent = moduleDecl.Parent
-            let scope = OpenScope.Range(TreeTextRange(moduleDecl.GetTreeEndOffset(), parent.GetTreeEndOffset()))
+            let scope = OpenScope.Range(TreeTextRange(moduleDeclEnd, getNodeEnd parent))
             importQualifiedName scope moduleDecl.ClrName
 
         let namedModuleDecl = moduleDecl.As<INamedModuleDeclaration>()
@@ -430,7 +452,7 @@ type OpenedModulesProvider(context: ITreeNode) =
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelDecl then
-                let scope = OpenScope.Range(topLevelDecl.GetTreeTextRange())
+                let scope = OpenScope.Range(TreeTextRange(topLevelDecl.GetTreeStartOffset(), getNodeEnd topLevelDecl))
                 importDecl scope topLevelDecl
 
         match fsFile.GetParseAndCheckResults(true, "OpenedModulesProvider") with
@@ -439,7 +461,8 @@ type OpenedModulesProvider(context: ITreeNode) =
 
         let openDeclarations = results.CheckResults.OpenDeclarations
         for fcsOpenDecl in openDeclarations do
-            let scope = OpenScope.Range(getTreeTextRange document fcsOpenDecl.AppliedScope)
+            let appliedScope = getTreeTextRange document fcsOpenDecl.AppliedScope
+            let scope = getRangeScope appliedScope.StartOffset appliedScope.EndOffset
             for fcsEntity in fcsOpenDecl.Modules do
                 let declaredElement = fcsEntity.GetDeclaredElement(psiModule).As<IClrDeclaredElement>()
                 if isNotNull declaredElement then
