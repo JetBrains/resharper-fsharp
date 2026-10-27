@@ -257,7 +257,6 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Same ns 02``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 03``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 04``() = x.DoTestFiles("File1.fs", "File2.fs")
-    [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 06``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 07``() = x.DoTestFiles("File1.fs", "File2.fs")
 
@@ -651,11 +650,18 @@ type FSharpFilteredCompletionTest() =
 
     member val CompleteItem = null with get, set
 
+    member x.DoTestFiles([<ParamArray>] names: string[]) =
+        let testDir = x.TestDataPath / x.TestMethodName
+        let paths = names |> Array.map (fun name -> testDir.Combine(name).FullPath)
+        x.DoTestSolution(paths)
+
     override this.LookupItemFilter(lookupItem) =
         isNull this.CompleteItem ||
         match lookupItem with
             | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-            | _ -> lookupItem.DisplayName.Text = this.CompleteItem
+            | _ ->
+                let text = lookupItem.DisplayName.Text
+                text = this.CompleteItem || text.StartsWith(this.CompleteItem + " (in ", StringComparison.Ordinal)
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
@@ -683,6 +689,17 @@ type FSharpFilteredCompletionTest() =
 
     [<Test>] member x.``Expr - Module 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Import - Type - Opened namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test>] member x.``Import - Same ns 08 - Empty module``() = x.DoTestFiles("File1.fs", "File2.fs")
+
+    [<Test>] member x.``Import - Union case - Opened module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Union case - Opened module 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Union case - Opened module 03 - Auto open``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Union case - Opened module 04 - Own module``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Union case - Opened module 05 - Namespace``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpClassLib")>] member x.``Import - Union case - Compiled 01 - Opened module``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - No reparse ident 01``() = x.DoNamedTest()
     [<Test; Explicit("243")>] member x.``Pattern - Union case - List 01``() = x.DoNamedTest()
     [<Test; Explicit("243")>] member x.``Pattern - Union case - List 02``() = x.DoNamedTest() // todo: fix in 233; types/namespaces are missing
@@ -699,7 +716,7 @@ type FSharpFilteredCompletionTest() =
     [<Test; Explicit>] member x.``NamedUnionCaseFieldsPat - 08`` () = x.DoNamedTest()
 
     override this.BeforeTestStart(_, _, documentText) =
-        this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "COMPLETE_ITEM")
+        this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "FILTER_ITEM")
 
 
 [<FSharpTest>]
