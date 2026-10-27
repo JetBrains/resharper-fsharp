@@ -1,0 +1,16 @@
+﻿// ${COMPLETE_ITEM:B (in Ns.M.U)}
+
+namespace Ns
+
+module M =
+    type U =
+        | A
+        | B of int
+
+namespace Ns2
+
+open Ns
+open Ns.M
+
+module M2 =
+    let x = B{caret}
