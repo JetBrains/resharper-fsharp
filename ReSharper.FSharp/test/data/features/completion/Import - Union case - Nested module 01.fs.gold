@@ -1,0 +1,13 @@
+﻿// ${COMPLETE_ITEM:B (in Module.Outer.Inner.U)}
+module Module
+
+module Outer =
+    module Inner =
+        type U =
+            | A
+            | B of int
+
+open Outer
+open Outer.Inner
+
+let x = B{caret}

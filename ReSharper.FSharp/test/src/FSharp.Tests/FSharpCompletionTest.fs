@@ -246,6 +246,10 @@ type FSharpCompletionTest() =
 
     [<Test>] member x.``Import - Sibling namespace``() = x.DoNamedTest()
 
+    [<Test>] member x.``Import - Union case - Opened namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Union case - Nested module 01``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpClassLib")>] member x.``Import - Union case - Compiled 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Import - Same project 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 

@@ -11,14 +11,15 @@ let private isTypeOrNsInScope (openedModulesProvider: OpenedModulesProvider) (de
     let scopes = openedModulesProvider.OpenedModuleScopes.GetValuesSafe(name)
     OpenScope.inAnyScope openedModulesProvider.Context scopes
 
-let areMembersInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
+let rec areMembersInScope (openedModulesProvider: OpenedModulesProvider) (typeElement: ITypeElement) =
     match typeElement with
     | :? IFSharpModule as fsModule ->
         isTypeOrNsInScope openedModulesProvider fsModule
 
     | typeElement ->
-        let ns = typeElement.GetContainingNamespace()
-        isTypeOrNsInScope openedModulesProvider ns
+        match typeElement.GetContainingType() with
+        | null -> isTypeOrNsInScope openedModulesProvider (typeElement.GetContainingNamespace())
+        | containingType -> areMembersInScope openedModulesProvider containingType
 
 let isExtensionMemberInScope (openedModulesProvider: OpenedModulesProvider) (typeMember: ITypeMember) =
     let containingTypeOrNs: IClrDeclaredElement =
