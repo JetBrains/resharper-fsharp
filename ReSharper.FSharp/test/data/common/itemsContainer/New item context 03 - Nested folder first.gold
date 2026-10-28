@@ -1,0 +1,19 @@
+﻿Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File2
+2:File3
+
+.NETFramework,Version=v0.0
+Folder/SubFolder/File1
+Folder/File2
+File3
+
+
+Project -> Before Folder/SubFolder/File1
+Folder[1] -> Before Folder/SubFolder/File1
+SubFolder[1] -> Before Folder/SubFolder/File1
+File1 -> Inside Folder/SubFolder/File1
+File2 -> Inside Folder/File2
+File3 -> Inside File3
