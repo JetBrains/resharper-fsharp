@@ -1,0 +1,18 @@
+﻿Add folder 'Folder' Before 'File1'
+Update view File1
+Update view File2
+Update view Folder[1]
+Project
+1:Folder[1]
+2:File1
+3:File2
+
+.NETFramework,Version=v0.0
+File1
+File2
+
+
+Project -> Before Folder
+File1 -> Inside File1
+File2 -> Inside File2
+Folder[1] -> Inside Folder

@@ -1079,6 +1079,43 @@ type FSharpItemsContainerTest() =
               createItem "CompileBefore" "File2" ])
 
     [<Test>]
+    member x.``New item context 01 - Top level files``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "Compile" "File1"
+              createItem "Compile" "File2"
+              createItem "Compile" "File3" ])
+
+    [<Test>]
+    member x.``New item context 02 - Folders``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "Compile" "File1"
+              createItem "Compile" "Folder[1]/File2"
+              createItem "Compile" "Folder[1]/File3"
+              createItem "Compile" "File4" ])
+
+    [<Test>]
+    member x.``New item context 03 - Nested folder first``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "Compile" "Folder[1]/SubFolder[1]/File1"
+              createItem "Compile" "Folder[1]/File2"
+              createItem "Compile" "File3" ])
+
+    [<Test>]
+    member x.``New item context 04 - CompileBefore``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "CompileBefore" "File1"
+              createItem "Compile"       "Folder[1]/File2"
+              createItem "Compile"       "File3" ])
+
+    [<Test>]
+    member x.``New item context 05 - Empty folder first``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "Compile" "File1"
+              createItem "Compile" "File2" ],
+            [ "Folder" ],
+            fun container -> container.OnAddFolder("Folder", "File1", Some RelativeToType.Before))
+
+    [<Test>]
     member x.``Update 01 - Rename files``() =
         x.DoContainerModificationTest(
             [ "Folder[1]/File1"
@@ -1255,6 +1292,33 @@ type FSharpItemsContainerTest() =
                                     sprintf "%O %s" context.RelativeTo.Type path
                                 | _ -> "null")
                 writer.WriteLine()) |> ignore
+
+    member x.DoCreateNewItemContextTest(items: AnItem list, ?emptyFolders: string list, ?setup: LoggingFSharpItemsContainer -> unit) =
+        x.ExecuteWithGold(fun writer ->
+            let container = createContainer items writer
+            (defaultArg setup ignore) container
+            let provider = FSharpItemModificationContextProvider(container)
+            container.Dump(writer)
+            writer.WriteLine()
+
+            let solutionItems = Dictionary()
+            let project = getOrCreateFolder projectDirectory solutionItems
+            let viewItems =
+                Seq.append
+                    (items |> Seq.collect (createViewItems solutionItems))
+                    (defaultArg emptyFolders [] |> Seq.map (fun path -> createViewFolder (projectPath path) 1 solutionItems))
+                |> Seq.distinct
+                |> List.ofSeq
+
+            let relativeItems = ("Project", box project) :: [ for viewItem in viewItems -> string viewItem, box viewItem ]
+            for name, relativeItem in relativeItems do
+                let context = provider.CreateModificationContext(None, relativeItem, RelativeToType.Inside)
+                writer.WriteLine(
+                    match context with
+                    | Some context ->
+                        let (NormalizedPath path) = context.RelativeTo.NotNull().ReferenceItem.Location
+                        sprintf "%s -> %O %s" name context.RelativeTo.Type path
+                    | _ -> sprintf "%s -> null" name)) |> ignore
 
 
     member x.DoAddFileRelativeBeforeTest(items: string list, filePath, relativeBefore) =

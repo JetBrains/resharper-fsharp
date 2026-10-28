@@ -609,19 +609,30 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | Some item -> tryGetRelativeChildItem (ProjectItem item) modifiedItemCompileOrder relativeToType
         | _ -> None
 
+    let rec tryGetFirstChildItem (relativeElement: FSharpProjectModelElement)
+            (modifiedItemCompileOrder: FSharpCompileOrder option) =
+        getChildrenSorted relativeElement
+        |> Seq.tryPick (fun item ->
+            if canBeRelative item modifiedItemCompileOrder then Some(item, RelativeToType.Before) else
+
+            match item with
+            | FolderItem _ -> tryGetFirstChildItem (ProjectItem item) modifiedItemCompileOrder
+            | _ -> None
+        )
+
     let getRelativeChildPathImpl (relativeElement: FSharpProjectModelElement)
-            (modifiedItemCompilerOrder: FSharpCompileOrder option) relativeToType =
+            (modifiedItemCompilerOrder: FSharpCompileOrder option) relativeToType isNewItem =
         match relativeElement with
         | ProjectItem(FileItem _ as fileItem) ->
             Some(fileItem, relativeToType)
 
-        | ProjectItem(FolderItem _ as folderItem) ->
-            if canBeRelative folderItem modifiedItemCompilerOrder then
-                Some(folderItem, relativeToType)
-            else
-                tryGetRelativeChildItem relativeElement modifiedItemCompilerOrder relativeToType
+        | ProjectItem(FolderItem _ as folderItem) when canBeRelative folderItem modifiedItemCompilerOrder ->
+            Some(folderItem, relativeToType)
 
-        | Project _ ->
+        | _ when isNewItem && relativeToType = RelativeToType.Inside ->
+            tryGetFirstChildItem relativeElement modifiedItemCompilerOrder
+
+        | _ ->
             tryGetRelativeChildItem relativeElement modifiedItemCompilerOrder relativeToType
 
     let rec renameFolder oldLocation newLocation itemUpdater =
@@ -1039,7 +1050,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             |> Option.map (fun item -> item.ProjectItem.Location)
             |> Option.defaultValue null
 
-        match getRelativeChildPathImpl relativeItem modifiedItemCompilerOrder relativeToType with
+        match getRelativeChildPathImpl relativeItem modifiedItemCompilerOrder relativeToType modifiedViewItem.IsNone with
         | Some(relativeChildItem, relativeToType) when
                  relativeChildItem.PhysicalPath = modifiedItemLocation ||
                  relativeChildItem.IsNonThisProjectFileItem ->
