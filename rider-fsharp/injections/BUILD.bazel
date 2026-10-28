@@ -31,30 +31,6 @@ jvm_library(
         "//rider/plugins/plugins-appender/database",
     ],
 )
-
-jvm_library(
-    name = "injections_test_lib",
-    testonly = True,
-    srcs = glob(
-        [],
-        allow_empty = True,
-    ),
-    module_name = "intellij.rider.plugins.fsharp.injections",
-    visibility = ["//visibility:public"],
-    runtime_deps = [
-        # do not sort,
-        ":injections",
-        "//dotnet/Plugins:rider-plugins-fsharp_test_lib",
-        "@community//platform/core-api:core_test_lib",
-        "@community//plugins/IntelliLang:langInjection_test_lib",
-        "//rider/languages:languages_test_lib",
-        "@community//platform/lang-impl:lang-impl_test_lib",
-        "//dbe/sql/core-impl:database-sql-core-impl_test_lib",
-        "@community//platform/lang-api:lang_test_lib",
-        "//rider/plugins/plugins-appender/lang:lang_test_lib",
-        "//rider/plugins/plugins-appender/database:database_test_lib",
-    ],
-)
 ### auto-generated section `build intellij.rider.plugins.fsharp.injections` end
 
 ### auto-generated section `iml intellij.rider.plugins.fsharp.injections` start
