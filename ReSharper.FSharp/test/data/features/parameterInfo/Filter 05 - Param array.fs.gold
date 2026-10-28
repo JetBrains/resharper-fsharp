@@ -1,0 +1,10 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(params xs: int array) : unit
+Parameter: 0 'params xs: int array'
+
+(a: string) : unit
+Parameter: 0 'a: string'
+
+--- Accepted invocables: ---
+(params xs: int array) : unit

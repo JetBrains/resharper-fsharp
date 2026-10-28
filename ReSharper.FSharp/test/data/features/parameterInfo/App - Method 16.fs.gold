@@ -13,7 +13,6 @@ Parameter: 0 'format: string'
 Parameter: 0 'provider: IFormatProvider'
 
 --- Accepted invocables: ---
-(<no parameters>) : [NotNull] string
 (format: string) : [NotNull] string
 (format: string, provider: IFormatProvider) : [NotNull] string
 (provider: IFormatProvider) : [NotNull] string

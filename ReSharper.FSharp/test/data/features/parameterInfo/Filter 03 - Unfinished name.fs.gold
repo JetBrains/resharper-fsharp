@@ -1,0 +1,11 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(a: int) : R
+Parameter: 0 'a: int'
+
+(a: int, b: int) : int
+Parameter: 0 'a: int'
+
+--- Accepted invocables: ---
+(a: int) : R
+(a: int, b: int) : int

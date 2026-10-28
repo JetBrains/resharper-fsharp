@@ -597,8 +597,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
             for pat in pats do
                 x.ProcessParam(pat, isLocal, markMember)
 
-        | SynArgPats.NamePatPairs(idsAndPats, argsRange, _) ->
-            let argsMark = x.MarkTokenOrRange(FSharpTokenType.LPAREN, argsRange)
+        | SynArgPats.NamePatPairs(idsAndPats, _, trivia) ->
+            let parenRange = trivia.ParenRange
+            let parenMark = x.Mark(parenRange)
 
             for NamePatPairField(lid, _, range, pat, _) in idsAndPats do
                 let mark = x.Mark(range)
@@ -606,7 +607,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, warnDirectives, lifetime, pat
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
-            x.Done(argsRange, argsMark, ElementType.NAMED_UNION_CASE_FIELDS_PAT)
+            x.Done(parenRange, parenMark, ElementType.NAMED_UNION_CASE_FIELDS_PAT)
 
     member x.ProcessMemberParams(args: SynArgPats, isLocal, markMember) =
         match args with

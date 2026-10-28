@@ -44,10 +44,54 @@ module FcsParameterInfoCandidate =
     let notNullAttrTypeName = clrTypeName "JetBrains.Annotations.NotNullAttribute"
 
 
+type NamedArgsLayout =
+    { DisplayOrder: int[]
+      ArgPositions: int[]
+      PositionalCount: int
+      BracketedFrom: int }
+
+
 type IFcsParameterInfoCandidate =
     abstract Symbol: FSharpSymbol
     abstract ParameterGroupCounts: IList<int>
     abstract ParameterOwner: IParametersOwner
+    abstract IsParamArray: parameterIndex: int -> bool
+    abstract TryGetNamedArgIndex: namedArgs: string[] * slot: int -> int option
+
+
+module NamedArgsLayout =
+    let tryCreate (parameterNames: string[]) (namedArgs: string[]) : NamedArgsLayout option =
+        if Array.forall isNull namedArgs then None else
+
+        let count = parameterNames.Length
+        let positionalCount = namedArgs |> Array.takeWhile isNull |> Array.length
+        let displayedPositionalCount = min count positionalCount
+
+        let namedParameters =
+            namedArgs
+            |> Array.skip positionalCount
+            |> Array.choose (fun name -> if isNull name then None else Some(Array.IndexOf(parameterNames, name)))
+            |> Array.filter (fun parameter -> parameter >= displayedPositionalCount)
+            |> Array.distinct
+
+        let unusedParameters = [| displayedPositionalCount .. count - 1 |] |> Array.except namedParameters
+        let nextUnusedPosition = if unusedParameters.IsEmpty() then -1 else displayedPositionalCount + namedParameters.Length
+
+        let argPositions =
+            Array.append namedArgs [| null |]
+            |> Array.mapi (fun arg name ->
+                if arg < positionalCount then -1
+                elif isNull name then nextUnusedPosition
+                else
+
+                match Array.IndexOf(namedParameters, Array.IndexOf(parameterNames, name)) with
+                | -1 -> -1
+                | position -> displayedPositionalCount + position)
+
+        Some { DisplayOrder = Array.concat [ [| 0 .. displayedPositionalCount - 1 |]; namedParameters; unusedParameters ]
+               ArgPositions = argPositions
+               PositionalCount = positionalCount
+               BracketedFrom = if namedParameters.IsEmpty() then count else displayedPositionalCount }
 
 
 type ParameterInfoArgument =
@@ -64,33 +108,62 @@ type ParameterInfoArgument =
         | Expression expr -> Expression(expr.IgnoreInnerParens(true))
         | Pattern pat -> Pattern(pat.IgnoreInnerParens(true))
 
-    member this.TryGetTupledArgs() =
+    member this.TryGetArgumentList() =
         match this with
         | Expression expr ->
             match expr.IgnoreInnerParens(true) with
-            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct ->
-                Some(ParameterInfoTupledArguments.Expression tupleExpr)
+            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct -> Some(TupleExpr tupleExpr)
             | _ -> None
 
         | Pattern pat ->
             match pat.IgnoreInnerParens(true) with
-            | :? ITuplePat as tuplePat when not tuplePat.IsStruct ->
-                Some(ParameterInfoTupledArguments.Pattern tuplePat)
+            | :? ITuplePat as tuplePat when not tuplePat.IsStruct -> Some(TuplePat tuplePat)
+            | :? INamedUnionCaseFieldsPat as fieldsPat -> Some(NamedFieldsPat fieldsPat)
             | _ -> None
 
-and ParameterInfoTupledArguments =
-    | Expression of ITupleExpr
-    | Pattern of ITuplePat
+    member this.GetSlot(caretOffset: DocumentOffset) =
+        match this.TryGetArgumentList() with
+        | Some argList -> argList.GetSlot(caretOffset)
+        | _ -> 0
 
-    member this.Node: IFSharpTreeNode =
-        match this with
-        | Expression expr -> expr
-        | Pattern pat -> pat
+    member this.SlotCount =
+        match this.TryGetArgumentList() with
+        | Some argList -> Seq.length argList.Separators + 1
+        | _ -> if this.Node :? IUnitExpr || this.Node :? IUnitPat then 0 else 1
 
-    member this.Commas =
+    member this.NamedArgs: string[] =
+        match this.TryGetArgumentList() with
+        | Some argList -> argList.NamedArgs
+        | _ ->
+
         match this with
-        | Expression tupleExpr -> tupleExpr.Commas
-        | Pattern pat -> pat.Commas
+        | Expression expr ->
+            match FSharpArgumentsUtil.TryGetNamedArgName(expr.IgnoreInnerParens(true)) with
+            | null -> [||]
+            | name -> [| name |]
+        | _ -> [||]
+
+and ParameterInfoArgumentList =
+    | TupleExpr of ITupleExpr
+    | TuplePat of ITuplePat
+    | NamedFieldsPat of INamedUnionCaseFieldsPat
+
+    member this.Separators: ITreeNode seq =
+        match this with
+        | TupleExpr tupleExpr -> Seq.cast tupleExpr.CommasEnumerable
+        | TuplePat tuplePat -> Seq.cast tuplePat.CommasEnumerable
+        | NamedFieldsPat fieldsPat -> Seq.cast fieldsPat.SeparatorsEnumerable
+
+    member this.GetSlot(caretOffset: DocumentOffset) =
+        this.Separators
+        |> Seq.takeWhile (fun separator -> separator.GetDocumentStartOffset().Offset < caretOffset.Offset)
+        |> Seq.length
+
+    member this.NamedArgs: string[] =
+        match this with
+        | TupleExpr tupleExpr -> tupleExpr.ExpressionsEnumerable |> Seq.map FSharpArgumentsUtil.TryGetNamedArgName |> Array.ofSeq
+        | TuplePat _ -> [||]
+        | NamedFieldsPat fieldsPat -> fieldsPat.FieldPatternsEnumerable |> Seq.map (fun fieldPat -> fieldPat.ShortName) |> Array.ofSeq
 
 [<AllowNullLiteral>]
 type IFSharpParameterInfoContext =
@@ -103,6 +176,7 @@ type IFSharpParameterInfoContext =
     abstract Reference: FSharpSymbolReference
 
     abstract ArgGroups: ParameterInfoArgument list
+    abstract UnnamedArgCount: int
     abstract ExpectingMoreArgs: caretOffset: DocumentOffset * allowAtLastArgEnd: bool -> bool
 
 
@@ -144,9 +218,34 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
     abstract SkipLastGroupDescription: bool
     default this.SkipLastGroupDescription = false
 
+    abstract CanHaveNamedArguments: bool
+    default this.CanHaveNamedArguments = false
+
+    abstract IsFilteredOut: bool
+    default this.IsFilteredOut = false
+
     member this.GetParameter(index) =
         let index = if this.IsExtensionMember then index + 1 else index
         getParameterIncludingThis index
+
+    member this.IsParamArray(index) =
+        match this.GetParameter(index) with
+        | null -> false
+        | parameter -> parameter.IsParameterArray
+
+    member this.ParameterNames =
+        this.ParameterGroups[0]
+        |> Seq.map (this.GetParamName >> Option.toObj)
+        |> Array.ofSeq
+
+    member this.TryGetNamedArgsLayout(namedArgs: string[]) =
+        if not this.CanHaveNamedArguments then None else
+        NamedArgsLayout.tryCreate this.ParameterNames namedArgs
+
+    member this.TryGetNamedArgIndex(namedArgs: string[], slot: int) =
+        match this.TryGetNamedArgsLayout(namedArgs) with
+        | Some layout when slot >= layout.PositionalCount -> Array.tryItem slot layout.ArgPositions
+        | _ -> None
 
     interface IFcsParameterInfoCandidate with
         member this.ParameterGroupCounts =
@@ -156,6 +255,8 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
 
         member this.ParameterOwner = getParametersOwner ()
         member this.Symbol = this.Symbol
+        member this.IsParamArray(parameterIndex) = this.IsParamArray(parameterIndex)
+        member this.TryGetNamedArgIndex(namedArgs, slot) = this.TryGetNamedArgIndex(namedArgs, slot)
 
     interface ICandidate with
         member this.GetDescription _ =
@@ -215,7 +316,7 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                 paramInfos[index] <- ParamPresentationInfo(Name = name, Description = description)
             )
 
-        member this.GetSignature(_, _, parameterRanges, mapToOriginalOrder, extensionMethodInfo) =
+        member this.GetSignature(namedArguments, _, parameterRanges, mapToOriginalOrder, extensionMethodInfo) =
             let referenceOwner = fsContext.Reference.GetElement()
 
             let paramGroups = this.ParameterGroups
@@ -227,6 +328,9 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             // Add additional group parameters to highlight group ranges
             let paramsCount = curriedParamsCount + groupParameters
             parameterRanges <- Array.zeroCreate paramsCount
+            mapToOriginalOrder <- Array.init paramsCount id
+
+            let namedArgsLayout = this.TryGetNamedArgsLayout(namedArguments)
 
             let text = RichText()
 
@@ -274,18 +378,30 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                             text.Append(", ", TextStyle.Default) |> ignore
                     | _ -> ()
 
-                for i = 0 to paramGroup.Count - 1 do
-                    let fcsParameter = paramGroup[i]
-                    let parameter = this.GetParameter(paramIndex)
+                let groupStartIndex = paramIndex
+                let displayOrder, bracketedFrom =
+                    match namedArgsLayout with
+                    | Some layout -> layout.DisplayOrder, layout.BracketedFrom
+                    | _ -> Array.init paramGroup.Count id, paramGroup.Count
+
+                for displayIndex = 0 to paramGroup.Count - 1 do
+                    let groupParamIndex = displayOrder[displayIndex]
+                    let fcsParameter = paramGroup[groupParamIndex]
+                    let parameter = this.GetParameter(groupStartIndex + groupParamIndex)
+                    mapToOriginalOrder[paramIndex] <- groupStartIndex + groupParamIndex
 
                     let paramStart = text.Length
 
                     if isNotNull parameter then
                         appendNullabilityAttribute parameter |> ignore
 
-                        if parameter.IsParameterArray then
-                            text.Append("params", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
-                            text.Append(" ", TextStyle.Default) |> ignore
+                    let isBracketed = displayIndex >= bracketedFrom
+                    if isBracketed then
+                        text.Append("[", TextStyle.Default) |> ignore
+
+                    if isNotNull parameter && parameter.IsParameterArray then
+                        text.Append("params", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
+                        text.Append(" ", TextStyle.Default) |> ignore
 
                     if this.IsOptionalParam(fcsParameter) && not parameter.IsOptional then
                         text.Append("?", TextStyle.Default) |> ignore
@@ -315,10 +431,13 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                         text.Append(" = ", TextStyle.Default) |> ignore
                         text.Append(presentation) |> ignore
 
+                    if isBracketed then
+                        text.Append("]", TextStyle.Default) |> ignore
+
                     let paramEnd = text.Length
                     parameterRanges[paramIndex] <- TextRange(paramStart, paramEnd)
 
-                    if i < paramGroup.Count - 1 then
+                    if displayIndex < paramGroup.Count - 1 then
                         text.Append(", ", TextStyle.Default) |> ignore
 
                     paramIndex <- paramIndex + 1
@@ -351,11 +470,10 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
             isNotNull mainElement && mainElement.Equals(element) ||
             symbol.IsEffectivelySameAs(fsContext.MainSymbol)
 
-        member this.IsFilteredOut = false
+        member this.IsFilteredOut with get () = this.IsFilteredOut and set _ = ()
         member this.IsObsolete = false
         member this.ObsoleteDescription = RichTextBlock()
         member this.PositionalParameterCount = 0
-        member this.IsFilteredOut with set _ = ()
 
 // keeps the original symbol order
 type FallbackCandidateSortStrategy private() =
@@ -367,6 +485,33 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
     inherit FcsParameterInfoCandidateBase<FSharpMemberOrFunctionOrValue, FSharpParameter>(mfv, symbolUse, fsContext)
 
     let isCustomOp = mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.customOperationAttrTypeName)
+
+    let settableReturnMemberNames =
+        lazy
+            FSharpSymbolUtil.getSettableMembers mfv.ReturnParameter.Type
+            |> List.map (fun symbol -> symbol.DisplayName)
+            |> HashSet
+
+    override this.IsFilteredOut =
+        if not this.CanHaveNamedArguments || fsContext.Candidates.Length < 2 then false else
+
+        let parameters = this.ParameterGroups[0]
+        let parameterCount =
+            if parameters.Count = 1 && this.GetParamType(parameters[0]).IsUnitType then 0 else parameters.Count
+
+        let hasCorrectArity =
+            fsContext.UnnamedArgCount <= parameterCount ||
+            parameterCount > 0 && this.IsParamArray(parameterCount - 1)
+
+        let assignsAllNamedArgs =
+            let parameterNames = this.ParameterNames
+            fsContext.NamedArguments
+            |> Array.forall (fun name ->
+                isNull name ||
+                Array.contains name parameterNames ||
+                settableReturnMemberNames.Value.Contains(name))
+
+        not (hasCorrectArity && assignsAllNamedArgs)
 
     override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingType else None
     override val ReturnType = if mfv.IsConstructor then None else Some mfv.ReturnParameter.Type
@@ -387,6 +532,7 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
     override this.GetParamName(parameter) = parameter.Name
     override this.GetParamType(parameter) = parameter.Type
     override this.IsOptionalParam(parameter) = parameter.IsOptionalArg
+    override this.CanHaveNamedArguments = mfv.IsMember && not isCustomOp && mfv.CurriedParameterGroups.Count = 1
 
     interface ISupportsStructuredSortCandidate with
         member this.GetStrategyAndSortItem() =
@@ -415,6 +561,7 @@ type FcsUnionCaseParameterInfoCandidateBase<'TSymbol when 'TSymbol :> FSharpSymb
 
     override this.GetParamType(field) = field.FieldType
     override this.IsOptionalParam _ = false
+    override this.CanHaveNamedArguments = true
 
 
 type FcsUnionCaseParameterInfoCandidate(unionCase, symbolUse, fsContext) =
@@ -573,7 +720,16 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             candidatesSource
 
     abstract ArgGroups: ParameterInfoArgument list
-    abstract NamedArgs: string[]
+
+    member this.NamedArgs =
+        match this.ArgGroups with
+        | [ arg ] -> arg.NamedArgs
+        | _ -> [||]
+
+    member this.UnnamedArgCount =
+        match this.ArgGroups with
+        | [ arg ] -> arg.SlotCount - (arg.NamedArgs |> Array.filter isNotNull).Length
+        | _ -> 0
 
     interface IFSharpParameterInfoContext with
         member this.Range =
@@ -591,6 +747,10 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
             if invalidArg = 0 then invalidArg else
 
             let args = this.ArgGroups
+
+            let tryGetNamedArgIndex (arg: ParameterInfoArgument) =
+                candidate.TryGetNamedArgIndex(this.NamedArgs, arg.GetSlot(caretOffset))
+                |> Option.map (fun index -> if index < 0 then invalidArg else index)
 
             let rec loop argIndex (acc: int) (args: ParameterInfoArgument list) =
                 match args with
@@ -620,32 +780,25 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                             allParametersCount + argIndex
 
                     elif argRange.Contains(caretOffset) && argStart <> caretOffset && argEnd <> caretOffset && argIndex < parameterGroups.Count then
+                        match tryGetNamedArgIndex arg with
+                        | Some index -> index
+                        | _ ->
+
                         if parameterGroups[argIndex] = 1 then acc else
                         if arg.Node :? IUnitExpr && caretOffset.Offset < argEnd.Offset then acc else
 
-                        match arg.TryGetTupledArgs() with
-                        | Some tupledArgs ->
-                            let commaIndex =
-                                let commas = tupledArgs.Commas
-                                if commas.IsEmpty then 0 else
-
-                                commas
-                                |> Seq.tryFindIndex (fun comma -> caretOffset.Offset <= comma.GetDocumentStartOffset().Offset)
-                                |> Option.defaultValue commas.Count
-
+                        match arg.TryGetArgumentList() with
+                        | Some argList ->
+                            let slot = argList.GetSlot(caretOffset)
                             let paramGroup = parameterGroups[argIndex]
-                            if commaIndex >= paramGroup then
+                            if slot >= paramGroup then
                                 if paramGroup = 0 then invalidArg else
 
                                 let lastParamIndex = acc + paramGroup - 1
-                                let parameters = candidate.ParameterOwner.Parameters
-                                if lastParamIndex < parameters.Count && parameters[lastParamIndex].IsParameterArray then
-                                    lastParamIndex
-                                else
-                                    invalidArg
+                                if candidate.IsParamArray(lastParamIndex) then lastParamIndex else invalidArg
                             else
                                 let maxArgOffset = max 0 (parameterGroups[argIndex] - 1)
-                                let currentArgOffset = min maxArgOffset commaIndex
+                                let currentArgOffset = min maxArgOffset slot
                                 acc + currentArgOffset
                         | _ ->
                             let innerArg = arg.IgnoreSingleInnerParens().Node
@@ -730,6 +883,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                     | :? IFcsParameterInfoCandidate as c -> c.ParameterGroupCounts.Count > argGroupsLength
                     | _ -> false)
 
+        member this.UnnamedArgCount = this.UnnamedArgCount
         member this.CheckResults = checkResults
         member this.FcsRange = fcsRange
         member this.MainSymbol = mainSymbol
@@ -755,37 +909,11 @@ type FSharpPrefixAppParameterInfoContext(caretOffset, context, reference, symbol
         getArgs context []
         |> List.map ParameterInfoArgument.Expression
 
-    override this.NamedArgs =
-        let appExpr = context.As<IPrefixAppExpr>()
-        if isNull appExpr then [||] else
-
-        let funExpr = appExpr.FunctionExpression.IgnoreInnerParens()
-        if not (funExpr :? IReferenceExpr) then [||] else
-
-        let argExpr = appExpr.ArgumentExpression
-
-        let args =
-            match argExpr.IgnoreInnerParens(singleLevel = true) with
-            | :? ITupleExpr as tupleExpr when not tupleExpr.IsStruct -> tupleExpr.Expressions
-            | :? IBinaryAppExpr as binaryAppExpr -> TreeNodeCollection([| binaryAppExpr |])
-            | _ -> TreeNodeCollection.Empty
-
-        args
-        |> Array.ofSeq
-        |> Array.map (function
-            | :? IBinaryAppExpr as binaryAppExpr when binaryAppExpr.ShortName = "=" ->
-                match binaryAppExpr.LeftArgument with
-                | :? IReferenceExpr as referenceExpr -> referenceExpr.ShortName
-                | _ -> null
-            | _ -> null)
-
 [<AllowNullLiteral>]
 type FSharpTypeReferenceCtorParameterInfoContext(caretOffset, context, argExpr: IFSharpExpression, reference,
         symbolUses, checkResults, referenceEndOffset, mainSymbol) =
     inherit FSharpParameterInfoContextBase<IFSharpReferenceOwner>(caretOffset, context, reference, symbolUses,
         checkResults, referenceEndOffset, mainSymbol)
-
-    override this.NamedArgs = [||] // todo
 
     override this.ArgGroups =
         [ if isNotNull argExpr then ParameterInfoArgument.Expression argExpr ]
@@ -796,8 +924,6 @@ type FSharpPatternParameterInfoContext(caretOffset, pat: IFSharpPattern, referen
         symbolUses, checkResults, referenceEndOffset, mainSymbol) =
     inherit FSharpParameterInfoContextBase<IFSharpPattern>(caretOffset, pat, reference, symbolUses,
         checkResults, referenceEndOffset, mainSymbol)
-
-    override this.NamedArgs = [||] // todo
 
     override this.ArgGroups =
         match pat with
@@ -920,7 +1046,12 @@ type FSharpParameterInfoContextFactory() =
         | :? IReferenceExpr as refExpr ->
             // todo: enable for non-predefined operators?
             let binaryAppExpr = BinaryAppExprNavigator.GetByOperator(refExpr)
-            if isNotNull binaryAppExpr then null else
+            if isNotNull binaryAppExpr then
+                if FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr) then
+                    tryCreateFromParentExpr isAutoPopup caretOffset binaryAppExpr
+                else
+                    null
+            else
 
             match PrefixAppExprNavigator.GetByArgumentExpression(refExpr) with
             | null ->
