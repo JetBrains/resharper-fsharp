@@ -9,6 +9,4 @@ Parameter: 0 'i: int'
 Parameter: 1 's: string'
 
 --- Accepted invocables: ---
-(<no parameters>)
-(i: int)
 (i: int, s: string)

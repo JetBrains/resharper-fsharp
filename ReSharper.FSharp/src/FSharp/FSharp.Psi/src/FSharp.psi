@@ -339,7 +339,7 @@ recordPat options { stubBase="FSharpPatternBase"; }:
 
 namedUnionCaseFieldsPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LeftParen>
-  fieldPat<FIELD_PAT, FieldPatterns>*
+  LIST fieldPat<FIELD_PAT, FieldPatterns> SEP SEMICOLON<FSHARP_SEMI, Separators>
   RPAREN<RPAREN, RightParen>;
 
 fieldPat options { stubBase="FSharpPatternBase"; }:

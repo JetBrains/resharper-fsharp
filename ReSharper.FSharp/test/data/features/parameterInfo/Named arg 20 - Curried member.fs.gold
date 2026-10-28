@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(a: int, b: int) (c: int, d: int) : unit
+Parameter: 3 'd: int'
+
+--- Accepted invocables: ---
+(a: int, b: int) (c: int, d: int) : unit

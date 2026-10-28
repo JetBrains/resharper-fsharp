@@ -235,6 +235,30 @@ let tryGetAbbreviatedTypeEntity (fcsType: FSharpType) =
     else
         None
 
+let rec getSettableMembers (fcsType: FSharpType) : FSharpSymbol list =
+    match tryGetAbbreviatedTypeEntity fcsType with
+    | None -> []
+    | Some entity ->
+
+    let properties =
+        entity.MembersFunctionsAndValues
+        |> Seq.filter (fun mfv -> mfv.IsProperty && mfv.HasSetterMethod)
+        |> Seq.map (fun mfv -> mfv :> FSharpSymbol)
+
+    let fields =
+        entity.FSharpFields
+        |> Seq.filter (fun field -> field.IsMutable)
+        |> Seq.map (fun field -> field :> FSharpSymbol)
+
+    let inheritedMembers =
+        match entity.BaseType with
+        | Some baseType -> getSettableMembers baseType
+        | None -> []
+
+    [ yield! properties
+      yield! fields
+      yield! inheritedMembers ]
+
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =
     entity.GenericParameters.Count > 0 && entity.GenericParameters[0].IsMeasure;

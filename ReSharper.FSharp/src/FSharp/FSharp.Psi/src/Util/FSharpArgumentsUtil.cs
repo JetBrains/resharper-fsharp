@@ -13,6 +13,9 @@ public static class FSharpArgumentsUtil
       ? refExpr
       : null;
 
+  public static string TryGetNamedArgName(IFSharpExpression expr) =>
+    TryGetNamedArgRefExpr(expr)?.ShortName;
+
   public static bool IsTopLevelArg(IFSharpExpression expr)
   {
     var tupleExpr = TupleExprNavigator.GetByExpression(expr);
