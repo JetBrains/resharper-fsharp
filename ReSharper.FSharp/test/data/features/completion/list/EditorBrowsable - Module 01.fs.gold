@@ -1,0 +1,26 @@
+﻿Completion: Basic
+Count: 6
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "M.♦"
+
+##### RELEVANCE SORT #####
+
+                            [TypesAndNamespaces, ImportedType]
+Advanced                    <==
+Always
+Unmarked
+                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+advancedValue               int
+alwaysValue                 int
+unmarkedValue               int
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Advanced                    <==
+Always
+Unmarked
+advancedValue               int
+alwaysValue                 int
+unmarkedValue               int

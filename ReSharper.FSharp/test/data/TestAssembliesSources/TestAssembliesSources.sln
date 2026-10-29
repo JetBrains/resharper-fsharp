@@ -17,6 +17,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ModuleMembers", "ModuleMemb
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AbstractMembers", "AbstractMembers\AbstractMembers.fsproj", "{78228E45-825D-43D8-A8EB-5D8D5916C2E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorBrowsableMembers", "EditorBrowsableMembers\EditorBrowsableMembers.csproj", "{3B7D5A1E-0C6F-4E2B-9A61-7D2F4C8E1B55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -39,5 +41,7 @@ Global
 		{51D06D99-4C39-4105-8DD0-55F2D1B1CC9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78228E45-825D-43D8-A8EB-5D8D5916C2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78228E45-825D-43D8-A8EB-5D8D5916C2E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B7D5A1E-0C6F-4E2B-9A61-7D2F4C8E1B55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B7D5A1E-0C6F-4E2B-9A61-7D2F4C8E1B55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
