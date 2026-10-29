@@ -1,0 +1,44 @@
+﻿Completion: Basic
+Count: 14
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.♦"
+
+##### RELEVANCE SORT #####
+
+                            [FieldsAndProperties]
+AdvancedProp                int    <==
+AlwaysProp                  int
+NeverProp                   int
+UnmarkedProp                int
+                            [Methods, MemberOfCurrentType^]
+AdvancedMethod              int
+AlwaysMethod                int
+NeverMethod                 int
+UnmarkedMethod              int
+                            [Methods, MemberOfObject]
+Equals                      bool
+GetHashCode                 int
+GetType                     Type
+ToString                    string
+                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+let
+match
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+AdvancedMethod              int
+AdvancedProp                int    <==
+AlwaysMethod                int
+AlwaysProp                  int
+Equals                      bool
+GetHashCode                 int
+GetType                     Type
+NeverMethod                 int
+NeverProp                   int
+ToString                    string
+UnmarkedMethod              int
+UnmarkedProp                int
+let
+match

@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
 open System.Collections.Generic
+open System.ComponentModel
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.EditorServices
 open FSharp.Compiler.Syntax.PrettyNaming
@@ -25,8 +26,15 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FcsLookupItemsProvider(logger: ILogger) =
-    let fcsCodeCompletionOptions =
+    let getFcsCodeCompletionOptions (context: FSharpCodeCompletionContext) =
+        let suggestEditorBrowsableSymbols =
+            match context.BasicContext.EditorBrowsableProcessing with
+            | EditorBrowsableProcessingType.All -> EditorBrowsableState.Never
+            | EditorBrowsableProcessingType.Normal -> EditorBrowsableState.Always
+            | _ -> EditorBrowsableState.Advanced
+
         { FSharpCodeCompletionOptions.Default with
+            SuggestEditorBrowsableSymbols = suggestEditorBrowsableSymbols
             SuggestGeneratedOverrides = false
             SuggestObsoleteSymbols = true
             SuggestOverrideBodies = false
@@ -113,6 +121,7 @@ type FcsLookupItemsProvider(logger: ILogger) =
             let parseResults = fsFile.ParseResults
             let fcsContext = context.FcsCompletionContext
             let line = int fcsContext.Coords.Line + 1
+            let fcsCodeCompletionOptions = getFcsCodeCompletionOptions context
 
             try
                 let itemLists =

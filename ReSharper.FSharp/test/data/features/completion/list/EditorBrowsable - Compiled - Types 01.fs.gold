@@ -1,0 +1,21 @@
+﻿Completion: Basic
+Count: 4
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "EditorBrowsableMembers.♦"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, TypesAndNamespaces, ImportedType, NormalSelectionPriority, Other]
+Advanced                    <==
+Always
+Class
+Unmarked
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Advanced                    <==
+Always
+Class
+Unmarked

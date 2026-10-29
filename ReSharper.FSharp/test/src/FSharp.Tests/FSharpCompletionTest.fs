@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.CodeCompletion
 
 open System
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -846,3 +848,27 @@ type FSharpCompletionModernListTest() =
     [<Test>] member x.``Local val - Short lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Unfinished string 01``() = x.DoNamedTest()
     [<Test>] member x.``Unfinished string 02 - Eof``() = x.DoNamedTest()
+
+    [<Test>] member x.``EditorBrowsable - Members 01 - Advanced``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<CodeCompletionSettingsKey>, "EditorBrowsableProcessing", EditorBrowsableProcessingType.All)>]
+    [<Test>] member x.``EditorBrowsable - Members 02 - All``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<CodeCompletionSettingsKey>, "EditorBrowsableProcessing", EditorBrowsableProcessingType.Normal)>]
+    [<Test>] member x.``EditorBrowsable - Members 03 - Normal``() = x.DoNamedTest()
+
+    [<Test>] member x.``EditorBrowsable - Module 01``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("EditorBrowsableMembers")>]
+    member x.``EditorBrowsable - Compiled - Members 01 - Advanced``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<CodeCompletionSettingsKey>, "EditorBrowsableProcessing", EditorBrowsableProcessingType.All)>]
+    [<Test; TestReferenceProjectOutput("EditorBrowsableMembers")>]
+    member x.``EditorBrowsable - Compiled - Members 02 - All``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<CodeCompletionSettingsKey>, "EditorBrowsableProcessing", EditorBrowsableProcessingType.Normal)>]
+    [<Test; TestReferenceProjectOutput("EditorBrowsableMembers")>]
+    member x.``EditorBrowsable - Compiled - Members 03 - Normal``() = x.DoNamedTest()
+
+    [<Test; TestReferenceProjectOutput("EditorBrowsableMembers")>]
+    member x.``EditorBrowsable - Compiled - Types 01``() = x.DoNamedTest()
