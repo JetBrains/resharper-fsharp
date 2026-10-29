@@ -1,0 +1,12 @@
+// ${COMPLETE_ITEM:Implement IFoo}
+module Module
+
+type IFoo =
+    abstract M1: int -> int
+    abstract M2: unit -> unit
+    abstract P: string
+
+type A() =
+    interface IFoo with
+        member this.M1(x) = x
+        {caret}

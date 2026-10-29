@@ -1,2 +1,3 @@
 ﻿
+Implement System.IDisposable
 member Dispose(){caret}

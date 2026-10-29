@@ -331,10 +331,11 @@ module OverrideMemberRule =
             .WithBehavior(fun _ -> OverrideBehavior(info, types))
             .WithTextToMatch(presentationText)
 
-    let keepOnlyOverrideItems (collector: IItemsCollector) =
+    let keepOnlyOverrideItems (alsoInclude: ILookupItem -> bool) (collector: IItemsCollector) =
         collector.RemoveWhere(fun (item: ILookupItem) ->
             match item with
             | :? FSharpKeywordLookupItem -> false
+            | _ when alsoInclude item -> false
             | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? OverrideBehavior)
             | _ -> true)
 
@@ -363,5 +364,5 @@ type OverrideMemberRule() =
         false
 
     override this.TransformItems(context, collector) =
-        OverrideMemberRule.keepOnlyOverrideItems collector
+        OverrideMemberRule.keepOnlyOverrideItems (fun _ -> false) collector
         FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext
