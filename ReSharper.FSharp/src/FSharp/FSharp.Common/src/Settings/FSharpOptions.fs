@@ -29,7 +29,7 @@ type FSharpSettings() = class end
 
 
 [<AutoOpen>]
-module FSharpOptions =
+module private FSharpOptions =
     let [<Literal>] skipImplementationAnalysis = "Skip implementation files analysis when possible"
     let [<Literal>] parallelProjectReferencesAnalysis = "Analyze project references in parallel"
     let [<Literal>] nonFSharpProjectInMemoryReferences = "Analyze C# and VB.NET project references in-memory"
@@ -88,6 +88,7 @@ module FSharpExperimentalFeatures =
     let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] outOfProcessTypeProviders = "Host type providers out-of-process"
     let [<Literal>] generativeTypeProvidersInMemoryAnalysis = "Enable generative type providers analysis in C#/VB.NET projects"
+    let [<Literal>] useTransparentCompiler = "Use FCS transparent compiler"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
@@ -108,7 +109,10 @@ type FSharpExperimentalFeatures =
       mutable OutOfProcessTypeProviders: bool
 
       [<SettingsEntry(true, FSharpExperimentalFeatures.generativeTypeProvidersInMemoryAnalysis); DefaultValue>]
-      mutable GenerativeTypeProvidersInMemoryAnalysis: bool }
+      mutable GenerativeTypeProvidersInMemoryAnalysis: bool
+
+      [<SettingsEntry(false, FSharpExperimentalFeatures.useTransparentCompiler); DefaultValue>]
+      mutable UseTransparentCompiler: bool }
 
 
 [<AllowNullLiteral>]
@@ -144,6 +148,7 @@ type FSharpExperimentalFeaturesProvider(lifetime, solution: ISolution, settings,
     member val Formatter = base.GetValueProperty<bool>("Formatter")
     member val OutOfProcessTypeProviders = base.GetValueProperty<bool>("OutOfProcessTypeProviders")
     member val GenerativeTypeProvidersInMemoryAnalysis = base.GetValueProperty<bool>("GenerativeTypeProvidersInMemoryAnalysis")
+    member val UseTransparentCompiler = base.GetValueProperty<bool>("UseTransparentCompiler")
 
 
 [<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
@@ -227,6 +232,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         if configurations.IsInternalMode() then
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
+            this.AddBoolOptionWithComment((fun key -> key.UseTransparentCompiler), FSharpExperimentalFeatures.useTransparentCompiler, "Requires restart") |> ignore
 
 
 [<ShellComponent>]
