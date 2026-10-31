@@ -1,0 +1,10 @@
+// ${COMPLETE_ITEM:Implement IFoo}
+module Module
+
+type IFoo =
+    abstract M: int -> int
+    abstract P: string
+
+{ new IFoo with
+    member this.M(var0) = failwith "todo"{caret}
+    member this.P = failwith "todo" }

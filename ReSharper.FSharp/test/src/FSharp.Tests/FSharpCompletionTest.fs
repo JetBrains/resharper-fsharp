@@ -356,6 +356,14 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Override member - Interface - Duplicates 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface - Duplicates 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Interface - Duplicates 03`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Implement all members - Interface 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - Interface 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - Interface 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - ObjExpr 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - ObjExpr 02`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - ObjExpr 03`` () = x.DoNamedTest()
+
     [<Test>] member x.``Override member - Change Overridden Member 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Change Overridden Member 02`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Change Overridden Member 03`` () = x.DoNamedTest()

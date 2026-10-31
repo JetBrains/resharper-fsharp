@@ -650,6 +650,25 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
               FSharpGeneratorElement(prop.Setter, { element.MfvInstance with Mfv = mfv.SetterMethod }, element.AddTypes) ]
     )
 
+let generateInterfaceMembers (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
+    let implContext =
+        match interfaceImpl with
+        | None ->
+            match typeDecl with
+            | :? IObjExpr as objExpr ->
+                ValueSome (InterfaceImplementationContext.Create(objExpr))
+            | _ -> ValueNone
+        | Some impl ->
+            ValueSome (InterfaceImplementationContext.Create(impl))
+
+    match implContext with
+    | ValueNone -> []
+    | ValueSome implContext ->
+        let typeElement = typeDecl.DeclaredElement
+        getInterfaceMembers true implContext typeElement
+        |> sanitizeMembers
+        |> List.ofSeq
+
 let private annotateParamDecl (paramDecl: IFSharpParameterDeclaration) (_, fcsType) =
     match paramDecl with
     | :? IFSharpPattern as fsPat -> TypeAnnotationUtil.specifyPatternType fcsType fsPat
