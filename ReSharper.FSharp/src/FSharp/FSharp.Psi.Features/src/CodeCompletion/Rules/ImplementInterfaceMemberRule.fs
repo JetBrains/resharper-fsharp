@@ -22,10 +22,19 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 
-type ImplementAllMembersBehavior(info, context: FSharpCodeCompletionContext) =
-    inherit TextualBehavior<TextualInfo>(info)
+type ImplementAllMembersInfo(context: FSharpCodeCompletionContext, identity: string) =
+    inherit TextualInfo("member _", identity, Ranges = context.Ranges)
+
+    member this.Context = context
+
+    override this.IsRiderAsync = false
+
+type ImplementAllMembersBehavior(info) =
+    inherit TextualBehavior<ImplementAllMembersInfo>(info)
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
+        let context = info.Context
+
         use pinCheckResultsCookie =
             Assertion.Assert(context.ParseAndCheckResults.IsValueCreated)
             textControl.GetFSharpFile(solution).PinTypeCheckResults(context.ParseAndCheckResults.Value)
@@ -36,21 +45,21 @@ type ImplementAllMembersBehavior(info, context: FSharpCodeCompletionContext) =
         psiServices.Files.CommitAllDocuments()
 
         let node = textControl.Document.GetPsiSourceFile(solution).FSharpFile.FindNodeAt(nameRange)
-        let memberDecl = node.NextSibling
+        let anchorMemberDecl = node.NextSibling
         let interfaceImpl = node.GetContainingNode<IInterfaceImplementation>() |> Option.ofObj
         let typeDecl = node.GetContainingNode<IFSharpTypeElementDeclaration>()
 
         let generatorElements = GenerateOverrides.generateInterfaceMembers typeDecl interfaceImpl
 
         let memberDecls =
-            use writeCookie = WriteLockCookie.Create(memberDecl.IsPhysical())
+            use writeCookie = WriteLockCookie.Create(anchorMemberDecl.IsPhysical())
             use transactionCookie =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, nameof ImplementAllMembersBehavior)
 
-            let decls = GenerateOverrides.addMembers generatorElements typeDecl memberDecl
+            let decls = GenerateOverrides.addMembers generatorElements typeDecl anchorMemberDecl
             let deleteRangeStart =
-                skipMatchingNodesAfter isInlineSpaceOrComment (memberDecl.GetPreviousMeaningfulSibling())
-            ModificationUtil.DeleteChildRange(deleteRangeStart, memberDecl)
+                skipMatchingNodesAfter isInlineSpaceOrComment (anchorMemberDecl.GetPreviousMeaningfulSibling())
+            ModificationUtil.DeleteChildRange(deleteRangeStart, anchorMemberDecl)
             decls
 
         let expr = GenerateOverrides.getGeneratedBodyToSelect memberDecls
@@ -80,12 +89,12 @@ type ImplementInterfaceMemberRule() =
         (typeDecl: IFSharpTypeElementDeclaration)
         (interfaceImpl: IInterfaceImplementation option) =
         let text = $"Implement {getInterfaceTypeName typeDecl interfaceImpl}"
-        let info = TextualInfo("member _", text, Ranges = context.Ranges)
+        let info = ImplementAllMembersInfo(context, text)
 
         LookupItemFactory
             .CreateLookupItem(info)
             .WithPresentation(fun _ -> TextualPresentation(RichText(text), info))
-            .WithBehavior(fun _ -> ImplementAllMembersBehavior(info, context))
+            .WithBehavior(fun _ -> ImplementAllMembersBehavior(info))
             .WithTextToMatch(text)
             .WithRelevance(Relevance)
 
