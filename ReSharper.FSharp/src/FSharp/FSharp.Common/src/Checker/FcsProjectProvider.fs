@@ -610,7 +610,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         member this.GetAllReferencedModules() =
             referencedModules
 
-        member this.PrepareAssemblyShim(psiModule) =
+        member this.UpdateFcsProjectWithAssemblyShim(psiModule) =
             locks.AssertReadAccessAllowed()
 
             if psiModule :? FSharpScriptPsiModule then None else
@@ -629,6 +629,11 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
             fcsAssemblyReaderShim.Value.PrepareForFcsRequest(fcsProject)
 
+            // PrepareForFcsRequest may update timestamps of referenced metadata modules,
+            // so the snapshot taken above may be stale with respect to them.
+            // Snapshots cache versions computed from metadata timestamps,
+            // so the project snapshot has to be recreated to get the actual metadata reference timestamps.
+            // Getting the project again processes the invalidated projects and recreates the snapshots.
             if checkerService.UseTransparentCompiler then
                 (this :> IFcsProjectProvider).GetFcsProject(psiModule)
             else
