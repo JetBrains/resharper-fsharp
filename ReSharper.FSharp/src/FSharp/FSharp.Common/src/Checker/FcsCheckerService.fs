@@ -131,7 +131,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
         if not (fcsProject.IsKnownFile(sourceFile)) && not fcsProject.Options.UseScriptResolutionRules then None else
 
         let fcsProject =
-            x.FcsProjectProvider.PrepareAssemblyShim(psiModule)
+            x.FcsProjectProvider.UpdateFcsProjectWithAssemblyShim(psiModule)
             |> Option.defaultValue fcsProject
 
         let path = sourceFile.GetLocation().FullPath
@@ -288,7 +288,7 @@ type IFcsProjectProvider =
 
     abstract ProjectRemoved: ISignal<FcsProjectKey * FcsProject>
 
-    abstract PrepareAssemblyShim: psiModule: IPsiModule -> FcsProject option
+    abstract UpdateFcsProjectWithAssemblyShim: psiModule: IPsiModule -> FcsProject option
 
     abstract GetReferencedModule: projectKey: FcsProjectKey -> ReferencedModule option 
     abstract GetAllReferencedModules: unit -> KeyValuePair<FcsProjectKey, ReferencedModule> seq
