@@ -81,7 +81,7 @@ type ImplementInterfaceMemberRule() =
         | None, (:? IObjExpr as objExpr) -> objExpr.TypeName.GetText()
         | _ -> Assertion.Fail("Unexpected interface implementation context"); null
 
-    let isImplHasNoMembers (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
+    let isImplEmpty (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
         match interfaceImpl, typeDecl with
         | Some impl, _ -> impl.TypeMembers.IsEmpty
         | None, (:? IObjExpr as objExpr) -> objExpr.MemberDeclarations.IsEmpty
@@ -122,7 +122,7 @@ type ImplementInterfaceMemberRule() =
             collector.Add(item)
 
         if isWhitespace context.NodeInFile
-           && isImplHasNoMembers typeDecl interfaceImpl
+           && isImplEmpty typeDecl interfaceImpl
            && generatorElements |> (Seq.tryHead >> _.IsSome) then
             context.ParseAndCheckResults.Value |> ignore
             let implAllItem = createImplementAllMembersItem context typeDecl interfaceImpl
