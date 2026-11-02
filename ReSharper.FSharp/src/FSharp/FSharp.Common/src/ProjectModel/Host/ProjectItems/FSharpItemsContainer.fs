@@ -127,7 +127,8 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
     let getItems (toolsetVersion: NuGetVersion) (msBuildProject: MsBuildProject) projectDescriptor
-            (itemTypeFilter: MsBuildProjectItem -> bool) (itemsByName: HashSet<_>) allowNonDefaultItemType =
+            (itemTypeFilter: MsBuildProjectItem -> bool) (seenIncludes: HashSet<struct (TargetFrameworkId * string)>)
+            allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
 
         let shouldRemoveAssemblyInfo =
@@ -149,7 +150,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
 
                 // todo: allow passing additional default item types to the filter ctor
                 (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
-                (itemsByName.Add(item.EvaluatedInclude) || item.ItemType |> (|BuildAction|) |> _.IsNone() |> not)
+                seenIncludes.Add(struct (targetFrameworkId, item.EvaluatedInclude))
             )
             |> Seq.fold (fun index item ->
                 if index < items.Count && items[index].Item.EvaluatedInclude = item.EvaluatedInclude then
@@ -252,10 +253,10 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
                     |> ValueOption.map _.Version
                     |> ValueOption.defaultValue null
 
-                let itemsByName = HashSet()
-                let compileBeforeItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileBeforeItem itemsByName true
-                let compileAfterItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileAfterItem itemsByName true
-                let restItems = getItems toolsetVersion msBuildProject projectDescriptor (changesOrderItem >> not) itemsByName false
+                let seenIncludes = HashSet()
+                let compileBeforeItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileBeforeItem seenIncludes true
+                let compileAfterItems = getItems toolsetVersion msBuildProject projectDescriptor isCompileAfterItem seenIncludes true
+                let restItems = getItems toolsetVersion msBuildProject projectDescriptor (changesOrderItem >> not) seenIncludes false
 
                 let items =
                     compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
@@ -659,18 +660,25 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             itemUpdater folderItem)
         folders.RemoveKey(oldLocation)
 
+    let moveChildren (source: FSharpProjectModelElement) (target: FSharpProjectModelElement) =
+        for child in getChildrenSorted source |> List.ofSeq do
+            children.RemoveValue(source, child)
+            child.ItemInfo.Parent <- target
+            child.ItemInfo.SortKey <- getNewSortKey target
+            addChild child
+
+    let releaseFolderIdentity folderPath (removedIdentity: FSharpViewFolderIdentity) =
+        for folderItem in folders[folderPath] do
+            match folderItem with
+            | FolderItem(_, id) when id.Identity > removedIdentity.Identity -> id.Identity <- id.Identity - 1
+            | _ -> ()
+
     let rec removeSplittedFolderIfEmpty folder folderPath folderRefresher itemUpdater =
         let isFolderSplitted path = folders[path].Count > 1
 
         match folder with
         | ProjectItem(EmptyFolder(FolderItem(_, folderId)) as folderItem) when isFolderSplitted folderPath ->
-            folders[folderPath]
-            |> Seq.iter (fun folderItem ->
-                match folderItem with
-                | FolderItem(_, id) ->
-                    if id.Identity > folderId.Identity then id.Identity <- id.Identity - 1
-                | _ -> ())
-
+            releaseFolderIdentity folderPath folderId
             removeItem folderRefresher itemUpdater folderItem
             folderRefresher folderItem.Parent
         | _ -> ()
@@ -703,14 +711,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             let folderAfterChildren = getChildrenSorted (ProjectItem itemAfter) |> List.ofSeq
             let folderBeforeChildren = getChildrenSorted (ProjectItem itemBefore) |> List.ofSeq
 
-            let folderBeforeChildrenCount = folderBeforeChildren |> List.length
-            folderAfterChildren |> List.iteri (fun i child ->
-                let oldParent = child.Parent
-                child.ItemInfo.Parent <- ProjectItem itemBefore
-                child.ItemInfo.SortKey <- folderBeforeChildrenCount + i + 1
-
-                children.RemoveValue(oldParent, child)
-                addChild child)
+            moveChildren (ProjectItem itemAfter) (ProjectItem itemBefore)
 
             folders.RemoveValue(itemAfter.PhysicalPath, itemAfter)
             children.RemoveKey(ProjectItem itemAfter)
@@ -811,8 +812,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     let iter f = iterFrom project f
 
     member x.Update(items) =
-        let folders = Stack()
-        folders.Push(State.Create(projectDirectory, project))
+        let orderedFolders = Stack()
+        orderedFolders.Push(State.Create(projectDirectory, project))
+        let looseFolders = List<FSharpProjectModelElement>()
 
         let parsePaths (item: MsBuildProjectItem) =
             let path = VirtualFileSystemPath.TryParse(item.EvaluatedInclude, InteractionContext.SolutionContext)
@@ -827,6 +829,58 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 else projectDirectory.Combine(physicalPath.Name)
             Some(physicalPath, logicalPath)
 
+        let getOrderedParent (logicalPath: VirtualFileSystemPath) =
+            if logicalPath.Directory <> orderedFolders.Peek().Path then
+                let commonParent = FileSystemPathEx.GetDeepestCommonParent(logicalPath.Parent, orderedFolders.Peek().Path)
+                while orderedFolders.Peek().Path <> commonParent do
+                    orderedFolders.Pop() |> ignore
+
+                let newFolders =
+                    logicalPath.GetParentDirectories() |> Seq.takeWhile (fun p -> p <> commonParent) |> Seq.rev
+
+                for folderPath in newFolders do
+                    let parent = orderedFolders.Peek().Folder
+                    let folder = addFolder parent (getNewSortKey parent) folderPath ignore
+                    orderedFolders.Push(State.Create(folderPath, folder))
+
+            orderedFolders.Peek().Folder
+
+        let getLooseParent (logicalPath: VirtualFileSystemPath) =
+            logicalPath.GetParentDirectories()
+            |> Seq.takeWhile (fun p -> p <> projectDirectory)
+            |> Seq.rev
+            |> Seq.fold (fun parent folderPath ->
+                folders[folderPath]
+                |> Seq.filter (fun folder -> folder.Parent = parent)
+                |> Seq.sortBy _.SortKey
+                |> Seq.tryLast
+                |> Option.map ProjectItem
+                |> Option.defaultWith (fun _ ->
+                    let folder = addFolder parent (getNewSortKey parent) folderPath ignore
+                    looseFolders.Add(folder)
+                    folder)) project
+
+        let mergeLooseFolders () =
+            for looseFolder in looseFolders do
+                match looseFolder with
+                | ProjectItem(FolderItem(_, identity) as folder) ->
+                    let orderedParts =
+                        folders[folder.LogicalPath]
+                        |> Seq.filter (fun part -> part.Parent = folder.Parent && not (looseFolders.Contains(ProjectItem part)))
+                        |> Seq.sortBy _.SortKey
+                        |> List.ofSeq
+
+                    orderedParts
+                    |> List.tryFind (fun part -> part.SortKey > folder.SortKey)
+                    |> Option.orElse (List.tryLast orderedParts)
+                    |> Option.iter (fun orderedFolder ->
+                        moveChildren looseFolder (ProjectItem orderedFolder)
+                        releaseFolderIdentity folder.LogicalPath identity
+                        folders.RemoveValue(folder.LogicalPath, folder)
+                        removeChild folder
+                        moveFollowingItems folder.Parent folder.SortKey MoveDirection.Up ignore)
+                | _ -> ()
+
         for item in items do
             let msbuildItem = item.Item
             match parsePaths msbuildItem with
@@ -834,41 +888,36 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 if not (projectDirectory.IsPrefixOf(logicalPath)) then
                     logger.Warn("Invalid logical path {0} for project dir: {1}", logicalPath, projectDirectory) else
 
-                if logicalPath.Directory <> folders.Peek().Path then
-                    let commonParent = FileSystemPathEx.GetDeepestCommonParent(logicalPath.Parent, folders.Peek().Path)
-                    while (folders.Peek().Path <> commonParent) do
-                        folders.Pop() |> ignore
-
-                    let newFolders =
-                        logicalPath.GetParentDirectories() |> Seq.takeWhile (fun p -> p <> commonParent) |> Seq.rev
-
-                    for folderPath in newFolders do
-                        let currentState = folders.Peek()
-                        currentState.NextSortKey <- currentState.NextSortKey + 1
-
-                        let folder = addFolder currentState.Folder currentState.NextSortKey folderPath ignore
-                        folders.Push(State.Create(folderPath, folder))
-
-                let currentState = folders.Peek()
-                let parent = currentState.Folder
-                currentState.NextSortKey <- currentState.NextSortKey + 1
-
-                let compileOrder =
-                    msbuildItem.GetMetadataValue(ProjectItemMetadata.compileOrder)
-                    |> FSharpCompileOrder.ofString
-
                 match msbuildItem.ItemType with
-                | Folder -> addFolder parent currentState.NextSortKey logicalPath ignore |> ignore
+                | Folder ->
+                    let parent = getOrderedParent logicalPath
+                    addFolder parent (getNewSortKey parent) logicalPath ignore |> ignore
+
                 | BuildAction buildAction ->
-                    let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, currentState.NextSortKey)
                     if files.ContainsKey(physicalPath) then
-                        logger.Warn(sprintf "%O added twice" physicalPath)
-                    else
-                        let isThisProjectItem = msbuildItem.Origin :? RdThisProjectItemOrigin
-                        let item = FileItem(itemInfo, buildAction, compileOrder, item.TargetFrameworkIds, isThisProjectItem)
-                        files.Add(physicalPath, item)
-                        addChild item
+                        logger.Warn(sprintf "%O added twice" physicalPath) else
+
+                    let isExplicit =
+                        msbuildItem.Origin :? RdThisProjectItemOrigin && msbuildItem.FromWildcard = Nullable(false)
+
+                    let isOrdered =
+                        match buildAction with
+                        | SourceFile -> true
+                        | _ -> isExplicit
+
+                    let parent = if isOrdered then getOrderedParent logicalPath else getLooseParent logicalPath
+
+                    let compileOrder =
+                        msbuildItem.GetMetadataValue(ProjectItemMetadata.compileOrder)
+                        |> FSharpCompileOrder.ofString
+
+                    let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, getNewSortKey parent)
+                    let item = FileItem(itemInfo, buildAction, compileOrder, item.TargetFrameworkIds, isExplicit)
+                    files.Add(physicalPath, item)
+                    addChild item
             | _ -> ()
+
+        mergeLooseFolders ()
 
     member x.Write(writer: UnsafeWriter) =
         let writeTargetFrameworkIds ids =
@@ -893,7 +942,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             writer.Write(info.SortKey)
 
             match projectItem with
-            | FileItem(_, buildAction, compileOrder, targetFrameworks, isThisProjectItem) ->
+            | FileItem(_, buildAction, compileOrder, targetFrameworks, isExplicit) ->
                 writer.Write(int FSharpProjectItemType.File)
                 writer.Write(buildAction.Value)
 
@@ -906,7 +955,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     | FSharpCompileOrder.CompileBefore -> writer.Write(1)
 
                 writeTargetFrameworkIds targetFrameworks
-                writer.Write(isThisProjectItem)
+                writer.Write(isExplicit)
 
             | FolderItem(_, identity) ->
                 writer.Write(int FSharpProjectItemType.Folder)
@@ -1050,21 +1099,26 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             |> Option.map (fun item -> item.ProjectItem.Location)
             |> Option.defaultValue null
 
+        let rec tryGetAdjacentExplicitItem (relativeItem: FSharpProjectItem) relativeToType =
+            match tryGetAdjacentRelativeItem (ProjectItem relativeItem) modifiedItemCompilerOrder relativeToType with
+            | Some(adjacentItem, _) when adjacentItem.IsImplicitFileItem -> tryGetAdjacentExplicitItem adjacentItem relativeToType
+            | adjacentItem -> adjacentItem
+
         match getRelativeChildPathImpl relativeItem modifiedItemCompilerOrder relativeToType modifiedViewItem.IsNone with
         | Some(relativeChildItem, relativeToType) when
                  relativeChildItem.PhysicalPath = modifiedItemLocation ||
-                 relativeChildItem.IsNonThisProjectFileItem ->
+                 relativeChildItem.IsImplicitFileItem ->
 
             // When moving files, we remove each file first, and then we add it next to the relative item.
             // An item should not be relative to itself as we won't be able to find place to insert after removing.
             // We need to find another item to be relative to.
-            match tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedItemCompilerOrder relativeToType with
+            match tryGetAdjacentExplicitItem relativeChildItem relativeToType with
             | Some(adjacentItem, relativeToType) ->
                   Some(adjacentItem.PhysicalPath, changeDirection relativeToType)
             | _ ->
                 // There were no adjacent items in this direction, try the other one.
                 let relativeToType = changeDirection relativeToType
-                tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedItemCompilerOrder relativeToType
+                tryGetAdjacentExplicitItem relativeChildItem relativeToType
                 |> Option.map (fun (item, relativeToType) -> item.PhysicalPath, changeDirection relativeToType)
 
         | Some(item, relativeToType) -> Some(item.PhysicalPath, relativeToType)
@@ -1128,7 +1182,7 @@ module FSharpCompileOrder =
 [<ReferenceEquality>]
 [<StructuredFormatDisplay("{RelativePhysicalPath}")>]
 type FSharpProjectItem =
-    | FileItem of ItemInfo * BuildAction * compileOrder: FSharpCompileOrder option * ISet<TargetFrameworkId> * isThisProjectItem: bool
+    | FileItem of ItemInfo * BuildAction * compileOrder: FSharpCompileOrder option * ISet<TargetFrameworkId> * isExplicit: bool
     | FolderItem of ItemInfo * FSharpViewFolderIdentity
 
     member this.CompileOrder: FSharpCompileOrder option =
@@ -1155,9 +1209,9 @@ type FSharpProjectItem =
     member x.RelativePhysicalPath = x.PhysicalPath.MakeRelativeTo(x.ProjectDirectory)
 
     // todo: it will break for an imported empty folder item, check folders properly
-    member x.IsNonThisProjectFileItem =
+    member x.IsImplicitFileItem =
         match x with
-        | FileItem(_, _, _, _, isThisProjectItem) -> not isThisProjectItem
+        | FileItem(_, _, _, _, isExplicit) -> not isExplicit
         | _ -> false
 
     override x.ToString() =
@@ -1202,11 +1256,10 @@ type MoveDirection =
 
 type State =
     { Path: VirtualFileSystemPath
-      Folder: FSharpProjectModelElement
-      mutable NextSortKey: int }
+      Folder: FSharpProjectModelElement }
 
     static member Create(path, folder: FSharpProjectModelElement) =
-        { Path = path; Folder = folder; NextSortKey = 0 }
+        { Path = path; Folder = folder }
 
 
 type RdProjectItemWithTargetFrameworks =

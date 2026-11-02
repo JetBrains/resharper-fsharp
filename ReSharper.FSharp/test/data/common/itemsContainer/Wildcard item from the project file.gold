@@ -1,0 +1,24 @@
+﻿
+=== Container Dump ===
+Project
+1:Views[1]
+  1:MainWindow.fs
+  2:Notes.txt (None)
+2:Program.fs
+
+.NETFramework,Version=v0.0
+Views/MainWindow.fs
+Views/Notes.txt
+Program.fs
+
+
+=== Structure API ===
+Views SortKey=1
+  MainWindow.fs SortKey=1 ParentFolderIdentity=Some(1)
+Program.fs SortKey=2 ParentFolderIdentity=<null>
+Views SortKey=1
+  Notes.txt SortKey=2 ParentFolderIdentity=Some(1)
+
+=== Parent Folders API ===
+Views
+  Views[1] -> <null>

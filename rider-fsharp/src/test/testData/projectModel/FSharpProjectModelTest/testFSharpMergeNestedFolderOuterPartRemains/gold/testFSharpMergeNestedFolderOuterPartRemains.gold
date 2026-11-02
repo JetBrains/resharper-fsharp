@@ -71,6 +71,7 @@ Content roots:
     1:net5.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
@@ -80,19 +81,15 @@ Content roots:
   1:Nested[2]
     1:File3.fs
   2:File4.fs
-5:obj[2]
-  1:Debug[2]
-    1:net5.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net5.0
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ILLink.Substitutions.xml
 Folder1/Nested/File1.fs
 Folder2/File2.fs
 Folder1/Nested/File3.fs
 Folder1/File4.fs
-obj/Debug/net5.0/ILLink.Substitutions.xml
 
 ===================
 1. Move 'Folder1(2)/Nested' after 'Folder1(1)/Nested/File1.fs'
@@ -166,6 +163,7 @@ Content roots:
     1:net5.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
@@ -174,17 +172,13 @@ Content roots:
   1:File2.fs
 4:Folder1[2]
   1:File4.fs
-5:obj[2]
-  1:Debug[2]
-    1:net5.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net5.0
 obj/Debug/net5.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.fs
+obj/Debug/net5.0/ILLink.Substitutions.xml
 Folder1/Nested/File1.fs
 Folder1/Nested/File3.fs
 Folder2/File2.fs
 Folder1/File4.fs
-obj/Debug/net5.0/ILLink.Substitutions.xml
 

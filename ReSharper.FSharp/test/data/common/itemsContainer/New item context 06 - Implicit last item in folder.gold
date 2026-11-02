@@ -1,0 +1,14 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:Notes.txt (None)
+
+.NETFramework,Version=v0.0
+File1
+Folder/Notes.txt
+
+
+Project -> Before File1
+File1 -> Inside File1
+Folder[1] -> After File1
+Notes.txt -> After File1

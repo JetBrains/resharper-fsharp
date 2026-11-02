@@ -1,0 +1,28 @@
+﻿
+=== Container Dump ===
+Project
+1:Verifier.fs
+2:Program.fs
+3:snapshots[1]
+  1:Test1.verified.txt (None)
+  2:Test2.verified.txt (None)
+
+.NETFramework,Version=v0.0
+Verifier.fs
+Program.fs
+snapshots/Test1.verified.txt
+snapshots/Test2.verified.txt
+
+
+=== Structure API ===
+snapshots SortKey=3
+  Test1.verified.txt SortKey=1 ParentFolderIdentity=Some(1)
+snapshots SortKey=3
+  Test2.verified.txt SortKey=2 ParentFolderIdentity=Some(1)
+Verifier.fs SortKey=1 ParentFolderIdentity=<null>
+Program.fs SortKey=2 ParentFolderIdentity=<null>
+snapshots SortKey=3
+
+=== Parent Folders API ===
+snapshots
+  snapshots[1] -> <null>

@@ -1,0 +1,76 @@
+===================
+Init
+
+-Project
+ -SolutionWithExplicitItemBetweenSources * 1 project
+  -App
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/10.1.202
+     -Frameworks
+      Microsoft.NETCore.App
+   -Views
+    MainWindow.fs
+    Notes.txt
+   Program.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : SolutionWithExplicitItemBetweenSources.sln)[]
+
+Project [Name:App, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : App.fsproj)[]
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    Folder [Name:Views]
+      Child items:
+        ProjectFileImpl(Path : MainWindow.fs)[COMPILE ]
+        ProjectFileImpl(Path : Notes.txt)[NONE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : App.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  App/App.fsproj
+  App/Program.fs
+  App/Views/MainWindow.fs
+  App/Views/Notes.txt
+  App/obj/Debug/net10.0/App.AssemblyInfo.fs
+  App/obj/Debug/net10.0/ILLink.Substitutions.xml
+  SolutionWithExplicitItemBetweenSources.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net10.0[1]
+      1:App.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
+2:Views[1]
+  1:MainWindow.fs
+  2:Notes.txt (None)
+3:Program.fs
+
+net10.0
+obj/Debug/net10.0/App.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
+Views/MainWindow.fs
+Views/Notes.txt
+Program.fs
+

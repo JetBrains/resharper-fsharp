@@ -1,0 +1,28 @@
+﻿Project
+1:File1
+2:Notes.txt (None)
+3:File2
+
+.NETFramework,Version=v0.0
+File1
+Notes.txt
+File2
+
+
+File1 Before File1 -> Before File2
+File1 After File1 -> Before File2
+File1 Before Notes.txt -> After File1
+File1 After Notes.txt -> Before File2
+
+Notes.txt Before File1 -> Before File1
+Notes.txt After File1 -> After File1
+Notes.txt Before Notes.txt -> After File1
+Notes.txt After Notes.txt -> Before File2
+Notes.txt Before File2 -> Before File2
+Notes.txt After File2 -> After File2
+
+File2 Before Notes.txt -> After File1
+File2 After Notes.txt -> Before File2
+File2 Before File2 -> After File1
+File2 After File2 -> After File1
+

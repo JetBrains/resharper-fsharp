@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <None Include="**\*.verified.*" />
+  </ItemGroup>
+</Project>

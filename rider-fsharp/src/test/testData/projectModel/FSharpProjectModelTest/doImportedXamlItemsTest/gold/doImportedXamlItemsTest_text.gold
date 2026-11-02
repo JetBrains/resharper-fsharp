@@ -1,0 +1,15 @@
+===================
+Init
+
+[Program.fs]
+module Program
+
+
+[ViewModelBase.fs]
+module ViewModelBase
+
+
+[MainWindow.axaml.fs]
+module MainWindow
+
+

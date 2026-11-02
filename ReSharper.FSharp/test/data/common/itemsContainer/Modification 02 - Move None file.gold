@@ -1,0 +1,31 @@
+﻿Project
+1:Program.fs
+2:Scripts[1]
+  1:Build.fsx (None)
+  2:Deploy.fsx (None)
+
+.NETFramework,Version=v0.0
+Program.fs
+Scripts/Build.fsx
+Scripts/Deploy.fsx
+
+
+=======
+Move 'Scripts/Deploy.fsx' before 'Scripts/Build.fsx':
+Remove 'Scripts/Deploy.fsx'
+Add 'Scripts/Deploy.fsx' Before 'Scripts/Build.fsx'
+Update view Scripts/Build.fsx
+Update view Scripts/Deploy.fsx
+
+Project
+1:Program.fs
+2:Scripts[1]
+  1:Deploy.fsx (None)
+  2:Build.fsx (None)
+
+.NETFramework,Version=v0.0
+Program.fs
+Scripts/Deploy.fsx
+Scripts/Build.fsx
+
+

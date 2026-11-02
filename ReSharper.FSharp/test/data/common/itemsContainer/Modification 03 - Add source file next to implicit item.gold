@@ -1,0 +1,30 @@
+﻿Project
+1:Views[1]
+  1:MainWindow.axaml.fs
+  2:MainWindow.axaml (None)
+2:Program.fs
+
+.NETFramework,Version=v0.0
+Views/MainWindow.axaml.fs
+Views/MainWindow.axaml
+Program.fs
+
+
+=======
+Add 'Views/New.fs' Before 'Program.fs'
+Update view Views/New.fs
+
+Project
+1:Views[1]
+  1:MainWindow.axaml.fs
+  2:MainWindow.axaml (None)
+  3:New.fs
+2:Program.fs
+
+.NETFramework,Version=v0.0
+Views/MainWindow.axaml.fs
+Views/MainWindow.axaml
+Views/New.fs
+Program.fs
+
+

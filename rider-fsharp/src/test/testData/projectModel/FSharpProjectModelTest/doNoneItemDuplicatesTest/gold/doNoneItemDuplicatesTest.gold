@@ -54,17 +54,14 @@ Content roots:
     1:net10.0[1]
       1:Library.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Library.fs
 3:host.json (None)
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/Library.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Library.fs
 host.json
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
