@@ -1,4 +1,4 @@
-// ${COMPLETE_ITEM:Implement IFoo}
+// ${ABSENT_ITEM:Implement IFoo}
 module Module
 
 type IFoo =

@@ -652,14 +652,12 @@ let sanitizeMembers (inputElements: FSharpGeneratorElement seq) =
 
 let generateInterfaceMembers (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
     let implContext =
-        match interfaceImpl with
-        | None ->
-            match typeDecl with
-            | :? IObjExpr as objExpr ->
-                ValueSome (InterfaceImplementationContext.Create(objExpr))
-            | _ -> ValueNone
-        | Some impl ->
+        match interfaceImpl, typeDecl with
+        | None, (:? IObjExpr as objExpr) ->
+            ValueSome (InterfaceImplementationContext.Create(objExpr))
+        | Some impl, _ ->
             ValueSome (InterfaceImplementationContext.Create(impl))
+        | _ -> ValueNone
 
     match implContext with
     | ValueNone -> []

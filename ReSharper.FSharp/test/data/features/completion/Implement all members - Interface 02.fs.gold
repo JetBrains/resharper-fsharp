@@ -1,13 +1,60 @@
-// ${COMPLETE_ITEM:Implement IFoo}
-module Module
-
-type IFoo =
-    abstract M1: int -> int
-    abstract M2: unit -> unit
-    abstract P: string
-
-type A() =
-    interface IFoo with
-        member this.M1(x) = x
-        member this.M2() = failwith "todo"{caret}
-        member this.P = failwith "todo"
+﻿
+abstract
+and
+as
+assert
+base
+begin
+class
+default
+delegate
+do
+done
+downcast
+downto
+elif
+else
+end
+false
+finally
+for
+fun
+function
+global
+if
+in
+inherit
+interface
+internal
+lazy
+let
+match
+member
+member M2()
+member P
+new
+not
+null
+of
+or
+override
+private
+public
+rec
+return
+sig
+static
+struct
+then
+to
+true
+try
+upcast
+use
+val
+void
+when
+while
+while!
+with
+yield{caret}

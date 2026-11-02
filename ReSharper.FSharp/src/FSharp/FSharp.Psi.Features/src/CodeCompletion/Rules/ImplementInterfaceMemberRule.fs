@@ -31,6 +31,7 @@ type ImplementAllMembersInfo(context: FSharpCodeCompletionContext, identity: str
 
 type ImplementAllMembersBehavior(info) =
     inherit TextualBehavior<ImplementAllMembersInfo>(info)
+    interface IFSharpGenerateMembersBehavior
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         let context = info.Context
@@ -57,9 +58,7 @@ type ImplementAllMembersBehavior(info) =
                 PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, nameof ImplementAllMembersBehavior)
 
             let decls = GenerateOverrides.addMembers generatorElements typeDecl anchorMemberDecl
-            let deleteRangeStart =
-                skipMatchingNodesAfter isInlineSpaceOrComment (anchorMemberDecl.GetPreviousMeaningfulSibling())
-            ModificationUtil.DeleteChildRange(deleteRangeStart, anchorMemberDecl)
+            ModificationUtil.DeleteChild(anchorMemberDecl)
             decls
 
         let expr = GenerateOverrides.getGeneratedBodyToSelect memberDecls
@@ -77,12 +76,16 @@ type ImplementInterfaceMemberRule() =
         ||| CLRLookupItemRelevance.ExpectedTypeMatch
 
     let getInterfaceTypeName (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
-        match interfaceImpl with
-        | Some impl -> impl.TypeName.GetText()
-        | None ->
-            match typeDecl with
-            | :? IObjExpr as objExpr -> objExpr.TypeName.GetText()
-            | _ -> "???"
+        match interfaceImpl, typeDecl with
+        | Some impl, _ -> impl.TypeName.GetText()
+        | None, (:? IObjExpr as objExpr) -> objExpr.TypeName.GetText()
+        | _ -> Assertion.Fail("Unexpected interface implementation context"); null
+
+    let isImplHasNoMembers (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
+        match interfaceImpl, typeDecl with
+        | Some impl, _ -> impl.TypeMembers.IsEmpty
+        | None, (:? IObjExpr as objExpr) -> objExpr.MemberDeclarations.IsEmpty
+        | _ -> Assertion.Fail("Unexpected interface implementation context"); false
 
     let createImplementAllMembersItem
         (context: FSharpCodeCompletionContext)
@@ -118,7 +121,9 @@ type ImplementInterfaceMemberRule() =
 
             collector.Add(item)
 
-        if isWhitespace context.NodeInFile && generatorElements |> (Seq.tryHead >> _.IsSome) then
+        if isWhitespace context.NodeInFile
+           && isImplHasNoMembers typeDecl interfaceImpl
+           && generatorElements |> (Seq.tryHead >> _.IsSome) then
             context.ParseAndCheckResults.Value |> ignore
             let implAllItem = createImplementAllMembersItem context typeDecl interfaceImpl
             implAllItem.Placement.Location <- PlacementLocation.Top
@@ -128,9 +133,5 @@ type ImplementInterfaceMemberRule() =
         false
 
     override this.TransformItems(context, collector) =
-        collector |> keepOnlyOverrideItems (fun item ->
-            match item with
-            | :? IAspectLookupItemBase as aspectItem ->
-                aspectItem.Behavior :? ImplementAllMembersBehavior
-            | _ -> false)
+        keepOnlyOverrideItems collector
         FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext

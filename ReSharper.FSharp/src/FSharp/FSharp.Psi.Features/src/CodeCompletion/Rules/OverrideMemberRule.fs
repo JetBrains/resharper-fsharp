@@ -28,6 +28,10 @@ open JetBrains.UI.RichText
 open JetBrains.ProjectModel
 open JetBrains.Util.NetFX.Media.Colors
 
+[<Interface>]
+type IFSharpGenerateMembersBehavior =
+    interface end
+
 type OverrideBehavior(info, types) =
     inherit TextualBehavior<TextualInfo>(info)
 
@@ -40,6 +44,8 @@ type OverrideBehavior(info, types) =
             |> Option.defaultValue null
 
         | expr -> expr
+
+    interface IFSharpGenerateMembersBehavior
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
@@ -331,12 +337,11 @@ module OverrideMemberRule =
             .WithBehavior(fun _ -> OverrideBehavior(info, types))
             .WithTextToMatch(presentationText)
 
-    let keepOnlyOverrideItems (alsoInclude: ILookupItem -> bool) (collector: IItemsCollector) =
+    let keepOnlyOverrideItems (collector: IItemsCollector) =
         collector.RemoveWhere(fun (item: ILookupItem) ->
             match item with
             | :? FSharpKeywordLookupItem -> false
-            | _ when alsoInclude item -> false
-            | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? OverrideBehavior)
+            | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? IFSharpGenerateMembersBehavior)
             | _ -> true)
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -364,5 +369,5 @@ type OverrideMemberRule() =
         false
 
     override this.TransformItems(context, collector) =
-        OverrideMemberRule.keepOnlyOverrideItems (fun _ -> false) collector
+        OverrideMemberRule.keepOnlyOverrideItems collector
         FSharpCodeCompletionContext.disableFullEvaluation context.BasicContext
