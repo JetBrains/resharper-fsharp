@@ -1,0 +1,26 @@
+﻿Project
+1:Views[1]
+  1:MainWindow.fs
+2:Program.fs
+
+.NETFramework,Version=v0.0
+Views/MainWindow.fs
+Program.fs
+
+
+=======
+Add 'Views/Notes.txt' After 'Views/MainWindow.fs'
+Update view Views/Notes.txt
+
+Project
+1:Views[1]
+  1:MainWindow.fs
+  2:Notes.txt (None)
+2:Program.fs
+
+.NETFramework,Version=v0.0
+Views/MainWindow.fs
+Views/Notes.txt
+Program.fs
+
+

@@ -68,6 +68,7 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
@@ -76,18 +77,14 @@ Content roots:
 4:Folder1[2]
   1:Nested[2]
     1:File3.fs
-5:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Folder1/Nested/File1.fs
 Folder2/File2.fs
 Folder1/Nested/File3.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
 ===================
 1. Move folder 'Folder1(2)' before 'Folder2'
@@ -157,22 +154,19 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Folder1[1]
   1:Nested[1]
     1:File1.fs
     2:File3.fs
 3:Folder2[1]
   1:File2.fs
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Folder1/Nested/File1.fs
 Folder1/Nested/File3.fs
 Folder2/File2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 

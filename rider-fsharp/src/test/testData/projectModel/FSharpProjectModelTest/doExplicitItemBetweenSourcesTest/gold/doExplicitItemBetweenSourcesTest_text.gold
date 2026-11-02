@@ -1,0 +1,14 @@
+===================
+Init
+
+[Program.fs]
+module Program
+
+[<EntryPoint>]
+let main _ = 0
+
+
+[MainWindow.fs]
+module Views.MainWindow
+
+

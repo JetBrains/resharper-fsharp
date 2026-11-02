@@ -46,25 +46,34 @@ let removeIdentities path =
     Regex.Replace(path, @"\[\d+\]", String.Empty)
 
 
-let createContainer items writer =
+let createContainerWithParts (parts: (RdProjectProperty list * AnItem list) list) writer =
     let container = LoggingFSharpItemsContainer(writer, createRefresher writer)
-    let rdItems =
-        items |> List.map (fun { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = link } ->
-            let evaluatedInclude = removeIdentities evaluatedInclude
-            let metadata =
-                match link with
-                | null -> []
-                | _ -> [RdProjectMetadata("Link", link, null, false)]
-            RdProjectItem(itemType, evaluatedInclude, String.Empty, Nullable(false), RdThisProjectItemOrigin(), metadata.ToList(id)))
+    let createRdProject (properties: RdProjectProperty list, items: AnItem list) =
+        let rdItems =
+            items |> List.map (fun item ->
+                let evaluatedInclude = removeIdentities item.EvaluatedInclude
+                let metadata =
+                    match item.Link with
+                    | null -> []
+                    | link -> [RdProjectMetadata("Link", link, null, false)]
+                RdProjectItem(item.ItemType, evaluatedInclude, String.Empty, item.FromWildcard, item.Origin, metadata.ToList(id)))
+        RdProject(properties.ToList(id), rdItems.ToList(id), List(), List(), List(), List(), List())
 
-    let rdProject = RdProject(List(), rdItems.ToList(id), List(), List(), List(), List(), List())
+    let rdProjects = parts |> List.map createRdProject
     let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
     let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid.NewGuid(), projectProperties, null, projectMark.Name)
 
-    let projectLoadResult = RdProjectLoadResult(RdProjectId(0), [rdProject].ToList(id), null, null, null, RdDesignTimeBuildStatus.Done, ProjectCacheMissReason.CacheDisabled)
+    let projectLoadResult = RdProjectLoadResult(RdProjectId(0), rdProjects.ToList(id), null, null, null, RdDesignTimeBuildStatus.Done, ProjectCacheMissReason.CacheDisabled)
     let msBuildProject = MsBuildProject(AllowEverythingScheme.Instance, projectMark.Location, Dictionary(), List(), projectLoadResult)
     (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, projectDescriptor, msBuildProject)
     container
+
+let createContainer items writer =
+    createContainerWithParts [[], items] writer
+
+let targetFramework identifier version =
+    [ RdProjectProperty("TargetFrameworkIdentifier", identifier)
+      RdProjectProperty("TargetFrameworkVersion", version) ]
 
 
 let createRefresher (writer: TextWriter) =
@@ -149,10 +158,20 @@ let createViewItems solutionItems (item: AnItem) : seq<FSharpViewItem> = seq {
 
 
 let createItem itemType evaluatedInclude =
-    { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = null }
+    { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = null
+      Origin = RdThisProjectItemOrigin(); FromWildcard = Nullable(false) }
 
 let link link item =
     { item with Link = link }
+
+let imported item =
+    { item with Origin = RdImportedProjectItemOrigin("Imported.props") }
+
+let wildcard item =
+    { item with FromWildcard = Nullable(true) }
+
+let evaluated item =
+    { item with Origin = RdEvaluatedProjectItemOrigin(); FromWildcard = Nullable() }
 
 
 [<TestFixture>]
@@ -1243,6 +1262,129 @@ type FSharpItemsContainerTest() =
               createItem "None" "host.json"
               createItem "None" "host.json" ]
 
+    [<Test>]
+    member x.``Other item type duplicates``() =
+        let items =
+            [ createItem "AvaloniaXaml"     "App.axaml" |> imported |> wildcard
+              createItem "AvaloniaXaml"     "Views[1]/MainWindow.axaml" |> imported |> wildcard
+              createItem "Folder"           "Models[1]"
+              createItem "AvaloniaResource" "Assets[1]/logo.ico" |> wildcard
+              createItem "Compile"          "ViewModels[1]/ViewModelBase.fs"
+              createItem "Compile"          "Views[1]/MainWindow.axaml.fs"
+              createItem "Compile"          "Program.fs"
+              createItem "AdditionalFiles"  "App.axaml" |> evaluated
+              createItem "AdditionalFiles"  "Views[1]/MainWindow.axaml" |> evaluated ]
+        let availableItemName = createItem "AvailableItemName" "AvaloniaXaml" |> imported
+        x.DoContainerInitializationTest([[], availableItemName :: items], items)
+
+    [<Test>]
+    member x.``Folder item for a folder with items``() =
+        x.DoContainerInitializationTest
+            [ createItem "None"    "snapshots[1]/Test1.verified.txt" |> imported |> wildcard
+              createItem "None"    "snapshots[1]/Test2.verified.txt" |> imported |> wildcard
+              createItem "Compile" "Verifier.fs"
+              createItem "Compile" "Program.fs"
+              createItem "Folder"  "snapshots[1]" ]
+
+    [<Test>]
+    member x.``Explicit item after sources``() =
+        x.DoContainerInitializationTest
+            [ createItem "Compile" "Views[1]/MainWindow.fs"
+              createItem "Compile" "Program.fs"
+              createItem "None"    "Views[2]/Notes.txt" ]
+
+    [<Test>]
+    member x.``Modification 02 - Move None file``() =
+        x.DoContainerModificationTest(
+            [ createItem "Compile" "Program.fs"
+              createItem "None"    "Scripts[1]/Build.fsx"
+              createItem "None"    "Scripts[1]/Deploy.fsx" ],
+            fun container writer ->
+                writer.WriteLine("Move 'Scripts/Deploy.fsx' before 'Scripts/Build.fsx':")
+                container.OnRemoveFile("None", "Scripts/Deploy.fsx")
+                container.OnAddFile("None", "Scripts/Deploy.fsx", "Scripts/Build.fsx", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Create modification context 07 - Implicit relative item``() =
+        x.DoCreateModificationContextTest(
+            [ createItem "Compile" "File1"
+              createItem "None"    "Notes.txt" |> imported |> wildcard
+              createItem "Compile" "File2"
+              createItem "None"    "Readme.md" ])
+
+    [<Test>]
+    member x.``New item context 06 - Implicit last item in folder``() =
+        x.DoCreateNewItemContextTest(
+            [ createItem "Compile" "File1"
+              createItem "None"    "Folder[1]/Notes.txt" |> imported |> wildcard ])
+
+    [<Test>]
+    member x.``Explicit item between sources``() =
+        x.DoContainerInitializationTest
+            [ createItem "Compile" "Views[1]/MainWindow.fs"
+              createItem "None"    "Views[1]/Notes.txt"
+              createItem "Compile" "Program.fs" ]
+
+    [<Test>]
+    member x.``Wildcard item from the project file``() =
+        x.DoContainerInitializationTest
+            [ createItem "Compile" "Views[1]/MainWindow.fs"
+              createItem "Compile" "Program.fs"
+              createItem "None"    "Views[1]/Notes.txt" |> wildcard ]
+
+    [<Test>]
+    member x.``Implicit items in nested folder before sources``() =
+        x.DoContainerInitializationTest
+            [ createItem "None"    "Views[1]/Sub[1]/Notes.txt" |> imported |> wildcard
+              createItem "None"    "Views[1]/Readme.md" |> imported |> wildcard
+              createItem "Compile" "Views[1]/Sub[1]/File1.fs"
+              createItem "Compile" "Views[1]/File2.fs"
+              createItem "Compile" "Program.fs" ]
+
+    [<Test>]
+    member x.``Implicit items in a split folder``() =
+        x.DoContainerInitializationTest
+            [ createItem "None"    "Views[1]/Notes1.txt" |> imported |> wildcard
+              createItem "Compile" "Views[1]/File1.fs"
+              createItem "None"    "Views[1]/Notes2.txt" |> imported |> wildcard
+              createItem "Compile" "Program.fs"
+              createItem "Compile" "Views[2]/File2.fs"
+              createItem "None"    "Views[2]/Notes3.txt" |> imported |> wildcard ]
+
+    [<Test>]
+    member x.``Modification 03 - Add source file next to implicit item``() =
+        x.DoContainerModificationTest(
+            [ createItem "None"    "Views[1]/MainWindow.axaml" |> imported |> wildcard
+              createItem "Compile" "Views[1]/MainWindow.axaml.fs"
+              createItem "Compile" "Program.fs" ],
+            fun container _ ->
+                container.OnAddFile("Compile", "Views/New.fs", "Program.fs", Some RelativeToType.Before))
+
+    [<Test>]
+    member x.``Modification 04 - Add None file next to source file``() =
+        x.DoContainerModificationTest(
+            [ createItem "Compile" "Views[1]/MainWindow.fs"
+              createItem "Compile" "Program.fs" ],
+            fun container _ ->
+                container.OnAddFile("None", "Views/Notes.txt", "Views/MainWindow.fs", Some RelativeToType.After))
+
+    [<Test>]
+    member x.``Create modification context 08 - Wildcard relative item from the project file``() =
+        x.DoCreateModificationContextTest(
+            [ createItem "Compile" "File1"
+              createItem "None"    "Notes.txt" |> wildcard
+              createItem "Compile" "File2" ])
+
+    [<Test>]
+    member x.``Multi-target None items``() =
+        let items =
+            [ createItem "Compile" "Program.fs"
+              createItem "None"    "TestResults[1]/NewFile.txt" ]
+        x.DoContainerInitializationTest(
+            [ targetFramework ".NETCoreApp" "v3.0", items
+              targetFramework ".NETFramework" "v4.6.1", items ],
+            items)
+
     member x.DoCreateModificationContextTest(items: AnItem list) =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]
         x.ExecuteWithGold(fun writer ->
@@ -1251,11 +1393,11 @@ type FSharpItemsContainerTest() =
             container.Dump(writer)
             writer.WriteLine()
 
-            let itemTypes =
+            let itemsByPath =
                 items |> List.map (fun item ->
                     // todo: linked
                     let path = VirtualFileSystemPath.Parse(removeIdentities item.EvaluatedInclude, InteractionContext.SolutionContext)
-                    path.MakeAbsoluteBasedOn(projectDirectory), item.ItemType)
+                    path.MakeAbsoluteBasedOn(projectDirectory), item)
                 |> dict
 
             let viewItems = HashSet(Seq.collect (Dictionary() |> createViewItems) items)
@@ -1265,14 +1407,14 @@ type FSharpItemsContainerTest() =
                     for relativeToType in relativeToTypes do
                         let projectItem = viewFile.ProjectItem
                         let relative = relativeViewItem.ProjectItem
-                        let itemType = itemTypes.TryGetValue(projectItem.Location)
-                        let relativeItemType = itemTypes.TryGetValue(relative.Location)
+                        let item = itemsByPath.TryGetValue(projectItem.Location)
+                        let relativeItem = itemsByPath.TryGetValue(relative.Location)
 
                         let context = provider.CreateModificationContext(Some viewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
                         | FSharpViewFile _, Some context when
-                                projectItem <> relative && isNotNull itemType &&
-                                equalsIgnoreCase itemType relativeItemType ->
+                                projectItem <> relative && isNotNull item.ItemType &&
+                                equalsIgnoreCase item.ItemType relativeItem.ItemType && relativeItem.IsExplicit ->
 
                             let contextRelativeTo = context.RelativeTo.NotNull()
                             Assertion.Assert(eq relative.Location contextRelativeTo.ReferenceItem.Location,
@@ -1402,8 +1544,11 @@ type FSharpItemsContainerTest() =
                     writer.WriteLine()) |> ignore
 
     member x.DoContainerInitializationTest(items: AnItem list) =
+        x.DoContainerInitializationTest([[], items], items)
+
+    member x.DoContainerInitializationTest(parts: (RdProjectProperty list * AnItem list) list, items: AnItem list) =
         x.ExecuteWithGold(fun writer ->
-            let container = createContainer items writer
+            let container = createContainerWithParts parts writer
             let solutionItems = Dictionary()
 
             writer.WriteLine()
@@ -1464,10 +1609,12 @@ type FSharpItemsContainerTest() =
 type AnItem =
     { ItemType: string
       EvaluatedInclude: string
-      Link: string }
+      Link: string
+      Origin: RdProjectItemOrigin
+      FromWildcard: Nullable<bool> }
 
-    static member Create(itemType, evaluatedInclude, ?link) =
-        { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = defaultArg link null }
+    member x.IsExplicit =
+        x.Origin :? RdThisProjectItemOrigin && x.FromWildcard = Nullable(false)
 
 
 let itemFilterProvider =
@@ -1475,10 +1622,17 @@ let itemFilterProvider =
         [| yield! MsBuildCommonBuildActionsProvider().DefaultBuildActions
            yield BuildActions.compileBefore
            yield BuildActions.compileAfter |]
-        |> HashSet
+
+    let availableItemNameProvider = AvailableItemNameElementBuildActionProvider()
 
     { new IItemTypeFilterProvider with
-        member x.CreateItemFilter(_, _) = MsBuildItemTypeFilter(defaultBuildActions) }
+        member x.CreateItemFilter(projectPart, _) =
+            let buildActions = HashSet(defaultBuildActions)
+            for item in projectPart.GetAvailableItems() do
+                match availableItemNameProvider.GetFromProjectItem(item) with
+                | null -> ()
+                | buildAction -> buildActions.Add(buildAction) |> ignore
+            MsBuildItemTypeFilter(buildActions) }
 
 
 type LoggingFSharpItemsContainer(writer, refresher) as this =

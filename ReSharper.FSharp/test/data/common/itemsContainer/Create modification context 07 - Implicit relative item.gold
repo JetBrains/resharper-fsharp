@@ -1,0 +1,43 @@
+﻿Project
+1:File1
+2:Notes.txt (None)
+3:File2
+4:Readme.md (None)
+
+.NETFramework,Version=v0.0
+File1
+Notes.txt
+File2
+Readme.md
+
+
+File1 Before File1 -> Before File2
+File1 After File1 -> Before File2
+File1 Before Notes.txt -> After File1
+File1 After Notes.txt -> Before File2
+File1 Before Readme.md -> Before Readme.md
+File1 After Readme.md -> After Readme.md
+
+Notes.txt Before File1 -> Before File1
+Notes.txt After File1 -> After File1
+Notes.txt Before Notes.txt -> After File1
+Notes.txt After Notes.txt -> Before File2
+Notes.txt Before File2 -> Before File2
+Notes.txt After File2 -> After File2
+
+File2 Before Notes.txt -> After File1
+File2 After Notes.txt -> Before File2
+File2 Before File2 -> After File1
+File2 After File2 -> Before Readme.md
+File2 Before Readme.md -> Before Readme.md
+File2 After Readme.md -> After Readme.md
+
+Readme.md Before File1 -> Before File1
+Readme.md After File1 -> After File1
+Readme.md Before Notes.txt -> After File1
+Readme.md After Notes.txt -> Before File2
+Readme.md Before File2 -> Before File2
+Readme.md After File2 -> After File2
+Readme.md Before Readme.md -> After File2
+Readme.md After Readme.md -> After File2
+

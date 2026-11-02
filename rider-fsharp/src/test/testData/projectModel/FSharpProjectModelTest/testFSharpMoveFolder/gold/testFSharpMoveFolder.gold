@@ -98,6 +98,7 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 3:Folder[1]
   1:File1.fs
   2:File2.fs
@@ -114,16 +115,13 @@ Content roots:
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
-10:AfterFile.fs
+9:AfterFile.fs
 
 net10.0
 BeforeFile.fs
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Folder/File1.fs
 Folder/File2.fs
 File3.fs
@@ -134,7 +132,6 @@ Folder/File5.fs
 Folder/Sub/Class2.fs
 ../ExternalFolder/LinkedFile1.fs
 ../ExternalFolder/LinkedFile2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 AfterFile.fs
 
 ===================
@@ -236,6 +233,7 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 3:File3.fs
 4:Folder[1]
   1:File1.fs
@@ -251,16 +249,13 @@ Content roots:
 6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 7:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-8:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
-9:AfterFile.fs
+8:AfterFile.fs
 
 net10.0
 BeforeFile.fs
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 File3.fs
 Folder/File1.fs
 Folder/File2.fs
@@ -271,6 +266,5 @@ Folder/File5.fs
 Folder/Sub/Class2.fs
 ../ExternalFolder/LinkedFile1.fs
 ../ExternalFolder/LinkedFile2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 AfterFile.fs
 

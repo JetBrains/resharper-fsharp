@@ -1,0 +1,25 @@
+﻿
+=== Container Dump ===
+Project
+1:Program.fs
+2:TestResults[1]
+  1:NewFile.txt (None)
+
+.NETCoreApp,Version=v3.0
+Program.fs
+TestResults/NewFile.txt
+
+
+.NETFramework,Version=v4.6.1
+Program.fs
+TestResults/NewFile.txt
+
+
+=== Structure API ===
+Program.fs SortKey=1 ParentFolderIdentity=<null>
+TestResults SortKey=2
+  NewFile.txt SortKey=1 ParentFolderIdentity=Some(1)
+
+=== Parent Folders API ===
+TestResults
+  TestResults[1] -> <null>

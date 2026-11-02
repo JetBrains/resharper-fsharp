@@ -1,0 +1,82 @@
+===================
+Init
+
+-Project
+ -SolutionWithGlobInFolderItem * 1 project
+  -Tests
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/10.1.202
+     -Frameworks
+      Microsoft.NETCore.App
+   Verifier.fs
+   Program.fs
+   -snapshots
+    Test1.verified.txt
+    Test2.verified.txt
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : SolutionWithGlobInFolderItem.sln)[]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+Project [Name:Tests, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    ProjectFileImpl(Path : Tests.fsproj)[]
+    ProjectFileImpl(Path : Verifier.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
+                ProjectFileImpl(Path : Tests.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+    Folder [Name:snapshots]
+      Child items:
+        ProjectFileImpl(Path : Test1.verified.txt)[NONE ]
+        ProjectFileImpl(Path : Test2.verified.txt)[NONE ]
+
+
+
+===================
+Workspace Model
+Content roots:
+  Directory.Build.targets
+  SolutionWithGlobInFolderItem.sln
+  Tests/Program.fs
+  Tests/Tests.fsproj
+  Tests/Verifier.fs
+  Tests/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Tests/obj/Debug/net10.0/Tests.AssemblyInfo.fs
+  Tests/snapshots/Test1.verified.txt
+  Tests/snapshots/Test2.verified.txt
+
+1:obj[1]
+  1:Debug[1]
+    1:net10.0[1]
+      1:Tests.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
+2:Verifier.fs
+3:Program.fs
+4:snapshots[1]
+  1:Test1.verified.txt (None)
+  2:Test2.verified.txt (None)
+
+net10.0
+obj/Debug/net10.0/Tests.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
+Verifier.fs
+Program.fs
+snapshots/Test1.verified.txt
+snapshots/Test2.verified.txt
+

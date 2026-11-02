@@ -209,6 +209,33 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     }
   }
 
+  @Test // RIDER-129314
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SolutionWithImportedXamlItems")
+  fun doImportedXamlItemsTest() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+    }
+  }
+
+  @Test // RIDER-99079
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SolutionWithGlobInFolderItem")
+  fun doGlobInFolderItemTest() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+    }
+  }
+
+  @Test
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("SolutionWithExplicitItemBetweenSources")
+  fun doExplicitItemBetweenSourcesTest() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+    }
+  }
+
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")

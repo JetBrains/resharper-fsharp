@@ -1,0 +1,48 @@
+﻿
+=== Container Dump ===
+Project
+1:App.axaml (AvaloniaXaml)
+2:Models[1]
+3:Assets[1]
+  1:logo.ico (AvaloniaResource)
+4:ViewModels[1]
+  1:ViewModelBase.fs
+5:Views[1]
+  1:MainWindow.axaml.fs
+  2:MainWindow.axaml (AvaloniaXaml)
+6:Program.fs
+
+.NETFramework,Version=v0.0
+App.axaml
+Assets/logo.ico
+ViewModels/ViewModelBase.fs
+Views/MainWindow.axaml.fs
+Views/MainWindow.axaml
+Program.fs
+
+
+=== Structure API ===
+App.axaml SortKey=1 ParentFolderIdentity=<null>
+Views SortKey=5
+  MainWindow.axaml SortKey=2 ParentFolderIdentity=Some(1)
+Models SortKey=2
+Assets SortKey=3
+  logo.ico SortKey=1 ParentFolderIdentity=Some(1)
+ViewModels SortKey=4
+  ViewModelBase.fs SortKey=1 ParentFolderIdentity=Some(1)
+Views SortKey=5
+  MainWindow.axaml.fs SortKey=1 ParentFolderIdentity=Some(1)
+Program.fs SortKey=6 ParentFolderIdentity=<null>
+App.axaml SortKey=1 ParentFolderIdentity=<null>
+Views SortKey=5
+  MainWindow.axaml SortKey=2 ParentFolderIdentity=Some(1)
+
+=== Parent Folders API ===
+Assets
+  Assets[1] -> <null>
+Models
+  Models[1] -> <null>
+ViewModels
+  ViewModels[1] -> <null>
+Views
+  Views[1] -> <null>

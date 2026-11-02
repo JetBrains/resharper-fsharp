@@ -62,23 +62,20 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Outer[1]
   1:File1.fs
   2:EmptySub[1]
   3:File2.fs
 3:Sibling.fs
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Outer/File1.fs
 Outer/File2.fs
 Sibling.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
 ===================
 1. Move folder 'Outer' after 'Sibling.fs'
@@ -144,21 +141,18 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:Sibling.fs
 3:Outer[1]
   1:File1.fs
   2:EmptySub[1]
   3:File2.fs
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 Sibling.fs
 Outer/File1.fs
 Outer/File2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 

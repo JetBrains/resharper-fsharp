@@ -1,0 +1,94 @@
+===================
+Init
+
+-Project
+ -SolutionWithImportedXamlItems * 1 project
+  -App
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/10.1.202
+     -Frameworks
+      Microsoft.NETCore.App
+   App.axaml
+   -ViewModels
+    ViewModelBase.fs
+   -Views
+    MainWindow.axaml.fs
+    MainWindow.axaml
+   Program.fs
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : SolutionWithImportedXamlItems.sln)[]
+
+Project [Name:App, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : App.axaml)[AVALONIAXAML ]
+    ProjectFileImpl(Path : App.axaml)[Hidden ADDITIONALFILES ]
+    ProjectFileImpl(Path : App.fsproj)[]
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    Folder [Name:ViewModels]
+      Child items:
+        ProjectFileImpl(Path : ViewModelBase.fs)[COMPILE ]
+    Folder [Name:Views]
+      Child items:
+        ProjectFileImpl(Path : MainWindow.axaml)[AVALONIAXAML ]
+        ProjectFileImpl(Path : MainWindow.axaml)[Hidden ADDITIONALFILES ]
+        ProjectFileImpl(Path : MainWindow.axaml.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : App.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  App/App.axaml
+  App/App.fsproj
+  App/Program.fs
+  App/ViewModels/ViewModelBase.fs
+  App/Views/MainWindow.axaml
+  App/Views/MainWindow.axaml.fs
+  App/obj/Debug/net10.0/App.AssemblyInfo.fs
+  App/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Directory.Build.props
+  Directory.Build.targets
+  SolutionWithImportedXamlItems.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net10.0[1]
+      1:App.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
+2:App.axaml (AvaloniaXaml)
+3:ViewModels[1]
+  1:ViewModelBase.fs
+4:Views[1]
+  1:MainWindow.axaml.fs
+  2:MainWindow.axaml (AvaloniaXaml)
+5:Program.fs
+
+net10.0
+obj/Debug/net10.0/App.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
+App.axaml
+ViewModels/ViewModelBase.fs
+Views/MainWindow.axaml.fs
+Views/MainWindow.axaml
+Program.fs
+

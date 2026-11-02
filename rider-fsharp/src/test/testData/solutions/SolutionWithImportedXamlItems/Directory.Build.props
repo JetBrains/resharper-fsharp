@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <AvailableItemName Include="AvaloniaXaml" />
+    <AvaloniaXaml Include="**\*.axaml" />
+  </ItemGroup>
+</Project>

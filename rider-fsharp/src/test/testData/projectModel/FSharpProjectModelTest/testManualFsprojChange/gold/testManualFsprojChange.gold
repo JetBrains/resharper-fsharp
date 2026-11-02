@@ -54,19 +54,16 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:File1.fs
 3:File2.fs
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 File1.fs
 File2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
 ===================
 Move File1 and File2 lines
@@ -124,17 +121,14 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:File2.fs
 3:File1.fs
-4:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 File2.fs
 File1.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 

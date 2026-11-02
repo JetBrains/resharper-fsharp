@@ -58,21 +58,18 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:File1.fs
 3:FolderA[1]
 4:File2.fs
 5:FolderB[1]
-6:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 File1.fs
 File2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
 ===================
 1. Move empty folder 'FolderA' after 'FolderB'
@@ -134,19 +131,16 @@ Content roots:
     1:net10.0[1]
       1:ClassLibrary1.AssemblyInfo.fs
       2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
 2:File1.fs
 3:File2.fs
 4:FolderB[1]
 5:FolderA[1]
-6:obj[2]
-  1:Debug[2]
-    1:net10.0[2]
-      1:ILLink.Substitutions.xml (EmbeddedResource)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
 obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
 File1.fs
 File2.fs
-obj/Debug/net10.0/ILLink.Substitutions.xml
 
