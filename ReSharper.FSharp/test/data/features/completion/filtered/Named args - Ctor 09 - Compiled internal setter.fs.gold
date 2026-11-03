@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let s = Ns.Setters(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+Public |=                   int             OrderStr=Public
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Public |=                   int             OrderStr=Public

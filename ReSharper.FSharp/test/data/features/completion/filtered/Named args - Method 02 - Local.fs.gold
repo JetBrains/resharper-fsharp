@@ -1,0 +1,25 @@
+﻿Completion: Basic
+Count: 5 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.M(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [LocalVariablesAndParameters]
+b                           string    <==
+t                           T
+                            [NamedArguments]
+a |=                        int             OrderStr=a
+b |=                        string          OrderStr=b
+                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+a                           int
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+a |=                        int             OrderStr=a
+a                           int
+b                           string    <==
+b |=                        string          OrderStr=b
+t                           T

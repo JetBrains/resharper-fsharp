@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "static member Create() = A(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+P |=                        int             OrderStr=P
+Q |=                        int             OrderStr=Q
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+P |=                        int             OrderStr=P
+Q |=                        int             OrderStr=Q

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.CodeCompletion
 open System
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.BaseInfrastructure
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.AspectLookupItems.Info
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
 open JetBrains.ReSharper.Plugins.FSharp
@@ -195,6 +196,9 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Record Field 04``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 05``() = x.DoNamedTest()
     [<Test>] member x.``Record Field 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Named args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args 02 - Escape``() = x.DoNamedTest()
 
     [<Test>] member x.``To recursive - Escape 01``() = x.DoNamedTest()
     [<Test>] member x.``To recursive - Local 01``() = x.DoNamedTest()
@@ -650,7 +654,7 @@ type FSharpFilteredCompletionTest() =
 
     override x.TestType = CodeCompletionTestType.ModernList
 
-    member val CompleteItem = null with get, set
+    member val FilterItems: string[] = null with get, set
 
     member x.DoTestFiles([<ParamArray>] names: string[]) =
         let testDir = x.TestDataPath / x.TestMethodName
@@ -658,12 +662,15 @@ type FSharpFilteredCompletionTest() =
         x.DoTestSolution(paths)
 
     override this.LookupItemFilter(lookupItem) =
-        isNull this.CompleteItem ||
-        match lookupItem with
-            | :? FcsLookupItem as item -> item.Text = this.CompleteItem
-            | _ ->
-                let text = lookupItem.DisplayName.Text
-                text = this.CompleteItem || text.StartsWith(this.CompleteItem + " (in ", StringComparison.Ordinal)
+        isNull this.FilterItems ||
+
+        let text =
+            match lookupItem with
+            | :? FcsLookupItem as item -> item.Text
+            | :? IAspectLookupItem<TextualInfo> as item -> item.Info.Text
+            | _ -> lookupItem.DisplayName.Text
+
+        Array.contains text this.FilterItems
 
     [<Test>] member x.``Expr - Base 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Base 02 - Local``() = x.DoNamedTest()
@@ -717,8 +724,44 @@ type FSharpFilteredCompletionTest() =
     [<Test; Explicit("243")>] member x.``NamedUnionCaseFieldsPat - 07`` () = x.DoNamedTest()
     [<Test; Explicit>] member x.``NamedUnionCaseFieldsPat - 08`` () = x.DoNamedTest()
 
+    [<Test>] member x.``Named args - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Attribute 02 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Attribute 03 - Suffix``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Attribute 04 - Private setter``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Exception 01 - After named``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Exception 02 - Pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 01 - Params and setter``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 02 - Unfinished name``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 03 - Inherited setter``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 04 - Mutable field``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 05 - Named after caret``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 06 - Compiled``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 07 - Private setter in type``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Ctor 08 - All used``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("FSharpClassLib")>] member x.``Named args - Ctor 09 - Compiled internal setter``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 01 - Params and return setter``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 02 - Local``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 03 - Extension``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 04 - After named``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 05 - Overloads union``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 06 - Overloads return setters``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Method 07 - Positional named again``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - New 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Not available - Curried 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Not available - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Not available - Too many args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 02 - After named``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 03 - Equality``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 04 - All used``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 05 - Unknown field``() = x.DoNamedTest()
+    [<Test>] member x.``Named args - Union case 06 - Equality``() = x.DoNamedTest()
+
     override this.BeforeTestStart(_, _, documentText) =
-        this.CompleteItem <- FSharpFilteredCompletionTest.GetSetting(documentText, "FILTER_ITEM")
+        this.FilterItems <-
+            match FSharpFilteredCompletionTest.GetSetting(documentText, "FILTER_ITEMS") with
+            | null -> null
+            | names -> names.Split(',')
 
 
 [<FSharpTest>]
@@ -779,6 +822,11 @@ type FSharpCodeCompletionTypingTest() =
     [<Test>] member x.``Space - NamedUnionCaseField 01`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 02`` () = x.DoNamedTest()
     [<Test>] member x.``Space - NamedUnionCaseField 03`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - NamedUnionCaseField 04 - Between`` () = x.DoNamedTest()
+
+    [<Test>] member x.``Space - Named arg 01`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - Named arg 02 - Between`` () = x.DoNamedTest()
+    [<Test>] member x.``Space - Named arg 03 - Positional`` () = x.DoNamedTest()
 
 
 [<FSharpTest>]

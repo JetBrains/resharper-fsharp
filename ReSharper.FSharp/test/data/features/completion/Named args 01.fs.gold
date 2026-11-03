@@ -1,0 +1,5 @@
+﻿// ${COMPLETE_ITEM:X =}
+type Z() =
+    member val X = 0 with get, set
+
+let z = Z(X = {caret})

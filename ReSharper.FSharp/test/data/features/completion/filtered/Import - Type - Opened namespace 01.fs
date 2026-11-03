@@ -1,4 +1,4 @@
-// ${FILTER_ITEM:T}
+// ${FILTER_ITEMS:T}
 namespace Ns
 
 type T() = class end

@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="Records.fs" />
     <Compile Include="Unions.fs" />
+    <Compile Include="Setters.fs" />
   </ItemGroup>
 
   <ItemGroup>

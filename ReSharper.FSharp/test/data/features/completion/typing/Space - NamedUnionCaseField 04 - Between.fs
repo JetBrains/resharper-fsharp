@@ -1,0 +1,10 @@
+// ${TEXT: }
+module Module
+
+type A =
+    | B
+    | C of apple: int * banana: string * citrus: char
+
+match B with
+| C(apple = 7;{caret}; citrus = 'e') -> ()
+| _ -> ()

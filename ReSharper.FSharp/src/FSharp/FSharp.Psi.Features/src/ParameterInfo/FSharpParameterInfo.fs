@@ -486,32 +486,21 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
 
     let isCustomOp = mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.customOperationAttrTypeName)
 
-    let settableReturnMemberNames =
-        lazy
-            FSharpSymbolUtil.getSettableMembers mfv.ReturnParameter.Type
-            |> List.map (fun symbol -> symbol.DisplayName)
-            |> HashSet
-
     override this.IsFilteredOut =
         if not this.CanHaveNamedArguments || fsContext.Candidates.Length < 2 then false else
 
-        let parameters = this.ParameterGroups[0]
-        let parameterCount =
-            if parameters.Count = 1 && this.GetParamType(parameters[0]).IsUnitType then 0 else parameters.Count
+        if not (acceptsUnnamedArgs mfv.CurriedParameterGroups[0] fsContext.UnnamedArgCount) then true else
 
-        let hasCorrectArity =
-            fsContext.UnnamedArgCount <= parameterCount ||
-            parameterCount > 0 && this.IsParamArray(parameterCount - 1)
+        let parameterNames = this.ParameterNames
+        let isCandidateParameterName name =
+            fsContext.Candidates
+            |> Array.exists (function
+                | :? FcsMfvParameterInfoCandidate as candidate -> Array.contains name candidate.ParameterNames
+                | _ -> false)
 
-        let assignsAllNamedArgs =
-            let parameterNames = this.ParameterNames
-            fsContext.NamedArguments
-            |> Array.forall (fun name ->
-                isNull name ||
-                Array.contains name parameterNames ||
-                settableReturnMemberNames.Value.Contains(name))
-
-        not (hasCorrectArity && assignsAllNamedArgs)
+        fsContext.NamedArguments
+        |> Array.exists (fun name ->
+            isNotNull name && not (Array.contains name parameterNames) && isCandidateParameterName name)
 
     override val ExtendedType = if mfv.IsExtensionMember then Some mfv.ApparentEnclosingType else None
     override val ReturnType = if mfv.IsConstructor then None else Some mfv.ReturnParameter.Type
@@ -532,7 +521,7 @@ type FcsMfvParameterInfoCandidate(mfv, symbolUse, fsContext) =
     override this.GetParamName(parameter) = parameter.Name
     override this.GetParamType(parameter) = parameter.Type
     override this.IsOptionalParam(parameter) = parameter.IsOptionalArg
-    override this.CanHaveNamedArguments = mfv.IsMember && not isCustomOp && mfv.CurriedParameterGroups.Count = 1
+    override this.CanHaveNamedArguments = canHaveNamedArguments mfv
 
     interface ISupportsStructuredSortCandidate with
         member this.GetStrategyAndSortItem() =
@@ -722,13 +711,14 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
     abstract ArgGroups: ParameterInfoArgument list
 
     member this.NamedArgs =
-        match this.ArgGroups with
-        | [ arg ] -> arg.NamedArgs
+        match this.ArgGroups, mainSymbol with
+        | [ Expression _ as arg ], FieldsOwner fields -> getFieldNamedArgs fields arg.NamedArgs
+        | [ arg ], _ -> arg.NamedArgs
         | _ -> [||]
 
     member this.UnnamedArgCount =
         match this.ArgGroups with
-        | [ arg ] -> arg.SlotCount - (arg.NamedArgs |> Array.filter isNotNull).Length
+        | [ arg ] -> arg.SlotCount - (this.NamedArgs |> Array.filter isNotNull).Length
         | _ -> 0
 
     interface IFSharpParameterInfoContext with
@@ -1085,10 +1075,8 @@ type FSharpParameterInfoContextFactory() =
         let symbol = symbolUse.Symbol
         if not (isApplicable symbol) then None else
 
-        match getAllMethods reference true "FSharpParameterInfoContextFactory.getMethods" with
-        | None -> None
-        | Some (checkResults, Some symbolUses) when not symbolUses.IsEmpty -> Some(checkResults, symbol, symbolUses)
-        | Some (checkResults, _) -> Some(checkResults, symbol, [symbolUse])
+        getMethodCandidates reference "FSharpParameterInfoContextFactory.getMethods"
+        |> Option.map (fun (checkResults, symbolUses) -> checkResults, symbol, symbolUses)
 
     and create (caretOffset: DocumentOffset) (reference: FSharpSymbolReference) (context: IFSharpTreeNode) =
         if isNull reference || isNull context then null else

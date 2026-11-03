@@ -5,8 +5,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 public static class FSharpArgumentsUtil
 {
   /// Has the 'name = expr' form
-  public static bool HasNamedArgStructure(IBinaryAppExpr app) =>
-    TryGetNamedArgRefExpr(app) != null;
+  public static bool HasNamedArgStructure(IFSharpExpression expr) =>
+    TryGetNamedArgRefExpr(expr) != null;
 
   public static IReferenceExpr TryGetNamedArgRefExpr(IFSharpExpression expr) =>
     expr is IBinaryAppExpr { ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } refExpr }

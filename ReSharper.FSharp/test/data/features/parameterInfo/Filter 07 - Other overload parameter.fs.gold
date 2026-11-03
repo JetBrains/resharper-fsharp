@@ -1,11 +1,12 @@
 ﻿ParameterInfo is available
 --- All invocables: ----
-(a: int) : Derived
+(a: int) : unit
 Parameter: 2
-(a: int, b: int) : int
-Parameter: 3
+(a: int, [b: int]) : unit
+Parameter: 1 '[b: int]'
+
 --- Accepted invocables: ---
-(a: int) : Derived
+(a: int, [b: int]) : unit
 --- Named Arguments: ---
 0: 
-1: X
+1: b

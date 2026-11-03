@@ -12,7 +12,7 @@ match B with
 > Typing [ ] char:
 ====================================
 Lookup list (Focused):
-                              [FromLightEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
+                              [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
   banana| |=                  string          OrderStr=banana    <==
   citrus| |=                  char            OrderStr=citrus
 

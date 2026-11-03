@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "[<A(♦)>]"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+P |=                        int             OrderStr=P
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+P |=                        int             OrderStr=P

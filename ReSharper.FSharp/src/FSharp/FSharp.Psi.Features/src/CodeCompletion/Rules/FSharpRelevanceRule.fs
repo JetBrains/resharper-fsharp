@@ -42,6 +42,8 @@ type FSharpRelevanceRule() =
         let fcsType = getQualifierType context
 
         for item in items do
+            if item.IsNamedArgument() then () else
+
             let info =
                 match item with
                 | :? IFcsLookupItemInfo as info -> info

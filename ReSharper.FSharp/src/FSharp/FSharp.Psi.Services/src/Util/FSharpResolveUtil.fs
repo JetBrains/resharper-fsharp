@@ -122,6 +122,15 @@ let getAllMethods (reference: FSharpSymbolReference) shiftEndColumn opName =
     let checkResults = results.CheckResults
     Some (checkResults, checkResults.GetMethodsAsSymbols(endLine, endColumn, "", names))
 
+let getMethodCandidates (reference: FSharpSymbolReference) opName =
+    match getAllMethods reference true opName with
+    | None -> None
+    | Some(checkResults, Some symbolUses) when not symbolUses.IsEmpty -> Some(checkResults, symbolUses)
+    | Some(checkResults, _) ->
+
+    let symbolUse = reference.GetSymbolUse()
+    if isNull symbolUse then None else Some(checkResults, [ symbolUse ])
+
 // TODO: check if field can be resolved without qualifier
 // TODO: support generics
 let findRequiredQualifierForRecordField (fieldBinding: IRecordFieldBinding) =

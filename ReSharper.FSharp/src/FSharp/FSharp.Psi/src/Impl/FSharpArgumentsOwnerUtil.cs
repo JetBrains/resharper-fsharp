@@ -59,8 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               canHaveNamedArgs &&
               argExpr is ITupleExpr tupleExpr &&
               ParenExprNavigator.GetByInnerExpression(ParenExprNavigator.GetByInnerExpression(tupleExpr)) == null &&
-              tupleExpr.ExpressionsEnumerable.Any(arg =>
-                arg is IBinaryAppExpr binaryAppExpr && FSharpArgumentsUtil.HasNamedArgStructure(binaryAppExpr));
+              tupleExpr.ExpressionsEnumerable.Any(FSharpArgumentsUtil.HasNamedArgStructure);
 
             if (!hasNamedArgInTuple) return [argExpr as IArgument];
           }
