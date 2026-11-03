@@ -1,40 +1,51 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.parser
 
-import com.intellij.lang.ParserDefinition
-import com.intellij.mock.MockFileTypeManager
-import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.platform.testFramework.junit5.codeInsight.fixture.ParsingTestFixture
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.LightVirtualFile
+import com.intellij.testFramework.junit5.SystemPropertyClassLevel
+import com.intellij.testFramework.junit5.TestApplication
+import com.intellij.testFramework.junit5.fixture.TestFixtures
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderLanguageFileTypeBase
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptFileImpl
-import com.jetbrains.rider.test.base.psi.parsing.RiderFrontendParserTest
-import org.junit.Assert
-import org.junit.Test
+import com.jetbrains.rider.test.base.psi.parsing.riderFrontendParserFixture
+import com.jetbrains.rider.test.base.psi.parsing.riderFrontendParserProjectFixture
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) :
-  RiderFrontendParserTest("", fileType.defaultExtension, FSharpParserDefinition()) {
+abstract class FSharpFrontendParserTest(private val fileType: RiderLanguageFileTypeBase) {
+  protected abstract val parser: ParsingTestFixture
 
   protected open fun assertFileImpl(file: PsiFile) {}
 
-  override fun parseFile(name: String, text: String): PsiFile {
-    val file = super.parseFile(name, text)
+  protected fun doTest() {
+    val name = parser.testName
+    val text = parser.loadFile("$name.${parser.fileExt}")
+    // Create the file with the explicit [fileType]: the fixture otherwise derives it from the language, which is the
+    // same for .fs and .fsx, so FSharpScriptFileType (and FSharpScriptFileImpl) would never be chosen.
+    val virtualFile = LightVirtualFile("$name.${parser.fileExt}", fileType, text).apply { charset = Charsets.UTF_8 }
+    val file = parser.checkParsedFile(parser.createFile(virtualFile), text)
     assertFileImpl(file)
-    return file
-  }
-
-  override fun configureFromParserDefinition(definition: ParserDefinition, extension: String?) {
-    super.configureFromParserDefinition(definition, extension)
-    application.picoContainer.unregisterComponent(FileTypeManager::class.java.name)
-    application.registerService(FileTypeManager::class.java, MockFileTypeManager(fileType), testRootDisposable)
+    parser.checkResult(name, file)
   }
 }
 
 
+@SystemPropertyClassLevel("rider.disable.resharper.backend", "true")
+@TestApplication
+@TestFixtures
 class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
-  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpFileImpl)
+  companion object {
+    private val projectFixture = riderFrontendParserProjectFixture()
+  }
+
+  override val parser: ParsingTestFixture by riderFrontendParserFixture(projectFixture, FSharpFileType.defaultExtension, FSharpParserDefinition())
+
+  override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpFileImpl)
 
   @Test fun `test empty`() = doTest()
   @Test fun `test concatenation 01 - simple`() = doTest()
@@ -65,8 +76,17 @@ class FSharpDummyParserTest : FSharpFrontendParserTest(FSharpFileType) {
 }
 
 
+@SystemPropertyClassLevel("rider.disable.resharper.backend", "true")
+@TestApplication
+@TestFixtures
 class FSharpScriptDummyParserTest : FSharpFrontendParserTest(FSharpScriptFileType) {
-  override fun assertFileImpl(file: PsiFile) = Assert.assertTrue(file is FSharpScriptFileImpl)
+  companion object {
+    private val projectFixture = riderFrontendParserProjectFixture()
+  }
+
+  override val parser: ParsingTestFixture by riderFrontendParserFixture(projectFixture, FSharpScriptFileType.defaultExtension, FSharpParserDefinition())
+
+  override fun assertFileImpl(file: PsiFile) = Assertions.assertTrue(file is FSharpScriptFileImpl)
 
   @Test fun `test empty`() = doTest()
 }
