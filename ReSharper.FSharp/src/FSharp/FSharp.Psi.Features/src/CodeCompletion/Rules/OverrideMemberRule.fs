@@ -167,7 +167,8 @@ module OverrideMemberRule =
         let isInsideOwnerBody (memberOwner: ITreeNode) =
             match memberOwner with
             | :? IObjectModelTypeRepresentation as repr ->
-                caretLine > repr.BeginKeyword.StartLine && caretLine < repr.EndKeyword.StartLine
+                let endKeyword = repr.EndKeyword
+                caretLine > repr.BeginKeyword.StartLine && (isNull endKeyword || caretLine < endKeyword.StartLine)
 
             | :? IFSharpTypeDeclaration as typeDecl ->
                 let repr = typeDecl.TypeRepresentation
@@ -218,7 +219,7 @@ module OverrideMemberRule =
             let anchor = generatorContext.Anchor
 
             let memberDecl: IMemberDeclaration =
-                anchor.GetContainingNode<IMemberDeclaration>(true)
+                if isNull anchor then null else anchor.GetContainingNode<IMemberDeclaration>(true)
 
             isNotNull memberOwner && isNotNull memberDecl
             && (token == memberDecl.Delimiter || isNull memberDecl.Delimiter)
