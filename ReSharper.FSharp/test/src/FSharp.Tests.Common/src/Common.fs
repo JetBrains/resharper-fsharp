@@ -8,6 +8,7 @@ open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Components
 open JetBrains.Application.Parts
+open JetBrains.Application.Settings
 open JetBrains.Application.Settings.Implementation
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
@@ -44,6 +45,7 @@ open JetBrains.TestFramework.TestCompiler
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
+open NUnit.Framework
 open NuGet.Frameworks
 
 module FSharpTestUtil =
@@ -263,6 +265,27 @@ type FSharpExperimentalFeatureAttribute(feature: ExperimentalFeature) =
     override this.OnAfterTestExecute _ =
         cookie.Dispose()
         cookie <- null
+
+
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, Inherited = false)>]
+type ExplicitIfTransparentCompilerAttribute(reason: string) =
+    inherit ExplicitAttribute(reason)
+
+    new () = ExplicitIfTransparentCompilerAttribute("Not supported with transparent compiler")
+
+    static member IsTransparentCompilerEnabled =
+        match Environment.GetEnvironmentVariable("UseTransparentCompiler") with
+        | null ->
+            SettingsEntryAttribute.ReflectionHelpers.GetDefaultValueFromRuntimeType<FSharpExperimentalFeatures, bool>(
+                _.UseTransparentCompiler,
+                Logging.Logger.GetLogger<ExplicitIfTransparentCompilerAttribute>())
+        | value -> Boolean.Parse(value)
+
+    interface NUnit.Framework.Interfaces.IApplyToTest with
+        member this.ApplyToTest(test) =
+            if ExplicitIfTransparentCompilerAttribute.IsTransparentCompilerEnabled then
+                base.ApplyToTest(test)
+
 
 [<SolutionComponent(InstantiationEx.LegacyDefault)>]
 type TestModifiedFilesCache(psiFilesCache: IPsiFilesCache ) =
