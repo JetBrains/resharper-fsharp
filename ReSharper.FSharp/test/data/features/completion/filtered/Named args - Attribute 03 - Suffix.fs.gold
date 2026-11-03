@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "[<System.AttributeUsageAttribute(System.AttributeTargets.All, ♦)>]"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+AllowMultiple |=            bool            OrderStr=AllowMultiple
+Inherited |=                bool            OrderStr=Inherited
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+AllowMultiple |=            bool            OrderStr=AllowMultiple
+Inherited |=                bool            OrderStr=Inherited

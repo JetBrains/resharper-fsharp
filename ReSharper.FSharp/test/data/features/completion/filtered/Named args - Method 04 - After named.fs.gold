@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Count: 2
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.M(b = "", ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+X |=                        int             OrderStr=X    <==
+a| |=                       int             OrderStr=a
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+X |=                        int             OrderStr=X    <==
+a| |=                       int             OrderStr=a

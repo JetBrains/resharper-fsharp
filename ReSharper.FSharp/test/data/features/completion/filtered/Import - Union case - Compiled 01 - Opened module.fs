@@ -1,4 +1,4 @@
-// ${FILTER_ITEM:CaseB}
+// ${FILTER_ITEMS:CaseB}
 module Module
 
 open Ns.UnionModule

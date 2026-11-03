@@ -1,0 +1,18 @@
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let u = A(a = 1, ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [NamedArguments]
+x |=                        int             OrderStr=x
+                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+a                           int
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+a                           int
+x |=                        int             OrderStr=x

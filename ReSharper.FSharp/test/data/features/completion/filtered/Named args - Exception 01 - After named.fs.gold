@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let e = E(x = 1, ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+y| |=                       int             OrderStr=y    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+y| |=                       int             OrderStr=y    <==

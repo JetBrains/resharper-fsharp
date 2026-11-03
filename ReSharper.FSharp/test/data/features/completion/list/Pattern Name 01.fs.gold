@@ -1,15 +1,13 @@
 ﻿Completion: Basic
-Count: 267
+Count: 3809
 Focus: Soft
 Rules: [\w] => add_to_prefix
 Range: "| Some(♦)"
 
 ##### RELEVANCE SORT #####
 
-                            [ExpectedTypeMatchLambda]
+                            [ExpectedTypeMatch, ExpectedTypeMatchLambda]
 value                       <==
-                            [ExpectedTypeMatch^]
-Value| |=                   'T              OrderStr=Value
                             [Methods, Keywords]
 false
 null
@@ -57,6 +55,8 @@ Ok                          Result<'T,'TError>
 Some                        'T option
 ValueNone                   'T voption
 ValueSome                   'T voption
+                            [NamedArguments]
+Value |=                    'T              OrderStr=Value
                             [Keywords]
 abstract
 and
@@ -267,7 +267,7 @@ unativeint
 unit
 voidptr
 voption
-                            [FromLightEvaluation^, NormalSelectionPriority^, Other^]
+                            [FromLightEvaluation^]
 #I
 #else
 #endif
@@ -280,6 +280,18 @@ voption
 FSharpFunc
 ctx                         Current file context
 nguid                       Insert new GUID
+                            [TypesAndNamespaces, NotImportedType, NormalSelectionPriority^, FromFullEvaluation, Other^]
+ADVF |(in System.Runtime.InteropServices.ComTypes)
+ASCIIEncoding |(in System.Text)
+AbandonedMutexException |(in System.Threading)
+AcceptRejectRule |(in System.Data)
+AccessControlActions |(in System.Security.AccessControl)
+AccessControlModification |(in System.Security.AccessControl)
+AccessControlSections |(in System.Security.AccessControl)
+AccessControlType |(in System.Security.AccessControl)
+AccessRule |(in System.Security.AccessControl)
+AccessViolationException |(in System)
+.. +3799 more items ..
 
 ##### ALPHABETIC SORT #####
 
@@ -448,7 +460,7 @@ TaskBuilderExtensions
 Text
 Unchecked
 UnverifiableAttribute
-Value| |=                   'T              OrderStr=Value
+Value |=                    'T              OrderStr=Value
 ValueNone                   'T voption
 ValueOption
 ValueSome                   'T voption
@@ -552,3 +564,15 @@ while
 while!
 with
 yield
+                            [Full, Generic]
+ADVF |(in System.Runtime.InteropServices.ComTypes)
+ASCIIEncoding |(in System.Text)
+AbandonedMutexException |(in System.Threading)
+AcceptRejectRule |(in System.Data)
+AccessControlActions |(in System.Security.AccessControl)
+AccessControlModification |(in System.Security.AccessControl)
+AccessControlSections |(in System.Security.AccessControl)
+AccessControlType |(in System.Security.AccessControl)
+AccessRule |(in System.Security.AccessControl)
+AccessViolationException |(in System)
+.. +3799 more items ..

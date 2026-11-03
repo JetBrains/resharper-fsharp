@@ -1,0 +1,19 @@
+﻿Completion: Basic
+Count: 3 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let z = Z(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+X |=                        int             OrderStr=X
+a |=                        int             OrderStr=a
+b |=                        string          OrderStr=b
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+X |=                        int             OrderStr=X
+a |=                        int             OrderStr=a
+b |=                        string          OrderStr=b

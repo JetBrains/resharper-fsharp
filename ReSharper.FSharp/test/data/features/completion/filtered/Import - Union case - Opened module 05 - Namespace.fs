@@ -1,4 +1,4 @@
-// ${FILTER_ITEM:B}
+// ${FILTER_ITEMS:B}
 namespace Ns
 
 module M =

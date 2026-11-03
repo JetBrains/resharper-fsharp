@@ -1,0 +1,29 @@
+﻿// ${TEXT: }
+module Module
+
+type A =
+    | B
+    | C of apple: int * banana: string * citrus: char
+
+match B with
+| C(apple = 7;{caret}; citrus = 'e') -> ()
+| _ -> ()
+
+> Typing [ ] char:
+====================================
+Lookup list (Focused):
+                              [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+  banana| |=                  string          OrderStr=banana    <==
+
+> Last text control state (lookup still opened):
+====================================
+// ${TEXT: }
+module Module
+
+type A =
+    | B
+    | C of apple: int * banana: string * citrus: char
+
+match B with
+| C(apple = 7; {caret}; citrus = 'e') -> ()
+| _ -> ()

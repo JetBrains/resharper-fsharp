@@ -6,7 +6,7 @@ Range: "| Bar(apple = a;♦) -> ()"
 
 ##### RELEVANCE SORT #####
 
-                            [FromLightEvaluation, ExpectedTypeMatch, NormalSelectionPriority, Other]
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
 banana| |=                  string          OrderStr=banana    <==
 citrus| |=                  float           OrderStr=citrus
 

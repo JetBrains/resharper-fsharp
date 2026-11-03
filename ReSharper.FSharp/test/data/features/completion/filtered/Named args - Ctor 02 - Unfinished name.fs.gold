@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Prefix: "X"
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let z = Z(X♦ = 1)"
+                  ▲▲
+
+##### RELEVANCE SORT #####
+
+                            [ExactMatch, FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+X̣ |=                        int             OrderStr=X    <==
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+X̣ |=                        int             OrderStr=X    <==

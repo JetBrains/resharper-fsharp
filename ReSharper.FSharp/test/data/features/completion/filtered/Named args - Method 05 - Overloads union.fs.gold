@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.M(1, ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+b |=                        string          OrderStr=b
+c |=                        float           OrderStr=c
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+b |=                        string          OrderStr=b
+c |=                        float           OrderStr=c

@@ -1,0 +1,19 @@
+﻿Completion: Basic
+Count: 3 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.Run(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+Settable |=                 int             OrderStr=Settable
+Settable0 |=                int             OrderStr=Settable0
+a |=                        int             OrderStr=a
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Settable |=                 int             OrderStr=Settable
+Settable0 |=                int             OrderStr=Settable0
+a |=                        int             OrderStr=a

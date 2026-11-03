@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let o = Some(a = 1, ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NormalSelectionPriority, Other]
+a                           int
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+a                           int

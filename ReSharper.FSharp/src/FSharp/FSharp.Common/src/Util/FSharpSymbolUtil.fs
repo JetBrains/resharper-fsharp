@@ -1,6 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpSymbolUtil
 
+open System.Collections.Generic
 open System.Text
 open FSharp.Compiler.Symbols
 open JetBrains.Application.UI.Icons.ComposedIcons
@@ -242,12 +243,12 @@ let rec getSettableMembers (fcsType: FSharpType) : FSharpSymbol list =
 
     let properties =
         entity.MembersFunctionsAndValues
-        |> Seq.filter (fun mfv -> mfv.IsProperty && mfv.HasSetterMethod)
+        |> Seq.filter (fun mfv -> mfv.IsProperty && mfv.HasSetterMethod && mfv.IsInstanceMember)
         |> Seq.map (fun mfv -> mfv :> FSharpSymbol)
 
     let fields =
         entity.FSharpFields
-        |> Seq.filter (fun field -> field.IsMutable)
+        |> Seq.filter (fun field -> field.IsMutable && not field.IsStatic && not field.IsCompilerGenerated)
         |> Seq.map (fun field -> field :> FSharpSymbol)
 
     let inheritedMembers =
@@ -258,6 +259,36 @@ let rec getSettableMembers (fcsType: FSharpType) : FSharpSymbol list =
     [ yield! properties
       yield! fields
       yield! inheritedMembers ]
+
+let canHaveNamedArguments (mfv: FSharpMemberOrFunctionOrValue) =
+    mfv.IsMember && mfv.CurriedParameterGroups.Count = 1 &&
+    not (mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.customOperationAttrTypeName))
+
+let acceptsUnnamedArgs (parameters: IList<FSharpParameter>) (unnamedArgCount: int) =
+    let parameterCount = if parameters.Count = 1 && parameters[0].Type.IsUnitType then 0 else parameters.Count
+    unnamedArgCount <= parameterCount || parameterCount > 0 && parameters[parameterCount - 1].IsParamArrayArg
+
+let (|FieldsOwner|_|) (fcsSymbol: FSharpSymbol) =
+    match fcsSymbol with
+    | :? FSharpUnionCase as fcsUnionCase -> Some fcsUnionCase.Fields
+    | :? FSharpEntity as entity when entity.IsFSharpExceptionDeclaration -> Some entity.FSharpFields
+    | _ -> None
+
+let getFieldNamedArgs (fields: IList<FSharpField>) (argNames: string[]) =
+    let isEqualityArg index =
+        let name = argNames[index]
+        index < fields.Count &&
+        not (fields |> Seq.exists (fun field -> field.DisplayNameCore = name)) &&
+
+        let fieldType = fields[index].FieldType
+        fieldType.IsBooleanType || fieldType.IsGenericParameter
+
+    let positionalCount =
+        Seq.init argNames.Length id
+        |> Seq.takeWhile (fun index -> isNull argNames[index] || isEqualityArg index)
+        |> Seq.length
+
+    argNames |> Array.mapi (fun index name -> if index < positionalCount then null else name)
 
 [<Extension; CompiledName("HasMeasureParameter")>]
 let hasMeasureParameter(entity: FSharpEntity) =

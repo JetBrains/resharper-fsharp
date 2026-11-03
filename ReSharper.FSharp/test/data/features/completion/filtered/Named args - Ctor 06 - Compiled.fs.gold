@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let l = System.Collections.Generic.List<int>(1, ♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+Capacity |=                 int             OrderStr=Capacity
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+Capacity |=                 int             OrderStr=Capacity

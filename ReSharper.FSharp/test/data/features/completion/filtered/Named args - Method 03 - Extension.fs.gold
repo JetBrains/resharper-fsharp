@@ -1,0 +1,17 @@
+﻿Completion: Basic
+Count: 2 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "t.Ext(♦)"
+
+##### RELEVANCE SORT #####
+
+                            [FromLightEvaluation, NamedArguments, NormalSelectionPriority, Other]
+e |=                        int             OrderStr=e
+f |=                        int             OrderStr=f
+
+##### ALPHABETIC SORT #####
+
+                            [Light, Generic]
+e |=                        int             OrderStr=e
+f |=                        int             OrderStr=f

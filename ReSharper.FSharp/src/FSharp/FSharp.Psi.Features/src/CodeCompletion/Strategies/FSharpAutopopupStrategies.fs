@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.Util
@@ -72,14 +73,21 @@ type FSharpOnSpaceAutopopupStrategy() =
                 | :? IAsPat -> true
                 | _ -> false
 
-            | TokenType FSharpTokenType.SEMICOLON semi ->
-                match semi.Parent with
+            | TokenType FSharpTokenType.SEMICOLON separator
+            | TokenType FSharpTokenType.COMMA separator ->
+                match separator.Parent with
                 | :? IRecordFieldBinding as node ->
-                    node.LastChild == semi
+                    node.LastChild == separator
 
-                | :? INamedUnionCaseFieldsPat as node ->
-                    let nextSibling = semi.GetNextMeaningfulSibling()
-                    isNull nextSibling || nextSibling == node.RightParen
+                | :? INamedUnionCaseFieldsPat -> true
+
+                | :? ITupleExpr as tupleExpr ->
+                    FSharpArgumentsUtil.IsTopLevelArg(tupleExpr) &&
+
+                    separator.LeftSiblings()
+                    |> Seq.exists (function
+                        | :? IFSharpExpression as expr -> FSharpArgumentsUtil.HasNamedArgStructure(expr)
+                        | _ -> false)
 
                 | _ -> false
 
