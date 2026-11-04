@@ -4,7 +4,7 @@ import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.junit5.base.TypingAssistTestBase
+import com.jetbrains.rider.test.base.TypingAssistTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditor
 import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
 import com.jetbrains.rider.test.suplementary.RiderTestSolution

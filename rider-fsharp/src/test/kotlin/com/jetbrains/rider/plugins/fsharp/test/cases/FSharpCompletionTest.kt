@@ -7,7 +7,7 @@ import com.jetbrains.rider.test.annotations.report.Issue
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.facades.editor.PatchEngineEditorTestMode
-import com.jetbrains.rider.test.junit5.base.PatchEngineCompletionTestBase
+import com.jetbrains.rider.test.base.PatchEngineCompletionTestBase
 import com.jetbrains.rider.test.scriptingApi.dumpOpenedEditorFacade
 import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.MethodOrderer

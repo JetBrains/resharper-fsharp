@@ -6,7 +6,7 @@ import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
-import com.jetbrains.rider.test.junit5.base.EditorTestBase
+import com.jetbrains.rider.test.base.EditorTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.framework.executeWithGold

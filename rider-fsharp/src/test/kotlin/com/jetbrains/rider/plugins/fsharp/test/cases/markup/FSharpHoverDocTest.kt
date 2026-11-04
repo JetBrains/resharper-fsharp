@@ -5,7 +5,7 @@ import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldContains
-import com.jetbrains.rider.test.junit5.base.DocumentationTestBase
+import com.jetbrains.rider.test.base.DocumentationTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
