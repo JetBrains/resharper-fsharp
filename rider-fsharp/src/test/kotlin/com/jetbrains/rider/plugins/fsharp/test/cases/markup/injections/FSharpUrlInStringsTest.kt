@@ -4,7 +4,7 @@ import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.junit5.base.BaseTestWithMarkup
+import com.jetbrains.rider.test.base.BaseTestWithMarkup
 import com.jetbrains.rider.test.scriptingApi.getHighlighters
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.shared.constants.TeamCityTags

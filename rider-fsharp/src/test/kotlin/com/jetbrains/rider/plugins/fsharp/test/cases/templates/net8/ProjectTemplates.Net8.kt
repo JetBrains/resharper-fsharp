@@ -5,9 +5,9 @@ import com.jetbrains.rider.test.annotations.Subsystem
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.ChecklistItems
-import com.jetbrains.rider.test.junit5.base.sdk.ClassLibProjectTemplateTestBase
-import com.jetbrains.rider.test.junit5.base.sdk.ConsoleAppProjectTemplateTestBase
-import com.jetbrains.rider.test.junit5.base.sdk.XUnitProjectTemplateTestBase
+import com.jetbrains.rider.test.base.sdk.ClassLibProjectTemplateTestBase
+import com.jetbrains.rider.test.base.sdk.ConsoleAppProjectTemplateTestBase
+import com.jetbrains.rider.test.base.sdk.XUnitProjectTemplateTestBase
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion

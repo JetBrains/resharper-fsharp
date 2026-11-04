@@ -11,7 +11,7 @@ import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.junit5.base.PerTestProjectModelTestBase
+import com.jetbrains.rider.test.base.PerTestProjectModelTestBase
 import com.jetbrains.rider.test.scriptingApi.createDataContextFor
 import com.jetbrains.rider.test.scriptingApi.dump
 import com.jetbrains.rider.test.scriptingApi.prepareProjectView
