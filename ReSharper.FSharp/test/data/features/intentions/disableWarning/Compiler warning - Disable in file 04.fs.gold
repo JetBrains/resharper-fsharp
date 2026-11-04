@@ -2,7 +2,6 @@
 #nowarn FS0025
 #nowarn FS0026
 
-
 module A
 
 let 5{caret} = 5

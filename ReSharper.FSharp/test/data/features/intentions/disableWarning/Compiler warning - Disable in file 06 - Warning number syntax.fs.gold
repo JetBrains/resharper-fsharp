@@ -1,6 +1,5 @@
 ﻿#nowarn "20"
 
-
 module A
 
 5{caret}
