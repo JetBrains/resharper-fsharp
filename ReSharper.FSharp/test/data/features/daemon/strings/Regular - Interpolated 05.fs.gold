@@ -1,0 +1,6 @@
+let x = 1
+$"\|{{|(0){x}|}}|(1)"
+
+---------------------------------------------------------
+(0): ReSharper String Escape Character 1: 
+(1): ReSharper String Escape Character 1: 

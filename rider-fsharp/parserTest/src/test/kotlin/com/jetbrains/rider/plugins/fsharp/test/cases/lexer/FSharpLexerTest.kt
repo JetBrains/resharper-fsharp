@@ -1478,6 +1478,147 @@ class FSharpLexerTest {
   }
 
   @Test
+  fun `testStrings - Interpolated - Braces - Escape 06 - Verbatim`() {
+    lexer.doTest(
+      "$@\"{{{marker}}}\"",
+      """VERBATIM_INTERPOLATED_STRING_START ('${'$'}@"{{{')
+            |IDENT ('marker')
+            |VERBATIM_INTERPOLATED_STRING_END ('}}}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 04`() {
+    lexer.doTest(
+      "$\"\\{2}\"",
+      """REGULAR_INTERPOLATED_STRING_START ('${'$'}"\{')
+            |INT32 ('2')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 09`() {
+    lexer.doTest(
+      "$\"\\{{{marker}}}\"",
+      """REGULAR_INTERPOLATED_STRING_START ('${'$'}"\{{{')
+            |IDENT ('marker')
+            |REGULAR_INTERPOLATED_STRING_END ('}}}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 10`() {
+    lexer.doTest("$\"\\{{2}}\"", """REGULAR_INTERPOLATED_STRING ('${'$'}"\{{2}}"')""")
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 11`() {
+    lexer.doTest(
+      "$\"{1}\\{2}\"",
+      """REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_MIDDLE ('}\{')
+            |INT32 ('2')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 12`() {
+    lexer.doTest(
+      "$\"{1}\\}}\"",
+      """REGULAR_INTERPOLATED_STRING_START ('${'$'}"{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_END ('}\}}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Regular 13`() {
+    lexer.doTest(
+      "$\"\\\\{1}\"",
+      """REGULAR_INTERPOLATED_STRING_START ('${'$'}"\\{')
+            |INT32 ('1')
+            |REGULAR_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Triple quote 04`() {
+    lexer.doTest(
+      "$\"\"\"\\{2}\"\"\"",
+      """TRIPLE_QUOTE_INTERPOLATED_STRING_START ('${'$'}""${'"'}\{')
+            |INT32 ('2')
+            |TRIPLE_QUOTED_STRING_END ('}""${'"'}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Triple quote 05`() {
+    lexer.doTest(
+      "$\"\"\"\\{{{marker}}}\"\"\"",
+      """TRIPLE_QUOTE_INTERPOLATED_STRING_START ('${'$'}""${'"'}\{{{')
+            |IDENT ('marker')
+            |TRIPLE_QUOTED_STRING_END ('}}}""${'"'}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Triple quote 06`() {
+    lexer.doTest(
+      "$\"\"\"{1}\\{2}\"\"\"",
+      """TRIPLE_QUOTE_INTERPOLATED_STRING_START ('${'$'}""${'"'}{')
+            |INT32 ('1')
+            |TRIPLE_QUOTED_STRING_MIDDLE ('}\{')
+            |INT32 ('2')
+            |TRIPLE_QUOTED_STRING_END ('}""${'"'}')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Verbatim 04`() {
+    lexer.doTest(
+      "$@\"\\{{{marker}}}\"",
+      """VERBATIM_INTERPOLATED_STRING_START ('${'$'}@"\{{{')
+            |IDENT ('marker')
+            |VERBATIM_INTERPOLATED_STRING_END ('}}}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Verbatim 05`() {
+    lexer.doTest(
+      "$@\"\\{2}\"",
+      """VERBATIM_INTERPOLATED_STRING_START ('${'$'}@"\{')
+            |INT32 ('2')
+            |VERBATIM_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Verbatim 06`() {
+    lexer.doTest(
+      "$@\"\\{{{marker}\\}}\"",
+      """VERBATIM_INTERPOLATED_STRING_START ('${'$'}@"\{{{')
+            |IDENT ('marker')
+            |VERBATIM_INTERPOLATED_STRING_END ('}\}}"')""".trimMargin()
+    )
+  }
+
+  @Test
+  fun `testStrings - Interpolated - Escape - Verbatim 07`() {
+    lexer.doTest(
+      "$@\"{1}\\{2}\"",
+      """VERBATIM_INTERPOLATED_STRING_START ('${'$'}@"{')
+            |INT32 ('1')
+            |VERBATIM_INTERPOLATED_STRING_MIDDLE ('}\{')
+            |INT32 ('2')
+            |VERBATIM_INTERPOLATED_STRING_END ('}"')""".trimMargin()
+    )
+  }
+
+  @Test
   fun `test shebang 01`() {
     lexer.doTest("#!/bin/sh\nopen System",
       """
