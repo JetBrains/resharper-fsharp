@@ -31,8 +31,10 @@ type RegularStringLexer(buffer) =
         match x.Buffer[x.Position] with
         | '\\' ->
             x.Position <- x.Position + 1
-            if x.CanAdvance then x.ProcessEscapeSequence()
-            else StringTokenTypes.CHARACTER
+            if x.CanAdvance then x.ProcessEscapeSequence() else
+
+            x.Position <- x.Position - 1
+            StringTokenTypes.CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
     abstract ProcessEscapeSequence: unit -> TokenNodeType
@@ -75,6 +77,13 @@ type RegularInterpolatedStringLexer(buffer) =
         match InterpolatedStringLexer.advance x with
         | null -> base.AdvanceInternal()
         | nodeType -> nodeType
+
+    override x.ProcessEscapeSequence() =
+        match x.Buffer[x.Position] with
+        | '{' | '}' ->
+            x.Position <- x.Position - 1
+            StringTokenTypes.CHARACTER
+        | _ -> base.ProcessEscapeSequence()
 
 type RegularInterpolatedStringMiddleEndLexer(buffer) =
     inherit RegularInterpolatedStringLexer(buffer)
