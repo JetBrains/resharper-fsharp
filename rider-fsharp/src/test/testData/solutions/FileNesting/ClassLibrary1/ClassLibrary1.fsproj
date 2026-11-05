@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Library.fs" />
+    <Compile Include="Library.Designer.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="Data.xml" />
+    <None Include="DataDependent.xml">
+      <DependentUpon>Data.xml</DependentUpon>
+    </None>
+  </ItemGroup>
+</Project>
