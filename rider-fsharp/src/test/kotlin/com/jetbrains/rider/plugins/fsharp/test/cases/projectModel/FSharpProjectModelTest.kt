@@ -240,6 +240,22 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
   }
 
   @Test
+  @Issues([Issue("RIDER-17284"), Issue("RIDER-19094"), Issue("RIDER-36201")])
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FileNesting")
+  fun testFSharpFileNesting() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move file 'Library.fs' after 'Program.fs'") {
+        moveItem(
+          arrayOf("FileNesting", "ClassLibrary1", "Library.fs"),
+          arrayOf("FileNesting", "ClassLibrary1", "Program.fs"), RdDndOrderType.After
+        )
+      }
+    }
+  }
+
+  @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
   fun testFSharpMoveFolder() {

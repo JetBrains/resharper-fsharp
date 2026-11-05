@@ -1287,6 +1287,20 @@ type IFSharpItemsContainerRefresher =
     abstract member SelectItem: IProjectMark * VirtualFileSystemPath -> unit
 
 
+let getViewParent (container: IFSharpItemsContainer) (viewItem: FSharpViewItem): obj =
+    let dependsUponFile =
+        match viewItem with
+        | FSharpViewFile file -> file.GetDependsUponFile()
+        | FSharpViewFolder _ -> null
+
+    if isNotNull dependsUponFile then box (FSharpViewFile dependsUponFile) else
+
+    let parentFolder = viewItem.ProjectItem.ParentFolder
+    match container.TryGetParentFolderIdentity(viewItem) with
+    | Some identity -> box (FSharpViewFolder(parentFolder, identity))
+    | None -> box parentFolder
+
+
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
@@ -1314,12 +1328,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
 
                     let container = solution.GetComponent<IFSharpItemsContainer>()
                     if container.IsValid(viewItem) then
-                        let parentFolder = viewItem.ProjectItem.ParentFolder
-                        let parentItem: obj =
-                            match container.TryGetParentFolderIdentity(viewItem) with
-                            | Some identity -> FSharpViewFolder(parentFolder, identity)
-                            | None -> viewItem.ProjectItem.ParentFolder
-                        viewHost.AddOrUpdateItem(viewItem, parentItem)
+                        viewHost.AddOrUpdateItem(viewItem, getViewParent container viewItem)
             )
         )
 

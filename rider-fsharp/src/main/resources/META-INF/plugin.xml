@@ -89,6 +89,7 @@
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
     <navbar.members.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.navbar.FSharpNavBarMembersSupport"/>
+    <nestingRulesLanguageExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpNestingRulesLanguageExtensions"/>
     <projectModelViewExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpProjectModelViewExtensions"/>
     <psi.referenceContributor language="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.FSharpWebReferenceContributor" />
     <rdclient.codeStructureTextAttributeProvider language="F#" implementationClass="com.jetbrains.rider.fileStructure.RiderTextAttributeProvider"/>
