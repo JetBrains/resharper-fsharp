@@ -1,23 +1,22 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Daemon.QuickDoc
 
 open FSharp.Compiler.EditorServices
-open FSharp.Compiler.Symbols
 open FSharp.Compiler.Text
 open FSharp.Compiler.Tokenization
 open JetBrains.Application.DataContext
 open JetBrains.Application.Parts
 open JetBrains.DocumentManagers
-open JetBrains.DocumentModel.DataContext
 open JetBrains.ReSharper.Daemon.Tooltips
 open JetBrains.ReSharper.Feature.Services.QuickDoc
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FcsTypeUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util.FcsTaggedText
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
-open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 
@@ -67,8 +66,14 @@ module FSharpQuickDoc =
         let column = int coords.Column
         Some(results.CheckResults.GetToolTip(line, column, lineText, tokenNames, FSharpTokenTag.Identifier))
 
+    let getWildPatTooltipText (wildPat: IWildPat) =
+        let fcsType = wildPat.TryGetFcsType()
+        if isNull fcsType then None else
 
-type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFSharpIdentifier) =
+        Some(RichText(fcsType.Format(wildPat)))
+
+
+type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, node: ITreeNode) =
     let richTextEscapeToHtml (text: RichText) =
         (RichText.Empty, text.GetFormattedParts()) ||> Seq.fold (fun result part ->
             result.Append(part.Text.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", "<br>"), part.Style))
@@ -82,7 +87,12 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         richTextEscapeToHtml text +
         "</pre></div>"
 
-    member x.CreateRichTextTooltip() =
+    let createWildPatTooltip (wildPat: IWildPat) =
+        FSharpQuickDoc.getWildPatTooltipText wildPat
+        |> Option.map asDefinition
+        |> Option.defaultValue null
+
+    let createIdentifierTooltip (identifier: IFSharpIdentifier) =
         match FSharpQuickDoc.getKeywordTooltipText identifier with
         | Some keywordText -> asDefinition keywordText
         | None ->
@@ -122,6 +132,12 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
         )
         |> Option.defaultValue null
 
+    member x.CreateRichTextTooltip() =
+        match node with
+        | :? IFSharpIdentifier as identifier -> createIdentifierTooltip identifier
+        | :? IWildPat as wildPat -> createWildPatTooltip wildPat
+        | _ -> null
+
     interface IQuickDocPresenter with
         member this.GetHtml _ =
             QuickDocTitleAndText(this.CreateRichTextTooltip(), null)
@@ -134,18 +150,9 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, identifier: IFS
 
 [<QuickDocProvider(-1000)>]
 type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
-    let tryFindFSharpFile (context: IDataContext) =
-        let editorContext = context.GetData(DocumentModelDataConstants.EDITOR_CONTEXT)
-        if isNull editorContext then null else
-
+    let tryFindNode (context: IDataContext) : ITreeNode =
         let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
         if isNull sourceFile then null else
-
-        sourceFile.GetPsiFile(editorContext.CaretOffset).AsFSharpFile()
-
-    let tryFindToken (context: IDataContext) : IFSharpIdentifier option =
-        let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
-        if isNull sourceFile then None else
 
         context.GetData(PsiDataConstants.SELECTED_TREE_NODES)
         |> Option.ofObj
@@ -154,31 +161,33 @@ type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
             | :? IFSharpIdentifier as node when node.GetSourceFile() = sourceFile ->
                 let activePatternCaseName = ActivePatternCaseNameNavigator.GetByIdentifier(node)
                 let activePatternId = ActivePatternIdNavigator.GetByCase(activePatternCaseName)
-                if isNotNull activePatternId then Some (activePatternId :> IFSharpIdentifier) else Some node
+                if isNotNull activePatternId then Some(activePatternId :> ITreeNode) else Some node
             | node when node.GetTokenType() == FSharpTokenType.UNDERSCORE ->
                 match node.Parent with
-                | :? IDotLambdaId as dotLambdaId -> Some dotLambdaId
+                | :? IDotLambdaId
+                | :? IWildPat -> Some node.Parent
                 | _ -> None
             | _ -> None
         )
         |> Seq.tryExactlyOne
+        |> Option.toObj
 
     interface IQuickDocProvider with
         member this.CanNavigate(context) =
-            match tryFindToken context with
-            | None -> false
-            | Some token ->
+            match tryFindNode context with
+            | :? IFSharpIdentifier as token ->
+                FSharpQuickDoc.getKeywordTooltipText token |> Option.isSome ||
 
-            FSharpQuickDoc.getKeywordTooltipText token |> Option.isSome ||
-
-            FSharpQuickDoc.getFSharpToolTipText token
-            |> Option.map (fun (ToolTipText layouts) -> not layouts.IsEmpty)
-            |> Option.defaultValue false
+                FSharpQuickDoc.getFSharpToolTipText token
+                |> Option.map (fun (ToolTipText layouts) -> not layouts.IsEmpty)
+                |> Option.defaultValue false
+            | :? IWildPat as wildPat -> FSharpQuickDoc.getWildPatTooltipText wildPat |> Option.isSome
+            | _ -> false
 
         member this.Resolve(context, resolved) =
-            tryFindToken context
-            |> Option.iter (fun token ->
-                resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, token :?> _), FSharpLanguage.Instance))
+            let node = tryFindNode context
+            if isNotNull node then
+                resolved.Invoke(FSharpQuickDocPresenter(xmlDocService, node), FSharpLanguage.Instance)
 
 
 [<Language(typeof<FSharpLanguage>, Instantiation.DemandAnyThreadSafe)>]
