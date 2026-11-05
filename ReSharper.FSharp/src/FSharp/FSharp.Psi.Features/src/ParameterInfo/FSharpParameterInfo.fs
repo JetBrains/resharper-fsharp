@@ -43,6 +43,23 @@ module FcsParameterInfoCandidate =
     let canBeNullAttrTypeName = clrTypeName "JetBrains.Annotations.CanBeNullAttribute"
     let notNullAttrTypeName = clrTypeName "JetBrains.Annotations.NotNullAttribute"
 
+    let isSupportedDefaultValueType (parameterType: IType) =
+        let valueType =
+            match parameterType.GetNullableUnderlyingType() with
+            | null -> parameterType
+            | underlyingType -> underlyingType
+
+        not (valueType.IsDecimal() || valueType.IsDateTime())
+
+    let getEffectiveDefaultValue (parameter: IParameter) =
+        let defaultValue = parameter.GetDefaultValue()
+        if defaultValue.IsBadValue then defaultValue else
+
+        let parameterType = parameter.Type
+        if defaultValue.IsConstant && isSupportedDefaultValueType parameterType then defaultValue else
+        if parameterType.IsNullable() then DefaultValue(parameterType, ConstantValue.Null(parameterType)) else
+        DefaultValue(parameterType, parameterType, ConstantValue.DefaultOf(parameterType))
+
 
 type NamedArgsLayout =
     { DisplayOrder: int[]
@@ -426,10 +443,13 @@ type FcsParameterInfoCandidateBase<'TSymbol, 'TParameter when 'TSymbol :> FSharp
                     text.Append(fcsParameterType.FormatRichText(displayContext) |> ofFcsRichText) |> ignore
 
                     if isNotNull parameter && parameter.IsOptional then
-                        let constantValue = parameter.GetDefaultValue().ConstantValue
-                        let presentation = constantValue.GetPresentation(FSharpLanguage.Instance, TypePresentationStyle.Default)
                         text.Append(" = ", TextStyle.Default) |> ignore
-                        text.Append(presentation) |> ignore
+
+                        let defaultValue = FcsParameterInfoCandidate.getEffectiveDefaultValue parameter
+                        if defaultValue.IsDefaultValue && not defaultValue.IsConstant then
+                            text.Append("default", TextStyle FSharpHighlightingAttributeIds.Keyword) |> ignore
+                        else
+                            text.Append(defaultValue.ConstantValue.GetPresentation(FSharpLanguage.Instance, TypePresentationStyle.Default)) |> ignore
 
                     if isBracketed then
                         text.Append("]", TextStyle.Default) |> ignore
