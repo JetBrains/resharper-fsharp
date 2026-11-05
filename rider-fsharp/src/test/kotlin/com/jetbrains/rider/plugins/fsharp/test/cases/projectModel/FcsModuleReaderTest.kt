@@ -15,6 +15,7 @@ import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
 import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.PerTestProjectModelTestBase
@@ -110,6 +111,7 @@ class FcsModuleReaderTest : PerTestProjectModelTestBase() {
     frameworkLogger.info("Editor switched to $targetFileName")
   }
 
+  @Mute("RIDER-140007")
   @Solution("ProjectReferencesCSharp")
   @Test
   fun testUnloadReloadCSharp() {
@@ -432,6 +434,7 @@ class FcsModuleReaderTest : PerTestProjectModelTestBase() {
     )
   }
 
+  @Mute("RIDER-144558")
   @Solution("ProjectReferencesCSharp2")
   @Test
   fun testRenameTypeInNamespace() {

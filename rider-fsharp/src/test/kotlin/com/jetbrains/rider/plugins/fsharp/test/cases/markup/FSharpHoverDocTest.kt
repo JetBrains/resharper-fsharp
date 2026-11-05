@@ -45,11 +45,13 @@ class FSharpHoverDocTest : DocumentationTestBase() {
   @Solution("ConsoleAppTwoTargetFrameworks")
   fun `test multiple frameworks`() = doTest("Program.fs", "Program.fs")
 
+  @Mute("RIDER-113071")
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SwaggerProviderCSharp")
   fun `provided method in csharp`() = doTest("CSharpLibrary.cs", "CSharpLibrary.cs")
 
+  @Mute("RIDER-113071")
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("SwaggerProviderCSharp")
