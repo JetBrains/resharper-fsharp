@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(x: decimal = 0) : unit
+Parameter: 0 'x: decimal = 0'
+
+--- Accepted invocables: ---
+(x: decimal = 0) : unit

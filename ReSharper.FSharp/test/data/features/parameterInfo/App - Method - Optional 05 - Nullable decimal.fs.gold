@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(x: Nullable<decimal> = null) : unit
+Parameter: 0 'x: Nullable<decimal> = null'
+
+--- Accepted invocables: ---
+(x: Nullable<decimal> = null) : unit

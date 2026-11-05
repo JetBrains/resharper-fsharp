@@ -101,6 +101,15 @@ type FSharpParameterInfoTest() =
     [<Test>] member x.``App - Method - Optional 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Optional 02``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Optional 03``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("OptionalParameters")>]
+    member x.``App - Method - Optional 04 - Decimal``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("OptionalParameters")>]
+    member x.``App - Method - Optional 05 - Nullable decimal``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("OptionalParameters")>]
+    member x.``App - Method - Optional 06 - DateTime``() = x.DoNamedTest()
+    [<Test>] member x.``App - Method - Optional 07 - No default value``() = x.DoNamedTest()
+    [<Test; TestReferenceProjectOutput("OptionalParameters")>]
+    member x.``App - Method - Optional 08 - Int``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Method - Params 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Method - Params 02``() = x.DoNamedTest()

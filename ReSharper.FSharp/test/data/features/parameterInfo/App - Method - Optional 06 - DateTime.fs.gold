@@ -1,0 +1,7 @@
+﻿ParameterInfo is available
+--- All invocables: ----
+(d: DateTime = default) : unit
+Parameter: 0 'd: DateTime = default'
+
+--- Accepted invocables: ---
+(d: DateTime = default) : unit
