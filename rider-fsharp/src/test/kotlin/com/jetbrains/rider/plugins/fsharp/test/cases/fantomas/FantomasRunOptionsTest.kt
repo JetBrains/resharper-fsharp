@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.fantomas
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -98,6 +99,7 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
     }
   }
 
+  @Mute("RIDER-139900")
   @Test
   fun `local tool selected but not found`() = doSelectedButNotFoundTest("LocalDotnetTool")
 
