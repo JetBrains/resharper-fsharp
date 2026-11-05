@@ -1,0 +1,30 @@
+===================
+Init
+
+[Library.Designer.fs]
+module LibraryDesigner
+
+
+[Library.fs]
+module Library
+
+
+[Program.fs]
+module Program
+
+
+===================
+1. Move file 'Library.fs' after 'Program.fs'
+
+[Library.Designer.fs]
+module LibraryDesigner
+
+
+[Library.fs]
+module Library
+
+
+[Program.fs]
+module Program
+
+
