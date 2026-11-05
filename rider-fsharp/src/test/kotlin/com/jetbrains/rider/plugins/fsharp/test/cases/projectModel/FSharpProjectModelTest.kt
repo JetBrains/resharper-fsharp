@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Issue
@@ -58,6 +59,7 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     dump.treeOutput.append(project.fcsHost.dumpSingleProjectMapping.sync(Unit))
   }
 
+  @Mute("RIDER-122782")
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
@@ -155,6 +157,7 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     }
   }
 
+  @Mute("RIDER-110482")
   @Test
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
   @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
