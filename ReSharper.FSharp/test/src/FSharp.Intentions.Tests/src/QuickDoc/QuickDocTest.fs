@@ -83,6 +83,15 @@ type QuickDocTest() =
     [<Test>] member x.``Let Binding 04``() = x.DoNamedTest()
     [<Test>] member x.``Let Binding 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Wild Pat 01``() = x.DoNamedTest()
+    [<Test>] member x.``Wild Pat 02``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Wild Pat 03``() = x.DoNamedTest()
+    [<Test>] member x.``Wild Pat 04``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Wild Pat 05``() = x.DoNamedTest()
+    [<Test>] member x.``Wild Pat 06``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Wild Pat 07``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Wild Pat 08``() = x.DoNamedTest()
+
     [<Test>] member x.``DiscriminatedUnion 01``() = x.DoNamedTest()
     [<Test>] member x.``DiscriminatedUnion 02``() = x.DoNamedTest()
     [<Test>] member x.``DiscriminatedUnion 03``() = x.DoNamedTest()
