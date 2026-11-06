@@ -17,6 +17,8 @@ Init
    -Data
     a.csv
     b.csv
+    -Sub
+     d.csv
 
 
 Project [Name:&, GUID:GUID]
@@ -28,6 +30,9 @@ Project [Name:ClassLibrary1, GUID:GUID]
     ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
     Folder [Name:Data, Virtual:../Data, AllowsNonExistence:true]
       Child items:
+        Folder [Name:Sub, AllowsNonExistence:true]
+          Child items:
+            ProjectFileImpl(Path : d.csv)[CONTENT ]
         ProjectFileImpl(Path : a.csv)[CONTENT ]
         ProjectFileImpl(Path : b.csv)[CONTENT ]
     ProjectFileImpl(Path : Library.fs)[COMPILE ]
@@ -51,6 +56,7 @@ Content roots:
   ClassLibrary1/Library.fs
   ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
   ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Data/Sub/d.csv
   Data/a.csv
   Data/b.csv
   LinkBase.sln
@@ -65,6 +71,8 @@ Content roots:
 3:Data[1]
   1:a.csv (Content) (from ../Data/a.csv)
   2:b.csv (Content) (from ../Data/b.csv)
+  3:Sub[1]
+    1:d.csv (Content) (from ../Data/Sub/d.csv)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
@@ -73,6 +81,7 @@ obj/Debug/net10.0/ILLink.Substitutions.xml
 Library.fs
 ../Data/a.csv
 ../Data/b.csv
+../Data/Sub/d.csv
 
 ===================
 1. Add file 'c.csv' to the linked folder 'Data'
@@ -94,6 +103,8 @@ Library.fs
     c.csv
     a.csv
     b.csv
+    -Sub
+     d.csv
    -Data
     c.csv
 
@@ -107,6 +118,9 @@ Project [Name:ClassLibrary1, GUID:GUID]
     ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
     Folder [Name:Data, Virtual:../Data, AllowsNonExistence:true]
       Child items:
+        Folder [Name:Sub, AllowsNonExistence:true]
+          Child items:
+            ProjectFileImpl(Path : d.csv)[CONTENT ]
         ProjectFileImpl(Path : a.csv)[CONTENT ]
         ProjectFileImpl(Path : b.csv)[CONTENT ]
         ProjectFileImpl(Path : c.csv)[CONTENT ]
@@ -134,6 +148,7 @@ Content roots:
   ClassLibrary1/Library.fs
   ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
   ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Data/Sub/d.csv
   Data/a.csv
   Data/b.csv
   Data/c.csv
@@ -150,6 +165,8 @@ Content roots:
   1:c.csv (Content) (from ../Data/c.csv)
   2:a.csv (Content) (from ../Data/a.csv)
   3:b.csv (Content) (from ../Data/b.csv)
+  4:Sub[1]
+    1:d.csv (Content) (from ../Data/Sub/d.csv)
 
 net10.0
 obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
@@ -159,4 +176,5 @@ Library.fs
 ../Data/c.csv
 ../Data/a.csv
 ../Data/b.csv
+../Data/Sub/d.csv
 

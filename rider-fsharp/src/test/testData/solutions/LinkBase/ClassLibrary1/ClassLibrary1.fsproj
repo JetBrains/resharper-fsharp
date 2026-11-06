@@ -8,6 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Library.fs" />
-    <Content Include="..\Data\*.csv" LinkBase="Data" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Data\**\*.csv" LinkBase="Data" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
