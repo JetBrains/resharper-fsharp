@@ -10,6 +10,7 @@ import com.jetbrains.rider.plugins.fsharp.test.framework.withoutNonFSharpProject
 import com.jetbrains.rider.projectView.workspace.containingProjectEntity
 import com.jetbrains.rider.projectView.workspace.getId
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntity
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.enums.BuildTool
@@ -125,6 +126,7 @@ class FcsProjectProviderTest : PerTestSolutionTestBase() {
     assertHasErrorsAndProjectStampAndReferences("FSharpProject/Library.fs", false, listOf("CSharpProject"))
   }
 
+  @Mute("RIDER-136314")
   @Test
   @Solution("ProjectReferencesCSharp")
   fun projectReferencesCSharpNoModuleReader() {

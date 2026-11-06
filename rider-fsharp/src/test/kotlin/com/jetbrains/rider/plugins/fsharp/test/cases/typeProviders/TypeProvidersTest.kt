@@ -27,6 +27,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun simpleErasedProvider() = doTest("SimpleErasedProvider")
 
   @Test
+  @Mute("RIDER-139900")
   fun simpleGenerativeProvider() = doTest("SimpleGenerativeProvider")
 
   @Test
@@ -34,6 +35,7 @@ class TypeProvidersTest : BaseTypeProvidersTest() {
   fun providersErrors() = doTest("ProvidersErrors")
 
   @Test // RIDER-60909
+  @Mute("RIDER-139900")
   @Solution("LegacyTypeProviderLibrary")
   fun legacyTypeProviders() = doTest("LegacyTypeProviders")
 

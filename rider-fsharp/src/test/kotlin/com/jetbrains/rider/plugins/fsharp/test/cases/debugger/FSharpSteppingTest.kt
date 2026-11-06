@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.debugger
 
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.base.debugger.DebuggerTestBase
@@ -134,6 +135,7 @@ class FSharpSteppingTest : DebuggerTestBase() {
         }, true)
     }
 
+    @Mute("RIDER-139900")
     @Test
     fun testTuples() {
         testDebugProgram({
@@ -186,6 +188,7 @@ class FSharpSteppingTest : DebuggerTestBase() {
         }, true)
     }
 
+    @Mute("RIDER-139900")
     @Test
     fun testPipes() {
         testDebugProgram({
