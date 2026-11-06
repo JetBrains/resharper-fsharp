@@ -1230,7 +1230,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build()
 
         .Name("BlankLinesAroundModules")
-        .Where(Node().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET))
+        .Where(
+          Node().In(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET)
+            .And().Not().Satisfies(IsFirstNodeOfTypeSet(ElementBitsets.TOP_LEVEL_MODULE_LIKE_DECLARATION_BIT_SET, false)))
         .MinBlankLines(it => it.BlankLineAroundTopLevelModules)
         .Build();
 
