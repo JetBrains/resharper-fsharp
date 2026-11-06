@@ -15,6 +15,7 @@ import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade
 import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade.CompareProjFileOptions.XmlNodes
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
+import com.jetbrains.rider.test.scriptingApi.addNewFile
 import com.jetbrains.rider.test.scriptingApi.addNewFolder
 import com.jetbrains.rider.test.scriptingApi.addProject
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
@@ -236,6 +237,19 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
   fun doExplicitItemBetweenSourcesTest() {
     withDump {
       dumpWithSingleProjectMapping("Init") { }
+    }
+  }
+
+  @Test
+  @Issue("RIDER-106262")
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("LinkBase")
+  fun doLinkBaseTest() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Add file 'c.csv' to the linked folder 'Data'") {
+        addNewFile(project, arrayOf("LinkBase", "ClassLibrary1", "Data"), "c.csv")
+      }
     }
   }
 
