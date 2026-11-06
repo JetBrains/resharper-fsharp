@@ -68,7 +68,7 @@ type ImplementAllMembersBehavior(info) =
             textControl.Selection.SetRange(range)
 
 [<Language(typeof<FSharpLanguage>)>]
-type ImplementInterfaceMemberRule() =
+type ImplementInterfaceMemberRule(logger: ILogger) =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
 
     let [<Literal>] Relevance =
@@ -79,13 +79,13 @@ type ImplementInterfaceMemberRule() =
         match interfaceImpl, typeDecl with
         | Some impl, _ -> impl.TypeName.GetText()
         | None, (:? IObjExpr as objExpr) -> objExpr.TypeName.GetText()
-        | _ -> Assertion.Fail("Unexpected interface implementation context"); null
+        | _ -> logger.Warn("Unexpected interface implementation context"); null
 
     let isImplEmpty (typeDecl: IFSharpTypeElementDeclaration) (interfaceImpl: IInterfaceImplementation option) =
         match interfaceImpl, typeDecl with
         | Some impl, _ -> impl.TypeMembers.IsEmpty
         | None, (:? IObjExpr as objExpr) -> objExpr.MemberDeclarations.IsEmpty
-        | _ -> Assertion.Fail("Unexpected interface implementation context"); false
+        | _ -> logger.Warn("Unexpected interface implementation context"); false
 
     let createImplementAllMembersItem
         (context: FSharpCodeCompletionContext)
