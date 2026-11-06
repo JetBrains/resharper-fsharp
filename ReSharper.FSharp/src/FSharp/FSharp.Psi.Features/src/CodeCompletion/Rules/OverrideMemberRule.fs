@@ -28,6 +28,10 @@ open JetBrains.UI.RichText
 open JetBrains.ProjectModel
 open JetBrains.Util.NetFX.Media.Colors
 
+[<Interface>]
+type IFSharpGenerateMembersBehavior =
+    interface end
+
 type OverrideBehavior(info, types) =
     inherit TextualBehavior<TextualInfo>(info)
 
@@ -40,6 +44,8 @@ type OverrideBehavior(info, types) =
             |> Option.defaultValue null
 
         | expr -> expr
+
+    interface IFSharpGenerateMembersBehavior
 
     override this.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaretStill)
@@ -336,7 +342,7 @@ module OverrideMemberRule =
         collector.RemoveWhere(fun (item: ILookupItem) ->
             match item with
             | :? FSharpKeywordLookupItem -> false
-            | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? OverrideBehavior)
+            | :? IAspectLookupItemBase as aspectItem -> not (aspectItem.Behavior :? IFSharpGenerateMembersBehavior)
             | _ -> true)
 
 [<Language(typeof<FSharpLanguage>)>]
