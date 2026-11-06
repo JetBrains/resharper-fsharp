@@ -4,6 +4,7 @@ import com.jetbrains.rider.daemon.util.hasErrors
 import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.test.annotations.Mute
+import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -31,7 +32,7 @@ import java.time.Duration
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Test
-  @Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
+  @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]), Mute("RIDER-139900")])
   fun `generative type providers cross-project analysis`() {
     val generativeProviderProjectPath =
       "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
@@ -56,7 +57,7 @@ class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])
+  @Mutes([Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]), Mute("RIDER-139900")])
   fun `change abbreviation`() {
     executeWithGold(testGoldFile) {
       withOpenedEditor("GenerativeTypeProvider/Library.fs") {

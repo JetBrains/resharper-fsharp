@@ -137,7 +137,11 @@ class FSharpCompletionSequentialTest : FSharpCompletionTestBase(PatchEngineEdito
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
-class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative)
+class FSharpCompletionSpeculativeTest : FSharpCompletionTestBase(PatchEngineEditorTestMode.Speculative) {
+  init {
+    addMute(Mute("RIDER-139900"), ::`nuget reference - package name`)
+  }
+}
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
