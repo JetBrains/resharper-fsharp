@@ -30,6 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [NotNull] private readonly object mySyncObject = new();
     private bool myOpened;
 
+    public ChameleonExpression() { }
+
     public ChameleonExpression([NotNull] SynExpr expr, FSharpList<WarnDirectiveTrivia> warningDirectives,
       int startOffset, int lineStart)
     {
