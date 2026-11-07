@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.markup.injections
 import com.intellij.codeInsight.daemon.impl.HighlightInfoType
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.base.BaseTestWithMarkup
 import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
@@ -65,6 +66,7 @@ class FSharpLanguageInjectionTest : BaseTestWithMarkup() {
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("FableApp")
 class FSharpFrontendFrameworksTest : BaseTestWithMarkup() {
+  @Mute("RIDER-126077")
   @Test
   fun testInjectionByExternalAnnotation() = doTest()
 }

@@ -1,0 +1,180 @@
+===================
+Init
+
+-Project
+ -LinkBase * 1 project
+  -ClassLibrary1
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      Microsoft.NETCore.App
+   Library.fs
+   -Data
+    a.csv
+    b.csv
+    -Sub
+     d.csv
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : LinkBase.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:Data, Virtual:../Data, AllowsNonExistence:true]
+      Child items:
+        Folder [Name:Sub, AllowsNonExistence:true]
+          Child items:
+            ProjectFileImpl(Path : d.csv)[CONTENT ]
+        ProjectFileImpl(Path : a.csv)[CONTENT ]
+        ProjectFileImpl(Path : b.csv)[CONTENT ]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/Library.fs
+  ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Data/Sub/d.csv
+  Data/a.csv
+  Data/b.csv
+  LinkBase.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net10.0[1]
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
+2:Library.fs
+3:Data[1]
+  1:a.csv (Content) (from ../Data/a.csv)
+  2:b.csv (Content) (from ../Data/b.csv)
+  3:Sub[1]
+    1:d.csv (Content) (from ../Data/Sub/d.csv)
+
+net10.0
+obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
+Library.fs
+../Data/a.csv
+../Data/b.csv
+../Data/Sub/d.csv
+
+===================
+1. Add file 'c.csv' to the linked folder 'Data'
+
+-Project
+ -LinkBase * 1 project
+  -ClassLibrary1
+   -Dependencies
+    -.NET 10.0
+     -Assemblies
+      -Implicit
+       ...
+     -Packages
+      FSharp.Core/5.0.0
+     -Frameworks
+      Microsoft.NETCore.App
+   Library.fs
+   -Data
+    c.csv
+    a.csv
+    b.csv
+    -Sub
+     d.csv
+   -Data
+    c.csv
+
+
+Project [Name:&, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : LinkBase.sln)[]
+
+Project [Name:ClassLibrary1, GUID:GUID]
+  Child items:
+    ProjectFileImpl(Path : ClassLibrary1.fsproj)[]
+    Folder [Name:Data, Virtual:../Data, AllowsNonExistence:true]
+      Child items:
+        Folder [Name:Sub, AllowsNonExistence:true]
+          Child items:
+            ProjectFileImpl(Path : d.csv)[CONTENT ]
+        ProjectFileImpl(Path : a.csv)[CONTENT ]
+        ProjectFileImpl(Path : b.csv)[CONTENT ]
+        ProjectFileImpl(Path : c.csv)[CONTENT ]
+    Folder [Name:Data, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : c.csv (../../Data/c.csv))[CONTENT ]
+    ProjectFileImpl(Path : Library.fs)[COMPILE ]
+    Folder [Name:obj, IsHidden:true]
+      Child items:
+        Folder [Name:Debug, IsHidden:true]
+          Child items:
+            Folder [Name:net10.0, IsHidden:true]
+              Child items:
+                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILE Properties:CompileOrder=CompileBefore]
+                ProjectFileImpl(Path : ILLink.Substitutions.xml)[Hidden EMBEDDEDRESOURCE Properties:LogicalName=ILLink.Substitutions.xml]
+
+Project [Name:Miscellaneous Files, GUID:GUID]
+
+
+
+===================
+Workspace Model
+Content roots:
+  ClassLibrary1/ClassLibrary1.fsproj
+  ClassLibrary1/Library.fs
+  ClassLibrary1/obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+  ClassLibrary1/obj/Debug/net10.0/ILLink.Substitutions.xml
+  Data/Sub/d.csv
+  Data/a.csv
+  Data/b.csv
+  Data/c.csv
+  LinkBase.sln
+
+1:obj[1]
+  1:Debug[1]
+    1:net10.0[1]
+      1:ClassLibrary1.AssemblyInfo.fs
+      2:.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+      3:ILLink.Substitutions.xml (EmbeddedResource)
+2:Library.fs
+3:Data[1]
+  1:c.csv (Content) (from ../Data/c.csv)
+  2:a.csv (Content) (from ../Data/a.csv)
+  3:b.csv (Content) (from ../Data/b.csv)
+  4:Sub[1]
+    1:d.csv (Content) (from ../Data/Sub/d.csv)
+
+net10.0
+obj/Debug/net10.0/ClassLibrary1.AssemblyInfo.fs
+obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.fs
+obj/Debug/net10.0/ILLink.Substitutions.xml
+Library.fs
+../Data/c.csv
+../Data/a.csv
+../Data/b.csv
+../Data/Sub/d.csv
+

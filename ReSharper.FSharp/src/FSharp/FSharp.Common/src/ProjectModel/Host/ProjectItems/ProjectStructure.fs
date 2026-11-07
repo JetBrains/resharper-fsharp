@@ -24,9 +24,6 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
             | project when not project.IsFSharp -> null
             | _ ->
 
-            let getParent defaultParent =
-                Option.map box >> Option.defaultValue defaultParent
-
             match projectItem with
             | :? IProjectFolder as projectFolder ->
                 let parentFolder = projectFolder.ParentFolder.NotNull()
@@ -34,17 +31,12 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
                 container.CreateFoldersWithParents(projectFolder)
                 |> List.ofSeq
                 |> List.map (fun (viewFolder, parentOpt) ->
-                    ProjectStructureItem(viewFolder, parentOpt |> getParent parentFolder)) :> _
+                    let parent = parentOpt |> Option.map box |> Option.defaultValue (box parentFolder)
+                    ProjectStructureItem(viewFolder, parent)) :> _
 
             | :? IProjectFile as projectFile ->
                 let item = FSharpViewFile projectFile
-                let parentFolder = projectFile.ParentFolder.NotNull()
-
-                let parentViewFolder =
-                    container.TryGetParentFolderIdentity(item)
-                    |> Option.map (fun identity -> FSharpViewFolder (parentFolder, identity))
-                    |> getParent parentFolder
-                [| ProjectStructureItem(item, parentViewFolder) |] :> _
+                [| ProjectStructureItem(item, getViewParent container item) |] :> _
 
             | _ -> null
 

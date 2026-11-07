@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.projectModel
 import com.jetbrains.rd.ide.model.RdDndOrderType
 import com.jetbrains.rider.plugins.fsharp.test.framework.fcsHost
 import com.jetbrains.rider.test.OpenSolutionParams
+import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.annotations.report.Issue
@@ -14,6 +15,7 @@ import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade
 import com.jetbrains.rider.test.facades.projectmodel.ProjectModelDumpApiFacade.CompareProjFileOptions.XmlNodes
 import com.jetbrains.rider.test.framework.waitBackend
 import com.jetbrains.rider.test.scriptingApi.ProjectTemplates
+import com.jetbrains.rider.test.scriptingApi.addNewFile
 import com.jetbrains.rider.test.scriptingApi.addNewFolder
 import com.jetbrains.rider.test.scriptingApi.addProject
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
@@ -58,6 +60,7 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     dump.treeOutput.append(project.fcsHost.dumpSingleProjectMapping.sync(Unit))
   }
 
+  @Mute("RIDER-122782")
   @Test
   @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
   @Solution("FSharpProjectTree")
@@ -155,6 +158,7 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     }
   }
 
+  @Mute("RIDER-110482")
   @Test
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
   @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
@@ -233,6 +237,35 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
   fun doExplicitItemBetweenSourcesTest() {
     withDump {
       dumpWithSingleProjectMapping("Init") { }
+    }
+  }
+
+  @Test
+  @Issue("RIDER-106262")
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("LinkBase")
+  fun doLinkBaseTest() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Add file 'c.csv' to the linked folder 'Data'") {
+        addNewFile(project, arrayOf("LinkBase", "ClassLibrary1", "Data"), "c.csv")
+      }
+    }
+  }
+
+  @Test
+  @Issues([Issue("RIDER-17284"), Issue("RIDER-19094"), Issue("RIDER-36201")])
+  @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
+  @Solution("FileNesting")
+  fun testFSharpFileNesting() {
+    withDump {
+      dumpWithSingleProjectMapping("Init") { }
+      dumpWithSingleProjectMapping("1. Move file 'Library.fs' after 'Program.fs'") {
+        moveItem(
+          arrayOf("FileNesting", "ClassLibrary1", "Library.fs"),
+          arrayOf("FileNesting", "ClassLibrary1", "Program.fs"), RdDndOrderType.After
+        )
+      }
     }
   }
 

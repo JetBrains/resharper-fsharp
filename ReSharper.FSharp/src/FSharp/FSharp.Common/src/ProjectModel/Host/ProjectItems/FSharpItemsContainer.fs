@@ -334,7 +334,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
             tryGetProjectMark folder
             |> Option.bind tryGetProjectMapping
             |> Option.map (fun mapping ->
-                mapping.TryGetFolderItems(folder.Location)
+                mapping.TryGetFolderItems(getLogicalPath folder)
                 |> Seq.map (function
                     | FolderItem(_, id) as folderItem ->
                         let parent =
@@ -439,11 +439,10 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         tryGetValue path files
 
     let tryGetProjectItem (viewItem: FSharpViewItem) =
-        let path = viewItem.ProjectItem.Location
         match viewItem with
-        | FSharpViewFile _ -> tryGetFile path
-        | FSharpViewFolder(_, identity) ->
-            folders[path]
+        | FSharpViewFile file -> tryGetFile file.Location
+        | FSharpViewFolder(folder, identity) ->
+            folders[getLogicalPath folder]
             |> Seq.tryFind (function | FolderItem(_, id) -> id = identity | _ -> false)
 
     let getNewFolderIdentity path =
@@ -1287,6 +1286,39 @@ type IFSharpItemsContainerRefresher =
     abstract member SelectItem: IProjectMark * VirtualFileSystemPath -> unit
 
 
+let rec getLogicalPath (folder: IProjectFolder): VirtualFileSystemPath =
+    if folder :? IProject then folder.Location else
+
+    let parentLogicalPath = getLogicalPath folder.ParentFolder
+    parentLogicalPath.Combine(folder.Name)
+
+let rec findFoldersByLogicalPath (parent: IProjectFolder) (logicalPath: VirtualFileSystemPath): IProjectFolder seq =
+    parent.GetSubFolders()
+    |> Seq.collect (fun folder ->
+        let folderLogicalPath = getLogicalPath folder
+        if folderLogicalPath = logicalPath then
+            Seq.singleton folder else
+
+        if not (folderLogicalPath.IsPrefixOf(logicalPath)) then
+            Seq.empty else
+
+        findFoldersByLogicalPath folder logicalPath
+    )
+
+let getViewParent (container: IFSharpItemsContainer) (viewItem: FSharpViewItem): obj =
+    let dependsUponFile =
+        match viewItem with
+        | FSharpViewFile file -> file.GetDependsUponFile()
+        | FSharpViewFolder _ -> null
+
+    if isNotNull dependsUponFile then box (FSharpViewFile dependsUponFile) else
+
+    let parentFolder = viewItem.ProjectItem.ParentFolder
+    match container.TryGetParentFolderIdentity(viewItem) with
+    | Some identity -> box (FSharpViewFolder(parentFolder, identity))
+    | None -> box parentFolder
+
+
 [<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
@@ -1303,23 +1335,14 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                         | null -> ()
                         | appender -> appender.Refresh(projectFolder)))
 
-    let update projectMark path viewItemCtor =
+    let update projectMark getViewItems =
         solution.Locks.QueueReadLock(lifetime, "Update Items View", fun _ ->
             tryGetProject projectMark
             |> Option.iter (fun project ->
-                for projectItem in project.FindProjectItemsByLocation(path) do
-                    match viewItemCtor projectItem with
-                    | None -> ()
-                    | Some viewItem ->
-
-                    let container = solution.GetComponent<IFSharpItemsContainer>()
+                let container = solution.GetComponent<IFSharpItemsContainer>()
+                for viewItem in getViewItems project do
                     if container.IsValid(viewItem) then
-                        let parentFolder = viewItem.ProjectItem.ParentFolder
-                        let parentItem: obj =
-                            match container.TryGetParentFolderIdentity(viewItem) with
-                            | Some identity -> FSharpViewFolder(parentFolder, identity)
-                            | None -> viewItem.ProjectItem.ParentFolder
-                        viewHost.AddOrUpdateItem(viewItem, parentItem)
+                        viewHost.AddOrUpdateItem(viewItem, getViewParent container viewItem)
             )
         )
 
@@ -1329,17 +1352,15 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
 
         // todo: single identity
         member x.RefreshFolder(projectMark, folder, _) =
-            refresh projectMark (fun project -> project.FindProjectItemsByLocation(folder).OfType<IProjectFolder>())
+            refresh projectMark (fun project -> findFoldersByLogicalPath project folder)
 
         member x.UpdateFile(projectMark, path) =
-            update projectMark path (function
-                | ProjectFile file -> Some(FSharpViewFile(file))
-                | _ -> None)
+            update projectMark (fun project ->
+                project.FindProjectItemsByLocation(path).OfType<IProjectFile>() |> Seq.map FSharpViewFile)
 
         member x.UpdateFolder(projectMark, path, id) =
-            update projectMark path (function
-                | ProjectFolder folder -> Some(FSharpViewFolder(folder, id))
-                | _ -> None)
+            update projectMark (fun project ->
+                findFoldersByLogicalPath project path |> Seq.map (fun folder -> FSharpViewFolder(folder, id)))
 
         member x.ReloadProject(projectMark) =
             let opName = sprintf "Reload %O after FSharpItemsContainer change" projectMark
