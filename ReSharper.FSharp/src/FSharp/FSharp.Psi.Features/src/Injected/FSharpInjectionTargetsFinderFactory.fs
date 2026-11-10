@@ -17,8 +17,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnn
 type FSharpInjectionTargetsFinder() =
     let possibleInjectorFunctionNames = HashSet([|"html"; "css"; "sql"; "js"; "javascript"; "json"; "jsx"; "tsx"|])
     let normalizeLanguage = function
-        | "js" -> "javascript"
-        | "jsx" -> "ECMAScript 6"
+        | "js"
+        | "jsx" -> "javascript"
         | "tsx" -> "TypeScript JSX"
         | "fsharp" -> "F#"
         | language -> language
