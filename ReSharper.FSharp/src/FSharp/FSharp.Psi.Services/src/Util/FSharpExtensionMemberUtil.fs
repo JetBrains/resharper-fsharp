@@ -215,6 +215,7 @@ let getExtensionMembersForType (context: ITreeNode) (fcsType: FSharpType) isStat
         resolvesAsExtensionMember typeMember &&
         matchesName typeMember &&
         not (isInScope typeMember) &&
+        not (openedModulesProvider.IsExcludedFromImport(typeMember)) &&
         FSharpAccessRightUtil.IsAccessible(typeMember.ContainingType, context) &&
         matchesCallingConvention typeMember &&
         matchesType typeMember

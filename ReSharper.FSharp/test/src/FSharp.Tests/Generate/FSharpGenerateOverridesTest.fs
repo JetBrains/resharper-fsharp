@@ -3,6 +3,8 @@
 open JetBrains.ReSharper.FeaturesTestFramework.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Psi.CSharp
+open JetBrains.ReSharper.Psi.ImportType
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -151,6 +153,8 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Import 01``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
     [<Test>] member x.``Import 02 - Prefer qualified``() = x.DoNamedTest()
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "FullyQualifiedImports", "Ns1.T", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import 03 - Fully qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Static class 01``() = x.DoNamedTest()

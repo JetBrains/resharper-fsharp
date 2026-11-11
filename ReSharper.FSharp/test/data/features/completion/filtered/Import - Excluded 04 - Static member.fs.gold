@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "String.♦"
+
+##### RELEVANCE SORT #####
+
+                            [ImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+Format |(in System.String)
+
+##### ALPHABETIC SORT #####
+
+                            [Full, Generic]
+Format |(in System.String)

@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.ImportType
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
@@ -28,10 +29,14 @@ let rec private setQualifiers (reference: FSharpSymbolReference) (elements: IClr
     reference.SetQualifier(element)
     setQualifiers reference.QualifierReference outerElements
 
-let private qualifyIfPreferred (context: ITreeNode) (reference: FSharpSymbolReference) (moduleToOpen: IClrDeclaredElement) =
+let private isQualifiedReferencePreferred (context: ITreeNode) (typeOrMember: IClrDeclaredElement) =
     let settings = context.GetSettingsStoreWithEditorConfig()
-    let preferQualified = settings.GetValue(fun key -> key.PreferQualifiedReference)
-    if not preferQualified then false else
+    settings.GetValue(fun key -> key.PreferQualifiedReference) ||
+    ImportFilteringUtil.ShouldPreferFullQualification(typeOrMember, context)
+
+let private qualifyIfPreferred (context: ITreeNode) (reference: FSharpSymbolReference)
+        (typeOrMember: IClrDeclaredElement) (moduleToOpen: IClrDeclaredElement) =
+    if not (isQualifiedReferencePreferred context typeOrMember) then false else
 
     let firstNameReference = getFirstNameReference reference
     let hasExprQualifier = firstNameReference.IsQualified
@@ -46,9 +51,10 @@ let private isExtensionMember (declaredElement: IClrDeclaredElement) =
     | :? ITypeMember as typeMember -> typeMember.ExtensionMemberKind <> ExtensionMemberKind.NONE
     | _ -> false
 
-let private qualifyOrAddOpen (reference: FSharpSymbolReference) (moduleToOpen: IClrDeclaredElement) =
+let private qualifyOrAddOpen (reference: FSharpSymbolReference) (typeOrMember: IClrDeclaredElement)
+        (moduleToOpen: IClrDeclaredElement) =
     let referenceOwner = reference.GetElement()
-    let qualified = qualifyIfPreferred referenceOwner reference moduleToOpen
+    let qualified = qualifyIfPreferred referenceOwner reference typeOrMember moduleToOpen
     if not qualified then
         addOpen referenceOwner moduleToOpen
 
@@ -68,14 +74,14 @@ let bindDeclaredElementToReference (context: ITreeNode) (reference: FSharpSymbol
     if isExtensionMember declaredElement then
         addOpen referenceOwner moduleToOpen
     else
-        qualifyOrAddOpen reference moduleToOpen
+        qualifyOrAddOpen reference declaredElement moduleToOpen
 
 let bindModuleMemberToReference (reference: FSharpSymbolReference) (containingType: ITypeElement) =
     let referenceOwner = reference.GetElement()
     reference.SetRequiredQualifiersForContainingType(containingType, referenceOwner)
 
     let moduleToOpen = getModuleToOpenFromContainingType containingType
-    qualifyOrAddOpen reference moduleToOpen
+    qualifyOrAddOpen reference containingType moduleToOpen
 
 let bindFcsSymbolToReference (context: ITreeNode) (reference: FSharpSymbolReference) (fcsSymbol: FSharpSymbol) opName =
     let declaredElement = fcsSymbol.GetDeclaredElement(context.GetPsiModule()).As<IClrDeclaredElement>()
@@ -96,7 +102,7 @@ let bindFcsSymbolToReferenceAndGetModuleToOpen (openedModulesProvider: OpenedMod
 
     if FSharpImportUtil.isTypeOrNsInScope openedModulesProvider moduleToOpen then None else
 
-    let qualified = qualifyIfPreferred context reference moduleToOpen
+    let qualified = qualifyIfPreferred context reference declaredElement moduleToOpen
     if qualified then None else Some moduleToOpen
 
 

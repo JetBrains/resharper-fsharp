@@ -58,10 +58,12 @@ type ImportStaticMemberRule() =
 
             if typeElement :? IFSharpModule then () else
             if FSharpImportUtil.isTypeElementInScope openedModulesProvider typeElement then () else
+            if openedModulesProvider.IsExcludedFromImport(typeElement) then () else
 
             let qualifiedName = typeElement.GetQualifiedName()
             for typeMember in typeElement.GetMembers() do
-                if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) then
+                if typeMember.IsStatic && AccessUtil.IsSymbolAccessible(typeMember, accessContext) &&
+                        not (openedModulesProvider.IsExcludedFromImport(typeMember)) then
                     let name = typeMember.GetSourceName()
                     let info = ImportDeclaredElementInfo(typeMember, name, qualifiedName, context, Ranges = context.Ranges)
                     let item =

@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "let x = ♦"
+
+##### RELEVANCE SORT #####
+
+                            [NotImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+value |(in Ns2.M2)          OrderStr=value
+
+##### ALPHABETIC SORT #####
+
+                            [Full, Generic]
+value |(in Ns2.M2)          OrderStr=value

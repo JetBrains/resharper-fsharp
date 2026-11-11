@@ -233,6 +233,7 @@ type FSharpImportTypeElementRule() =
             if not (isAllowed context typeElement) then () else
 
             if FSharpImportUtil.isTypeElementInScope openedModulesProvider typeElement then () else
+            if openedModulesProvider.IsExcludedFromImport(typeElement) then () else
 
             let currentName =
                 let shortName = getSourceName typeElement
