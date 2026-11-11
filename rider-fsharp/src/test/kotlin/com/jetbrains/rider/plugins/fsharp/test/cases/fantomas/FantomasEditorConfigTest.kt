@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import kotlin.io.path.copyTo
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
-@TestSettings(sdkVersion = SdkVersion.DOT_NET_7, buildTool = BuildTool.SDK)
+@TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.SDK)
 @Solution("FormatCodeApp")
 class FantomasEditorConfigTest : FantomasDotnetToolTestBase() {
   override fun beforeDoTestWithDocuments() {
