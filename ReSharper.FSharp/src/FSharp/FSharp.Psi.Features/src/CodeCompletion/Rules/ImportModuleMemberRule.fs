@@ -25,7 +25,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Transactions
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -54,10 +53,7 @@ type ImportModuleMemberBehavior(info: ImportModuleMemberInfo) =
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
         use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, ImportInfo.Id)
 
-        let typeElement = info.TypeElement
-        let moduleToImport = ModuleToImport.DeclaredElement(getModuleToOpenFromContainingType typeElement)
-        addOpen (referenceOwner.GetDocumentStartOffset()) referenceOwner.FSharpFile moduleToImport
-        referenceOwner.Reference.SetRequiredQualifiersForContainingType(typeElement, referenceOwner)
+        FSharpBindUtil.bindModuleMemberToReference referenceOwner.Reference info.TypeElement
 
 
 [<Language(typeof<FSharpLanguage>)>]

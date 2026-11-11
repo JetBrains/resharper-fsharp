@@ -1,7 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 type GenerateInterfaceMembersFixTest() =
@@ -78,6 +80,8 @@ type GenerateMissingMembersFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/generateMissingMembers"
 
     [<Test>] member x.``Context - Common namespace 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Context - Common namespace 02 - Prefer qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Explicit impl 01``() = x.DoNamedTest()
     [<Test>] member x.``Explicit impl 02``() = x.DoNamedTest()

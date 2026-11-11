@@ -1,7 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Generate
 
 open JetBrains.ReSharper.FeaturesTestFramework.Generate
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest; AssertCorrectTreeStructure>]
@@ -145,6 +147,10 @@ type FSharpGenerateOverridesTest() =
 
     [<Test>] member x.``Super 01``() = x.DoNamedTest()
     [<Test>] member x.``Super 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Import 02 - Prefer qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Static class 01``() = x.DoNamedTest()

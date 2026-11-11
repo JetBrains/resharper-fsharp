@@ -30,12 +30,18 @@ let private resolvesToAssociatedModule (declaredElement: IDeclaredElement) (unqu
     let typeElement = FSharpImplUtil.TryGetAssociatedType(unqualifiedTypeElement, shortName, declaredElement.TypeParametersCount)
     declaredElement.Equals(typeElement)
 
+let private resolvesToConstructor (declaredElement: IDeclaredElement) (resolvedElement: IDeclaredElement) =
+    match resolvedElement with
+    | :? IConstructor as ctor -> declaredElement.Equals(ctor.ContainingType)
+    | _ -> false
+
 let private resolvesTo (declaredElement: IDeclaredElement) (reference: FSharpSymbolReference) qualified resolveExpr opName =
     reference.ResolveWithFcs(opName, resolveExpr, qualified)
     |> Seq.exists (fun symbolUse ->
         let referenceOwner = reference.GetElement()
         let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
         if declaredElement.Equals(unqualifiedElement) then true else
+        if resolvesToConstructor declaredElement unqualifiedElement then true else
 
         resolvesToAssociatedModule declaredElement unqualifiedElement reference
     )

@@ -58,13 +58,36 @@ type ImportTypeTest() =
 
     [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Qualifiers - Expr - Imported 03 - Prefer nested``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Qualifiers - New expr - Imported 01 - Prefer nested``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Qualifiers - Inherit - Imported 01 - Prefer nested``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Expr 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Reference name - Expression 01``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Reference name - Type 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Qualifiers - Reference name - Type 02 - Imported - Prefer nested``() = x.DoNamedTest()
     [<Test>] member x.``Qualifiers - Type extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Qualifiers - Namespace 01``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Type 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Type 02 - Nested module``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Type 03 - Escaped module``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Attribute 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Static member 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Qualifiers 01 - Nested``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Type extension 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available 01 - Open``() = x.DoNamedTest()
 
@@ -180,6 +203,15 @@ type ImportExtensionMemberTest() =
 
     [<Test>] member x.``FSharp - Nested module 01``() = x.DoNamedTest()
 
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Source 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Source 02 - Qualifier expr``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test; TestReferenceProjectOutput("FSharpExtensions")>] member x.``Prefer qualified - Compiled 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - CSharp 01``() = x.DoNamedTestFsCs()
+
     [<Test>] member x.``Not Available - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Not Available - Function 02``() = x.DoNamedTest()
     [<Test>] member x.``Not Available - Function 03``() = x.DoNamedTest()
@@ -223,6 +255,7 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Expr - Union 04 - Rqa Rqa``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Expr - Union 05 - Rqa AutoOpen Rqa``() = x.DoNamedTest()
     [<Test; TestReferenceProjectOutput("ModuleMembers")>] member x.``Expr - Union 06``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Union 07 - Rqa - Opened nested module``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Value 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Value 02``() = x.DoNamedTest()
@@ -253,6 +286,15 @@ type FSharpImportModuleMemberTest() =
     [<Test; Explicit>] member x.``Pattern - Union 05 - Rqa AutoOpen Rqa``() = x.DoNamedTest()
     [<Test; TestReferenceProjectOutput("ModuleMembers")>] member x.``Pattern - Union 06``() = x.DoNamedTest()
 
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Expr - Value 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Expr - Union 01 - Rqa``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Expr - Union 02 - Rqa - Opened nested module``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Prefer qualified - Pattern - Literal 01``() = x.DoNamedTest()
+
     [<Test; Explicit>] member x.``Not available - Internal 01 - Literal``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Not available - Internal 02 - Value``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Not available - Internal 03 - Function``() = x.DoNamedTest()
@@ -261,3 +303,6 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Not available - Unreachable 02``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Unreachable 03``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Unreachable 04``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Unreachable 05 - Nested module``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available - Signature 01 - Opened nested module``() = x.DoNamedTestWithSignatureAndSecondFile()

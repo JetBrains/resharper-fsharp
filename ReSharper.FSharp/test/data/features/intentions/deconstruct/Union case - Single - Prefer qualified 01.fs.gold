@@ -1,0 +1,12 @@
+﻿namespace Ns1
+
+type U =
+    | A of field: int
+
+namespace Ns2
+
+module Module =
+    let (Ns1.A {spotstart#1}field{spotend#1}{caret}) = Ns1.U.A 1
+
+LOOKUP ITEMS IN HOTSPOTS:
+  spot#1 [Count: 4, Focus: HardAtStart] field, i, item, _

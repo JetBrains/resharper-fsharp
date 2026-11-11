@@ -35,6 +35,7 @@ module FSharpOptions =
     let [<Literal>] nonFSharpProjectInMemoryReferences = "Analyze C# and VB.NET project references in-memory"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
+    let [<Literal>] preferQualifiedReference = "Prefer qualified references"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -49,7 +50,10 @@ type FSharpOptions =
       mutable NonFSharpProjectInMemoryReferences: bool
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-      mutable TopLevelOpenCompletion: bool }
+      mutable TopLevelOpenCompletion: bool
+
+      [<SettingsEntry(false, preferQualifiedReference); DefaultValue>]
+      mutable PreferQualifiedReference: bool }
 
 type FantomasLocationSettings =
     | AutoDetected = 0
@@ -202,6 +206,7 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
     do
         this.AddHeader("Imports")
         this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
+        this.AddBoolOption((fun key -> key.PreferQualifiedReference), RichText(preferQualifiedReference), null) |> ignore
 
         this.AddHeader("Script editing")
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore

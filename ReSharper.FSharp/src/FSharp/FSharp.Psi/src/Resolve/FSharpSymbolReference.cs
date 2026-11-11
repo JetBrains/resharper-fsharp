@@ -160,8 +160,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       var referenceOwner = GetElement();
       var checkerService = referenceOwner.CheckerService;
 
-      var names = qualified && referenceOwner is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
-        ? qualifiableReferenceOwner.Names
+      var names = qualified && GetQualifiableNameOwner(referenceOwner) is { } qualifiableNameOwner
+        ? qualifiableNameOwner.Names
         : new[] {GetName()};
 
       var symbolUses =
@@ -169,6 +169,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       return FilterSymbols(symbolUses);
     }
+
+    [CanBeNull]
+    private static IFSharpQualifiableReferenceOwner GetQualifiableNameOwner(IFSharpReferenceOwner referenceOwner) =>
+      referenceOwner switch
+      {
+        IFSharpQualifiableReferenceOwner qualifiableReferenceOwner => qualifiableReferenceOwner,
+        INewExpr newExpr => newExpr.TypeName,
+        ITypeInherit typeInherit => typeInherit.TypeName,
+        _ => null
+      };
 
     protected virtual FSharpList<FSharpSymbolUse> FilterSymbols(FSharpList<FSharpSymbolUse> symbols) =>
       symbols.GetSlice(null, 0);

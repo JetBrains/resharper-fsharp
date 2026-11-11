@@ -40,7 +40,7 @@ type private CommonStrings = JetBrains.ReSharper.Intentions.Resources.Strings
 type FSharpExtensionMemberImportUtil() =
     inherit ExtensionMemberImportUtilBase()
 
-    override this.CollectApplicableCandidates(applicableCandidates, reference, acceptableErrorTypes) =
+    override this.CollectApplicableCandidates(applicableCandidates, reference, _) =
         let refExpr = reference.GetTreeNode().As<IReferenceExpr>()
         if isNull refExpr then () else
 
@@ -81,10 +81,13 @@ type FSharpImportModuleMemberAction(typeElement: ITypeElement, reference: FSharp
 
     override this.Bind() =
         let referenceOwner = reference.GetElement()
+        let moduleToOpen = getModuleToOpenFromContainingType typeElement
+        let openedModulesProvider = OpenedModulesProvider(referenceOwner)
 
-        let moduleToImport = ModuleToImport.DeclaredElement(getModuleToOpenFromContainingType typeElement)
-        addOpen (referenceOwner.GetDocumentStartOffset()) referenceOwner.FSharpFile moduleToImport
-        reference.SetRequiredQualifiersForContainingType(typeElement, referenceOwner)
+        if FSharpImportUtil.isTypeOrNsInScope openedModulesProvider moduleToOpen then
+            reference.SetRequiredQualifiersForContainingType(typeElement, referenceOwner)
+        else
+            FSharpBindUtil.bindModuleMemberToReference reference typeElement
 
 
 [<AbstractClass>]
@@ -168,7 +171,7 @@ type FSharpImportModuleMemberFix(reference: IReference) =
                 | _ -> Seq.empty
 
             if names |> Seq.exists (fun names -> SharedImplUtil.HasMemberWithName(names, name, false)) then
-                if openedScopes.Contains(typeElement, referenceOwner) then () else
+                if FSharpImportUtil.isTypeOrNsInScope openedScopes typeElement then () else
 
                 if FSharpResolveUtil.canReference reference typeElement then
                     result.Add(typeElement) |> ignore

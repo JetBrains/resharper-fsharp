@@ -9,12 +9,9 @@ open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -125,10 +122,8 @@ type FSharpQuickFixUtilComponent() =
         let referenceOwner = reference.GetElement()
         use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
 
-        reference.SetRequiredQualifiers(typeElement, referenceOwner)
-        if FSharpResolveUtil.resolvesToQualified typeElement reference false FcsOpName then reference else
-
-        addOpens reference typeElement
+        FSharpBindUtil.bindDeclaredElementToReference referenceOwner reference typeElement FcsOpName
+        reference
 
     interface IFSharpQuickFixUtilComponent with
         member x.BindTo(reference, typeElement, _, _) =

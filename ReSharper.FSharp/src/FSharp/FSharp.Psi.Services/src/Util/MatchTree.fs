@@ -437,7 +437,8 @@ module MatchNode =
           Factory: IFSharpElementFactory
           IdentifierPattern: IReferencePat
           CachedPatterns: IDictionary<string, IFSharpPattern>
-          SeenTypes: ISet<FSharpEntity> }
+          OpenedModulesProvider: Lazy<OpenedModulesProvider>
+          ModulesToOpen: ISet<IClrDeclaredElement> }
 
         static member Create(context: ITreeNode) =
             let factory = context.CreateElementFactory()
@@ -445,7 +446,8 @@ module MatchNode =
               Factory = factory
               IdentifierPattern = factory.CreatePattern("a", false) :?> IReferencePat
               CachedPatterns = Dictionary()
-              SeenTypes = HashSet() }
+              OpenedModulesProvider = lazy OpenedModulesProvider(context)
+              ModulesToOpen = HashSet() }
 
 
     let bind (context: BindContext) (usedNames: ISet<string>) (oldPat: IFSharpPattern) (node: MatchNode) =
@@ -459,8 +461,10 @@ module MatchNode =
                 .GetOrCreateValue(text, fun text -> context.Factory.CreatePattern(text, false))
                 .Copy((*context.Context*))
 
-        let markSeenType (fcsEntity: FSharpEntity) =
-            context.SeenTypes.Add(fcsEntity) |> ignore
+        let bindFcsSymbol reference (fcsSymbol: FSharpSymbol) =
+            let openedModulesProvider = context.OpenedModulesProvider.Value
+            FSharpBindUtil.bindFcsSymbolToReferenceAndGetModuleToOpen openedModulesProvider reference fcsSymbol
+            |> Option.iter (context.ModulesToOpen.Add >> ignore)
 
         let rec bind (context: ITreeNode) (usedNames: ISet<string>) (oldPat: IFSharpPattern) (node: MatchNode) =
             let replaceWithPattern existingPattern (newPat: IFSharpPattern) =
@@ -513,14 +517,9 @@ module MatchNode =
                 replaceTuplePat oldPat nodes
 
             | MatchTest.Union _, [{ Value = { Type = MatchType.UnionCase(unionCase, _) } } as casNode] ->
-                match node.Value.Type with
-                | MatchType.Union unionInstance ->
-                    markSeenType unionInstance.Entity
-                | _ -> ()
-
                 let patText = if not unionCase.HasFields then unionCase.Name else $"{unionCase.Name} _"
                 let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                FSharpBindUtil.bindFcsSymbolToReference context pat.ReferenceName.Reference unionCase "get pattern"
+                bindFcsSymbol pat.ReferenceName.Reference unionCase
 
                 if not unionCase.HasFields then () else
 
@@ -546,11 +545,7 @@ module MatchNode =
                     let field, _ = fields |> Array.find (snd >> ((=) constantValue))
                     let patText = field.DisplayNameCore
                     let pat = createPattern patText |> replaceWithPattern oldPat :?> IReferenceNameOwnerPat
-                    FSharpBindUtil.bindFcsSymbolToReference pat pat.ReferenceName.Reference field "get pattern"
-                    match node.Value.Type with
-                    | MatchType.Enum(enumEntity, _) ->
-                        markSeenType enumEntity
-                    | _ -> ()
+                    bindFcsSymbol pat.ReferenceName.Reference field
 
                 | valueType -> failwith $"Unexpected value type: {valueType}"
 
@@ -1275,33 +1270,12 @@ let generateClauses (matchExpr: IMatchLikeExpr) value nodes deconstructions =
 
     moveCommentsAndWhitespaceInside matchExpr
 
-    let tempMatchClause = ModificationUtil.AddChild(matchExpr, bindContext.Factory.CreateMatchClause())
-    tempMatchClause.AddLineBreakBefore() |> ignore
-
-    for fcsEntity in bindContext.SeenTypes do
-        let case: FSharpSymbol option = 
-            if fcsEntity.IsFSharpUnion then
-                fcsEntity.UnionCases
-                |> Seq.tryHead
-                |> Option.map (fun case -> case :> FSharpSymbol)
-            elif fcsEntity.IsEnum then
-                fcsEntity.FSharpFields
-                |> Seq.tryFind (fun fcsField -> fcsField.LiteralValue.IsSome)
-                |> Option.map (fun case -> case :> FSharpSymbol)
-            else
-                None
-
-        case
-        |> Option.iter (fun fcsSymbol ->
-            FSharpBindUtil.bindFcsSymbol tempMatchClause.Pattern fcsSymbol "get pattern" |> ignore
-        )
-
-    let templClauseRange = TreeRange(tempMatchClause)
     for clause in sandBoxMatchExpr.ClausesEnumerable do
         let matchClause = ModificationUtil.AddChild(matchExpr, clause)
         matchClause.AddLineBreakBefore() |> ignore
 
-    ModificationUtil.DeleteChild(tempMatchClause)
+    for moduleToOpen in bindContext.ModulesToOpen do
+        addOpen matchExpr moduleToOpen
 
 
 let markTopLevelDeconstructions (deconstructions: Deconstructions) (value: MatchValue) =

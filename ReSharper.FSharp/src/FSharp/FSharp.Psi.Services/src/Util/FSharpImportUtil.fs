@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
-let private isTypeOrNsInScope (openedModulesProvider: OpenedModulesProvider) (declaredElement: IClrDeclaredElement) =
+let isTypeOrNsInScope (openedModulesProvider: OpenedModulesProvider) (declaredElement: IClrDeclaredElement) =
     let name = getClrName declaredElement
     let scopes = openedModulesProvider.OpenedModuleScopes.GetValuesSafe(name)
     OpenScope.inAnyScope openedModulesProvider.Context scopes
