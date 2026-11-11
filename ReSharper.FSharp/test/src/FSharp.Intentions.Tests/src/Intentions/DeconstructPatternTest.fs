@@ -6,6 +6,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -70,6 +71,11 @@ type DeconstructPatternTest() =
     [<Test>] member x.``Union case - Single - Rqa 02 - Import``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Rqa 03 - Rqa module``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Rqa 04 - Escaped``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Union case - Single - Prefer qualified 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Union case - Single - Prefer qualified 02 - Rqa``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Used 01``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Used 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Union case - Single - Used 03``() = x.DoNamedTest()

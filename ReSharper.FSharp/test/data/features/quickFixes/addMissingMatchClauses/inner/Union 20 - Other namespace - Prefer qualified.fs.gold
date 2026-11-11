@@ -1,0 +1,14 @@
+﻿namespace Ns1
+
+type U =
+    | A
+    | B
+    | C
+
+namespace Ns2
+
+module Module =    
+    match Ns1.U.A with
+    | Ns1.U.A -> ()
+    | Ns1.B -> {selstart}failwith "todo"{selend}
+    | Ns1.C -> failwith "todo"

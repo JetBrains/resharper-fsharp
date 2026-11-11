@@ -259,6 +259,11 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Same project 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Same project 02 - Disabled import``() = x.DoNamedTest()
 
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Import - Prefer qualified 01 - Type``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Import - Prefer qualified 02 - Union case``() = x.DoNamedTest()
+
     [<Test>] member x.``Import - Same ns 01``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 02``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 03``() = x.DoTestFiles("File1.fs", "File2.fs")

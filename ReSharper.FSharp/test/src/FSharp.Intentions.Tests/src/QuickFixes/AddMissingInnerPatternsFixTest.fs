@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -23,6 +25,9 @@ type AddMissingInnerPatternsFixTest() =
     [<Test>] member x.``Enum 03 - Duplicate field``() = x.DoNamedTest()
     [<Test>] member x.``Enum 04 - Unnamed``() = x.DoNamedTest()
     [<Test>] member x.``Enum 05 - Rqa module``() = x.DoNamedTest()
+    [<Test>] member x.``Enum 06 - Opened namespace``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Enum 07 - Opened namespace - Prefer qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``List 01``() = x.DoNamedTest()
     [<Test>] member x.``List 02``() = x.DoNamedTest()
@@ -68,6 +73,12 @@ type AddMissingInnerPatternsFixTest() =
     [<Test>] member x.``Union 17``() = x.DoNamedTest()
     [<Test>] member x.``Union 18``() = x.DoNamedTest()
     [<Test>] member x.``Union 19``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Union 20 - Other namespace - Prefer qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Union 21 - Opened namespace``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Union 22 - Opened namespace - Prefer qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Union 23 - Opened nested module``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

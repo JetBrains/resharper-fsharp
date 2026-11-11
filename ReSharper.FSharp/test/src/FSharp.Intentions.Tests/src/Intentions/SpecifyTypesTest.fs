@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -93,6 +94,10 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Import types - Anon record 02 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Anon record 03 - Nested record``() = x.DoNamedTest()
     [<Test>] member x.``Import types - RQA 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Import types - Prefer qualified 01``() = x.DoNamedTest()
+    [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
+    [<Test>] member x.``Import types - Prefer qualified 02 - RQA``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Single open 01``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Single open 02 - Full signature``() = x.DoNamedTest()
     [<Test>] member x.``Import types - Composite type 01``() = x.DoNamedTest()

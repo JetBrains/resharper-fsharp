@@ -1,0 +1,10 @@
+﻿module Top
+
+module Nested =
+    type System.String with
+        member this.Prop = ()
+
+open Nested
+
+let Prop = ""
+Prop.Prop{caret}

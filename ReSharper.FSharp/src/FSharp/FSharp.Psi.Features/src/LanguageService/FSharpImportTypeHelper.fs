@@ -93,10 +93,9 @@ type FSharpImportTypeHelper() =
                             not (psiModule.References(typeElement.Module)) then
                         true else
 
-                    let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)
-                    let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToImport
-                    let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
-                    let names = qualifiedElementList |> List.map (fun el -> el.GetSourceName())
+                    let moduleDecl, _ = findModuleToInsertTo fsFile referenceStartOffset settings moduleToOpen
+                    let elementsToOpen = getQualifiedElementsToOpen moduleDecl true moduleToOpen
+                    let names = elementsToOpen |> List.map _.GetSourceName()
 
                     let autoOpenedModules = fsAssemblyAutoOpenCache.GetAutoOpenedModules(typeElement.Module)
                     if autoOpenedModules.Count > 0 && autoOpenedModules.Contains(String.concat "." names) then false else

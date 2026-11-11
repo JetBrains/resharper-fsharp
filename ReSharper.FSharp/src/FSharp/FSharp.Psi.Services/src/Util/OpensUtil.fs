@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -20,7 +19,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -58,52 +56,27 @@ let getQualifiedName (element: IClrDeclaredElement) =
     |> String.concat "."
 
 
-[<RequireQualifiedAccess>]
-type ModuleToImport =
-    | DeclaredElement of element: IClrDeclaredElement
+let getQualifiedElementsToOpen (moduleDeclaration: IModuleLikeDeclaration) skipNamespaces
+        (moduleToOpen: IClrDeclaredElement) =
+    let declElement = moduleDeclaration.DeclaredElement
+    if (moduleToOpen :? INamespace && moduleToOpen.Equals(declElement)) then [] else
 
-    /// FCS-provided namespace to import that uses the previous import logic,
-    /// will be removed when remaining cases are moved to use declared elements.
-    | FullName of string
+    let elements = toQualifiedList moduleToOpen
+    if not skipNamespaces && not (moduleDeclaration :? IModuleDeclaration) then elements else
 
-    member this.GetQualifiedElementList(moduleDeclaration: IModuleLikeDeclaration, skipNamespaces) =
-        match this with
-        | FullName _ -> []
-        | DeclaredElement(element) ->
+    // When importing `Ns.Module.NestedModule` inside `Ns.Module`, skip the parent part.
+    match List.skipWhile (declElement.Equals >> not) elements with
+    | [] ->
+        match declElement with
+        | :? IFSharpModule as fsModule when moduleToOpen.Equals(fsModule.GetContainingNamespace()) -> []
+        | _ -> elements
 
-        let declElement = moduleDeclaration.DeclaredElement
-        if (element :? INamespace && element.Equals(declElement)) then [] else
+    | _ :: skippedElements ->
 
-        let elements = toQualifiedList element
-        if not skipNamespaces && not (moduleDeclaration :? IModuleDeclaration) then elements else
-
-        // When importing `Ns.Module.NestedModule` inside `Ns.Module`, skip the parent part.
-        match List.skipWhile (declElement.Equals >> not) elements with
-        | [] ->
-            match declElement with
-            | :? IFSharpModule as fsModule when element.Equals(fsModule.GetContainingNamespace()) -> []
-            | _ -> elements
-
-        | _ :: skippedElements ->
-
-        // Don't insert `open Ns2.Module` for `Ns1.Ns2.Module`, prefer the full name.
-        match skippedElements with
-        | :? INamespace :: _ -> elements
-        | _ -> skippedElements
-
-    member this.GetNamespace(moduleDeclaration: IModuleLikeDeclaration, insertFullNamespace) =
-        match this with
-        | FullName(ns) -> ns
-        | DeclaredElement element ->
-
-        let namingService = NamingManager.GetNamingLanguageService(moduleDeclaration.Language)
-
-        let elements = this.GetQualifiedElementList(moduleDeclaration, not insertFullNamespace && element :? ITypeElement)
-        elements
-        |> List.map (fun el ->
-            let sourceName = el.GetSourceName()
-            namingService.MangleNameIfNecessary(sourceName))
-        |> String.concat "."
+    // Don't insert `open Ns2.Module` for `Ns1.Ns2.Module`, prefer the full name.
+    match skippedElements with
+    | :? INamespace :: _ -> elements
+    | _ -> skippedElements
 
 
 let getContainingEntity (typeElement: ITypeElement): IClrDeclaredElement =
@@ -125,45 +98,41 @@ and getModuleToOpenFromContainingType (containingType: ITypeElement): IClrDeclar
     else
         getModuleToOpen containingType
 
-let tryGetCommonParentModuleDecl (context: ITreeNode) (moduleToImport: ModuleToImport) =
-    match moduleToImport with
-    | ModuleToImport.DeclaredElement(declaredElement) ->
-        let moduleDecls = 
-            context.ContainingNodes<IModuleLikeDeclaration>(true).ToEnumerable()
-            |> Seq.toList
-            |> List.rev
+let tryGetCommonParentModuleDecl (context: ITreeNode) (moduleToOpen: IClrDeclaredElement) =
+    let moduleDecls =
+        context.ContainingNodes<IModuleLikeDeclaration>(true).ToEnumerable()
+        |> Seq.toList
+        |> List.rev
 
-        let moduleDecls = 
-            match moduleDecls with
-            | :? IGlobalNamespaceDeclaration :: decls -> decls
-            | _ -> moduleDecls
+    let moduleDecls =
+        match moduleDecls with
+        | :? IGlobalNamespaceDeclaration :: decls -> decls
+        | _ -> moduleDecls
 
-        if moduleDecls.IsEmpty then None else
+    if moduleDecls.IsEmpty then None else
 
-        let importModuleQualifiedList = toQualifiedList declaredElement
-        let topLevelDecl = List.head moduleDecls
+    let importModuleQualifiedList = toQualifiedList moduleToOpen
+    let topLevelDecl = List.head moduleDecls
 
-        let commonPrefixImportModuleList =
-            importModuleQualifiedList |> List.skipWhile (fun d -> d.Equals(topLevelDecl.DeclaredElement) |> not)        
+    let commonPrefixImportModuleList =
+        importModuleQualifiedList |> List.skipWhile (fun d -> d.Equals(topLevelDecl.DeclaredElement) |> not)
 
-        if commonPrefixImportModuleList.IsEmpty then None else
+    if commonPrefixImportModuleList.IsEmpty then None else
 
-        let matchingDecls, restDecls = 
-            (commonPrefixImportModuleList, moduleDecls)
-            ||> Seq.zip
-            |> List.ofSeq
-            |> List.partition (fun (element, decl) -> element.Equals(decl.DeclaredElement))
+    let matchingDecls, restDecls =
+        (commonPrefixImportModuleList, moduleDecls)
+        ||> Seq.zip
+        |> List.ofSeq
+        |> List.partition (fun (element, decl) -> element.Equals(decl.DeclaredElement))
 
-        let decl = matchingDecls |> List.last |> snd
-        Some(decl, not restDecls.IsEmpty || commonPrefixImportModuleList.Length > moduleDecls.Length)
-
-    | _ -> None
+    let decl = matchingDecls |> List.last |> snd
+    Some(decl, not restDecls.IsEmpty || commonPrefixImportModuleList.Length > moduleDecls.Length)
 
 let findModuleToInsertTo (fsFile: IFSharpFile) (offset: DocumentOffset) (settings: IContextBoundSettingsStore)
-        (moduleToImport: ModuleToImport): IModuleLikeDeclaration * bool =
+        (moduleToOpen: IClrDeclaredElement): IModuleLikeDeclaration * bool =
 
     let containingModuleDecl = fsFile.GetNode<IModuleLikeDeclaration>(offset)
-    match tryGetCommonParentModuleDecl containingModuleDecl moduleToImport with
+    match tryGetCommonParentModuleDecl containingModuleDecl moduleToOpen with
     | Some(decl, searchAnchor) -> decl, searchAnchor
     | _ ->
 
@@ -212,37 +181,15 @@ let canInsertBefore (openStatement: IOpenStatement) ns =
         not openStatement.IsSystem &&
         ns < openStatement.ReferenceName.QualifiedName
 
-let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (moduleToImport: ModuleToImport) =
-    let elementFactory = fsFile.CreateElementFactory()
+let private tryGetImportContext (context: ITreeNode) (moduleToOpen: IClrDeclaredElement) =
+    let fsFile = context.GetContainingFile() :?> IFSharpFile
+    let settings = fsFile.GetSettingsStoreWithEditorConfig()
 
-    let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
-        moduleMember.OpenChameleon()
-        ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
+    let offset = context.GetDocumentStartOffset()
+    let moduleDecl, searchAnchor = findModuleToInsertTo fsFile offset settings moduleToOpen
+    if isNull moduleDecl then None else // can happen when the node is not in a proper tree, i.e. during generation
 
-    let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
-        anchor.OpenChameleon()
-        ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
-
-    let duplicates (ns: string) (openStatement: IOpenStatement) =
-        let referenceName = openStatement.ReferenceName
-        isNotNull referenceName && referenceName.QualifiedName = ns
-
-    let rec addOpenToOpensGroup (opens: IOpenStatement list) (ns: string) =
-        match opens with
-        | [] -> failwith "Expecting non-empty list"
-        | openStatement :: rest ->
-
-        if canInsertBefore openStatement ns then
-            insertBeforeModuleMember ns openStatement
-        else
-            match rest with
-            | [] -> insertAfterAnchor ns openStatement
-            | _ -> addOpenToOpensGroup rest ns
-
-    let moduleDecl, searchAnchor = findModuleToInsertTo fsFile offset settings moduleToImport
-    if isNull moduleDecl then () else // can happen when the node is not in a proper tree, i.e. during generation
-
-    let qualifiedElementList = moduleToImport.GetQualifiedElementList(moduleDecl, true)
+    let qualifiedElementList = getQualifiedElementsToOpen moduleDecl true moduleToOpen
     let firstModule = qualifiedElementList |> List.tryHead |> Option.toObj
 
     // When the anchor module decl is not found among members, it's likely in a different namespace part.
@@ -269,8 +216,46 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
 
         if skippedMembers.IsEmpty then moduleMembers, true else skippedMembers, false
 
-    let ns = moduleToImport.GetNamespace(moduleDecl, insertFullNamespace)
-    if ns.IsEmpty() then () else
+    let skipNamespaces = not insertFullNamespace && moduleToOpen :? ITypeElement
+    let elementsToOpen = getQualifiedElementsToOpen moduleDecl skipNamespaces moduleToOpen
+    if elementsToOpen.IsEmpty then None else Some(moduleDecl, inScopeModuleMembers, elementsToOpen)
+
+let addOpen (context: ITreeNode) (moduleToOpen: IClrDeclaredElement) =
+    match tryGetImportContext context moduleToOpen with
+    | None -> ()
+    | Some(moduleDecl, inScopeModuleMembers, elementsToOpen) ->
+
+    let ns =
+        elementsToOpen
+        |> List.map (fun el -> FSharpReferenceBindingUtil.SuggestShortReferenceName(el, moduleDecl.Language))
+        |> String.concat "."
+
+    let offset = context.GetDocumentStartOffset()
+    let elementFactory = moduleDecl.CreateElementFactory()
+
+    let insertBeforeModuleMember (ns: string) (moduleMember: IModuleMember) =
+        moduleMember.OpenChameleon()
+        ModificationUtil.AddChildBefore(moduleMember, elementFactory.CreateOpenStatement(ns)) |> ignore
+
+    let insertAfterAnchor (ns: string) (anchor: ITreeNode) =
+        anchor.OpenChameleon()
+        ModificationUtil.AddChildAfter(anchor, elementFactory.CreateOpenStatement(ns)) |> ignore
+
+    let duplicates (ns: string) (openStatement: IOpenStatement) =
+        let referenceName = openStatement.ReferenceName
+        isNotNull referenceName && referenceName.QualifiedName = ns
+
+    let rec addOpenToOpensGroup (opens: IOpenStatement list) (ns: string) =
+        match opens with
+        | [] -> failwith "Expecting non-empty list"
+        | openStatement :: rest ->
+
+        if canInsertBefore openStatement ns then
+            insertBeforeModuleMember ns openStatement
+        else
+            match rest with
+            | [] -> insertAfterAnchor ns openStatement
+            | _ -> addOpenToOpensGroup rest ns
 
     match tryGetFirstOpensGroup inScopeModuleMembers with
     | Some opens ->
@@ -280,7 +265,7 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
     | _ ->
 
     match moduleDecl with
-    | :? IAnonModuleDeclaration when (fsFile.GetPsiModule() :? SandboxPsiModule) ->
+    | :? IAnonModuleDeclaration when (moduleDecl.GetPsiModule() :? SandboxPsiModule) ->
         inScopeModuleMembers
         |> Seq.skipWhile (fun m -> not (m :? IDoLikeStatement)) // todo: check this
         |> Seq.tail
@@ -311,26 +296,17 @@ let addOpenWithSettings (offset: DocumentOffset) (fsFile: IFSharpFile) (settings
 
     insertAfterAnchor ns anchor
 
-let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (moduleToImport: ModuleToImport) =
-    let settings = fsFile.GetSettingsStoreWithEditorConfig()
-    addOpenWithSettings offset fsFile settings moduleToImport
+let tryGetElementsToOpen (context: ITreeNode) (moduleToOpen: IClrDeclaredElement) =
+    tryGetImportContext context moduleToOpen
+    |> Option.map (fun (_, _, elementsToOpen) -> elementsToOpen)
 
-let addOpens (reference: FSharpSymbolReference) (declaredElement: IClrDeclaredElement) =
+let tryGetModuleToOpen (declaredElement: IClrDeclaredElement) =
     let containingType = declaredElement.GetContainingType()
-    if isNotNull containingType && containingType.IsAutoImported() then reference else
-
-    let referenceOwner = reference.GetElement()
-    use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+    if isNotNull containingType && containingType.IsAutoImported() then None else
 
     let moduleToOpen = getModuleToOpen declaredElement
-    let fsFile = referenceOwner.FSharpFile
-
     let qualifiedModuleToOpen = toQualifiedList moduleToOpen
-    if qualifiedModuleToOpen.IsEmpty then reference else
-
-    let moduleToImport = ModuleToImport.DeclaredElement(moduleToOpen)
-    addOpen (referenceOwner.GetDocumentStartOffset()) fsFile moduleToImport
-    reference
+    if qualifiedModuleToOpen.IsEmpty then None else Some moduleToOpen
 
 let getContainingModules (treeNode: ITreeNode) =
     treeNode.ContainingNodes<IModuleLikeDeclaration>().ToEnumerable()
@@ -470,23 +446,5 @@ type OpenedModulesProvider(context: ITreeNode) =
 
     member x.Context = context
     member x.OpenedModuleScopes = map
-
-    member this.Contains(declaredElement: IClrDeclaredElement, context: ITreeNode) =
-        let qualifiedName =
-            match declaredElement with
-            | :? INamespace as ns -> ValueSome ns.QualifiedName
-            | :? IFSharpModule as fsModule -> ValueSome fsModule.QualifiedSourceName
-            | _ ->
-
-            match declaredElement.GetContainingType() with
-            | :? IFSharpModule as fsModule -> ValueSome (fsModule.QualifiedSourceName + "." + declaredElement.GetSourceName())
-            | _ -> ValueNone
-
-        match qualifiedName with
-        | ValueNone -> false
-        | ValueSome qualifiedName ->
-
-        map.GetValuesSafe(qualifiedName)
-        |> OpenScope.inAnyScope context
 
 let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")

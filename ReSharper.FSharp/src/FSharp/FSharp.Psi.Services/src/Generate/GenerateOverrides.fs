@@ -382,7 +382,10 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
     let fcsEntity = getFcsEntity fcsSymbolUse
 
     let ownMembersXmlDocIds = getMemberXmlDocIds typeElement |> HashSet
-    let memberInstances = getOverridableMemberIds typeElement fcsEntity psiModule |> dict
+    let memberInstances =
+        getOverridableMemberIds typeElement fcsEntity psiModule
+        |> Seq.mapi (fun declarationIndex (xmlDocId, memberInstance) -> xmlDocId, (declarationIndex, memberInstance))
+        |> dict
 
     let baseFcsTypes = getBaseTypes isObjExpr fcsEntity fcsSymbolUse
 
@@ -412,10 +415,10 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
                 | _ -> state
 
             alreadyOverriden[overridableMemberInstance] <- state
-            
+
     let inline hasImplGetter (state: PropertyOverrideState) =
         state &&& PropertyOverrideState.Getter <> enum 0
-        
+
     let inline hasImplSetter (state: PropertyOverrideState) =
         state &&& PropertyOverrideState.Setter <> enum 0
 
@@ -430,30 +433,31 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
         (not prop.IsReadable || hasImplGetter state) &&
         (not prop.IsWritable || hasImplSetter state)
 
-    for KeyValue(_, memberInstance) in memberInstances do
+    for KeyValue(_, (_, memberInstance)) in memberInstances do
         let fsTypeMember = memberInstance.Member.As<IFSharpTypeMember>()
         if isNull fsTypeMember || fsTypeMember.IsVisibleFromFSharp then
             addOverrides memberInstance
 
     let allOverridableMemberInstances =
         baseFcsMembers |> List.collect (fun (_, mfvInstances) ->
-            mfvInstances |> List.choose (fun mfvInstance ->
-                let mfv = mfvInstance.Mfv
-                if mfv.IsAccessor() then None else
+            mfvInstances
+            |> List.choose (fun mfvInstance ->
+                if mfvInstance.Mfv.IsAccessor() then None else
 
                 let xmlDocId = getMfvXmlDocId mfvInstance psiModule
-
-                let mutable memberInstance = Unchecked.defaultof<_>
-                if not (memberInstances.TryGetValue(xmlDocId, &memberInstance)) then None else
-
+                match memberInstances.TryGetValue(xmlDocId) with
+                | true, (declarationIndex, memberInstance) -> Some(declarationIndex, xmlDocId, memberInstance, mfvInstance)
+                | _ -> None
+            )
+            |> List.sortBy (fun (declarationIndex, _, _, _) -> declarationIndex)
+            |> List.map (fun (_, xmlDocId, memberInstance, mfvInstance) ->
                 let isAvailable =
                     not (ownMembersXmlDocIds.Contains(xmlDocId)) &&
                     not (isOverridden memberInstance)
 
                 addOverrides memberInstance
-                Some (memberInstance.Member, mfvInstance, isAvailable)
+                memberInstance.Member, mfvInstance, isAvailable
             )
-            |> Seq.toList
         )
 
     let overridableMemberInstances =
@@ -473,7 +477,7 @@ let getOverridableMembersForType (typeElement: ITypeElement) (fcsSymbolUse: FSha
         let mfv = mfvInstance.Mfv
         let prop = m.As<IProperty>()
         if isNull prop || not (mfv.IsNonCliEventProperty()) then [i] else
-        
+
         let state =
             match alreadyOverriden.TryGetValue(OverridableMemberInstance(prop :> IOverridableMember)) with
             | true, state -> state

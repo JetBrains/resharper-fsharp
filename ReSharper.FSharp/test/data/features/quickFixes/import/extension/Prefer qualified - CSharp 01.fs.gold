@@ -1,0 +1,5 @@
+﻿module Module
+
+open CSharpLib
+
+"".{caret}M()
