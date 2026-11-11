@@ -122,6 +122,8 @@ type ImportModuleMemberRule() =
             | Some ns when shouldIgnore ns -> ()
             | Some ns ->
 
+            if openedModulesProvider.IsExcludedFromImport(typeElement) then () else
+
             let members =
                 let addIcon icon names =
                     names |> Array.map (fun name -> name, icon)

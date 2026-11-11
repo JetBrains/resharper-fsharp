@@ -11,6 +11,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
+open JetBrains.ReSharper.Psi.CSharp
+open JetBrains.ReSharper.Psi.ImportType
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -88,6 +90,9 @@ type ImportTypeTest() =
     [<Test>] member x.``Prefer qualified - Qualifiers 01 - Nested``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
     [<Test>] member x.``Prefer qualified - Type extension 01``() = x.DoNamedTest()
+
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "FullyQualifiedImports", "System.String", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Fully qualified - Type 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available 01 - Open``() = x.DoNamedTest()
 
@@ -294,6 +299,12 @@ type FSharpImportModuleMemberTest() =
     [<Test>] member x.``Prefer qualified - Expr - Union 02 - Rqa - Opened nested module``() = x.DoNamedTest()
     [<TestSetting(typeof<FSharpOptions>, "PreferQualifiedReference", "true")>]
     [<Test>] member x.``Prefer qualified - Pattern - Literal 01``() = x.DoNamedTest()
+
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "FullyQualifiedImports", "Ns1.Top", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Fully qualified - Expr - Value 01``() = x.DoNamedTest()
+
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "Ns1.*", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Excluded - Expr - Value 01``() = x.DoNamedTest()
 
     [<Test; Explicit>] member x.``Not available - Internal 01 - Literal``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Not available - Internal 02 - Value``() = x.DoNamedTest()

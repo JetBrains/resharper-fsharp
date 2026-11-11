@@ -172,6 +172,7 @@ type FSharpImportModuleMemberFix(reference: IReference) =
 
             if names |> Seq.exists (fun names -> SharedImplUtil.HasMemberWithName(names, name, false)) then
                 if FSharpImportUtil.isTypeOrNsInScope openedScopes typeElement then () else
+                if openedScopes.IsExcludedFromImport(typeElement) then () else
 
                 if FSharpResolveUtil.canReference reference typeElement then
                     result.Add(typeElement) |> ignore

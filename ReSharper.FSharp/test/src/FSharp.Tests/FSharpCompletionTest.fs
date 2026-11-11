@@ -13,6 +13,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion.Rules
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Psi.CSharp
+open JetBrains.ReSharper.Psi.ImportType
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -716,6 +718,17 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Import - Type - Opened namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 08 - Empty module``() = x.DoTestFiles("File1.fs", "File2.fs")
+
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "Ns1.*", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import - Excluded 01 - Type``() = x.DoNamedTest()
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "Ns1.*", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import - Excluded 02 - Module member``() = x.DoNamedTest()
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "Ns1.*", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import - Excluded 03 - Extension member``() = x.DoNamedTest()
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "System.String.Empty", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import - Excluded 04 - Static member``() = x.DoNamedTest()
+    [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "System.String", true, CSharpLanguage.Name)>]
+    [<Test>] member x.``Import - Excluded 05 - Static member - Type``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Union case - Opened module 01``() = x.DoNamedTest()
     [<Test>] member x.``Import - Union case - Opened module 02 - Nested``() = x.DoNamedTest()

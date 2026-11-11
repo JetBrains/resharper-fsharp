@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files.SandboxFiles
+open JetBrains.ReSharper.Psi.ImportType
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -350,6 +351,7 @@ module OpenScope =
 
 type OpenedModulesProvider(context: ITreeNode) =
     let map = OneToListMap<string, OpenScope>()
+    let canImport = ImportFilteringUtil.GetImportFilteringPredicate(context)
 
     let autoOpenCache = context.GetSolution().GetComponent<FSharpAutoOpenCache>()
     let fsFile = context.GetContainingFileThroughSandBox() :?> IFSharpFile
@@ -446,5 +448,8 @@ type OpenedModulesProvider(context: ITreeNode) =
 
     member x.Context = context
     member x.OpenedModuleScopes = map
+
+    member x.IsExcludedFromImport(declaredElement: IDeclaredElement) =
+        not (canImport.Invoke(declaredElement))
 
 let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")

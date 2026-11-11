@@ -1,0 +1,15 @@
+﻿Completion: Basic
+Count: 1 (filtered)
+Focus: Soft
+Rules: [\w] => add_to_prefix
+Range: "i.♦"
+
+##### RELEVANCE SORT #####
+
+                            [ImportedType, NormalSelectionPriority, FromFullEvaluation, Other]
+Method |(in Ns2.Module)
+
+##### ALPHABETIC SORT #####
+
+                            [Full, Generic]
+Method |(in Ns2.Module)
