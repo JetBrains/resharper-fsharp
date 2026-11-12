@@ -108,7 +108,7 @@ module OverrideMemberRule =
         match typeDecl with
         | :? IObjExpr as objExpr when not(objExpr.Contains(impl)) -> null
         | _ -> impl
- 
+
     let getMemberOwner (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) : ITreeNode =
         let anchor = generatorContext.Anchor
 
