@@ -223,14 +223,7 @@ type FSharpOverridingMembersBuilder() =
 
         let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment anchor
 
-        let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
-
-        let inputElements =
-            if missingMembersOnly then context.InputElements |> Seq.cast<FSharpGeneratorElement> else
-
-            context.InputElements
-            |> Seq.cast<FSharpGeneratorElement>
-            |> GenerateOverrides.sanitizeMembers
+        let inputElements = context.InputElements |> Seq.cast<FSharpGeneratorElement>
 
         let addedMembers = GenerateOverrides.addMembers inputElements typeDecl anchor
         let expr = GenerateOverrides.getGeneratedBodyToSelect addedMembers

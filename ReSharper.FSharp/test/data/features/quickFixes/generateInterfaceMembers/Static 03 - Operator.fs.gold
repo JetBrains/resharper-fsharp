@@ -1,0 +1,12 @@
+﻿module Module
+
+type I<'T when 'T :> I<'T>> =
+    static abstract P: int
+    static abstract (+): 'T * 'T -> 'T
+    abstract M: unit -> unit
+
+type T() =
+    interface I<T> with
+        static member P = {selstart}failwith "todo"{selend}
+        static member ( + )(var0, var1) = failwith "todo"
+        member this.M() = failwith "todo"

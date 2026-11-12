@@ -250,7 +250,6 @@ module OverrideMemberRule =
 
     let getOverridableElements (generatorContext: FSharpGeneratorContext) =
         GenerateOverrides.getOverridableMembers false generatorContext.TypeDeclaration
-        |> GenerateOverrides.sanitizeMembers
 
     let createOverrideLookupItem (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) (generatorElement: FSharpGeneratorElement)
             (mayHaveBaseCalls: bool) =

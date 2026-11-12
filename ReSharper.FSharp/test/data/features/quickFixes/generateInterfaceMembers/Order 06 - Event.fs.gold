@@ -1,0 +1,18 @@
+﻿module Module
+
+type I =
+    abstract P2: int
+    [<CLIEvent>]
+    abstract E: IEvent<System.EventHandler, System.EventArgs>
+    abstract M: unit -> unit
+    abstract P1: int
+
+type T() =
+    interface I with
+        member this.P2 = {selstart}failwith "todo"{selend}
+
+        [<CLIEvent>]
+        member this.E = failwith "todo"
+
+        member this.M() = failwith "todo"
+        member this.P1 = failwith "todo"

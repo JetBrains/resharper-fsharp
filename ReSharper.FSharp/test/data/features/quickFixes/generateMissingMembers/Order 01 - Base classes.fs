@@ -1,0 +1,14 @@
+[<AbstractClass>]
+type A() =
+    abstract P3: int
+    abstract P1: int
+
+[<AbstractClass>]
+type B() =
+    inherit A()
+
+    abstract P4: int
+    abstract P2: int
+
+type C{caret}() =
+    inherit B()
