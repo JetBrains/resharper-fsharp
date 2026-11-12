@@ -1,0 +1,36 @@
+﻿module Module
+
+let f
+    (a: int) =
+    ()
+
+let g
+    (
+        a: int
+    ) =
+    ()
+
+let h { A = a
+        B = b } =
+    ()
+
+do
+    let f (
+        a: int
+    ) =
+        ()
+
+    let g (a: int,
+           b: int) =
+        ()
+
+    let h
+        (a: int) =
+        ()
+
+    fun (a,
+         b) -> ()
+
+    match a with
+    | { A = a
+        B = b } -> ()

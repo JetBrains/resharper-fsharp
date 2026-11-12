@@ -1,0 +1,5 @@
+﻿module Module
+
+open System.IO
+
+new Memory{caret}Stream() |> ignore

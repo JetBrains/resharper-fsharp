@@ -1,0 +1,31 @@
+module Module
+
+type T(
+    a: int,
+    b: int
+) =
+    member x.M(
+        a: int,
+        b: int
+    ) =
+        ()
+
+    member x.N(a: int,
+               b: int) =
+        ()
+
+let f (
+    a: int
+) =
+    ()
+
+[<A(
+    1
+)>]
+let x = 1
+
+type U() =
+    inherit T(
+        1,
+        2
+    )

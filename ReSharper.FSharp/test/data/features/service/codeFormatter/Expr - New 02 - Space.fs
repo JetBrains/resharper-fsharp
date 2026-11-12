@@ -1,0 +1,15 @@
+module Module
+
+do
+    new T(a)
+
+    new T (a)
+
+    new T()
+
+    new T ()
+
+    new T 1
+
+    new T
+        (a)

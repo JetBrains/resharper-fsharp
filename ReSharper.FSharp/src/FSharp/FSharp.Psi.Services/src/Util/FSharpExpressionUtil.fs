@@ -217,6 +217,9 @@ let isOperatorReferenceExpr (expr: IFSharpExpression) =
     name <> SharedImplUtil.MISSING_DECLARATION_NAME &&
     PrettyNaming.IsOperatorDisplayName name
 
+let isParenOrUnitExpr (node: ITreeNode) =
+    node :? IParenExpr || node :? IUnitExpr
+
 let isPipeOpApp (binaryAppExpr: IBinaryAppExpr) =
     isPredefinedInfixOpApp "|>" binaryAppExpr ||
     isPredefinedInfixOpApp "||>" binaryAppExpr ||

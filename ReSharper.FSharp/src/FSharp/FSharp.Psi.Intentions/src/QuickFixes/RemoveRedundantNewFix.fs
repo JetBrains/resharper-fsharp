@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -21,7 +22,7 @@ type RemoveRedundantNewFix(warning: RedundantNewWarning) =
         let refExpr = factory.AsReferenceExpr(newExpr.TypeName)
 
         let argExpr = newExpr.ArgumentExpression
-        let addSpace = not (argExpr :? IParenExpr || argExpr :? IUnitExpr)
+        let addSpace = not (isParenOrUnitExpr argExpr)
 
         // todo: convert referenceName, copy other children from original node
         let appExpr = factory.CreateAppExpr(refExpr, argExpr, addSpace)

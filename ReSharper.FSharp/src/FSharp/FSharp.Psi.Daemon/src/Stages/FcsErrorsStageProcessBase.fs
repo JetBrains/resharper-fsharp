@@ -87,6 +87,7 @@ module FSharpErrors =
     let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] ObjectOfIndeterminateTypeUsedRequireTypeConstraint = 752
     let [<Literal>] AbstractTypeCannotBeInstantiated = 759
+    let [<Literal>] IDisposableTypeShouldUseNew = 760
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] InvalidUseOfTypeName = 800
@@ -523,6 +524,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | AbstractTypeCannotBeInstantiated ->
             createHighlightingFromNodeWithMessage AbstractTypeCannotBeInstantiatedError range error
+
+        | IDisposableTypeShouldUseNew ->
+            createHighlightingFromNodeWithMessage IDisposableTypeShouldUseNewWarning range error
 
         | FieldRequiresAssignment ->
             createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error

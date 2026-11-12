@@ -1,0 +1,53 @@
+module Module
+
+type T(a: int,
+       b: int) =
+    new (
+        a: int
+    ) =
+        T(a, 1)
+
+    static member M(
+        a: int
+    ): int =
+        1
+
+    member x.N
+        (
+            a: int
+        ) =
+        ()
+
+    abstract P: int
+
+type T
+    (
+        a: int
+    ) =
+    class end
+
+let f (a: int,
+       b: int) =
+    ()
+
+let g a (
+    b: int
+) =
+    ()
+
+do
+    match a with
+    | A(
+          b,
+          c
+      ) -> ()
+    | A(b,
+        c) -> ()
+    | A(
+          x = b;
+          y = c
+      ) -> ()
+
+[<A(1,
+    2)>]
+let x = 1

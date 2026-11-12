@@ -14,6 +14,10 @@ type FSharpCodeFormatterTest() =
 
     override x.RelativeTestDataPath = "features/service/codeFormatter"
 
+    [<Test>] member x.``Declaration - Paren 01``() = x.DoNamedTest()
+    [<Test>] member x.``Declaration - Paren 02``() = x.DoNamedTest()
+    [<Test>] member x.``Declaration - Paren 03 - Bindings``() = x.DoNamedTest()
+
     [<Test>] member x.``Directive - Nowarn 01``() = x.DoNamedTest()
     [<Test>] member x.``Directive - Nowarn 02``() = x.DoNamedTest()
     [<Test>] member x.``Directive - Nowarn 03``() = x.DoNamedTest()
@@ -24,6 +28,7 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - App - CompExpr 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Nested 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Nested 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Paren 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 03``() = x.DoNamedTest()
@@ -37,11 +42,15 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 02 - Last clause expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - New 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - New 02 - Space``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Obj 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Obj 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Obj 03 - Interface``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Obj 04 - Interface``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Op - Deref 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Paren 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Paren 02 - Context``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref 02 - Invocation``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Ref 04``() = x.DoNamedTest()

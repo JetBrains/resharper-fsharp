@@ -1,0 +1,29 @@
+module Module
+
+do
+    (
+        a
+    )
+
+    (a,
+     b)
+
+    (
+        a,
+        b
+    )
+
+    (a
+     |> f)
+
+    (fun x ->
+        x)
+
+    (
+        a
+    )
+    |> f
+
+    (f(
+        a
+    )).P

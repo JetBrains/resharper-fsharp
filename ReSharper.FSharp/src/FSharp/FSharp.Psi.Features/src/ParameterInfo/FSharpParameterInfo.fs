@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Feature.Services.ParameterInfo.Sorting
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpResolveUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DocComments
@@ -866,7 +867,7 @@ type FSharpParameterInfoContextBase<'TNode when 'TNode :> IFSharpTreeNode>(caret
                 argGroupsLength = 1 &&
 
                 let expr = argGroups[0].Node
-                (expr :? IParenExpr || expr :? IUnitExpr) &&
+                isParenOrUnitExpr expr &&
 
                 candidatesLazy.Value
                 |> Array.forall (function

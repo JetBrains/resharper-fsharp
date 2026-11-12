@@ -134,6 +134,7 @@
     <Compile Include="src\QuickFixes\UpdateRecordFieldTypeInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\RemovePatternArgumentFixTest.fs" />
     <Compile Include="src\QuickFixes\AddMissingSeqFixTest.fs" />
+    <Compile Include="src\QuickFixes\AddMissingNewFixTest.fs" />
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxTest.fs" />

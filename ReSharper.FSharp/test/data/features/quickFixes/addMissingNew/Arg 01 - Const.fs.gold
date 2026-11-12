@@ -1,0 +1,5 @@
+﻿module Module
+
+open System.IO
+
+let stream = new Memory{caret}Stream(1)
