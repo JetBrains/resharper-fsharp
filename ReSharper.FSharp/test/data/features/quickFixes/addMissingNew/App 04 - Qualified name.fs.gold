@@ -1,0 +1,3 @@
+﻿module Module
+
+let stream = new System.IO.Memory{caret}Stream()

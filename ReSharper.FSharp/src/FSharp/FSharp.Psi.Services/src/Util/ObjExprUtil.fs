@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util.ObjExprUtil
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
@@ -9,15 +10,12 @@ open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
 
 module NewObjPostfixTemplate =
-    let private isApplicableArgExpr (expr: IFSharpExpression) =
-        expr :? IParenExpr || expr :? IUnitExpr
-
     let getReference (expr: IFSharpExpression) =
         match expr with
         | :? IReferenceExpr as refExpr -> refExpr.Reference
         | :? IPrefixAppExpr as appExpr ->
             match appExpr.FunctionExpression with
-            | :? IReferenceExpr as refExpr when isApplicableArgExpr appExpr.ArgumentExpression -> refExpr.Reference
+            | :? IReferenceExpr as refExpr when isParenOrUnitExpr appExpr.ArgumentExpression -> refExpr.Reference
             | _ -> null
         | _ -> null
 

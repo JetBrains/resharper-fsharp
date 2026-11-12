@@ -1,0 +1,37 @@
+﻿module Module
+
+do
+    new T(
+        a
+    )
+
+    new T(a,
+          b)
+
+    new T(
+        a,
+        b
+    )
+
+    new T
+        (a)
+
+    new T
+        (
+            a
+        )
+
+    (new T(
+        a
+    )).P
+
+    new T<int>(
+        a
+    )
+
+    x <- new T
+             (a)
+
+    f (new T(
+        a
+    ))

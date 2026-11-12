@@ -337,6 +337,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
             ElementType.UNIT_EXPR,
             ElementType.REFERENCE_EXPR,
             ElementType.PREFIX_APP_EXPR,
+            ElementType.NEW_EXPR,
 
             ElementType.ARRAY_PAT,
             ElementType.CHAR_RANGE_PAT,
@@ -376,6 +377,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .AddException(Node().In(ElementType.ATTRIBUTE_LIST, ElementType.DOC_COMMENT_BLOCK))
         .AddException(Node().In(ElementType.COMPUTATION_EXPR).Satisfies((node, _) =>
           !node.HasNewLineBefore()))
+        .AddException(
+          Node()
+            .In(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION, ElementType.PARAMETERS_PATTERN_DECLARATION)
+            .Satisfies((node, _) => !node.HasNewLineBefore() && IsParenParametersDeclaration(node.Node)))
         .Build();
 
       Describe<ContinuousIndentRule>()
@@ -534,6 +539,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
+    private static bool IsParenParametersDeclaration(ITreeNode node) =>
+      node is IPrimaryConstructorDeclaration or IParametersPatternDeclaration { Pattern: IParenPat };
+
     private static bool IsNestedRefOrAppExpr(ITreeNode node)
     {
       // ReSharper disable once VariableHidesOuterVariable
@@ -644,6 +652,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IndentType.ExternalNoIndent)
         .Build();
 
+      Describe<IndentingRule>()
+        .Name("NewExprAlignment")
+        .Where(Node().In(ElementType.NEW_EXPR))
+        .Return(IndentType.AlignThrough)
+        .Build();
+
       DescribeNestedAlignment("RefExprAppAlignment", ElementType.REFERENCE_EXPR);
       DescribeNestedAlignment("FunctionTypeUsageAlignment", ElementType.FUNCTION_TYPE_USAGE);
       DescribeNestedAlignment("ArrayTypeUsageAlignment", ElementType.ARRAY_TYPE_USAGE);
@@ -663,23 +677,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ElementType.ATTRIBUTE,
         attrList => attrList.AttributesEnumerable);
 
-      Describe<IndentingRule>().Name("Function deindent alignment")
-        .Where(
-          Parent().In(ElementType.PAREN_EXPR)
-            .Satisfies((node, _) =>
-            {
-              var innerExpr = ((IParenExpr)node.Node).InnerExpression;
-              if (innerExpr is IMatchLambdaExpr or ILambdaExpr) return true;
+      DescribeChildrenAlignment<IRecordPat>(
+        ElementType.RECORD_PAT,
+        ElementType.FIELD_PAT,
+        pat => pat.FieldPatternsEnumerable);
 
-              if (innerExpr is ITupleExpr tupleExpr &&
-                  tupleExpr.ExpressionsEnumerable.LastOrDefault() is IMatchLambdaExpr or ILambdaExpr)
-                return true;
+      DescribeParenIndent("ParenExpr", new NodeTypeSet(ElementType.PAREN_EXPR, ElementType.TUPLE_EXPR),
+        IndentType.InternalCollapsible | IndentType.OverrideAlignment);
 
-              return false;
-            }),
-          Left().In(FSharpTokenType.LPAREN), Right().In(FSharpTokenType.RPAREN))
-        .Return(IndentType.OverrideAlignment | IndentType.ExternalNoIndent | IndentType.Internal)
-        .Build();
+      DescribeParenIndent("ParenPat", new NodeTypeSet(ElementType.PAREN_PAT, ElementType.NAMED_UNION_CASE_FIELDS_PAT),
+        IndentType.InternalCollapsible);
 
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
@@ -722,6 +729,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IndentType.StartAfterFirstToken | IndentType.EndAtExternal)
         .Build();
     }
+
+    private void DescribeParenIndent(string name, NodeTypeSet parenNodeTypes, IndentType sameLineParenIndentType) =>
+      Describe<IndentingRule>()
+        .Where(Parent().In(parenNodeTypes), Right().In(FSharpTokenType.RPAREN))
+        .StartAlternating()
+
+        .Name(name + "Indent")
+        .Where(Left().In(FSharpTokenType.LPAREN).Satisfies((node, _) => !node.HasNewLineBefore()))
+        .Return(sameLineParenIndentType)
+        .Build()
+
+        .Name(name + "OnNewLineIndent")
+        .Where(Left().In(FSharpTokenType.LPAREN).Satisfies((node, _) => node.HasNewLineBefore()))
+        .Return(IndentType.Internal)
+        .Build();
 
     private static bool IsPrefixAppWithNoComputationExprArg(VirtNode node) =>
       node.Node is IPrefixAppExpr { ArgumentExpression: not IComputationExpr };
@@ -916,6 +938,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
           Left().In(FSharpTokenType.IDENTIFIER, ElementType.POSTFIX_TYPE_PARAMETER_DECLARATION_LIST),
           Right().In(ElementType.PRIMARY_CONSTRUCTOR_DECLARATION, ElementType.POSTFIX_TYPE_PARAMETER_DECLARATION_LIST))
         .Return(IntervalFormatType.Empty)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceBeforeNewExprArg")
+        .Group(SpaceRuleGroup)
+        .Where(
+          Parent().In(ElementType.NEW_EXPR),
+          Left().In(ElementType.TYPE_REFERENCE_NAME),
+          Right().In(ElementType.PAREN_EXPR, ElementType.UNIT_EXPR))
+        .Switch(it => it.SpaceBeforeUppercaseInvocation, SpaceOptionsBuilders)
         .Build();
 
       Describe<FormattingRule>()
