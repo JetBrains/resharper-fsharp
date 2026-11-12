@@ -1,0 +1,8 @@
+﻿module Module
+
+type T() =
+    inherit A()
+
+    override this.P2 = {selstart}failwith "todo"{selend}
+    override this.M(i) = failwith "todo"
+    override this.P1 = failwith "todo"

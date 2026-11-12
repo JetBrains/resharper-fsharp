@@ -46,8 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       var interfaces = entity.DeclaredInterfaces;
       var types = new List<IDeclaredType>(interfaces.Count + 1);
-      foreach (var entityInterface in interfaces)
-        if (MapType(entityInterface, typeParams, psiModule) is IDeclaredType declaredType)
+      for (var i = interfaces.Count - 1; i >= 0; i--)
+        if (MapType(interfaces[i], typeParams, psiModule) is IDeclaredType declaredType)
           types.Add(declaredType);
 
       var baseType = MapBaseType(entity, typeParams, psiModule);

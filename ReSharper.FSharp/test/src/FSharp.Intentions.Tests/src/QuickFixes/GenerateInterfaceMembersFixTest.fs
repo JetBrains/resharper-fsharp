@@ -71,6 +71,15 @@ type GenerateInterfaceMembersFixTest() =
 
     [<Test>] member x.``Static 01``() = x.DoNamedTest()
     [<Test>] member x.``Static 02``() = x.DoNamedTest()
+    [<Test>] member x.``Static 03 - Operator``() = x.DoNamedTest()
+
+    [<Test>] member x.``Order 01 - Declaration``() = x.DoNamedTest()
+    [<Test>] member x.``Order 02 - Inherited interface``() = x.DoNamedTest()
+    [<Test>] member x.``Order 03 - Diamond``() = x.DoNamedTest()
+    [<Test>] member x.``Order 04 - Generic instantiations``() = x.DoNamedTest()
+    [<Test>] member x.``Order 05 - Partial impl``() = x.DoNamedTest()
+    [<Test>] member x.``Order 06 - Event``() = x.DoNamedTest()
+    [<Test>] member x.``Order 07 - CSharp``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
 
 [<FSharpTest; AssertCorrectTreeStructure>]
@@ -97,6 +106,9 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Object Expr 05``() = x.DoNamedTest()
     [<TestReferenceProjectOutput("AbstractMembers")>]
     [<Test>] member x.``Object Expr 06``() = x.DoNamedTest()
+
+    [<Test>] member x.``Order 01 - Base classes``() = x.DoNamedTest()
+    [<Test>] member x.``Order 02 - CSharp``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
     [<Test>] member x.``Partial type 01``() = x.DoNamedTest()
 

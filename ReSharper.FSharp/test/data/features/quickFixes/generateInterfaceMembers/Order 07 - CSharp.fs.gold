@@ -1,0 +1,7 @@
+﻿module Module
+
+type T() =
+    interface I with
+        member this.P2 = {selstart}failwith "todo"{selend}
+        member this.M(i) = failwith "todo"
+        member this.P1 = failwith "todo"

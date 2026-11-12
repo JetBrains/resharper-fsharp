@@ -46,10 +46,8 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
         let implContext = InterfaceImplementationContext.Create(impl)
 
-        let membersToGenerate =
-            GenerateOverrides.getInterfaceMembers true implContext typeElement
-            |> GenerateOverrides.sanitizeMembers
-            
+        let membersToGenerate = GenerateOverrides.getInterfaceMembers true implContext typeElement
+
         let (anchor: ITreeNode) =
             let existingMembers = impl.TypeMembers
             if not existingMembers.IsEmpty then
