@@ -100,6 +100,15 @@ module OverrideMemberRule =
 
             generatorContextFactory.TryCreate(GeneratorStandardKinds.Overrides, view).As<FSharpGeneratorContext>()
 
+    let getNearestInterfaceImpl (anchor: ITreeNode) (typeDecl: IFSharpTypeElementDeclaration) =
+        let impl =
+            match anchor with
+            | null -> null
+            | anchor -> anchor.GetContainingNode<IInterfaceImplementation>(true)
+        match typeDecl with
+        | :? IObjExpr as objExpr when not(objExpr.Contains(impl)) -> null
+        | _ -> impl
+
     let getMemberOwner (context: FSharpCodeCompletionContext) (generatorContext: FSharpGeneratorContext) : ITreeNode =
         let anchor = generatorContext.Anchor
 
@@ -108,16 +117,7 @@ module OverrideMemberRule =
 
         let typeDecl = generatorContext.TypeDeclaration
 
-        let nearestInterfaceImpl =
-            let impl =
-                match anchor with
-                | null -> null
-                | anchor -> anchor.GetContainingNode<IInterfaceImplementation>(true)
-            match typeDecl with
-            | :? IObjExpr as objExpr when not(objExpr.Contains(impl)) -> null
-            | _ -> impl
-
-        match nearestInterfaceImpl with
+        match getNearestInterfaceImpl anchor typeDecl with
         | interfaceImpl when isNotNull interfaceImpl && caretColumn > interfaceImpl.Indent ->
             interfaceImpl
         | _ ->

@@ -1,0 +1,13 @@
+// ${COMPLETE_ITEM:Implement IInner}
+module Module
+
+type IInner =
+    abstract Foo: unit -> unit
+type IOuter =
+    abstract Bar: unit -> unit
+
+type Test =
+    interface IOuter with
+        member this.Bar() =
+            { new IInner with // a comment to keep
+                {caret} }
