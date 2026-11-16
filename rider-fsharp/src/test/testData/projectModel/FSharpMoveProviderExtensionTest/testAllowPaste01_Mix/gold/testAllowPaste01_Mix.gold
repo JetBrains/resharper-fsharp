@@ -10,7 +10,7 @@
       -Implicit
        ...
      -Packages
-      FSharp.Core/10.1.202
+      FSharp.Core/10.1.404
      -Frameworks
       Microsoft.NETCore.App
    CompileBeforeFile.fs [CompileBefore]

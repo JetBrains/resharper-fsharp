@@ -2,7 +2,7 @@ Stopped inside a2:
 --> Task.fs:27 // let! aResult = a
 
 Stepped over:
---> Task.fs:28 // return
+--> Task.fs:28 // return f2 T.Prop aResult
 
 Stepped into Prop:
 --> Task.fs:6 // 1
@@ -11,7 +11,7 @@ Stopped inside a3:
 --> Task.fs:33 // let i = 1
 
 Stepped over:
---> Task.fs:34 // return
+--> Task.fs:34 // return f2 i T.Prop
 
 Stepped into Prop:
 --> Task.fs:6 // 1
@@ -23,7 +23,7 @@ Stepped over:
 --> Task.fs:40 // let i = a + 1
 
 Stepped over:
---> Task.fs:41 // return
+--> Task.fs:41 // return f2 i T.Prop
 
 Stopped inside a5:
 --> Task.fs:46 // let! a = a
@@ -35,7 +35,7 @@ Stepped over:
 --> Task.fs:49 // a + 1
 
 Stepped over:
---> Task.fs:51 // return
+--> Task.fs:51 // return f2 i T.Prop
 
 Stopped inside a6:
 --> Task.fs:56 // let! a = a
@@ -50,14 +50,14 @@ Stepped over:
 --> Task.fs:59 // 1
 
 Stepped over:
---> Task.fs:61 // return
+--> Task.fs:61 // return f2 i T.Prop
 
 Stopped inside a9:
 --> Task.fs:77 // let! a = a
 
 Stepped over:
---> Task.fs:78 // use
+--> Task.fs:78 // d
 
 Stepped over:
---> Task.fs:79 // return
+--> Task.fs:79 // return a + 1
 

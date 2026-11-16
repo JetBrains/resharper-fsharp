@@ -1,12 +1,12 @@
 Stopped inside a1:
---> Async.fs:22(232,238) // return
+--> Async.fs:22(232,248) // return f1 T.Prop
 Stepped into f1:
 --> Async.fs:9(89,94) // x + 1
 Async.f1() in CeSteppingTests.dll
     x = {int} 1
 
 Stopped inside a2:
---> Async.fs:28(310,316) // return
+--> Async.fs:28(310,334) // return f2 T.Prop aResult
 Stepped into T.Prop:
 --> Async.fs:6(71,72) // 1
 Async.T.get_Prop() in CeSteppingTests.dll
