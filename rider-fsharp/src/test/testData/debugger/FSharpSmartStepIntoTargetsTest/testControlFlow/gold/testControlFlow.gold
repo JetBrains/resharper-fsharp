@@ -4,12 +4,9 @@
 --> ControlFlow.fs:11(111,125) // match g 1 with
 +[g, ControlFlow] -> g 1
 
---> ControlFlow.fs:15(159,162) // for
-+[getList, ControlFlow] -> getList ()
--[get_TailOrNull, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
+--> ControlFlow.fs:15(159,164) // for i
 -[get_HeadOrDefault, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
--[get_TailOrNull, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
 
---> ControlFlow.fs:18(198,211) // while g 0 > 1
-+[g, ControlFlow] -> g 0
+--> ControlFlow.fs:15(159,164) // for i
+-[get_HeadOrDefault, Microsoft.FSharp.Collections.FSharpList`1] -> (no expr)
 

@@ -1,12 +1,12 @@
---> Task.fs:22 // return
+--> Task.fs:22 // return f1 T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[f1, Task] -> f1 T.Prop
 
---> Task.fs:28 // return
+--> Task.fs:28 // return f2 T.Prop aResult
 +[get_Prop, Task+T] -> T.Prop
 +[f2, Task] -> f2 T.Prop aResult
 
---> Task.fs:34 // return
+--> Task.fs:34 // return f2 i T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[f2, Task] -> f2 i T.Prop
 
@@ -14,15 +14,15 @@
 +[get_Prop, Task+T] -> T.Prop
 +[incrementAsync, Task] -> incrementAsync T.Prop
 
---> Task.fs:41 // return
+--> Task.fs:41 // return f2 i T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[f2, Task] -> f2 i T.Prop
 
---> Task.fs:51 // return
+--> Task.fs:51 // return f2 i T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[f2, Task] -> f2 i T.Prop
 
---> Task.fs:61 // return
+--> Task.fs:61 // return f2 i T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[f2, Task] -> f2 i T.Prop
 
@@ -30,7 +30,7 @@
 +[get_Prop, Task+T] -> T.Prop
 +[incrementAsync, Task] -> incrementAsync T.Prop
 
---> Task.fs:72 // return!
+--> Task.fs:72 // return! incrementAsync T.Prop
 +[get_Prop, Task+T] -> T.Prop
 +[incrementAsync, Task] -> incrementAsync T.Prop
 
