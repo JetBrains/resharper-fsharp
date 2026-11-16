@@ -143,7 +143,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, node: ITreeNode
             QuickDocTitleAndText(this.CreateRichTextTooltip(), null)
 
         member this.GetId() = null
-        member this.OpenInEditor _ = ()
+        member this.OpenInEditor(_, _) = ()
         member this.ReadMore _ = ()
         member this.Resolve _ = null
 
