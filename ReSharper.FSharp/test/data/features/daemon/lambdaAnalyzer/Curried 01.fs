@@ -1,0 +1,7 @@
+open System
+
+type A() =
+    static member M (d: Func<int, int>) (f: int -> int) = ()
+    static member G(x: int) = x
+
+A.M (Func<_, _>(id)) (fun x -> A.G x)

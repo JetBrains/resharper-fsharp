@@ -1,0 +1,4 @@
+﻿module Module
+
+let x = 1
+let s = $"%d{(x: int)}{caret}"

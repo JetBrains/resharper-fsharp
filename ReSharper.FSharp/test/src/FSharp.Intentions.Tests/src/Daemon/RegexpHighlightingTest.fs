@@ -23,6 +23,8 @@ type RegexpHighlightingTest() =
 
     [<Test>] member x.``Strings 01``() = x.DoNamedTest()
     [<Test>] member x.``Options 01``() = x.DoNamedTest()
+    [<Test>] member x.``Options 02 - Pipe``() = x.DoNamedTest()
+    [<Test>] member x.``Options 03 - Curried``() = x.DoNamedTest()
     [<Test>] member x.``Errors 01``() = x.DoNamedTest()
 
     [<Test; TestNet70; TestPackages(JetBrainsAnnotationsPackage)>] member x.``Detection 01``() = x.DoNamedTest()
@@ -32,6 +34,7 @@ type RegexpHighlightingTest() =
     [<Test>] member x.``Detection 04``() = x.DoNamedTest()
     [<Test>] member x.``Detection 05 - Wrong arg - Not available``() = x.DoNamedTest()
     [<Test>] member x.``Detection 06 - Interface augmentation``() = x.DoNamedTest()
+    [<Test>] member x.``Detection 07 - Pipe``() = x.DoNamedTest()
 
     [<Test; TestReferenceProjectOutput("FSharpExtensions")>]
     member x.``Detection - Compiled 01``() = x.DoNamedTest()

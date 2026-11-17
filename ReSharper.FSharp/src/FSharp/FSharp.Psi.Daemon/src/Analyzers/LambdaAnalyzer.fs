@@ -39,6 +39,14 @@ type LambdaAnalyzer() =
 
         | _ -> false
 
+    let getFunctionAndArgs (appExpr: IFSharpExpression) =
+        let funExpr, argExprs = getAppFunctionAndArgs appExpr
+        let argExprs = List.ofSeq argExprs
+
+        match appExpr with
+        | :? IBinaryAppExpr as pipeApp when isTuplePipeOpApp pipeApp && argExprs.Length = 1 -> null, []
+        | _ -> funExpr, argExprs
+
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
@@ -66,30 +74,32 @@ type LambdaAnalyzer() =
     and compareArgs (pats: TreeNodeCollection<_>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i nameUsages =
             let hasMatches = i > 0
-            match expr.IgnoreInnerParens() with
-            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
-                let pat = pats[pats.Count - 1 - i]
-                let argExpr = app.ArgumentExpression
+            let expr = expr.IgnoreInnerParens()
 
-                if not (compareArg pat argExpr) then
-                    hasMatches, false, app :> IFSharpExpression
-                else
-                    let funExpr = app.FunctionExpression
-                    let usedNames =
-                        if isNotNull nameUsages then nameUsages else
-                        FSharpNamingService.getUsedNamesUsages [funExpr] EmptyList.Instance null false
-
-                    if not (patIsUsed usedNames argExpr pat) then
-                        compareArgsRec funExpr (i + 1) usedNames
-                    else
-                        hasMatches, false, app :> _
-
+            match expr with
             | :? IReferenceExpr as r when
                     let name = r.ShortName
                     name = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorDisplayName name ->
                 false, false, null
 
-            | x -> hasMatches, i = pats.Count, x
+            | _ ->
+
+            let funExpr, argExprs = getFunctionAndArgs expr
+            let matchedPatsCount = i + argExprs.Length
+            if isNull funExpr || argExprs.IsEmpty || matchedPatsCount > pats.Count then
+                hasMatches, i = pats.Count, expr else
+
+            let argPats = [ for argIndex in 0 .. argExprs.Length - 1 -> pats[pats.Count - matchedPatsCount + argIndex] ]
+            if not (List.forall2 compareArg argPats argExprs) then hasMatches, false, expr else
+
+            let usedNames =
+                if isNotNull nameUsages then nameUsages else
+                FSharpNamingService.getUsedNamesUsages [funExpr] EmptyList.Instance null false
+
+            let isAnyPatUsed = List.exists2 (fun argExpr pat -> patIsUsed usedNames argExpr pat) argExprs argPats
+            if isAnyPatUsed then hasMatches, false, expr else
+
+            compareArgsRec funExpr matchedPatsCount usedNames
 
         compareArgsRec expr 0 null
 
@@ -128,28 +138,29 @@ type LambdaAnalyzer() =
             (replacementExprSymbol: FSharpSymbol voption) =
         isNull (QuoteExprNavigator.GetByQuotedExpression(lambda.IgnoreParentParens())) &&
 
-        let binaryExpr = BinaryAppExprNavigator.GetByRightArgument(lambda)
-        let argExpr = if isNull binaryExpr then lambda else binaryExpr :> _
-        let argExpr = argExpr.IgnoreParentParens()
-        let appTuple = TupleExprNavigator.GetByExpression(argExpr)
-        let app = getArgsOwner argExpr
+        match tryGetParameterIndex lambda with
+        | None -> true
+        | Some(app, parameterIndex) ->
 
         let reference = getReference app
         if not (app :? IPrefixAppExpr) || isNull reference then true else
 
-        if isNotNull binaryExpr && not (FSharpArgumentsUtil.IsNamedArgSyntactically(binaryExpr)) then true else
-
         match reference.GetFcsSymbol() with
         | :? FSharpMemberOrFunctionOrValue as m when m.IsMember ->
-            let lambdaPos = if isNotNull appTuple then appTuple.Expressions.IndexOf(argExpr) else 0
-
             let parameterGroups = m.CurriedParameterGroups
-            if parameterGroups.Count = 0 then true else
+            if parameterGroups.Count <= parameterIndex.GroupIndex then true else
 
-            let parameters = parameterGroups[0]
-            if parameters.Count <= lambdaPos then true else
+            let parameters = parameterGroups[parameterIndex.GroupIndex]
 
-            let parameterDecl = parameters[lambdaPos]
+            let parameterDecl =
+                match parameterIndex.NamedArg with
+                | null -> Seq.tryItem (parameterIndex.ParameterIndex.GetValueOrDefault()) parameters
+                | name -> parameters |> Seq.tryFind (fun parameter -> parameter.Name = Some name)
+
+            match parameterDecl with
+            | None -> true
+            | Some parameterDecl ->
+
             let parameterType = parameterDecl.Type
             let parameterIsDelegateOrExprDelegate =
                 parameterType.HasTypeDefinition &&
@@ -328,6 +339,8 @@ type LambdaAnalyzer() =
 
     let isApplicable (expr: IFSharpExpression) (pats: TreeNodeCollection<IFSharpPattern>) =
         match expr with
+        | :? IBinaryAppExpr as binaryApp when not (isPipeOpApp binaryApp || isBackwardPipeOpApp binaryApp) -> false
+        | :? IBinaryAppExpr
         | :? IPrefixAppExpr
         | :? IReferenceExpr
         | :? ITupleExpr

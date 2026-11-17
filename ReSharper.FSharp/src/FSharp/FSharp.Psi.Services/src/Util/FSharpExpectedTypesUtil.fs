@@ -39,15 +39,19 @@ let getFunTypeArgs (fcsType: FSharpType) =
     loop [] fcsType
 
 let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplayContext) option =
-    match FSharpMethodInvocationUtil.getFunExprAndPosition expr with
+    match FSharpMethodInvocationUtil.tryGetParameterIndex expr with
     | None -> None
-    | Some(funExpr, (groupIndex, paramIndex), prefixAppExpr) ->
+    | Some(argsOwner, parameterIndex) ->
+
+    let appExpr = argsOwner.As<IAppExpr>()
+    if isNull appExpr || isNotNull parameterIndex.NamedArg then None else
 
     // Disable for non-last arg for now, like in `f arg1 {caret} arg2`. 
-    let outerPrefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(prefixAppExpr.IgnoreParentParens())
+    let outerPrefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(appExpr.IgnoreParentParens())
     if isNotNull outerPrefixAppExpr then None else
 
-    let funExpr = funExpr.As<IReferenceExpr>()
+    let invokedExpr = getInvokedExpr appExpr
+    let funExpr = invokedExpr.As<IReferenceExpr>()
     if isNull funExpr then None else
 
     let funFcsSymbolUse = funExpr.Reference.GetSymbolUse()
@@ -62,7 +66,7 @@ let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplay
     let mfvParameterGroups = funMfv.CurriedParameterGroups
 
     let partialSubstitution =
-        let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(prefixAppExpr)
+        let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(appExpr)
         if isNull binaryAppExpr then [] else
 
         // todo: check isPredefined
@@ -119,12 +123,14 @@ let tryGetExpectedFcsType (expr: IFSharpExpression): (FSharpType * FSharpDisplay
 
     let fcsFunParamTypes = getFunTypeArgs funFcsType
 
-    List.tryItem groupIndex fcsFunParamTypes
+    let indexInGroup = parameterIndex.ParameterIndex.GetValueOrDefault()
+
+    List.tryItem parameterIndex.GroupIndex fcsFunParamTypes
     |> Option.bind (fun paramGroupType ->
         if paramGroupType.IsTupleType && not paramGroupType.IsStructTupleType then
             let genericArguments = paramGroupType.GenericArguments
-            Seq.tryItem paramIndex genericArguments
-        elif paramIndex = 0 then
+            Seq.tryItem indexInGroup genericArguments
+        elif indexInGroup = 0 then
             Some(paramGroupType)
         else
             None)

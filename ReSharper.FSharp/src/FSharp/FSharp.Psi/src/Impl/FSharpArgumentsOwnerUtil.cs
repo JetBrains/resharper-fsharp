@@ -2,8 +2,11 @@
 using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
+using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -11,6 +14,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class FSharpArgumentsOwnerUtil
   {
+    [CanBeNull]
+    public static IFSharpMethodInvocationUtil GetInvocationUtil([NotNull] this ITreeNode node) =>
+      node.GetSolution().GetComponent<LanguageManager>()
+        .TryGetService<IFSharpMethodInvocationUtil>(FSharpLanguage.Instance);
+
+    public static IList<IArgument> CalculateParameterArguments([NotNull] this IFSharpArgumentsOwner argsOwner) =>
+      argsOwner.GetInvocationUtil()?.GetParameterArguments(argsOwner) ?? EmptyList<IArgument>.InstanceList;
+
     public static IList<IArgument> CalculateParameterArguments(this IFSharpReferenceOwner referenceOwner,
       IEnumerable<IFSharpExpression> appliedExpressions)
     {
@@ -26,7 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         appliedArg = appliedArg.IgnoreInnerParens();
 
         return appliedArg is ITupleExpr tupleExpr
-          ? tupleExpr.Expressions.Take(unionCase.Fields.Count).ToList(t => t as IArgument)
+          ? MatchGroupArguments(tupleExpr.Expressions, unionCase.Fields.Select(field => field.Name).ToList(),
+            canHaveNamedArgs: true, canHaveSetters: false).ToList()
           : new List<IArgument> { appliedArg as IArgument };
       }
 
@@ -77,70 +89,67 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               _ => EmptyList<IFSharpExpression>.Instance
             };
 
-          IList<IFSharpExpression> unnamedArgs = new List<IFSharpExpression>();
-          var namedLikeArgs = new Dictionary<string, IArgument>();
-
-          if (canHaveNamedArgs)
-            foreach (var expr in tupleExprs)
-            {
-              if (FSharpArgumentsUtil.IsTopLevelArg(expr) &&
-                  FSharpArgumentsUtil.TryGetNamedArgRefExpr(expr) is { ShortName: { } name })
-                namedLikeArgs.TryAdd(name, expr as IArgument);
-
-              else unnamedArgs.Add(expr);
-            }
-          else unnamedArgs = tupleExprs;
-
-          return paramGroup.Select((x, i) =>
-          {
-            if (i < unnamedArgs.Count) return unnamedArgs[i] as IArgument;
-            if (x.Name?.Value is { } paramName) return namedLikeArgs.GetValueSafe(paramName);
-            return null;
-          });
+          return MatchGroupArguments(tupleExprs, paramGroup.Select(param => param.Name?.Value).ToList(),
+            canHaveNamedArgs, canHaveSetters: canHaveNamedArgs);
         }).ToList();
     }
 
-    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpTypeOwnerNode node,
+    private static IEnumerable<IArgument> MatchGroupArguments(IList<IFSharpExpression> argExprs,
+      IList<string> parameterNames, bool canHaveNamedArgs, bool canHaveSetters)
+    {
+      var unnamedArgs = new List<IFSharpExpression>();
+      var namedLikeArgs = new Dictionary<string, IArgument>();
+
+      foreach (var expr in argExprs)
+      {
+        var name = canHaveNamedArgs && FSharpArgumentsUtil.IsTopLevelArg(expr)
+          ? FSharpArgumentsUtil.TryGetNamedArgName(expr)
+          : null;
+
+        if (name != null && (canHaveSetters || parameterNames.Contains(name)))
+          namedLikeArgs.TryAdd(name, expr as IArgument);
+        else
+          unnamedArgs.Add(expr);
+      }
+
+      return parameterNames.Select((parameterName, i) =>
+      {
+        if (i < unnamedArgs.Count) return unnamedArgs[i] as IArgument;
+        if (parameterName != null) return namedLikeArgs.GetValueSafe(parameterName);
+        return null;
+      });
+    }
+
+    [CanBeNull]
+    public static FSharpSymbolReference GetInvokedFunctionReference([NotNull] this IReferenceExpr referenceExpr,
+      int appliedExpressionsCount)
+    {
+      var reference = referenceExpr.Reference;
+      var fcsSymbol = reference.GetFcsSymbol();
+
+      // todo: exceptions
+      var isValid = fcsSymbol switch
+      {
+        FSharpMemberOrFunctionOrValue mfv => mfv.CurriedParameterGroups.Count >= appliedExpressionsCount,
+        FSharpUnionCase unionCase => unionCase.HasFields && appliedExpressionsCount <= 1,
+        FSharpEntity fcsEntity => fcsEntity.IsFSharpExceptionDeclaration,
+        _ => false
+      };
+
+      return isValid ? reference : null;
+    }
+
+    public static FSharpParameterIndex? TryGetFSharpParameterIndex([NotNull] IFSharpPattern pat,
       out IFSharpArgumentsOwner argOwner)
     {
       argOwner = null;
 
-      if (node is IFSharpExpression expr)
-      {
-        var argGroupExpr = GetArgGroupExpr(out var parameterIndex, out var namedArg);
-        argOwner = FSharpArgumentOwnerNavigator.GetByArgumentExpression(argGroupExpr);
-        if (argOwner == null)
-          return null;
+      var argPat = GetArgGroupPat(out var parameterIndex, out var namedArg);
+      if (ParametersOwnerPatNavigator.GetByParameter(argPat) is not { } parametersOwnerPat)
+        return null;
 
-        if (argOwner is IAttribute or INewExpr)
-          return new FSharpParameterIndex(0, parameterIndex, namedArg);
-
-        var paramGroupIndex = 0;
-        while (argOwner is IPrefixAppExpr prefixAppExpr)
-        {
-          if (prefixAppExpr.FunctionExpression is IPrefixAppExpr funPrefixAppExpr)
-          {
-            argOwner = funPrefixAppExpr;
-            paramGroupIndex++;
-          }
-          else
-            break;
-        }
-
-        return new FSharpParameterIndex(paramGroupIndex, parameterIndex, namedArg);
-      }
-
-      if (node is IFSharpPattern pat)
-      {
-        var argPat = GetArgGroupPat(out var parameterIndex, out var namedArg);
-        if (ParametersOwnerPatNavigator.GetByParameter(argPat) is { } parametersOwnerPat)
-        {
-          argOwner = parametersOwnerPat;
-          return new FSharpParameterIndex(0, parameterIndex, namedArg);
-        }
-      }
-
-      return null;
+      argOwner = parametersOwnerPat;
+      return new FSharpParameterIndex(0, parameterIndex, namedArg);
 
       IFSharpPattern GetArgGroupPat(out int? parameterIndex, out string namedArg)
       {
@@ -159,30 +168,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           parameterIndex = tuplePat?.Patterns.IndexOf(tupleItemPat);
 
           return tuplePat.IgnoreParentParens() ?? tupleItemPat;
-        }
-      }
-
-      IFSharpExpression GetArgGroupExpr(out int? parameterIndex, out string namedArg)
-      {
-        parameterIndex = null;
-        namedArg = null;
-
-        var binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr);
-        if (binaryAppExpr is { Operator.ShortName: "=", LeftArgument: IReferenceExpr { IsSimpleName: true } refExpr })
-        {
-          namedArg = refExpr.ShortName;
-          var tupleExpr = TupleExprNavigator.GetByExpression(binaryAppExpr);
-          var parenExpr = ParenExprNavigator.GetByInnerExpression((IFSharpExpression)tupleExpr ?? binaryAppExpr);
-          return parenExpr;
-        }
-        else
-        {
-          var tupleItemExpr = expr.IgnoreParentParens();
-          var tupleExpr = TupleExprNavigator.GetByExpression(tupleItemExpr);
-          parameterIndex = tupleExpr?.Expressions.IndexOf(tupleItemExpr);
-
-          var argGroupExpr = tupleExpr.IgnoreParentParens() ?? tupleItemExpr;
-          return argGroupExpr;
         }
       }
     }

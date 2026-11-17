@@ -1,0 +1,19 @@
+﻿module Test
+
+open System.Diagnostics.CodeAnalysis
+
+let f (x: string) ([<StringSyntax(StringSyntaxAttribute.Regex)>] y: string) = ()
+let g ([<StringSyntax(StringSyntaxAttribute.Regex)>] x: string) = ()
+
+"|\d|(0)" |> f "\d"
+f "\d" <| "|\d|(1)"
+("\d", "|\d|(2)") ||> f
+"|\d|(3)" |> g
+g <| "|\d|(4)"
+
+---------------------------------------------------------
+(0): ReSharper Regex Identifier: 
+(1): ReSharper Regex Identifier: 
+(2): ReSharper Regex Identifier: 
+(3): ReSharper Regex Identifier: 
+(4): ReSharper Regex Identifier: 

@@ -3,6 +3,7 @@
 let foo x =
     x + 1
 
-foo 123 |> printfn "%O"
+foo 123 |> printfn |"%O"|(0)
 
 ---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string

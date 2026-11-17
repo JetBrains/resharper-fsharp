@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class Attribute
   {
-    private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
+    private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new();
 
     protected override FSharpSymbolReference CreateReference() =>
       new CtorReference(this);
@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifier NameIdentifier => ReferenceName?.Identifier;
 
     public IList<IArgument> ParameterArguments => 
-      myParameterArguments.GetValue(this, static expr => expr.CalculateParameterArguments([expr.Expression]));
+      myParameterArguments.GetValue(this, static expr => expr.CalculateParameterArguments());
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }

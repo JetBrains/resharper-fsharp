@@ -119,10 +119,12 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Lambda - Arg - Curried 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried 02``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Arg - Curried 03``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Arg - Extension method 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe - Double 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 02``() = x.DoNamedTest()
     [<Test>] member x.``Lambda - Pipe 03 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda - Pipe 04 - Backward``() = x.DoNamedTest()
 
     [<Test>] member x.``Match - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Match - Enum 02``() = x.DoNamedTest()

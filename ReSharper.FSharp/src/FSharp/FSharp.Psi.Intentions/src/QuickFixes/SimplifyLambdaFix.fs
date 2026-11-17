@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -16,13 +17,6 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
     let lambda = warning.LambdaExpr
     let replaceCandidate = warning.ReplaceCandidate
 
-    let countRedundantArgs expr =
-        let rec countRedundantArgsRec (expr: IFSharpExpression) i =
-            let expr = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
-            if isNotNull expr then countRedundantArgsRec expr (i + 1) else i
-
-        countRedundantArgsRec expr 0
-
     override x.Text = "Simplify lambda"
 
     override x.IsAvailable _ = isValid lambda && isValid replaceCandidate
@@ -30,6 +24,6 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(lambda.IsPhysical())
 
+        let redundantArgsCount = getPrefixAppExprArgs replaceCandidate |> Seq.length
         ModificationUtil.ReplaceChild(lambda.Expression, replaceCandidate) |> ignore
-        let redundantArgsCount = countRedundantArgs replaceCandidate
         deletePatternsFromEnd lambda redundantArgsCount

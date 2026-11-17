@@ -105,10 +105,13 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
                     else
                         index
 
+                let exprText = expr.GetText()
+                let exprText = if exprText.StartsWith("{") then "(" + exprText + ")" else exprText
+
                 interpolatedSb
                     .Insert(index, '{')
-                    .Insert(index + 1, expr.GetText())
-                    .Insert(index + 1 + expr.GetTextLength(), '}')
+                    .Insert(index + 1, exprText)
+                    .Insert(index + 1 + exprText.Length, '}')
                 |> ignore
 
         let factory = formatStringExpr.CreateElementFactory()

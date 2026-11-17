@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Intentions.QuickFixes
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -144,11 +145,29 @@ type ChangeParamTypeFromArgTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/changeType/arg"
 
+    override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
+        base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
+
+        for referencedProject in project.GetReferencedProjects(project.GetCurrentTargetFrameworkId()) do
+            x.CheckProject(referencedProject)
+
+    member x.DoNamedTestFsCs() =
+        x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+
+    [<Test>] member x.``CSharp 01 - Method``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``CSharp 02 - Extension method``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``CSharp 03 - Extension method - Static call``() = x.DoNamedTestFsCs()
+    [<Test>] member x.``CSharp 04 - Named arg``() = x.DoNamedTestFsCs()
+
     [<Test>] member x.``Exception - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Expr 02``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Pattern 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Extension 01 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Extension 02 - Type extension``() = x.DoNamedTest()
+
+    [<Test>] member x.``Function - Pipe 01 - Backward``() = x.DoNamedTest()
     [<Test>] member x.``Function - Tuple - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Tuple - Type 02``() = x.DoNamedTest()
     [<Test>] member x.``Function - Tuple - Type 03``() = x.DoNamedTest()
@@ -172,17 +191,35 @@ type ChangeParamTypeFromArgTest() =
     [<Test>] member x.``Method 02``() = x.DoNamedTest()
     [<Test>] member x.``Method 03``() = x.DoNamedTest()
     [<Test>] member x.``Method 04``() = x.DoNamedTest()
+    [<Test>] member x.``Method 05 - Named arg``() = x.DoNamedTest()
+    [<Test>] member x.``Method 06 - Named arg - Unordered``() = x.DoNamedTest()
+    [<Test>] member x.``Method 07 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Method 08 - Optional``() = x.DoNamedTest()
+    [<Test>] member x.``Method 09 - As pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Method 10 - Attribute``() = x.DoNamedTest()
 
     [<Test>] member x.``Union - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Union - Expr 02``() = x.DoNamedTest()
     [<Test>] member x.``Union - Expr 03``() = x.DoNamedTest()
     [<Test>] member x.``Union - Expr 04``() = x.DoNamedTest()
     [<Test>] member x.``Union - Expr 05``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 06 - Named field``() = x.DoNamedTest()
+    [<Test>] member x.``Union - Expr 07 - Named field - Unordered``() = x.DoNamedTest()
     [<Test>] member x.``Union - Pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Union - Pat 02``() = x.DoNamedTest()
     [<Test>] member x.``Union - Pat 03``() = x.DoNamedTest()
     [<Test>] member x.``Union - Pat 04``() = x.DoNamedTest()
     [<Test>] member x.``Union - Pat 05``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type ChangeParamTypeFromArgAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/changeType/arg"
+
+    [<Test>] member x.``Availability - CSharp 01 - Params``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+    [<Test>] member x.``Availability - Comparison 01``() = x.DoNamedTest()
 
 
 [<AssertCorrectTreeStructure>]

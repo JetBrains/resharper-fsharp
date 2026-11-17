@@ -76,7 +76,14 @@ type FSharpRegexNodeProvider(codeAnnotationsCache: CodeAnnotationsCache) =
 
         if not isSuccess then ValueNone else
 
-        match expr |> getArgsOwner |> getOptionsArg with
+        let argsOwner = getArgsOwner expr
+
+        let outermostArgsOwner =
+            match argsOwner with
+            | :? IAppExpr as appExpr -> (getOutermostAppExpr appExpr).IgnoreInnerParens().As<IFSharpArgumentsOwner>()
+            | _ -> argsOwner
+
+        match getOptionsArg outermostArgsOwner with
         | Some arg -> ValueSome (evalOptionsArg arg)
         | None -> ValueSome RegexOptions.None
 

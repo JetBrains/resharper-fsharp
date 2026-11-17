@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System.Linq
 open FSharp.Compiler.Symbols
 open FSharp.Compiler.Diagnostics.ExtendedData
 open JetBrains.ReSharper.Intentions.QuickFixes
@@ -134,7 +135,7 @@ type ChangeTypeFixBase(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedD
 type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosticInfo: FcsCachedDiagnosticInfo) =
     inherit ChangeTypeFixBase(node, fcsDiagnosticInfo)
 
-    let fsParamIndex, argsOwner = FSharpArgumentsOwnerUtil.TryGetFSharpParameterIndex(node)
+    let argsOwnerAndIndex = tryGetParameterIndex node
 
     new (error: TypeEquationError) =
         ChangeParameterTypeFromArgumentFix(error.Node, error.DiagnosticInfo)
@@ -149,7 +150,9 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
         data.ActualType
 
     override this.DeclaredElement =
-        if not fsParamIndex.HasValue || isNull argsOwner then null else
+        match argsOwnerAndIndex with
+        | None -> null
+        | Some(argsOwner, index) ->
 
         let symbolReference = getReference argsOwner
         if isNull symbolReference then null else
@@ -157,7 +160,6 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
         let declaredElement = symbolReference.Resolve().DeclaredElement
         match declaredElement with
         | :? IParametersOwner as parametersOwner when not (declaredElement :? IFSharpDeclaredElement) ->
-            let index = fsParamIndex.Value
             if index.GroupIndex <> 0 then null else
 
             let parameters = parametersOwner.Parameters
@@ -167,8 +169,9 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
                 parameters |> Seq.tryFind (_.ShortName >> (=) namedArg) |> Option.defaultValue null :> _
             else
                 let parameterIndex = index.ParameterIndex
-                let index = if parameterIndex.HasValue then parameterIndex.Value else 0 
-                parameters[index]
+                let index = if parameterIndex.HasValue then parameterIndex.Value else 0
+                let offset = getExtensionMethodParameterOffset (symbolReference.GetFcsSymbol())
+                parameters.ElementAtOrDefault(index + offset)
     
         | :? IFSharpGeneratedFromUnionCase as generatedFromUnionCase ->
             match generatedFromUnionCase.OriginElement with
@@ -180,7 +183,21 @@ type ChangeParameterTypeFromArgumentFix(node: IFSharpTypeOwnerNode, fcsDiagnosti
 
     override this.SetType(decl, _, fcsType) =
         let decl = FSharpParameterOwnerDeclarationNavigator.Unwrap(decl)
-        decl.SetParameterFcsType(fsParamIndex.Value, fcsType)
+        let index = snd argsOwnerAndIndex.Value
+
+        let declaredParameter =
+            match this.DeclaredElement, node with
+            | :? IFSharpParameterOwner as parameterOwner, _ when isNotNull index.NamedArg ->
+                parameterOwner.GetParameter(index)
+
+            | _, (:? IFSharpExpression as expr) ->
+                let matchingParameter = getMatchingParameter expr
+                matchingParameter.As<IFSharpParameter>()
+
+            | _ -> null
+
+        let index = if isNull declaredParameter then index else declaredParameter.FSharpIndex
+        decl.SetParameterFcsType(index, fcsType)
 
 
 type ChangeTypeFromElementReferenceFix(node, fcsDiagnosticInfo) =
