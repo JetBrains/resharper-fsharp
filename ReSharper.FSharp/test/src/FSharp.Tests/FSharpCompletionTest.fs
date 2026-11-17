@@ -376,6 +376,7 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Implement all members - ObjExpr 02`` () = x.DoNamedTest()
     [<Test>] member x.``Implement all members - ObjExpr 03`` () = x.DoNamedTest()
     [<Test>] member x.``Implement all members - ObjExpr 04`` () = x.DoNamedTest()
+    [<Test>] member x.``Implement all members - ObjExpr 05`` () = x.DoNamedTest()
 
     [<Test>] member x.``Override member - Change Overridden Member 01`` () = x.DoNamedTest()
     [<Test>] member x.``Override member - Change Overridden Member 02`` () = x.DoNamedTest()

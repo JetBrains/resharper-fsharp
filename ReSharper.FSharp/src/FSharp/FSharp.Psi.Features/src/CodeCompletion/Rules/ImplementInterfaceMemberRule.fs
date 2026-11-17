@@ -47,8 +47,8 @@ type ImplementAllMembersBehavior(info) =
 
         let node = textControl.Document.GetPsiSourceFile(solution).FSharpFile.FindNodeAt(nameRange)
         let anchorMemberDecl = node.NextSibling
-        let interfaceImpl = node.GetContainingNode<IInterfaceImplementation>() |> Option.ofObj
         let typeDecl = node.GetContainingNode<IFSharpTypeElementDeclaration>()
+        let interfaceImpl = getNearestInterfaceImpl anchorMemberDecl typeDecl |> Option.ofObj
 
         let generatorElements = GenerateOverrides.generateInterfaceMembers typeDecl interfaceImpl
 
