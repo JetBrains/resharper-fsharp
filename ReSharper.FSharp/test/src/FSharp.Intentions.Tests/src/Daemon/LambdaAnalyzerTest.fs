@@ -22,7 +22,11 @@ type LambdaAnalyzerTest() =
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()
+    [<Test>] member x.``Curried 01``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 02 - Body``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 03 - Corner cases``() = x.DoNamedTest()
     [<Test>] member x.``Id 01``() = x.DoNamedTest()
     [<Test>] member x.``Id 02 - Pipe``() = x.DoNamedTest()
     [<Test>] member x.``Fst``() = x.DoNamedTest()
@@ -30,6 +34,7 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Delegates 01``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 02 - Method overloads``() = x.DoNamedTest()
     [<Test>] member x.``Delegates 03 - Simplify lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 04 - Extension method``() = x.DoNamedTest()
 
     [<Test; TestReferences("System.Core")>] member x.``Delegates``() = x.DoNamedTest()
 

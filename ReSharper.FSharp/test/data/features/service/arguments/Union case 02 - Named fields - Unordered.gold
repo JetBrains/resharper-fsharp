@@ -1,0 +1,8 @@
+﻿type U =
+    | A of named: int * other: int
+
+A(|other = 1|(arg #1), |named = 2|(arg #0))
+
+---------------------------------------------------------
+(arg #0) => _named
+(arg #1) => _other

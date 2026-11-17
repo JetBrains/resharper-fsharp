@@ -225,6 +225,22 @@ let isPipeOpApp (binaryAppExpr: IBinaryAppExpr) =
     isPredefinedInfixOpApp "||>" binaryAppExpr ||
     isPredefinedInfixOpApp "|||>" binaryAppExpr
 
+let isBackwardPipeOpApp (binaryAppExpr: IBinaryAppExpr) =
+    isPredefinedInfixOpApp "<|" binaryAppExpr ||
+    isPredefinedInfixOpApp "<||" binaryAppExpr ||
+    isPredefinedInfixOpApp "<|||" binaryAppExpr
+
+let isTuplePipeOpApp (binaryAppExpr: IBinaryAppExpr) =
+    isPredefinedInfixOpApp "||>" binaryAppExpr ||
+    isPredefinedInfixOpApp "|||>" binaryAppExpr ||
+    isPredefinedInfixOpApp "<||" binaryAppExpr ||
+    isPredefinedInfixOpApp "<|||" binaryAppExpr
+
+let private getPipedArgs (pipeApp: IBinaryAppExpr) (arg: IFSharpExpression) =
+    match arg.IgnoreInnerParens() with
+    | :? ITupleExpr as tupleExpr when isTuplePipeOpApp pipeApp -> seq tupleExpr.Expressions
+    | _ -> Seq.singleton arg
+
 let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
     seq {
@@ -239,16 +255,12 @@ let rec getPrefixAppExprArgs (expr: IFSharpExpression) =
             let binaryAppExpr = BinaryAppExprNavigator.GetByRightArgument(expr)
             if isPipeOpApp binaryAppExpr then
                 currentExpr <- binaryAppExpr
-                match binaryAppExpr.LeftArgument.IgnoreInnerParens() with
-                | :? ITupleExpr as tupleExpr when binaryAppExpr.ShortName <> "|>" ->
-                    yield! tupleExpr.Expressions
-                | _ -> yield binaryAppExpr.LeftArgument
-            else
+                yield! getPipedArgs binaryAppExpr binaryAppExpr.LeftArgument else
 
             let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
-            if isNotNull binaryAppExpr && isPredefinedInfixOpApp "<|" binaryAppExpr then
+            if isBackwardPipeOpApp binaryAppExpr then
                 currentExpr <- binaryAppExpr
-                yield binaryAppExpr.RightArgument else
+                yield! getPipedArgs binaryAppExpr binaryAppExpr.RightArgument else
 
             currentExpr <- null
     }
@@ -263,9 +275,31 @@ let rec getOutermostAppExpr (expr: IFSharpExpression) =
     if isPipeOpApp binaryAppExpr then getOutermostAppExpr binaryAppExpr else
 
     let binaryAppExpr = BinaryAppExprNavigator.GetByLeftArgument(expr)
-    if isPredefinedInfixOpApp "<|" binaryAppExpr then getOutermostAppExpr binaryAppExpr else
+    if isBackwardPipeOpApp binaryAppExpr then getOutermostAppExpr binaryAppExpr else
 
     expr
+
+let getAppFunctionAndArgs (appExpr: IFSharpExpression): IFSharpExpression * IFSharpExpression seq =
+    match appExpr with
+    | :? IPrefixAppExpr as prefixApp ->
+        prefixApp.FunctionExpression, Seq.singleton prefixApp.ArgumentExpression
+
+    | :? IBinaryAppExpr as pipeApp when isPipeOpApp pipeApp ->
+        pipeApp.RightArgument, getPipedArgs pipeApp pipeApp.LeftArgument
+
+    | :? IBinaryAppExpr as pipeApp when isBackwardPipeOpApp pipeApp ->
+        pipeApp.LeftArgument, getPipedArgs pipeApp pipeApp.RightArgument
+
+    | _ -> null, Seq.empty
+
+let rec getInvokedExpr (expr: IFSharpExpression) =
+    let expr = expr.IgnoreInnerParens()
+    let funExpr, _ = getAppFunctionAndArgs expr
+    if isNull funExpr then expr else getInvokedExpr funExpr
+
+let getInvokedReferenceExpr (appExpr: IAppExpr) =
+    let invokedExpr = getInvokedExpr appExpr
+    invokedExpr.As<IReferenceExpr>()
 
 let rec isStaticContext (expr: IFSharpExpression) =
     let isTypeReferenceOrUnresolved (fsReference: FSharpSymbolReference) =

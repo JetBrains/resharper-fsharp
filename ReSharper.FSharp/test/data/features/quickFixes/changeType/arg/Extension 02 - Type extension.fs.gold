@@ -1,0 +1,6 @@
+﻿module Module
+
+type System.String with
+    member this.M(a: int, b: string) = ()
+
+"".M(1, ""{caret})

@@ -1,0 +1,12 @@
+﻿module Module
+
+open N
+
+C.M(1, 2, |""|(0))
+
+------------------------------------------------
+0: This expression was expected to have type
+    'int'    
+but here has type
+    'string'    
+NO QUICKFIXES

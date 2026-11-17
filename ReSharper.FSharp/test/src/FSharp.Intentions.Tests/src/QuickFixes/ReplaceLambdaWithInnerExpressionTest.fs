@@ -18,6 +18,10 @@ type ReplaceLambdaWithInnerExpressionTest() =
     [<Test>] member x.``Parens 03``() = x.DoNamedTest()
     [<Test>] member x.``Parens 04 - Indexer``() = x.DoNamedTest()
     [<Test>] member x.``Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 01 - Forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 02 - Backward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 03 - Prefix and forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 04 - Double forward``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

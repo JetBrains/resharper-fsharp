@@ -1,0 +1,4 @@
+﻿module Module
+
+let foo = "foo"
+printfn ${caret}"Text is %s{foo}"

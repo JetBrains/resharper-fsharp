@@ -1,0 +1,5 @@
+module Module
+
+open N
+
+C.M(b = ""{caret}, a = 1)

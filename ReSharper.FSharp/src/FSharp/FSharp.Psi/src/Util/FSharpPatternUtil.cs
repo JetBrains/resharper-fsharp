@@ -172,7 +172,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       var typeAnnotationUtil = paramOwnerDecl.GetFSharpTypeAnnotationUtil();
 
-      if (parameterPatternGroups.GetParameterDeclaration(index) is IReferencePat refPat)
+      if (parameterPatternGroups.GetParameterDeclaration(index) is IFSharpPattern paramPat &&
+          paramPat.TryGetNameIdentifierOwner() is { } refPat)
       {
         var declPat = refPat.TryGetContainingParameterDeclarationPattern();
         typeAnnotationUtil.SetPatternFcsType(declPat, fcsType);
@@ -271,7 +272,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         pat switch
         {
           IAttribPat attribPat => attribPat.Pattern,
-          IAsPat asPat => asPat,
+          IAsPat asPat => asPat.RightPattern,
           IOptionalValPat optionalValPat => optionalValPat.Pattern,
           IParenPat parenPat => parenPat.Pattern,
           ITypedPat typedPat => typedPat.Pattern,

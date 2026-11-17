@@ -1,0 +1,39 @@
+﻿open System
+
+type A() =
+    static member M1(x: int -> int) = ()
+    static member M2(x: int -> int) = ()
+    static member M2(x: string -> string) = ()
+    static member M3(x: Func<int, int>) = ()
+    static member G1(x: int) = x
+
+let f (x: int -> int) = ()
+let f2 (x: int) (y: int -> int) = ()
+let g (x: int) = x
+
+(|fun x -> x|(0)) |> f
+f <| (|fun x -> x|(1))
+(|fun x -> g x|(2)) |> f
+f <| |fun x -> g x|(3)
+(|fun x -> g x|(4)) |> f2 1
+(1, |fun x -> g x|(5)) ||> f2
+(|fun x -> g x|(6)) |> A.M1
+A.M1 <| |fun x -> g x|(7)
+(|fun x -> A.G1 x|(8)) |> A.M1
+(|fun x -> g x|(9)) |> A.M2
+(|fun x -> A.G1 x|(10)) |> A.M2
+(|fun x -> g x|(11)) |> A.M3
+
+---------------------------------------------------------
+(0): ReSharper Hint: Lambda can be replaced with 'id'
+(1): ReSharper Hint: Lambda can be replaced with 'id'
+(2): ReSharper Hint: Lambda can be replaced with 'g'
+(3): ReSharper Hint: Lambda can be replaced with 'g'
+(4): ReSharper Hint: Lambda can be replaced with 'g'
+(5): ReSharper Hint: Lambda can be replaced with 'g'
+(6): ReSharper Hint: Lambda can be replaced with 'g'
+(7): ReSharper Hint: Lambda can be replaced with 'g'
+(8): ReSharper Hint: Lambda can be replaced with 'A.G1'
+(9): ReSharper Hint: Lambda can be replaced with 'g'
+(10): ReSharper Hint: Lambda can be replaced with 'A.G1'
+(11): ReSharper Hint: Lambda can be replaced with 'g'

@@ -1,0 +1,33 @@
+﻿module Module
+
+let foo = "foo"
+let t = 10, foo
+
+let s1 = foo |> sprintf |"%s"|(0)
+let s2 = sprintf |"%s"|(1) <| foo
+let s3 = foo |> sprintf |"%d %s"|(2) 10
+let s4 = (10, foo) ||> sprintf |"%d %s"|(3)
+let s5 = sprintf |"%d %s"|(4) <|| (10, foo)
+let s6 = foo |> sprintf |"%s"|(5) |> ignore
+
+let n1 = t ||> sprintf "%d %s"
+let n2 = foo |> sprintf "%d %s"
+
+let n3 =
+    [1; 2]
+    |> List.sum
+    |> sprintf "%d"
+
+let s7 =
+    sprintf |"%d"|(6) (
+        [1; 2]
+        |> List.sum)
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(1): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(2): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(3): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(4): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(5): ReSharper Suggestion: Format string can be replaced with an interpolated string
+(6): ReSharper Suggestion: Format string can be replaced with an interpolated string

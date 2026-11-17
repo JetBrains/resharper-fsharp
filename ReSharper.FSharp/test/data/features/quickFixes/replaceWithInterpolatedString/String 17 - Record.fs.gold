@@ -1,0 +1,4 @@
+﻿module Module
+
+type R = { X: int }
+let s = ${caret}"%A{({ X = 1 })}"

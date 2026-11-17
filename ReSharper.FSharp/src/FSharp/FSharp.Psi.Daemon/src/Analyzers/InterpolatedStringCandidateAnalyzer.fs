@@ -6,8 +6,10 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Tree
@@ -77,21 +79,26 @@ type InterpolatedStringCandidateAnalyzer() =
         let parameterGroups = mfv.CurriedParameterGroups
         if prefixAppExpr.AppliedExpressions.Count <> parameterGroups.Count then () else
 
-        // Find the outermost IPrefixAppExpr and all applied exprs (excluding the format string itself)
-        let outerPrefixAppExpr, appliedExprs =
-            let getArgExpr (expr: IFSharpExpression) =
-                match expr.IgnoreInnerParens() with
-                | :? ITupleExpr as tupleExpr when
-                        tupleExpr != expr && not tupleExpr.IsStruct ->
-                    tupleExpr.Parent :?> IFSharpExpression
-                | expr -> expr
+        let getArgExpr (expr: IFSharpExpression) =
+            match expr.IgnoreInnerParens() with
+            | :? ITupleExpr as tupleExpr when
+                    tupleExpr != expr && not tupleExpr.IsStruct ->
+                tupleExpr.Parent :?> IFSharpExpression
 
-            let rec loop acc (expr: IPrefixAppExpr) =
-                match PrefixAppExprNavigator.GetByFunctionExpression (expr.IgnoreParentParens()) with
-                | null -> expr.IgnoreParentParens(), acc
-                | parent -> loop (getArgExpr parent.ArgumentExpression :: acc) parent
+            | :? ITypedExpr as typedExpr when typedExpr != expr ->
+                typedExpr.Parent :?> IFSharpExpression
 
-            loop [] prefixAppExpr
+            | expr -> expr
+
+        let outerAppExpr = getOutermostAppExpr prefixAppExpr
+        let appliedExprs = getPrefixAppExprArgs prefixAppExpr |> List.ofSeq
+
+        let isMultilinePipedExpr (expr: IFSharpExpression) =
+            not expr.IsSingleLine && isNull (PrefixAppExprNavigator.GetByArgumentExpression(expr))
+
+        if appliedExprs |> List.exists isMultilinePipedExpr then () else
+
+        let appliedExprs = appliedExprs |> List.map getArgExpr
 
         if appliedExprs.Length <> matchingFormatSpecsAndArity.Length then () else
 
@@ -110,10 +117,10 @@ type InterpolatedStringCandidateAnalyzer() =
 
         if anyDisallowedExprs then () else
 
-        let exprs = appliedExprs |> Seq.rev |> Array.ofSeq
+        let exprs = Array.ofList appliedExprs
         let formatSpecs = matchingFormatSpecsAndArity |> Seq.map fst
         let offsets = formatSpecs |> Seq.map (fun range -> range.EndOffset.Offset - literalExpr.GetDocumentStartOffset().Offset) |> Array.ofSeq
         let formatSpecs = formatSpecs |> Seq.map _.GetText() |> Array.ofSeq
 
-        InterpolatedStringCandidateWarning(literalExpr, prefixAppExpr, outerPrefixAppExpr, formatSpecs, offsets, exprs)
+        InterpolatedStringCandidateWarning(literalExpr, prefixAppExpr, outerAppExpr, formatSpecs, offsets, exprs)
         |> consumer.AddHighlighting

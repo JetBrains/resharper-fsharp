@@ -1,0 +1,25 @@
+﻿let f x y z = ()
+let add x = x + 1
+
+|fun x y -> x |> f 1 <| y|(0)
+|fun x y -> y |> (x |> f 1)|(1)
+|fun x -> x |> (fun y -> y + 1)|(2)
+|fun (a, b) -> (a, b) |> fst|(3)
+|fun x -> x |> Some|(4)
+|fun x -> (x) |> add|(5)
+|fun x -> (x |> add)|(6)
+
+fun x -> x |> add |> add
+fun (x: int) -> x |> add
+fun x y -> (y, x) ||> f 1
+fun x -> x |> f (add 1) 2
+fun x -> x |> add <| 1
+
+---------------------------------------------------------
+(0): ReSharper Hint: Lambda can be simplified
+(1): ReSharper Hint: Lambda can be simplified
+(2): ReSharper Hint: Lambda can be simplified
+(3): ReSharper Hint: Lambda can be replaced with 'fst'
+(4): ReSharper Hint: Lambda can be replaced with 'Some'
+(5): ReSharper Hint: Lambda can be replaced with 'add'
+(6): ReSharper Hint: Lambda can be replaced with 'add'

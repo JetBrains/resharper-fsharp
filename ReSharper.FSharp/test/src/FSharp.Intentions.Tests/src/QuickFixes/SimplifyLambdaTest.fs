@@ -23,6 +23,8 @@ type SimplifyLambdaTest() =
     [<Test>] member x.``Multiline body 3``() = x.DoNamedTest()
     [<Test>] member x.``Multiline body 4``() = x.DoNamedTest()
     [<Test>] member x.``Multiline body 5 - Next line``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 01 - Forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 02 - Double forward``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

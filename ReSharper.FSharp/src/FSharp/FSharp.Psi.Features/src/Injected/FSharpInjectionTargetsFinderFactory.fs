@@ -13,6 +13,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.impl.Shared.InjectedPsi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpErrorUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Injected.FSharpInjectionAnnotationUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpMethodInvocationUtil
 
 type FSharpInjectionTargetsFinder() =
     let possibleInjectorFunctionNames = HashSet([|"html"; "css"; "sql"; "js"; "javascript"; "json"; "jsx"; "tsx"|])
@@ -52,24 +54,27 @@ type FSharpInjectionTargetsFinder() =
                         consumer.Consume(expr, normalizeLanguage language, prefix, suffix)
                     | _ ->
 
-                    let prefixApp = PrefixAppExprNavigator.GetByArgumentExpression(expr.IgnoreParentParens())
-                    if isNotNull prefixApp then
+                    match getReferenceName (getArgsOwner expr) with
+                    | language when possibleInjectorFunctionNames.Contains(language) ->
                         // support injection functions
                         // https://github.com/alfonsogarciacaro/vscode-template-fsharp-highlight
-                        match prefixApp.FunctionExpression.IgnoreInnerParens() with
-                        | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
-                            let language = ref.ShortName
-                            if possibleInjectorFunctionNames.Contains(language) then
+                        match tryGetParameterIndex expr with
+                        | Some(:? IAppExpr as appExpr, parameterIndex) when parameterIndex = FSharpParameterIndex.Zero ->
+                            match getInvokedExpr appExpr with
+                            | :? IReferenceExpr as ref when isSimpleQualifiedName ref ->
                                 consumer.Consume(expr, normalizeLanguage language, "", "")
+                            | _ -> ()
                         | _ -> ()
-                    else match tryGetTypeProviderName (expr.As<IConstExpr>()) with
-                         | ValueSome "SqlCommandProvider" ->
-                             consumer.Consume(expr, "sql", "", "")
-                         | ValueSome "JsonProvider" when expr.GetText().Contains("{") ->
-                             consumer.Consume(expr, "json", "", "")
-                         | ValueSome "XmlProvider" when expr.GetText().Contains("<") ->
-                             consumer.Consume(expr, "xml", "", "")
-                         | _ -> ()
+                    | _ ->
+
+                    match tryGetTypeProviderName (expr.As<IConstExpr>()) with
+                    | ValueSome "SqlCommandProvider" ->
+                        consumer.Consume(expr, "sql", "", "")
+                    | ValueSome "JsonProvider" when expr.GetText().Contains("{") ->
+                        consumer.Consume(expr, "json", "", "")
+                    | ValueSome "XmlProvider" when expr.GetText().Contains("<") ->
+                        consumer.Consume(expr, "xml", "", "")
+                    | _ -> ()
 
                 | :? IChameleonNode as c when not c.IsOpened -> descendants.SkipThisNode()
                 | _ -> ()

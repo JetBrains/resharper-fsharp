@@ -1,5 +1,7 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
@@ -7,5 +9,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     IParameter GetMatchingParameter(IFSharpExpression fsExpr);
     IParameter GetNamedArg(IFSharpExpression fsExpr);
+    IList<IArgument> GetParameterArguments(IFSharpArgumentsOwner argsOwner);
   }
 }

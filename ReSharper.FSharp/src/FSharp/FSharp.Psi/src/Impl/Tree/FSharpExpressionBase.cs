@@ -1,5 +1,4 @@
 using JetBrains.DocumentModel;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -22,9 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     IInvocationInfo IArgumentInfo.Invocation => null;
 
-    private IFSharpMethodInvocationUtil InvocationUtil =>
-      this.GetSolution().GetComponent<LanguageManager>()
-        .TryGetService<IFSharpMethodInvocationUtil>(FSharpLanguage.Instance);
+    private IFSharpMethodInvocationUtil InvocationUtil => this.GetInvocationUtil();
 
     DeclaredElementInstance<IParameter> IArgumentInfo.MatchingParameter =>
       InvocationUtil?.GetMatchingParameter(this) is { } parameter

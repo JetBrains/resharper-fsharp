@@ -9,6 +9,18 @@ type ReplaceWithInterpolatedStringTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithInterpolatedString"
 
+    [<Test>] member x.``Pipe 01 - Forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 02 - Backward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 03 - Prefix and forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 04 - Double forward``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 05 - printfn``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 06 - Chain``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 07 - Cast``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 08 - Lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 09 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 10 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 11 - Anon record``() = x.DoNamedTest()
+
     [<Test; ExecuteScopedActionInFile>] member x.``String 01 - Single specifier``() = x.DoNamedTest()
     [<Test; ExecuteScopedActionInFile>] member x.``String 02 - Many specifiers``() = x.DoNamedTest()
     [<Test>] member x.``String 03 - Many specifiers with text``() = x.DoNamedTest()
@@ -23,6 +35,9 @@ type ReplaceWithInterpolatedStringTest() =
     [<Test>] member x.``String 12 - sprintf piped``() = x.DoNamedTest()
     [<Test>] member x.``String 13 - Format string parens``() = x.DoNamedTest()
     [<Test>] member x.``String 14 - Parentheses required``() = x.DoNamedTest()
+    [<Test>] member x.``String 15 - Cast``() = x.DoNamedTest()
+    [<Test>] member x.``String 16 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``String 17 - Record``() = x.DoNamedTest()
 
     [<Test>] member x.``Triple Quoted String 01 - Many specifiers with text``() = x.DoNamedTest()
     [<Test>] member x.``Triple Quoted String 02 - Applied string literal``() = x.DoNamedTest()

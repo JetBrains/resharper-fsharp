@@ -84,8 +84,11 @@ let setPatternTypeUsage (pattern: IFSharpPattern) (typeUsage: ITypeUsage) =
 
     let factory = pattern.CreateElementFactory()
 
+    let innerPattern = pattern.IgnoreInnerParens()
+    let replacedPattern = if innerPattern :? IAsPat then innerPattern else pattern
+
     let newPattern =
-        match pattern.IgnoreInnerParens() with
+        match innerPattern with
         | :? ITuplePat as tuplePat -> addParens factory tuplePat
         | :? ITypedPat as typedPat -> typedPat.Pattern
         | pattern -> pattern
@@ -93,7 +96,7 @@ let setPatternTypeUsage (pattern: IFSharpPattern) (typeUsage: ITypeUsage) =
     let typedPat = factory.CreateTypedPat(newPattern, typeUsage)
 
     let pat =
-        ModificationUtil.ReplaceChild(pattern, typedPat)
+        ModificationUtil.ReplaceChild(replacedPattern, typedPat)
         |> ParenPatUtil.addParensIfNeeded
 
     pat.IgnoreInnerParens().As<ITypedPat>()
