@@ -119,6 +119,7 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Object expr - Curried 03``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Curried 04 - No with``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Interface 02 - Base interface``() = x.DoNamedTest()
     [<Test>] member x.``Object expr 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Object expr 02``() = x.DoNamedTest()
 
@@ -155,6 +156,15 @@ type FSharpGenerateOverridesTest() =
     [<Test>] member x.``Import 02 - Prefer qualified``() = x.DoNamedTest()
     [<TestIndexedSetting(typeof<AutoImport2Settings>, "FullyQualifiedImports", "Ns1.T", true, CSharpLanguage.Name)>]
     [<Test>] member x.``Import 03 - Fully qualified``() = x.DoNamedTest()
+
+    [<Test>] member x.``Missing members - Base class 01``() = x.DoNamedTest()
+    [<Test>] member x.``Missing members - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Missing members - Object expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Missing members - Object expr 02 - Secondary interface``() = x.DoNamedTest()
+    [<Test>] member x.``Missing members - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Missing members - Union 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Interface - Missing members 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Static class 01``() = x.DoNamedTest()

@@ -1,0 +1,12 @@
+﻿Provided elements:
+ 0: Dispose():System.Void
+
+// ${KIND:Implementations}
+// ${SELECT0:Dispose():System.Void}
+
+let o =
+    { new obj() with
+        override this.ToString() = ""
+
+      interface System.IDisposable with
+          member this.Dispose() = {selstart}failwith "todo"{selend} }

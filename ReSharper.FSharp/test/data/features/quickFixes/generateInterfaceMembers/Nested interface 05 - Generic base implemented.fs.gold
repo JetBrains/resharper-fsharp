@@ -1,0 +1,19 @@
+﻿module Module
+
+type I1<'T> =
+    abstract P1: 'T
+
+type I2<'T> =
+    inherit I1<'T>
+
+    abstract P2: 'T
+
+type T1<'T>() =
+    interface I1<'T> with
+        member this.P1 = Unchecked.defaultof<'T>
+
+type T2() =
+    inherit T1<int>()
+
+    interface I2<int> with
+        member this.P2 = {selstart}failwith "todo"{selend}

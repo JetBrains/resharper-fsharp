@@ -1,0 +1,7 @@
+﻿// ${MEMBER:P}
+module Module
+
+type T() =
+    inherit A()
+
+    override this.P = failwith "todo"

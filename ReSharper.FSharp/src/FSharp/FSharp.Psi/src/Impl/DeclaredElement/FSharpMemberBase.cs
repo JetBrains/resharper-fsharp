@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.Symbols;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -7,6 +8,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -89,8 +91,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           return EmptyList<IExplicitImplementation>.Instance;
 
         var typeName = GetObjectExpressionMemberDeclaringTypeName(GetDeclaration() as IOverridableMemberDeclaration);
-        if (typeName?.Reference.ResolveType() is { } declaringType)
-          return new IExplicitImplementation[] { new ExplicitImplementation(this, declaringType, ShortName, true) };
+        if (typeName?.Reference.ResolveType() is { } objectExpressionType)
+          return [CreateObjectExpressionMemberExplicitImplementation(objectExpressionType)];
 
         var implementations = mfv.ImplementedAbstractSignatures;
         if (implementations.IsNullOrEmpty())
@@ -103,6 +105,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
         return result.ResultingList();
       }
+    }
+
+    private IExplicitImplementation CreateObjectExpressionMemberExplicitImplementation(IDeclaredType objectExpressionType)
+    {
+      var declaringTypeCandidates = objectExpressionType.GetAllSuperTypes().Prepend(objectExpressionType);
+      var implementations = declaringTypeCandidates.Select(CreateImplementation);
+      return implementations.FirstOrDefault(implementation => implementation.Resolve() != null) ??
+             CreateImplementation(objectExpressionType);
+
+      ExplicitImplementation CreateImplementation(IDeclaredType declaringType) =>
+        new(this, declaringType, ShortName, true);
     }
 
     [CanBeNull]

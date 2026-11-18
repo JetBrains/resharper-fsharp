@@ -1,0 +1,14 @@
+﻿module Module
+
+type IA<'T> =
+    abstract M2: 'T -> unit
+    abstract M1: 'T -> unit
+
+type T() =
+    interface IA<int> with
+        member this.M2(i: int) = ()
+        member this.M1(i: int) = ()
+
+    interface IA<string> with
+        member this.M2(var0) = {selstart}failwith "todo"{selend}
+        member this.M1(var0) = failwith "todo"

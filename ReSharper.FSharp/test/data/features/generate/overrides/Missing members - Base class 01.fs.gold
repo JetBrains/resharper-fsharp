@@ -1,0 +1,18 @@
+﻿Provided elements:
+ 0: get_P2():System.Int32
+ 1: get_P1():System.Int32
+
+// ${KIND:Implementations}
+// ${SELECT0:get_P2():System.Int32}
+// ${SELECT1:get_P1():System.Int32}
+
+[<AbstractClass>]
+type A() =
+    abstract P2: int
+    abstract P1: int
+
+type B() =
+    inherit A()
+
+    override this.P2 = {selstart}failwith "todo"{selend}
+    override this.P1 = failwith "todo"

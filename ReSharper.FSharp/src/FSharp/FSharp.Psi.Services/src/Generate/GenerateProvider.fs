@@ -59,19 +59,9 @@ type FSharpGeneratorContextFactory() =
 type FSharpOverridableMembersProvider() =
     inherit GeneratorProviderBase<FSharpGeneratorContext>()
 
-    let canHaveOverrides (typeElement: ITypeElement) =
-        // todo: filter out union cases
-        match typeElement with
-        | :? FSharpClass as fsClass -> not (fsClass.IsAbstract && fsClass.IsSealed)
-        | :? IStruct -> true
-        | _ -> false // todo: interfaces with default impl
-
-    let getTestDescriptor (overridableMember: ITypeMember) =
-        GeneratorElementBase.GetTestDescriptor(overridableMember, overridableMember.IdSubstitution)
-
     override x.Populate(context: FSharpGeneratorContext) =
         let missingMembersOnly = context.Kind = GeneratorStandardKinds.MissingMembers
-        GenerateOverrides.getOverridableMembers missingMembersOnly context.TypeDeclaration
+        GenerateOverrides.getOverridableAndMissingInterfaceMembers missingMembersOnly context.TypeDeclaration
         |> Seq.iter context.ProvidedElements.Add
 
 
@@ -97,7 +87,7 @@ type FSharpOverridingMembersBuilder() =
 
         let typeDecl = context.Root :?> IFSharpTypeElementDeclaration
 
-        let (anchor: ITreeNode) =
+        let getTypeMembersAnchor () : ITreeNode =
             match typeDecl with
             | :? IFSharpTypeDeclaration as typeDecl ->
                 match typeDecl.TypeRepresentation with
@@ -221,24 +211,32 @@ type FSharpOverridingMembersBuilder() =
 
             | typeDecl -> failwith $"Unexpected typeDecl: {typeDecl}"
 
-        let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment anchor
+        let addedMembers =
+            context.InputElements
+            |> Seq.cast<FSharpGeneratorElement>
+            |> List.ofSeq
+            |> List.groupBy _.InterfaceImplementation
+            |> List.collect (fun (interfaceImpl, elements) ->
+                if isNotNull interfaceImpl then
+                    GenerateOverrides.addInterfaceMembers elements typeDecl interfaceImpl else
 
-        let inputElements = context.InputElements |> Seq.cast<FSharpGeneratorElement>
+                let anchor = getLastMatchingNodeAfter isInlineSpaceOrComment (getTypeMembersAnchor ())
+                GenerateOverrides.addMembers elements typeDecl anchor)
 
-        let addedMembers = GenerateOverrides.addMembers inputElements typeDecl anchor
         let expr = GenerateOverrides.getGeneratedBodyToSelect addedMembers
         context.SetSelectedRange(expr.GetTreeTextRange())
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpInheritanceAnalyzer() =
+    let getMemberInstances missingMembersOnly (typeDeclaration: ITypeDeclaration) =
+        typeDeclaration.As()
+        |> GenerateOverrides.getOverridableAndMissingInterfaceMembers missingMembersOnly
+        |> Seq.map (_.Member >> OverridableMemberInstance)
+
     interface InheritanceAnalyzer.IInheritanceAnalyzer with
         member this.IInheritanceAnalyzer_GetMissingMembers(typeDeclaration) =
-            typeDeclaration.As()
-            |> GenerateOverrides.getOverridableMembers true
-            |> Seq.map (_.Member >> OverridableMemberInstance)
+            getMemberInstances true typeDeclaration
 
         member this.IInheritanceAnalyzer_GetOverridableMembers(typeDeclaration) =
-            typeDeclaration.As()
-            |> GenerateOverrides.getOverridableMembers false
-            |> Seq.map (_.Member >> OverridableMemberInstance)
+            getMemberInstances false typeDeclaration

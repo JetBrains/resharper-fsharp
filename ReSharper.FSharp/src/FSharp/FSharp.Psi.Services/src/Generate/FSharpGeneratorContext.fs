@@ -52,7 +52,8 @@ type PropertyOverrideState =
     | Getter = 1
     | Setter = 2
 
-type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInstance, addTypes: bool) =
+type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInstance, addTypes: bool,
+        [<CanBeNull>] interfaceImpl: IInterfaceImplementation) =
     inherit GeneratorDeclaredElement(element)
 
     member x.AddTypes = addTypes
@@ -62,5 +63,6 @@ type FSharpGeneratorElement(element: IOverridableMember, mfvInstance: FcsMfvInst
     member x.DisplayContext = mfvInstance.DisplayContext
     member x.Substitution = mfvInstance.Substitution
     member x.IsOverride = not (element.ContainingType :? IInterface)
+    member x.InterfaceImplementation = interfaceImpl
 
     override x.ToString() = element.ToString()

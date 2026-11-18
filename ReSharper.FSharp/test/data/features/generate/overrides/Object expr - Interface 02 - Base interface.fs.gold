@@ -1,0 +1,18 @@
+﻿Provided elements:
+ 0: M1():System.Void
+ 1: M2():System.Void
+
+// ${KIND:Overrides}
+// ${SELECT0:M1():System.Void}
+// ${SELECT1:M2():System.Void}
+
+type IA =
+    abstract M1: unit -> unit
+
+type IB =
+    inherit IA
+    abstract M2: unit -> unit
+
+{ new IB with
+    member this.M1() = {selstart}failwith "todo"{selend}
+    member this.M2() = failwith "todo" }

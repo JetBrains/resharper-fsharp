@@ -1,0 +1,16 @@
+﻿module Module
+
+type IA =
+    abstract M1: unit -> unit
+
+type IB =
+    inherit IA
+
+    abstract M2: unit -> unit
+
+{ new obj() with
+    override this.ToString() = ""
+
+  interface IB with
+      member this.M1() = ()
+      member this.M2() = {selstart}failwith "todo"{selend} }

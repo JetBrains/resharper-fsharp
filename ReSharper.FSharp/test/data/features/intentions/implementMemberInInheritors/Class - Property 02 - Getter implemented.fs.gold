@@ -1,0 +1,8 @@
+﻿// ${MEMBER:P}
+module Module
+
+type T() =
+    inherit A()
+
+    override this.P = 1
+    override this.P with set value = failwith "todo"
