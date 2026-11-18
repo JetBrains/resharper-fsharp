@@ -36,6 +36,7 @@
     <Compile Include="Parsing\FSharpLexerTest.fs" />
     <Compile Include="Parsing\FSharpParserTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
+    <Compile Include="Build\FscRuntimeConfigTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
