@@ -36,6 +36,7 @@ module FSharpOptions =
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
     let [<Literal>] preferQualifiedReference = "Prefer qualified references"
+    let [<Literal>] reduceCompilerJitWarmup = "Reduce F# compiler JIT warm-up"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -53,7 +54,10 @@ type FSharpOptions =
       mutable TopLevelOpenCompletion: bool
 
       [<SettingsEntry(false, preferQualifiedReference); DefaultValue>]
-      mutable PreferQualifiedReference: bool }
+      mutable PreferQualifiedReference: bool
+
+      [<SettingsEntry(true, reduceCompilerJitWarmup); DefaultValue>]
+      mutable ReduceCompilerJitWarmup: bool }
 
 type FantomasLocationSettings =
     | AutoDetected = 0
@@ -161,6 +165,8 @@ type FSharpOptionsProvider(lifetime, solution: ISolution, settings, settingsSche
         this.NonFSharpProjectInMemoryReferences <-
             base.GetValueProperty<bool>("NonFSharpProjectInMemoryReferences").Value
 
+    member val ReduceCompilerJitWarmup = base.GetValueProperty<bool>("ReduceCompilerJitWarmup")
+
 [<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpFantomasSettingsProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpFantomasOptions>(lifetime, solution, settings, settingsSchema)
@@ -226,6 +232,9 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.OutOfProcessTypeProviders), fun t -> t :> obj))
 
         this.AddBoolOptionWithComment((fun key -> key.NonFSharpProjectInMemoryReferences), nonFSharpProjectInMemoryReferences, "Requires restart") |> ignore
+
+        this.AddHeader("Build")
+        this.AddBoolOptionWithComment((fun key -> key.ReduceCompilerJitWarmup), reduceCompilerJitWarmup, "ReSharper Build only") |> ignore
 
         this.AddHeader("Experimental features")
         this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
