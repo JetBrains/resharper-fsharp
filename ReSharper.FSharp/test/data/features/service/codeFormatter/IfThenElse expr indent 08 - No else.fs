@@ -1,0 +1,12 @@
+module Module
+
+do
+    if a then b
+              c
+
+    if a then
+        b
+
+    if a then
+
+        b

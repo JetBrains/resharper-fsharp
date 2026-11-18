@@ -38,5 +38,18 @@ type InvertIfTest() =
     [<Test>] member x.``Single line expressions 04 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Single line expressions 05 - Lazy``() = x.DoNamedTest()
 
+    [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 03 - Match``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 04 - Then on same line``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 05 - Else on same line``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 06 - Argument``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 07 - Condition``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 08 - Else if``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 09 - Then if``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 10 - Nested layout``() = x.DoNamedTest()
+
+    [<Test>] member x.``Deindent - Multiline 01``() = x.DoNamedTest()
+    [<Test>] member x.``Deindent - Multiline 02 - Chain``() = x.DoNamedTest()
     [<Test>] member x.``Deindent - Single line expressions 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Deindent - Single line expressions 02 - Comment``() = x.DoNamedTest()

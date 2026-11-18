@@ -1,0 +1,6 @@
+﻿if{caret} false then
+    h ()
+    i ()
+else
+    f ()
+    g ()

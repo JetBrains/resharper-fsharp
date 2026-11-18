@@ -1,0 +1,7 @@
+﻿if{caret} not a then
+    f ()
+else
+    if b then
+        g ()
+    else
+        h ()

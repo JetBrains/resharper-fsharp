@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -30,13 +31,6 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
 
         if ifExpr.IsSingleLine then true else
 
-        // Allow inverting simple expressions of form
-        // if foo then "a" else
-        //
-        // "b"
-
-        if not (thenExpr.IsSingleLine && elseExpr.IsSingleLine) then false else
-
         let beforeThenExpr = skipMatchingNodesBefore isWhitespace thenExpr
         let beforeElseExpr = skipMatchingNodesBefore isWhitespace elseExpr
 
@@ -56,7 +50,11 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
         let thenExpr = oldThenExpr.Copy()
         let elseExpr = ifExpr.ElseExpr
 
-        ModificationUtil.ReplaceChild(oldThenExpr, elseExpr.IgnoreInnerParens().Copy()) |> addParensIfNeeded |> ignore
-        ModificationUtil.ReplaceChild(elseExpr, thenExpr.IgnoreInnerParens()) |> addParensIfNeeded |> ignore
+        let newThenExpr = ModificationUtil.ReplaceChild(oldThenExpr, elseExpr.IgnoreInnerParens())
+        let newElseExpr = ModificationUtil.ReplaceChild(elseExpr, thenExpr.IgnoreInnerParens())
+        ifExpr.FormatNode()
+
+        addParensIfNeeded newThenExpr |> ignore
+        addParensIfNeeded newElseExpr |> ignore
 
         null

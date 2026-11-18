@@ -1,0 +1,26 @@
+﻿module Module
+
+do
+    let x = if a then b else c
+
+    let y =
+        if a then
+            b
+        else
+            c
+
+    match a with
+    | 1 -> if b then c else d
+    | _ ->
+        if b then
+            c
+        else
+            d
+
+    f (if a then
+           b
+       else
+           c)
+
+    if a then b else
+        c

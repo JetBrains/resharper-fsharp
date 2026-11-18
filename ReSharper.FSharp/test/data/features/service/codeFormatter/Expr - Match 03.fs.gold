@@ -3,5 +3,6 @@
 do
 
     match () with
-    | _ -> a
-               b
+    | _ ->
+        a
+            b
