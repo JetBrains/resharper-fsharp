@@ -193,6 +193,13 @@ module Util =
     let (|FSharpProjectMark|_|) (mark: IProjectMark) =
         if isFSharpProject mark.Location mark.Guid then someUnit else None
 
+    let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
+        if isNull configuration then VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext) else
+
+        match configuration.PropertiesCollection.TryGetValue(FSharpProperties.DotnetFscCompilerPath) with
+        | true, path -> path.Trim('"').ParseVirtualPathSafe(InteractionContext.SolutionContext)
+        | false, _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
+
     type IProject with
         member x.IsFSharp =
             x.ProjectProperties :? FSharpProjectProperties ||

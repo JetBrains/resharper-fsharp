@@ -98,13 +98,6 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
     let getLanguageLevelByCompiler (fscPath: VirtualFileSystemPath): VersionMapping =
         compilerPathToLanguageLevels.GetOrAdd(fscPath, getLanguageLevelByCompilerNoCache)
 
-    let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
-        if isNull configuration then VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext) else
-
-        match configuration.PropertiesCollection.TryGetValue(FSharpProperties.DotnetFscCompilerPath) with
-        | true, path -> path.Trim('"').ParseVirtualPathSafe(InteractionContext.SolutionContext)
-        | false, _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
-
     let convertToLanguageLevel (configuration: IFSharpProjectConfiguration) version =
         match version with
         | FSharpLanguageVersion.FSharp46 -> FSharpLanguageLevel.FSharp46
