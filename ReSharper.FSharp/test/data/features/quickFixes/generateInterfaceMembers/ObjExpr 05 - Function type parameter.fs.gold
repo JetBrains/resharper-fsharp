@@ -1,0 +1,13 @@
+﻿module Module
+
+type IA<'T> =
+    abstract M1: 'T -> unit
+    abstract M2: 'T -> unit
+
+let f (x: 'T) =
+    { new obj() with
+        override this.ToString() = ""
+
+      interface IA<'T> with
+          member this.M2 _ = ()
+          member this.M1(var0) = {selstart}failwith "todo"{selend} }

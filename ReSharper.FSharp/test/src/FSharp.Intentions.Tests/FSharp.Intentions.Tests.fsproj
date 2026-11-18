@@ -54,6 +54,8 @@
     <Compile Include="src\Intentions\InvertIfTest.fs" />
     <Compile Include="src\Intentions\ElifToIfTest.fs" />
     <Compile Include="src\Intentions\IfToElifTest.fs" />
+    <Compile Include="src\Intentions\ImplementAbstractMemberTest.fs" />
+    <Compile Include="src\Intentions\ImplementMemberInInheritorsTest.fs" />
     <Compile Include="src\Intentions\NegateConditionTest.fs" />
     <Compile Include="src\Intentions\ToMutableTest.fs" />
     <Compile Include="src\Intentions\SpecifyTypesTest.fs" />

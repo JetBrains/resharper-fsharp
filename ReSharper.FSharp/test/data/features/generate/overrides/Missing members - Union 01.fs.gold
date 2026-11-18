@@ -1,0 +1,15 @@
+﻿Provided elements:
+ 0: M(System.Int32):System.Void
+
+// ${KIND:Implementations}
+// ${SELECT0:M(System.Int32):System.Void}
+
+type I =
+    abstract M: int -> unit
+
+type U =
+    | A
+    | B
+
+    interface I with
+        member this.M(var0) = {selstart}failwith "todo"{selend}

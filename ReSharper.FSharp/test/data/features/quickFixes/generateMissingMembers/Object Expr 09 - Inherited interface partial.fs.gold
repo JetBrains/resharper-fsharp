@@ -1,0 +1,13 @@
+﻿module Module
+
+type IA =
+    abstract M1: unit -> unit
+
+type IB =
+    inherit IA
+
+    abstract M2: unit -> unit
+
+let o = { new IB with
+            member this.M1() = ()
+            member this.M2() = {selstart}failwith "todo"{selend} }

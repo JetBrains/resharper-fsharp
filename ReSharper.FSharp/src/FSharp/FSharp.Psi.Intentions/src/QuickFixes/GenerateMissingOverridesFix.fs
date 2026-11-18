@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Feature.Services.Generate
 open JetBrains.ReSharper.Feature.Services.Generate.Workflows
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Generate
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
@@ -26,7 +27,8 @@ type GenerateMissingOverridesFix(typeDecl: IFSharpTypeElementDeclaration) =
     override x.Text = "Generate missing members"
 
     override this.IsAvailable _ =
-        isValid typeDecl && isNotNull (typeDecl.GetFcsSymbol())
+        isValid typeDecl && isNotNull (typeDecl.GetFcsSymbol()) &&
+        not (Seq.isEmpty (GenerateOverrides.getOverridableAndMissingInterfaceMembers true typeDecl))
 
     override x.Execute(solution, textControl) =
         let workflow = GenerateImplementationsWorkflow()

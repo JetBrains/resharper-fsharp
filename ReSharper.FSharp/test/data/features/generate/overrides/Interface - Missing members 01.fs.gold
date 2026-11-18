@@ -1,0 +1,18 @@
+﻿Provided elements:
+ 0: Equals(System.Object?):System.Boolean
+ 1: Finalize():System.Void
+ 2: GetHashCode():System.Int32
+ 3: ToString():System.String?
+ 4: M(System.Int32):System.Void
+ 5: get_P():System.Int32
+
+// ${KIND:Overrides}
+// ${SELECT0:M(System.Int32):System.Void}
+
+type I =
+    abstract M: int -> unit
+    abstract P: int
+
+type T() =
+    interface I with
+        member this.M(var0) = {selstart}failwith "todo"{selend}

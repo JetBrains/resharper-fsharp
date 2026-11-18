@@ -10,7 +10,7 @@ type IB =
 
 type T() =
     interface IB with
-        member this.M2(var0: string): unit = {selstart}failwith "todo"{selend}
-        member this.M2(var0: int): unit = failwith "todo"
-        member this.M1(var0: string): unit = failwith "todo"
+        member this.M2(var0: int): unit = {selstart}failwith "todo"{selend}
         member this.M1(var0: int): unit = failwith "todo"
+        member this.M2(var0: string): unit = failwith "todo"
+        member this.M1(var0: string): unit = failwith "todo"

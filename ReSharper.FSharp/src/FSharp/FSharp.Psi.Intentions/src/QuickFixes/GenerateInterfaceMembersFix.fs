@@ -33,8 +33,7 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
     override x.Text = "Generate missing members"
 
     override x.IsAvailable _ =
-        let fcsEntity = impl.FcsEntity
-        isNotNull fcsEntity && fcsEntity.IsInterface
+        GenerateOverrides.isInterfaceImplementation impl
 
     override x.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(impl.IsPhysical())
@@ -46,18 +45,8 @@ type GenerateInterfaceMembersFix(impl: IInterfaceImplementation) =
 
         let implContext = InterfaceImplementationContext.Create(impl)
 
-        let membersToGenerate = GenerateOverrides.getInterfaceMembers true implContext typeElement
+        let membersToGenerate = GenerateOverrides.getMissingInterfaceMembers implContext typeElement
 
-        let (anchor: ITreeNode) =
-            let existingMembers = impl.TypeMembers
-            if not existingMembers.IsEmpty then
-                existingMembers.Last()
-            else
-                if isNull impl.WithKeyword then
-                    ModificationUtil.AddChildAfter(impl.TypeName, FSharpTokenType.WITH.CreateLeafElement()) |> ignore
-
-                impl.WithKeyword
-
-        let addedMembers = GenerateOverrides.addMembers membersToGenerate typeDeclaration anchor
+        let addedMembers = GenerateOverrides.addInterfaceMembers membersToGenerate typeDeclaration impl
         let expr = GenerateOverrides.getGeneratedBodyToSelect addedMembers
         BulbActionCommands.SetSelection(expr)

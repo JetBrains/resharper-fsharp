@@ -35,6 +35,7 @@
     <Compile Include="src\Intentions\ToModuleNamespaceDeclarationAction.fs" />
     <Compile Include="src\Intentions\InvertIfAction.fs" />
     <Compile Include="src\Intentions\ElifToIfAction.fs" />
+    <Compile Include="src\Intentions\ImplementAbstractMemberAction.fs" />
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />

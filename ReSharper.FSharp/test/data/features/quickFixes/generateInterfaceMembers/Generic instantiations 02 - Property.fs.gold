@@ -1,0 +1,18 @@
+﻿module Module
+
+type IA<'T> =
+    abstract P2: 'T with get, set
+    abstract P1: 'T
+
+type IB =
+    inherit IA<int>
+    inherit IA<string>
+
+type T() =
+    interface IB with
+        member this.P2: int = {selstart}failwith "todo"{selend}
+        member this.P2 with set (value: int) = failwith "todo"
+        member this.P1: int = failwith "todo"
+        member this.P2: string = failwith "todo"
+        member this.P2 with set (value: string) = failwith "todo"
+        member this.P1: string = failwith "todo"

@@ -63,11 +63,15 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Nested interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 02 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Nested interface 03 - Partially base implemented``() = x.DoNamedTest()
+    [<Test>] member x.``Nested interface 04 - Partially implemented``() = x.DoNamedTest()
+    [<Test>] member x.``Nested interface 05 - Generic base implemented``() = x.DoNamedTest()
 
     [<Test>] member x.``ObjExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``ObjExpr 02``() = x.DoNamedTest()
     [<Test>] member x.``ObjExpr 03``() = x.DoNamedTest()
     [<Test>] member x.``ObjExpr 04``() = x.DoNamedTest()
+    [<Test>] member x.``ObjExpr 05 - Function type parameter``() = x.DoNamedTest()
+    [<Test>] member x.``ObjExpr 06 - Inherited interface partial``() = x.DoNamedTest()
 
     [<Test>] member x.``Static 01``() = x.DoNamedTest()
     [<Test>] member x.``Static 02``() = x.DoNamedTest()
@@ -80,6 +84,12 @@ type GenerateInterfaceMembersFixTest() =
     [<Test>] member x.``Order 05 - Partial impl``() = x.DoNamedTest()
     [<Test>] member x.``Order 06 - Event``() = x.DoNamedTest()
     [<Test>] member x.``Order 07 - CSharp``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
+
+    [<Test>] member x.``Generic instantiations 01 - Separate impls``() = x.DoNamedTest()
+    [<Test>] member x.``Generic instantiations 02 - Property``() = x.DoNamedTest()
+    [<Test>] member x.``Generic instantiations 03 - Partial impl``() = x.DoNamedTest()
+    [<Test>] member x.``Generic instantiations 04 - Type parameter``() = x.DoNamedTest()
+    [<Test>] member x.``Generic instantiations 05 - Object expr``() = x.DoNamedTest()
 
 
 [<FSharpTest; AssertCorrectTreeStructure>]
@@ -97,6 +107,7 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Explicit impl 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Default impl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Default interface member 01``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
 
     [<Test>] member x.``Object Expr - Generic 01``() = x.DoNamedTest()
     [<Test>] member x.``Object Expr 01``() = x.DoNamedTest()
@@ -106,6 +117,14 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Object Expr 05``() = x.DoNamedTest()
     [<TestReferenceProjectOutput("AbstractMembers")>]
     [<Test>] member x.``Object Expr 06``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 07 - With``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 08 - Generic instantiations``() = x.DoNamedTest()
+    [<Test>] member x.``Object Expr 09 - Inherited interface partial``() = x.DoNamedTest()
+
+    [<Test>] member x.``Base - Interface 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available - Own abstract 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Own abstract 02 - Base type``() = x.DoNamedTest()
 
     [<Test>] member x.``Order 01 - Base classes``() = x.DoNamedTest()
     [<Test>] member x.``Order 02 - CSharp``() = x.DoTestSolution(FSharpTestUtil.referenceCSharpProject x)
@@ -115,6 +134,7 @@ type GenerateMissingMembersFixTest() =
     [<Test>] member x.``Property - Accessor - Setter 01``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 02``() = x.DoNamedTest()
     [<Test>] member x.``Property - Accessor - Setter 03``() = x.DoNamedTest()
+    [<Test>] member x.``Property - Accessor - Setter 04 - Base type``() = x.DoNamedTest()
     [<Test>] member x.``Property - Indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Property 01``() = x.DoNamedTest()
 

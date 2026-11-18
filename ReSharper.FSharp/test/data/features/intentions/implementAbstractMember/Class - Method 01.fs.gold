@@ -1,0 +1,10 @@
+﻿module Module
+
+[<AbstractClass>]
+type A() =
+    abstract M: int -> unit
+
+type T() =
+    inherit A()
+
+    override this.M(var0) = {selstart}failwith "todo"{selend}

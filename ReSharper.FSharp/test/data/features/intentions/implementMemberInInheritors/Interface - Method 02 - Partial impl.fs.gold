@@ -1,0 +1,7 @@
+﻿// ${MEMBER:M2}
+module Module
+
+type T() =
+    interface I with
+        member this.M1(i) = ()
+        member this.M2(i) = failwith "todo"

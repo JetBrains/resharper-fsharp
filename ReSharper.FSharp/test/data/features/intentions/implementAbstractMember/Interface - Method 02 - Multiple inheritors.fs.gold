@@ -1,0 +1,12 @@
+﻿module Module
+
+type I =
+    abstract M: int -> unit
+
+type T1() =
+    interface I with
+        member this.M(var0) = failwith "todo"
+
+type T2() =
+    interface I with
+        member this.M(var0) = {selstart}failwith "todo"{selend}

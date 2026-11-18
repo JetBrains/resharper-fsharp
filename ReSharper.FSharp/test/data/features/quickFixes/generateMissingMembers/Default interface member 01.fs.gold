@@ -1,0 +1,9 @@
+﻿module Module
+
+type T() =
+    inherit A()
+
+    interface I with
+        member this.M1() = ()
+
+    override this.M3() = {selstart}failwith "todo"{selend}

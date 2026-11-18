@@ -1,0 +1,16 @@
+﻿module Module
+
+type I =
+    abstract M1: int -> unit
+
+[<AbstractClass>]
+type A() =
+    abstract M2: int -> unit
+
+type T() =
+    inherit A()
+
+    interface I with
+        member this.M1(var0) = failwith "todo"
+
+    override this.M2(var0) = {selstart}failwith "todo"{selend}
