@@ -43,6 +43,7 @@ val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$riderBaseVersion.$buildCounter"
 
 dependencies {
+  testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.junit.params)
   testRuntimeOnly(libs.junit.launcher)
