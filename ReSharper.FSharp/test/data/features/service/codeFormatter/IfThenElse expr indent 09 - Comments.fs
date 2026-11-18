@@ -1,0 +1,13 @@
+module Module
+
+do
+    if a then // c1
+        b
+    else // c2
+        c
+
+    if a then
+        b
+    // c3
+    else
+        c

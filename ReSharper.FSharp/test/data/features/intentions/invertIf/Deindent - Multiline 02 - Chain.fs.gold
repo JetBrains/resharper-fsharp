@@ -1,0 +1,9 @@
+﻿let f a =
+    if{caret} not a then
+        let x = g ()
+        if x then Some 1 else
+
+        let y = h ()
+        Some y
+    else
+        None

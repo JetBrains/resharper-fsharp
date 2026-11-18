@@ -1,0 +1,7 @@
+﻿let f a b =
+    if{caret} not a then
+        1
+    else
+        match b with
+        | Some x -> x
+        | None -> 0

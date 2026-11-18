@@ -1,0 +1,20 @@
+module Module
+
+type T() =
+    member x.M =
+        f(
+            a
+        )
+
+    member x.N = f(
+        a
+    )
+
+    member x.P = async {
+        return a
+    }
+
+    member x.Q =
+        async {
+            return a
+        }

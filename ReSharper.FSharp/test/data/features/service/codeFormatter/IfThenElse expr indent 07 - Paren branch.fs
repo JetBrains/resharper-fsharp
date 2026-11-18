@@ -1,0 +1,16 @@
+module Module
+
+do
+    if a then f(
+        b
+    ) else c
+
+    if a then async {
+        return b
+    } else c
+
+    if a then
+        b
+    else f(
+        c
+    )

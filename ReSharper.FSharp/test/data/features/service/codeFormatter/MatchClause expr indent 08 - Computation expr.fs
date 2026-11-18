@@ -1,0 +1,8 @@
+module Module
+
+do
+    match a with
+    | 1 -> async {
+               return a
+           }
+    | _ -> b

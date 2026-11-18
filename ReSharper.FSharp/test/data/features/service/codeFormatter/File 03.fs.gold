@@ -647,6 +647,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, path, projectedOffs
         | [] -> []
         | { Range = r } :: rest ->
             if Position.posGt r.End outerRange.Start then attrs else
+
             x.SkipOuterAttrs(rest, outerRange)
 
     member x.ProcessTopLevelBinding(binding, isSecondary) =

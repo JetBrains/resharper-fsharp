@@ -23,11 +23,8 @@ let addIndent (clause: IMatchClause) =
         ModificationUtil.ReplaceChildRange(oldRange, TreeRange(Whitespace())) |> ignore
     else
         if clause.RArrow.StartLine.Plus1() < expr.StartLine then
-            let lineEnding = expr.GetLineEnding()
-            let oldRange = TreeRange(clause.RArrow.NextSibling, expr.PrevSibling)
-            ModificationUtil.DeleteChildRange(oldRange)
-            ModificationUtil.AddChildAfter(clause.RArrow, Whitespace(clause.Indent)) |> ignore
-            ModificationUtil.AddChildAfter(clause.RArrow, NewLine(lineEnding)) |> ignore
+            let lastNewLine = skipMatchingNodesBefore isInlineSpace expr
+            ModificationUtil.DeleteChildRange(TreeRange(clause.RArrow.NextSibling, lastNewLine.PrevSibling))
 
         let indentSize = expr.GetIndentSize()
         shiftWithWhitespaceBefore indentSize expr

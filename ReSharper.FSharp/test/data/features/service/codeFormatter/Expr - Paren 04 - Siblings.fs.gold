@@ -1,0 +1,17 @@
+﻿module Module
+
+do
+    [ f(
+          a
+      )
+      g ]
+
+    { F = f(
+          a
+      )
+      G = b }
+
+    f(
+        a
+    ),
+    g

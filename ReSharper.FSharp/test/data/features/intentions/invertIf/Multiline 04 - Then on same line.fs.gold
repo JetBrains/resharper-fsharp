@@ -1,0 +1,6 @@
+﻿let f a =
+    if{caret} not a then
+        g ()
+        h ()
+    else
+        1

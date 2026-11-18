@@ -1,0 +1,24 @@
+module Module
+
+do
+    match a with
+    | 1 -> { F = a
+             G = b }
+    | _ -> c
+
+    match a with
+    | 1 -> fun x ->
+        x
+    | _ -> id
+
+    match a with
+    | 1 -> a
+           |> f
+    | _ -> b
+
+    match a with
+    | 1 -> if b then
+               c
+           else d
+    | _ -> match b with
+           | _ -> c

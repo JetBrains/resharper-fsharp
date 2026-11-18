@@ -148,9 +148,16 @@ let precedence (expr: ITreeNode) =
 
     | _ -> 0
 
+let private startsIfBranchBlock (branchExpr: IFSharpExpression) =
+    if not (isOnlyMeaningfulNodeOnLine branchExpr) then false else
+
+    let nextBranchStart = branchExpr.GetNextMeaningfulSibling()
+    isNull nextBranchStart || nextBranchStart.Indent < branchExpr.Indent
+
 let startsBlock (context: IFSharpExpression) =
 //    isNotNull (BinaryAppExprNavigator.GetByRightArgument(context)) || // todo: not really a block here :(
-    isNotNull (SetExprNavigator.GetByRightExpression(context))
+    isNotNull (SetExprNavigator.GetByRightExpression(context)) ||
+    isNotNull (IfExprNavigator.GetByBranchExpression(context)) && startsIfBranchBlock context
 
 let getContextPrecedence (context: IFSharpExpression) =
     if context :? IInterpolatedStringExpr then 0 else
@@ -285,7 +292,7 @@ let rec needsParensImpl (allowHighPrecedenceAppParens: unit -> bool) (context: I
 
     match expr with
     | :? IIfThenElseExpr ->
-        isNotNull (IfThenElseExprNavigator.GetByThenExpr(context)) ||
+        isNotNull (IfThenElseExprNavigator.GetByThenExpr(context)) && not (startsBlock context) ||
         isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ||
         isNotNull (ForEachExprNavigator.GetByInExpression(context)) ||
         isNotNull (BinaryAppExprNavigator.GetByLeftArgument(context)) ||

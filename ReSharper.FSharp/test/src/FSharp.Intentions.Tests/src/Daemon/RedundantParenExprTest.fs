@@ -78,6 +78,8 @@ type RedundantParenExprTest() =
 
     [<Test>] member x.``For each - Condition - If 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``If - Branch 01 - Own line``() = x.DoNamedTest()
+    [<Test>] member x.``If - Branch 02 - Else column``() = x.DoNamedTest()
     [<Test>] member x.``If - Condition - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``If - Condition - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``If - Condition - Type cast 01``() = x.DoNamedTest()

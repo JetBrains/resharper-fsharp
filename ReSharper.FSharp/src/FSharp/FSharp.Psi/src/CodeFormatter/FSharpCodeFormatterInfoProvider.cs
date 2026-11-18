@@ -100,23 +100,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
       // WrapArguments
 
       Describe<WrapRule>()
+        .Return(WrapType.KeepTogether | WrapType.LineBreakBeforeIfMultiline)
+        .StartAlternating()
+
         .Name("MultilineLambdaBody")
         .Where(
           Parent().In(ElementType.LAMBDA_EXPR),
-          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET)
-        )
-        .Return(WrapType.KeepTogether | WrapType.LineBreakBeforeIfMultiline)
-        .Build();
+          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET))
+        .Build()
 
-      // todo: unify with the lambda rule?
-      Describe<WrapRule>()
-        .Name("BindingBody")
+        .Name("MultilineBody")
         .Where(
-          Parent().In(ElementBitsets.BINDING_BIT_SET.Union(ElementType.DO_STATEMENT, ElementType.DO_EXPR)),
+          Parent().In(ElementBitsets.BINDING_BIT_SET.Union(
+            ElementType.DO_STATEMENT, ElementType.DO_EXPR, ElementType.MATCH_CLAUSE)),
           Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET.Union(ElementType.CHAMELEON_EXPRESSION))
-            .Satisfies((node, _) => ForceInsertLineBreak(node.Node))
-        )
-        .Return(WrapType.KeepTogether | WrapType.LineBreakBeforeIfMultiline)
+            .Satisfies((node, _) => ForceInsertLineBreak(node.Node)))
+        .Build()
+
+        .Name("MultilineIfBranch")
+        .Where(
+          Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
+          Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET)
+            .Satisfies((node, _) => IsIfBranch(node.Node) && ForceInsertLineBreak(node.Node)))
         .Build();
 
       // Describe<FormattingRule>()
@@ -413,7 +418,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .AddException(
           Parent().In(ElementType.MATCH_CLAUSE).Satisfies(IsLastNodeOfItsType),
           Node().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies((node, context) =>
-            AreAligned(node, node.Parent, context.CodeFormatter)))
+            !node.HasNewLineBefore() || IsDeindentedBody(node, context)))
         .AddException(
           Parent().In(ElementType.MATCH_CLAUSE),
           Node().In(ElementType.OR_PAT))
@@ -539,6 +544,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
+    private static bool IsIfBranch(ITreeNode node) =>
+      node is IFSharpExpression expr and not IIfExpr && IfExprNavigator.GetByBranchExpression(expr) != null;
+
     private static bool IsParenParametersDeclaration(ITreeNode node) =>
       node is IPrimaryConstructorDeclaration or IParametersPatternDeclaration { Pattern: IParenPat };
 
@@ -603,7 +611,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
 
       Describe<IndentingRule>()
         .Name("SimpleAlignment")
-        .Where(Node().In(aligningNodes).Satisfies((node, _) => !aligningNodes[node.Parent.NodeType] || node.Parent.FirstChild != node))
+        .Where(Node().In(aligningNodes).Satisfies((node, _) =>
+          (!aligningNodes[node.Parent.NodeType] || node.Parent.FirstChild != node) && !IsElseIfExpr(node)))
         .Return(IndentType.AlignThrough)
         .Build();
 
@@ -682,11 +691,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         ElementType.FIELD_PAT,
         pat => pat.FieldPatternsEnumerable);
 
-      DescribeParenIndent("ParenExpr", new NodeTypeSet(ElementType.PAREN_EXPR, ElementType.TUPLE_EXPR),
-        IndentType.InternalCollapsible | IndentType.OverrideAlignment);
+      var parenExprs = new NodeTypeSet(ElementType.PAREN_EXPR, ElementType.TUPLE_EXPR);
+      var parenPats = new NodeTypeSet(ElementType.PAREN_PAT, ElementType.NAMED_UNION_CASE_FIELDS_PAT);
 
-      DescribeParenIndent("ParenPat", new NodeTypeSet(ElementType.PAREN_PAT, ElementType.NAMED_UNION_CASE_FIELDS_PAT),
-        IndentType.InternalCollapsible);
+      DescribeParenIndent("ParenExprIndent", parenExprs,
+        IndentType.InternalCollapsible | IndentType.OverrideAlignment,
+        (lParen, context) => !lParen.HasNewLineBefore() && !IsOnMatchClauseFirstLine(lParen, context));
+
+      DescribeParenIndent("ParenExprInMatchClauseIndent", parenExprs, IndentType.InternalCollapsible,
+        (lParen, context) => !lParen.HasNewLineBefore() && IsOnMatchClauseFirstLine(lParen, context));
+
+      DescribeParenIndent("ParenExprOnNewLineIndent", parenExprs, IndentType.Internal,
+        (lParen, _) => lParen.HasNewLineBefore());
+
+      DescribeParenIndent("ParenPatIndent", parenPats, IndentType.InternalCollapsible,
+        (lParen, _) => !lParen.HasNewLineBefore());
+
+      DescribeParenIndent("ParenPatOnNewLineIndent", parenPats, IndentType.Internal,
+        (lParen, _) => lParen.HasNewLineBefore());
 
       Describe<IndentingRule>().Name("EnumCaseLikeDeclarations")
         .Where(Parent().In(ElementBitsets.SIMPLE_TYPE_REPRESENTATION_BIT_SET),
@@ -730,20 +752,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Build();
     }
 
-    private void DescribeParenIndent(string name, NodeTypeSet parenNodeTypes, IndentType sameLineParenIndentType) =>
+    private void DescribeParenIndent(string name, NodeTypeSet parenNodeTypes, IndentType indentType,
+      Func<VirtNode, CodeFormattingContext, bool> lParenPredicate) =>
       Describe<IndentingRule>()
-        .Where(Parent().In(parenNodeTypes), Right().In(FSharpTokenType.RPAREN))
-        .StartAlternating()
-
-        .Name(name + "Indent")
-        .Where(Left().In(FSharpTokenType.LPAREN).Satisfies((node, _) => !node.HasNewLineBefore()))
-        .Return(sameLineParenIndentType)
-        .Build()
-
-        .Name(name + "OnNewLineIndent")
-        .Where(Left().In(FSharpTokenType.LPAREN).Satisfies((node, _) => node.HasNewLineBefore()))
-        .Return(IndentType.Internal)
+        .Name(name)
+        .Where(
+          Parent().In(parenNodeTypes),
+          Left().In(FSharpTokenType.LPAREN).Satisfies(lParenPredicate),
+          Right().In(FSharpTokenType.RPAREN))
+        .Return(indentType)
         .Build();
+
+    private static bool IsOnMatchClauseFirstLine(VirtNode node, CodeFormattingContext context) =>
+      node.NodeOrNull?.GetContainingNode<IMatchClause>() is { FirstChild: { } clauseStart } &&
+      !FormatterImplHelper.HasLineBreaksBetween(new VirtNode(context, clauseStart), node);
 
     private static bool IsPrefixAppWithNoComputationExprArg(VirtNode node) =>
       node.Node is IPrefixAppExpr { ArgumentExpression: not IComputationExpr };
@@ -821,6 +843,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .Return(IntervalFormatType.InsertSpace)
         .Build();
 
+
+      Describe<FormattingRule>()
+        .Name("ElseAfterMultilineThenExpr")
+        .Group(LineBreaksRuleGroup)
+        .Where(
+          Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
+          Left().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET)
+            .Satisfies((node, _) => node.HasNewLineBefore() || node.ContainsLineBreak()),
+          Right().In(FSharpTokenType.ELSE, ElementType.ELIF_EXPR))
+        .Return(IntervalFormatType.NewLine)
+        .Build();
 
       Describe<FormattingRule>()
         .Name("GoodPlacesToWrap")
@@ -1268,6 +1301,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
         .MinBlankLines(it => it.BlankLineAroundTopLevelModules)
         .Build();
 
+      Describe<BlankLinesRule>()
+        .Group(MaxLineBreaks)
+        .Where(
+          Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
+          Left().In(FSharpTokenType.THEN, FSharpTokenType.ELSE))
+        .StartAlternating()
+
+        .Name("NoBlankLinesBeforeIfBranch")
+        .Where(Right().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies((node, context) =>
+          !IsEarlyReturnElseExpr(node, context)))
+        .Return(0, NoMildLimitOnMaxBlankLines, 0, true)
+        .Build()
+
+        .Name("BlankLineBeforeEarlyReturnElseExpr")
+        .Where(Right().In(ElementBitsets.F_SHARP_EXPRESSION_BIT_SET).Satisfies(IsEarlyReturnElseExpr))
+        .Return(1, NoMildLimitOnMaxBlankLines, NoStrictLimitOnMaxBlankLines, true)
+        .Build();
+
+      Describe<BlankLinesRule>()
+        .Name("NoBlankLinesBeforeElse")
+        .Group(MaxLineBreaks)
+        .Where(
+          Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
+          Right().In(FSharpTokenType.ELSE, ElementType.ELIF_EXPR))
+        .Return(0, NoMildLimitOnMaxBlankLines, 0, true)
+        .Build();
+
       // todo: test sig files
       Describe<BlankLinesRule>()
         .Name("BlankLinesInDecls")
@@ -1457,10 +1517,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.CodeFormatter
     }
 
     private static bool IndentElseExpr(VirtNode elseExpr, CodeFormattingContext context) =>
-      elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine() && elseExpr.NodeOrNull is not IElifExpr;
+      elseExpr.NodeOrNull is not IElifExpr && !IsElseIfExpr(elseExpr) && !IsEarlyReturnElseExpr(elseExpr, context);
 
-    private static bool AreAligned(VirtNode first, VirtNode second, IWhitespaceChecker checker) =>
-      first.Node.CalcLineIndent(checker, true) == second.Node.CalcLineIndent(checker, true);
+    private static bool IsEarlyReturnElseExpr(VirtNode node, CodeFormattingContext context) =>
+      node.NodeOrNull is IFSharpExpression expr && IfExprNavigator.GetByElseExpr(expr) != null &&
+      !node.GetPreviousMeaningfulSibling().IsFirstOnLine() && IsDeindentedBody(node, context);
+
+    private static bool IsElseIfExpr(VirtNode node) =>
+      node.NodeOrNull is IIfThenElseExpr ifExpr && IfExprNavigator.GetByElseExpr(ifExpr) != null &&
+      !node.HasNewLineBefore();
+
+    private static bool IsDeindentedBody(VirtNode body, CodeFormattingContext context)
+    {
+      var checker = context.CodeFormatter;
+      return body.Node.IsFirstOnLine(checker) &&
+             body.Node.CalcLineIndent(checker, true) == body.Parent.Node.CalcLineIndent(checker, true);
+    }
 
     private static bool IsPipeOperator(VirtNode node, CodeFormattingContext context) =>
       node.NodeOrNull is IReferenceExpr refExpr && FSharpPredefinedType.PipeOperatorNames.Contains(refExpr.ShortName);
