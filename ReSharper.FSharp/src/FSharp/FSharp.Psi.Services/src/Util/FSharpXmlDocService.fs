@@ -20,10 +20,10 @@ open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
-type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration,
-        psiModules: IPsiModules, assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming,
-        factory: XmlDocSectionFactory, renderer: IXmlDocHtmlRenderer) =
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
+type FSharpXmlDocService(xmlDocThread: XmlIndexThread, psiConfig: IPsiConfiguration, psiModules: IPsiModules,
+        assemblyInfoDatabase: AssemblyInfoDatabase, theming: ITheming, factory: XmlDocSectionFactory,
+        renderer: IXmlDocHtmlRenderer) =
 
     static let crefManager =
         { new CrefManager() with
@@ -54,7 +54,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                         let psiModules = psiModules.GetAssemblyPsiModuleByName(assemblyName)
                         psiModules |> Seq.tryFind (fun psiModule -> psiModule.Assembly.Location.Equals(dllPath)))
                     |> Option.map (fun psiModule ->
-                        let assemblyFile = psiServices.Symbols.GetLibraryFile(psiModule.Assembly)
+                        let assemblyFile = psiModule.GetPsiServices().Symbols.GetLibraryFile(psiModule.Assembly)
                         assemblyFile.XmlDocIndex)
                     |> Option.defaultWith (fun _ ->
                         XmlDocIndex(dllPath.ChangeExtension(ExtensionConstants.Xml), true, psiConfig, xmlDocThread))

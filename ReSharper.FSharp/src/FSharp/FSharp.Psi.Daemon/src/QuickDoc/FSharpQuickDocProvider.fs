@@ -148,7 +148,7 @@ type FSharpQuickDocPresenter(xmlDocService: FSharpXmlDocService, node: ITreeNode
         member this.Resolve _ = null
 
 
-[<QuickDocProvider(-1000)>]
+[<QuickDocProvider(-1000, Instantiation.DemandAnyThreadSafe)>]
 type FSharpQuickDocProvider(xmlDocService: FSharpXmlDocService) =
     let tryFindNode (context: IDataContext) : ITreeNode =
         let sourceFile = context.GetData(PsiDataConstants.SOURCE_FILE)
