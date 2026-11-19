@@ -49,43 +49,43 @@ module FSharpProjectSnapshotExtensions =
 
 type FcsProjectOptions =
     | FcsProjectOptions of FSharpProjectOptions * FSharpParsingOptions
-    | FcsProjectSnapshot of FSharpProjectSnapshot
+    | FcsProjectSnapshot of FSharpProjectSnapshot * FSharpParsingOptions
 
     member x.Stamp =
         match x with
         | FcsProjectOptions(options, _) -> options.Stamp
-        | FcsProjectSnapshot(snapshot) -> snapshot.Stamp
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.Stamp
 
     member x.LoadTime =
         match x with
         | FcsProjectOptions(options, _) -> options.LoadTime
-        | FcsProjectSnapshot(snapshot) -> snapshot.LoadTime
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.LoadTime
 
     member x.ProjectFileName =
         match x with
         | FcsProjectOptions(options, _) -> options.ProjectFileName
-        | FcsProjectSnapshot(snapshot) -> snapshot.ProjectFileName
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.ProjectFileName
 
     member x.UseScriptResolutionRules =
         match x with
         | FcsProjectOptions(options, _) -> options.UseScriptResolutionRules
-        | FcsProjectSnapshot(snapshot) -> snapshot.UseScriptResolutionRules
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.UseScriptResolutionRules
 
     member x.OriginalLoadReferences =
         match x with
         | FcsProjectOptions(options, _) -> options.OriginalLoadReferences
-        | FcsProjectSnapshot(snapshot) -> snapshot.OriginalLoadReferences
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.OriginalLoadReferences
 
     member x.SourceFiles: string array =
         match x with
         | FcsProjectOptions(options, _) -> options.SourceFiles
-        | FcsProjectSnapshot(snapshot) -> snapshot.SourceFiles |> Seq.map _.FileName |> Seq.toArray
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.SourceFiles |> Seq.map _.FileName |> Seq.toArray
 
     member x.OtherOptions: string seq =
         match x with
         | FcsProjectOptions(options, _) -> options.OtherOptions
         //TODO: change type to array in FCS 
-        | FcsProjectSnapshot(snapshot) -> snapshot.OtherOptions
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.OtherOptions
 
     member x.ReferencePaths: string seq =
         match x with
@@ -93,36 +93,22 @@ type FcsProjectOptions =
             options.OtherOptions
             |> Seq.choose (fun o -> if o.StartsWith("-r:", StringComparison.Ordinal) then Some(o.Substring(3)) else None)
 
-        | FcsProjectSnapshot(snapshot) -> snapshot.ReferencesOnDisk |> Seq.map _.Path
+        | FcsProjectSnapshot(snapshot, _) -> snapshot.ReferencesOnDisk |> Seq.map _.Path
 
     member x.ParsingOptions: FSharpParsingOptions =
         match x with
         | FcsProjectOptions(_, parsingOptions) -> parsingOptions
-        | FcsProjectSnapshot snapshot ->
-        { FSharpParsingOptions.Default with
-            SourceFiles = x.SourceFiles
-            ConditionalDefines = x.ConditionalDefines
-            IsInteractive = snapshot.UseScriptResolutionRules
-            //LangVersionText = TODO
-            IsExe = false } //TODO: is exe
+        | FcsProjectSnapshot(_, parsingOptions) -> parsingOptions
 
     member x.ConditionalDefines: string list =
-        match x with
-        | FcsProjectOptions(_, options) -> options.ConditionalDefines
-        //TODO: FCS doesn't provide this info
-        | FcsProjectSnapshot(snapshot) -> [
-            if snapshot.UseScriptResolutionRules then
-                "INTERACTIVE"
-            else
-                "COMPILED"
-        ]
+        x.ParsingOptions.ConditionalDefines
 
     member x.AreSameForChecking(y: FcsProjectOptions) =
         let inline arrayEq a1 a2 = Array.length a1 = Array.length a2 && Array.forall2 (=) a1 a2
 
         let referencesOnDisk (options: FcsProjectOptions) =
             match options with
-            | FcsProjectSnapshot(snapshot) -> snapshot.ReferencesOnDisk
+            | FcsProjectSnapshot(snapshot, _) -> snapshot.ReferencesOnDisk
             | _ -> []
 
         if x.ProjectFileName <> y.ProjectFileName ||
@@ -151,7 +137,7 @@ type FcsProjectOptions =
                 | _ -> false
             )
 
-        | FcsProjectSnapshot(x), FcsProjectSnapshot(y) ->
+        | FcsProjectSnapshot(x, _), FcsProjectSnapshot(y, _) ->
             x.ReferencesOnDisk = y.ReferencesOnDisk &&
             x.ReferencedProjects.Length = y.ReferencedProjects.Length &&
             (x.ReferencedProjects, y.ReferencedProjects)
@@ -199,15 +185,15 @@ and FcsProject =
 
     member x.WithUpdatedFile(path: VirtualFileSystemPath) =
         match x.Options with
-        | FcsProjectSnapshot(snapshot) when x.FileIndices.ContainsKey(path) ->
+        | FcsProjectSnapshot(snapshot, parsingOptions) when x.FileIndices.ContainsKey(path) ->
             let snapshot = snapshot.Replace([FSharpFileSnapshot.CreateFromFileSystem(path.FullPath)])
-            { x with Options = FcsProjectSnapshot(snapshot) }
+            { x with Options = FcsProjectSnapshot(snapshot, parsingOptions) }
 
         | _ -> x
 
     member x.WithUpdateReferencedProject(outputPath: string, referencedSnapshot: FSharpProjectSnapshot) =
         match x.Options with
-        | FcsProjectSnapshot(snapshot) ->
+        | FcsProjectSnapshot(snapshot, parsingOptions) ->
             let referencedProjects =
                 snapshot.ReferencedProjects
                 |> List.map (function
@@ -215,7 +201,7 @@ and FcsProject =
                         FSharpReferencedProjectSnapshot.FSharpReference(path, referencedSnapshot)
                     | reference -> reference)
 
-            { x with Options = FcsProjectSnapshot(snapshot.With(referencedProjects = referencedProjects)) }
+            { x with Options = FcsProjectSnapshot(snapshot.With(referencedProjects = referencedProjects), parsingOptions) }
 
         | _ -> x
 
@@ -238,19 +224,19 @@ and FcsProject =
 
                 FcsProjectOptions({ projectOptions with ReferencedProjects = references }, parsingOptions)
 
-            | FcsProjectSnapshot projectSnapshot ->
+            | FcsProjectSnapshot(projectSnapshot, parsingOptions) ->
                 let references =
                     applicableReferences
                     |> Seq.map (function
                         | FcsReferencedModule.OutputAssembly(path, getTimestamp, getReader) ->
                             FSharpReferencedProjectSnapshot.ILModuleReference(path, getTimestamp, getReader)
-                        | FcsReferencedModule.Project { Options = FcsProjectSnapshot(snapshot); OutputPath = outputPath } ->
+                        | FcsReferencedModule.Project { Options = FcsProjectSnapshot(snapshot, _); OutputPath = outputPath } ->
                             FSharpReferencedProjectSnapshot.FSharpReference(outputPath.FullPath, snapshot)
                         | _ -> failwith "Expecting referenced project with FcsProjectSnapshot"
                     )
                     |> Seq.toList
 
-                FcsProjectSnapshot(projectSnapshot.With(referencedProjects = references))
+                FcsProjectSnapshot(projectSnapshot.With(referencedProjects = references), parsingOptions)
 
         { x with ReferencedModules = HashSet(moduleReferences); Options = options }
 
@@ -280,7 +266,7 @@ and FcsProject =
                     | _ -> ""
                 writer.WriteLine($"  {stamp}{referencedProject.OutputFile}")
 
-        | FcsProjectSnapshot projectSnapshot ->
+        | FcsProjectSnapshot(projectSnapshot, _) ->
             for referencedProject in projectSnapshot.ReferencedProjects do
                 let stamp =
                     match referencedProject with

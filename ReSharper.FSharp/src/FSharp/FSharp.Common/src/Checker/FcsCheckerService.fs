@@ -79,18 +79,18 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
 
     member x.GetProjectOptionsFromScript(path, source, otherFlags, targetNetFramework, sdkDirOverride) =
         let source = SourceTextNew.ofString(source)
+        let parsingOptions =
+            { FSharpParsingOptions.Default with
+                SourceFiles = [| path |]
+                ConditionalDefines = ImplicitDefines.scriptDefines
+                IsInteractive = true
+                IsExe = true } //TODO: language version
 
         if x.UseTransparentCompiler then
             let snapshot, errors = checker.Value.GetProjectSnapshotFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
-            FcsProjectOptions.FcsProjectSnapshot(snapshot), errors
+            FcsProjectOptions.FcsProjectSnapshot(snapshot, parsingOptions), errors
         else
             let options, errors = checker.Value.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags, assumeDotNetFramework = targetNetFramework, ?sdkDirOverride = sdkDirOverride).RunAsTask()
-            let parsingOptions =
-                { FSharpParsingOptions.Default with
-                    SourceFiles = [| path |]
-                    ConditionalDefines = ImplicitDefines.scriptDefines
-                    IsInteractive = true
-                    IsExe = true } //TODO: language version
 
             FcsProjectOptions.FcsProjectOptions(options, parsingOptions), errors
 
@@ -175,7 +175,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                 | Some (_, checkResults, _) -> Some checkResults
                 | _ -> None
 
-            | FcsProjectSnapshot projectSnapshot ->
+            | FcsProjectSnapshot(projectSnapshot, _) ->
                 let projectSnapshot =
                     if not ContentModelFork.IsCurrentlyForked then projectSnapshot
                     else projectSnapshot.Replace([FSharpFileSnapshot.CreateFromString(path, content)])
@@ -207,7 +207,7 @@ type FcsCheckerService(lifetime: Lifetime, logger: ILogger, settingsStore: ISett
                 logger.Trace("Remove FcsProject in FCS: {0}", projectOptions.ProjectFileName)
                 checker.Value.ClearCache(Seq.singleton projectOptions)
 
-        | FcsProjectSnapshot projectSnapshot ->
+        | FcsProjectSnapshot(projectSnapshot, _) ->
             match invalidationType with
             | FcsProjectInvalidationType.Invalidate ->
                 logger.Trace("Invalidate FcsProject in FCS: {0}", projectSnapshot.ProjectFileName)

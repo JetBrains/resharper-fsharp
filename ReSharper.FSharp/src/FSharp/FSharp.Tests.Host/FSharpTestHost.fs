@@ -78,7 +78,7 @@ type FSharpTestHost(solution: ISolution, sourceCache: FSharpSourceCache, itemsCo
         let outputPaths =
             match projectOptions with
             | FcsProjectOptions(projectOptions, _) -> projectOptions.ReferencedProjects |> Seq.map _.OutputFile
-            | FcsProjectSnapshot projectSnapshot -> projectSnapshot.ReferencedProjects |> Seq.map _.OutputFile
+            | FcsProjectSnapshot(projectSnapshot, _) -> projectSnapshot.ReferencedProjects |> Seq.map _.OutputFile
 
         outputPaths
         |> Seq.map (fun path -> VirtualFileSystemPath.Parse(path, InteractionContext.SolutionContext).NameWithoutExtension)

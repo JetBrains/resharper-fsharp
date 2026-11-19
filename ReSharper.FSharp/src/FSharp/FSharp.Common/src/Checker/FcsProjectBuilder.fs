@@ -231,6 +231,9 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = None }
 
+        let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(basicOptions)
+        if not errors.IsEmpty then logger.Warn("Getting parsing options: {0}", concatErrors errors)
+
         let options =
             if checkerService.UseTransparentCompiler then
                 let sourceFiles =
@@ -242,29 +245,30 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
                         { ReferenceOnDisk.Path = path.FullPath
                           LastModified = FileSystem.GetLastWriteTimeShim(path.FullPath) })
 
-                FSharpProjectSnapshot.Create(
-                    projectOptions.ProjectFileName,
-                    None,
-                    projectOptions.ProjectId,
-                    sourceFiles,
-                    referencesOnDisk,
-                    basicOptions,
-                    [],
-                    projectOptions.IsIncompleteTypeCheckEnvironment,
-                    projectOptions.UseScriptResolutionRules,
-                    projectOptions.LoadTime,
-                    projectOptions.UnresolvedReferences,
-                    projectOptions.OriginalLoadReferences,
-                    projectOptions.Stamp)
-                |> FcsProjectOptions.FcsProjectSnapshot
+                let snapshot =
+                    FSharpProjectSnapshot.Create(
+                        projectOptions.ProjectFileName,
+                        None,
+                        projectOptions.ProjectId,
+                        sourceFiles,
+                        referencesOnDisk,
+                        basicOptions,
+                        [],
+                        projectOptions.IsIncompleteTypeCheckEnvironment,
+                        projectOptions.UseScriptResolutionRules,
+                        projectOptions.LoadTime,
+                        projectOptions.UnresolvedReferences,
+                        projectOptions.OriginalLoadReferences,
+                        projectOptions.Stamp)
+
+                FcsProjectOptions.FcsProjectSnapshot(snapshot, parsingOptions)
+
             else
-                let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(basicOptions)
                 let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
                 let parsingOptions = { parsingOptions with
                                          SourceFiles = projectOptions.SourceFiles
                                          ConditionalDefines = defines }
 
-                if not errors.IsEmpty then logger.Warn("Getting parsing options: {0}", concatErrors errors)
                 FcsProjectOptions.FcsProjectOptions(projectOptions, parsingOptions)
 
         { OutputPath = outPath

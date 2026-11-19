@@ -121,7 +121,7 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
         fcsProjects[projectKey] <- fcsProject
 
         match fcsProject.Options with
-        | FcsProjectSnapshot snapshot ->
+        | FcsProjectSnapshot(snapshot, _) ->
             let outputPath = fcsProject.OutputPath.FullPath
             for referencingProjectKey in getReferencingModules projectKey do
                 match tryGetValue referencingProjectKey fcsProjects with
@@ -144,8 +144,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
     let updateReferencingProjects (projectKey: FcsProjectKey) =
         for referencingProjectKey in getReferencingModules projectKey do
             match tryGetValue referencingProjectKey fcsProjects with
-            | Some({ Options = FcsProjectSnapshot snapshot } as fcsProject) ->
-                updateProject referencingProjectKey { fcsProject with Options = FcsProjectSnapshot(snapshot.With()) }
+            | Some({ Options = FcsProjectSnapshot(snapshot, parsingOptions) } as fcsProject) ->
+                updateProject referencingProjectKey { fcsProject with Options = FcsProjectSnapshot(snapshot.With(), parsingOptions) }
             | _ -> ()
 
     let rec removeProject (projectKey: FcsProjectKey) =
@@ -223,8 +223,8 @@ type FcsProjectProvider(lifetime: Lifetime, solution: ISolution, changeManager: 
 
             let options =
                 match fcsProject.Options with
-                | FcsProjectSnapshot snapshot ->
-                    FcsProjectSnapshot(snapshot.With(stamp = stamp))
+                | FcsProjectSnapshot(snapshot, parsingOptions) ->
+                    FcsProjectSnapshot(snapshot.With(stamp = stamp), parsingOptions)
 
                 | FcsProjectOptions(projectOptions, parsingOptions) ->
                     FcsProjectOptions({ projectOptions with Stamp = stamp }, parsingOptions)

@@ -94,9 +94,11 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
                           { options with SourceFiles = [| path.FullPath |] },
                           { parsingOptions with SourceFiles = [| path.FullPath |] }))
 
-            | Some (FcsProjectOptions.FcsProjectSnapshot(snapshot)) ->
+            | Some (FcsProjectOptions.FcsProjectSnapshot(snapshot, parsingOptions)) ->
                 let fileSnapshot = FSharpFileSnapshot.CreateFromFileSystem(path.FullPath)
-                Some (FcsProjectOptions.FcsProjectSnapshot(snapshot.With(sourceFiles = [fileSnapshot])))
+                Some (FcsProjectOptions.FcsProjectSnapshot(
+                          snapshot.With(sourceFiles = [fileSnapshot]),
+                          { parsingOptions with SourceFiles = [| path.FullPath |] }))
 
             | _ -> None
 
@@ -120,7 +122,7 @@ type ScriptFcsProjectProvider(lifetime: Lifetime, logger: ILogger, checkerServic
             let fileIndices =
                 match options with
                 | FcsProjectOptions _ -> dict [path, 0]
-                | FcsProjectSnapshot projectSnapshot ->
+                | FcsProjectSnapshot(projectSnapshot, _) ->
                     projectSnapshot.SourceFiles
                     |> Seq.mapi (fun i fileSnapshot -> VirtualFileSystemPath.TryParse(fileSnapshot.FileName, InteractionContext.SolutionContext), i)
                     |> dict

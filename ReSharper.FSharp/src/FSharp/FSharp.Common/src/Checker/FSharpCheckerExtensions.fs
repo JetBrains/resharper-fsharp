@@ -24,9 +24,9 @@ type FSharpChecker with
             // Todo: workaround for document forks: the forked file content isn't visible through the project snapshot,
             //  so it is replaced explicitly here; support forks in FSharpSourceCache and AssemblyReaderShim instead
             match fcsProject.Options with
-            | FcsProjectSnapshot projectSnapshot when ContentModelFork.IsCurrentlyForked ->
+            | FcsProjectSnapshot(projectSnapshot, parsingOptions) when ContentModelFork.IsCurrentlyForked ->
                 let currentFileSnapshot = FSharpFileSnapshot.CreateFromString(path, source)
-                FcsProjectSnapshot(projectSnapshot.Replace([currentFileSnapshot]))
+                FcsProjectSnapshot(projectSnapshot.Replace([currentFileSnapshot]), parsingOptions)
             | options -> options
 
         let parseAndCheckFile =
@@ -38,7 +38,7 @@ type FSharpChecker with
                         //TODO: getHashCode is not required here
                         x.ParseAndCheckFileInProject(path, source.GetHashCode(), source, options, userOpName = opName)
 
-                    | FcsProjectSnapshot projectSnapshot ->
+                    | FcsProjectSnapshot(projectSnapshot, _) ->
                         x.ParseAndCheckFileInProject(path, projectSnapshot, userOpName = opName)
 
                 return
