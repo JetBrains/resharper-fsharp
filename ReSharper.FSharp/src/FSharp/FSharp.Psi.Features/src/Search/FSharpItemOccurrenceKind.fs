@@ -41,7 +41,7 @@ module FSharpOccurrenceKinds =
         |> dict
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FsharpSpecificOccurrenceKindIconsProvider() =
     interface IOccurrenceKindIconProvider with
         member this.GetImageId(occurrenceKind, occurrence) =
@@ -55,7 +55,7 @@ type FsharpSpecificOccurrenceKindIconsProvider() =
 // todo: parens in `let i: (int) = 1`
 // todo: patterns in overrides and objExpr
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpItemOccurenceKindProvider() =
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =

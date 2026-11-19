@@ -227,7 +227,7 @@ type FSharpFolderCompletionItem(path: VirtualFileSystemPath) =
         textControl.RescheduleCompletion(solution)
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpScriptReferenceAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
 
