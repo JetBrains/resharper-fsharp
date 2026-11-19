@@ -34,7 +34,7 @@ type FSharpAutopopupStrategyBase() =
         member this.ProcessSubsequentTyping(c, textControl) = this.ProcessSubsequentTyping(c, textControl)
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpAutocompletionStrategy() =
     inherit FSharpAutopopupStrategyBase()
 
@@ -48,7 +48,7 @@ type FSharpAutocompletionStrategy() =
             FSharpTokenType.Strings[tokenType]))
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpOnSpaceAutopopupStrategy() =
     inherit FSharpAutopopupStrategyBase()
 
@@ -115,7 +115,7 @@ type FSharpOnSpaceAutopopupStrategy() =
         )
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpOnParenAutopopupStrategy() =
     inherit FSharpAutopopupStrategyBase()
 
