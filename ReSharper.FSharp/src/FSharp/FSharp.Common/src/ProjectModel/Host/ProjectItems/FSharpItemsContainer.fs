@@ -84,11 +84,12 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
         map :> _
 
 
+[<DerivedComponentsInstantiationRequirement(InstantiationRequirement.DeadlockSafe)>]
 type IItemTypeFilterProvider =
     abstract CreateItemFilter: MsBuildProjectPart * IProjectDescriptor -> MsBuildItemTypeFilter
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
     interface IItemTypeFilterProvider with
         member x.CreateItemFilter(projectPart, projectDescriptor) =
@@ -96,7 +97,7 @@ type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
 
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>)>]
 type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: FSharpItemsContainerLoader,
         projectRefresher: IFSharpItemsContainerRefresher, filterProvider: IItemTypeFilterProvider, locks: IShellLocks,
@@ -399,6 +400,7 @@ type FSharpItemsContainer(lifetime: Lifetime, logger: ILogger, containerLoader: 
         member this.IsValid(item) =
             this.IsValid(item)
 
+[<DerivedComponentsInstantiationRequirement(InstantiationRequirement.DeadlockSafe)>]
 type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
@@ -1266,6 +1268,7 @@ type RdProjectItemWithTargetFrameworks =
       TargetFrameworkIds: HashSet<TargetFrameworkId> }
 
 
+[<DerivedComponentsInstantiationRequirement(InstantiationRequirement.DeadlockSafe)>]
 type IFSharpItemsContainerRefresher =
     /// Refresh the project tree structure for a project.
     abstract member RefreshProject: IProjectMark * isOnProjectLoad: bool -> unit
@@ -1319,7 +1322,7 @@ let getViewParent (container: IFSharpItemsContainer) (viewItem: FSharpViewItem):
     | None -> box parentFolder
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, viewHost: ProjectModelViewHost) =
 
@@ -1429,7 +1432,7 @@ type FSharpViewFolderIdentity =
     override x.ToString() = x.Identity.ToString()
 
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
     inherit OrderingContextProvider()
@@ -1468,7 +1471,7 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
             | item -> Some(OrderingContext(RelativeTo(item, relativeToType))))
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpMovedProjectItemsProvider(container: IFSharpItemsContainer) =
     interface IMovedProjectItemsProvider with
@@ -1490,7 +1493,7 @@ type FSharpMovedProjectItemsProvider(container: IFSharpItemsContainer) =
             |> Option.toObj
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpModificationSettingsProvider() =
     interface IMsBuildModificationSettingsProvider with
         member x.SmartModificationsFilter = ["fsproj"] :> _
@@ -1508,7 +1511,7 @@ type FSharpBuildActionsProvider() =
     override x.IsApplicable(projectProperties) = projectProperties :? FSharpProjectProperties
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpProjectSchemeProvider() =
     interface IMsBuildProjectSchemeProvider with
         member this.BuildScheme(scheme) =

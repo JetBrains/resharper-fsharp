@@ -49,7 +49,7 @@ type FSharpProjectPropertiesBuilder(projectPropertiesRequests) =
         configuration.Nullable <- nullable
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>)>]
 type FSharpLanguageSpecificItemsProvider() =
     interface IMsBuildConfigurationTabProvider with

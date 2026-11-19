@@ -394,7 +394,7 @@ type FSharpKeywordsRule() =
         true
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpHashDirectiveAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
         member x.Language = FSharpLanguage.Instance :> _
