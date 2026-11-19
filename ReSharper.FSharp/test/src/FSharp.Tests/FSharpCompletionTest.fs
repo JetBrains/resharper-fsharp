@@ -717,7 +717,7 @@ type FSharpFilteredCompletionTest() =
     [<Test>] member x.``Expr - Module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Type - Opened namespace 01``() = x.DoNamedTest()
-    [<Test>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
+    [<Test; ExplicitIfTransparentCompiler>] member x.``Import - Same ns 05``() = x.DoTestFiles("File1.fs", "File2.fs")
     [<Test>] member x.``Import - Same ns 08 - Empty module``() = x.DoTestFiles("File1.fs", "File2.fs")
 
     [<TestIndexedSetting(typeof<AutoImport2Settings>, "BlackLists", "Ns1.*", true, CSharpLanguage.Name)>]
