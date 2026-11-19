@@ -6,7 +6,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.InlayHints
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.ContainerAsyncAnyThreadSafe)>]
 type FSharpTypeHintsOptionsRegistrator(inlayHintsOptionsStore: InlayHintsOptionsStore, settingsStore: ISettingsStore) =
     do
         let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()

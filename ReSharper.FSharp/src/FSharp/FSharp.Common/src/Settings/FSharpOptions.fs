@@ -13,7 +13,6 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ProjectModel.Resources
-open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.TextControl.DocumentMarkup.Adornments
 open JetBrains.UI.RichText
@@ -143,7 +142,7 @@ type FSharpScriptSettingsProvider(lifetime, solution: ISolution, settings, setti
     member val CustomDefines = base.GetValueProperty<string>("CustomDefines")
 
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpExperimentalFeaturesProvider(lifetime, solution: ISolution, settings, settingsSchema) =
     inherit FSharpSettingsProviderBase<FSharpExperimentalFeatures>(lifetime, solution, settings, settingsSchema)
 
@@ -241,21 +240,6 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings,
         if configurations.IsInternalMode() then
             this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
             this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
-
-
-[<ShellComponent>]
-type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStore,
-        highlightingSettingsManager: HighlightingSettingsManager) =
-    do
-        let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()
-
-        settingsStore.Changed.Advise(lifetime, fun (args: SettingsStoreChangeArgs) ->
-            let typeHintOptionChanged =
-                args.ChangedEntries
-                |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)
-
-            if typeHintOptionChanged then
-                highlightingSettingsManager.SettingsChanged.Fire(Nullable(false)))
 
 
 module SettingsUtil =

@@ -26,7 +26,7 @@ open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IReSharperHostNetFeatureZone>, typeof<IRiderProductEnvironmentZone>, typeof<IRiderFeatureZone>)>]
 type FSharpExtendedFileStructureLanguage() =
     interface IExtendedFileStructureLanguage with

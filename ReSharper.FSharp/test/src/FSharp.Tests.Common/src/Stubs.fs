@@ -18,7 +18,7 @@ type FSharpFileServiceStub() =
         member x.IsScratchFile _ = false
         member x.IsScriptLike _ = false
 
-[<SolutionInstanceComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionInstanceComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type StubFSharpItemsContainer() =
     interface IFSharpItemsContainer with

@@ -32,7 +32,7 @@ module ModulePathProvider =
     let outputPathKey = Key<VirtualFileSystemPath>("AssemblyReaderTest.outputPath")
 
 [<ZoneMarker(typeof<IFSharpPluginZone>)>]
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type ModulePathProvider(moduleReferencesResolveStore: IModuleReferencesResolveStore) =
     abstract GetModulePath: reference: IProjectToModuleReference -> VirtualFileSystemPath option
     default this.GetModulePath(reference: IProjectToModuleReference) =

@@ -25,9 +25,9 @@ module internal Reflection =
         if isNotNull field then field.GetValue(obj) else null
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
 type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
-                  schema: SettingsSchema) =
+                  notifications: FantomasNotificationsManager, schema: SettingsSchema) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
@@ -87,7 +87,9 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         RdFcsParsingOptions(Array.last options.SourceFiles,
             List.toArray options.ConditionalDefines, options.IsExe, options.LangVersionText)
 
-    do fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
+    do
+        fantomasDetector.VersionToRun.Advise(solutionLifetime, fun _ -> terminateConnection ())
+        fantomasDetector.NotificationProducer.Advise(solutionLifetime, fun notification -> notifications.Show(notification))
 
     member x.FormatSelection(filePath, range, source, settings, options, newLineText, settingsStore) =
         connect()

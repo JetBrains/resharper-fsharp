@@ -15,7 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open NUnit.Framework
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestModulePathProvider(shim: TestAssemblyReaderShim, moduleReferencesResolveStore: IModuleReferencesResolveStore) =
     inherit ModulePathProvider(moduleReferencesResolveStore)

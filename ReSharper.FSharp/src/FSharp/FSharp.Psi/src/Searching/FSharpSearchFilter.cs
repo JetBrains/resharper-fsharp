@@ -1,4 +1,5 @@
 using System.Linq;
+using JetBrains.Application.Components;
 using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
@@ -10,8 +11,8 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
-  [PsiComponent(Instantiation.DemandAnyThreadUnsafe)]
-  public sealed class FSharpSearchFilter(IFcsProjectProvider fsProjectProvider) : ISearchFilter
+  [PsiComponent(Instantiation.DemandAnyThreadSafe)]
+  public sealed class FSharpSearchFilter(ILazy<IFcsProjectProvider> fsProjectProvider) : ISearchFilter
   {
     private record FSharpSearchFilterKey(
       bool IsTypePrivateMember,
@@ -58,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     }
 
     public object TryGetKey(IDeclaredElement declaredElement) =>
-      TryGetKey(declaredElement, fsProjectProvider);
+      TryGetKey(declaredElement, fsProjectProvider.Value);
 
     public bool CanContainReferences(IPsiSourceFile sourceFile, object key)
     {
@@ -70,7 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (fsSearchFilterKey.IsTypePrivateMember) return false;
       if (!sourceFile.PsiModule.Equals(fsSearchFilterKey.PsiModule)) return true;
 
-      var sourceFileIndex = fsProjectProvider.GetFileIndex(sourceFile);
+      var sourceFileIndex = fsProjectProvider.Value.GetFileIndex(sourceFile);
       return sourceFileIndex >= fsSearchFilterKey.FileIndex;
     }
   }
