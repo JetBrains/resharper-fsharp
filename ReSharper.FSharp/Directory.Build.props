@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CSharpLanguageVersion>12</CSharpLanguageVersion>
+    <CSharpLanguageVersion>14</CSharpLanguageVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,31 @@
+﻿boolValue: System.Boolean
+sbyteValue: System.SByte
+byteValue: System.Byte
+int16Value: System.Int16
+uint16Value: System.UInt16
+int32Value: System.Int32
+int32Suffix: System.Int32
+uint32Value: System.UInt32
+uint32Suffix: System.UInt32
+int64Value: System.Int64
+uint64Value: System.UInt64
+nativeintValue: System.IntPtr
+unativeintValue: System.UIntPtr
+float32Value: System.Single
+floatValue: System.Double
+decimalValue: System.Decimal
+bigintValue: System.Numerics.BigInteger
+charValue: System.Char, token: System.Char
+byteChar: System.Byte
+stringValue: System.String, token: System.String
+verbatimString: System.String, token: System.String
+tripleQuoteString: System.String, token: System.String
+byteArray: System.Byte[], token: System.Byte[]
+verbatimByteArray: System.Byte[], token: System.Byte[]
+interpolatedString: System.String
+measure: System.Double
+sourceDirectory: System.String
+sourceFile: System.String
+line: System.String
+unitValue: System.Void
+paren: System.Int32

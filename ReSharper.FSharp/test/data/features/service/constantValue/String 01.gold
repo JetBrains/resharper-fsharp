@@ -1,0 +1,29 @@
+﻿regular: string 97 98 99
+escapes: string 97 9 98 10 13 8 7 12 11 34 39 92
+codes: string 65 65 65 65
+notEscapes: string 92 48 92 49 50 92 113
+continuation: string 97 98
+continuationBlankLine: string 97 10 32 32 32 32 98
+verbatim: string 97 34 98 92 110
+triple: string 97 34 98 92 110
+paren: string 97 98 99
+interpolated: not constant
+byteArray: not constant
+number: 42
+character: not constant
+empty: string 
+escapeAtEnd: string 97 10
+backslashAtEnd: string 97 92
+verbatimEmpty: string 
+verbatimQuoteAtEnd: string 97 34
+tripleEmpty: string 
+trigraphAbove255: string 231
+trigraphNonAsciiDigits: string 92 1633 1634 1635
+Literal: string 108 105 116 101 114 97 108
+literalReference: string 108 105 116 101 114 97 108
+valueReference: not constant
+concatenated: string 97 98
+concatenatedChain: string 97 98 99 100
+concatenatedLiteral: string 108 105 116 101 114 97 108 98
+concatenatedValue: not constant
+subtracted: not constant

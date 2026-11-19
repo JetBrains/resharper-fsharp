@@ -3,15 +3,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Text
 
 type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuoteError) =
     inherit FSharpQuickFixBase()
@@ -26,13 +25,14 @@ type ReplaceWithTripleQuotedInterpolatedStringFix(error: SingleQuoteInSingleQuot
         FSharpTokenType.TRIPLE_QUOTE_INTERPOLATED_STRING_END.Create($"}}{content}\"\"\"")
 
     let checkRegularStringLiteral (literal: ITokenNode) =
-        let tokenContent = getStringContent literal
-        let lexer = RegularInterpolatedStringLexer(StringBuffer(tokenContent))
+        let stringToken = literal :?> FSharpString
+        let lexer = stringToken.CreateLexer()
 
+        lexer.Start()
         let mutable found = false
-        while not found && lexer.CanAdvance do
-            lexer.Advance()
+        while not found && isNotNull lexer.TokenType do
             found <- lexer.TokenType == StringTokenTypes.ESCAPE_CHARACTER
+            lexer.Advance()
         found
 
     let processStringLiteral (textContentFactory: ITokenNode -> string) (literal: ITokenNode) =

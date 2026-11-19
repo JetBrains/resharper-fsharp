@@ -1,0 +1,13 @@
+﻿decimal: 42
+suffix: 42
+hex: 42
+hexUpper: 42
+hexSuffix: 42
+hexNegative: -1
+octal: 42
+binary: 42
+underscore: 42
+negative: -1
+minValue: -2147483648
+tooBig: not constant
+negativeHex: -42

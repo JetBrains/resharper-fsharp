@@ -155,6 +155,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
     public static readonly NodeTypeSet Operators;
+    public static readonly NodeTypeSet ConstantStrings;
     public static readonly NodeTypeSet StringsLiterals;
     public static readonly NodeTypeSet RawInterpolatedStrings;
     public static readonly NodeTypeSet InterpolatedStrings;
@@ -281,6 +282,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         MINUS,
         LESS,
         LPAREN_STAR_RPAREN);
+
+      ConstantStrings = new NodeTypeSet(STRING, VERBATIM_STRING, TRIPLE_QUOTED_STRING);
 
       StringsLiterals = new NodeTypeSet(
         CHARACTER_LITERAL,

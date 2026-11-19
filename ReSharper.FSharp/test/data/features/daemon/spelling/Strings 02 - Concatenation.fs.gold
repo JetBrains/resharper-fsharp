@@ -1,0 +1,18 @@
+﻿module Module
+
+let x = ""
+let s1 = "|wrong|(0)" + "|word|(1)"
+let s2 = "this is |wrong|(2)" + ("|wo|(3)" + "|rd|(4)")
+let s3 = "and this is |incorrect |(5)" + @"|phrase |(6)" + "|part|(7)"
+let s4 = "wrong", "word"
+let s5 = "wrong" + x + "word"
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Typo in string: 'wrong'
+(1): ReSharper Suggestion: Typo in string: 'word'
+(2): ReSharper Suggestion: Typo in string: 'wrong'
+(3): ReSharper Suggestion: Typo in string: 'wo'
+(4): ReSharper Suggestion: Typo in string: 'rd'
+(5): ReSharper Suggestion: Grammar mistake: 'incorrect '
+(6): ReSharper Suggestion: Grammar mistake: 'phrase '
+(7): ReSharper Suggestion: Grammar mistake: 'part'

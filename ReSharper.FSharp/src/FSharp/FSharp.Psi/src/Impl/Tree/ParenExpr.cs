@@ -7,6 +7,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IType Type() =>
       InnerExpression?.Type() ?? base.Type();
 
+    public override ConstantValue ConstantValue =>
+      InnerExpression?.ConstantValue ?? base.ConstantValue;
+
     public override bool IsConstantValue() =>
       InnerExpression?.IsConstantValue() ?? false;
   }

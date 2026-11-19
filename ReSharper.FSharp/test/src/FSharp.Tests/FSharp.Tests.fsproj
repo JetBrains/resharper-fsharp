@@ -29,6 +29,8 @@
     <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
     <Compile Include="Service\ArgumentsAfterEditTest.fs" />
     <Compile Include="Service\ArgumentsOwnerTest.fs" />
+    <Compile Include="Service\ConstantValueTest.fs" />
+    <Compile Include="Service\ExpressionTypeTest.fs" />
     <Compile Include="Service\InjectionTargetsFinderTest.fs" />
     <Compile Include="Service\FantomasEditorConfigTests.fs" />
     <Compile Include="Cache\CSharpResolveTestBase.fs" />
