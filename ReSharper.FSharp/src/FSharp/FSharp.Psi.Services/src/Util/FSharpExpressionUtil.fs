@@ -3,7 +3,6 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 open FSharp.Compiler.Syntax
 open FSharp.Compiler.Symbols
-open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -15,41 +14,26 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
-let isPredefinedFunctionRef name (expr: IFSharpExpression) =
-    let refExpr = expr.IgnoreInnerParens().As<IReferenceExpr>()
-    if isNull refExpr then false else
-
-    Assertion.Assert(predefinedFunctionTypes.ContainsKey(name), "Predefined function is not added to map: {0}", name)
-
-    let exprReference = refExpr.Reference
-    if exprReference.GetName() <> name then false else
-
-    let declaredElement = exprReference.Resolve().DeclaredElement.As<IFunction>()
-    if isNull declaredElement then false else
-
-    let containingType = declaredElement.GetContainingType()
-    isNotNull containingType && containingType.GetClrName() = predefinedFunctionTypes[name]
-
 let isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
     if isNull binaryAppExpr then false else
-    isPredefinedFunctionRef name binaryAppExpr.Operator
+    binaryAppExpr.Operator.IsPredefinedFunctionRef(name)
 
 let isPredefinedFunctionApp name (expr: #IFSharpExpression) (arg: outref<IFSharpExpression>) =
     match expr :> IFSharpExpression with
     | :? IPrefixAppExpr as prefixApp when
-            isPredefinedFunctionRef name prefixApp.FunctionExpression ->
+            prefixApp.FunctionExpression.IsPredefinedFunctionRef(name) ->
         arg <- prefixApp.ArgumentExpression
         true
 
     | :? IBinaryAppExpr as binaryApp when
             isPredefinedInfixOpApp "|>" binaryApp &&
-            isPredefinedFunctionRef name binaryApp.RightArgument ->
+            binaryApp.RightArgument.IsPredefinedFunctionRef(name) ->
         arg <- binaryApp.LeftArgument
         true
 
     | :? IBinaryAppExpr as binaryApp when
             isPredefinedInfixOpApp "<|" binaryApp &&
-            isPredefinedFunctionRef name binaryApp.LeftArgument ->
+            binaryApp.LeftArgument.IsPredefinedFunctionRef(name) ->
         arg <- binaryApp.RightArgument
         true
 

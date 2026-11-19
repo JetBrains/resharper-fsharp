@@ -19,7 +19,7 @@ type ReplaceWithAssignmentExpressionFix(expr: IBinaryAppExpr) =
         ReplaceWithAssignmentExpressionFix(warning.Node.As<IBinaryAppExpr>())
 
     override x.IsAvailable _ =
-        if not (isValid expr && isPredefinedFunctionRef "=" expr.Operator) then false else
+        if not (isValid expr && isPredefinedInfixOpApp "=" expr) then false else
 
         match expr.LeftArgument with
         | :? IReferenceExpr as ref ->

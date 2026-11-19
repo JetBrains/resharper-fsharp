@@ -1,8 +1,11 @@
 ﻿using System;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -29,6 +32,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     public static bool IsSimpleValueExpression([CanBeNull] this IFSharpExpression fsExpr) =>
       fsExpr.IgnoreInnerParens() is { } expr && ourSimpleValueExpressionNodeTypes[expr.NodeType];
+
+    public static bool IsPredefinedFunctionRef([CanBeNull] this IFSharpExpression fsExpr, [NotNull] string name)
+    {
+      if (fsExpr.IgnoreInnerParens() is not IReferenceExpr referenceExpr)
+        return false;
+
+      var predefinedFunctionTypes = FSharpPredefinedType.predefinedFunctionTypes;
+      Assertion.Assert(predefinedFunctionTypes.ContainsKey(name), "Predefined function is not added to map: {0}", name);
+
+      var reference = referenceExpr.Reference;
+      if (reference.GetName() != name)
+        return false;
+
+      return reference.Resolve().DeclaredElement is IFunction function &&
+             function.GetContainingType() is { } containingType &&
+             containingType.GetClrName().Equals(predefinedFunctionTypes[name]);
+    }
 
     public static bool IsLiteralExpression([CanBeNull] this IFSharpExpression fsExpr) =>
       fsExpr.IgnoreInnerParens() is ILiteralExpr literalExpr && literalExpr.IsConstantValue();

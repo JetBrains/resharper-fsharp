@@ -61,17 +61,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       attr.GetShortName() == shortName;
 
     [CanBeNull]
-    private static FSharpString GetStringConst([CanBeNull] IFSharpExpression expr)
-    {
-      switch (expr)
+    private static string GetStringConstValue([CanBeNull] IFSharpExpression expr) =>
+      expr switch
       {
-        case IParenExpr parenExpr:
-          return GetStringConst(parenExpr.InnerExpression);
-        case IConstExpr constExpr:
-          return constExpr.FirstChild as FSharpString;
-      }
-      return null;
-    }
+        IParenExpr parenExpr => GetStringConstValue(parenExpr.InnerExpression),
+        IConstExpr { FirstChild: FSharpString stringToken } when stringToken.IsConstantValue() =>
+          stringToken.GetStringValue(),
+        IBinaryAppExpr { ShortName: "+" } binaryAppExpr
+          when GetStringConstValue(binaryAppExpr.LeftArgument) is { } leftString &&
+               GetStringConstValue(binaryAppExpr.RightArgument) is { } rightString => leftString + rightString,
+        _ => null
+      };
 
     private static bool GetCompiledNameValue(IAttribute attr, out string compiledName)
     {
@@ -81,18 +81,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return false;
       }
 
-      // todo: proper expressions evaluation, e.g. "S1" + "S2"
-      var stringArg = GetStringConst(attr.Expression);
-      if (stringArg == null)
+      var stringValue = GetStringConstValue(attr.Expression);
+      if (stringValue == null)
       {
         compiledName = null;
         return false;
       }
 
-      compiledName =
-        stringArg.GetText()
-          .Substring(1, stringArg.GetText().Length - 2)
-          .SubstringBeforeLast("`", StringComparison.Ordinal);
+      compiledName = stringValue.SubstringBeforeLast("`", StringComparison.Ordinal);
       return true;
     }
 

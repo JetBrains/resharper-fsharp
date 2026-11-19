@@ -14,6 +14,7 @@ type StringAnalyzerTest() =
 
     [<Test>] member x.``String escaping 01 - Strings``() = x.DoNamedTest()
     [<Test>] member x.``String escaping 02 - Chars``() = x.DoNamedTest()
+    [<Test>] member x.``String escaping 03 - Byte arrays``() = x.DoNamedTest()
 
     [<Test>] member x.``Regular - Interpolated 01``() = x.DoNamedTest()
     [<Test>] member x.``Regular - Interpolated 02``() = x.DoNamedTest()

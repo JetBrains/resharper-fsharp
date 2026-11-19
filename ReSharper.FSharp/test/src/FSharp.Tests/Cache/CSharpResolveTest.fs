@@ -134,6 +134,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings - Compiled name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings - Compiled name 02 - Nested pat``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings - Compiled name 03 - Overloads``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings - Compiled name 04 - Concatenation``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
     [<Test>] member x.``Nested module 02 - Compiled name``() = x.DoNamedTest()

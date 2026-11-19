@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
@@ -14,9 +15,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string ShortName => Operator?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     // TODO: remove logic from FSharpRegexNodeProvider.evalOptionsArg
-    // ReSharper disable once RedundantOverriddenMember
-    public override ConstantValue ConstantValue =>
-      base.ConstantValue;
+    public override ConstantValue ConstantValue
+    {
+      get
+      {
+        if (ShortName != "+")
+          return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+
+        if (LeftArgument?.ConstantValue.AsString() is not { } leftString ||
+            RightArgument?.ConstantValue.AsString() is not { } rightString)
+          return ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+
+        return Operator.IsPredefinedFunctionRef("+")
+          ? ConstantValue.String(leftString + rightString, GetPsiModule())
+          : ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+      }
+    }
 
     public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
 

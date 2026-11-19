@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -50,7 +51,7 @@ type ReplaceWithInterpolatedStringFix(warning: InterpolatedStringCandidateWarnin
     let outerPrefixAppExpr = warning.OuterPrefixAppExpr
     let prefixAppExpr = warning.PrefixAppExpr
     let formatStringExpr = warning.FormatStringExpr
-    let isSprintf = isPredefinedFunctionRef "sprintf" prefixAppExpr.FunctionExpression
+    let isSprintf = prefixAppExpr.FunctionExpression.IsPredefinedFunctionRef("sprintf")
 
     override this.Text = "To interpolated string"
 

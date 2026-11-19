@@ -82,6 +82,9 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Strings - Triple quoted 01 - Multiple words``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Triple quoted 02 - Multiline``() = x.DoNamedTest()
 
+    [<Test>] member x.``Strings - Byte array 01 - Multiple words``() = x.DoNamedTest()
+    [<Test>] member x.``Strings - Byte array 02 - Verbatim``() = x.DoNamedTest()
+
     [<Test>] member x.``Strings - Interpolated - Regular 01 - Before start brace``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 02 - After end brace``() = x.DoNamedTest()
     [<Test>] member x.``Strings - Interpolated - Regular 03 - After start brace``() = x.DoNamedTest()

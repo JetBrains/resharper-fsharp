@@ -1,14 +1,20 @@
 using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Injections;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Parsing;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LiteralExpr
   {
-    private static readonly NodeTypeSet LiteralTokenTypes =
+    private static readonly NodeTypeSet ourConstantValueTokenTypes =
       new(
         FSharpTokenType.TRUE,
         FSharpTokenType.FALSE,
@@ -28,69 +34,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         FSharpTokenType.TRIPLE_QUOTED_STRING
       );
 
+    private static readonly NodeTypeDictionary<IClrTypeName> ourLiteralTypeNames =
+      new(new List<KeyValuePair<NodeType, IClrTypeName>>
+      {
+        new(FSharpTokenType.TRUE, PredefinedType.BOOLEAN_FQN),
+        new(FSharpTokenType.FALSE, PredefinedType.BOOLEAN_FQN),
+        new(FSharpTokenType.SBYTE, PredefinedType.SBYTE_FQN),
+        new(FSharpTokenType.BYTE, PredefinedType.BYTE_FQN),
+        new(FSharpTokenType.INT16, PredefinedType.SHORT_FQN),
+        new(FSharpTokenType.UINT16, PredefinedType.USHORT_FQN),
+        new(FSharpTokenType.INT32, PredefinedType.INT_FQN),
+        new(FSharpTokenType.UINT32, PredefinedType.UINT_FQN),
+        new(FSharpTokenType.INT64, PredefinedType.LONG_FQN),
+        new(FSharpTokenType.UINT64, PredefinedType.ULONG_FQN),
+        new(FSharpTokenType.NATIVEINT, PredefinedType.INTPTR_FQN),
+        new(FSharpTokenType.UNATIVEINT, PredefinedType.UINTPTR_FQN),
+        new(FSharpTokenType.IEEE32, PredefinedType.FLOAT_FQN),
+        new(FSharpTokenType.IEEE64, PredefinedType.DOUBLE_FQN),
+        new(FSharpTokenType.DECIMAL, PredefinedType.DECIMAL_FQN),
+        new(FSharpTokenType.CHARACTER_LITERAL, PredefinedType.CHAR_FQN),
+        new(FSharpTokenType.BYTECHAR, PredefinedType.BYTE_FQN),
+        new(FSharpTokenType.STRING, PredefinedType.STRING_FQN),
+        new(FSharpTokenType.VERBATIM_STRING, PredefinedType.STRING_FQN),
+        new(FSharpTokenType.TRIPLE_QUOTED_STRING, PredefinedType.STRING_FQN),
+      });
+
     public override bool IsConstantValue()
     {
       var tokenType = Literal?.GetTokenType();
-      return LiteralTokenTypes[tokenType];
+      return ourConstantValueTokenTypes[tokenType];
     }
 
-    public override IType Type()
+    public override IType Type() =>
+      TryGetLiteralType(Literal?.GetTokenType(), GetPsiModule()) ?? base.Type();
+
+    [CanBeNull]
+    internal static IType TryGetLiteralType([CanBeNull] TokenNodeType tokenType, [NotNull] IPsiModule psiModule)
     {
-      var psiModule = GetPsiModule();
-
-      var tokenType = Literal?.GetTokenType();
-      if (tokenType == null)
-        return TypeFactory.CreateUnknownType(psiModule);
-
       var predefinedType = psiModule.GetPredefinedType();
+      if (tokenType == FSharpTokenType.BYTEARRAY || tokenType == FSharpTokenType.VERBATIM_BYTEARRAY)
+        return TypeFactory.CreateArrayType(predefinedType.Byte, 1, NullableAnnotation.Unknown);
 
-      if (tokenType == FSharpTokenType.TRUE || tokenType == FSharpTokenType.FALSE)
-        return predefinedType.Bool;
-
-      if (tokenType == FSharpTokenType.STRING || tokenType == FSharpTokenType.VERBATIM_STRING ||
-          tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING)
-        return predefinedType.String;
-
-      if (tokenType == FSharpTokenType.CHARACTER_LITERAL)
-        return predefinedType.Char;
-
-      if (tokenType == FSharpTokenType.INT32)
-        return predefinedType.Int;
-
-      if (tokenType == FSharpTokenType.UINT32)
-        return predefinedType.Uint;
-
-      if (tokenType == FSharpTokenType.IEEE64)
-        return predefinedType.Double;
-
-      if (tokenType == FSharpTokenType.IEEE32)
-        return predefinedType.Float;
-
-      if (tokenType == FSharpTokenType.UINT64)
-        return predefinedType.Ulong;
-
-      if (tokenType == FSharpTokenType.INT16)
-        return predefinedType.Short;
-
-      if (tokenType == FSharpTokenType.UINT16)
-        return predefinedType.Ushort;
-
-      if (tokenType == FSharpTokenType.INT64)
-        return predefinedType.Long;
-
-      if (tokenType == FSharpTokenType.UINT64)
-        return predefinedType.Ulong;
-
-      if (tokenType == FSharpTokenType.BYTE)
-        return predefinedType.Byte;
-
-      if (tokenType == FSharpTokenType.SBYTE)
-        return predefinedType.Sbyte;
-
-      if (tokenType == FSharpTokenType.DECIMAL)
-        return predefinedType.Decimal;
-
-      return TypeFactory.CreateUnknownType(psiModule);
+      return ourLiteralTypeNames[tokenType] is { } typeName
+        ? predefinedType.TryGetType(typeName, NullableAnnotation.Unknown)
+        : null;
     }
 
     public override ConstantValue ConstantValue
@@ -101,17 +88,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (literal == null)
           return ConstantValue.BAD_VALUE;
 
+        if (literal is FSharpString stringToken)
+          return stringToken.IsConstantValue() ? stringToken.ConstantValue : ConstantValue.NOT_COMPILE_TIME_CONSTANT;
+
         var tokenType = literal.GetTokenType();
         if (tokenType == FSharpTokenType.INT32)
         {
-          var text = literal.GetText();
-          var literalBase = GetIntegerDigitsStartOffsetAndBase(text);
+          var text = literal.GetText().TrimEnd('l');
+          var literalBase = GetIntegerBase(text);
           var startOffset = literalBase == IntBase.Decimal ? 0 : 2;
           var literalText = text.Substring(startOffset).Replace("_", string.Empty);
 
           try
           {
-            var result = Convert.ToInt32(literalText, (int)literalBase);
+            var isNegative = FirstChild?.GetTokenType() == FSharpTokenType.MINUS;
+            var result = ParseInt32(literalText, literalBase, isNegative);
             return ConstantValue.Create(result, GetPsiModule().GetPredefinedType().Int);
           }
           catch (Exception)
@@ -124,7 +115,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private static IntBase GetIntegerDigitsStartOffsetAndBase(string literalText)
+    private static int ParseInt32(string digits, IntBase literalBase, bool isNegative)
+    {
+      if (literalBase == IntBase.Decimal)
+        return Convert.ToInt32(isNegative ? "-" + digits : digits, 10);
+
+      var value = Convert.ToInt32(digits, (int)literalBase);
+      return isNegative ? unchecked(-value) : value;
+    }
+
+    private static IntBase GetIntegerBase(string literalText)
     {
       if (literalText.Length <= 2 || literalText[0] != '0')
         return IntBase.Decimal;
@@ -150,9 +150,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     bool IInjectionHostNode.IsValidHost =>
-      Literal?.GetTokenType() is { } tokenType &&
-      (tokenType == FSharpTokenType.STRING ||
-       tokenType == FSharpTokenType.VERBATIM_STRING ||
-       tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING);
+      FSharpTokenType.ConstantStrings[Literal?.GetTokenType()];
   }
 }

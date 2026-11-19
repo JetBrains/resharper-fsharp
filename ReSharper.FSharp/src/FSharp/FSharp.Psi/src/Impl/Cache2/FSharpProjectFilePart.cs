@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -138,9 +137,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       return args.Select(expr =>
       {
-        var value = expr is ILiteralExpr {FirstChild: FSharpString fsString}
-          ? fsString.ConstantValue
-          : ConstantValue.BAD_VALUE;
+        var value = expr is ILiteralExpr literalExpr ? literalExpr.ConstantValue : ConstantValue.BAD_VALUE;
 
         return new AttributeValue(value);
       });

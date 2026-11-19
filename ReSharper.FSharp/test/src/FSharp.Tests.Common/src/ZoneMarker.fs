@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Environment
 open JetBrains.ReSharper.Daemon.Syntax
+open JetBrains.ReSharper.FeaturesTestFramework.SpellEngineStub
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Application.Zones
@@ -16,6 +17,7 @@ type ITestFSharpPluginZone =
     inherit IZone
     inherit IRequire<IFSharpPluginZone>
     inherit IRequire<PsiFeatureTestZone>
+    inherit IRequire<IReSpellerTestStubZone>
     
 [<ZoneMarker>]
 type ZoneMarker() =

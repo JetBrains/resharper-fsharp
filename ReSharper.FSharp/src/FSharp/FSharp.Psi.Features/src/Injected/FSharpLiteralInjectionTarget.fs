@@ -59,15 +59,15 @@ type FSharpLiteralInjectionTarget() =
         override _.CreateBuffer(literalNode, text, options) =
             let literalType =
                 match literalNode.GetTokenType().GetLiteralType() with
-                | RegularString ->
+                | FSharpLiteralType.RegularString ->
                     CSharpLiteralType.RegularString :> CSharpLiteralType
-                | InterpolatedString ->
+                | FSharpLiteralType.InterpolatedString ->
                     CSharpLiteralType.RegularInterpolatedString
-                | InterpolatedStringStart ->
+                | FSharpLiteralType.InterpolatedStringStart ->
                     CSharpLiteralType.RegularInterpolatedStringStart
-                | InterpolatedStringMiddle ->
+                | FSharpLiteralType.InterpolatedStringMiddle ->
                     CSharpLiteralType.RegularInterpolatedStringMiddle
-                | InterpolatedStringEnd ->
+                | FSharpLiteralType.InterpolatedStringEnd ->
                     CSharpLiteralType.RegularInterpolatedStringEnd
                 | _ ->
                     CSharpLiteralType.VerbatimString

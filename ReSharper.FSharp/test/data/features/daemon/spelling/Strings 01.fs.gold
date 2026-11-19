@@ -1,0 +1,33 @@
+﻿module Module
+
+let x = 1
+let regular = "|wrongword|(0)"
+let verbatim = @"|wrongword|(1)"
+let tripleQuote = """|wrongword|(2)"""
+let interpolated = $"|wrongword|(3) {x} |wrongword|(4)"
+let verbatimInterpolated = $@"|wrongword|(5) {x} |wrongword|(6)"
+let tripleQuoteInterpolated = $"""|wrongword|(7) {x} |wrongword|(8)"""
+let bytes = "|wrongword|(9)"B
+let escaped = "\t|wrongword|(10)"
+let escapedLines = "hello\n|wrongword|(11)\rhello"
+let verbatimQuote = @"a""|wrongword|(12)"
+let interpolatedBraces = $"{{|wrongword|(13)}} {x}"
+let continuation = "hello \
+    |wrongword|(14)"
+
+---------------------------------------------------------
+(0): ReSharper Suggestion: Typo in string: 'wrongword'
+(1): ReSharper Suggestion: Typo in string: 'wrongword'
+(2): ReSharper Suggestion: Typo in string: 'wrongword'
+(3): ReSharper Suggestion: Typo in string: 'wrongword'
+(4): ReSharper Suggestion: Typo in string: 'wrongword'
+(5): ReSharper Suggestion: Typo in string: 'wrongword'
+(6): ReSharper Suggestion: Typo in string: 'wrongword'
+(7): ReSharper Suggestion: Typo in string: 'wrongword'
+(8): ReSharper Suggestion: Typo in string: 'wrongword'
+(9): ReSharper Suggestion: Typo in string: 'wrongword'
+(10): ReSharper Suggestion: Typo in string: 'wrongword'
+(11): ReSharper Suggestion: Typo in string: 'wrongword'
+(12): ReSharper Suggestion: Typo in string: 'wrongword'
+(13): ReSharper Suggestion: Typo in string: 'wrongword'
+(14): ReSharper Suggestion: Typo in string: 'wrongword'

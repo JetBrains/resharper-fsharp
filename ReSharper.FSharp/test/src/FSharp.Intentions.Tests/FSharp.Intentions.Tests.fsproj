@@ -35,6 +35,7 @@
     <Compile Include="src\Daemon\RedundantParenPatTest.fs" />
     <Compile Include="src\Daemon\RedundantParenTypeUsageTest.fs" />
     <Compile Include="src\Daemon\StringAnalyzerTest.fs" />
+    <Compile Include="src\Daemon\SpellingHighlightingTest.fs" />
     <Compile Include="src\Daemon\RedundantAttributeParensTest.fs" />
     <Compile Include="src\Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="src\Daemon\FSharpColorHighlightingTest.fs" />
@@ -137,6 +138,7 @@
     <Compile Include="src\QuickFixes\RemovePatternArgumentFixTest.fs" />
     <Compile Include="src\QuickFixes\AddMissingSeqFixTest.fs" />
     <Compile Include="src\QuickFixes\AddMissingNewFixTest.fs" />
+    <Compile Include="src\QuickFixes\TypoQuickFixTest.fs" />
     <Compile Include="src\QuickFixes\AddSetterFixTest.fs" />
     <Compile Include="src\QuickFixes\UpdateMutabilityInSignatureFixTest.fs" />
     <Compile Include="src\QuickFixes\UseNestedRecordFieldSyntaxTest.fs" />
