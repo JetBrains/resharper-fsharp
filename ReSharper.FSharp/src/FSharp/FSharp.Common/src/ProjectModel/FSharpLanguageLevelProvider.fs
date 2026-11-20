@@ -34,7 +34,7 @@ type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLang
     member this.Preview = preview
 
 
-[<SolutionComponent(Instantiation.ContainerAsyncPrimaryThread (* PrimaryThread due to not thread safe ProjectSettingsStorageComponent *) )>]
+[<SolutionComponent(Instantiation.ContainerAsyncAnyThreadSafe)>]
 type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset: ISolutionToolset) =
     inherit LanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(
         lifetime, locks, projectPropertiesListener)
@@ -97,13 +97,6 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
 
     let getLanguageLevelByCompiler (fscPath: VirtualFileSystemPath): VersionMapping =
         compilerPathToLanguageLevels.GetOrAdd(fscPath, getLanguageLevelByCompilerNoCache)
-
-    let getFscPath (configuration: IFSharpProjectConfiguration): VirtualFileSystemPath =
-        if isNull configuration then VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext) else
-
-        match configuration.PropertiesCollection.TryGetValue(FSharpProperties.DotnetFscCompilerPath) with
-        | true, path -> path.Trim('"').ParseVirtualPathSafe(InteractionContext.SolutionContext)
-        | false, _ -> VirtualFileSystemPath.GetEmptyPathFor(InteractionContext.SolutionContext)
 
     let convertToLanguageLevel (configuration: IFSharpProjectConfiguration) version =
         match version with
@@ -195,7 +188,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         member this.Changed _ =
             compilerPathToLanguageLevels.Clear()
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLanguageLevelProviderForAnyModule() =
     abstract IsApplicable: IPsiModule -> bool
     default this.IsApplicable _ = true
@@ -235,7 +228,7 @@ type FSharpLanguageLevelProviderForAnyModule() =
         member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
     inherit FSharpLanguageLevelProviderForAnyModule()
 

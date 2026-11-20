@@ -224,7 +224,7 @@ type FSharpCodeCompletionContext(context: CodeCompletionContext, fcsCompletionCo
     member this.GetCheckResults() =
         this.ParseAndCheckResults.Value |> Option.map (fun results -> results.CheckResults)
 
-[<IntellisensePart(Instantiation.DemandAnyThreadUnsafe)>]
+[<IntellisensePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpCodeCompletionContextProvider(fsXmlDocService: FSharpXmlDocService) =
     inherit CodeCompletionContextProviderBase()
 

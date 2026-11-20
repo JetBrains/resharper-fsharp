@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
+open JetBrains.Application.Parts
 open JetBrains.HabitatDetector
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel.ProjectsHost
@@ -16,7 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>, typeof<IFSharpPluginZone>)>]
 type FSharpProjectLoadTargetsAnalyzer() =
      interface IMsBuildProjectLoadDiagnosticProvider with
@@ -47,7 +48,7 @@ and FSharpTargetsDiagnosticMessage(projectMark, message) =
         FSharpTargetsDiagnosticMessage(projectMark, message)
 
 
-[<ShellComponent>]
+[<ShellComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<IHostSolutionZone>, typeof<IFSharpPluginZone>)>]
 type FSharpProjectTypeGuidAnalyzer() =
     interface IMsBuildProjectLoadDiagnosticProvider with
