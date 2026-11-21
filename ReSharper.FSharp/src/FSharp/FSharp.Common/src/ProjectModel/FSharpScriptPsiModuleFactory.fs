@@ -540,7 +540,7 @@ type ScriptReferences =
           Files = EmptySet.Instance }
 
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpScriptLanguageLevelProvider(scriptSettingsProvider: FSharpScriptSettingsProvider) =
     inherit FSharpLanguageLevelProviderForAnyModule()
 

@@ -103,10 +103,9 @@ type FantomasPage(lifetime, smartContext: OptionsSettingsSmartContext, optionsPa
         this.AddLinkButton("DotnetToolsLink", "Learn more", fun () -> uiApplication.OpenUri("https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install")) |> ignore
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
-type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifications: UserNotifications,
-        optionsManager: OptionsManager, dotnetToolsTracker: SolutionDotnetToolsTracker,
-        uiApplication: IUIApplication) =
+[<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
+type FantomasNotificationsManager(lifetime, notifications: UserNotifications, optionsManager: OptionsManager,
+        dotnetToolsTracker: SolutionDotnetToolsTracker, uiApplication: IUIApplication) =
     let goToSettings = [| UserNotificationCommand("Settings", fun _ -> optionsManager.BeginShowOptions(nameof(FantomasPage))) |]
     let goToYouTrack = [| UserNotificationCommand("Report issue", fun _ -> uiApplication.OpenUri("https://youtrack.jetbrains.com/newissue?project=RIDER&clearDraft=true")) |]
     let openDotnetToolsOrGoToSettings toolsManifestPath =
@@ -172,4 +171,4 @@ type FantomasNotificationsManager(lifetime, settings: FantomasDetector, notifica
             body = body,
             additionalCommands = commands) |> ignore
 
-    do settings.NotificationProducer.Advise(lifetime, createNotification)
+    member x.Show(notification) = createNotification notification

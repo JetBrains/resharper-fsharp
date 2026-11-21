@@ -28,7 +28,7 @@ apply {
 }
 
 repositories {
-  maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+  maven("https://cache-redirector.jetbrains.com/maven/ultimate-public")
   maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
   maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
   maven("https://cache-redirector.jetbrains.com/maven-central")
@@ -43,6 +43,7 @@ val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$riderBaseVersion.$buildCounter"
 
 dependencies {
+  testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.junit.params)
   testRuntimeOnly(libs.junit.launcher)
@@ -90,6 +91,12 @@ dependencies {
 
   testImplementation("org.opentest4j:opentest4j:1.3.0")
   testImplementation("org.xmlunit:xmlunit-core:2.9.1")
+}
+
+configurations.testRuntimeClasspath {
+  // kotlin-test adds the kotlin-stdlib of the Kotlin Gradle plugin.
+  // The tests must use the kotlin-stdlib of the IDE, which has the version of the kotlin-reflect of the IDE.
+  exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
 }
 
 val isMonorepo = rootProject.projectDir != projectDir

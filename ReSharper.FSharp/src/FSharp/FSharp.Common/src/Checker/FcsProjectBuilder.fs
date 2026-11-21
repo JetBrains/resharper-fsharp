@@ -68,7 +68,7 @@ module FcsProjectBuilder =
         | :? IProject as project -> getProjectConfiguration psiModule.TargetFrameworkId project |> isNullnessEnabled
         | _ -> false
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 [<ZoneMarker(typeof<ISinceClr4HostZone>, typeof<IFSharpPluginZone>)>]
 type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFSharpItemsContainer,
         modulePathProvider: ModulePathProvider, logger: ILogger,

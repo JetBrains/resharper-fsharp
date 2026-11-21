@@ -338,7 +338,7 @@ type AssociatedTypeRenameEvaluator() =
 
             | _ -> [] :> _
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.DemandAnyThreadSafe)>]
 type FSharpSuspiciousReferenceSearchService(searchFilter: FSharpSearchFilter) =
     inherit SuspiciousReferencesSearchService()
 
