@@ -15,7 +15,7 @@ public class FSharpInRiderProduct
 {
   public static readonly SubplatformName ThisSubplatformName = new((RelativePath)"Plugins" / "resharper-fsharp" / "ReSharper.FSharp" / "src" / "FSharp.RiderPlugin");
 
-  public static readonly RelativePath DotFilesFolder = @"plugins\rider-plugins-fsharp\DotFiles";
+  public static readonly RelativePath DotFilesFolder = RiderLocations.DotFilesFolder;
 
   public const string ProductTechnicalName = "FSharp";
 
@@ -77,7 +77,7 @@ public class FSharpInRiderProduct
   {
     public static readonly SubplatformName FantomasSubplatformName = new((RelativePath)"Plugins" / "resharper-fsharp" / "ReSharper.FSharp" / "src" / "FSharp.Fantomas.Host");
 
-    public static readonly RelativePath FantomasFolder = @"plugins\rider-plugins-fsharp\fantomas";
+    public static readonly RelativePath FantomasFolder = DotFilesFolder / "fantomas";
 
     public const string ProductTechnicalName = "FSharp.Fantomas";
 
@@ -108,7 +108,7 @@ public class FSharpInRiderProduct
   {
     public static readonly SubplatformName TypeProvidersSubplatformName = new((RelativePath)"Plugins" / "resharper-fsharp" / "ReSharper.FSharp" / "src" / "FSharp.TypeProviders.Host");
 
-    public static readonly RelativePath TypeProvidersFolder = @"plugins\rider-plugins-fsharp\typeProviders";
+    public static readonly RelativePath TypeProvidersFolder = DotFilesFolder / "typeProviders";
 
     public const string ProductTechnicalName = "FSharp.TypeProviders";
 

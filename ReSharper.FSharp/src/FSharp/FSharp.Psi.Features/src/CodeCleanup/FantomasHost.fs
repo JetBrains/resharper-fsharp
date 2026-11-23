@@ -4,7 +4,9 @@ open System
 open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open JetBrains.Application.Parts
+open JetBrains.Application.Processes
 open JetBrains.Application.Settings
+open JetBrains.Application.Threading
 open JetBrains.Core
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
@@ -26,8 +28,9 @@ module internal Reflection =
 
 
 [<SolutionComponent(Instantiation.DemandAnyThreadUnsafe)>]
-type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, fantomasDetector: FantomasDetector,
-                  notifications: FantomasNotificationsManager, schema: SettingsSchema) =
+type FantomasHost(solution: ISolution, fantomasDetector: FantomasDetector, notifications: FantomasNotificationsManager,
+                  schema: SettingsSchema, processStartInfoPatcher: ISolutionProcessStartInfoPatcher, logger: ILogger,
+                  locks: IShellLocks) =
     let solutionLifetime = solution.GetSolutionLifetimes().UntilSolutionCloseLifetime
     let mutable connection: FantomasConnection = null
     let mutable formatConfigFields: string[] = [||]
@@ -46,7 +49,10 @@ type FantomasHost(solution: ISolution, fantomasFactory: FantomasProcessFactory, 
         fantomasDetector.TryRun(fun (path, version) ->
             if isConnectionAlive () then () else
             formatterHostLifetime <- Lifetime.Define(solutionLifetime)
-            connection <- fantomasFactory.Create(formatterHostLifetime.Lifetime, version, path).Run()
+            let fantomasProcess =
+                FantomasProcess(formatterHostLifetime.Lifetime, logger, locks, processStartInfoPatcher,
+                    JetProcessRuntimeRequest.CreateInternalRuntime(), version, path)
+            connection <- fantomasProcess.Run()
             formatConfigFields <- connection.Execute(fun x -> connection.ProtocolModel.GetFormatConfigFields.Sync(Unit.Instance, RpcTimeouts.Maximal))
         )
 

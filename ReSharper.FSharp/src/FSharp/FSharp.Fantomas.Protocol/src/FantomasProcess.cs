@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
 using JetBrains.Core;
@@ -25,10 +26,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol
       get
       {
         var assemblyDir = typeof(FantomasProcess).Assembly.GetDirectory();
-        var defaultDirectory = assemblyDir.Parent / "fantomas";
+        var hostDirectoryCandidates = new[] { assemblyDir / "fantomas", assemblyDir.Parent / "fantomas" };
 
         // In the monorepo, assemblies are located in a shared folder
-        return defaultDirectory.ExistsDirectory ? defaultDirectory : assemblyDir;
+        return hostDirectoryCandidates.FirstOrDefault(directory => directory.ExistsDirectory) ?? assemblyDir;
       }
     }
 
