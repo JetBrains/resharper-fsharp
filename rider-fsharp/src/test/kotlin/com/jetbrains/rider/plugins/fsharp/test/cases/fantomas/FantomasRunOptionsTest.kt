@@ -99,7 +99,6 @@ class FantomasRunOptionsTest : FantomasDotnetToolTestBase() {
     }
   }
 
-  @Mute("RIDER-139900")
   @Test
   fun `local tool selected but not found`() = doSelectedButNotFoundTest("LocalDotnetTool")
 

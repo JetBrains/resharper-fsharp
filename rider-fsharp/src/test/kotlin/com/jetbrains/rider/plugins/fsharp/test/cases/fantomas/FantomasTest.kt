@@ -27,7 +27,6 @@ class FantomasTest : EditorTestBase() {
   @Test
   fun simpleFormatting() = doTest("Simple.fs")
 
-  @Mute("RIDER-139900")
   @Test
   fun formatLastFile() = doTest("Program.fs")
 
