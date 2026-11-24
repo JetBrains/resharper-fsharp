@@ -32,7 +32,7 @@ import java.time.Duration
 @TestSettings(sdkVersion = SdkVersion.LATEST_STABLE, buildTool = BuildTool.FULL, mono = Mono.UNIX_ONLY)
 class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   @Test
-  @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]), Mute("RIDER-139900")])
+  @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])])
   fun `generative type providers cross-project analysis`() {
     val generativeProviderProjectPath =
       "${project.solutionDirectoryPath}/GenerativeTypeProvider/GenerativeTypeProvider.fsproj"
@@ -57,7 +57,7 @@ class GenerativeTypeProvidersTest : BaseTypeProvidersTest() {
   }
 
   @Test
-  @Mutes([Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]), Mute("RIDER-139900")])
+  @Mutes([Mute("RIDER-111883", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL])])
   fun `change abbreviation`() {
     executeWithGold(testGoldFile) {
       withOpenedEditor("GenerativeTypeProvider/Library.fs") {

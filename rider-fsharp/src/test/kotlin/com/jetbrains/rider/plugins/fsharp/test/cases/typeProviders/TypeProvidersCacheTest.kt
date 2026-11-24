@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 import com.jetbrains.rd.platform.diagnostics.LogTraceScenario
 import com.jetbrains.rd.platform.diagnostics.RdLogTraceScenarios
 import com.jetbrains.rider.plugins.fsharp.test.framework.dumpTypeProviders
+import com.jetbrains.rider.plugins.fsharp.test.framework.flushFileChanges
 import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Mutes
 import com.jetbrains.rider.test.annotations.Solution
@@ -11,22 +12,20 @@ import com.jetbrains.rider.test.enums.BuildTool
 import com.jetbrains.rider.test.enums.Mono
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.enums.sdk.SdkVersion
-import com.jetbrains.rider.test.framework.disableTimedMarkupSuppression
-import com.jetbrains.rider.test.framework.enableTimedMarkupSuppression
 import com.jetbrains.rider.test.framework.executeWithGold
+import com.jetbrains.rider.test.scriptingApi.deleteRecursivelySafe
 import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
-import com.jetbrains.rider.test.scriptingApi.deleteRecursivelySafe
 import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
-import kotlin.io.path.pathString
 import kotlin.io.path.createDirectory
+import kotlin.io.path.pathString
 
 @Tag(TeamCityTags.Plugins.FSharp.General)
 @Solution("TypeProviderLibrary")
@@ -57,6 +56,7 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     checkTypeProviders(Path.of(testGoldFile.pathString + "_after"), defaultSourceFile)
   }
 
+  // TODO: invalidate the daemon on the provider invalidation
   @Test
   @Mutes([Mute("RIDER-111885", platforms = [PlatformType.LINUX_ALL, PlatformType.MAC_OS_ALL]),
          Mute("RIDER-121793")])
@@ -64,10 +64,11 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
     val testDirectory = Path.of(project.basePath!!, "TypeProviderLibrary", "Test")
 
     withOpenedEditor(defaultSourceFile) {
-      disableTimedMarkupSuppression()
       waitForDaemon()
 
       testDirectory.deleteRecursivelySafe()
+      flushFileChanges(project!!)
+
       typeWithLatency("//")
       waitForNextDaemon()
 
@@ -76,14 +77,14 @@ class TypeProvidersCacheTest : BaseTypeProvidersTest() {
       }
 
       testDirectory.createDirectory()
+      flushFileChanges(project!!)
+
       typeWithLatency(" ")
       waitForNextDaemon()
 
       executeWithGold(Path.of(testGoldFile.pathString + "_after")) {
         dumpTypeProviders(it)
       }
-
-      enableTimedMarkupSuppression()
     }
   }
 
