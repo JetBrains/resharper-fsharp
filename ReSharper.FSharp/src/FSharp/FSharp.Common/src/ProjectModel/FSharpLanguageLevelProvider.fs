@@ -34,7 +34,7 @@ type VersionMapping(defaultVersion: FSharpLanguageLevel, latestMajor: FSharpLang
     member this.Preview = preview
 
 
-[<SolutionComponent(Instantiation.ContainerAsyncPrimaryThread (* PrimaryThread due to not thread safe ProjectSettingsStorageComponent *) )>]
+[<SolutionComponent(Instantiation.ContainerAsyncAnyThreadSafe)>]
 type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset: ISolutionToolset) =
     inherit LanguageLevelProjectProperty<FSharpLanguageLevel, FSharpLanguageVersion>(
         lifetime, locks, projectPropertiesListener)
@@ -195,7 +195,7 @@ type FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListen
         member this.Changed _ =
             compilerPathToLanguageLevels.Clear()
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLanguageLevelProviderForAnyModule() =
     abstract IsApplicable: IPsiModule -> bool
     default this.IsApplicable _ = true
@@ -235,7 +235,7 @@ type FSharpLanguageLevelProviderForAnyModule() =
         member this.GetLatestAvailableLanguageLevel _ = failwith "todo"
         member this.LanguageVersionModifier = failwith "todo"
 
-[<SolutionFeaturePart(InstantiationEx.LegacyDefault)>]
+[<SolutionFeaturePart(Instantiation.DemandAnyThreadSafe)>]
 type FSharpLanguageLevelProvider(projectProperty: FSharpLanguageLevelProjectProperty) =
     inherit FSharpLanguageLevelProviderForAnyModule()
 
