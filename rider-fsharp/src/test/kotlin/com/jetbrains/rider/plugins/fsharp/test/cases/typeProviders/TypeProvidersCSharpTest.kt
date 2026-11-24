@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.fsharp.test.cases.typeProviders
 
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.test.annotations.Mute
 import com.jetbrains.rider.test.annotations.Solution
 import com.jetbrains.rider.test.annotations.TestSettings
 import com.jetbrains.rider.test.asserts.shouldBeFalse
@@ -18,9 +17,9 @@ import com.jetbrains.rider.test.scriptingApi.reloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.typeFromOffset
 import com.jetbrains.rider.test.scriptingApi.unloadAllProjects
 import com.jetbrains.rider.test.scriptingApi.waitForAllAnalysisFinished
-import com.jetbrains.rider.test.scriptingApi.waitForCompletion
 import com.jetbrains.rider.test.scriptingApi.waitForDaemon
 import com.jetbrains.rider.test.scriptingApi.waitForNextDaemon
+import com.jetbrains.rider.test.scriptingApi.waitLookupItemsWithFullPresentation
 import com.jetbrains.rider.test.scriptingApi.withOpenedEditor
 import com.jetbrains.rider.test.shared.constants.TeamCityTags
 import org.junit.jupiter.api.Tag
@@ -31,7 +30,6 @@ import kotlin.io.path.pathString
 @Tag(TeamCityTags.Plugins.FSharp.General)
 @Solution("YamlProviderCSharp")
 class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
-  @Mute("RIDER-136409")
   @Test
   fun resolveTest() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs") {
@@ -83,7 +81,6 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     }
   }
 
-  @Mute("RIDER-136408")
   @Test
   fun `provided abbreviation rename`() {
     withOpenedEditor("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.cs") {
@@ -105,13 +102,11 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     }
   }
 
-  @Mute("RIDER-117704")
   @Test
   @Solution("YamlProviderCSharp")
   fun `provided type abbreviation completion`() =
     doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
 
-  @Mute("RIDER-117704")
   @Test
   @Solution("YamlProviderCSharp")
   fun `provided nested type completion`() = doTestDumpLookupItems("CSharpLibrary/CSharpLibrary.cs", "CSharpLibrary.fs")
@@ -121,7 +116,7 @@ class TypeProvidersCSharpTest : BaseTypeProvidersTest() {
     withOpenedEditor(relativePath, sourceFileName) {
       waitForDaemon()
       callBasicCompletion()
-      waitForCompletion()
+      waitLookupItemsWithFullPresentation()
       executeWithGold(testGoldFile) {
         dumpActiveLookupItemsPresentations(it)
       }
