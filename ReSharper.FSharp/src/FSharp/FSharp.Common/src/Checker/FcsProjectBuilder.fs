@@ -3,6 +3,8 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.CodeAnalysis.ProjectSnapshot
+open FSharp.Compiler.IO
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Diagnostics
@@ -205,6 +207,17 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
         let fileIndices = Dictionary<VirtualFileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices[p] <- i) filePaths
 
+        let basicOptions = List.ofSeq otherOptions
+
+        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
+        let referencePaths =
+            references
+            |> Seq.choose modulePathProvider.GetModulePath
+            |> Seq.filter (fun path -> not path.IsEmpty)
+            |> Seq.toList
+
+        otherOptions.AddRange(referencePaths |> Seq.map (fun path -> "-r:" + path.FullPath))
+
         let projectOptions =
             { ProjectFileName = $"{project.ProjectFileLocation}.{targetFrameworkId}.fsproj"
               ProjectId = None
@@ -218,35 +231,48 @@ type FcsProjectBuilder(checkerService: FcsCheckerService, itemsContainer: IFShar
               UnresolvedReferences = None
               Stamp = None }
 
-        let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+        let parsingOptions, errors = checkerService.GetParsingOptionsFromCommandLineArgs(basicOptions)
+        if not errors.IsEmpty then logger.Warn("Getting parsing options: {0}", concatErrors errors)
 
         let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalDefines
-
         let parsingOptions = { parsingOptions with
-                                 SourceFiles = projectOptions.SourceFiles
-                                 ConditionalDefines = defines }
+                                SourceFiles = projectOptions.SourceFiles
+                                ConditionalDefines = defines }
 
-        if not errors.IsEmpty then
-            logger.Warn("Getting parsing options: {0}", concatErrors errors)
+        let options =
+            if checkerService.UseTransparentCompiler then
+                let sourceFiles =
+                    [for file in projectOptions.SourceFiles -> FSharpFileSnapshot.CreateFromFileSystem(file)]
 
-        let fcsProject =
-            { OutputPath = outPath
-              ProjectOptions = projectOptions
-              ParsingOptions = parsingOptions
-              FileIndices = fileIndices
-              ImplementationFilesWithSignatures = implsWithSig
-              ReferencedModules = HashSet() }
-        
-        let references = projectKey.Project.GetModuleReferences(projectKey.TargetFrameworkId)
-        let paths =
-            references
-            |> Array.ofSeq
-            |> Array.choose modulePathProvider.GetModulePath
-            |> Array.choose (fun path -> if path.IsEmpty then None else Some("-r:" + path.FullPath))
+                let referencesOnDisk =
+                    referencePaths
+                    |> List.map (fun path ->
+                        { ReferenceOnDisk.Path = path.FullPath
+                          LastModified = FileSystem.GetLastWriteTimeShim(path.FullPath) })
 
-        let projectOptions =
-            { fcsProject.ProjectOptions with
-                OtherOptions = Array.append fcsProject.ProjectOptions.OtherOptions paths }
+                let snapshot =
+                    FSharpProjectSnapshot.Create(
+                        projectOptions.ProjectFileName,
+                        None,
+                        projectOptions.ProjectId,
+                        sourceFiles,
+                        referencesOnDisk,
+                        basicOptions,
+                        [],
+                        projectOptions.IsIncompleteTypeCheckEnvironment,
+                        projectOptions.UseScriptResolutionRules,
+                        projectOptions.LoadTime,
+                        projectOptions.UnresolvedReferences,
+                        projectOptions.OriginalLoadReferences,
+                        projectOptions.Stamp)
 
-        { fcsProject with ProjectOptions = projectOptions }
+                FcsProjectOptions.FcsProjectSnapshot(snapshot, parsingOptions)
+
+            else
+                FcsProjectOptions.FcsProjectOptions(projectOptions, parsingOptions)
+
+        { OutputPath = outPath
+          Options = options
+          FileIndices = fileIndices
+          ImplementationFilesWithSignatures = implsWithSig
+          ReferencedModules = HashSet() }

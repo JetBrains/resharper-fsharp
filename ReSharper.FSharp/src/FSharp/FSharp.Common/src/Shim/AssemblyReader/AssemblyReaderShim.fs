@@ -270,7 +270,11 @@ type AssemblyReaderShim(lifetime: Lifetime, changeManager: ChangeManager, psiMod
                     let referencedModule = projectKeyToPsiModules.TryGetValue(referencedProjectKey)
                     if isNotNull referencedModule && assemblyReadersByModule.ContainsKey(referencedModule) then
                         barrier.EnqueueJob(fun _ ->
-                            tryGetReaderFromModule referencedModule |> Option.iter _.UpdateTimestamp()
+                            tryGetReaderFromModule referencedModule |> Option.iter (fun reader ->
+                                let timestamp = reader.Timestamp
+                                reader.UpdateTimestamp()
+                                if reader.Timestamp <> timestamp then
+                                    getFcsProjectProvider().ReferencedModuleChanged(referencedModule))
                         )
 
                 lastSyncedWriteLockTimestamp <- locks.ContentModelLocks.WriteLockTimestamp
