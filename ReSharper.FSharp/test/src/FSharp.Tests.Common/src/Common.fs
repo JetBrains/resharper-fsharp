@@ -312,7 +312,7 @@ type TestFcsCapturedInfoCache(lifetime, fcsProjectProvider, scriptModuleProvider
     interface IHideImplementation<FcsCapturedInfoCache>
 
 
-[<SolutionComponent(InstantiationEx.LegacyDefault)>]
+[<SolutionComponent(Instantiation.ContainerAsyncAnyThreadSafe)>]
 [<ZoneMarker(typeof<ITestFSharpPluginZone>)>]
 type TestFSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset, psiModules: IPsiModules) =
     inherit FSharpLanguageLevelProjectProperty(lifetime, locks, projectPropertiesListener, solutionToolset)
