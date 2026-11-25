@@ -157,7 +157,6 @@ class FSharpProjectModelTest : PerTestProjectModelTestBase() {
     }
   }
 
-  @Mute("RIDER-110482")
   @Test
   @Issues([Issue("RIDER-69084"), Issue("RIDER-69562")])
   @TestSettings(sdkVersion = SdkVersion.DOT_NET_9, buildTool = BuildTool.SDK)
