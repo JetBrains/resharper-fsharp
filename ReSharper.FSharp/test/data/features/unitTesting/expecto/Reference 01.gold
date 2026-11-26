@@ -1,0 +1,17 @@
+﻿Dispositions:
+"Parser" 6-8: All.Parser
+"numbers" 7-7: All.Parser.numbers
+"Lexer" 11-13: All.Lexer
+"tokens" 12-12: All.Lexer.tokens
+"All" 17-21: All
+"direct" 20-20: All.direct
+allTests 15-21: All
+Module 1-21: All
+
+Elements:
+All: group, Source, Module, Reference 01.fs, 17: "All"
+All.Lexer: group, Source, Module, Reference 01.fs, 11: "Lexer"
+All.Lexer.tokens: test, Source, Module, Reference 01.fs, 12: "tokens"
+All.Parser: group, Source, Module, Reference 01.fs, 6: "Parser"
+All.Parser.numbers: test, Source, Module, Reference 01.fs, 7: "numbers"
+All.direct: test, Source, Module, Reference 01.fs, 20: "direct"

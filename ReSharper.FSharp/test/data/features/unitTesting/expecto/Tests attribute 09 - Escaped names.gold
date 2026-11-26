@@ -1,0 +1,15 @@
+﻿Dispositions:
+"All" 7-12: All
+"tab\tname" 8-8: All.tab	name
+@"verbatim ""quoted"" \name" 9-9: All.verbatim "quoted" \\name
+"""triple "quoted" \name""" 10-10: All.triple "quoted" \\name
+"quote \" name" 11-11: All.quote " name
+tests 5-12: All
+Module 1-12: All
+
+Elements:
+All: group, Source, Module, Tests attribute 09 - Escaped names.fs, 7: "All"
+All.quote " name: test, Source, Module, Tests attribute 09 - Escaped names.fs, 11: "quote \" name"
+All.tab	name: test, Source, Module, Tests attribute 09 - Escaped names.fs, 8: "tab\tname"
+All.triple "quoted" \\name: test, Source, Module, Tests attribute 09 - Escaped names.fs, 10: """triple "quoted" \name"""
+All.verbatim "quoted" \\name: test, Source, Module, Tests attribute 09 - Escaped names.fs, 9: @"verbatim ""quoted"" \name"

@@ -1,0 +1,10 @@
+﻿Dispositions:
+"All" 12-16: All
+LiteralName 13-13: All.literal
+LiteralName 14-14: All.literal
+tests 10-16: All
+Module 1-16: All
+
+Elements:
+All: group, Source, Module, Tests attribute 10 - Literal name.fs, 12: "All"
+All.literal: test, Source, Module, Tests attribute 10 - Literal name.fs, 13: LiteralName, 14: LiteralName

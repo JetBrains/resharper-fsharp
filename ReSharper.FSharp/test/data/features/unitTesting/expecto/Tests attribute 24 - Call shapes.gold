@@ -1,0 +1,19 @@
+﻿Dispositions:
+"Tuple" 9-9: Tuple
+"piped" 9-9: Tuple.piped
+"Methods" 13-15: Methods
+"positional" 14-14: Methods.positional
+"Qualified" 19-21: Qualified
+"qualified" 20-20: Qualified.qualified
+tupleTests 7-9: Tuple
+methodTests 11-15: Methods
+qualifiedTests 17-21: Qualified
+Module 1-21: Tuple, Methods, Qualified
+
+Elements:
+Methods: group, Source, Module, Tests attribute 24 - Call shapes.fs, 13: "Methods"
+Methods.positional: test, Source, Module, Tests attribute 24 - Call shapes.fs, 14: "positional"
+Qualified: group, Source, Module, Tests attribute 24 - Call shapes.fs, 19: "Qualified"
+Qualified.qualified: test, Source, Module, Tests attribute 24 - Call shapes.fs, 20: "qualified"
+Tuple: group, Source, Module, Tests attribute 24 - Call shapes.fs, 9: "Tuple"
+Tuple.piped: test, Source, Module, Tests attribute 24 - Call shapes.fs, 9: "piped"

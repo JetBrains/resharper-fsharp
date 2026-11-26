@@ -2,17 +2,16 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open System
 open System.Collections.Generic
-open System.Linq
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Parts
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.DotNetCore
 open JetBrains.ProjectModel.Impl.Build
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.ProjectsHost
-open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
@@ -158,8 +157,12 @@ type FSharpProjectPropertiesFactory() =
         FSharpProjectProperties(parameters.ProjectTypeGuids, factoryGuid, parameters.TargetFrameworkIds,
             parameters.TargetPlatformData, parameters.DotNetCorePlatform) :> _
 
+    static member CreateProjectProperties(targetFrameworkIds, dotNetCorePlatform: DotNetCorePlatformInfo) =
+        FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, dotNetCorePlatform)
+        :> IProjectProperties
+
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
-        FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, null) :> _
+        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds, null)
 
     override x.Read(reader, stringIntern) =
         let projectProperties = FSharpProjectProperties(factoryGuid)

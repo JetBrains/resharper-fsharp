@@ -1,0 +1,11 @@
+﻿Dispositions:
+"local" 7-7: All.local
+"All" 9-12: All
+"mapped" 11-11: All.mapped
+tests 5-12: All
+Module 1-12: All
+
+Elements:
+All: group, Source, Artifact, Module, Tests attribute 26 - Local binding.fs, 9: "All"
+All.local: test, Artifact, Module, , 7: "local"
+All.mapped: test, Artifact, Module, , 11: "mapped"

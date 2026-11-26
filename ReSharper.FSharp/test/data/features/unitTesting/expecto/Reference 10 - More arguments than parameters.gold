@@ -1,0 +1,13 @@
+﻿Dispositions:
+"All" 10-13: All
+"query" 11-11: All.Db.query
+"piped" 12-12: All.Piped.piped
+tests 8-13: All
+Module 1-13: All
+
+Elements:
+All: group, Source, Artifact, Module, Reference 10 - More arguments than parameters.fs, 10: "All"
+All.Db: group, Artifact, Module, 
+All.Db.query: test, Artifact, Module, , 11: "query"
+All.Piped: group, Artifact, Module, 
+All.Piped.piped: test, Artifact, Module, , 12: "piped"

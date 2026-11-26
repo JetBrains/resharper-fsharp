@@ -1,0 +1,11 @@
+﻿Dispositions:
+"All" 11-13: All
+"case" 11-11: All.case
+"standard" 12-12: All.standard
+Tests 9-13: All
+Samples 5-14: All
+
+Elements:
+All: group, Source, Artifact, Samples, CSharp 05 - Lambda.cs, 11: "All"
+All.case: test, Artifact, Samples, , 11: "case"
+All.standard: test, Artifact, Samples, , 12: "standard"

@@ -1,0 +1,11 @@
+﻿Dispositions:
+"Shared" 6-8: First.Shared, Second.Shared
+"test" 7-7: First.Shared.test, Second.Shared.test
+
+Elements:
+First: group, Artifact, Module, 
+First.Shared: group, Artifact, Module, , 6: "Shared"
+First.Shared.test: test, Artifact, Module, , 7: "test"
+Second: group, Artifact, Module, 
+Second.Shared: group, Artifact, Module, , 6: "Shared"
+Second.Shared.test: test, Artifact, Module, , 7: "test"

@@ -59,6 +59,7 @@
     <Compile Include="RearrangeCodeTest.fs" />
     <Compile Include="FSharpReferenceResolveTest.fs" />
     <Compile Include="ForkedFcsCapturedInfoCacheTest.fs" />
+    <Compile Include="UnitTesting\ExpectoTest.fs" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\..\..\src\FSharp\FSharp.Common\FSharp.Common.fsproj" />

@@ -1,0 +1,5 @@
+﻿Expecto: 11.1.1.0, supported: Yes
+
+Results:
+Dots.Api.V1.get: Failed Found duplicated test names, these names are: [["Dots.Api.V1.get"]]
+Dots.Api\.V1.get: Failed Found duplicated test names, these names are: [["Dots.Api.V1.get"]]

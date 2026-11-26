@@ -1,0 +1,5 @@
+<RunSettings>
+  <Expecto>
+    <parallel-workers>1</parallel-workers>
+  </Expecto>
+</RunSettings>

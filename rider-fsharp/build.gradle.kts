@@ -144,7 +144,9 @@ val pluginFiles = listOf(
   "FSharp/FSharp.Psi.Intentions/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Intentions",
   "FSharp/FSharp.Psi.Features/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
   "FSharp/FSharp.Fantomas.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.Fantomas.Protocol",
-  "FSharp/FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol"
+  "FSharp/FSharp.TypeProviders.Protocol/$outputRelativePath/JetBrains.ReSharper.Plugins.FSharp.TypeProviders.Protocol",
+  "FSharp/FSharp.Expecto.Tasks/bin/$buildConfiguration/netstandard2.0/JetBrains.ReSharper.Plugins.FSharp.Expecto.Tasks",
+  "FSharp/FSharp.Expecto.Adapter/bin/$buildConfiguration/netstandard2.0/JetBrains.ReSharper.Plugins.FSharp.Expecto.Adapter"
 )
 
 val debuggerFiles = listOf(

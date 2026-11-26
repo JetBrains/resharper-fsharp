@@ -1,0 +1,14 @@
+﻿Dispositions:
+"computed child" 7-7: All.Computed.computed child
+"Named" 11-13: All.Named
+"named child" 12-12: All.Named.named child
+"All" 17-21: All
+allTests 15-21: All
+Module 1-21: All
+
+Elements:
+All: group, Source, Artifact, Module, Reference 03 - Parameters.fs, 17: "All"
+All.Computed: group, Artifact, Module, 
+All.Computed.computed child: test, Artifact, Module, , 7: "computed child"
+All.Named: group, Source, Module, Reference 03 - Parameters.fs, 11: "Named"
+All.Named.named child: test, Source, Module, Reference 03 - Parameters.fs, 12: "named child"

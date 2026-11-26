@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 7-9: All
+"in namespace" 8-8: All.in namespace
+tests 5-9: All
+Tests 1-9: All
+
+Elements:
+All: group, Source, My.Namespace.Tests in My.Namespace, Tests attribute 14 - Namespace.fs, 7: "All"
+All.in namespace: test, Source, My.Namespace.Tests in My.Namespace, Tests attribute 14 - Namespace.fs, 8: "in namespace"

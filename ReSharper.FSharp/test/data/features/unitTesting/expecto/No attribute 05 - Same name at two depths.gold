@@ -1,0 +1,8 @@
+﻿Dispositions:
+"Nested" 6-8: All.Nested
+"same" 7-7: All.Nested.same
+
+Elements:
+All: group, Artifact, Module, 
+All.Nested: group, Artifact, Module, , 6: "Nested"
+All.Nested.same: test, Artifact, Module, , 7: "same"

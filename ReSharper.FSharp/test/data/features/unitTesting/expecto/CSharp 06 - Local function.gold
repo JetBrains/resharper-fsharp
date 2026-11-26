@@ -1,0 +1,9 @@
+﻿Dispositions:
+"local" 11-11: All.local
+"All" 12-12: All
+Tests 6-14: All
+Samples 4-15: All
+
+Elements:
+All: group, Source, Artifact, Samples, CSharp 06 - Local function.cs, 12: "All"
+All.local: test, Artifact, Samples, , 11: "local"

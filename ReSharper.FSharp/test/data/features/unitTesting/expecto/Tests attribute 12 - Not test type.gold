@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 11-13: All
+"in test" 12-12: All.in test
+tests 9-13: All
+Module 1-13: All
+
+Elements:
+All: group, Source, Module, Tests attribute 12 - Not test type.fs, 11: "All"
+All.in test: test, Source, Module, Tests attribute 12 - Not test type.fs, 12: "in test"

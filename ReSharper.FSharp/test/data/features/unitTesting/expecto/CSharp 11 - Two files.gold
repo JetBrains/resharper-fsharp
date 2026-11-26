@@ -1,0 +1,13 @@
+﻿Dispositions in CSharp 11 - Lists.cs:
+"Parser" 7-10: All.Parser
+"numbers" 8-8: All.Parser.numbers
+
+Dispositions in CSharp 11 - Main.cs:
+"All" 8-10: All
+Tests 6-10: All
+Main 4-11: All
+
+Elements:
+All: group, Source, Artifact, Main, CSharp 11 - Main.cs, CSharp 11 - Main.cs 8: "All"
+All.Parser: group, Artifact, Main, , CSharp 11 - Lists.cs 7: "Parser"
+All.Parser.numbers: test, Artifact, Main, , CSharp 11 - Lists.cs 8: "numbers"

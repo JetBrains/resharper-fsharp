@@ -1,0 +1,13 @@
+﻿Dispositions:
+"Generated" 7-13: Generated
+$"case {i}" 9-10: Generated.case 1, Generated.case 2, Generated.case 3
+"static" 12-12: Generated.static
+tests 5-13: Generated
+Module 1-13: Generated
+
+Elements:
+Generated: group, Source, Artifact, Module, Located by runner 01 - Loop.fs, 7: "Generated"
+Generated.case 1: test, Artifact, Module, Located by runner 01 - Loop.fs:10, 9: $"case {i}"
+Generated.case 2: test, Artifact, Module, Located by runner 01 - Loop.fs:10, 9: $"case {i}"
+Generated.case 3: test, Artifact, Module, Located by runner 01 - Loop.fs:10, 9: $"case {i}"
+Generated.static: test, Source, Module, Located by runner 01 - Loop.fs, 12: "static"

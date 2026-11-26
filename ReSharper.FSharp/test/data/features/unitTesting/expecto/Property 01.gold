@@ -1,0 +1,13 @@
+﻿Dispositions:
+"Properties" 7-11: Properties
+"addition" 8-8: Properties.addition
+"with config" 9-9: Properties.with config
+"pending" 10-10: Properties.pending
+tests 5-11: Properties
+Module 1-11: Properties
+
+Elements:
+Properties: group, Source, Module, Property 01.fs, 7: "Properties"
+Properties.addition: test, Source, Module, Property 01.fs, 8: "addition"
+Properties.pending: test, Source, Module, Property 01.fs, 10: "pending"
+Properties.with config: test, Source, Module, Property 01.fs, 9: "with config"

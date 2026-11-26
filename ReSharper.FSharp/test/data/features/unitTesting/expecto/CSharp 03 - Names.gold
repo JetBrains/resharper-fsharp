@@ -1,0 +1,15 @@
+﻿Dispositions:
+"All" 10-16: All
+@"verbatim" 11-11: All.verbatim
+ConstantName 12-12: All.constant
+"con" + "cat" 13-13: All.concat
+"named argument" 14-14: All.named argument
+Tests 8-16: All
+Samples 4-17: All
+
+Elements:
+All: group, Source, Samples, CSharp 03 - Names.cs, 10: "All"
+All.concat: test, Source, Samples, CSharp 03 - Names.cs, 13: "con" + "cat"
+All.constant: test, Source, Samples, CSharp 03 - Names.cs, 12: ConstantName
+All.named argument: test, Source, Samples, CSharp 03 - Names.cs, 14: "named argument"
+All.verbatim: test, Source, Samples, CSharp 03 - Names.cs, 11: @"verbatim"

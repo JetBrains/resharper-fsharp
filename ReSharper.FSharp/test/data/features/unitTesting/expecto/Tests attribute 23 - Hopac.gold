@@ -1,0 +1,11 @@
+﻿Dispositions:
+"All" 8-14: All
+"case job" 9-9: All.case job
+"job" 11-13: All.job
+tests 6-14: All
+Module 1-14: All
+
+Elements:
+All: group, Source, Module, Tests attribute 23 - Hopac.fs, 8: "All"
+All.case job: test, Source, Module, Tests attribute 23 - Hopac.fs, 9: "case job"
+All.job: test, Source, Module, Tests attribute 23 - Hopac.fs, 11: "job"

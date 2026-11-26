@@ -1,0 +1,8 @@
+﻿Expecto: 11.1.1.0, supported: Yes
+
+Results:
+Parallel.first: Failed The second test starts before the first test ends. Actual value was false but had expected it to be true.
+  Output: output of first
+  Stack trace: Tests.fs:line 52
+Parallel.second: Success 
+  Output: output of second

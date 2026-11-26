@@ -1,0 +1,46 @@
+﻿module ||(0)Module
+
+open Expecto
+
+[<Tests>]
+let ||(1)tests =
+    testList ||(2)"All" [
+        testCase ||(3)"sync" <| fun _ ->
+            ()
+
+        test ||(4)"builder" {
+            ()
+        }
+
+        testCaseAsync ||(5)"async" <| async { return () }
+
+        testList ||(6)"Nested" [
+            ptestCase ||(7)"pending" (fun _ -> ())
+            ftestCase ||(8)"focused" (fun _ -> ())
+        ]
+
+        testTheory ||(9)"theory" [1; 2] <| fun x ->
+            ()
+    ]
+
+[<FTests>]
+let ||(10)focused = testCase ||(11)"focused root" <| fun _ -> ()
+
+[<PTests>]
+let ||(12)pending () = testCase ||(13)"pending root" <| fun _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Unit Test Element Container: 
+(1): ReSharper Unit Test Element Container: Expecto Test (Click to run)
+(2): ReSharper Unit Test Element Container: Expecto Test (Click to run)
+(3): ReSharper Unit Test Element: Expecto Test (Click to run)
+(4): ReSharper Unit Test Element: Expecto Test (Click to run)
+(5): ReSharper Unit Test Element: Expecto Test (Click to run)
+(6): ReSharper Unit Test Element Container: Expecto Test (Click to run)
+(7): ReSharper Unit Test Element: Expecto Test (Click to run)
+(8): ReSharper Unit Test Element: Expecto Test (Click to run)
+(9): ReSharper Unit Test Element Container: Expecto Test (Click to run)
+(10): ReSharper Unit Test Element: Expecto Test (Click to run)
+(11): ReSharper Unit Test Element: Expecto Test (Click to run)
+(12): ReSharper Unit Test Element: Expecto Test (Click to run)
+(13): ReSharper Unit Test Element: Expecto Test (Click to run)

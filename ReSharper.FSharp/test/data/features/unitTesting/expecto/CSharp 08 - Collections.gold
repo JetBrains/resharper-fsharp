@@ -1,0 +1,25 @@
+﻿Dispositions:
+"All" 9-15: All
+"in list" 10-10: All.in list
+"Collection expression" 11-13: All.Collection expression
+"in collection expression" 12-12: All.Collection expression.in collection expression
+"cast" 14-14: All.cast
+"Property" 20-20: Property
+"in getter" 20-20: Property.in getter
+"Method" 24-24: Method
+"in method" 24-24: Method.in method
+Tests 7-15: All
+Property 17-21: Property
+Method 23-24: Method
+Samples 5-25: All, Property, Method
+
+Elements:
+All: group, Source, Samples, CSharp 08 - Collections.cs, 9: "All"
+All.Collection expression: group, Source, Samples, CSharp 08 - Collections.cs, 11: "Collection expression"
+All.Collection expression.in collection expression: test, Source, Samples, CSharp 08 - Collections.cs, 12: "in collection expression"
+All.cast: test, Source, Samples, CSharp 08 - Collections.cs, 14: "cast"
+All.in list: test, Source, Samples, CSharp 08 - Collections.cs, 10: "in list"
+Method: group, Source, Samples, CSharp 08 - Collections.cs, 24: "Method"
+Method.in method: test, Source, Samples, CSharp 08 - Collections.cs, 24: "in method"
+Property: group, Source, Samples, CSharp 08 - Collections.cs, 20: "Property"
+Property.in getter: test, Source, Samples, CSharp 08 - Collections.cs, 20: "in getter"

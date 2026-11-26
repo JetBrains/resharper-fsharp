@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 10-12: All
+"test" 11-11: All.test
+tests 8-12: All
+Module 1-12: All
+
+Elements:
+All: group, Source, Module, Tests attribute 04 - Not Expecto.fs, 10: "All"
+All.test: test, Source, Module, Tests attribute 04 - Not Expecto.fs, 11: "test"

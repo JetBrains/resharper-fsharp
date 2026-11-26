@@ -1,0 +1,6 @@
+﻿Dispositions:
+"test" 8-8: 1.test
+
+Elements:
+1: group, Artifact, Module, 
+1.test: test, Artifact, Module, , 8: "test"

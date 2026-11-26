@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 7-9: All
+"second" 9-9: All.second
+tests 5-9: All
+Module 1-9: All
+
+Elements:
+All: group, Source, Artifact, Module, Reference 07 - Qualifier.fs, 7: "All"
+All.second: test, Artifact, Module, , 9: "second"

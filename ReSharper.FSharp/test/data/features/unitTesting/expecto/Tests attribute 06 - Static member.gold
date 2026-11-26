@@ -1,0 +1,10 @@
+﻿Dispositions:
+"Static" 8-10: Static
+"test" 9-9: Static.test
+StaticTests 6-10: Static
+Tests 5-16: Static
+Module 1-16: Static
+
+Elements:
+Static: group, Source, Module+Tests, Tests attribute 06 - Static member.fs, 8: "Static"
+Static.test: test, Source, Module+Tests, Tests attribute 06 - Static member.fs, 9: "test"

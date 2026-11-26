@@ -1,0 +1,16 @@
+﻿Dispositions:
+"All" 7-12: All
+"no body" 8-8: All.no body
+"Partial" 10-10: All.Partial
+"complete" 11-11: All.complete
+"Open" 16-19: Open
+tests 5-12: All
+openTests 14-19: Open
+Module 1-19: All, Open
+
+Elements:
+All: group, Source, Module, Tests attribute 18 - Incomplete code.fs, 7: "All"
+All.Partial: group, Source, Module, Tests attribute 18 - Incomplete code.fs, 10: "Partial"
+All.complete: test, Source, Module, Tests attribute 18 - Incomplete code.fs, 11: "complete"
+All.no body: test, Source, Module, Tests attribute 18 - Incomplete code.fs, 8: "no body"
+Open: group, Source, Module, Tests attribute 18 - Incomplete code.fs, 16: "Open"

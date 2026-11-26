@@ -1,0 +1,15 @@
+﻿Dispositions:
+"Properties" 7-12: Properties
+"configs" 8-8: Properties.configs
+"std gen" 9-9: Properties.std gen
+"etest" 10-10: Properties.etest
+"etest config" 11-11: Properties.etest config
+tests 5-12: Properties
+Module 1-12: Properties
+
+Elements:
+Properties: group, Source, Module, Property 02 - Std gen.fs, 7: "Properties"
+Properties.configs: test, Source, Module, Property 02 - Std gen.fs, 8: "configs"
+Properties.etest: test, Source, Module, Property 02 - Std gen.fs, 10: "etest"
+Properties.etest config: test, Source, Module, Property 02 - Std gen.fs, 11: "etest config"
+Properties.std gen: test, Source, Module, Property 02 - Std gen.fs, 9: "std gen"

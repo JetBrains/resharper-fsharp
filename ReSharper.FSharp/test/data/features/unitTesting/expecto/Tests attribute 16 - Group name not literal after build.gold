@@ -1,0 +1,7 @@
+﻿Dispositions:
+"All" 9-13: All
+tests 7-13: All
+Module 1-13: All
+
+Elements:
+All: group, Source, Artifact, Module, Tests attribute 16 - Group name not literal after build.fs, 9: "All"

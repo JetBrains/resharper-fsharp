@@ -1,0 +1,18 @@
+﻿Dispositions:
+"Yielded" 7-10: Yielded
+"from list" 8-8: Yielded.from list
+"single" 9-9: Yielded.single
+"Typed" 14-17: Typed
+"typed" 15-15: Typed.typed
+"parenthesized" 16-16: Typed.parenthesized
+yieldedTests 5-10: Yielded
+typedTests 12-17: Typed
+Module 1-17: Yielded, Typed
+
+Elements:
+Typed: group, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 14: "Typed"
+Typed.parenthesized: test, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 16: "parenthesized"
+Typed.typed: test, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 15: "typed"
+Yielded: group, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 7: "Yielded"
+Yielded.from list: test, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 8: "from list"
+Yielded.single: test, Source, Module, Tests attribute 20 - Yield and type annotation.fs, 9: "single"

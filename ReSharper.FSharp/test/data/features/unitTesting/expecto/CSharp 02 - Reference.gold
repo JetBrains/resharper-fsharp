@@ -1,0 +1,13 @@
+﻿Dispositions:
+"Shared" 7-9: All.Shared
+"shared test" 8-8: All.Shared.shared test
+"All" 14-17: All
+"outer" 16-16: All.outer
+AllTests 11-17: All
+Samples 4-18: All
+
+Elements:
+All: group, Source, Samples, CSharp 02 - Reference.cs, 14: "All"
+All.Shared: group, Source, Samples, CSharp 02 - Reference.cs, 7: "Shared"
+All.Shared.shared test: test, Source, Samples, CSharp 02 - Reference.cs, 8: "shared test"
+All.outer: test, Source, Samples, CSharp 02 - Reference.cs, 16: "outer"

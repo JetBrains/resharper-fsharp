@@ -1,0 +1,11 @@
+﻿Dispositions:
+"All" 8-13: All
+"complete" 12-12: All.complete
+"open" 13-13: All.open
+AllTests 6-13: All
+Samples 4-13: All
+
+Elements:
+All: group, Source, Samples, CSharp 09 - Incomplete code.cs, 8: "All"
+All.complete: test, Source, Samples, CSharp 09 - Incomplete code.cs, 12: "complete"
+All.open: test, Source, Samples, CSharp 09 - Incomplete code.cs, 13: "open"

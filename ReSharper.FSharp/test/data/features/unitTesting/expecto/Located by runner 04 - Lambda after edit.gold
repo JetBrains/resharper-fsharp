@@ -1,0 +1,13 @@
+﻿Dispositions:
+"All" 9-13: All
+"added" 10-10: All.added
+"first" 11-11: All.first
+"second" 12-12: All.second
+tests 7-13: All
+Module 1-13: All
+
+Elements:
+All: group, Source, Artifact, Module, Located by runner 04 - Lambda after edit.fs, 9: "All"
+All.added: test, Source, Module, Located by runner 04 - Lambda after edit.fs, 10: "added"
+All.first: test, Artifact, Module, Located by runner 04 - Lambda after edit.fs:10, 11: "first"
+All.second: test, Artifact, Module, Located by runner 04 - Lambda after edit.fs:11, 12: "second"

@@ -1,0 +1,13 @@
+﻿Dispositions:
+"Shared" 7-9: All.Shared
+"shared test" 8-8: All.Shared.shared test
+"All" 13-16: All
+"parenthesized" 15-15: All.parenthesized
+AllTests 11-16: All
+Samples 4-17: All
+
+Elements:
+All: group, Source, Samples, CSharp 10 - Method call.cs, 13: "All"
+All.Shared: group, Source, Samples, CSharp 10 - Method call.cs, 7: "Shared"
+All.Shared.shared test: test, Source, Samples, CSharp 10 - Method call.cs, 8: "shared test"
+All.parenthesized: test, Source, Samples, CSharp 10 - Method call.cs, 15: "parenthesized"

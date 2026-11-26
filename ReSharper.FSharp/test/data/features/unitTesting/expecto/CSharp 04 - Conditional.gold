@@ -1,0 +1,11 @@
+﻿Dispositions:
+"All" 10-13: All
+"conditional" 11-11: All.conditional
+"standard" 12-12: All.standard
+Tests 8-13: All
+Samples 4-14: All
+
+Elements:
+All: group, Source, Artifact, Samples, CSharp 04 - Conditional.cs, 10: "All"
+All.conditional: test, Artifact, Samples, , 11: "conditional"
+All.standard: test, Source, Samples, CSharp 04 - Conditional.cs, 12: "standard"

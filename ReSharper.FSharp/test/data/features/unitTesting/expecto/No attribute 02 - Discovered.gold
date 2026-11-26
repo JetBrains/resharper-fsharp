@@ -1,0 +1,11 @@
+﻿Dispositions:
+"Parser" 6-10: All.Parser
+"numbers" 7-7: All.Parser.numbers
+"strings" 8-8: All.Parser.strings
+
+Elements:
+All: group, Artifact, Module, 
+All.Parser: group, Artifact, Module, , 6: "Parser"
+All.Parser.numbers: test, Artifact, Module, , 7: "numbers"
+All.Parser.removed: test, Artifact, Module, 
+All.Parser.strings: test, Artifact, Module, , 8: "strings"

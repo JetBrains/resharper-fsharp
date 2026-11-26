@@ -1,0 +1,20 @@
+﻿Dispositions:
+"test" 7-7: First.Computed.test
+"First" 12-14: First
+"Second" 18-26: Second
+"Named" 19-21: Second.Named
+"test" 20-20: Second.Named.test
+"test" 24-24: Second.1.test
+firstTests 10-14: First
+secondTests 16-26: Second
+Module 1-26: First, Second
+
+Elements:
+First: group, Source, Artifact, Module, Tests attribute 08 - Computed group prefix.fs, 12: "First"
+First.Computed: group, Artifact, Module, 
+First.Computed.test: test, Artifact, Module, , 7: "test"
+Second: group, Source, Artifact, Module, Tests attribute 08 - Computed group prefix.fs, 18: "Second"
+Second.1: group, Artifact, Module, 
+Second.1.test: test, Artifact, Module, , 24: "test"
+Second.Named: group, Source, Artifact, Module, Tests attribute 08 - Computed group prefix.fs, 19: "Named"
+Second.Named.test: test, Source, Artifact, Module, Tests attribute 08 - Computed group prefix.fs, 20: "test"
