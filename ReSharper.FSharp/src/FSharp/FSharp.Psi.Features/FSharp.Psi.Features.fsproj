@@ -132,6 +132,12 @@
     <Compile Include="src\AICore\FSharpBackendSyntaxErrorChecker.fs" />
     <Compile Include="src\AICore\FSharpFileSummarizer.fs" />
     <Compile Include="src\AICore\FSharpLanguageOrTechnologyChatContextProvider.fs" />
+    <Compile Include="src\UnitTesting\ZoneMarker.fs" />
+    <Compile Include="src\UnitTesting\ExpectoTestDeclarationWalker.fs" />
+    <Compile Include="src\UnitTesting\ExpectoTestElement.fs" />
+    <Compile Include="src\UnitTesting\ExpectoTestRunner.fs" />
+    <Compile Include="src\UnitTesting\ExpectoTestProvider.fs" />
+    <Compile Include="src\UnitTesting\ExpectoTestExplorerFromFile.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
@@ -143,9 +149,11 @@
     <PackageReference Include="JetBrains.NuGet.Packaging" />
     <PackageReference Include="JetBrains.NuGet.Versioning" />
     <PackageReference Include="JetBrains.RdFramework" />
+    <PackageReference Include="JetBrains.ReSharper.TestRunner.Abstractions" />
   </ItemGroup>
   <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\FSharp.Expecto.Tasks\FSharp.Expecto.Tasks.csproj" />
     <ProjectReference Include="..\FSharp.Fantomas.Protocol\FSharp.Fantomas.Protocol.csproj" />
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\FSharp.Psi.Services\FSharp.Psi.Services.fsproj" />

@@ -1,0 +1,16 @@
+﻿Dispositions:
+"Generated" 7-10: Generated
+"Mapped" 14-14: Mapped
+"Interpolated" 18-20: Interpolated
+"outer" 24-26: outer
+generated 5-10: Generated
+mapped 12-14: Mapped
+interpolated 16-20: Interpolated
+nestedInTest 22-26: outer
+Module 1-26: Generated, Mapped, Interpolated, outer
+
+Elements:
+Generated: group, Source, Module, Tests attribute 03 - Computed tests.fs, 7: "Generated"
+Interpolated: group, Source, Module, Tests attribute 03 - Computed tests.fs, 18: "Interpolated"
+Mapped: group, Source, Module, Tests attribute 03 - Computed tests.fs, 14: "Mapped"
+outer: test, Source, Module, Tests attribute 03 - Computed tests.fs, 24: "outer"

@@ -1,0 +1,11 @@
+﻿Dispositions:
+"Concat" + "enated" 10-13: Concatenated
+"first" + " " + "test" 11-11: Concatenated.first test
+Prefix + "test" 12-12: Concatenated.prefix test
+tests 8-13: Concatenated
+Module 1-13: Concatenated
+
+Elements:
+Concatenated: group, Source, Module, Tests attribute 27 - Concatenated names.fs, 10: "Concat" + "enated"
+Concatenated.first test: test, Source, Module, Tests attribute 27 - Concatenated names.fs, 11: "first" + " " + "test"
+Concatenated.prefix test: test, Source, Module, Tests attribute 27 - Concatenated names.fs, 12: Prefix + "test"

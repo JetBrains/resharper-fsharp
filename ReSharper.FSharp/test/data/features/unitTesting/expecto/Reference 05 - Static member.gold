@@ -1,0 +1,11 @@
+﻿Dispositions:
+"Shared" 7-9: All.Shared
+"test" 8-8: All.Shared.test
+"All" 13-15: All
+allTests 11-15: All
+Module 1-15: All
+
+Elements:
+All: group, Source, Module, Reference 05 - Static member.fs, 13: "All"
+All.Shared: group, Source, Module, Reference 05 - Static member.fs, 7: "Shared"
+All.Shared.test: test, Source, Module, Reference 05 - Static member.fs, 8: "test"

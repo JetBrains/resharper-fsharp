@@ -1,0 +1,42 @@
+Before the build:
+module <UNIT_TEST_ELEMENT_CONTAINER>Tests
+
+open Expecto
+
+[<Tests>]
+let <UNIT_TEST_ELEMENT_CONTAINER>tests =
+    testList <UNIT_TEST_ELEMENT_CONTAINER>"All" [
+        testCase <UNIT_TEST_ELEMENT>"literal" <| fun _ -> ()
+
+        for n in 1 .. 2 ->
+            testCase $"case {n}" <| fun _ -> ()
+    ]
+
+After the build, no edit:
+module <UNIT_TEST_ELEMENT_CONTAINER>Tests
+
+open Expecto
+
+[<Tests>]
+let <UNIT_TEST_ELEMENT_CONTAINER>tests =
+    testList <UNIT_TEST_ELEMENT_CONTAINER>"All" [
+        testCase <UNIT_TEST_ELEMENT>"literal" <| fun _ -> ()
+
+        for n in 1 .. 2 ->
+            testCase <UNIT_TEST_ELEMENT_CONTAINER>$"case {n}" <| fun _ -> ()
+    ]
+
+After an edit:
+ module <UNIT_TEST_ELEMENT_CONTAINER>Tests
+
+open Expecto
+
+[<Tests>]
+let <UNIT_TEST_ELEMENT_CONTAINER>tests =
+    testList <UNIT_TEST_ELEMENT_CONTAINER>"All" [
+        testCase <UNIT_TEST_ELEMENT>"literal" <| fun _ -> ()
+
+        for n in 1 .. 2 ->
+            testCase <UNIT_TEST_ELEMENT_CONTAINER>$"case {n}" <| fun _ -> ()
+    ]
+

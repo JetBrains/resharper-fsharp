@@ -1,0 +1,10 @@
+﻿All: group, Artifact, Main, , Two files 01 - Main.fs 7: "All"
+All.Parser: group, Artifact, Main, , Two files 01 - Lists.fs 6: "Parser"
+All.Parser.numbers: test, Artifact, Main, Two files 01 - Lists.fs:7, Two files 01 - Lists.fs 7: "numbers"
+All.direct: test, Artifact, Main, Two files 01 - Main.fs:9, Two files 01 - Main.fs 9: "direct"
+
+After the edit:
+All: group, Artifact, Main, , Two files 01 - Main.fs 7: "All"
+All.Parser: group, Artifact, Main, , Two files 01 - Lists.fs 7: "Parser"
+All.Parser.numbers: test, Artifact, Main, Two files 01 - Lists.fs:7, Two files 01 - Lists.fs 8: "numbers"
+All.direct: test, Artifact, Main, Two files 01 - Main.fs:9, Two files 01 - Main.fs 9: "direct"

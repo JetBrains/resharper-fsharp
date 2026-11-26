@@ -1,0 +1,20 @@
+﻿Expecto: 11.1.1.0, supported: Yes
+
+Results:
+All.Nested.async: Ignored The test is skipped because other tests are Focused
+All.Parser.numbers: Ignored The test is skipped because other tests are Focused
+All.Parser.strings: Ignored The test is skipped because other tests are Focused
+All.fails: Ignored The test is skipped because other tests are Focused
+All.passes: Ignored The test is skipped because other tests are Focused
+All.pending: Ignored The test or one of its parents is marked as Pending
+All.theory.1: Ignored The test is skipped because other tests are Focused
+All.theory.2: Ignored The test is skipped because other tests are Focused
+All.throws: Ignored The test is skipped because other tests are Focused
+All.throws with inner: Ignored The test is skipped because other tests are Focused
+Dots.Api.V1: Ignored The test is skipped because other tests are Focused
+Dots.Api\.V1.get: Ignored The test is skipped because other tests are Focused
+Focused.focused: Success 
+Focused.other: Ignored The test is skipped because other tests are Focused
+Nested module.in nested module: Ignored The test is skipped because other tests are Focused
+Parallel.first: Ignored The test is skipped because other tests are Focused
+Parallel.second: Ignored The test is skipped because other tests are Focused

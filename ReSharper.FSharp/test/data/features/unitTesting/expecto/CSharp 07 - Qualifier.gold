@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 9-12: All
+"second" 11-11: All.second
+Tests 7-12: All
+Samples 5-13: All
+
+Elements:
+All: group, Source, Artifact, Samples, CSharp 07 - Qualifier.cs, 9: "All"
+All.second: test, Artifact, Samples, , 11: "second"

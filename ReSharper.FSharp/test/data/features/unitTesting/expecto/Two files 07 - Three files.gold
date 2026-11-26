@@ -1,0 +1,17 @@
+﻿Dispositions in Two files 07 - Inner.fs:
+"Inner" 6-8: All.Middle.Inner
+"test" 7-7: All.Middle.Inner.test
+
+Dispositions in Two files 07 - Main.fs:
+"All" 6-6: All
+tests 5-6: All
+Main 1-6: All
+
+Dispositions in Two files 07 - Middle.fs:
+"Middle" 5-5: All.Middle
+
+Elements:
+All: group, Source, Artifact, Main, Two files 07 - Main.fs, Two files 07 - Main.fs 6: "All"
+All.Middle: group, Artifact, Main, , Two files 07 - Middle.fs 5: "Middle"
+All.Middle.Inner: group, Artifact, Main, , Two files 07 - Inner.fs 6: "Inner"
+All.Middle.Inner.test: test, Artifact, Main, , Two files 07 - Inner.fs 7: "test"

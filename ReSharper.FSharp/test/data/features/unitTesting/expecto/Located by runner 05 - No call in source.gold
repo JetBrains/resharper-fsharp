@@ -1,0 +1,8 @@
+﻿Dispositions:
+"All" 8-8: All
+tests 7-8: All
+Module 1-8: All
+
+Elements:
+All: group, Source, Artifact, Module, Located by runner 05 - No call in source.fs, 8: "All"
+All.external: test, Artifact, Module, Located by runner 05 - No call in source.fs:5, 5: let createTests (): Test list = failwith "The tests come from another assembly"

@@ -1,0 +1,45 @@
+﻿Dispositions:
+"test" 5-5: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2.1.test
+"1" 6-6: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2.1
+"2" 7-7: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2
+"3" 8-8: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3
+"4" 9-9: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4
+"5" 10-10: All.18.17.16.15.14.13.12.11.10.9.8.7.6.5
+"6" 11-11: All.18.17.16.15.14.13.12.11.10.9.8.7.6
+"7" 12-12: All.18.17.16.15.14.13.12.11.10.9.8.7
+"8" 13-13: All.18.17.16.15.14.13.12.11.10.9.8
+"9" 14-14: All.18.17.16.15.14.13.12.11.10.9
+"10" 15-15: All.18.17.16.15.14.13.12.11.10
+"11" 16-16: All.18.17.16.15.14.13.12.11
+"12" 17-17: All.18.17.16.15.14.13.12
+"13" 18-18: All.18.17.16.15.14.13
+"14" 19-19: All.18.17.16.15.14
+"15" 20-20: All.18.17.16.15
+"16" 21-21: All.18.17.16
+"17" 22-22: All.18.17
+"18" 23-23: All.18
+"All" 26-26: All
+allTests 25-26: All
+Module 1-26: All
+
+Elements:
+All: group, Source, Module, Reference 04 - Repeated.fs, 26: "All"
+All.18: group, Source, Module, Reference 04 - Repeated.fs, 23: "18"
+All.18.17: group, Source, Module, Reference 04 - Repeated.fs, 22: "17"
+All.18.17.16: group, Source, Module, Reference 04 - Repeated.fs, 21: "16"
+All.18.17.16.15: group, Source, Module, Reference 04 - Repeated.fs, 20: "15"
+All.18.17.16.15.14: group, Source, Module, Reference 04 - Repeated.fs, 19: "14"
+All.18.17.16.15.14.13: group, Source, Module, Reference 04 - Repeated.fs, 18: "13"
+All.18.17.16.15.14.13.12: group, Source, Module, Reference 04 - Repeated.fs, 17: "12"
+All.18.17.16.15.14.13.12.11: group, Source, Module, Reference 04 - Repeated.fs, 16: "11"
+All.18.17.16.15.14.13.12.11.10: group, Source, Module, Reference 04 - Repeated.fs, 15: "10"
+All.18.17.16.15.14.13.12.11.10.9: group, Source, Module, Reference 04 - Repeated.fs, 14: "9"
+All.18.17.16.15.14.13.12.11.10.9.8: group, Source, Module, Reference 04 - Repeated.fs, 13: "8"
+All.18.17.16.15.14.13.12.11.10.9.8.7: group, Source, Module, Reference 04 - Repeated.fs, 12: "7"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6: group, Source, Module, Reference 04 - Repeated.fs, 11: "6"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5: group, Source, Module, Reference 04 - Repeated.fs, 10: "5"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4: group, Source, Module, Reference 04 - Repeated.fs, 9: "4"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3: group, Source, Module, Reference 04 - Repeated.fs, 8: "3"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2: group, Source, Module, Reference 04 - Repeated.fs, 7: "2"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2.1: group, Source, Module, Reference 04 - Repeated.fs, 6: "1"
+All.18.17.16.15.14.13.12.11.10.9.8.7.6.5.4.3.2.1.test: test, Source, Module, Reference 04 - Repeated.fs, 5: "test"

@@ -1,0 +1,10 @@
+﻿Dispositions:
+"Mapped" 7-8: Mapped
+testCase 8-8: Mapped.a, Mapped.b
+tests 5-8: Mapped
+Module 1-8: Mapped
+
+Elements:
+Mapped: group, Source, Artifact, Module, Located by runner 03 - Function value.fs, 7: "Mapped"
+Mapped.a: test, Artifact, Module, Located by runner 03 - Function value.fs:8, 8: testCase
+Mapped.b: test, Artifact, Module, Located by runner 03 - Function value.fs:8, 8: testCase

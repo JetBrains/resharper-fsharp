@@ -1,0 +1,25 @@
+﻿Expecto: 11.1.1.0, supported: Yes
+
+Results:
+All.Nested.async: Success 
+All.Parser.numbers: Success 
+All.Parser.strings: Success 
+All.fails: Failed numbers.
+  Stack trace: Tests.fs:line 25
+All.passes: Success 
+  Output: output of passes
+All.pending: Ignored The test or one of its parents is marked as Pending
+All.theory.1: Success 
+All.theory.2: Success 
+All.throws: Failed error
+  Stack trace: Tests.fs:line 30
+All.throws with inner: Failed outer
+  Stack trace: Tests.fs:line 42
+  Inner exception: inner
+Dots.Api.V1: Success 
+Dots.Api\.V1.get: Success 
+Nested module.in nested module: Success 
+Parallel.first: Success 
+  Output: output of first
+Parallel.second: Success 
+  Output: output of second

@@ -1,0 +1,14 @@
+﻿Dispositions:
+name 5-5: First.a
+"a" 6-6: Second.a
+"First" 9-9: First
+"Second" 12-12: Second
+first 8-9: First
+second 11-12: Second
+Module 1-12: First, Second
+
+Elements:
+First: group, Source, Artifact, Module, Reference 11 - Computed name and same literal name.fs, 9: "First"
+First.a: test, Artifact, Module, Reference 11 - Computed name and same literal name.fs:5, 5: name
+Second: group, Source, Module, Reference 11 - Computed name and same literal name.fs, 12: "Second"
+Second.a: test, Source, Module, Reference 11 - Computed name and same literal name.fs, 6: "a"

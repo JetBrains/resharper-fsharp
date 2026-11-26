@@ -1,0 +1,17 @@
+﻿Dispositions in Two files 08 - Lists.fs:
+"Parser" 6-8: All.Parser
+"numbers" 7-7: All.Parser.numbers
+
+Dispositions in Two files 08 - Lists.fsi:
+
+Dispositions in Two files 08 - Main.fs:
+"All" 7-10: All
+"direct" 9-9: All.direct
+tests 5-10: All
+Main 1-10: All
+
+Elements:
+All: group, Source, Artifact, Main, Two files 08 - Main.fs, Two files 08 - Main.fs 7: "All"
+All.Parser: group, Artifact, Main, , Two files 08 - Lists.fs 6: "Parser"
+All.Parser.numbers: test, Artifact, Main, , Two files 08 - Lists.fs 7: "numbers"
+All.direct: test, Source, Main, Two files 08 - Main.fs, Two files 08 - Main.fs 9: "direct"

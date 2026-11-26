@@ -1,0 +1,25 @@
+﻿Expecto: 11.1.1.0, supported: Yes
+All: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.Nested: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.Nested.async: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.Parser: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.Parser.numbers: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.Parser.strings: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.fails: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.passes: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.pending: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.theory: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.theory.1: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:38
+All.theory.2: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:38
+All.throws: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+All.throws with inner: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Dots: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Dots.Api: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Dots.Api.V1: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Dots.Api\.V1: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Dots.Api\.V1.get: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Nested module: group, Source, Artifact, ExpectoTestProject.Tests+NestedTests in ExpectoTestProject, Tests.fs
+Nested module.in nested module: test, Source, Artifact, ExpectoTestProject.Tests+NestedTests in ExpectoTestProject, Tests.fs
+Parallel: group, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Parallel.first: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs
+Parallel.second: test, Source, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs

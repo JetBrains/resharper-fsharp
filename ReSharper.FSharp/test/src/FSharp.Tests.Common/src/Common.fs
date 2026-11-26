@@ -14,6 +14,7 @@ open JetBrains.Diagnostics
 open JetBrains.HabitatDetector
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.DotNetCore
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Feature.Services.BulbActions.Commands
@@ -184,6 +185,24 @@ type FSharpTestAttribute(extension) =
         let solution = context.TestProject.GetSolution()
         let testAssemblyReaderShim = solution.GetComponent<ITestAssemblyReaderShim>()
         testAssemblyReaderShim.Dispose()
+
+type FSharpDotNetCoreTestAttribute() =
+    inherit FSharpTestAttribute()
+
+    interface ITestProjectPropertiesProvider with
+        member x.GetProjectProperties(_, targetFrameworkIds, _) =
+            FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds, DotNetCorePlatformInfo.Empty)
+
+type FSharpNetFramework46TestAttribute() =
+    inherit FSharpTestAttribute()
+
+    interface ITestPackagesProvider with
+        member this.GetPackages _ = Seq.empty
+        member this.Inherits = false
+
+    interface ITestTargetFrameworkIdProvider with
+        member x.GetTargetFrameworkId() = TargetFrameworkId.Create(FrameworkConstants.CommonFrameworks.Net46)
+        member this.Inherits = false
 
 type FSharpSignatureTestAttribute() =
     inherit FSharpTestAttribute(FSharpSignatureProjectFileType.FsiExtension)

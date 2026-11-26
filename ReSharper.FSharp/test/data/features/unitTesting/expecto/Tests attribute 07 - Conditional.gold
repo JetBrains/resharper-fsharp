@@ -1,0 +1,13 @@
+﻿Dispositions:
+"All" 7-18: All
+"always" 8-8: All.always
+"conditional" 11-11: All.conditional
+"many" 17-17: All.many
+tests 5-18: All
+Module 1-18: All
+
+Elements:
+All: group, Source, Artifact, Module, Tests attribute 07 - Conditional.fs, 7: "All"
+All.always: test, Source, Module, Tests attribute 07 - Conditional.fs, 8: "always"
+All.conditional: test, Artifact, Module, , 11: "conditional"
+All.many: test, Artifact, Module, , 17: "many"

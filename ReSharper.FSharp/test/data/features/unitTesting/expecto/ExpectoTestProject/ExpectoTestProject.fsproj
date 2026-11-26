@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+    <TargetFrameworks Condition="'$(JB_CustomProperty)' == 'Expecto10'">net8.0</TargetFrameworks>
+    <RollForward>Major</RollForward>
+    <DebugType>portable</DebugType>
+    <DebugType Condition="'$(JB_CustomProperty)' == 'NoSymbols'">none</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'DuplicateNames'">$(DefineConstants);DUPLICATE_NAMES</DefineConstants>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'DuplicateDotNames'">$(DefineConstants);DUPLICATE_DOT_NAMES</DefineConstants>
+    <ExpectoVersion>11.1.1</ExpectoVersion>
+    <ExpectoVersion Condition="'$(JB_CustomProperty)' == 'Expecto8'">8.13.2</ExpectoVersion>
+    <ExpectoVersion Condition="'$(JB_CustomProperty)' == 'Expecto9'">9.0.4</ExpectoVersion>
+    <ExpectoVersion Condition="'$(JB_CustomProperty)' == 'Expecto10'">10.2.3</ExpectoVersion>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'Expecto8'">$(DefineConstants);NO_TEST_THEORY</DefineConstants>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'Expecto9'">$(DefineConstants);NO_TEST_THEORY</DefineConstants>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'Focused'">$(DefineConstants);FOCUSED</DefineConstants>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'ThrowingRoot'">$(DefineConstants);THROWING_ROOT</DefineConstants>
+    <DefineConstants Condition="'$(JB_CustomProperty)' == 'SamePath'">$(DefineConstants);SAME_PATH</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Tests.fs" />
+    <Compile Include="ThrowingTests.fs" Condition="'$(JB_CustomProperty)' == 'ThrowingRoot'" />
+    <Compile Include="MissingDependencyTests.fs" Condition="'$(JB_CustomProperty)' == 'MissingDependency'" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Expecto" Version="$(ExpectoVersion)" />
+    <PackageReference Include="FsCheck" Version="2.16.6" ExcludeAssets="runtime" Condition="'$(JB_CustomProperty)' == 'MissingDependency'" />
+  </ItemGroup>
+
+  <Target Name="MakeSymbolsUnreadable" AfterTargets="Build" Condition="'$(JB_CustomProperty)' == 'UnreadableSymbols' and '$(TargetFramework)' != ''">
+    <WriteLinesToFile File="$(OutDir)$(AssemblyName).pdb" Lines="not a symbol file" Overwrite="true" />
+  </Target>
+</Project>

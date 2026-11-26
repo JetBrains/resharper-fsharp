@@ -1,0 +1,11 @@
+﻿Dispositions:
+"All" 7-12: All
+"H" 8-11: All.H
+tests 5-12: All
+Module 1-12: All
+
+Elements:
+All: group, Source, Artifact, Module, Tests attribute 17 - Renamed group with computed tests.fs, 7: "All"
+All.G.1: test, parent: All, Artifact, Module, Tests attribute 17 - Renamed group with computed tests.fs:10, 10: testCase (string i) <| fun _ -> ()
+All.G.2: test, parent: All, Artifact, Module, Tests attribute 17 - Renamed group with computed tests.fs:10, 10: testCase (string i) <| fun _ -> ()
+All.H: group, Source, Module, Tests attribute 17 - Renamed group with computed tests.fs, 8: "H"

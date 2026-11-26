@@ -1,0 +1,8 @@
+﻿Dispositions:
+"Parser" 6-8: All.Parser
+"async" 7-7: All.Parser.async
+
+Elements:
+All: group, Artifact, Module, 
+All.Parser: group, Artifact, Module, , 6: "Parser"
+All.Parser.async: test, Artifact, Module, , 7: "async"

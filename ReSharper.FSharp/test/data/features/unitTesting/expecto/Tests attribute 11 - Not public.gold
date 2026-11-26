@@ -1,0 +1,9 @@
+﻿Dispositions:
+"Public" 20-22: Public
+"public binding" 21-21: Public.public binding
+tests 18-22: Public
+Module 1-22: Public
+
+Elements:
+Public: group, Source, Module, Tests attribute 11 - Not public.fs, 20: "Public"
+Public.public binding: test, Source, Module, Tests attribute 11 - Not public.fs, 21: "public binding"

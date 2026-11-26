@@ -1,0 +1,27 @@
+﻿Dispositions:
+"All" 7-24: All
+"sync" 8-9: All.sync
+"builder" 11-13: All.builder
+"async" 15-15: All.async
+"Nested" 17-20: All.Nested
+"pending" 18-18: All.Nested.pending
+"focused" 19-19: All.Nested.focused
+"theory" 22-23: All.theory
+"focused root" 27-27: focused root
+"pending root" 30-30: pending root
+tests 5-24: All
+focused 26-27: focused root
+pending 29-30: pending root
+Module 1-30: All, focused root, pending root
+
+Elements:
+All: group, Source, Module, Tests attribute 01.fs, 7: "All"
+All.Nested: group, Source, Module, Tests attribute 01.fs, 17: "Nested"
+All.Nested.focused: test, Source, Module, Tests attribute 01.fs, 19: "focused"
+All.Nested.pending: test, Source, Module, Tests attribute 01.fs, 18: "pending"
+All.async: test, Source, Module, Tests attribute 01.fs, 15: "async"
+All.builder: test, Source, Module, Tests attribute 01.fs, 11: "builder"
+All.sync: test, Source, Module, Tests attribute 01.fs, 8: "sync"
+All.theory: group, Source, Module, Tests attribute 01.fs, 22: "theory"
+focused root: test, Source, Module, Tests attribute 01.fs, 27: "focused root"
+pending root: test, Source, Module, Tests attribute 01.fs, 30: "pending root"

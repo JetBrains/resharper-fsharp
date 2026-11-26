@@ -1,0 +1,9 @@
+﻿Dispositions:
+"All" 12-15: All
+"direct" 13-13: All.direct
+tests 10-15: All
+Module 1-15: All
+
+Elements:
+All: group, Source, Module, Tests attribute 15 - Removed reference.fs, 12: "All"
+All.direct: test, Source, Module, Tests attribute 15 - Removed reference.fs, 13: "direct"

@@ -1,0 +1,19 @@
+﻿Dispositions:
+"Wrapper" 5-5: All.Wrapper
+"All" 9-14: All
+"direct" 10-10: All.Wrapper.direct
+"piped" 11-11: All.Wrapper.piped
+"in option" 12-12: All.in option
+"to lambda" 13-13: All.Lambda.to lambda
+"Lambda" 13-13: All.Lambda
+tests 7-14: All
+Module 1-14: All
+
+Elements:
+All: group, Source, Artifact, Module, Reference 09 - Test as function argument.fs, 9: "All"
+All.Lambda: group, Artifact, Module, , 13: "Lambda"
+All.Lambda.to lambda: test, Artifact, Module, , 13: "to lambda"
+All.Wrapper: group, Source, Artifact, Module, Reference 09 - Test as function argument.fs, 5: "Wrapper"
+All.Wrapper.direct: test, Artifact, Module, , 10: "direct"
+All.Wrapper.piped: test, Artifact, Module, , 11: "piped"
+All.in option: test, Artifact, Module, , 12: "in option"

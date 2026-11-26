@@ -1,0 +1,28 @@
+﻿Dispositions:
+"Field" 9-14: Field
+"standard" 10-10: Field.standard
+"Nested" 11-13: Field.Nested
+"nested" 12-12: Field.Nested.nested
+"Property" 17-17: Property
+"in property" 17-17: Property.in property
+"in method" 22-22: Method.in method
+"Method" 23-23: Method
+"No attribute" 27-29: All.No attribute
+"discovered" 28-28: All.No attribute.discovered
+FieldTests 7-14: Field
+PropertyTests 16-17: Property
+MethodTests 19-24: Method
+Samples 5-30: Field, Property, Method
+
+Elements:
+All: group, Artifact, Samples, 
+All.No attribute: group, Artifact, Samples, , 27: "No attribute"
+All.No attribute.discovered: test, Artifact, Samples, , 28: "discovered"
+Field: group, Source, Samples, CSharp 01 - Explorer.cs, 9: "Field"
+Field.Nested: group, Source, Samples, CSharp 01 - Explorer.cs, 11: "Nested"
+Field.Nested.nested: test, Source, Samples, CSharp 01 - Explorer.cs, 12: "nested"
+Field.standard: test, Source, Samples, CSharp 01 - Explorer.cs, 10: "standard"
+Method: group, Source, Artifact, Samples, CSharp 01 - Explorer.cs, 23: "Method"
+Method.in method: test, Artifact, Samples, , 22: "in method"
+Property: group, Source, Samples, CSharp 01 - Explorer.cs, 17: "Property"
+Property.in property: test, Source, Samples, CSharp 01 - Explorer.cs, 17: "in property"

@@ -1,0 +1,11 @@
+﻿Dispositions:
+"Recursive" 6-9: All.Recursive
+"test" 7-7: All.Recursive.test
+"All" 13-15: All
+allTests 11-15: All
+Module 1-15: All
+
+Elements:
+All: group, Source, Module, Reference 02 - Recursive.fs, 13: "All"
+All.Recursive: group, Source, Module, Reference 02 - Recursive.fs, 6: "Recursive"
+All.Recursive.test: test, Source, Module, Reference 02 - Recursive.fs, 7: "test"

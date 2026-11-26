@@ -25,4 +25,10 @@
     <data name="FSharpRemoveCodeRedundancies_ActionName" xml:space="preserve">
         <value>Processing redundancies in F# code</value>
     </data>
+    <data name="ExpectoVsTestAdapterExclusion_Name" xml:space="preserve">
+        <value>Exclusion of the YoloDev Expecto adapter from VSTest</value>
+    </data>
+    <data name="ExpectoVersionNotSupported_Text" xml:space="preserve">
+        <value>Expecto 9.0 or later is required</value>
+    </data>
 </root>

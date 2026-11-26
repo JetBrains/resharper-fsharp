@@ -1,0 +1,12 @@
+﻿Dispositions:
+"All" 7-10: All
+"theory" 8-9: All.theory
+[1; 2] 8-9: All.theory.1, All.theory.2
+tests 5-10: All
+Module 1-10: All
+
+Elements:
+All: group, Source, Artifact, Module, Tests attribute 22 - Theory.fs, 7: "All"
+All.theory: group, Source, Artifact, Module, Tests attribute 22 - Theory.fs, 8: "theory"
+All.theory.1: test, Artifact, Module, Tests attribute 22 - Theory.fs:8, 8: [1; 2]
+All.theory.2: test, Artifact, Module, Tests attribute 22 - Theory.fs:8, 8: [1; 2]

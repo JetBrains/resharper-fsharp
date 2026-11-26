@@ -1,0 +1,22 @@
+﻿Expecto: 9.0.4.0, supported: Yes
+All: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+All.Nested: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+All.Nested.async: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+All.Parser: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+All.Parser.numbers: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:8
+All.Parser.strings: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:11
+All.fails: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:25
+All.passes: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:21
+All.pending: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:27
+All.throws: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:30
+All.throws with inner: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:42
+Dots: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+Dots.Api: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+Dots.Api.V1: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:110
+Dots.Api\.V1: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+Dots.Api\.V1.get: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:98
+Nested module: group, Artifact, ExpectoTestProject.Tests+NestedTests in ExpectoTestProject, 
+Nested module.in nested module: test, Artifact, ExpectoTestProject.Tests+NestedTests in ExpectoTestProject, Tests.fs:125
+Parallel: group, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, 
+Parallel.first: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:51
+Parallel.second: test, Artifact, ExpectoTestProject.Tests in ExpectoTestProject, Tests.fs:55

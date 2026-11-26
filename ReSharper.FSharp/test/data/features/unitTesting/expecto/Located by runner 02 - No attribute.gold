@@ -1,0 +1,14 @@
+﻿Dispositions:
+"Parser" 6-11: All.Parser
+string i 8-8: All.Parser.1, All.Parser.2
+"static" 10-10: All.Parser.static
+
+Elements:
+All: group, Artifact, Module, 
+All.Other: group, Artifact, Module, 
+All.Other.elsewhere: test, Artifact, Module, Other.fs:8
+All.Other.unplaced: test, Artifact, Module, Located by runner 02 - No attribute.fs:30
+All.Parser: group, Artifact, Module, , 6: "Parser"
+All.Parser.1: test, Artifact, Module, Located by runner 02 - No attribute.fs:8, 8: string i
+All.Parser.2: test, Artifact, Module, Located by runner 02 - No attribute.fs:8, 8: string i
+All.Parser.static: test, Artifact, Module, , 10: "static"

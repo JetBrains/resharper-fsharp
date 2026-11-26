@@ -1,0 +1,6 @@
+﻿All: group, Artifact, Samples, , 9: "All"
+All.first: test, Artifact, Samples, CSharp 13 - Places after an edit in a method.cs:10, 10: "first"
+
+After the edit:
+All: group, Artifact, Samples, , 10: "All"
+All.first: test, Artifact, Samples, CSharp 13 - Places after an edit in a method.cs:10, 11: "first"

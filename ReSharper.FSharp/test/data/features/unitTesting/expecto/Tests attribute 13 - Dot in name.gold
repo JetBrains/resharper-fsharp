@@ -1,0 +1,17 @@
+﻿Dispositions:
+"All" 7-17: All
+"Api.V1" 8-10: All.Api\.V1
+"get" 9-9: All.Api\.V1.get
+"Api" 12-16: All.Api
+"V1" 13-15: All.Api.V1
+"list" 14-14: All.Api.V1.list
+tests 5-17: All
+Module 1-17: All
+
+Elements:
+All: group, Source, Module, Tests attribute 13 - Dot in name.fs, 7: "All"
+All.Api: group, Source, Module, Tests attribute 13 - Dot in name.fs, 12: "Api"
+All.Api.V1: group, Source, Module, Tests attribute 13 - Dot in name.fs, 13: "V1"
+All.Api.V1.list: test, Source, Module, Tests attribute 13 - Dot in name.fs, 14: "list"
+All.Api\.V1: group, Source, Module, Tests attribute 13 - Dot in name.fs, 8: "Api.V1"
+All.Api\.V1.get: test, Source, Module, Tests attribute 13 - Dot in name.fs, 9: "get"

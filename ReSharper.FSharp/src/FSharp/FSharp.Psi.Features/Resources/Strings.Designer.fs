@@ -41,3 +41,5 @@ type public Strings() =
     static member FSharpReformatCode_Name_Reformat_FSharp = Strings.ResourceManager.GetString("FSharpReformatCode_Name_Reformat_FSharp")
     static member CodeCleanupTask_FSharpReformatCode = Strings.ResourceManager.GetString("CodeCleanupTask_FSharpReformatCode")
     static member FSharpRemoveCodeRedundancies_ActionName = Strings.ResourceManager.GetString("FSharpRemoveCodeRedundancies_ActionName")
+    static member ExpectoVsTestAdapterExclusion_Name = Strings.ResourceManager.GetString("ExpectoVsTestAdapterExclusion_Name")
+    static member ExpectoVersionNotSupported_Text = Strings.ResourceManager.GetString("ExpectoVersionNotSupported_Text")

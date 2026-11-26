@@ -1,0 +1,13 @@
+﻿Dispositions in CSharp 12 - Part 1.cs:
+"All" 8-10: All
+Tests 6-10: All
+Samples 4-11: All
+
+Dispositions in CSharp 12 - Part 2.cs:
+"Shared" 7-9: All.Shared
+"x" 8-8: All.Shared.x
+
+Elements:
+All: group, Source, Artifact, Samples, CSharp 12 - Part 1.cs, CSharp 12 - Part 1.cs 8: "All"
+All.Shared: group, Artifact, Samples, , CSharp 12 - Part 2.cs 7: "Shared"
+All.Shared.x: test, Artifact, Samples, , CSharp 12 - Part 2.cs 8: "x"

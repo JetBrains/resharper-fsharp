@@ -1,0 +1,16 @@
+﻿Dispositions in Two files 09 - Db.fs:
+"Db" 6-8: All.Db
+"query" 7-7: All.Db.query
+
+Dispositions in Two files 09 - Main.fs:
+"All" 7-10: All
+$"case {n}" 9-9: All.case 1, All.case 2
+all 5-10: All
+Main 1-10: All
+
+Elements:
+All: group, Source, Artifact, Main, Two files 09 - Main.fs, Two files 09 - Main.fs 7: "All"
+All.Db: group, Artifact, Main, , Two files 09 - Db.fs 6: "Db"
+All.Db.query: test, Artifact, Main, , Two files 09 - Db.fs 7: "query"
+All.case 1: test, Artifact, Main, Two files 09 - Main.fs:9, Two files 09 - Main.fs 9: $"case {n}"
+All.case 2: test, Artifact, Main, Two files 09 - Main.fs:9, Two files 09 - Main.fs 9: $"case {n}"

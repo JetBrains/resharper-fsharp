@@ -1,0 +1,18 @@
+﻿Dispositions:
+"Shared" 6-8: First.Shared, Second.Shared
+"x" 7-7: First.Shared.x, Second.Shared.x
+"First" 12-12: First
+"Second" 16-16: Second
+tests 11-12: First
+tests 15-16: Second
+First 10-12: First
+Module 1-16: First, Second
+Second 14-16: Second
+
+Elements:
+First: group, Source, Module+First, Reference 06 - Used in two modules.fs, 12: "First"
+First.Shared: group, Source, Module+First, Reference 06 - Used in two modules.fs, 6: "Shared"
+First.Shared.x: test, Source, Module+First, Reference 06 - Used in two modules.fs, 7: "x"
+Second: group, Source, Module+Second, Reference 06 - Used in two modules.fs, 16: "Second"
+Second.Shared: group, Source, Module+Second, Reference 06 - Used in two modules.fs, 6: "Shared"
+Second.Shared.x: test, Source, Module+Second, Reference 06 - Used in two modules.fs, 7: "x"

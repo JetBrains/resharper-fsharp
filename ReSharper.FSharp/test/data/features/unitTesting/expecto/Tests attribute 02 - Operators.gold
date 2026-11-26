@@ -1,0 +1,41 @@
+﻿Dispositions:
+"first" 7-7: Piped.first
+"second" 8-8: Piped.second
+"Piped" 7-9: Piped
+"Wrapped" 15-17: Wrapped
+"test" 16-16: Wrapped.test
+"Concatenated" 21-23: Concatenated
+"first" 22-22: Concatenated.first
+"second" 23-23: Concatenated.second
+"Consed" 27-28: Consed
+"first" 28-28: Consed.first
+"second" 28-28: Consed.second
+"Chained" 32-36: Chained
+"first" 33-33: Chained.first
+"second" 34-34: Chained.second
+"third" 35-35: Chained.third
+"fourth" 36-36: Chained.fourth
+piped 5-10: Piped
+wrapped 12-17: Wrapped
+concatenated 19-23: Concatenated
+consed 25-28: Consed
+chained 30-36: Chained
+Module 1-36: Piped, Wrapped, Concatenated, Consed, Chained
+
+Elements:
+Chained: group, Source, Module, Tests attribute 02 - Operators.fs, 32: "Chained"
+Chained.first: test, Source, Module, Tests attribute 02 - Operators.fs, 33: "first"
+Chained.fourth: test, Source, Module, Tests attribute 02 - Operators.fs, 36: "fourth"
+Chained.second: test, Source, Module, Tests attribute 02 - Operators.fs, 34: "second"
+Chained.third: test, Source, Module, Tests attribute 02 - Operators.fs, 35: "third"
+Concatenated: group, Source, Module, Tests attribute 02 - Operators.fs, 21: "Concatenated"
+Concatenated.first: test, Source, Module, Tests attribute 02 - Operators.fs, 22: "first"
+Concatenated.second: test, Source, Module, Tests attribute 02 - Operators.fs, 23: "second"
+Consed: group, Source, Module, Tests attribute 02 - Operators.fs, 27: "Consed"
+Consed.first: test, Source, Module, Tests attribute 02 - Operators.fs, 28: "first"
+Consed.second: test, Source, Module, Tests attribute 02 - Operators.fs, 28: "second"
+Piped: group, Source, Module, Tests attribute 02 - Operators.fs, 9: "Piped"
+Piped.first: test, Source, Module, Tests attribute 02 - Operators.fs, 7: "first"
+Piped.second: test, Source, Module, Tests attribute 02 - Operators.fs, 8: "second"
+Wrapped: group, Source, Module, Tests attribute 02 - Operators.fs, 15: "Wrapped"
+Wrapped.test: test, Source, Module, Tests attribute 02 - Operators.fs, 16: "test"
