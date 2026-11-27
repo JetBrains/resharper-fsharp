@@ -105,9 +105,14 @@
 
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" displayName="F# Interactive" />
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" displayName="F#" />
-    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" displayName="F#" groupWeight="-20"/>
+    <!--suppress PluginXmlI18n The page class uses the same fixed label. -->
+    <projectConfigurable id="RiderFSharpFileTemplatesSettings" parentId="FileTemplatesSettingsId"
+                         instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage"
+                         displayName="F#" groupWeight="-20"/>
 
-    <projectConfigurable parentId="Errors" instance="com.jetbrains.rider.settings.FSharpInspectionsPage" />
+    <!--suppress PluginXmlI18n The page class uses the same fixed label. -->
+    <projectConfigurable id="Inspections-F#" parentId="Errors"
+                         instance="com.jetbrains.rider.settings.FSharpInspectionsPage" displayName="F#" />
 
     <projectConfigurable groupId="inlay.hints" groupWeight="10" dynamic="true"
                          id="inlay.hints.FSharpInlayHintsConfigurableGroup"
